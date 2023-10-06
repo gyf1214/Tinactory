@@ -1,0 +1,183 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forgegradle_version}", changing: true
+    }
+}
+
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+}
+apply plugin: 'net.minecraftforge.gradle'
+// optional JarJar
+//jarJar.enable()
+
+group = 'org.shsts.tinactory'
+archivesBaseName = "tinactory-${minecraft_version}"
+version = "${mod_version}"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+println "Minecraft: ${minecraft_version}, Forge: ${forge_version}, ForgeGradle: ${forgegradle_version}"
+minecraft {
+    mappings channel: 'official', version: "${minecraft_version}"
+
+    runs {
+        client {
+            workingDirectory project.file('run/client')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            jvmArgs '-ea'
+
+            mods {
+                tinydevices {
+                    source sourceSets.main
+                }
+
+                tinydevices_test {
+                    source sourceSets.test
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run/server')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            jvmArgs '-ea'
+
+            mods {
+                tinydevices {
+                    source sourceSets.main
+                }
+
+                tinydevices_test {
+                    source sourceSets.test
+                }
+            }
+        }
+
+        data {
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            jvmArgs '-ea'
+
+            mods {
+                tinydevices {
+                    source sourceSets.main
+                }
+
+                tinydevices_test {
+                    source sourceSets.test
+                }
+            }
+        }
+
+        mainData {
+            parent minecraft.runs.data
+
+            workingDirectory project.file('run/mainData')
+            args '--mod', 'tinactory', '--all', '--output', file('src/main/generated/resources/')
+            args '--existing', file('src/main/resources/')
+        }
+
+        testData {
+            parent minecraft.runs.data
+
+            workingDirectory project.file('run/testData')
+            args '--mod', 'tinactory_test', '--all', '--output', file('src/test/generated/resources/')
+            args '--existing', file('src/test/resources/')
+            args '--existing', file('src/main/resources/')
+            args '--existing', file('src/main/generated/resources')
+        }
+    }
+}
+
+repositories {
+    maven {
+        // Location of the maven for Registrate
+        name 'tterrag maven'
+        url 'https://maven.tterrag.com'
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // optional Registrate
+//    jarJar(group: 'com.tterrag.registrate', name: 'Registrate', version: "[${registrate_version},)") {
+//        jarJar.pin(it, registrate_version)
+//    }
+//    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
+}
+
+sourceSets.main.resources {
+    srcDir 'src/main/generated/resources'
+    exclude '.cache/'
+}
+
+sourceSets.test.resources {
+    srcDir 'src/test/generated/resources'
+    exclude '.cache/'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+jar {
+//    if JarJar is enabled, the original jar is named slim
+//    classifier = 'slim'
+    manifest {
+        attributes([
+                "Specification-Title"     : "tinactory",
+                "Specification-Vendor"    : "shsts",
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.jar.baseName,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : "shsts",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+jar.finalizedBy('reobfJar')
+
+// optional API jar
+//task apiJar(type: Jar) {
+//    classifier = 'api'
+//    include "org/shsts/tinactory/api/**"
+//    from sourceSets.main.allSource
+//    from sourceSets.main.output
+//}
+//artifacts {
+//    archives apiJar
+//}
+
+// JarJar
+//reobf {
+//    jarJar {}
+//}
+//tasks.jarJar.classifier = ''
+//tasks.jarJar.finalizedBy('reobfJarJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+//            artifact tasks.jarJar
+//            artifact apiJar
+        }
+    }
+    repositories {
+        maven {
+            url project.hasProperty('urlMaven') ? urlMaven : "file://${projectDir}/../release"
+        }
+    }
+}

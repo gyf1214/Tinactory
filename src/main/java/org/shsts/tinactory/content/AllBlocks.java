@@ -1,0 +1,41 @@
+package org.shsts.tinactory.content;
+
+import net.minecraft.world.item.CreativeModeTab;
+import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.content.machine.MachineBlock;
+import org.shsts.tinactory.content.network.CableBlock;
+import org.shsts.tinactory.content.network.CableSetting;
+import org.shsts.tinactory.content.network.NetworkController;
+import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.RegistryEntry;
+
+public final class AllBlocks {
+    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
+
+    public static final RegistryEntry<CableBlock> NORMAL_CABLE;
+    public static final RegistryEntry<CableBlock> DENSE_CABLE;
+    public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
+
+    static {
+        REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
+        NORMAL_CABLE = REGISTRATE.block("network/cable/normal", CableBlock.factory(CableSetting.NORMAL))
+                .transform(ModelGen.cable())
+                .defaultBlockItem()
+                .register();
+        DENSE_CABLE = REGISTRATE.block("network/cable/dense", CableBlock.factory(CableSetting.DENSE))
+                .transform(ModelGen.cable())
+                .defaultBlockItem()
+                .register();
+
+        NETWORK_CONTROLLER = REGISTRATE.entityBlock("network/controller", MachineBlock<NetworkController>::new)
+                .type(() -> AllBlockEntity.NETWORK_CONTROLLER)
+                .transform(ModelGen.machine(
+                        ModelGen.vendorLoc("gregtech", "blocks/casings/voltage/mv"),
+                        ModelGen.vendorLoc("gregtech", "blocks/machines/alloy_smelter/overlay_front")))
+                .defaultBlockItem()
+                .register();
+    }
+
+    public static void init() {}
+}

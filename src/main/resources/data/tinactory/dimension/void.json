@@ -1,0 +1,13 @@
+{
+  "type": "tinactory:void",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "tinactory:void",
+      "lakes": false,
+      "features": false,
+      "layers": [],
+      "structure_overrides": []
+    }
+  }
+}
