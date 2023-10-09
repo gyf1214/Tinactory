@@ -6,5 +6,6 @@ import org.shsts.tinactory.core.Transformer;
 
 public interface IBlockParent {
     Material getDefaultMaterial();
+
     Transformer<BlockBehaviour.Properties> getDefaultBlockProperties();
 }

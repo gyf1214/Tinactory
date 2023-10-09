@@ -9,5 +9,6 @@ import javax.annotation.Nullable;
 public interface IItemParent {
     @Nullable
     CreativeModeTab getDefaultCreativeModeTab();
+
     Transformer<Item.Properties> getDefaultItemProperties();
 }

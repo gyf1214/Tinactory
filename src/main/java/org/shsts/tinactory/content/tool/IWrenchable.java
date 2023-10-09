@@ -11,5 +11,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public interface IWrenchable {
     boolean canWrenchWith(ItemStack item);
+
     void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool, Direction dir, boolean sneaky);
 }
