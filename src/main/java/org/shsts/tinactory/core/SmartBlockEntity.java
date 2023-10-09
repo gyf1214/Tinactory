@@ -31,23 +31,23 @@ public class SmartBlockEntity extends BlockEntity {
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
-        isChunkUnloaded = true;
+        this.isChunkUnloaded = true;
     }
 
     @Override
     public final void setRemoved() {
         super.setRemoved();
-        assert level != null;
-        if (!isChunkUnloaded) {
-            onRemovedInWorld(level);
+        assert this.level != null;
+        if (!this.isChunkUnloaded) {
+            onRemovedInWorld(this.level);
         } else {
-            onRemovedByChunk(level);
+            onRemovedByChunk(this.level);
         }
     }
 
     public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T be) {
         if (be instanceof SmartBlockEntity sbe) {
-            if (world.isClientSide()) {
+            if (world.isClientSide) {
                 sbe.onClientTick(world, pos, state);
             } else {
                 sbe.onServerTick(world, pos, state);
@@ -58,54 +58,54 @@ public class SmartBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        assert level != null;
-        onLoad(level);
+        assert this.level != null;
+        this.onLoad(this.level);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        serializeOnSave(tag);
+        this.serializeOnSave(tag);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        deserializeOnSave(tag);
+        this.deserializeOnSave(tag);
     }
 
     @Override
     public CompoundTag getUpdateTag() {
         var tag = new CompoundTag();
-        serializeOnUpdate(tag);
+        this.serializeOnUpdate(tag);
         return tag;
     }
 
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return shouldSendUpdate() ? ClientboundBlockEntityDataPacket.create(this) : null;
+        return this.shouldSendUpdate() ? ClientboundBlockEntityDataPacket.create(this) : null;
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
-        deserializeOnUpdate(tag);
+        this.deserializeOnUpdate(tag);
     }
 
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         var tag = pkt.getTag();
         if (tag != null) {
-            deserializeOnUpdate(tag);
+            this.deserializeOnUpdate(tag);
         }
     }
 
     protected void notifyUpdate() {
-        setChanged();
-        if (level != null && !level.isClientSide()) {
-            isUpdateForced = true;
-            var state = getBlockState();
-            level.sendBlockUpdated(worldPosition, state, state, 2);
+        this.setChanged();
+        if (this.level != null && !this.level.isClientSide) {
+            this.isUpdateForced = true;
+            var state = this.getBlockState();
+            this.level.sendBlockUpdated(this.worldPosition, state, state, 2);
         }
     }
 
@@ -139,18 +139,18 @@ public class SmartBlockEntity extends BlockEntity {
     protected void deserializeOnSave(CompoundTag tag) {}
 
     protected boolean shouldSendUpdate() {
-        if (isUpdateForced) {
-            isUpdateForced = false;
+        if (this.isUpdateForced) {
+            this.isUpdateForced = false;
             return true;
         }
         return false;
     }
 
     protected void serializeOnUpdate(CompoundTag tag) {
-        serializeOnSave(tag);
+        this.serializeOnSave(tag);
     }
 
     protected void deserializeOnUpdate(CompoundTag tag) {
-        deserializeOnSave(tag);
+        this.deserializeOnSave(tag);
     }
 }

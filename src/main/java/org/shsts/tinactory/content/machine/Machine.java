@@ -39,7 +39,7 @@ public class Machine extends SmartBlockEntity {
 
     @Override
     protected void onServerTick(Level world, BlockPos pos, BlockState state) {
-        if (ticks++ % 40 == 0) {
+        if (this.ticks++ % 40 == 0) {
             LOGGER.debug("tick {}", this);
         }
     }

@@ -7,7 +7,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,6 +22,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.content.tool.WrenchItem;
 import org.shsts.tinactory.network.IConnector;
+import org.shsts.tinactory.network.NetworkManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
@@ -133,15 +136,50 @@ public class CableBlock extends Block implements IWrenchable, IConnector {
         return true;
     }
 
+    protected void setConnected(Level world, BlockPos pos, BlockState state, Direction dir, boolean connected) {
+        var property = PROPERTY_BY_DIRECTION.get(dir);
+        var newState = state.setValue(property, connected);
+        world.setBlockAndUpdate(pos, newState);
+
+        if (!world.isClientSide) {
+            var manager = NetworkManager.getInstance(world);
+            manager.invalidatePos(pos);
+            manager.invalidatePos(pos.relative(dir));
+        }
+    }
+
     @Override
     public void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool, Direction dir, boolean sneaky) {
         var property = PROPERTY_BY_DIRECTION.get(dir);
-        var newState = state.setValue(property, !state.getValue(property));
-        world.setBlockAndUpdate(pos, newState);
+        this.setConnected(world, pos, state, dir, !state.getValue(property));
     }
 
     @Override
     public boolean isConnected(Level world, BlockPos pos, BlockState state, Direction dir) {
         return state.getValue(PROPERTY_BY_DIRECTION.get(dir));
+    }
+
+    protected void onDestroy(Level world, BlockPos pos, BlockState state) {
+        if (!world.isClientSide) {
+            var manager = NetworkManager.getInstance(world);
+            manager.invalidatePos(pos);
+            for (var entry : PROPERTY_BY_DIRECTION.entrySet()) {
+                if (state.getValue(entry.getValue())) {
+                    manager.invalidatePos(pos.relative(entry.getKey()));
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
+        super.onBlockExploded(state, world, pos, explosion);
+        this.onDestroy(world, pos, state);
+    }
+
+    @Override
+    public void destroy(LevelAccessor world, BlockPos pos, BlockState state) {
+        super.destroy(world, pos, state);
+        this.onDestroy((Level) world, pos, state);
     }
 }
