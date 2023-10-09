@@ -34,13 +34,4 @@ public class Machine extends SmartBlockEntity {
     protected void onRemovedByChunk(Level world) {
         LOGGER.debug("on remove by chunk unload {}", this);
     }
-
-    private int ticks = 0;
-
-    @Override
-    protected void onServerTick(Level world, BlockPos pos, BlockState state) {
-        if (this.ticks++ % 40 == 0) {
-            LOGGER.debug("tick {}", this);
-        }
-    }
 }

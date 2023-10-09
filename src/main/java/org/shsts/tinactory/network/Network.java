@@ -27,6 +27,10 @@ public class Network {
     protected final NetworkManager manager;
     protected final BlockPos center;
 
+    public BlockPos getCenter() {
+        return this.center;
+    }
+
     public enum State {
         CONNECTED,
         CONNECTING,
@@ -74,8 +78,7 @@ public class Network {
         }
 
         private boolean connected(BlockPos pos, BlockState blockState, Direction dir) {
-            return blockState.getBlock() instanceof IConnector connector &&
-                    connector.isConnected(world, pos, blockState, dir);
+            return IConnector.isConnectedInWorld(world, pos, blockState, dir);
         }
 
         public Optional<BlockPos> next() {
@@ -103,13 +106,15 @@ public class Network {
         }
     }
 
-    protected final BFSContext bfsContext = new BFSContext();
+    protected final BFSContext bfsContext;
 
     public Network(Level world, BlockPos center) {
         this.world = world;
         this.manager = NetworkManager.getInstance(world);
         this.center = center;
+        this.bfsContext = new BFSContext();
         this.reset();
+        this.manager.registerNetwork(this);
     }
 
     protected void reset() {
@@ -137,6 +142,7 @@ public class Network {
         this.ref = null;
         this.state = State.DESTROYED;
         this.bfsContext.reset();
+        this.manager.unregisterNetwork(this);
     }
 
     public Ref ref() {
@@ -163,20 +169,25 @@ public class Network {
     }
 
     protected boolean connectNextBlock() {
+        if (!this.manager.registerNetwork(this)) {
+            this.connectConflict(this.center);
+            return false;
+        }
         var nextPos = this.bfsContext.next();
         if (nextPos.isEmpty()) {
             this.connectFinish();
             return false;
         }
         var pos = nextPos.get();
-        if (this.manager.hasNetwork(pos)) {
-            this.connectConflict(pos);
-            return false;
-        } else {
-            this.manager.putNetwork(pos, this);
-            var state = this.bfsContext.visited.get(pos);
-            this.putBlock(pos, state);
+        if (pos != this.center) {
+            if (this.manager.hasNetworkAtPos(pos)) {
+                this.connectConflict(pos);
+                return false;
+            }
+            this.manager.putNetworkAtPos(pos, this);
         }
+        var state = this.bfsContext.visited.get(pos);
+        this.putBlock(pos, state);
         return true;
     }
 

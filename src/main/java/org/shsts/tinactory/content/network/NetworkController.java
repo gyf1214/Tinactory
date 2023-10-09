@@ -39,7 +39,6 @@ public class NetworkController extends Machine {
 
     @Override
     protected void onServerTick(Level world, BlockPos pos, BlockState state) {
-        super.onServerTick(world, pos, state);
         if (this.network != null) {
             this.network.tick();
         }

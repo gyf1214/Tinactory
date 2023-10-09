@@ -141,11 +141,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector {
         var newState = state.setValue(property, connected);
         world.setBlockAndUpdate(pos, newState);
 
-        if (!world.isClientSide) {
-            var manager = NetworkManager.getInstance(world);
-            manager.invalidatePos(pos);
-            manager.invalidatePos(pos.relative(dir));
-        }
+        NetworkManager.tryGetInstance(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
     }
 
     @Override
@@ -160,15 +156,14 @@ public class CableBlock extends Block implements IWrenchable, IConnector {
     }
 
     protected void onDestroy(Level world, BlockPos pos, BlockState state) {
-        if (!world.isClientSide) {
-            var manager = NetworkManager.getInstance(world);
+        NetworkManager.tryGetInstance(world).ifPresent(manager -> {
             manager.invalidatePos(pos);
             for (var entry : PROPERTY_BY_DIRECTION.entrySet()) {
                 if (state.getValue(entry.getValue())) {
-                    manager.invalidatePos(pos.relative(entry.getKey()));
+                    manager.invalidatePosDir(pos, entry.getKey());
                 }
             }
-        }
+        });
     }
 
     @Override
