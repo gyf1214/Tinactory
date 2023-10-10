@@ -42,13 +42,13 @@ public class CableBlock extends Block implements IWrenchable, IConnector {
 
     protected final Map<BlockState, VoxelShape> shapes;
 
-    public final CableSetting setting;
+    public final CableSetting cableSetting;
 
-    private CableBlock(Properties properties, CableSetting setting) {
+    private CableBlock(Properties properties, CableSetting cableSetting) {
         super(properties);
-        this.setting = setting;
+        this.cableSetting = cableSetting;
 
-        this.shapes = this.makeShapes(setting.radius);
+        this.shapes = this.makeShapes(cableSetting.radius);
 
         var defaultState = this.stateDefinition.any()
                 .setValue(NORTH, false)

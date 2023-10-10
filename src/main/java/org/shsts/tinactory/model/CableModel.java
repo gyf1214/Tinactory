@@ -118,7 +118,7 @@ public final class CableModel {
         var prov = ctx.provider;
         var models = prov.models();
         var multipart = prov.getMultipartBuilder(ctx.object);
-        var setting = ctx.object.setting;
+        var setting = ctx.object.cableSetting;
 
         for (var dir : Direction.values()) {
             var xRot = ModelGen.xRotation(dir);
@@ -139,7 +139,7 @@ public final class CableModel {
     }
 
     public static void itemModel(RegistryDataContext<Item, BlockItem, ItemModelProvider> ctx) {
-        var setting = ((CableBlock) ctx.object.getBlock()).setting;
+        var setting = ((CableBlock) ctx.object.getBlock()).cableSetting;
         ctx.provider.withExistingParent(ctx.id, ctx.modLoc(ITEM_MODEL.formatted(setting.asId())));
     }
 }
