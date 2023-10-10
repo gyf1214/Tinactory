@@ -32,7 +32,7 @@ public final class AllBlocks {
                 .type(() -> AllBlockEntity.NETWORK_CONTROLLER)
                 .transform(ModelGen.machine(
                         ModelGen.vendorLoc("gregtech", "blocks/casings/voltage/mv"),
-                        ModelGen.vendorLoc("gregtech", "blocks/machines/alloy_smelter/overlay_front")))
+                        ModelGen.vendorLoc("gregtech", "blocks/overlay/machine/overlay_screen")))
                 .defaultBlockItem()
                 .register();
     }
