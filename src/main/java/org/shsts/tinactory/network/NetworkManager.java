@@ -43,7 +43,7 @@ public class NetworkManager {
     }
 
     public boolean registerNetwork(Network network) {
-        var center = network.getCenter();
+        var center = network.center;
         if (this.networks.containsKey(center)) {
             return this.networks.get(center) == network;
         } else {
@@ -55,7 +55,7 @@ public class NetworkManager {
     }
 
     public void unregisterNetwork(Network network) {
-        var center = network.getCenter();
+        var center = network.center;
         this.networks.remove(center);
     }
 

@@ -6,7 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.network.Network;
+import org.shsts.tinactory.network.CompositeNetwork;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -15,7 +15,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class NetworkController extends Machine {
     @Nullable
-    private Network network;
+    private CompositeNetwork network;
 
     public NetworkController(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -27,7 +27,7 @@ public class NetworkController extends Machine {
         super.onLoad(world);
         if (!world.isClientSide) {
             assert this.network == null;
-            this.network = new Network(world, this.worldPosition);
+            this.network = new CompositeNetwork(world, this.worldPosition);
         }
     }
 

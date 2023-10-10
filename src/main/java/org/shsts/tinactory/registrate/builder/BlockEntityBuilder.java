@@ -50,12 +50,12 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
         return self();
     }
 
-    public final S ticking(boolean ticking) {
+    public S ticking(boolean ticking) {
         this.ticking = ticking;
         return self();
     }
 
-    public final S ticking() {
+    public S ticking() {
         return this.ticking(true);
     }
 

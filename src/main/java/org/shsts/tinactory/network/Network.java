@@ -24,12 +24,9 @@ public class Network {
     private static final int MAX_CONNECT_PER_TICK = 100;
 
     protected final Level world;
-    protected final NetworkManager manager;
-    protected final BlockPos center;
 
-    public BlockPos getCenter() {
-        return this.center;
-    }
+    public final NetworkManager manager;
+    public final BlockPos center;
 
     public enum State {
         CONNECTED,
@@ -63,6 +60,8 @@ public class Network {
     @Nullable
     protected Ref ref;
 
+    @MethodsReturnNonnullByDefault
+    @ParametersAreNonnullByDefault
     protected class BFSContext {
         private final Queue<BlockPos> queue = new ArrayDeque<>();
         public final Map<BlockPos, BlockState> visited = new HashMap<>();
@@ -117,6 +116,10 @@ public class Network {
         this.manager.registerNetwork(this);
     }
 
+    protected void onDisconnect() {
+        LOGGER.debug("network {}: disconnect", this);
+    }
+
     protected void reset() {
         this.ref = new Ref(this);
         this.state = State.CONNECTING;
@@ -125,17 +128,20 @@ public class Network {
     }
 
     public void invalidate() {
+        if (this.state == State.DESTROYED) {
+            return;
+        }
         LOGGER.debug("network {}: invalidated", this);
+        this.onDisconnect();
         if (this.ref != null) {
             this.ref.network = null;
         }
-        if (this.state != State.DESTROYED) {
-            this.reset();
-        }
+        this.reset();
     }
 
     public void destroy() {
         LOGGER.debug("network {}: destroyed", this);
+        this.onDisconnect();
         if (this.ref != null) {
             this.ref.network = null;
         }
@@ -165,7 +171,6 @@ public class Network {
 
     protected void putBlock(BlockPos pos, BlockState state) {
         LOGGER.debug("network {}: add block {} at {}:{}", this, state, this.world.dimension(), pos);
-        // TODO: add the block to network
     }
 
     protected boolean connectNextBlock() {
