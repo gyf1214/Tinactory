@@ -46,11 +46,17 @@ public class Machine extends SmartBlockEntity {
         }
     }
 
+    /**
+     * Called when connect to the network
+     */
     public void onConnectToNetwork(CompositeNetwork network) {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
     }
 
+    /**
+     * Called when disconnect from the network
+     */
     public void onDisconnectFromNetwork() {
         LOGGER.debug("machine {}: disconnect from network", this);
         this.network = null;

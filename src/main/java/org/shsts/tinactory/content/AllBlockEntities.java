@@ -6,7 +6,7 @@ import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
-public class AllBlockEntity {
+public class AllBlockEntities {
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
     public static final RegistryEntry<SmartBlockEntityType<NetworkController>> NETWORK_CONTROLLER;

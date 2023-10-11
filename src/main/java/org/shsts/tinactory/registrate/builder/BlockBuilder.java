@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent, S extends BlockBuilder<U, P, S>>
-        extends RegistryBuilder<Block, U, P, S> implements IItemParent {
+        extends RegistryEntryBuilder<Block, U, P, S> implements IItemParent {
     @Nullable
     protected Function<BlockBehaviour.Properties, U> factory = null;
     @Nullable

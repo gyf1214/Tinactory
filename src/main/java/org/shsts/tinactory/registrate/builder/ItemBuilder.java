@@ -17,7 +17,7 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBuilder<U, P, S>>
-        extends RegistryBuilder<Item, U, P, S> {
+        extends RegistryEntryBuilder<Item, U, P, S> {
     protected final Function<Item.Properties, U> factory;
     protected Transformer<Item.Properties> properties = $ -> $;
     @Nullable

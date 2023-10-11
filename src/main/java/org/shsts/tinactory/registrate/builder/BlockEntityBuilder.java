@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEntityBuilder<U, P, S>>
-        extends RegistryBuilder<BlockEntityType<?>, SmartBlockEntityType<U>, P, S> {
+        extends RegistryEntryBuilder<BlockEntityType<?>, SmartBlockEntityType<U>, P, S> {
     @MethodsReturnNonnullByDefault
     @ParametersAreNonnullByDefault
     @FunctionalInterface

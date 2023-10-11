@@ -29,7 +29,7 @@ public final class AllBlocks {
                 .register();
 
         NETWORK_CONTROLLER = REGISTRATE.entityBlock("network/controller", MachineBlock<NetworkController>::new)
-                .type(() -> AllBlockEntity.NETWORK_CONTROLLER)
+                .type(() -> AllBlockEntities.NETWORK_CONTROLLER)
                 .transform(ModelGen.machine(
                         ModelGen.vendorLoc("gregtech", "blocks/casings/voltage/mv"),
                         ModelGen.vendorLoc("gregtech", "blocks/overlay/machine/overlay_screen")))

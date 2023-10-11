@@ -28,10 +28,10 @@ public class RegistryEntry<U> implements Supplier<U> {
         this.supplier = null;
     }
 
-    public RegistryEntry(ResourceLocation loc, RegistryObject<U> registryObject) {
+    public RegistryEntry(ResourceLocation loc, Supplier<U> supplier) {
         this.modid = loc.getNamespace();
         this.id = loc.getPath();
-        this.supplier = registryObject;
+        this.supplier = supplier;
     }
 
     public static <T, U extends T> RegistryEntry<U>
@@ -48,6 +48,10 @@ public class RegistryEntry<U> implements Supplier<U> {
     public void setObject(U object) {
         this.object = object;
         this.supplier = null;
+    }
+
+    public void setSupplier(Supplier<U> supplier) {
+        this.supplier = supplier;
     }
 
     @Override

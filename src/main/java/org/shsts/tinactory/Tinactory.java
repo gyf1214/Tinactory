@@ -11,11 +11,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.shsts.tinactory.content.AllBlockEntity;
+import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllBlocks;
 import org.shsts.tinactory.content.AllItems;
-import org.shsts.tinactory.content.AllWorldGen;
+import org.shsts.tinactory.content.AllWorldGens;
+import org.shsts.tinactory.content.network.AllNetworkRegistries;
 import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.registrate.AllRegistries;
 import org.shsts.tinactory.registrate.Registrate;
 import org.slf4j.Logger;
 
@@ -40,11 +42,15 @@ public class Tinactory {
     }
 
     private static void onCreate(IEventBus modEventBus) {
+        AllRegistries.init();
+
         ModelGen.init();
         AllBlocks.init();
         AllItems.init();
-        AllBlockEntity.init();
-        AllWorldGen.init();
+        AllBlockEntities.init();
+
+        AllNetworkRegistries.init();
+        AllWorldGens.init();
 
         REGISTRATE.register(modEventBus);
         modEventBus.addListener(Tinactory::init);

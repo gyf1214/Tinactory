@@ -10,7 +10,7 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
 import org.shsts.tinactory.registrate.handler.DataHandler;
-import org.shsts.tinactory.registrate.handler.RegistryHandler;
+import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -21,26 +21,26 @@ import java.util.function.Consumer;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class RegistryBuilder<T extends IForgeRegistryEntry<T>, U extends T, P,
-        S extends RegistryBuilder<T, U, P, S>>
+public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U extends T, P,
+        S extends RegistryEntryBuilder<T, U, P, S>>
         extends Builder<U, P, S> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final RegistryHandler<T> handler;
+    protected final RegistryEntryHandler<T> handler;
     protected final List<Consumer<RegistryEntry<U>>> onCreateEntry = new ArrayList<>();
     @Nullable
     protected RegistryEntry<U> entry = null;
 
     public final String id;
 
-    protected RegistryBuilder(Registrate registrate, RegistryHandler<T> handler, String id, P parent) {
+    protected RegistryEntryBuilder(Registrate registrate, RegistryEntryHandler<T> handler, String id, P parent) {
         super(registrate, parent);
         this.handler = handler;
         this.id = id;
     }
 
     public void registerObject(IForgeRegistry<T> registry) {
-        LOGGER.debug("register object {} {}:{}", this.getClass(), this.registrate.modid, this.id);
+        LOGGER.debug("register object {} {}:{}", registry.getRegistryName(), this.registrate.modid, this.id);
         assert this.entry != null;
         var object = this.buildObject();
         object.setRegistryName(new ResourceLocation(this.registrate.modid, this.id));
@@ -62,7 +62,7 @@ public abstract class RegistryBuilder<T extends IForgeRegistryEntry<T>, U extend
     }
 
     public RegistryEntry<U> register() {
-        LOGGER.debug("create object entry {} {}:{}", this.getClass(), this.registrate.modid, this.id);
+        LOGGER.debug("create object entry {} {}:{}", this.handler.getEntryClass(), this.registrate.modid, this.id);
         this.entry = this.handler.register(this);
         for (var callback : this.onCreateEntry) {
             callback.accept(this.entry);
@@ -70,5 +70,11 @@ public abstract class RegistryBuilder<T extends IForgeRegistryEntry<T>, U extend
         // free reference
         onCreateEntry.clear();
         return this.entry;
+    }
+
+    @FunctionalInterface
+    public interface BuilderFactory<T1 extends IForgeRegistryEntry<T1>, P1,
+            B extends RegistryEntryBuilder<T1, ?, P1, B>> {
+        B create(Registrate registrate, RegistryEntryHandler<T1> handler, String id, P1 parent);
     }
 }
