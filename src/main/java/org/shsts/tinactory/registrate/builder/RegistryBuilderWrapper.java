@@ -3,6 +3,7 @@ package org.shsts.tinactory.registrate.builder;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -30,7 +31,7 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
     @Nullable
     protected SmartRegistry<T> entry = null;
 
-    public RegistryBuilderWrapper(Registrate registrate, P parent, String id, Class<T> entryClass) {
+    public RegistryBuilderWrapper(Registrate registrate, String id, Class<T> entryClass, P parent) {
         super(registrate, parent);
         this.id = id;
         this.entryClass = entryClass;
@@ -67,5 +68,9 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
         this.entry.setHandler(handler);
         this.registrate.putHandler(handler);
         return this.entry;
+    }
+
+    public RegistryBuilderWrapper<T, P> onBake(IForgeRegistry.BakeCallback<T> cb) {
+        return this.builder($ -> $.add(cb));
     }
 }

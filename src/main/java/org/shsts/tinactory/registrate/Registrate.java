@@ -150,7 +150,7 @@ public class Registrate implements IBlockParent, IItemParent {
 
     public <T extends IForgeRegistryEntry<T>>
     RegistryBuilderWrapper<T, Registrate> registry(String id, Class<T> clazz) {
-        return new RegistryBuilderWrapper<>(this, this, id, clazz);
+        return new RegistryBuilderWrapper<>(this, id, clazz, this);
     }
 
     public <T extends IForgeRegistryEntry<T>, B extends RegistryEntryBuilder<T, ?, Registrate, B>>
