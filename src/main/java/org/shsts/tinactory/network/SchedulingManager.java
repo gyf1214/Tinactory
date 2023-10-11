@@ -7,7 +7,7 @@ import net.minecraftforge.registries.RegistryManager;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 
@@ -21,7 +21,7 @@ public final class SchedulingManager {
     private static List<Scheduling> sortedSchedulings;
 
     public static void onBake(IForgeRegistry<Scheduling> registry, RegistryManager stage) {
-        var nodes = new IdentityHashMap<Scheduling, SortInfo>();
+        var nodes = new HashMap<Scheduling, SortInfo>();
         for (var scheduling : registry) {
             nodes.put(scheduling, new SortInfo());
         }

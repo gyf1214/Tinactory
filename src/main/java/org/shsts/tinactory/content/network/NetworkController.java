@@ -6,10 +6,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.network.Component;
 import org.shsts.tinactory.network.CompositeNetwork;
+import org.shsts.tinactory.network.Scheduling;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.BiConsumer;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -59,4 +62,7 @@ public class NetworkController extends Machine {
             this.network.destroy();
         }
     }
+
+    @Override
+    public void buildSchedulings(BiConsumer<Scheduling, Component.Ticker> cons) {}
 }

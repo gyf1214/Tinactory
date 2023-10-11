@@ -7,15 +7,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.core.SmartBlockEntity;
+import org.shsts.tinactory.network.Component;
 import org.shsts.tinactory.network.CompositeNetwork;
+import org.shsts.tinactory.network.Scheduling;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.BiConsumer;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Machine extends SmartBlockEntity {
+public abstract class Machine extends SmartBlockEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Nullable
@@ -53,6 +56,8 @@ public class Machine extends SmartBlockEntity {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
     }
+
+    public abstract void buildSchedulings(BiConsumer<Scheduling, Component.Ticker> cons);
 
     /**
      * Called when disconnect from the network

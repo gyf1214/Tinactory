@@ -36,7 +36,7 @@ public class Network {
     }
 
     protected State state;
-    protected int delayTicks;
+    private int delayTicks;
 
     @MethodsReturnNonnullByDefault
     @ParametersAreNonnullByDefault
@@ -197,8 +197,8 @@ public class Network {
     }
 
     protected void doConnect() {
-        if (delayTicks < CONNECT_DELAY) {
-            delayTicks++;
+        if (this.delayTicks < CONNECT_DELAY) {
+            this.delayTicks++;
             return;
         }
         for (var i = 0; i < MAX_CONNECT_PER_TICK; i++) {

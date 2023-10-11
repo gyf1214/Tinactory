@@ -1,9 +1,13 @@
 package org.shsts.tinactory.network;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class Component {
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.BiConsumer;
+
+public abstract class Component {
     public interface Factory<T extends Component> {
         T create(ComponentType<T> type, Network network);
     }
@@ -30,4 +34,12 @@ public class Component {
      * Called when network disconnects.
      */
     public void onDisconnect() {}
+
+    @FunctionalInterface
+    @ParametersAreNonnullByDefault
+    public interface Ticker {
+        void tick(Level world, Network network);
+    }
+
+    public abstract void buildSchedulings(BiConsumer<Scheduling, Ticker> cons);
 }
