@@ -13,8 +13,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, ?>, S extends BlockItemBuilder<U, P, S>>
         extends ItemBuilder<U, P, S> {
-    @MethodsReturnNonnullByDefault
-    @ParametersAreNonnullByDefault
+
     @FunctionalInterface
     public interface Factory<U1 extends BlockItem> {
         U1 create(Block block, Item.Properties properties);

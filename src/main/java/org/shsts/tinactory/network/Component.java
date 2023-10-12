@@ -4,8 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public abstract class Component {
     public interface Factory<T extends Component> {
@@ -35,11 +35,9 @@ public abstract class Component {
      */
     public void onDisconnect() {}
 
-    @FunctionalInterface
-    @ParametersAreNonnullByDefault
     public interface Ticker {
         void tick(Level world, Network network);
     }
 
-    public abstract void buildSchedulings(BiConsumer<Scheduling, Ticker> cons);
+    public abstract void buildSchedulings(BiConsumer<Supplier<Scheduling>, Ticker> cons);
 }

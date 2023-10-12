@@ -43,7 +43,8 @@ public class CompositeNetwork extends Network {
         this.invalidate();
         var component = type.create(this);
         this.components.put(type, component);
-        component.buildSchedulings(((scheduling, ticker) -> this.componentSchedulings.put(scheduling, type, ticker)));
+        component.buildSchedulings(((scheduling, ticker) ->
+                this.componentSchedulings.put(scheduling.get(), type, ticker)));
     }
 
     public void detachComponent(ComponentType<?> type) {
@@ -80,7 +81,8 @@ public class CompositeNetwork extends Network {
         super.connectFinish();
         this.forEachComponent(Component::onConnect);
         this.forEachMachine(machine -> machine.onConnectToNetwork(this));
-        this.forEachMachine(machine -> machine.buildSchedulings(this.machineSchedulings::put));
+        this.forEachMachine(machine -> machine.buildSchedulings((scheduling, ticker) ->
+                this.machineSchedulings.put(scheduling.get(), ticker)));
     }
 
     @Override

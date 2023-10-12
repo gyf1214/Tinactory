@@ -21,8 +21,7 @@ import java.util.stream.Collectors;
 @ParametersAreNonnullByDefault
 public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEntityBuilder<U, P, S>>
         extends RegistryEntryBuilder<BlockEntityType<?>, SmartBlockEntityType<U>, P, S> {
-    @MethodsReturnNonnullByDefault
-    @ParametersAreNonnullByDefault
+
     @FunctionalInterface
     public interface Factory<U1 extends SmartBlockEntity> {
         U1 create(BlockEntityType<U1> type, BlockPos pos, BlockState state);

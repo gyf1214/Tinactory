@@ -1,6 +1,5 @@
 package org.shsts.tinactory.registrate.builder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
@@ -10,7 +9,6 @@ import org.shsts.tinactory.registrate.IItemParent;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 public class EntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>,
@@ -18,8 +16,6 @@ public class EntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntit
         extends BlockBuilder<U, P, S> {
 
     @FunctionalInterface
-    @MethodsReturnNonnullByDefault
-    @ParametersAreNonnullByDefault
     public interface Factory<T1 extends SmartBlockEntity, U1 extends SmartEntityBlock<T1>> {
         U1 create(BlockBehaviour.Properties properties, Supplier<SmartBlockEntityType<T1>> entityType);
     }

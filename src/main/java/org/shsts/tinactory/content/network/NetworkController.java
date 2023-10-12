@@ -13,6 +13,7 @@ import org.shsts.tinactory.network.Scheduling;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -20,7 +21,7 @@ public class NetworkController extends Machine {
     @Nullable
     private CompositeNetwork network;
 
-    public NetworkController(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public NetworkController(BlockEntityType<NetworkController> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         this.network = null;
     }
@@ -64,5 +65,5 @@ public class NetworkController extends Machine {
     }
 
     @Override
-    public void buildSchedulings(BiConsumer<Scheduling, Component.Ticker> cons) {}
+    public void buildSchedulings(BiConsumer<Supplier<Scheduling>, Component.Ticker> cons) {}
 }

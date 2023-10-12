@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -57,7 +58,7 @@ public abstract class Machine extends SmartBlockEntity {
         this.network = network;
     }
 
-    public abstract void buildSchedulings(BiConsumer<Scheduling, Component.Ticker> cons);
+    public abstract void buildSchedulings(BiConsumer<Supplier<Scheduling>, Component.Ticker> cons);
 
     /**
      * Called when disconnect from the network

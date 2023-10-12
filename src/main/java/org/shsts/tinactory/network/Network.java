@@ -38,8 +38,6 @@ public class Network {
     protected State state;
     private int delayTicks;
 
-    @MethodsReturnNonnullByDefault
-    @ParametersAreNonnullByDefault
     public static class Ref {
         @Nullable
         private Network network;
@@ -60,8 +58,6 @@ public class Network {
     @Nullable
     protected Ref ref;
 
-    @MethodsReturnNonnullByDefault
-    @ParametersAreNonnullByDefault
     protected class BFSContext {
         private final Queue<BlockPos> queue = new ArrayDeque<>();
         public final Map<BlockPos, BlockState> visited = new HashMap<>();
