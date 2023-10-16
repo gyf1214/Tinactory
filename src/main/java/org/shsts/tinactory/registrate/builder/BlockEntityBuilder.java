@@ -5,14 +5,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -32,6 +35,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
     protected boolean ticking = false;
     @Nullable
     protected Class<U> entityClass = null;
+    protected final List<Supplier<CapabilityProviderType<U, ?>>> capabilities = new ArrayList<>();
 
     public BlockEntityBuilder(Registrate registrate, String id, P parent, Factory<U> factory) {
         super(registrate, registrate.blockEntityHandler, id, parent);
@@ -58,6 +62,11 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
         return this.ticking(true);
     }
 
+    public S capability(Supplier<CapabilityProviderType<U, ?>> cap) {
+        this.capabilities.add(cap);
+        return self();
+    }
+
     @Override
     public SmartBlockEntityType<U> buildObject() {
         var entry = this.entry;
@@ -67,6 +76,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
         assert entry != null;
         assert entityClass != null;
         return new SmartBlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state),
-                validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()), entityClass, ticking);
+                validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()),
+                entityClass, ticking, this.capabilities);
     }
 }

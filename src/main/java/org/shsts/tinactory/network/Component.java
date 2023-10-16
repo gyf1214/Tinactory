@@ -9,13 +9,13 @@ import java.util.function.Supplier;
 
 public abstract class Component {
     public interface Factory<T extends Component> {
-        T create(ComponentType<T> type, Network network);
+        T create(ComponentType<T> type, CompositeNetwork network);
     }
 
     protected final ComponentType<?> type;
-    protected final Network network;
+    protected final CompositeNetwork network;
 
-    public Component(ComponentType<?> type, Network network) {
+    public Component(ComponentType<?> type, CompositeNetwork network) {
         this.type = type;
         this.network = network;
     }

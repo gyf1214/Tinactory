@@ -28,10 +28,14 @@ public class RegistryEntry<U> implements Supplier<U> {
         this.supplier = null;
     }
 
-    public RegistryEntry(ResourceLocation loc, Supplier<U> supplier) {
-        this.modid = loc.getNamespace();
-        this.id = loc.getPath();
+    public RegistryEntry(String modid, String id, Supplier<U> supplier) {
+        this.modid = modid;
+        this.id = id;
         this.supplier = supplier;
+    }
+
+    public RegistryEntry(ResourceLocation loc, Supplier<U> supplier) {
+        this(loc.getNamespace(), loc.getPath(), supplier);
     }
 
     public static <T, U extends T> RegistryEntry<U>

@@ -4,16 +4,20 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartEntityBlock;
 import org.shsts.tinactory.core.Transformer;
@@ -26,6 +30,7 @@ import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
 import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.handler.BlockStateHandler;
+import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.ItemModelHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
@@ -37,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -49,6 +55,8 @@ public class Registrate implements IBlockParent, IItemParent {
             RegistryEntryHandler.forge(this, ForgeRegistries.ITEMS);
     public final RegistryEntryHandler<BlockEntityType<?>> blockEntityHandler =
             RegistryEntryHandler.forge(this, ForgeRegistries.BLOCK_ENTITIES);
+
+    public final CapabilityHandler capabilityHandler = new CapabilityHandler(this);
 
     public final BlockStateHandler blockStateHandler = new BlockStateHandler(this);
     public final ItemModelHandler itemModelHandler = new ItemModelHandler(this);
@@ -77,6 +85,7 @@ public class Registrate implements IBlockParent, IItemParent {
         for (var handler : this.registryEntryHandlers) {
             handler.addListener(modEventBus);
         }
+        modEventBus.addListener(this.capabilityHandler::onRegisterEvent);
         modEventBus.addListener(this::onGatherData);
     }
 
@@ -153,10 +162,45 @@ public class Registrate implements IBlockParent, IItemParent {
         return new RegistryBuilderWrapper<>(this, id, clazz, this);
     }
 
+    public <T extends IForgeRegistryEntry<T>>
+    SmartRegistry<T> simpleRegistry(String id, Class<T> clazz) {
+        return (new RegistryBuilderWrapper<>(this, id, clazz, this)).register();
+    }
+
     public <T extends IForgeRegistryEntry<T>, B extends RegistryEntryBuilder<T, ?, Registrate, B>>
     B registryEntry(String id, SmartRegistry<T> registry,
                     RegistryEntryBuilder.BuilderFactory<T, Registrate, B> builderFactory) {
         return builderFactory.create(this, registry.getHandler(), id, this);
+    }
+
+    private class SimpleRegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U extends T>
+            extends RegistryEntryBuilder<T, U, Registrate, SimpleRegistryEntryBuilder<T, U>> {
+        private final Supplier<U> factory;
+
+        public SimpleRegistryEntryBuilder(RegistryEntryHandler<T> handler, String id, Supplier<U> factory) {
+            super(Registrate.this, handler, id, Registrate.this);
+            this.factory = factory;
+        }
+
+        @Override
+        public U buildObject() {
+            return this.factory.get();
+        }
+    }
+
+    public <T extends IForgeRegistryEntry<T>, U extends T>
+    RegistryEntry<U> registryEntry(String id, SmartRegistry<T> registry, Supplier<U> factory) {
+        return (new SimpleRegistryEntryBuilder<>(registry.getHandler(), id, factory)).register();
+    }
+
+    public <T> RegistryEntry<Capability<T>> capability(Class<T> clazz) {
+        return this.capabilityHandler.register(clazz);
+    }
+
+    public <T extends BlockEntity, U extends ICapabilityProvider>
+    RegistryEntry<CapabilityProviderType<T, U>> capabilityProvider(String id, Function<T, U> factory) {
+        return this.registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY,
+                () -> new CapabilityProviderType<>(factory));
     }
 
     public SchedulingBuilder<Registrate> scheduling(String id) {

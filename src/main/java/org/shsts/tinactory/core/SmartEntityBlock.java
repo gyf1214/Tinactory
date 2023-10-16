@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class SmartEntityBlock<T extends SmartBlockEntity> extends Block implements EntityBlock {
+public class SmartEntityBlock<T extends BlockEntity> extends Block implements EntityBlock {
     protected final Supplier<SmartBlockEntityType<T>> entityType;
 
     protected SmartEntityBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType) {
