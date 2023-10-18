@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.logistics.IItemCollection;
 import org.shsts.tinactory.registrate.Registrate;
@@ -13,7 +14,7 @@ public final class AllCapabilities {
     public static final RegistryEntry<Capability<IItemCollection>> ITEM_COLLECTION;
 
     static {
-        ITEM_COLLECTION = REGISTRATE.capability(IItemCollection.class);
+        ITEM_COLLECTION = REGISTRATE.capability(IItemCollection.class, new CapabilityToken<>() {});
     }
 
     public static void init() {}

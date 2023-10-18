@@ -32,11 +32,10 @@ public class CapabilityHandler {
         this.capabilities.clear();
     }
 
-    public <T> RegistryEntry<Capability<T>> register(Class<T> clazz) {
+    public <T> RegistryEntry<Capability<T>> register(Class<T> clazz, CapabilityToken<T> token) {
         this.capabilities.add(clazz);
         // ignore id
-        return new RegistryEntry<>(this.registrate.modid, "",
-                () -> CapabilityManager.get(new CapabilityToken<>() {}));
+        return new RegistryEntry<>(this.registrate.modid, "", () -> CapabilityManager.get(token));
     }
 
     public void onAttachBlockEntity(AttachCapabilitiesEvent<BlockEntity> event) {

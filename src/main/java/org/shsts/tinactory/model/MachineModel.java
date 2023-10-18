@@ -85,12 +85,12 @@ public final class MachineModel {
     }
 
     private ModelFile genModel(String id, BlockModelProvider prov) {
-        return this.applyTextures(prov.withExistingParent(id, prov.modLoc(CASING_MODEL)));
+        return this.applyTextures(prov.withExistingParent(id, ModelGen.modLoc(CASING_MODEL)));
     }
 
     public void blockState(RegistryDataContext<Block, ? extends MachineBlock<?>, BlockStateProvider> ctx) {
         var casing = this.genModel(ctx.id, ctx.provider.models());
-        var io = ctx.provider.models().getExistingFile(ctx.modLoc(IO_MODEL));
+        var io = ctx.provider.models().getExistingFile(ModelGen.modLoc(IO_MODEL));
         var multipart = ctx.provider.getMultipartBuilder(ctx.object);
 
         for (var dir : Direction.values()) {

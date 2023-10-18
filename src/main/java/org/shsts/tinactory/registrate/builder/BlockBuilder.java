@@ -12,8 +12,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.fml.DistExecutor;
 import org.shsts.tinactory.core.Transformer;
+import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.IBlockParent;
 import org.shsts.tinactory.registrate.IItemParent;
 import org.shsts.tinactory.registrate.Registrate;
@@ -24,7 +24,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -36,7 +35,7 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
     protected Material material = null;
     protected Transformer<BlockBehaviour.Properties> properties = $ -> $;
     @Nullable
-    protected Supplier<Supplier<RenderType>> renderType = null;
+    protected DistLazy<RenderType> renderType = null;
 
     @Nullable
     protected Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockStateCallback = null;
@@ -63,7 +62,7 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
         return self();
     }
 
-    public S renderType(Supplier<Supplier<RenderType>> renderType) {
+    public S renderType(DistLazy<RenderType> renderType) {
         this.renderType = renderType;
         return self();
     }
@@ -90,15 +89,15 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
         this.itemModelCallback = null;
     }
 
-    private static class SimpleBlockItemBuilder<U1 extends BlockItem, S1 extends BlockBuilder<?, ?, S1>>
-            extends BlockItemBuilder<U1, S1, SimpleBlockItemBuilder<U1, S1>> {
-        public SimpleBlockItemBuilder(Registrate registrate, S1 parent, Factory<U1> factory) {
-            super(registrate, parent, factory);
+    private class SimpleBlockItemBuilder<U1 extends BlockItem>
+            extends BlockItemBuilder<U1, S, SimpleBlockItemBuilder<U1>> {
+        public SimpleBlockItemBuilder(Factory<U1> factory) {
+            super(BlockBuilder.this.registrate, BlockBuilder.this.self(), factory);
         }
     }
 
     public <U1 extends BlockItem> BlockItemBuilder<U1, S, ?> blockItem(BlockItemBuilder.Factory<U1> factory) {
-        return new SimpleBlockItemBuilder<>(this.registrate, self(), factory);
+        return new SimpleBlockItemBuilder<>(factory);
     }
 
     public BlockItemBuilder<BlockItem, S, ?> blockItem() {
@@ -132,9 +131,9 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
         var properties = this.properties.apply(
                 this.parent.getDefaultBlockProperties().apply(BlockBehaviour.Properties.of(material)));
         var block = this.buildBlock(properties);
-        if (renderType != null) {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                    this.registrate.renderTypeHandler.setRenderType(block, renderType.get().get()));
+        if (this.renderType != null) {
+            this.renderType.runOnDist(Dist.CLIENT, () -> renderType ->
+                    this.registrate.renderTypeHandler.setRenderType(block, renderType));
         }
         return block;
     }

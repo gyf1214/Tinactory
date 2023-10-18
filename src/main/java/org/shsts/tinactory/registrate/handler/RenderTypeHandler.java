@@ -3,11 +3,12 @@ package org.shsts.tinactory.registrate.handler;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 
+@ParametersAreNonnullByDefault
 public class RenderTypeHandler {
     private final Map<Block, RenderType> renderTypes = new HashMap<>();
 
@@ -15,7 +16,7 @@ public class RenderTypeHandler {
         renderTypes.put(block, renderType);
     }
 
-    public void onClientSetup(FMLClientSetupEvent event) {
+    public void onClientSetup() {
         for (var entry : renderTypes.entrySet()) {
             ItemBlockRenderTypes.setRenderLayer(entry.getKey(), entry.getValue());
         }

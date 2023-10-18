@@ -8,6 +8,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
+import org.shsts.tinactory.gui.ContainerMenu;
+import org.shsts.tinactory.gui.ContainerMenuType;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.Nullable;
@@ -36,6 +38,8 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
     @Nullable
     protected Class<U> entityClass = null;
     protected final List<Supplier<CapabilityProviderType<U, ?>>> capabilities = new ArrayList<>();
+    @Nullable
+    protected Supplier<ContainerMenuType<U, ?>> menu = null;
 
     public BlockEntityBuilder(Registrate registrate, String id, P parent, Factory<U> factory) {
         super(registrate, registrate.blockEntityHandler, id, parent);
@@ -62,6 +66,21 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
         return this.ticking(true);
     }
 
+    public void setMenu(Supplier<ContainerMenuType<U, ?>> menu) {
+        this.menu = menu;
+    }
+
+    private class SimpleMenuBuilder<M extends ContainerMenu<U>> extends MenuBuilder<U, M, S, SimpleMenuBuilder<M>> {
+        public SimpleMenuBuilder(String id, ContainerMenu.Factory<U, M> factory) {
+            super(BlockEntityBuilder.this.registrate, id, BlockEntityBuilder.this.self(), factory);
+        }
+    }
+
+    public <M extends ContainerMenu<U>> MenuBuilder<U, M, S, ?>
+    menu(ContainerMenu.Factory<U, M> factory) {
+        return new SimpleMenuBuilder<>(this.id, factory);
+    }
+
     public S capability(Supplier<CapabilityProviderType<U, ?>> cap) {
         this.capabilities.add(cap);
         return self();
@@ -73,10 +92,11 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
         var entityClass = this.entityClass;
         var ticking = this.ticking;
         var factory = this.factory;
+        var menu = this.menu;
         assert entry != null;
         assert entityClass != null;
         return new SmartBlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state),
                 validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()),
-                entityClass, ticking, this.capabilities);
+                entityClass, ticking, this.capabilities, menu);
     }
 }

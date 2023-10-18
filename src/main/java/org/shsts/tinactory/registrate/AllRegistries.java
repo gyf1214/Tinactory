@@ -16,12 +16,7 @@ public final class AllRegistries {
                 .onBake(SchedulingManager::onBake)
                 .register();
         CAPABILITY_PROVIDER_TYPE_REGISTRY = REGISTRATE.simpleRegistry("capability_provider_type",
-                cast(CapabilityProviderType.class));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> Class<T> cast(Class<?> clazz) {
-        return (Class<T>) clazz;
+                CapabilityProviderType.class);
     }
 
     public static void init() {}

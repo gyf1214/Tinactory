@@ -4,7 +4,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import org.shsts.tinactory.gui.ContainerMenuType;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Set;
@@ -15,15 +17,19 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
     public final Class<T> entityClass;
     public final boolean ticking;
     public final List<Supplier<CapabilityProviderType<T, ?>>> capabilities;
+    @Nullable
+    public final Supplier<ContainerMenuType<T, ?>> menu;
 
     @SuppressWarnings("ConstantConditions")
     public SmartBlockEntityType(BlockEntitySupplier<? extends T> factory, Set<Block> validBlocks,
                                 Class<T> entityClass, boolean ticking,
-                                List<Supplier<CapabilityProviderType<T, ?>>> capabilities) {
+                                List<Supplier<CapabilityProviderType<T, ?>>> capabilities,
+                                @Nullable Supplier<ContainerMenuType<T, ?>> menu) {
         super(factory, validBlocks, null);
         this.entityClass = entityClass;
         this.ticking = ticking;
         this.capabilities = capabilities;
+        this.menu = menu;
     }
 
     public T cast(BlockEntity be) {

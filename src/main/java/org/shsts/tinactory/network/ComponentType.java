@@ -11,7 +11,7 @@ public class ComponentType<T extends Component> extends ForgeRegistryEntry<Compo
         this.factory = factory;
     }
 
-    public T create(Network network) {
+    public T create(CompositeNetwork network) {
         return this.factory.create(this, network);
     }
 }

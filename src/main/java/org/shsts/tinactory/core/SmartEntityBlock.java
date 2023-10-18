@@ -2,6 +2,10 @@ package org.shsts.tinactory.core;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -9,7 +13,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -58,5 +64,26 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
     public <T1 extends BlockEntity> BlockEntityTicker<T1>
     getTicker(Level world, BlockState state, BlockEntityType<T1> type) {
         return type == this.getEntityType() && this.getEntityType().ticking ? SmartBlockEntity::ticker : null;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
+                                 InteractionHand hand, BlockHitResult hitResult) {
+        var menu = this.entityType.get().menu;
+        if (menu == null) {
+            return InteractionResult.PASS;
+        }
+        var be = getBlockEntity(world, pos);
+        if (be.isEmpty()) {
+            return InteractionResult.PASS;
+        }
+        if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {
+            var menuProvider = menu.get().getProvider(be.get());
+            NetworkHooks.openGui(serverPlayer, menuProvider, pos);
+            return InteractionResult.CONSUME;
+        } else {
+            return InteractionResult.SUCCESS;
+        }
     }
 }

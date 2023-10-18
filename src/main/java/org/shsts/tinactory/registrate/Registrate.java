@@ -1,6 +1,7 @@
 package org.shsts.tinactory.registrate;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -10,7 +11,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -32,6 +35,7 @@ import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.handler.BlockStateHandler;
 import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.ItemModelHandler;
+import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
@@ -55,12 +59,15 @@ public class Registrate implements IBlockParent, IItemParent {
             RegistryEntryHandler.forge(this, ForgeRegistries.ITEMS);
     public final RegistryEntryHandler<BlockEntityType<?>> blockEntityHandler =
             RegistryEntryHandler.forge(this, ForgeRegistries.BLOCK_ENTITIES);
+    public final RegistryEntryHandler<MenuType<?>> menuTypeHandler =
+            RegistryEntryHandler.forge(this, ForgeRegistries.CONTAINERS);
 
     public final CapabilityHandler capabilityHandler = new CapabilityHandler(this);
 
     public final BlockStateHandler blockStateHandler = new BlockStateHandler(this);
     public final ItemModelHandler itemModelHandler = new ItemModelHandler(this);
     public final RenderTypeHandler renderTypeHandler = new RenderTypeHandler();
+    public final MenuScreenHandler menuScreenHandler = new MenuScreenHandler();
 
     private final List<RegistryEntryHandler<?>> registryEntryHandlers = new ArrayList<>();
 
@@ -69,6 +76,7 @@ public class Registrate implements IBlockParent, IItemParent {
         this.putHandler(this.blockHandler);
         this.putHandler(this.itemHandler);
         this.putHandler(this.blockEntityHandler);
+        this.putHandler(this.menuTypeHandler);
     }
 
     public void putHandler(RegistryEntryHandler<?> handler) {
@@ -87,10 +95,12 @@ public class Registrate implements IBlockParent, IItemParent {
         }
         modEventBus.addListener(this.capabilityHandler::onRegisterEvent);
         modEventBus.addListener(this::onGatherData);
+        MinecraftForge.EVENT_BUS.addListener(this.capabilityHandler::onAttachBlockEntity);
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {
-        this.renderTypeHandler.onClientSetup(event);
+        event.enqueueWork(this.renderTypeHandler::onClientSetup);
+        event.enqueueWork(this.menuScreenHandler::onClientSetup);
     }
 
     public void registerClient(IEventBus modEventBus) {
@@ -162,9 +172,10 @@ public class Registrate implements IBlockParent, IItemParent {
         return new RegistryBuilderWrapper<>(this, id, clazz, this);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends IForgeRegistryEntry<T>>
-    SmartRegistry<T> simpleRegistry(String id, Class<T> clazz) {
-        return (new RegistryBuilderWrapper<>(this, id, clazz, this)).register();
+    SmartRegistry<T> simpleRegistry(String id, Class<?> clazz) {
+        return (new RegistryBuilderWrapper<>(this, id, (Class<T>) clazz, this)).register();
     }
 
     public <T extends IForgeRegistryEntry<T>, B extends RegistryEntryBuilder<T, ?, Registrate, B>>
@@ -193,8 +204,8 @@ public class Registrate implements IBlockParent, IItemParent {
         return (new SimpleRegistryEntryBuilder<>(registry.getHandler(), id, factory)).register();
     }
 
-    public <T> RegistryEntry<Capability<T>> capability(Class<T> clazz) {
-        return this.capabilityHandler.register(clazz);
+    public <T> RegistryEntry<Capability<T>> capability(Class<T> clazz, CapabilityToken<T> token) {
+        return this.capabilityHandler.register(clazz, token);
     }
 
     public <T extends BlockEntity, U extends ICapabilityProvider>
