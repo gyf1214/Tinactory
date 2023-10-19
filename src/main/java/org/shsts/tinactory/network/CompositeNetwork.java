@@ -91,6 +91,7 @@ public class CompositeNetwork extends Network {
         this.forEachMachine(Machine::onDisconnectFromNetwork);
         this.forEachComponent(Component::onDisconnect);
         this.machines.clear();
+        this.machineSchedulings.clear();
     }
 
 
