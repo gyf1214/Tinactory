@@ -2,17 +2,25 @@ package org.shsts.tinactory.test;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.network.AllSchedulings;
 import org.shsts.tinactory.network.Component;
 import org.shsts.tinactory.network.Network;
 import org.shsts.tinactory.network.Scheduling;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -25,19 +33,24 @@ public class PrimitiveStoneGenerator extends Machine {
     }
 
     private int workProgress = 0;
-    private ItemStack outputBuffer = ItemStack.EMPTY;
+    private final IItemHandler outputBuffer = new ItemStackHandler(1);
 
     private void onWorkTick(Level world, Network network) {
         if (this.workProgress >= 5 * 20) {
-            if (this.outputBuffer.isEmpty()) {
-                this.outputBuffer = new ItemStack(Items.COBBLESTONE, 1);
-            } else {
-                this.outputBuffer.setCount(this.outputBuffer.getCount() + 1);
-            }
+            this.outputBuffer.insertItem(0, new ItemStack(Items.COBBLESTONE, 1), false);
             this.workProgress = 0;
         } else {
             this.workProgress++;
         }
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return LazyOptional.of(() -> outputBuffer).cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     @Override

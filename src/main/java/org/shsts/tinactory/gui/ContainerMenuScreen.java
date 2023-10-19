@@ -24,7 +24,7 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
             ModelGen.vendorLoc("gregtech", "gui/base/slot"), ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE);
     public static final int SLOT_BG_Z_INDEX = 20;
 
-    protected final List<ContainerWidget.Factory> widgetsFactory = new ArrayList<>();
+    protected final List<ContainerWidget.Builder> widgetBuilders = new ArrayList<>();
 
     public ContainerMenuScreen(M menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -34,8 +34,8 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         this.imageHeight = menu.getHeight();
     }
 
-    public void addWidgetFactories(List<ContainerWidget.Factory> factories) {
-        this.widgetsFactory.addAll(factories);
+    public void addWidgetBuilders(List<ContainerWidget.Builder> factories) {
+        this.widgetBuilders.addAll(factories);
     }
 
     protected void addSlotWidget(Slot slot) {
@@ -50,8 +50,8 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         for (var slot : this.menu.slots) {
             this.addSlotWidget(slot);
         }
-        for (var factory : this.widgetsFactory) {
-            var widget = factory.factory().apply(factory.rect().offset(this.leftPos, this.topPos));
+        for (var builder : this.widgetBuilders) {
+            var widget = builder.factory().apply(builder.rect().offset(this.leftPos, this.topPos));
             this.renderables.add(widget);
         }
     }

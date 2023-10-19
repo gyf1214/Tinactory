@@ -17,10 +17,10 @@ import org.shsts.tinactory.gui.Rect;
 import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.Registrate;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -32,11 +32,13 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     protected final Supplier<SmartBlockEntityType<T>> blockEntityType;
     protected final ContainerMenu.Factory<T, M> factory;
     protected Function<T, Component> title = be -> new TextComponent(be.toString());
-    @Nullable
-    protected DistLazy<MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>>> screenFactory = null;
     protected final List<Rect> widgetsRect = new ArrayList<>();
-    protected final List<ContainerWidget.Factory> widgets = new ArrayList<>();
     protected boolean showInventory = true;
+    protected final List<Consumer<M>> menuCallbacks = new ArrayList<>();
+
+    protected DistLazy<MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>>>
+            screenFactory = () -> () -> ContainerMenuScreen::new;
+    protected final List<ContainerWidget.Builder> widgets = new ArrayList<>();
 
     public MenuBuilder(Registrate registrate, String id, P parent, ContainerMenu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
@@ -52,15 +54,26 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
+    public S menuCallback(Consumer<M> callback) {
+        this.menuCallbacks.add(callback);
+        return self();
+    }
+
     public S screen(DistLazy<MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>>> screen) {
         this.screenFactory = screen;
         return self();
     }
 
-    public S widget(Rect rect, Supplier<Function<Rect, ContainerWidget>> widgetFactory) {
+    public S widget(Rect rect, Supplier<Function<Rect, ContainerWidget>> factory) {
         this.widgetsRect.add(rect);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                this.widgets.add(new ContainerWidget.Factory(rect, widgetFactory.get())));
+                this.widgets.add(new ContainerWidget.Builder(rect, factory.get())));
+        return self();
+    }
+
+    public S slot(int slotIndex, int posX, int posY) {
+        this.menuCallbacks.add(menu -> menu.addSlot(slotIndex, posX, posY));
+        this.widgetsRect.add(new Rect(posX, posY, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE));
         return self();
     }
 
@@ -73,6 +86,9 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         var showInventory = this.showInventory;
         return (type, id, inventory, blockEntity) -> {
             var menu = this.factory.create(type, id, inventory, blockEntity);
+            for (var callback : this.menuCallbacks) {
+                callback.accept(menu);
+            }
             menu.setLayout(this.widgetsRect, showInventory);
             return menu;
         };
@@ -83,7 +99,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         var screenFactory = this.screenFactory.getValue();
         return (menu, inventory, title) -> {
             var screen = screenFactory.create(menu, inventory, title);
-            screen.addWidgetFactories(this.widgets);
+            screen.addWidgetBuilders(this.widgets);
             return screen;
         };
     }

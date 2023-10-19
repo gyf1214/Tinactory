@@ -50,7 +50,7 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
     }
 
     public <T1 extends BlockEntity> Optional<T1> getBlockEntity(Level world, BlockPos pos, Class<T1> clazz) {
-        return this.getEntityClass().isAssignableFrom(clazz) ?
+        return clazz.isAssignableFrom(this.getEntityClass()) ?
                 this.getBlockEntity(world, pos).map(clazz::cast) : Optional.empty();
     }
 

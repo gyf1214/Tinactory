@@ -1,5 +1,6 @@
 package org.shsts.tinactory.test;
 
+import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.shsts.tinactory.registrate.Registrate;
@@ -14,8 +15,9 @@ public class AllBlockEntities {
         PRIMITIVE_STONE_GENERATOR = REGISTRATE.blockEntity("primitive/stone_generator", PrimitiveStoneGenerator::new)
                 .entityClass(PrimitiveStoneGenerator.class)
                 .validBlock(AllBlocks.PRIMITIVE_STONE_GENERATOR)
-                .menu(ContainerMenu::new)
-                .screen(() -> () -> TestMenuScreen::new)
+                .menu()
+                .title($ -> new TextComponent("Stone Generator"))
+                .slot(0, ContainerMenu.SLOT_SIZE * 4, 0)
                 .build()
                 .register();
     }

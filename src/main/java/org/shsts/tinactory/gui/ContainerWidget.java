@@ -25,5 +25,5 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
     @Override
     public abstract void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick);
 
-    public record Factory(Rect rect, Function<Rect, ContainerWidget> factory) {}
+    public record Builder(Rect rect, Function<Rect, ContainerWidget> factory) {}
 }
