@@ -95,7 +95,7 @@ public class Registrate implements IBlockParent, IItemParent {
         }
         modEventBus.addListener(this.capabilityHandler::onRegisterEvent);
         modEventBus.addListener(this::onGatherData);
-        MinecraftForge.EVENT_BUS.addListener(this.capabilityHandler::onAttachBlockEntity);
+        MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this.capabilityHandler::onAttachBlockEntity);
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {
