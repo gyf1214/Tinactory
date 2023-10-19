@@ -21,6 +21,10 @@ public final class MathUtil {
         return Math.abs(sth) <= threshold ? 0 : (sth > threshold ? 1 : -1);
     }
 
+    public static double clamp(double x, double min, double max) {
+        return Math.max(Math.min(x, max), min);
+    }
+
     public static Vector3f mulVecf(Vector3f x, float k) {
         x = x.copy();
         x.mul(k);

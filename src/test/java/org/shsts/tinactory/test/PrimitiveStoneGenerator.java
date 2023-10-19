@@ -19,6 +19,7 @@ import org.shsts.tinactory.content.network.AllSchedulings;
 import org.shsts.tinactory.network.Component;
 import org.shsts.tinactory.network.Network;
 import org.shsts.tinactory.network.Scheduling;
+import org.shsts.tinactory.util.MathUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,6 +29,8 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class PrimitiveStoneGenerator extends Machine {
+    private static final int WORK_TICKS = 5 * 20;
+
     public PrimitiveStoneGenerator(BlockEntityType<PrimitiveStoneGenerator> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -36,12 +39,16 @@ public class PrimitiveStoneGenerator extends Machine {
     private final IItemHandler outputBuffer = new ItemStackHandler(1);
 
     private void onWorkTick(Level world, Network network) {
-        if (this.workProgress >= 5 * 20) {
+        if (this.workProgress >= WORK_TICKS) {
             this.outputBuffer.insertItem(0, new ItemStack(Items.COBBLESTONE, 1), false);
             this.workProgress = 0;
         } else {
             this.workProgress++;
         }
+    }
+
+    public double getProgress() {
+        return MathUtil.clamp((double) this.workProgress / (double) WORK_TICKS, 0, 1);
     }
 
     @Nonnull

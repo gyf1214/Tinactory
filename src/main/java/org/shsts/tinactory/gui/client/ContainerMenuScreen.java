@@ -1,4 +1,4 @@
-package org.shsts.tinactory.gui;
+package org.shsts.tinactory.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -7,7 +7,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.gui.ContainerMenu;
+import org.shsts.tinactory.gui.Rect;
+import org.shsts.tinactory.gui.Texture;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -17,14 +19,8 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractContainerScreen<M> {
     public static final int TEXT_COLOR = 4210752;
-    public static final Texture BACKGROUND = new Texture(
-            ModelGen.vendorLoc("gregtech", "gui/base/background"), ContainerMenu.WIDTH, 166);
-    public static final int BG_Z_INDEX = 0;
-    public static final Texture SLOT_BACKGROUND = new Texture(
-            ModelGen.vendorLoc("gregtech", "gui/base/slot"), ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE);
-    public static final int SLOT_BG_Z_INDEX = 20;
 
-    protected final List<ContainerWidget.Builder> widgetBuilders = new ArrayList<>();
+    protected final List<ContainerWidget.Builder<M>> widgetBuilders = new ArrayList<>();
 
     public ContainerMenuScreen(M menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -34,14 +30,14 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         this.imageHeight = menu.getHeight();
     }
 
-    public void addWidgetBuilders(List<ContainerWidget.Builder> factories) {
-        this.widgetBuilders.addAll(factories);
+    public void addWidgetBuilder(ContainerWidget.Builder<M> factory) {
+        this.widgetBuilders.add(factory);
     }
 
     protected void addSlotWidget(Slot slot) {
         var x = slot.x + this.leftPos - 1;
         var y = slot.y + this.topPos - 1;
-        this.renderables.add(new StaticWidget(SLOT_BACKGROUND, SLOT_BG_Z_INDEX, x, y));
+        this.renderables.add(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND, 20, x, y));
     }
 
     @Override
@@ -51,7 +47,8 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
             this.addSlotWidget(slot);
         }
         for (var builder : this.widgetBuilders) {
-            var widget = builder.factory().apply(builder.rect().offset(this.leftPos, this.topPos));
+            var widget = builder.factory().apply(this.menu, builder.rect().offset(
+                    ContainerMenu.MARGIN_HORIZONTAL + this.leftPos, ContainerMenu.MARGIN_TOP + this.topPos));
             this.renderables.add(widget);
         }
     }
@@ -70,10 +67,10 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         var w = ContainerMenu.WIDTH;
         var h1 = ContainerMenu.MARGIN_VERTICAL;
         var h2 = this.imageHeight - 2 * h1;
-        var h3 = BACKGROUND.height() - 2 * h1;
-        RenderUtil.blit(poseStack, BACKGROUND, BG_Z_INDEX, new Rect(x, y, w, h1));
-        RenderUtil.blit(poseStack, BACKGROUND, BG_Z_INDEX, new Rect(x, y + h1, w, h2), new Rect(0, h1, w, h3));
-        RenderUtil.blit(poseStack, BACKGROUND, BG_Z_INDEX, new Rect(x, y + h1 + h2, w, h1), 0, h1 + h3);
+        var h3 = Texture.BACKGROUND.height() - 2 * h1;
+        RenderUtil.blit(poseStack, Texture.BACKGROUND, 0, new Rect(x, y, w, h1));
+        RenderUtil.blit(poseStack, Texture.BACKGROUND, 0, new Rect(x, y + h1, w, h2), new Rect(0, h1, w, h3));
+        RenderUtil.blit(poseStack, Texture.BACKGROUND, 0, new Rect(x, y + h1 + h2, w, h1), 0, h1 + h3);
     }
 
     @Override

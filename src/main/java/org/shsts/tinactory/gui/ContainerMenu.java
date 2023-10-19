@@ -1,5 +1,6 @@
 package org.shsts.tinactory.gui;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -9,9 +10,11 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu {
     public static final int WIDTH = 176;
     public static final int SLOT_SIZE = 18;
@@ -22,16 +25,20 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     public static final int MARGIN_VERTICAL = 3 + SPACING_VERTICAL;
     public static final int MARGIN_TOP = MARGIN_VERTICAL + FONT_HEIGHT + SPACING_VERTICAL;
 
-    protected final Player player;
-    protected final Inventory inventory;
-    protected final T blockEntity;
+    public final boolean isClientSide;
+    public final T blockEntity;
+    public final Player player;
+    public final Inventory inventory;
     protected int height;
+    protected final List<ContainerSyncData<?, ContainerMenu<T>>> syncData = new ArrayList<>();
 
     public ContainerMenu(ContainerMenuType<T, ?> type, int id, Inventory inventory, T blockEntity) {
         super(type, id);
         this.player = inventory.player;
         this.inventory = inventory;
         this.blockEntity = blockEntity;
+        assert blockEntity.getLevel() != null;
+        this.isClientSide = blockEntity.getLevel().isClientSide;
     }
 
     @Override
@@ -82,6 +89,20 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
                 .orElseThrow(NullPointerException::new);
         this.addSlot(new SlotItemHandler(itemHandler, slotIndex,
                 posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
+    }
+
+    public <U> int addSyncData(ContainerSyncData<U, ContainerMenu<T>> syncData) {
+        this.syncData.add(syncData);
+        this.addDataSlots(syncData);
+        return this.syncData.size() - 1;
+    }
+
+    public <U> U getSyncData(int index, Class<U> clazz) {
+        return clazz.cast(this.syncData.get(index).value);
+    }
+
+    public short getSimpleData(int index) {
+        return this.getSyncData(index, Short.class);
     }
 
     public interface Factory<T1 extends BlockEntity, M1 extends ContainerMenu<T1>> {

@@ -15,4 +15,8 @@ public record Rect(int x, int y, int width, int height) {
     public Rect offset(int dx, int dy) {
         return new Rect(x + dx, y + dy, width, height);
     }
+
+    public Rect resize(int newW, int newH) {
+        return new Rect(x, y, newW, newH);
+    }
 }
