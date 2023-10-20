@@ -29,5 +29,6 @@ public class MenuScreenHandler {
         for (var entry : this.entries) {
             entry.register();
         }
+        this.entries.clear();
     }
 }

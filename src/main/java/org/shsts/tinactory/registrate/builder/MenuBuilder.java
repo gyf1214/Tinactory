@@ -124,12 +124,15 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
 
     protected ContainerMenu.Factory<T, M> getFactory() {
         var showInventory = this.showInventory;
+        var menuCallbacks = this.menuCallbacks;
+        var widgetsRect = this.widgetsRect;
+        var factory = this.factory;
         return (type, id, inventory, blockEntity) -> {
-            var menu = this.factory.create(type, id, inventory, blockEntity);
-            for (var callback : this.menuCallbacks) {
+            var menu = factory.create(type, id, inventory, blockEntity);
+            for (var callback : menuCallbacks) {
                 callback.resolve(menu);
             }
-            menu.setLayout(this.widgetsRect, showInventory);
+            menu.setLayout(widgetsRect, showInventory);
             return menu;
         };
     }
@@ -137,9 +140,10 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     protected MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>> getScreenFactory() {
         assert this.screenFactory != null;
         var screenFactory = this.screenFactory.getValue();
+        var widgets = this.widgets;
         return (menu, inventory, title) -> {
             var screen = screenFactory.create(menu, inventory, title);
-            for (var widget : this.widgets) {
+            for (var widget : widgets) {
                 screen.addWidgetBuilder(widget.get());
             }
             return screen;
