@@ -31,7 +31,7 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
     }
 
     public <U extends T> RegistryEntry<U> getEntry(String id) {
-        return this.getEntry(new ResourceLocation(this.registrate.modid, id));
+        return this.getEntry(new ResourceLocation(id));
     }
 
     public abstract <U extends T> RegistryEntry<U> getEntry(ResourceLocation loc);

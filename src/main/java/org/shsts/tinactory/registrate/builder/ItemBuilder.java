@@ -61,7 +61,7 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
     }
 
     @Override
-    public RegistryEntry<U> register() {
+    protected RegistryEntry<U> createEntry() {
         if (this.modelCallback != null) {
             this.addDataCallback(this.registrate.itemModelHandler, this.modelCallback);
         }
@@ -70,11 +70,11 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
             this.onCreateObject.add(item -> tint.runOnDist(Dist.CLIENT, () -> itemColor ->
                     this.registrate.tintHandler.addItemColor(item, itemColor)));
         }
-        return super.register();
+        return super.createEntry();
     }
 
     @Override
-    public U buildObject() {
+    public U createObject() {
         var defaultTab = this.parent.getDefaultCreativeModeTab();
         var properties = new Item.Properties();
         if (defaultTab != null) {

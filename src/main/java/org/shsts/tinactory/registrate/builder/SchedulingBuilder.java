@@ -33,7 +33,7 @@ public class SchedulingBuilder<P> extends RegistryEntryBuilder<Scheduling, Sched
     }
 
     @Override
-    public Scheduling buildObject() {
+    public Scheduling createObject() {
         return new Scheduling(this.befores.stream().map(Supplier::get).toList(),
                 this.afters.stream().map(Supplier::get).toList());
     }

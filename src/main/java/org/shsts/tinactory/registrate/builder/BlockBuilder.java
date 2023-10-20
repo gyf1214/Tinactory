@@ -134,7 +134,7 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
     }
 
     @Override
-    public RegistryEntry<U> register() {
+    protected RegistryEntry<U> createEntry() {
         if (this.blockStateCallback != null) {
             this.addDataCallback(this.registrate.blockStateHandler, this.blockStateCallback);
         }
@@ -143,11 +143,11 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
             this.onCreateObject.add(block -> tint.runOnDist(Dist.CLIENT, () -> blockColor ->
                     this.registrate.tintHandler.addBlockColor(block, blockColor)));
         }
-        return super.register();
+        return super.createEntry();
     }
 
     @Override
-    public U buildObject() {
+    public U createObject() {
         var material = this.material == null ? this.parent.getDefaultMaterial() : this.material;
         var properties = this.properties.apply(
                 this.parent.getDefaultBlockProperties().apply(BlockBehaviour.Properties.of(material)));

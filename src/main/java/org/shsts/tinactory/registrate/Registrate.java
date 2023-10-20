@@ -5,6 +5,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -24,11 +25,13 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartEntityBlock;
+import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.core.Transformer;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.builder.ItemBuilder;
+import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
@@ -38,6 +41,8 @@ import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.ItemModelHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
+import org.shsts.tinactory.registrate.handler.RecipeDataHandler;
+import org.shsts.tinactory.registrate.handler.RecipeTypeHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
@@ -72,12 +77,16 @@ public class Registrate implements IBlockParent, IItemParent {
 
     // Others
     public final CapabilityHandler capabilityHandler = new CapabilityHandler(this);
+    public final RecipeTypeHandler recipeTypeHandler = new RecipeTypeHandler(this);
 
     // ModelGen
     public final BlockStateHandler blockStateHandler = new BlockStateHandler(this);
     public final ItemModelHandler itemModelHandler = new ItemModelHandler(this);
     @SuppressWarnings("deprecation")
     public final TagsHandler<Item> itemTagsHandler = new TagsHandler<>(this, Registry.ITEM);
+
+    // DataGen
+    public final RecipeDataHandler recipeDataHandler = new RecipeDataHandler(this);
 
     // Client
     public final RenderTypeHandler renderTypeHandler = new RenderTypeHandler();
@@ -127,6 +136,7 @@ public class Registrate implements IBlockParent, IItemParent {
         modEventBus.addListener(this.capabilityHandler::onRegisterEvent);
         modEventBus.addListener(this.tintHandler::onRegisterBlockColors);
         modEventBus.addListener(this.tintHandler::onRegisterItemColors);
+        this.recipeTypeHandler.addListeners(modEventBus);
 
         // Forge BUS
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this.capabilityHandler::onAttachBlockEntity);
@@ -228,7 +238,7 @@ public class Registrate implements IBlockParent, IItemParent {
         }
 
         @Override
-        public U buildObject() {
+        public U createObject() {
             return this.factory.get();
         }
     }
@@ -250,6 +260,11 @@ public class Registrate implements IBlockParent, IItemParent {
 
     public SchedulingBuilder<Registrate> scheduling(String id) {
         return this.registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
+    }
+
+    public <T extends Recipe<?>, S extends SmartRecipeSerializer<T>>
+    RecipeTypeBuilder<T, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, S> serializer) {
+        return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
 
     // defaults

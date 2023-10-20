@@ -27,14 +27,14 @@ public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, 
     }
 
     @Override
-    public RegistryEntry<U> register() {
+    protected RegistryEntry<U> createEntry() {
         if (this.modelCallback == null) {
             this.modelCallback = this.parent.getItemModel();
         }
         if (this.tint == null) {
             this.tint = this.parent.getItemTint().orElse(null);
         }
-        return super.register();
+        return super.createEntry();
     }
 
     @Override

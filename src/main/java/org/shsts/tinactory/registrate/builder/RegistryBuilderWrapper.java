@@ -19,21 +19,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
-        extends Builder<RegistryBuilder<T>, P, RegistryBuilderWrapper<T, P>> {
+        extends EntryBuilder<RegistryBuilder<T>, SmartRegistry<T>, P, RegistryBuilderWrapper<T, P>> {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public final String id;
     protected final Class<T> entryClass;
-
     @Nullable
     protected Transformer<RegistryBuilder<T>> transformer = $ -> $;
-    @Nullable
-    protected SmartRegistry<T> entry = null;
 
     public RegistryBuilderWrapper(Registrate registrate, String id, Class<T> entryClass, P parent) {
-        super(registrate, parent);
-        this.id = id;
+        super(registrate, id, parent);
         this.entryClass = entryClass;
     }
 
@@ -44,7 +39,7 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
     }
 
     @Override
-    public RegistryBuilder<T> buildObject() {
+    public RegistryBuilder<T> createObject() {
         assert this.transformer != null;
         var builder = new RegistryBuilder<T>();
         var loc = new ResourceLocation(this.registrate.modid, this.id);
@@ -61,13 +56,13 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
         this.entry.setSupplier(event.create(builder));
     }
 
-    public SmartRegistry<T> register() {
-        LOGGER.debug("create registry entry {} {}:{}", this.entryClass, this.registrate.modid, this.id);
-        this.entry = this.registrate.registryHandler.register(this);
-        var handler = RegistryEntryHandler.forge(this.registrate, this.entryClass, this.entry);
-        this.entry.setHandler(handler);
+    @Override
+    protected SmartRegistry<T> createEntry() {
+        var entry = this.registrate.registryHandler.register(this);
+        var handler = RegistryEntryHandler.forge(this.registrate, this.entryClass, entry);
+        entry.setHandler(handler);
         this.registrate.putHandler(handler);
-        return this.entry;
+        return entry;
     }
 
     public RegistryBuilderWrapper<T, P> onBake(IForgeRegistry.BakeCallback<T> cb) {

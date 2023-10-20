@@ -91,7 +91,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
     }
 
     @Override
-    public SmartBlockEntityType<U> buildObject() {
+    public SmartBlockEntityType<U> createObject() {
         var entry = this.entry;
         var entityClass = this.entityClass;
         var ticking = this.ticking;
