@@ -2,6 +2,7 @@ package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -24,8 +25,6 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
     protected final Function<Item.Properties, U> factory;
     protected Transformer<Item.Properties> properties = $ -> $;
     @Nullable
-    protected Consumer<RegistryDataContext<Item, U, ItemModelProvider>> defaultModelCallback = null;
-    @Nullable
     protected Consumer<RegistryDataContext<Item, U, ItemModelProvider>> modelCallback = null;
     @Nullable
     protected DistLazy<ItemColor> tint = null;
@@ -41,11 +40,6 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
         return self();
     }
 
-    public S defaultModel(Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
-        this.defaultModelCallback = cons;
-        return self();
-    }
-
     public S model(Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
         this.modelCallback = cons;
         return self();
@@ -56,11 +50,18 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
         return self();
     }
 
+    public S tint(int... colors) {
+        return tint(() -> () -> ($, index) -> index < colors.length ? colors[index] : colors[0]);
+    }
+
+    public S tag(ResourceLocation... loc) {
+        this.onCreateEntry.add(entry ->
+                this.registrate.itemTagsHandler.addTags(entry, loc));
+        return self();
+    }
+
     @Override
     public RegistryEntry<U> register() {
-        if (this.modelCallback == null) {
-            this.modelCallback = this.defaultModelCallback;
-        }
         if (this.modelCallback != null) {
             this.addDataCallback(this.registrate.itemModelHandler, this.modelCallback);
         }

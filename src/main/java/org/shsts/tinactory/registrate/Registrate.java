@@ -1,6 +1,7 @@
 package org.shsts.tinactory.registrate;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Registry;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -40,6 +41,7 @@ import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
+import org.shsts.tinactory.registrate.handler.TagsHandler;
 import org.shsts.tinactory.registrate.handler.TintHandler;
 
 import javax.annotation.Nullable;
@@ -74,6 +76,8 @@ public class Registrate implements IBlockParent, IItemParent {
     // ModelGen
     public final BlockStateHandler blockStateHandler = new BlockStateHandler(this);
     public final ItemModelHandler itemModelHandler = new ItemModelHandler(this);
+    @SuppressWarnings("deprecation")
+    public final TagsHandler<Item> itemTagsHandler = new TagsHandler<>(this, Registry.ITEM);
 
     // Client
     public final RenderTypeHandler renderTypeHandler = new RenderTypeHandler();
@@ -93,6 +97,7 @@ public class Registrate implements IBlockParent, IItemParent {
 
         this.putDataHandler(this.blockStateHandler);
         this.putDataHandler(this.itemModelHandler);
+        this.putDataHandler(this.itemTagsHandler);
     }
 
     public void putHandler(RegistryEntryHandler<?> handler) {

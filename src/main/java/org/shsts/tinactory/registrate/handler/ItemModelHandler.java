@@ -1,12 +1,10 @@
 package org.shsts.tinactory.registrate.handler;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -20,8 +18,8 @@ public class ItemModelHandler extends DataHandler<ItemModelProvider> {
     }
 
     private class Provider extends ItemModelProvider {
-        public Provider(DataGenerator generator, String modid, ExistingFileHelper existingFileHelper) {
-            super(generator, modid, existingFileHelper);
+        public Provider(GatherDataEvent event) {
+            super(event.getGenerator(), registrate.modid, event.getExistingFileHelper());
         }
 
         /**
@@ -51,7 +49,6 @@ public class ItemModelHandler extends DataHandler<ItemModelProvider> {
     @Override
     public void onGatherData(GatherDataEvent event) {
         var generator = event.getGenerator();
-        generator.addProvider(new Provider(generator, this.registrate.modid,
-                event.getExistingFileHelper()));
+        generator.addProvider(new Provider(event));
     }
 }

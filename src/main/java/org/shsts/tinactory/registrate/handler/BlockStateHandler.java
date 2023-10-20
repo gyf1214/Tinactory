@@ -1,7 +1,6 @@
 package org.shsts.tinactory.registrate.handler;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
@@ -9,7 +8,6 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -23,8 +21,8 @@ public class BlockStateHandler extends DataHandler<BlockStateProvider> {
     }
 
     private static class BlockProvider extends BlockModelProvider {
-        public BlockProvider(DataGenerator generator, String modid, ExistingFileHelper existingFileHelper) {
-            super(generator, modid, existingFileHelper);
+        public BlockProvider(GatherDataEvent event, String modid) {
+            super(event.getGenerator(), modid, event.getExistingFileHelper());
         }
 
         /**
@@ -50,8 +48,8 @@ public class BlockStateHandler extends DataHandler<BlockStateProvider> {
     }
 
     private static class ItemProvider extends ItemModelProvider {
-        public ItemProvider(DataGenerator generator, String modid, ExistingFileHelper existingFileHelper) {
-            super(generator, modid, existingFileHelper);
+        public ItemProvider(GatherDataEvent event, String modid) {
+            super(event.getGenerator(), modid, event.getExistingFileHelper());
         }
 
         /**
@@ -80,10 +78,10 @@ public class BlockStateHandler extends DataHandler<BlockStateProvider> {
         private final ItemModelProvider itemModels;
         private final BlockModelProvider blockModels;
 
-        public Provider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
-            super(gen, modid, exFileHelper);
-            this.blockModels = new BlockProvider(gen, modid, exFileHelper);
-            this.itemModels = new ItemProvider(gen, modid, exFileHelper);
+        public Provider(GatherDataEvent event) {
+            super(event.getGenerator(), registrate.modid, event.getExistingFileHelper());
+            this.blockModels = new BlockProvider(event, registrate.modid);
+            this.itemModels = new ItemProvider(event, registrate.modid);
         }
 
         @Override
@@ -104,6 +102,6 @@ public class BlockStateHandler extends DataHandler<BlockStateProvider> {
 
     public void onGatherData(GatherDataEvent event) {
         var generator = event.getGenerator();
-        generator.addProvider(new Provider(generator, this.registrate.modid, event.getExistingFileHelper()));
+        generator.addProvider(new Provider(event));
     }
 }

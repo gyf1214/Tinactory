@@ -41,7 +41,7 @@ public final class WrenchOutlineRenderer {
         var center = MathUtil.mulVecf(face.step(), 0.5f);
         var u = dirU.step();
         var v = dirV.step();
-        var radius = (float) WrenchItem.RADIUS_NORM;
+        var radius = (float) ToolItem.WRENCH_RADIUS_NORM;
         renderLine(vb, pose, MathUtil.addVecf(center, MathUtil.mulVecf(u, -0.5f), MathUtil.mulVecf(v, -radius)),
                 MathUtil.addVecf(center, MathUtil.mulVecf(u, 0.5f), MathUtil.mulVecf(v, -radius)));
         renderLine(vb, pose, MathUtil.addVecf(center, MathUtil.mulVecf(u, -0.5f), MathUtil.mulVecf(v, radius)),

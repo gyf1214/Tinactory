@@ -102,12 +102,16 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
         return self();
     }
 
-    public <U1 extends BlockItem> void buildItemModels(ItemBuilder<U1, ?, ?> itemBuilder) {
-        var callback = this.itemModelCallback;
-        if (callback != null) {
-            itemBuilder.model(callback::accept);
+    public <U1 extends BlockItem> Consumer<RegistryDataContext<Item, U1, ItemModelProvider>>
+    getItemModel() {
+        if (this.itemModelCallback != null) {
+            var ret = this.itemModelCallback;
+            this.itemModelCallback = null;
+            return ret::accept;
+        } else {
+            return ctx -> ctx.provider.withExistingParent(ctx.id,
+                    new ResourceLocation(ctx.modid, "block/" + ctx.id));
         }
-        this.itemModelCallback = null;
     }
 
     private class SimpleBlockItemBuilder<U1 extends BlockItem>
@@ -126,10 +130,7 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
     }
 
     public S defaultBlockItem() {
-        return this.blockItem()
-                .defaultModel(ctx -> ctx.provider.withExistingParent(ctx.id,
-                        new ResourceLocation(ctx.modid, "block/" + ctx.id)))
-                .build();
+        return this.blockItem().build();
     }
 
     @Override

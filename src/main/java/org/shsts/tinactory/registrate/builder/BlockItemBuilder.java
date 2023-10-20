@@ -29,7 +29,7 @@ public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, 
     @Override
     public RegistryEntry<U> register() {
         if (this.modelCallback == null) {
-            this.parent.buildItemModels(this);
+            this.modelCallback = this.parent.getItemModel();
         }
         if (this.tint == null) {
             this.tint = this.parent.getItemTint().orElse(null);
