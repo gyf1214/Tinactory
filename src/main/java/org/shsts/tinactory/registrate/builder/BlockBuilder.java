@@ -1,6 +1,8 @@
 package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -22,6 +24,7 @@ import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -34,13 +37,13 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
     @Nullable
     protected Material material = null;
     protected Transformer<BlockBehaviour.Properties> properties = $ -> $;
-    @Nullable
-    protected DistLazy<RenderType> renderType = null;
 
     @Nullable
     protected Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockStateCallback = null;
     @Nullable
     protected Consumer<RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider>> itemModelCallback = null;
+    @Nullable
+    protected DistLazy<BlockColor> tint = null;
 
     public BlockBuilder(Registrate registrate, String id, P parent,
                         Function<BlockBehaviour.Properties, U> factory) {
@@ -63,12 +66,30 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
     }
 
     public S renderType(DistLazy<RenderType> renderType) {
-        this.renderType = renderType;
+        this.onCreateObject.add(block -> renderType.runOnDist(Dist.CLIENT, () -> type ->
+                this.registrate.renderTypeHandler.setRenderType(block, type)));
         return self();
     }
 
     public S translucent() {
         return this.renderType(() -> RenderType::translucent);
+    }
+
+    public S tint(DistLazy<BlockColor> color) {
+        this.tint = color;
+        return self();
+    }
+
+    public S tint(int... colors) {
+        return this.tint(() -> () -> ($1, $2, $3, index) -> index < colors.length ? colors[index] : colors[0]);
+    }
+
+    public Optional<DistLazy<ItemColor>> getItemTint() {
+        var tint = this.tint;
+        return tint == null ? Optional.empty() : Optional.of(() -> () -> (itemStack, index) -> {
+            var item = (BlockItem) itemStack.getItem();
+            return tint.getValue().getColor(item.getBlock().defaultBlockState(), null, null, index);
+        });
     }
 
     public S blockState(Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
@@ -116,13 +137,12 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
         if (this.blockStateCallback != null) {
             this.addDataCallback(this.registrate.blockStateHandler, this.blockStateCallback);
         }
-        this.blockStateCallback = null;
+        var tint = this.tint;
+        if (tint != null) {
+            this.onCreateObject.add(block -> tint.runOnDist(Dist.CLIENT, () -> blockColor ->
+                    this.registrate.tintHandler.addBlockColor(block, blockColor)));
+        }
         return super.register();
-    }
-
-    protected U buildBlock(BlockBehaviour.Properties properties) {
-        assert this.factory != null;
-        return this.factory.apply(properties);
     }
 
     @Override
@@ -130,12 +150,8 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
         var material = this.material == null ? this.parent.getDefaultMaterial() : this.material;
         var properties = this.properties.apply(
                 this.parent.getDefaultBlockProperties().apply(BlockBehaviour.Properties.of(material)));
-        var block = this.buildBlock(properties);
-        if (this.renderType != null) {
-            this.renderType.runOnDist(Dist.CLIENT, () -> renderType ->
-                    this.registrate.renderTypeHandler.setRenderType(block, renderType));
-        }
-        return block;
+        assert this.factory != null;
+        return this.factory.apply(properties);
     }
 
     @Nullable

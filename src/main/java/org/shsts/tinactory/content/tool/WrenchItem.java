@@ -52,7 +52,8 @@ public class WrenchItem extends Item {
             var state = ctx.getLevel().getBlockState(pos);
             var tool = ctx.getItemInHand();
 
-            if (state.getBlock() instanceof IWrenchable wrenchable) {
+            if (state.getBlock() instanceof IWrenchable wrenchable &&
+                    wrenchable.canWrenchWith(tool)) {
                 var sneaking = ctx.getPlayer() != null && ctx.getPlayer().isShiftKeyDown();
                 var dir = wrenchedDirection(pos, ctx.getClickedFace(), ctx.getClickLocation());
                 wrenchable.onWrenchWith(ctx.getLevel(), pos, state, tool, dir, sneaking);

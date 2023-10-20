@@ -47,16 +47,16 @@ public final class CableModel {
         for (var dir : OPEN_FACES) {
             var face = element.face(dir);
             if (dir == ModelGen.FRONT_FACING) {
-                face.cullface(dir).texture("#wire").tintindex(2);
+                face.cullface(dir).texture("#wire").tintindex(1);
             } else {
-                face.texture("#insulation").tintindex(1);
+                face.texture("#insulation").tintindex(0);
             }
         }
         model.element()
                 .from(8 - radius, 8 - radius, 0)
                 .to(8 + radius, 8 + radius, 8 - radius)
                 .face(ModelGen.FRONT_FACING)
-                .cullface(ModelGen.FRONT_FACING).texture("#insulationOpen").tintindex(1);
+                .cullface(ModelGen.FRONT_FACING).texture("#insulationOpen").tintindex(0);
         return model;
     }
 
@@ -68,7 +68,7 @@ public final class CableModel {
                 .element()
                 .from(8 - radius, 8 - radius, 8 - radius)
                 .to(8 + radius, 8 + radius, 8 - radius)
-                .face(ModelGen.FRONT_FACING).texture("#insulation").tintindex(1).end()
+                .face(ModelGen.FRONT_FACING).texture("#insulation").tintindex(0).end()
                 .end();
     }
 
@@ -81,16 +81,16 @@ public final class CableModel {
                 .to(16, 8 + radius, 8 + radius)
                 .allFaces((dir, face) -> {
                     if (dir.getAxis() == Direction.Axis.X) {
-                        face.texture("#wire").cullface(dir).tintindex(2);
+                        face.texture("#wire").cullface(dir).tintindex(1);
                     } else {
-                        face.texture("#insulation").tintindex(1);
+                        face.texture("#insulation").tintindex(0);
                     }
                 }).end()
                 .element()
                 .from(0, 8 - radius, 8 - radius)
                 .to(16, 8 + radius, 8 + radius)
                 .face(Direction.EAST).end().face(Direction.WEST).end()
-                .faces((dir, face) -> face.texture("#insulationOpen").tintindex(1).cullface(dir))
+                .faces((dir, face) -> face.texture("#insulationOpen").tintindex(0).cullface(dir))
                 .end();
     }
 

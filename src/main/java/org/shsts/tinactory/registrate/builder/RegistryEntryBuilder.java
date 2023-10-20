@@ -28,6 +28,7 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
 
     protected final RegistryEntryHandler<T> handler;
     protected final List<Consumer<RegistryEntry<U>>> onCreateEntry = new ArrayList<>();
+    protected final List<Consumer<U>> onCreateObject = new ArrayList<>();
     @Nullable
     protected RegistryEntry<U> entry = null;
 
@@ -46,6 +47,10 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
         object.setRegistryName(new ResourceLocation(this.registrate.modid, this.id));
         registry.register(object);
         this.entry.setObject(object);
+        for (var cb : this.onCreateObject) {
+            cb.accept(object);
+        }
+        this.onCreateObject.clear();
     }
 
     @Override

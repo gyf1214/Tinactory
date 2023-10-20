@@ -31,6 +31,9 @@ public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, 
         if (this.modelCallback == null) {
             this.parent.buildItemModels(this);
         }
+        if (this.tint == null) {
+            this.tint = this.parent.getItemTint().orElse(null);
+        }
         return super.register();
     }
 

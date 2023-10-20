@@ -21,10 +21,12 @@ public final class AllBlocks {
         REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
         NORMAL_CABLE = REGISTRATE.block("network/cable/normal", CableBlock.factory(CableSetting.NORMAL))
                 .transform(ModelGen.cable())
+                .tint(0x363636, 0xFFFFFF)
                 .defaultBlockItem()
                 .register();
         DENSE_CABLE = REGISTRATE.block("network/cable/dense", CableBlock.factory(CableSetting.DENSE))
                 .transform(ModelGen.cable())
+                .tint(0x363636, 0xFFFFFF)
                 .defaultBlockItem()
                 .register();
 

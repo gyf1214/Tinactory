@@ -39,6 +39,7 @@ import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
+import org.shsts.tinactory.registrate.handler.TintHandler;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -52,7 +53,11 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 public class Registrate implements IBlockParent, IItemParent {
     public final String modid;
+
+    // Registry
     public final RegistryHandler registryHandler = new RegistryHandler(this);
+
+    // Registry Entries
     public final RegistryEntryHandler<Block> blockHandler =
             RegistryEntryHandler.forge(this, ForgeRegistries.BLOCKS);
     public final RegistryEntryHandler<Item> itemHandler =
@@ -62,12 +67,17 @@ public class Registrate implements IBlockParent, IItemParent {
     public final RegistryEntryHandler<MenuType<?>> menuTypeHandler =
             RegistryEntryHandler.forge(this, ForgeRegistries.CONTAINERS);
 
+    // Others
     public final CapabilityHandler capabilityHandler = new CapabilityHandler(this);
 
+    // ModelGen
     public final BlockStateHandler blockStateHandler = new BlockStateHandler(this);
     public final ItemModelHandler itemModelHandler = new ItemModelHandler(this);
+
+    // Client
     public final RenderTypeHandler renderTypeHandler = new RenderTypeHandler();
     public final MenuScreenHandler menuScreenHandler = new MenuScreenHandler();
+    public final TintHandler tintHandler = new TintHandler();
 
     private final List<RegistryEntryHandler<?>> registryEntryHandlers = new ArrayList<>();
 
@@ -89,12 +99,17 @@ public class Registrate implements IBlockParent, IItemParent {
     }
 
     public void register(IEventBus modEventBus) {
+        // mod BUS
         modEventBus.addListener(this.registryHandler::onNewRegistry);
         for (var handler : this.registryEntryHandlers) {
             handler.addListener(modEventBus);
         }
         modEventBus.addListener(this.capabilityHandler::onRegisterEvent);
         modEventBus.addListener(this::onGatherData);
+        modEventBus.addListener(this.tintHandler::onRegisterBlockColors);
+        modEventBus.addListener(this.tintHandler::onRegisterItemColors);
+
+        // Forge BUS
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this.capabilityHandler::onAttachBlockEntity);
     }
 

@@ -1,9 +1,12 @@
 package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.core.Transformer;
+import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.IItemParent;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
@@ -24,6 +27,8 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
     protected Consumer<RegistryDataContext<Item, U, ItemModelProvider>> defaultModelCallback = null;
     @Nullable
     protected Consumer<RegistryDataContext<Item, U, ItemModelProvider>> modelCallback = null;
+    @Nullable
+    protected DistLazy<ItemColor> tint = null;
 
     public ItemBuilder(Registrate registrate, String id, P parent,
                        Function<Item.Properties, U> factory) {
@@ -46,6 +51,11 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
         return self();
     }
 
+    public S tint(DistLazy<ItemColor> color) {
+        this.tint = color;
+        return self();
+    }
+
     @Override
     public RegistryEntry<U> register() {
         if (this.modelCallback == null) {
@@ -54,8 +64,11 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
         if (this.modelCallback != null) {
             this.addDataCallback(this.registrate.itemModelHandler, this.modelCallback);
         }
-        this.modelCallback = null;
-        this.defaultModelCallback = null;
+        var tint = this.tint;
+        if (this.tint != null) {
+            this.onCreateObject.add(item -> tint.runOnDist(Dist.CLIENT, () -> itemColor ->
+                    this.registrate.tintHandler.addItemColor(item, itemColor)));
+        }
         return super.register();
     }
 
