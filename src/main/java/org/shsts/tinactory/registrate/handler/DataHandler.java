@@ -1,11 +1,13 @@
 package org.shsts.tinactory.registrate.handler;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.registrate.Registrate;
+import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.function.Consumer;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class DataHandler<P extends DataProvider> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     protected final Registrate registrate;
     protected final List<Consumer<P>> callbacks = new ArrayList<>();
 
@@ -29,9 +33,14 @@ public abstract class DataHandler<P extends DataProvider> {
     public abstract void onGatherData(GatherDataEvent event);
 
     public void register(P provider) {
+        LOGGER.info("Data Handler {} add {} callbacks", this, this.callbacks.size());
         for (var callback : this.callbacks) {
             callback.accept(provider);
         }
+        this.clear();
+    }
+
+    public void clear() {
         this.callbacks.clear();
     }
 

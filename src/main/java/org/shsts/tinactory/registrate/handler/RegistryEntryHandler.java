@@ -1,5 +1,6 @@
 package org.shsts.tinactory.registrate.handler;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -10,6 +11,7 @@ import net.minecraftforge.registries.RegistryObject;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
+import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private final Registrate registrate;
     private final List<RegistryEntryBuilder<T, ?, ?, ?>> builders = new ArrayList<>();
 
@@ -41,6 +45,7 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
 
     private void onRegisterEvent(RegistryEvent.Register<T> event) {
         var registry = event.getRegistry();
+        LOGGER.info("Registry {} register {} objects", registry.getRegistryName(), this.builders.size());
         for (var builder : this.builders) {
             builder.registerObject(registry);
         }

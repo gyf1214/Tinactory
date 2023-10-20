@@ -17,7 +17,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.core.CapabilityProviderType;
@@ -34,6 +34,7 @@ import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
 import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.handler.BlockStateHandler;
 import org.shsts.tinactory.registrate.handler.CapabilityHandler;
+import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.ItemModelHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
@@ -80,22 +81,32 @@ public class Registrate implements IBlockParent, IItemParent {
     public final TintHandler tintHandler = new TintHandler();
 
     private final List<RegistryEntryHandler<?>> registryEntryHandlers = new ArrayList<>();
+    private final List<DataHandler<?>> dataHandlers = new ArrayList<>();
 
     public Registrate(String modid) {
         this.modid = modid;
+
         this.putHandler(this.blockHandler);
         this.putHandler(this.itemHandler);
         this.putHandler(this.blockEntityHandler);
         this.putHandler(this.menuTypeHandler);
+
+        this.putDataHandler(this.blockStateHandler);
+        this.putDataHandler(this.itemModelHandler);
     }
 
     public void putHandler(RegistryEntryHandler<?> handler) {
         this.registryEntryHandlers.add(handler);
     }
 
-    private void onGatherData(GatherDataEvent event) {
-        this.blockStateHandler.onGatherData(event);
-        this.itemModelHandler.onGatherData(event);
+    public void putDataHandler(DataHandler<?> handler) {
+        this.dataHandlers.add(handler);
+    }
+
+    private void onCommonSetup(FMLCommonSetupEvent event) {
+        for (var handler : this.dataHandlers) {
+            handler.clear();
+        }
     }
 
     public void register(IEventBus modEventBus) {
@@ -104,8 +115,11 @@ public class Registrate implements IBlockParent, IItemParent {
         for (var handler : this.registryEntryHandlers) {
             handler.addListener(modEventBus);
         }
+        for (var handler : this.dataHandlers) {
+            modEventBus.addListener(handler::onGatherData);
+        }
+        modEventBus.addListener(this::onCommonSetup);
         modEventBus.addListener(this.capabilityHandler::onRegisterEvent);
-        modEventBus.addListener(this::onGatherData);
         modEventBus.addListener(this.tintHandler::onRegisterBlockColors);
         modEventBus.addListener(this.tintHandler::onRegisterItemColors);
 
