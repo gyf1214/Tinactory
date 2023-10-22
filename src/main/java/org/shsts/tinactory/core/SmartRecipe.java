@@ -27,7 +27,7 @@ public abstract class SmartRecipe<C extends Container, T extends SmartRecipe<C, 
     }
 
     protected final ResourceLocation loc;
-    protected final RecipeType<?> type;
+    protected final RecipeType<? super T> type;
     protected final SmartRecipeSerializer<T> serializer;
 
     protected SmartRecipe(RecipeTypeEntry<T> type, ResourceLocation loc) {

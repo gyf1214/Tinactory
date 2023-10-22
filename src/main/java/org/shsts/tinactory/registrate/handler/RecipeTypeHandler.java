@@ -1,12 +1,12 @@
 package org.shsts.tinactory.registrate.handler;
 
 import net.minecraft.core.Registry;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
+import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
@@ -27,7 +27,7 @@ public class RecipeTypeHandler {
         this.recipeTypeRegister = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, registrate.modid);
     }
 
-    public <T extends Recipe<?>, S extends SmartRecipeSerializer<T>>
+    public <T extends SmartRecipe<?, T>, S extends SmartRecipeSerializer<T>>
     RecipeTypeEntry<T> register(RecipeTypeBuilder<T, S, ?> builder) {
         this.builders.add(builder);
         if (builder.willCreateType()) {

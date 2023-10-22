@@ -2,10 +2,10 @@ package org.shsts.tinactory.registrate.builder;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
@@ -17,13 +17,13 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeBuilder<T extends Recipe<?>, S extends SmartRecipeSerializer<T>, P>
+public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, S extends SmartRecipeSerializer<T>, P>
         extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T>, P, RecipeTypeBuilder<T, S, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final SmartRecipeSerializer.Factory<T, S> serializer;
     @Nullable
-    protected Supplier<RecipeType<?>> existingType = null;
+    protected Supplier<RecipeType<? super T>> existingType = null;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
                              SmartRecipeSerializer.Factory<T, S> serializer) {
@@ -31,7 +31,7 @@ public class RecipeTypeBuilder<T extends Recipe<?>, S extends SmartRecipeSeriali
         this.serializer = serializer;
     }
 
-    public RecipeTypeBuilder<T, S, P> existingType(Supplier<RecipeType<?>> existingType) {
+    public RecipeTypeBuilder<T, S, P> existingType(Supplier<RecipeType<? super T>> existingType) {
         this.existingType = existingType;
         return self();
     }
@@ -60,7 +60,7 @@ public class RecipeTypeBuilder<T extends Recipe<?>, S extends SmartRecipeSeriali
         return this.existingType == null;
     }
 
-    public Supplier<RecipeType<?>> getExistingType() {
+    public Supplier<RecipeType<? super T>> getExistingType() {
         assert this.existingType != null;
         return this.existingType;
     }

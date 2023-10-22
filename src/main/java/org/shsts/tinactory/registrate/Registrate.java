@@ -5,7 +5,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -25,6 +24,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartEntityBlock;
+import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.core.Transformer;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
@@ -262,7 +262,7 @@ public class Registrate implements IBlockParent, IItemParent {
         return this.registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
     }
 
-    public <T extends Recipe<?>, S extends SmartRecipeSerializer<T>>
+    public <T extends SmartRecipe<?, T>, S extends SmartRecipeSerializer<T>>
     RecipeTypeBuilder<T, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, S> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }

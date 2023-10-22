@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -14,11 +13,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class SmartRecipeSerializer<T extends Recipe<?>> extends ForgeRegistryEntry<RecipeSerializer<?>>
-        implements RecipeSerializer<T> {
+public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>>
+        extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
 
     @FunctionalInterface
-    public interface Factory<T extends Recipe<?>, S extends SmartRecipeSerializer<T>> {
+    public interface Factory<T extends SmartRecipe<?, T>, S extends SmartRecipeSerializer<T>> {
         S create(RecipeTypeEntry<T> type);
     }
 
