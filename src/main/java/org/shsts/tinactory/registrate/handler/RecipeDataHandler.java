@@ -4,7 +4,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.Nullable;
@@ -26,9 +25,9 @@ public class RecipeDataHandler extends DataHandler<RecipeDataHandler.Provider> {
             super(event.getGenerator());
         }
 
-        public void addRecipe(SmartRecipe<?, ?> recipe) {
+        public void addRecipe(FinishedRecipe recipe) {
             assert this.cons != null;
-            this.cons.accept(recipe.toFinished());
+            this.cons.accept(recipe);
         }
 
         @Override

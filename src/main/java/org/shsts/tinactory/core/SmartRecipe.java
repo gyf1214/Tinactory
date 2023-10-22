@@ -33,7 +33,7 @@ public abstract class SmartRecipe<C extends Container, T extends SmartRecipe<C, 
     protected SmartRecipe(RecipeTypeEntry<T, ?> type, ResourceLocation loc) {
         this.loc = loc;
         this.type = type.get();
-        this.serializer = type.getSerializer();
+        this.serializer = (SmartRecipeSerializer<T, ?>) type.getSerializer();
     }
 
     @Override
