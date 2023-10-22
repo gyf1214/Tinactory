@@ -1,23 +1,30 @@
 package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.SmartRecipe;
+import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class RecipeBuilder<U extends SmartRecipe<?, ?>, P, S extends RecipeBuilder<U, P, S>>
-        extends Builder<U, P, S> {
-    protected RecipeBuilder(Registrate registrate, P parent, String id) {
-        super(registrate, parent, id);
+public abstract class RecipeBuilder<U extends SmartRecipe<?, U>, S extends RecipeBuilder<U, S>>
+        extends Builder<U, RecipeTypeEntry<U, S>, S> {
+
+    @FunctionalInterface
+    public interface Factory<U1 extends SmartRecipe<?, U1>, S1 extends RecipeBuilder<U1, S1>> {
+        S1 create(Registrate registrate, RecipeTypeEntry<U1, S1> parent, ResourceLocation loc);
+    }
+
+    protected RecipeBuilder(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
+        super(registrate, parent, loc);
     }
 
     @Override
-    public P build() {
-        var object = this.buildObject();
-        this.registrate.recipeDataHandler.addCallback(prov -> prov.addRecipe(object));
+    public RecipeTypeEntry<U, S> build() {
+        this.registrate.recipeDataHandler.addCallback(prov -> prov.addRecipe(this.buildObject()));
         return this.parent;
     }
 }

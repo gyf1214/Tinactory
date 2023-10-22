@@ -23,14 +23,14 @@ public abstract class SmartRecipe<C extends Container, T extends SmartRecipe<C, 
 
     @FunctionalInterface
     public interface Factory<T extends SmartRecipe<?, T>> {
-        T create(RecipeTypeEntry<T> type, ResourceLocation loc);
+        T create(RecipeTypeEntry<T, ?> type, ResourceLocation loc);
     }
 
     protected final ResourceLocation loc;
     protected final RecipeType<? super T> type;
-    protected final SmartRecipeSerializer<T> serializer;
+    protected final SmartRecipeSerializer<T, ?> serializer;
 
-    protected SmartRecipe(RecipeTypeEntry<T> type, ResourceLocation loc) {
+    protected SmartRecipe(RecipeTypeEntry<T, ?> type, ResourceLocation loc) {
         this.loc = loc;
         this.type = type.get();
         this.serializer = type.getSerializer();

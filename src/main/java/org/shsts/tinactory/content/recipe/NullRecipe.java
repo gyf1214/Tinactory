@@ -12,13 +12,26 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
+import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.builder.RecipeBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> implements CraftingRecipe {
-    protected NullRecipe(RecipeTypeEntry<NullRecipe> type, ResourceLocation loc) {
+    public static class Builder extends RecipeBuilder<NullRecipe, Builder> {
+        public Builder(Registrate registrate, RecipeTypeEntry<NullRecipe, Builder> parent, ResourceLocation loc) {
+            super(registrate, parent, loc);
+        }
+
+        @Override
+        public NullRecipe createObject() {
+            return new NullRecipe(this.parent, this.loc);
+        }
+    }
+
+    protected NullRecipe(RecipeTypeEntry<NullRecipe, Builder> type, ResourceLocation loc) {
         super(type, loc);
     }
 
@@ -42,8 +55,8 @@ public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> imple
         return ItemStack.EMPTY;
     }
 
-    private static class Serializer extends SmartRecipeSerializer<NullRecipe> {
-        protected Serializer(RecipeTypeEntry<NullRecipe> type) {
+    private static class Serializer extends SmartRecipeSerializer<NullRecipe, Builder> {
+        protected Serializer(RecipeTypeEntry<NullRecipe, Builder> type) {
             super(type);
         }
 
@@ -64,7 +77,7 @@ public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> imple
         }
     }
 
-    public static SmartRecipeSerializer<NullRecipe> serializer(RecipeTypeEntry<NullRecipe> type) {
+    public static SmartRecipeSerializer<NullRecipe, Builder> serializer(RecipeTypeEntry<NullRecipe, Builder> type) {
         return new Serializer(type);
     }
 }

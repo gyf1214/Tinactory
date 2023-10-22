@@ -15,7 +15,7 @@ import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllBlocks;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllItems;
-import org.shsts.tinactory.content.AllRecipeTypes;
+import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllWorldGens;
 import org.shsts.tinactory.content.network.AllNetworkRegistries;
 import org.shsts.tinactory.model.ModelGen;
@@ -53,7 +53,7 @@ public class Tinactory {
         AllBlockEntities.init();
         AllNetworkRegistries.init();
 
-        AllRecipeTypes.init();
+        AllRecipes.init();
         AllWorldGens.init();
 
         REGISTRATE.register(modEventBus);

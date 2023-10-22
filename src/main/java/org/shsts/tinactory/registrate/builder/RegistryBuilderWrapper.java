@@ -2,7 +2,6 @@ package org.shsts.tinactory.registrate.builder;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.NewRegistryEvent;
@@ -42,15 +41,14 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
     public RegistryBuilder<T> createObject() {
         assert this.transformer != null;
         var builder = new RegistryBuilder<T>();
-        var loc = new ResourceLocation(this.registrate.modid, this.id);
-        builder = this.transformer.apply(builder.setName(loc).setType(this.entryClass));
+        builder = this.transformer.apply(builder.setName(this.loc).setType(this.entryClass));
         // free reference
         this.transformer = null;
         return builder;
     }
 
     public void registerObject(NewRegistryEvent event) {
-        LOGGER.debug("register registry {} {}:{}", this.entryClass, this.registrate.modid, this.id);
+        LOGGER.debug("register registry {} {}", this.entryClass, this.loc);
         assert this.entry != null;
         var builder = this.buildObject();
         this.entry.setSupplier(event.create(builder));
@@ -59,7 +57,7 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
     @Override
     protected SmartRegistry<T> createEntry() {
         var entry = this.registrate.registryHandler.register(this);
-        var handler = RegistryEntryHandler.forge(this.registrate, this.entryClass, entry);
+        var handler = RegistryEntryHandler.forge(this.entryClass, entry);
         entry.setHandler(handler);
         this.registrate.putHandler(handler);
         return entry;

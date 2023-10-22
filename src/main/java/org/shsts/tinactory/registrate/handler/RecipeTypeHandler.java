@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.builder.RecipeBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,7 +20,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class RecipeTypeHandler {
     private final Registrate registrate;
-    private final List<RecipeTypeBuilder<?, ?, ?>> builders = new ArrayList<>();
+    private final List<RecipeTypeBuilder<?, ?, ?, ?>> builders = new ArrayList<>();
     private final DeferredRegister<RecipeType<?>> recipeTypeRegister;
 
     public RecipeTypeHandler(Registrate registrate) {
@@ -27,14 +28,14 @@ public class RecipeTypeHandler {
         this.recipeTypeRegister = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, registrate.modid);
     }
 
-    public <T extends SmartRecipe<?, T>, S extends SmartRecipeSerializer<T>>
-    RecipeTypeEntry<T> register(RecipeTypeBuilder<T, S, ?> builder) {
+    public <T extends SmartRecipe<?, T>, B extends RecipeBuilder<T, B>, S extends SmartRecipeSerializer<T, B>>
+    RecipeTypeEntry<T, B> register(RecipeTypeBuilder<T, B, S, ?> builder) {
         this.builders.add(builder);
         if (builder.willCreateType()) {
             var object = this.recipeTypeRegister.register(builder.id, builder::buildObject);
-            return new RecipeTypeEntry<>(registrate, builder.id, object::get);
+            return new RecipeTypeEntry<>(registrate, builder.id, object::get, builder.getBuilderFactory());
         } else {
-            return new RecipeTypeEntry<>(registrate, builder.id, builder.getExistingType());
+            return new RecipeTypeEntry<>(registrate, builder.id, builder.getExistingType(), builder.getBuilderFactory());
         }
     }
 

@@ -27,7 +27,7 @@ public abstract class EntryBuilder<U, E, P, S extends EntryBuilder<U, E, P, S>> 
     protected abstract E createEntry();
 
     public E register() {
-        LOGGER.debug("create entry {} {}:{}", this, this.registrate.modid, this.id);
+        LOGGER.debug("create entry {} {}", this, this.loc);
         this.entry = this.createEntry();
         for (var callback : this.onCreateEntry) {
             callback.accept(this.entry);

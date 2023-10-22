@@ -8,7 +8,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.slf4j.Logger;
@@ -23,12 +22,8 @@ import java.util.function.Supplier;
 public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Registrate registrate;
     private final List<RegistryEntryBuilder<T, ?, ?, ?>> builders = new ArrayList<>();
 
-    public RegistryEntryHandler(Registrate registrate) {
-        this.registrate = registrate;
-    }
 
     public <U extends T> RegistryEntry<U> getEntry(String id) {
         return this.getEntry(new ResourceLocation(id));
@@ -40,7 +35,7 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
 
     public <U extends T> RegistryEntry<U> register(RegistryEntryBuilder<T, U, ?, ?> builder) {
         builders.add(builder);
-        return new RegistryEntry<>(this.registrate.modid, builder.id);
+        return new RegistryEntry<>(builder.loc.getNamespace(), builder.id);
     }
 
     private void onRegisterEvent(RegistryEvent.Register<T> event) {
@@ -61,14 +56,12 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
         private final Supplier<IForgeRegistry<T1>> registry;
         private final Class<T1> entryClass;
 
-        public Forge(Registrate registrate, IForgeRegistry<T1> registry) {
-            super(registrate);
+        public Forge(IForgeRegistry<T1> registry) {
             this.registry = () -> registry;
             this.entryClass = registry.getRegistrySuperType();
         }
 
-        public Forge(Registrate registrate, Class<T1> entryClass, Supplier<IForgeRegistry<T1>> registry) {
-            super(registrate);
+        public Forge(Class<T1> entryClass, Supplier<IForgeRegistry<T1>> registry) {
             this.registry = registry;
             this.entryClass = entryClass;
         }
@@ -86,12 +79,12 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
     }
 
     public static <T1 extends IForgeRegistryEntry<T1>> RegistryEntryHandler<T1>
-    forge(Registrate registrate, IForgeRegistry<T1> forgeRegistry) {
-        return new Forge<>(registrate, forgeRegistry);
+    forge(IForgeRegistry<T1> forgeRegistry) {
+        return new Forge<>(forgeRegistry);
     }
 
     public static <T1 extends IForgeRegistryEntry<T1>> RegistryEntryHandler<T1>
-    forge(Registrate registrate, Class<T1> entryClass, Supplier<IForgeRegistry<T1>> forgeRegistry) {
-        return new Forge<>(registrate, entryClass, forgeRegistry);
+    forge(Class<T1> entryClass, Supplier<IForgeRegistry<T1>> forgeRegistry) {
+        return new Forge<>(entryClass, forgeRegistry);
     }
 }

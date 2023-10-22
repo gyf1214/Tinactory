@@ -30,7 +30,7 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
     }
 
     public void registerObject(IForgeRegistry<T> registry) {
-        LOGGER.debug("register object {} {}:{}", registry.getRegistryName(), this.registrate.modid, this.id);
+        LOGGER.debug("register object {} {}", registry.getRegistryName(), this.loc);
         assert this.entry != null;
         var object = this.buildObject();
         object.setRegistryName(this.loc);

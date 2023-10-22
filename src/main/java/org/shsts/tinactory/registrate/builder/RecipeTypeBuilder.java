@@ -17,27 +17,35 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, S extends SmartRecipeSerializer<T>, P>
-        extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T>, P, RecipeTypeBuilder<T, S, P>> {
+public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B extends RecipeBuilder<T, B>,
+        S extends SmartRecipeSerializer<T, B>, P>
+        extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, S, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final SmartRecipeSerializer.Factory<T, S> serializer;
+    protected final SmartRecipeSerializer.Factory<T, B, S> serializer;
     @Nullable
     protected Supplier<RecipeType<? super T>> existingType = null;
+    @Nullable
+    protected RecipeBuilder.Factory<T, B> builderFactory = null;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
-                             SmartRecipeSerializer.Factory<T, S> serializer) {
+                             SmartRecipeSerializer.Factory<T, B, S> serializer) {
         super(registrate, id, parent);
         this.serializer = serializer;
     }
 
-    public RecipeTypeBuilder<T, S, P> existingType(Supplier<RecipeType<? super T>> existingType) {
+    public RecipeTypeBuilder<T, B, S, P> existingType(Supplier<RecipeType<? super T>> existingType) {
         this.existingType = existingType;
         return self();
     }
 
+    public RecipeTypeBuilder<T, B, S, P> builder(RecipeBuilder.Factory<T, B> factory) {
+        this.builderFactory = factory;
+        return self();
+    }
+
     public void registerSerializer(IForgeRegistry<RecipeSerializer<?>> registry) {
-        LOGGER.debug("register object {} {}:{}", registry.getRegistryName(), this.registrate.modid, this.id);
+        LOGGER.debug("register object {} {}", registry.getRegistryName(), this.loc);
         assert this.entry != null;
         var serializer = this.serializer.create(this.entry);
         serializer.setRegistryName(this.loc);
@@ -65,8 +73,13 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, S extends SmartRecip
         return this.existingType;
     }
 
+    public RecipeBuilder.Factory<T, B> getBuilderFactory() {
+        assert this.builderFactory != null;
+        return this.builderFactory;
+    }
+
     @Override
-    protected RecipeTypeEntry<T> createEntry() {
+    protected RecipeTypeEntry<T, B> createEntry() {
         return this.registrate.recipeTypeHandler.register(this);
     }
 }

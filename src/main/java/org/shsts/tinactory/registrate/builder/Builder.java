@@ -28,6 +28,13 @@ public abstract class Builder<U, P, S extends Builder<U, P, S>> implements ISelf
         this.loc = new ResourceLocation(registrate.modid, id);
     }
 
+    public Builder(Registrate registrate, P parent, ResourceLocation loc) {
+        this.registrate = registrate;
+        this.parent = parent;
+        this.id = loc.getPath();
+        this.loc = loc;
+    }
+
     public abstract U createObject();
 
     public U buildObject() {

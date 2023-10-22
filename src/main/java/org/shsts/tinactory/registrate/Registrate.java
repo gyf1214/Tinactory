@@ -31,6 +31,7 @@ import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.builder.ItemBuilder;
+import org.shsts.tinactory.registrate.builder.RecipeBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
@@ -67,13 +68,13 @@ public class Registrate implements IBlockParent, IItemParent {
 
     // Registry Entries
     public final RegistryEntryHandler<Block> blockHandler =
-            RegistryEntryHandler.forge(this, ForgeRegistries.BLOCKS);
+            RegistryEntryHandler.forge(ForgeRegistries.BLOCKS);
     public final RegistryEntryHandler<Item> itemHandler =
-            RegistryEntryHandler.forge(this, ForgeRegistries.ITEMS);
+            RegistryEntryHandler.forge(ForgeRegistries.ITEMS);
     public final RegistryEntryHandler<BlockEntityType<?>> blockEntityHandler =
-            RegistryEntryHandler.forge(this, ForgeRegistries.BLOCK_ENTITIES);
+            RegistryEntryHandler.forge(ForgeRegistries.BLOCK_ENTITIES);
     public final RegistryEntryHandler<MenuType<?>> menuTypeHandler =
-            RegistryEntryHandler.forge(this, ForgeRegistries.CONTAINERS);
+            RegistryEntryHandler.forge(ForgeRegistries.CONTAINERS);
 
     // Others
     public final CapabilityHandler capabilityHandler = new CapabilityHandler(this);
@@ -107,6 +108,7 @@ public class Registrate implements IBlockParent, IItemParent {
         this.putDataHandler(this.blockStateHandler);
         this.putDataHandler(this.itemModelHandler);
         this.putDataHandler(this.itemTagsHandler);
+        this.putDataHandler(this.recipeDataHandler);
     }
 
     public void putHandler(RegistryEntryHandler<?> handler) {
@@ -262,8 +264,8 @@ public class Registrate implements IBlockParent, IItemParent {
         return this.registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
     }
 
-    public <T extends SmartRecipe<?, T>, S extends SmartRecipeSerializer<T>>
-    RecipeTypeBuilder<T, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, S> serializer) {
+    public <T extends SmartRecipe<?, T>, B extends RecipeBuilder<T, B>, S extends SmartRecipeSerializer<T, B>>
+    RecipeTypeBuilder<T, B, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B, S> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
 
