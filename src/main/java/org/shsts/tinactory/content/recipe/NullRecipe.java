@@ -20,17 +20,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> implements CraftingRecipe {
-    public static class Builder extends SmartRecipeBuilder<NullRecipe, Builder> {
-        public Builder(Registrate registrate, RecipeTypeEntry<NullRecipe, Builder> parent, ResourceLocation loc) {
-            super(registrate, parent, loc);
-        }
-
-        @Override
-        public NullRecipe createObject() {
-            return new NullRecipe(this.parent, this.loc);
-        }
-    }
-
     protected NullRecipe(RecipeTypeEntry<NullRecipe, Builder> type, ResourceLocation loc) {
         super(type, loc);
     }
@@ -53,6 +42,17 @@ public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> imple
     @Override
     public ItemStack getResultItem() {
         return ItemStack.EMPTY;
+    }
+
+    public static class Builder extends SmartRecipeBuilder<NullRecipe, Builder> {
+        public Builder(Registrate registrate, RecipeTypeEntry<NullRecipe, Builder> parent, ResourceLocation loc) {
+            super(registrate, parent, loc);
+        }
+
+        @Override
+        public NullRecipe createObject() {
+            return new NullRecipe(this.parent, this.loc);
+        }
     }
 
     private static class Serializer extends SmartRecipeSerializer<NullRecipe, Builder> {

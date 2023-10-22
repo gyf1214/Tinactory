@@ -11,7 +11,6 @@ import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
-import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class RecipeTypeHandler {
         this.recipeTypeRegister = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, registrate.modid);
     }
 
-    public <T extends SmartRecipe<?, T>, B extends SmartRecipeBuilder<T, B>, S extends SmartRecipeSerializer<T, B>>
+    public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>
     RecipeTypeEntry<T, B> register(RecipeTypeBuilder<T, B, S, ?> builder) {
         this.builders.add(builder);
         if (builder.willCreateType()) {

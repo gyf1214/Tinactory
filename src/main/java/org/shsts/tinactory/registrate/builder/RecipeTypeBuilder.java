@@ -17,8 +17,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B extends SmartRecipeBuilder<T, B>,
-        S extends SmartRecipeSerializer<T, B>, P>
+public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>, P>
         extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, S, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
