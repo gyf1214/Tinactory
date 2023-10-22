@@ -8,17 +8,17 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.builder.RecipeBuilder;
+import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B extends RecipeBuilder<T, B>>
+public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B extends SmartRecipeBuilder<T, B>>
         extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
 
     @FunctionalInterface
-    public interface Factory<T1 extends SmartRecipe<?, T1>, B1 extends RecipeBuilder<T1, B1>,
+    public interface Factory<T1 extends SmartRecipe<?, T1>, B1 extends SmartRecipeBuilder<T1, B1>,
             S extends SmartRecipeSerializer<T1, B1>> {
         S create(RecipeTypeEntry<T1, B1> type);
     }

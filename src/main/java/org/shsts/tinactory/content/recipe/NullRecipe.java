@@ -13,14 +13,14 @@ import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.RecipeBuilder;
+import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> implements CraftingRecipe {
-    public static class Builder extends RecipeBuilder<NullRecipe, Builder> {
+    public static class Builder extends SmartRecipeBuilder<NullRecipe, Builder> {
         public Builder(Registrate registrate, RecipeTypeEntry<NullRecipe, Builder> parent, ResourceLocation loc) {
             super(registrate, parent, loc);
         }

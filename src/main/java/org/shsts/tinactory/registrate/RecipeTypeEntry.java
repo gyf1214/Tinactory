@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.builder.RecipeBuilder;
+import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -13,16 +13,16 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeEntry<T extends SmartRecipe<?, T>, B extends RecipeBuilder<T, B>>
+public class RecipeTypeEntry<T extends SmartRecipe<?, T>, B extends SmartRecipeBuilder<T, B>>
         extends RegistryEntry<RecipeType<? super T>> {
     private final Registrate registrate;
-    private final RecipeBuilder.Factory<T, B> builderFactory;
+    private final SmartRecipeBuilder.Factory<T, B> builderFactory;
     @Nullable
     private SmartRecipeSerializer<T, B> serializer;
 
     public RecipeTypeEntry(Registrate registrate, String id,
                            Supplier<RecipeType<? super T>> supplier,
-                           RecipeBuilder.Factory<T, B> builderFactory) {
+                           SmartRecipeBuilder.Factory<T, B> builderFactory) {
         super(registrate.modid, id, supplier);
         this.registrate = registrate;
         this.builderFactory = builderFactory;

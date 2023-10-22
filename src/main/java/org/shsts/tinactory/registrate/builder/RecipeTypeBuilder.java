@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B extends RecipeBuilder<T, B>,
+public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B extends SmartRecipeBuilder<T, B>,
         S extends SmartRecipeSerializer<T, B>, P>
         extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, S, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -26,7 +26,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B extends RecipeBuil
     @Nullable
     protected Supplier<RecipeType<? super T>> existingType = null;
     @Nullable
-    protected RecipeBuilder.Factory<T, B> builderFactory = null;
+    protected SmartRecipeBuilder.Factory<T, B> builderFactory = null;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
                              SmartRecipeSerializer.Factory<T, B, S> serializer) {
@@ -39,7 +39,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B extends RecipeBuil
         return self();
     }
 
-    public RecipeTypeBuilder<T, B, S, P> builder(RecipeBuilder.Factory<T, B> factory) {
+    public RecipeTypeBuilder<T, B, S, P> builder(SmartRecipeBuilder.Factory<T, B> factory) {
         this.builderFactory = factory;
         return self();
     }
@@ -73,7 +73,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B extends RecipeBuil
         return this.existingType;
     }
 
-    public RecipeBuilder.Factory<T, B> getBuilderFactory() {
+    public SmartRecipeBuilder.Factory<T, B> getBuilderFactory() {
         assert this.builderFactory != null;
         return this.builderFactory;
     }

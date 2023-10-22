@@ -31,11 +31,11 @@ import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.builder.ItemBuilder;
-import org.shsts.tinactory.registrate.builder.RecipeBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
+import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.handler.BlockStateHandler;
 import org.shsts.tinactory.registrate.handler.CapabilityHandler;
@@ -264,7 +264,7 @@ public class Registrate implements IBlockParent, IItemParent {
         return this.registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
     }
 
-    public <T extends SmartRecipe<?, T>, B extends RecipeBuilder<T, B>, S extends SmartRecipeSerializer<T, B>>
+    public <T extends SmartRecipe<?, T>, B extends SmartRecipeBuilder<T, B>, S extends SmartRecipeSerializer<T, B>>
     RecipeTypeBuilder<T, B, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B, S> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
