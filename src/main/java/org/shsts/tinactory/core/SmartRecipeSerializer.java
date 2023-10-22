@@ -14,7 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B extends SmartRecipeBuilder<T, B>>
+public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
         extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
 
     @FunctionalInterface

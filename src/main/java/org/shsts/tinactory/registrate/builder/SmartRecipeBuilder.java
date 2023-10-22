@@ -14,7 +14,7 @@ public abstract class SmartRecipeBuilder<U extends SmartRecipe<?, U>, S extends 
         extends Builder<U, RecipeTypeEntry<U, S>, S> {
 
     @FunctionalInterface
-    public interface Factory<U1 extends SmartRecipe<?, U1>, S1 extends SmartRecipeBuilder<U1, S1>> {
+    public interface Factory<U1 extends SmartRecipe<?, U1>, S1> {
         S1 create(Registrate registrate, RecipeTypeEntry<U1, S1> parent, ResourceLocation loc);
     }
 
