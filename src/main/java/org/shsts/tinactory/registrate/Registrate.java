@@ -2,6 +2,8 @@ package org.shsts.tinactory.registrate;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
+import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -267,6 +269,14 @@ public class Registrate implements IBlockParent, IItemParent {
     public <T extends SmartRecipe<?, T>, B extends SmartRecipeBuilder<T, B>, S extends SmartRecipeSerializer<T, B>>
     RecipeTypeBuilder<T, B, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B, S> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
+    }
+
+    public void vanillaRecipe(Supplier<RecipeBuilder> recipe) {
+        this.recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe));
+    }
+
+    public void vanillaRecipe(Supplier<RecipeBuilder> recipe, ResourceLocation loc) {
+        this.recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe, loc));
     }
 
     // defaults
