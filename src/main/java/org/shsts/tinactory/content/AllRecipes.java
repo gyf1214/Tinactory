@@ -41,12 +41,17 @@ public final class AllRecipes {
         woodRecipes("jungle");
         woodRecipes("acacia");
         woodRecipes("dark_oak");
+        woodRecipes("crimson");
+        woodRecipes("warped");
     }
 
     private static void woodRecipes(String prefix) {
+        var nether = prefix.equals("crimson") || prefix.equals("warped");
+
         var planks = REGISTRATE.itemHandler.getEntry(prefix + "_planks");
-        var logTag = AllTags.item(prefix + "_logs");
-        var wood = REGISTRATE.itemHandler.getEntry(prefix + "_wood");
+        var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
+        var wood = prefix + (nether ? "_hyphae" : "_wood");
+        var woodStripped = "stripped_" + wood;
 
         TOOL_RECIPE_TYPE.modRecipe(planks.id + "_saw")
                 .result(planks, 4)
@@ -55,7 +60,8 @@ public final class AllRecipes {
                 .damage(100)
                 .toolTag(AllTags.TOOL_SAW)
                 .build();
-        NULL_RECIPE_TYPE.recipe(wood.loc).build();
+        NULL_RECIPE_TYPE.recipe(wood).build();
+        NULL_RECIPE_TYPE.recipe(woodStripped).build();
         REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(planks.get(), 2)
                 .requires(logTag)
