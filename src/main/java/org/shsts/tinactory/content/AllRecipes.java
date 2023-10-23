@@ -6,10 +6,8 @@ import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.recipe.NullRecipe;
@@ -27,15 +25,6 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<NullRecipe, NullRecipe.Builder> NULL_RECIPE_TYPE;
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL_RECIPE_TYPE;
 
-    private static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
-    }
-
-    private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {
-        return new InventoryChangeTrigger.TriggerInstance(EntityPredicate.Composite.ANY,
-                MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
-    }
-
     static {
         NULL_RECIPE_TYPE = REGISTRATE.recipeType("null", NullRecipe::serializer)
                 .builder(NullRecipe.Builder::new)
@@ -46,21 +35,41 @@ public final class AllRecipes {
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
-        NULL_RECIPE_TYPE.recipe("oak_wood").build();
+        woodRecipes("oak");
+        woodRecipes("spruce");
+        woodRecipes("birch");
+        woodRecipes("jungle");
+        woodRecipes("acacia");
+        woodRecipes("dark_oak");
+    }
 
-        REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
-                .shapeless(Items.OAK_PLANKS, 2)
-                .requires(ItemTags.OAK_LOGS)
-                .group("planks")
-                .unlockedBy("has_logs", has(ItemTags.OAK_LOGS)));
+    private static void woodRecipes(String prefix) {
+        var planks = REGISTRATE.itemHandler.getEntry(prefix + "_planks");
+        var logTag = AllTags.item(prefix + "_logs");
+        var wood = REGISTRATE.itemHandler.getEntry(prefix + "_wood");
 
-        TOOL_RECIPE_TYPE.modRecipe("oak_plank")
-                .result(Items.OAK_PLANKS, 4)
+        TOOL_RECIPE_TYPE.modRecipe(planks.id + "_saw")
+                .result(planks, 4)
                 .pattern("X")
-                .define('X', ItemTags.OAK_LOGS)
+                .define('X', logTag)
                 .damage(100)
                 .toolTag(AllTags.TOOL_SAW)
                 .build();
+        NULL_RECIPE_TYPE.recipe(wood.loc).build();
+        REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
+                .shapeless(planks.get(), 2)
+                .requires(logTag)
+                .group("planks")
+                .unlockedBy("has_logs", has(logTag)));
+    }
+
+    private static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
+        return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
+    }
+
+    private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {
+        return new InventoryChangeTrigger.TriggerInstance(EntityPredicate.Composite.ANY,
+                MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
     }
 
     public static void init() {}

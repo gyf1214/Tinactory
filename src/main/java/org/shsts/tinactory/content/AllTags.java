@@ -20,4 +20,8 @@ public final class AllTags {
     public static TagKey<Item> item(ResourceLocation loc) {
         return TagKey.create(Registry.ITEM_REGISTRY, loc);
     }
+
+    public static TagKey<Item> item(String loc) {
+        return item(new ResourceLocation(loc));
+    }
 }

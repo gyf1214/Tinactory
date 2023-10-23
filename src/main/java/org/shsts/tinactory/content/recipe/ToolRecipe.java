@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 
 @MethodsReturnNonnullByDefault
@@ -115,14 +117,14 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
 
     public static class Builder extends SimpleRecipeBuilder<RecipeTypeEntry<ToolRecipe, Builder>, Builder> {
         @Nullable
-        private Item result = null;
+        private Supplier<Item> result = null;
         private int count = 0;
         private final List<String> rows = new ArrayList<>();
-        private final Map<Character, Ingredient> key = new HashMap<>();
+        private final Map<Character, Supplier<Ingredient>> key = new HashMap<>();
         private int damage = 0;
-        private final List<Ingredient> tools = new ArrayList<>();
+        private final List<Supplier<Ingredient>> tools = new ArrayList<>();
 
-        public Builder result(Item result, int count) {
+        public Builder result(Supplier<Item> result, int count) {
             this.result = result;
             this.count = count;
             return self();
@@ -134,7 +136,7 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
         }
 
         public Builder define(Character key, TagKey<Item> tag) {
-            this.key.put(key, Ingredient.of(tag));
+            this.key.put(key, () -> Ingredient.of(tag));
             return self();
         }
 
@@ -143,13 +145,13 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
             return self();
         }
 
-        public Builder tool(Ingredient ingredient) {
+        public Builder tool(Supplier<Ingredient> ingredient) {
             this.tools.add(ingredient);
             return self();
         }
 
         public Builder toolTag(ResourceLocation toolTag) {
-            return this.tool(Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, toolTag)));
+            return this.tool(() -> Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, toolTag)));
         }
 
         public Builder(Registrate registrate, RecipeTypeEntry<ToolRecipe, Builder> parent, ResourceLocation loc) {
@@ -159,8 +161,11 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
         @Override
         public FinishedRecipe createObject() {
             assert this.result != null;
-            var shaped = new FinishedShaped(this.loc, this.result, this.count, this.rows, this.key);
-            return new Finished(this.loc, this.parent, shaped, this.damage, this.tools);
+            var key = this.key.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
+            var tools = this.tools.stream().map(Supplier::get).toList();
+            var shaped = new FinishedShaped(this.loc, this.result.get(), this.count, this.rows, key);
+            return new Finished(this.loc, this.parent, shaped, this.damage, tools);
         }
     }
 

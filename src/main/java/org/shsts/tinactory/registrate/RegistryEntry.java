@@ -16,26 +16,29 @@ import java.util.function.Supplier;
 public class RegistryEntry<U> implements Supplier<U> {
     public final String modid;
     public final String id;
+    public final ResourceLocation loc;
 
     @Nullable
     private Supplier<U> supplier;
     @Nullable
     private U object = null;
 
-    public RegistryEntry(String modid, String id) {
+    public RegistryEntry(String modid, String id, @Nullable Supplier<U> supplier) {
         this.modid = modid;
         this.id = id;
-        this.supplier = null;
-    }
-
-    public RegistryEntry(String modid, String id, Supplier<U> supplier) {
-        this.modid = modid;
-        this.id = id;
+        this.loc = new ResourceLocation(this.modid, this.id);
         this.supplier = supplier;
     }
 
+    public RegistryEntry(String modid, String id) {
+        this(modid, id, null);
+    }
+
     public RegistryEntry(ResourceLocation loc, Supplier<U> supplier) {
-        this(loc.getNamespace(), loc.getPath(), supplier);
+        this.modid = loc.getNamespace();
+        this.id = loc.getPath();
+        this.loc = loc;
+        this.supplier = supplier;
     }
 
     public static <T, U extends T> RegistryEntry<U>

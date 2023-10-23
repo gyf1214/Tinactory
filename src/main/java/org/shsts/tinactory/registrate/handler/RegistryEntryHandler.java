@@ -24,7 +24,6 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
 
     private final List<RegistryEntryBuilder<T, ?, ?, ?>> builders = new ArrayList<>();
 
-
     public <U extends T> RegistryEntry<U> getEntry(String id) {
         return this.getEntry(new ResourceLocation(id));
     }
