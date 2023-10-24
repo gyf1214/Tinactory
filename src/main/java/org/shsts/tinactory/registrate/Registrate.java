@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -140,9 +139,6 @@ public class Registrate implements IBlockParent, IItemParent {
         modEventBus.addListener(this.tintHandler::onRegisterBlockColors);
         modEventBus.addListener(this.tintHandler::onRegisterItemColors);
         this.recipeTypeHandler.addListeners(modEventBus);
-
-        // Forge BUS
-        MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this.capabilityHandler::onAttachBlockEntity);
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {

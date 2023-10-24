@@ -5,9 +5,12 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -29,6 +32,9 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     public final T blockEntity;
     public final Player player;
     public final Inventory inventory;
+
+    protected int containerSlotCount;
+    protected boolean hasInventory;
     protected int height;
     protected final List<ContainerSyncData<?, ContainerMenu<T>>> syncData = new ArrayList<>();
 
@@ -53,17 +59,17 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     protected int addInventorySlots(int y) {
+        var barY = y + 3 * SLOT_SIZE + SPACING_VERTICAL;
+        for (var j = 0; j < 9; j++) {
+            this.addSlot(new Slot(this.inventory, j, MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, barY + 1));
+        }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 9; j++) {
-                this.addSlot(new Slot(this.inventory, 9 + i * 9 + j, MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, y + 1));
+                this.addSlot(new Slot(this.inventory, 9 + i * 9 + j,
+                        MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, y + i * SLOT_SIZE + 1));
             }
-            y += SLOT_SIZE;
         }
-        y += SPACING_VERTICAL;
-        for (var j = 0; j < 9; j++) {
-            this.addSlot(new Slot(this.inventory, j, MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, y + 1));
-        }
-        return y + SLOT_SIZE + MARGIN_VERTICAL;
+        return barY + SLOT_SIZE + MARGIN_VERTICAL;
     }
 
     public void setLayout(List<Rect> widgets, boolean hasInventory) {
@@ -72,12 +78,55 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             y = Math.max(y, widget.endY());
         }
         y += MARGIN_TOP + SPACING_VERTICAL;
+        this.containerSlotCount = this.slots.size();
+        this.hasInventory = hasInventory;
         if (hasInventory) {
             y = addInventorySlots(y);
         } else {
             y += MARGIN_VERTICAL;
         }
         this.height = y;
+    }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int index) {
+        if (!this.hasInventory || index < 0 || index >= this.slots.size()) {
+            return ItemStack.EMPTY;
+        }
+        var slot = this.slots.get(index);
+        if (!slot.hasItem()) {
+            return ItemStack.EMPTY;
+        }
+        var inv = new PlayerMainInvWrapper(this.inventory);
+        if (index < this.containerSlotCount) {
+            if (!slot.mayPickup(player)) {
+                return ItemStack.EMPTY;
+            }
+            var stack = slot.getItem().copy();
+            var reminder = ItemHandlerHelper.insertItemStacked(inv, stack, true);
+            stack.shrink(reminder.getCount());
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            var stack1 = slot.safeTake(stack.getCount(), Integer.MAX_VALUE, player);
+            ItemHandlerHelper.insertItemStacked(inv, stack1, false);
+
+            return slot.getItem();
+        } else {
+            var invIndex = index - this.containerSlotCount;
+            var reminder = inv.getStackInSlot(invIndex).copy();
+            var amount = reminder.getCount();
+            for (var i = 0; i < this.containerSlotCount; i++) {
+                if (reminder.isEmpty()) {
+                    break;
+                }
+                var targetSlot = this.slots.get(i);
+                reminder = targetSlot.safeInsert(reminder);
+            }
+            inv.extractItem(invIndex, amount - reminder.getCount(), false);
+
+            return inv.getStackInSlot(invIndex);
+        }
     }
 
     public int getHeight() {

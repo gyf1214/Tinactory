@@ -37,7 +37,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
     protected boolean ticking = false;
     @Nullable
     protected Class<U> entityClass = null;
-    protected final List<Supplier<CapabilityProviderType<U, ?>>> capabilities = new ArrayList<>();
+    protected final List<Supplier<CapabilityProviderType<? super U, ?>>> capabilities = new ArrayList<>();
     @Nullable
     protected Supplier<ContainerMenuType<U, ?>> menu = null;
 
@@ -85,7 +85,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
         return menu(ContainerMenu::new);
     }
 
-    public S capability(Supplier<CapabilityProviderType<U, ?>> cap) {
+    public S capability(Supplier<CapabilityProviderType<? super U, ?>> cap) {
         this.capabilities.add(cap);
         return self();
     }

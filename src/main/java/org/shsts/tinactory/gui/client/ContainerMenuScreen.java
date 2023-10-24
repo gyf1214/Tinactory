@@ -15,6 +15,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.gui.ContainerMenu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.gui.ContainerMenu.MARGIN_TOP;
+import static org.shsts.tinactory.gui.ContainerMenu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.gui.ContainerMenu.WIDTH;
+
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractContainerScreen<M> {
@@ -24,9 +29,9 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
 
     public ContainerMenuScreen(M menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.titleLabelX = ContainerMenu.MARGIN_HORIZONTAL;
-        this.titleLabelY = ContainerMenu.MARGIN_VERTICAL;
-        this.imageWidth = ContainerMenu.WIDTH;
+        this.titleLabelX = MARGIN_HORIZONTAL;
+        this.titleLabelY = MARGIN_VERTICAL;
+        this.imageWidth = WIDTH;
         this.imageHeight = menu.getHeight();
     }
 
@@ -48,7 +53,7 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         }
         for (var builder : this.widgetBuilders) {
             var widget = builder.factory().apply(this.menu, builder.rect().offset(
-                    ContainerMenu.MARGIN_HORIZONTAL + this.leftPos, ContainerMenu.MARGIN_TOP + this.topPos));
+                    MARGIN_HORIZONTAL + this.leftPos, MARGIN_TOP + this.topPos));
             this.renderables.add(widget);
         }
     }
@@ -64,8 +69,8 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
     protected void renderBg(PoseStack poseStack, float partialTick, int mouseX, int mouseY) {
         var x = this.leftPos;
         var y = this.topPos;
-        var w = ContainerMenu.WIDTH;
-        var h1 = ContainerMenu.MARGIN_VERTICAL;
+        var w = WIDTH;
+        var h1 = MARGIN_VERTICAL;
         var h2 = this.imageHeight - 2 * h1;
         var h3 = Texture.BACKGROUND.height() - 2 * h1;
         RenderUtil.blit(poseStack, Texture.BACKGROUND, 0, new Rect(x, y, w, h1));

@@ -16,14 +16,14 @@ import java.util.function.Supplier;
 public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType<T> {
     public final Class<T> entityClass;
     public final boolean ticking;
-    public final List<Supplier<CapabilityProviderType<T, ?>>> capabilities;
+    public final List<Supplier<CapabilityProviderType<? super T, ?>>> capabilities;
     @Nullable
     public final Supplier<ContainerMenuType<T, ?>> menu;
 
     @SuppressWarnings("ConstantConditions")
     public SmartBlockEntityType(BlockEntitySupplier<? extends T> factory, Set<Block> validBlocks,
                                 Class<T> entityClass, boolean ticking,
-                                List<Supplier<CapabilityProviderType<T, ?>>> capabilities,
+                                List<Supplier<CapabilityProviderType<? super T, ?>>> capabilities,
                                 @Nullable Supplier<ContainerMenuType<T, ?>> menu) {
         super(factory, validBlocks, null);
         this.entityClass = entityClass;

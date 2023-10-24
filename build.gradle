@@ -20,7 +20,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 //jarJar.enable()
 
 group = 'org.shsts.tinactory'
-archivesBaseName = "tinactory-${minecraft_version}"
+// archivesBaseName = "tinactory-${minecraft_version}"
 version = "${mod_version}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -29,6 +29,7 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 println "Minecraft: ${minecraft_version}, Forge: ${forge_version}, ForgeGradle: ${forgegradle_version}"
 minecraft {
     mappings channel: 'parchment', version: "${parchment_version}-${minecraft_version}"
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {

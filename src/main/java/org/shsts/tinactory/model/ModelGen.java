@@ -1,9 +1,12 @@
 package org.shsts.tinactory.model;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
@@ -14,6 +17,7 @@ import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -21,6 +25,13 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 public final class ModelGen {
     public static final Direction FRONT_FACING = Direction.NORTH;
+    public static final Map<Direction, String> DIR_TEX_KEYS = ImmutableMap.of(
+            Direction.UP, "top",
+            Direction.DOWN, "bottom",
+            Direction.SOUTH, "back",
+            Direction.NORTH, "front",
+            Direction.WEST, "left",
+            Direction.EAST, "right");
 
     public static int xRotation(Direction dir) {
         return switch (dir) {
@@ -48,6 +59,10 @@ public final class ModelGen {
         return modLoc(ModelGen.VENDOR_PATH.formatted(vendor, id));
     }
 
+    public static ResourceLocation extend(ResourceLocation loc, String suffix) {
+        return new ResourceLocation(loc.getNamespace(), loc.getPath() + "/" + suffix);
+    }
+
     public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
     basicItem(Function<RegistryDataContext<Item, U, ItemModelProvider>, ResourceLocation> texture) {
         return ctx -> ctx.provider
@@ -67,6 +82,18 @@ public final class ModelGen {
         var model = new MachineModel(casing, front);
         return $ -> $.blockState(model::blockState)
                 .translucent();
+    }
+
+    public static <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>> primitive(ResourceLocation tex) {
+        return ctx -> {
+            var model = ctx.provider.models().withExistingParent(ctx.id, "block/cube");
+            for (var entry : DIR_TEX_KEYS.entrySet()) {
+                var faceTex = extend(tex, entry.getValue());
+                model = model.texture(entry.getKey().getName(), faceTex);
+            }
+            ctx.provider.horizontalBlock(ctx.object, model);
+        };
     }
 
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;

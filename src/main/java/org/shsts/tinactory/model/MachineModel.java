@@ -1,6 +1,5 @@
 package org.shsts.tinactory.model;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -15,19 +14,11 @@ import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
-import java.util.Map;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class MachineModel {
     private static final String CASING_MODEL = "block/machine/casing";
-    private static final Map<Direction, String> CASING_OVERLAY_TEX_KEYS = ImmutableMap.of(
-            Direction.UP, "top_overlay",
-            Direction.DOWN, "bottom_overlay",
-            Direction.SOUTH, "back_overlay",
-            Direction.NORTH, "front_overlay",
-            Direction.WEST, "left_overlay",
-            Direction.EAST, "right_overlay");
 
     private static final String IO_MODEL = "block/machine/io";
     private static final String IO_TEX_KEY = "io_overlay";
@@ -43,10 +34,10 @@ public final class MachineModel {
                     default -> "#side";
                 })).end()
                 .element().from(0, 0, 0).to(16, 16, 16)
-                .allFaces((d, f) -> f.cullface(d).texture("#" + CASING_OVERLAY_TEX_KEYS.get(d)))
+                .allFaces((d, f) -> f.cullface(d).texture("#" + ModelGen.DIR_TEX_KEYS.get(d) + "_overlay"))
                 .end();
-        for (var texKey : CASING_OVERLAY_TEX_KEYS.values()) {
-            model.texture(texKey, ModelGen.VOID_TEX);
+        for (var texKey : ModelGen.DIR_TEX_KEYS.values()) {
+            model.texture(texKey + "_overlay", ModelGen.VOID_TEX);
         }
     }
 
@@ -73,14 +64,10 @@ public final class MachineModel {
         this.front = front;
     }
 
-    private static ResourceLocation suffix(ResourceLocation loc, String suffix) {
-        return new ResourceLocation(loc.getNamespace(), loc.getPath() + "/" + suffix);
-    }
-
     private <B extends ModelBuilder<B>> B applyTextures(B model) {
-        return model.texture("top", suffix(this.casing, "top"))
-                .texture("bottom", suffix(this.casing, "bottom"))
-                .texture("side", suffix(this.casing, "side"))
+        return model.texture("top", ModelGen.extend(this.casing, "top"))
+                .texture("bottom", ModelGen.extend(this.casing, "bottom"))
+                .texture("side", ModelGen.extend(this.casing, "side"))
                 .texture("front_overlay", this.front);
     }
 

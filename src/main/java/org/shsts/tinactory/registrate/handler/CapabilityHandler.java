@@ -1,13 +1,10 @@
 package org.shsts.tinactory.registrate.handler;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
@@ -36,11 +33,5 @@ public class CapabilityHandler {
         this.capabilities.add(clazz);
         // ignore id
         return new RegistryEntry<>(this.registrate.modid, "", () -> CapabilityManager.get(token));
-    }
-
-    public void onAttachBlockEntity(AttachCapabilitiesEvent<BlockEntity> event) {
-        if (event.getObject().getType() instanceof SmartBlockEntityType<?> type) {
-            type.attachCapabilities(event);
-        }
     }
 }
