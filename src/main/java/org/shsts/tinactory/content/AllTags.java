@@ -14,7 +14,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public final class AllTags {
     public static final ResourceLocation TOOL = ModelGen.modLoc("tool");
     public static final ResourceLocation TOOL_WRENCH = ModelGen.modLoc("tool/wrench");
-    public static final ResourceLocation TOOL_CUTTER = ModelGen.modLoc("tool/cutter");
     public static final ResourceLocation TOOL_SAW = ModelGen.modLoc("tool/saw");
 
     public static TagKey<Item> item(ResourceLocation loc) {

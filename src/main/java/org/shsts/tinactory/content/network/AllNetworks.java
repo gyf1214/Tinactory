@@ -5,7 +5,7 @@ import org.shsts.tinactory.network.Scheduling;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
-public final class AllSchedulings {
+public final class AllNetworks {
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
     public static final RegistryEntry<Scheduling> PRE_WORK;
@@ -20,5 +20,6 @@ public final class AllSchedulings {
         WORK = REGISTRATE.scheduling("machine/work").after(() -> ELECTRIC).register();
     }
 
-    public static void init() {}
+    public static void init() {
+    }
 }

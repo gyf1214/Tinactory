@@ -17,7 +17,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.logistics.OutputItemHandler;
 import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.content.network.AllSchedulings;
+import org.shsts.tinactory.content.network.AllNetworks;
 import org.shsts.tinactory.network.Component;
 import org.shsts.tinactory.network.Network;
 import org.shsts.tinactory.network.Scheduling;
@@ -67,6 +67,6 @@ public class PrimitiveStoneGenerator extends Machine {
 
     @Override
     public void buildSchedulings(BiConsumer<Supplier<Scheduling>, Component.Ticker> cons) {
-        cons.accept(AllSchedulings.WORK, this::onWorkTick);
+        cons.accept(AllNetworks.WORK, this::onWorkTick);
     }
 }

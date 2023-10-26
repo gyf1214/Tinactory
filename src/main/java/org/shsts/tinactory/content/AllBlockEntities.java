@@ -28,7 +28,7 @@ public class AllBlockEntities {
                 .entityClass(SmartBlockEntity.class)
                 .ticking()
                 .validBlock(AllBlocks.WORKBENCH)
-                .capability(AllCapabilityProviders.WORKBENCH_CONTAINER::get)
+                .capability(AllCapabilities.WORKBENCH_CONTAINER::get)
                 .menu();
 
         for (var i = 0; i < 3; i++) {
@@ -37,10 +37,8 @@ public class AllBlockEntities {
             }
         }
         workbenchMenu.slot(9, 6 * SLOT_SIZE, SLOT_SIZE);
-        for (var i = 0; i < 2; i++) {
-            for (var j = 0; j < 9; j++) {
-                workbenchMenu.slot(10 + i * 9 + j, j * SLOT_SIZE, (3 + i) * SLOT_SIZE + SPACING_VERTICAL);
-            }
+        for (var j = 0; j < 9; j++) {
+            workbenchMenu.slot(10 + j, j * SLOT_SIZE, 3 * SLOT_SIZE + SPACING_VERTICAL);
         }
 
         WORKBENCH = workbenchMenu.build().register();

@@ -8,8 +8,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -133,10 +133,15 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         return height;
     }
 
-    public void addSlot(int slotIndex, int posX, int posY) {
+    @FunctionalInterface
+    public interface SlotFactory<T extends Slot> {
+        T create(IItemHandler itemHandler, int index, int posX, int posY);
+    }
+
+    public void addSlot(SlotFactory<?> factory, int slotIndex, int posX, int posY) {
         var itemHandler = this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .orElseThrow(NullPointerException::new);
-        this.addSlot(new SlotItemHandler(itemHandler, slotIndex,
+        this.addSlot(factory.create(itemHandler, slotIndex,
                 posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 

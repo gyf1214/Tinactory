@@ -11,13 +11,13 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.logistics.ItemHelper;
 import org.shsts.tinactory.content.logistics.OutputItemHandler;
 import org.shsts.tinactory.content.recipe.NullContainer;
@@ -28,18 +28,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public class WorkbenchContainer extends NullContainer implements ICapabilityProvider, INBTSerializable<CompoundTag> {
     protected static class CraftingStack extends CraftingContainer {
-        public final IItemHandler wrapper;
-
         @SuppressWarnings("ConstantConditions")
         public CraftingStack(int width, int height) {
             super(null, width, height);
-            this.wrapper = new InvWrapper(this);
         }
 
         @Override
         public ItemStack removeItem(int index, int count) {
-            ContainerHelper.removeItem(this.items, index, count);
-            return ItemStack.EMPTY;
+            return ContainerHelper.removeItem(this.items, index, count);
         }
 
         @Override
@@ -48,9 +44,20 @@ public class WorkbenchContainer extends NullContainer implements ICapabilityProv
         }
     }
 
+    protected static class ToolItemHandler extends ItemStackHandler {
+        public ToolItemHandler(int size) {
+            super(size);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return stack.is(AllTags.item(AllTags.TOOL));
+        }
+    }
+
     protected final CraftingStack craftingStack;
     protected final IItemHandlerModifiable craftingView;
-    protected final IItemHandlerModifiable storage;
+    protected final IItemHandlerModifiable toolStorage;
     protected final IItemHandlerModifiable output;
     protected final IItemHandlerModifiable itemView;
 
@@ -58,8 +65,8 @@ public class WorkbenchContainer extends NullContainer implements ICapabilityProv
         this.craftingStack = new CraftingStack(3, 3);
         this.craftingView = new InvWrapper(this.craftingStack);
         this.output = new OutputItemHandler(new ItemStackHandler(1));
-        this.storage = new ItemStackHandler(2 * 9);
-        this.itemView = new CombinedInvWrapper(this.craftingView, this.output, this.storage);
+        this.toolStorage = new ToolItemHandler(9);
+        this.itemView = new CombinedInvWrapper(this.craftingView, this.output, this.toolStorage);
     }
 
     public CraftingContainer getCraftingContainer() {

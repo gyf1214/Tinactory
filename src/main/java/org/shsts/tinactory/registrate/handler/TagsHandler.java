@@ -45,10 +45,17 @@ public class TagsHandler<T> extends DataHandler<TagsProvider<T>> {
         }
     }
 
-    public final void addTags(Supplier<? extends T> object, ResourceLocation... tags) {
+    public void addTags(Supplier<? extends T> object, ResourceLocation... tags) {
         for (var tag : tags) {
             this.callbacks.add(prov -> ((Provider) prov)
                     .addTag(TagKey.create(this.registryKey, tag), object.get()));
+        }
+    }
+
+    @SafeVarargs
+    public final void addTags(Supplier<? extends T> object, TagKey<T>... tags) {
+        for (var tag : tags) {
+            this.callbacks.add(prov -> ((Provider) prov).addTag(tag, object.get()));
         }
     }
 

@@ -8,6 +8,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.gui.ContainerMenu;
@@ -101,7 +102,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     public S slot(int slotIndex, int posX, int posY) {
-        this.menuCallbacks.add(MenuCallback.dummy(menu -> menu.addSlot(slotIndex, posX, posY)));
+        return slot(SlotItemHandler::new, slotIndex, posX, posY);
+    }
+
+    public S slot(ContainerMenu.SlotFactory<?> factory, int slotIndex, int posX, int posY) {
+        this.menuCallbacks.add(MenuCallback.dummy(menu -> menu.addSlot(factory, slotIndex, posX, posY)));
         this.widgetsRect.add(new Rect(posX, posY, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE));
         return self();
     }

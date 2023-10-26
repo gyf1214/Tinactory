@@ -14,11 +14,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllBlocks;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllWorldGens;
-import org.shsts.tinactory.content.network.AllNetworkRegistries;
+import org.shsts.tinactory.content.network.AllNetworks;
 import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.AllRegistries;
 import org.shsts.tinactory.registrate.Registrate;
@@ -51,9 +50,8 @@ public class Tinactory {
         AllBlocks.init();
         AllItems.init();
         AllCapabilities.init();
-        AllCapabilityProviders.init();
         AllBlockEntities.init();
-        AllNetworkRegistries.init();
+        AllNetworks.init();
 
         AllRecipes.init();
         AllWorldGens.init();
