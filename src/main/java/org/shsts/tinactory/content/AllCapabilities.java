@@ -19,7 +19,7 @@ public final class AllCapabilities {
     static {
         ITEM_COLLECTION = REGISTRATE.capability(IItemCollection.class, new CapabilityToken<>() {});
         WORKBENCH_CONTAINER = REGISTRATE.capabilityProvider("primitive/workbench_container",
-                $ -> new WorkbenchContainer());
+                WorkbenchContainer::new);
     }
 
     public static void init() {}

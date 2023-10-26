@@ -46,11 +46,9 @@ public class ToolItem extends Item implements IToolItem {
         return this.level;
     }
 
-    @Override
-    public boolean canDamage(ItemStack stack, int damage) {
-        return true;
-    }
-
+    /**
+     * Will override the itemStack.
+     */
     @Override
     public ItemStack doDamage(ItemStack stack, int damage) {
         var newDurability = getDurability(stack) - damage;

@@ -18,7 +18,10 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.content.machine.WorkbenchContainer;
+import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
@@ -28,6 +31,7 @@ import org.shsts.tinactory.registrate.builder.SimpleRecipeBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,15 +54,59 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
         this.toolIngredients = toolIngredients;
     }
 
+    protected boolean matchTools(IItemHandler toolStorage) {
+        for (var ingredient : this.toolIngredients) {
+            var found = false;
+            for (var i = 0; i < toolStorage.getSlots(); i++) {
+                var stack = toolStorage.getStackInSlot(i);
+                if (ingredient.test(stack)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public boolean matches(WorkbenchContainer container, Level world) {
-        // TODO
-        return this.shapedRecipe.matches(container.getCraftingContainer(), world);
+        return this.shapedRecipe.matches(container.getCraftingContainer(), world) &&
+                this.matchTools(container.getToolStorage());
+    }
+
+    protected void doDamage(IItemHandlerModifiable toolStorage) {
+        var damages = new int[toolStorage.getSlots()];
+        Arrays.fill(damages, 0);
+
+        for (var ingredient : this.toolIngredients) {
+            var found = -1;
+            for (var i = 0; i < toolStorage.getSlots(); i++) {
+                var stack = toolStorage.getStackInSlot(i);
+                if (ingredient.test(stack)) {
+                    found = i;
+                    break;
+                }
+            }
+            if (found != -1) {
+                damages[found] += this.damage;
+            }
+        }
+
+        for (var i = 0; i < toolStorage.getSlots(); i++) {
+            var stack = toolStorage.getStackInSlot(i);
+            if (stack.getItem() instanceof ToolItem item) {
+                var stack1 = item.doDamage(stack, damages[i]);
+                toolStorage.setStackInSlot(i, stack1);
+            }
+        }
     }
 
     @Override
     public ItemStack assemble(WorkbenchContainer container) {
-        // TODO
+        this.doDamage(container.getToolStorage());
         return this.shapedRecipe.assemble(container.getCraftingContainer());
     }
 
