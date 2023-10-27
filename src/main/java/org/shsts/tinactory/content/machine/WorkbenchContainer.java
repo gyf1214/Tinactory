@@ -15,13 +15,12 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import net.minecraftforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.logistics.ItemHelper;
-import org.shsts.tinactory.content.logistics.NotifyItemHandler;
-import org.shsts.tinactory.content.logistics.OutputItemHandler;
+import org.shsts.tinactory.content.logistics.WrapperItemHandler;
 import org.shsts.tinactory.content.recipe.NullContainer;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,7 +28,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WorkbenchContainer extends NullContainer implements ICapabilityProvider, INBTSerializable<CompoundTag> {
-    protected class CraftingStack extends CraftingContainer {
+    protected static class CraftingStack extends CraftingContainer {
         @SuppressWarnings("ConstantConditions")
         public CraftingStack(int width, int height) {
             super(null, width, height);
@@ -44,16 +43,17 @@ public class WorkbenchContainer extends NullContainer implements ICapabilityProv
         public void setItem(int index, ItemStack stack) {
             this.items.set(index, stack);
         }
-
-        @Override
-        public void setChanged() {
-            WorkbenchContainer.this.onUpdate();
-        }
     }
 
     protected static class ToolItemHandler extends ItemStackHandler {
         public ToolItemHandler(int size) {
             super(size);
+        }
+
+        @NotNull
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            return isItemValid(slot, stack) ? super.insertItem(slot, stack, simulate) : stack;
         }
 
         @Override
@@ -64,23 +64,43 @@ public class WorkbenchContainer extends NullContainer implements ICapabilityProv
 
     protected final BlockEntity blockEntity;
     protected final CraftingStack craftingStack;
-    protected final IItemHandlerModifiable craftingView;
-    protected final IItemHandlerModifiable toolStorage;
-    protected final IItemHandlerModifiable output;
-    protected final IItemHandlerModifiable itemView;
+    protected final WrapperItemHandler craftingView;
+    protected final ToolItemHandler toolStorage;
+    protected final WrapperItemHandler output;
+    protected final WrapperItemHandler itemView;
 
     public WorkbenchContainer(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
+
         this.craftingStack = new CraftingStack(3, 3);
-        this.craftingView = new InvWrapper(this.craftingStack);
-        this.output = new OutputItemHandler(new ItemStackHandler(1));
+        this.craftingView = new WrapperItemHandler(this.craftingStack);
+        this.craftingView.addListener($ -> this.onUpdateCrafting());
+
+        this.output = new WrapperItemHandler(1);
+        this.output.allowInput = false;
+
         this.toolStorage = new ToolItemHandler(9);
-        this.itemView = new NotifyItemHandler(
-                new CombinedInvWrapper(this.craftingView, this.output, this.toolStorage), this::onUpdate);
+        this.itemView = new WrapperItemHandler(
+                new CombinedInvWrapper(this.craftingView, this.output, this.toolStorage));
+        this.itemView.addListener($ -> this.onUpdate());
     }
 
     protected void onUpdate() {
         this.blockEntity.setChanged();
+    }
+
+    protected void onUpdateCrafting() {
+        var level = this.blockEntity.getLevel();
+        if (level != null && !level.isClientSide) {
+            var recipe = level.getRecipeManager()
+                    .getRecipeFor(AllRecipes.TOOL_RECIPE_TYPE.getProperType(), this, level);
+            if (recipe.isEmpty()) {
+                this.output.setStackInSlot(0, ItemStack.EMPTY);
+            } else {
+                this.output.setStackInSlot(0, recipe.get().assemble(this));
+            }
+            this.onUpdate();
+        }
     }
 
     public CraftingContainer getCraftingContainer() {

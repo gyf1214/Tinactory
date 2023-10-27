@@ -36,6 +36,11 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
         this.serializer = serializer;
     }
 
+    @SuppressWarnings("unchecked")
+    public RecipeType<T> getProperType() {
+        return (RecipeType<T>) this.get();
+    }
+
     public B recipe(ResourceLocation loc) {
         return this.builderFactory.create(this.registrate, this, loc);
     }

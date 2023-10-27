@@ -11,11 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
-import org.shsts.tinactory.content.logistics.OutputItemHandler;
+import org.shsts.tinactory.content.logistics.WrapperItemHandler;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.network.AllNetworks;
 import org.shsts.tinactory.network.Component;
@@ -34,13 +31,12 @@ public class PrimitiveStoneGenerator extends Machine {
     private static final int WORK_TICKS = 5 * 20;
 
     private int workProgress = 0;
-    private final IItemHandlerModifiable outputBuffer;
-    private final IItemHandler outputView;
+    private final WrapperItemHandler outputBuffer;
 
     public PrimitiveStoneGenerator(BlockEntityType<PrimitiveStoneGenerator> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        this.outputBuffer = new ItemStackHandler(1);
-        this.outputView = new OutputItemHandler(this.outputBuffer);
+        this.outputBuffer = new WrapperItemHandler(1);
+        this.outputBuffer.allowInput = false;
     }
 
     private void onWorkTick(Level world, Network network) {
@@ -60,7 +56,7 @@ public class PrimitiveStoneGenerator extends Machine {
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> this.outputView).cast();
+            return LazyOptional.of(() -> this.outputBuffer).cast();
         }
         return super.getCapability(cap, side);
     }

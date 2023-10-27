@@ -82,7 +82,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
     }
 
     public MenuBuilder<U, ContainerMenu<U>, S, ?> menu() {
-        return menu(ContainerMenu::new);
+        return this.menu(ContainerMenu::new);
     }
 
     public S capability(Supplier<CapabilityProviderType<? super U, ?>> cap) {

@@ -64,6 +64,11 @@ public final class ModelGen {
     }
 
     public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
+    basicItem(ResourceLocation loc) {
+        return basicItem($ -> loc);
+    }
+
+    public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
     basicItem(Function<RegistryDataContext<Item, U, ItemModelProvider>, ResourceLocation> texture) {
         return ctx -> ctx.provider
                 .withExistingParent(ctx.id, "item/generated")

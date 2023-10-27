@@ -77,7 +77,7 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
                 this.matchTools(container.getToolStorage());
     }
 
-    protected void doDamage(IItemHandlerModifiable toolStorage) {
+    public void doDamage(IItemHandlerModifiable toolStorage) {
         var damages = new int[toolStorage.getSlots()];
         Arrays.fill(damages, 0);
 
@@ -106,7 +106,6 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
 
     @Override
     public ItemStack assemble(WorkbenchContainer container) {
-        this.doDamage(container.getToolStorage());
         return this.shapedRecipe.assemble(container.getCraftingContainer());
     }
 
