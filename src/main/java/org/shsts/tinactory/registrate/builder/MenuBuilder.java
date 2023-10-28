@@ -134,6 +134,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         var factory = this.factory;
         return (type, id, inventory, blockEntity) -> {
             var menu = factory.create(type, id, inventory, blockEntity);
+            menu.initLayout();
             for (var callback : menuCallbacks) {
                 callback.resolve(menu);
             }

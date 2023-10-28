@@ -7,14 +7,17 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -33,6 +36,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     public final Player player;
     public final Inventory inventory;
 
+    protected final LazyOptional<IItemHandler> container;
     protected int containerSlotCount;
     protected boolean hasInventory;
     protected int height;
@@ -45,6 +49,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         this.blockEntity = blockEntity;
         assert blockEntity.getLevel() != null;
         this.isClientSide = blockEntity.getLevel().isClientSide;
+        this.container = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        this.height = 0;
     }
 
     @Override
@@ -72,8 +78,17 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         return barY + SLOT_SIZE + MARGIN_VERTICAL;
     }
 
+    /**
+     * This is called before any menu callbacks
+     */
+    public void initLayout() {}
+
+    /**
+     * This is called after all menu callbacks
+     */
     public void setLayout(List<Rect> widgets, boolean hasInventory) {
-        var y = 0;
+        // here height does not include top margin and spacing
+        var y = this.height;
         for (var widget : widgets) {
             y = Math.max(y, widget.endY());
         }
@@ -138,9 +153,12 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         T create(IItemHandler itemHandler, int index, int posX, int posY);
     }
 
+    public void addSlot(int slotIndex, int posX, int posY) {
+        this.addSlot(SlotItemHandler::new, slotIndex, posX, posY);
+    }
+
     public void addSlot(SlotFactory<?> factory, int slotIndex, int posX, int posY) {
-        var itemHandler = this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                .orElseThrow(NullPointerException::new);
+        var itemHandler = this.container.orElseThrow(NoSuchElementException::new);
         this.addSlot(factory.create(itemHandler, slotIndex,
                 posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }

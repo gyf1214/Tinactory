@@ -6,6 +6,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -68,38 +70,41 @@ public class WorkbenchContainer extends NullContainer implements ICapabilityProv
     protected final ToolItemHandler toolStorage;
     protected final WrapperItemHandler output;
     protected final WrapperItemHandler itemView;
+    @Nullable
+    protected Recipe<?> currentRecipe = null;
 
     public WorkbenchContainer(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
 
         this.craftingStack = new CraftingStack(3, 3);
         this.craftingView = new WrapperItemHandler(this.craftingStack);
-        this.craftingView.addListener($ -> this.onUpdateCrafting());
+        this.craftingView.onUpdate(this::onUpdate);
 
         this.output = new WrapperItemHandler(1);
         this.output.allowInput = false;
 
         this.toolStorage = new ToolItemHandler(9);
         this.itemView = new WrapperItemHandler(
-                new CombinedInvWrapper(this.craftingView, this.output, this.toolStorage));
-        this.itemView.addListener($ -> this.onUpdate());
+                new CombinedInvWrapper(this.output, this.toolStorage, this.craftingView));
+        this.itemView.onUpdate(this::onUpdate);
     }
 
     protected void onUpdate() {
-        this.blockEntity.setChanged();
-    }
-
-    protected void onUpdateCrafting() {
-        var level = this.blockEntity.getLevel();
-        if (level != null && !level.isClientSide) {
-            var recipe = level.getRecipeManager()
-                    .getRecipeFor(AllRecipes.TOOL_RECIPE_TYPE.getProperType(), this, level);
-            if (recipe.isEmpty()) {
-                this.output.setStackInSlot(0, ItemStack.EMPTY);
+        var world = this.blockEntity.getLevel();
+        if (world != null && !world.isClientSide) {
+            var recipeManager = world.getRecipeManager();
+            var toolRecipe = recipeManager.getRecipeFor(AllRecipes.TOOL_RECIPE_TYPE.getProperType(), this, world);
+            if (toolRecipe.isEmpty()) {
+                var shapedRecipe = recipeManager.getRecipeFor(RecipeType.CRAFTING, this.craftingStack, world);
+                if (shapedRecipe.isEmpty()) {
+                    this.output.setStackInSlot(0, ItemStack.EMPTY);
+                } else {
+                    this.output.setStackInSlot(0, shapedRecipe.get().assemble(this.craftingStack));
+                }
             } else {
-                this.output.setStackInSlot(0, recipe.get().assemble(this));
+                this.output.setStackInSlot(0, toolRecipe.get().assemble(this));
             }
-            this.onUpdate();
+            this.blockEntity.setChanged();
         }
     }
 

@@ -11,13 +11,14 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WrapperItemHandler implements IItemHandlerModifiable {
     protected final IItemHandlerModifiable compose;
-    protected final List<Consumer<WrapperItemHandler>> listeners = new ArrayList<>();
+    protected final List<Runnable> updateListener = new ArrayList<>();
+    protected final List<Runnable> takeListener = new ArrayList<>();
+    protected final List<Runnable> quickCraftListener = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
@@ -33,20 +34,20 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         this(new InvWrapper(inv));
     }
 
-    public void addListener(Consumer<WrapperItemHandler> cons) {
-        this.listeners.add(cons);
+    public void onUpdate(Runnable cons) {
+        this.updateListener.add(cons);
     }
 
-    public void onUpdate() {
-        for (var cons : this.listeners) {
-            cons.accept(this);
+    protected void setUpdate() {
+        for (var cons : this.updateListener) {
+            cons.run();
         }
     }
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
         this.compose.setStackInSlot(slot, stack);
-        this.onUpdate();
+        this.setUpdate();
     }
 
     @Override
@@ -68,7 +69,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         }
         var reminder = this.compose.insertItem(slot, stack, simulate);
         if (!simulate && reminder.getCount() < stack.getCount()) {
-            this.onUpdate();
+            this.setUpdate();
         }
         return reminder;
     }
@@ -81,7 +82,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         }
         var extracted = this.compose.extractItem(slot, amount, simulate);
         if (!simulate && !extracted.isEmpty()) {
-            this.onUpdate();
+            this.setUpdate();
         }
         return extracted;
     }
