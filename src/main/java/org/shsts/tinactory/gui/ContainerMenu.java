@@ -11,7 +11,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -105,7 +104,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        if (!this.hasInventory || index < 0 || index >= this.slots.size()) {
+        if (!this.hasInventory || index < 0 || index >= this.slots.size() || this.isClientSide) {
             return ItemStack.EMPTY;
         }
         var slot = this.slots.get(index);
@@ -117,7 +116,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             if (!slot.mayPickup(player)) {
                 return ItemStack.EMPTY;
             }
-            var stack = slot.getItem().copy();
+            var oldStack = slot.getItem().copy();
+            var stack = oldStack.copy();
             var reminder = ItemHandlerHelper.insertItemStacked(inv, stack, true);
             stack.shrink(reminder.getCount());
             if (stack.isEmpty()) {
@@ -126,10 +126,11 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             var stack1 = slot.safeTake(stack.getCount(), Integer.MAX_VALUE, player);
             ItemHandlerHelper.insertItemStacked(inv, stack1, false);
 
-            return slot.getItem();
+            return oldStack;
         } else {
             var invIndex = index - this.containerSlotCount;
-            var reminder = inv.getStackInSlot(invIndex).copy();
+            var oldStack = inv.getStackInSlot(invIndex).copy();
+            var reminder = oldStack.copy();
             var amount = reminder.getCount();
             for (var i = 0; i < this.containerSlotCount; i++) {
                 if (reminder.isEmpty()) {
@@ -140,7 +141,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             }
             inv.extractItem(invIndex, amount - reminder.getCount(), false);
 
-            return inv.getStackInSlot(invIndex);
+            return oldStack;
         }
     }
 
@@ -154,7 +155,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     public void addSlot(int slotIndex, int posX, int posY) {
-        this.addSlot(SlotItemHandler::new, slotIndex, posX, posY);
+        this.addSlot(WrapperSlot::new, slotIndex, posX, posY);
     }
 
     public void addSlot(SlotFactory<?> factory, int slotIndex, int posX, int posY) {

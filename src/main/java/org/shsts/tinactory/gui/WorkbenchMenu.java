@@ -2,6 +2,9 @@ package org.shsts.tinactory.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import org.shsts.tinactory.content.logistics.ItemHelper;
 import org.shsts.tinactory.core.SmartBlockEntity;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -9,7 +12,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WorkbenchMenu extends ContainerMenu<SmartBlockEntity> {
-    private static final int OUTPUT_SLOT = 0;
+    public static final int OUTPUT_SLOT = 0;
 
     public WorkbenchMenu(ContainerMenuType<SmartBlockEntity, ?> type, int id,
                          Inventory inventory, SmartBlockEntity blockEntity) {
@@ -28,5 +31,16 @@ public class WorkbenchMenu extends ContainerMenu<SmartBlockEntity> {
             }
         }
         this.height = 4 * SLOT_SIZE + SPACING_VERTICAL;
+    }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int index) {
+        var oldStack = super.quickMoveStack(player, index);
+        if (oldStack.isEmpty()) {
+            return oldStack;
+        }
+        var slot = this.slots.get(index);
+        var newStack = slot.getItem();
+        return ItemHelper.itemStackEqual(oldStack, newStack) ? newStack : ItemStack.EMPTY;
     }
 }

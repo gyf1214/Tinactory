@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -117,6 +118,11 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
     @Override
     public ItemStack getResultItem() {
         return this.shapedRecipe.getResultItem();
+    }
+
+    @Override
+    public NonNullList<ItemStack> getRemainingItems(WorkbenchContainer container) {
+        return this.shapedRecipe.getRemainingItems(container.getCraftingContainer());
     }
 
     private static class FinishedShaped extends ShapedRecipeBuilder.Result {

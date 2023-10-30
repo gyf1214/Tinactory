@@ -9,6 +9,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -45,5 +46,18 @@ public final class ItemHelper {
                 itemHandler.setStackInSlot(slot, ItemStack.of(itemTags));
             }
         }
+    }
+
+    /**
+     * This also ignores the stack limit. This means ItemStack with exact same NBT can also stack.
+     */
+    public static boolean canItemsStack(ItemStack a, ItemStack b) {
+        return !a.isEmpty() && !b.isEmpty() && a.sameItem(b) && a.hasTag() == b.hasTag() &&
+                (!a.hasTag() || Objects.equals(a.getTag(), b.getTag())) &&
+                a.areCapsCompatible(b);
+    }
+
+    public static boolean itemStackEqual(ItemStack a, ItemStack b) {
+        return (a.isEmpty() && b.isEmpty()) || (canItemsStack(a, b) && a.getCount() == b.getCount());
     }
 }

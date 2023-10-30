@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.logistics;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
@@ -15,10 +16,14 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WrapperItemHandler implements IItemHandlerModifiable {
+    @FunctionalInterface
+    public interface OnTakeListener {
+        void accept(int slot, Player player, ItemStack stack);
+    }
+
     protected final IItemHandlerModifiable compose;
     protected final List<Runnable> updateListener = new ArrayList<>();
-    protected final List<Runnable> takeListener = new ArrayList<>();
-    protected final List<Runnable> quickCraftListener = new ArrayList<>();
+    protected final List<OnTakeListener> onTakeListener = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
@@ -38,16 +43,26 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         this.updateListener.add(cons);
     }
 
-    protected void setUpdate() {
+    public void onTake(OnTakeListener cons) {
+        this.onTakeListener.add(cons);
+    }
+
+    protected void invokeUpdate() {
         for (var cons : this.updateListener) {
             cons.run();
+        }
+    }
+
+    public void invokeTake(int slot, Player player, ItemStack stack) {
+        for (var cons : this.onTakeListener) {
+            cons.accept(slot, player, stack);
         }
     }
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
         this.compose.setStackInSlot(slot, stack);
-        this.setUpdate();
+        this.invokeUpdate();
     }
 
     @Override
@@ -69,7 +84,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         }
         var reminder = this.compose.insertItem(slot, stack, simulate);
         if (!simulate && reminder.getCount() < stack.getCount()) {
-            this.setUpdate();
+            this.invokeUpdate();
         }
         return reminder;
     }
@@ -82,7 +97,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         }
         var extracted = this.compose.extractItem(slot, amount, simulate);
         if (!simulate && !extracted.isEmpty()) {
-            this.setUpdate();
+            this.invokeUpdate();
         }
         return extracted;
     }

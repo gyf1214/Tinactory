@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.content.logistics.IItemCollection;
+import org.shsts.tinactory.content.logistics.ItemHelper;
 import org.shsts.tinactory.content.logistics.ItemTypeWrapper;
 import org.shsts.tinactory.network.Component;
 import org.shsts.tinactory.network.ComponentType;
@@ -72,7 +73,7 @@ public class LogisticComponent extends Component {
     private ItemStack transmitItem(IItemCollection from, IItemCollection to, ItemStack item, boolean simulate) {
         var extracted = from.extractItem(item, simulate);
         var notExtracted = item.getCount() - extracted.getCount();
-        if (ItemTypeWrapper.canItemsStack(extracted, item)) {
+        if (ItemHelper.canItemsStack(extracted, item)) {
             var remaining = to.insertItem(extracted, simulate);
             assert simulate || remaining.isEmpty();
             remaining.grow(notExtracted);

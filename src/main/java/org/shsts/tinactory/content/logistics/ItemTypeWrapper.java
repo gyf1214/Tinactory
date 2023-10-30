@@ -31,19 +31,10 @@ public class ItemTypeWrapper {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ItemTypeWrapper o && canItemsStack(this.stack, o.stack);
+        return obj instanceof ItemTypeWrapper o && this.canStackWith(o.stack);
     }
 
     public boolean canStackWith(ItemStack stack) {
-        return canItemsStack(this.stack, stack);
-    }
-
-    /**
-     * This also ignores the stack limit. This means ItemStack with exact same NBT can also stack.
-     */
-    public static boolean canItemsStack(ItemStack a, ItemStack b) {
-        return !a.isEmpty() && !b.isEmpty() && a.sameItem(b) && a.hasTag() == b.hasTag() &&
-                (!a.hasTag() || Objects.equals(a.getTag(), b.getTag())) &&
-                a.areCapsCompatible(b);
+        return ItemHelper.canItemsStack(this.stack, stack);
     }
 }

@@ -53,14 +53,14 @@ public class ItemHandlerCollection implements IItemCollection {
                 break;
             }
             var slotItem = this.itemHandler.getStackInSlot(i);
-            if (ItemTypeWrapper.canItemsStack(item, slotItem)) {
+            if (ItemHelper.canItemsStack(item, slotItem)) {
                 var extractedItem = this.itemHandler.extractItem(i, amount, simulate);
                 if (extractedItem.isEmpty()) {
                     continue;
                 }
                 if (ret.isEmpty()) {
                     ret = extractedItem;
-                } else if (ItemTypeWrapper.canItemsStack(ret, extractedItem)) {
+                } else if (ItemHelper.canItemsStack(ret, extractedItem)) {
                     ret.grow(extractedItem.getCount());
                 } else {
                     // don't know what to do actually, can only destroy the extracted item
@@ -81,7 +81,7 @@ public class ItemHandlerCollection implements IItemCollection {
         var ret = 0;
         for (var i = 0; i < slots; i++) {
             var slotItem = this.itemHandler.getStackInSlot(i);
-            if (ItemTypeWrapper.canItemsStack(item, slotItem)) {
+            if (ItemHelper.canItemsStack(item, slotItem)) {
                 ret += slotItem.getCount();
             }
         }
