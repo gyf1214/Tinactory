@@ -177,6 +177,10 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
         private int damage = 0;
         private final List<Supplier<Ingredient>> tools = new ArrayList<>();
 
+        public Builder(Registrate registrate, RecipeTypeEntry<ToolRecipe, Builder> parent, ResourceLocation loc) {
+            super(registrate, parent, loc);
+        }
+
         public Builder result(Supplier<Item> result, int count) {
             this.result = result;
             this.count = count;
@@ -205,10 +209,6 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
 
         public Builder toolTag(ResourceLocation toolTag) {
             return this.tool(() -> Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, toolTag)));
-        }
-
-        public Builder(Registrate registrate, RecipeTypeEntry<ToolRecipe, Builder> parent, ResourceLocation loc) {
-            super(registrate, parent, loc);
         }
 
         @Override

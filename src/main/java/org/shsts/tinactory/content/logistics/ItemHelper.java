@@ -7,9 +7,11 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -59,5 +61,26 @@ public final class ItemHelper {
 
     public static boolean itemStackEqual(ItemStack a, ItemStack b) {
         return (a.isEmpty() && b.isEmpty()) || (canItemsStack(a, b) && a.getCount() == b.getCount());
+    }
+
+    /**
+     * Return whether the requirements are met.
+     */
+    public static boolean consumeItemCollection(IItemCollection collection, Predicate<ItemStack> ingredient,
+                                                int amount, boolean simulate) {
+        if (!collection.acceptOutput()) {
+            return false;
+        }
+        for (var itemStack : collection.getAllItems()) {
+            if (amount <= 0) {
+                return true;
+            }
+            if (ingredient.test(itemStack)) {
+                var itemStack1 = ItemHandlerHelper.copyStackWithSize(itemStack, amount);
+                var extracted = collection.extractItem(itemStack1, simulate);
+                amount -= extracted.getCount();
+            }
+        }
+        return false;
     }
 }

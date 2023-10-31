@@ -28,8 +28,8 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.logistics.ItemHelper;
+import org.shsts.tinactory.content.logistics.NullContainer;
 import org.shsts.tinactory.content.logistics.WrapperItemHandler;
-import org.shsts.tinactory.content.recipe.NullContainer;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.slf4j.Logger;
 
@@ -40,7 +40,7 @@ import static org.shsts.tinactory.gui.WorkbenchMenu.OUTPUT_SLOT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WorkbenchContainer extends NullContainer implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+public class WorkbenchContainer implements NullContainer, ICapabilityProvider, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected static class CraftingStack extends CraftingContainer {
@@ -123,27 +123,29 @@ public class WorkbenchContainer extends NullContainer implements ICapabilityProv
 
     protected void onUpdate() {
         var world = this.blockEntity.getLevel();
-        if (world != null && !world.isClientSide) {
-            LOGGER.debug("{} check recipe", this);
-            var recipeManager = world.getRecipeManager();
-            var toolRecipe = recipeManager.getRecipeFor(AllRecipes.TOOL_RECIPE_TYPE.getProperType(), this, world);
-            if (toolRecipe.isEmpty()) {
-                var shapedRecipe = recipeManager.getRecipeFor(RecipeType.CRAFTING, this.craftingStack, world);
-                if (shapedRecipe.isEmpty()) {
-                    this.currentRecipe = null;
-                } else {
-                    this.currentRecipe = shapedRecipe.get();
-                }
-            } else {
-                this.currentRecipe = toolRecipe.get();
-            }
-            if (this.currentRecipe != null) {
-                this.output.setStackInSlot(0, this.applyRecipeFunc(Recipe::assemble));
-            } else {
-                this.output.setStackInSlot(0, ItemStack.EMPTY);
-            }
-            this.blockEntity.setChanged();
+        if (world == null || world.isClientSide) {
+            return;
         }
+
+        LOGGER.debug("{} check recipe", this);
+        var recipeManager = world.getRecipeManager();
+        var toolRecipe = recipeManager.getRecipeFor(AllRecipes.TOOL_RECIPE_TYPE.getProperType(), this, world);
+        if (toolRecipe.isEmpty()) {
+            var shapedRecipe = recipeManager.getRecipeFor(RecipeType.CRAFTING, this.craftingStack, world);
+            if (shapedRecipe.isEmpty()) {
+                this.currentRecipe = null;
+            } else {
+                this.currentRecipe = shapedRecipe.get();
+            }
+        } else {
+            this.currentRecipe = toolRecipe.get();
+        }
+        if (this.currentRecipe != null) {
+            this.output.setStackInSlot(0, this.applyRecipeFunc(Recipe::assemble));
+        } else {
+            this.output.setStackInSlot(0, ItemStack.EMPTY);
+        }
+        this.blockEntity.setChanged();
     }
 
     protected void onCraft(int slot, Player player, ItemStack stack) {

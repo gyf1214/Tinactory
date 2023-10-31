@@ -2,6 +2,7 @@ package org.shsts.tinactory.registrate;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -43,6 +44,12 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
 
     public B recipe(ResourceLocation loc) {
         return this.builderFactory.create(this.registrate, this, loc);
+    }
+
+    public B recipe(Item item) {
+        var loc = item.getRegistryName();
+        assert loc != null;
+        return this.recipe(loc);
     }
 
     public B recipe(String loc) {

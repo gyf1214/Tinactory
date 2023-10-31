@@ -8,6 +8,7 @@ import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.recipe.NullRecipe;
@@ -34,6 +35,12 @@ public final class AllRecipes {
         TOOL_RECIPE_TYPE = REGISTRATE.recipeType("tool", ToolRecipe::serializer)
                 .builder(ToolRecipe.Builder::new)
                 .register();
+
+        NULL_RECIPE_TYPE.recipe(Items.WOODEN_AXE);
+        NULL_RECIPE_TYPE.recipe(Items.WOODEN_HOE);
+        NULL_RECIPE_TYPE.recipe(Items.WOODEN_PICKAXE);
+        NULL_RECIPE_TYPE.recipe(Items.WOODEN_SHOVEL);
+        NULL_RECIPE_TYPE.recipe(Items.WOODEN_SWORD);
 
         woodRecipes("oak");
         woodRecipes("spruce");

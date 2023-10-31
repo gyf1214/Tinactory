@@ -20,7 +20,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> implements CraftingRecipe {
-    protected NullRecipe(RecipeTypeEntry<NullRecipe, Builder> type, ResourceLocation loc) {
+    public NullRecipe(RecipeTypeEntry<NullRecipe, Builder> type, ResourceLocation loc) {
         super(type, loc);
     }
 
