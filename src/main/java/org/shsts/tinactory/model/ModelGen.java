@@ -85,8 +85,7 @@ public final class ModelGen {
     public static <S extends BlockBuilder<? extends MachineBlock<?>, ?, S>>
     Transformer<S> machine(ResourceLocation casing, ResourceLocation front) {
         var model = new MachineModel(casing, front);
-        return $ -> $.blockState(model::blockState)
-                .translucent();
+        return $ -> $.blockState(model::blockState).translucent();
     }
 
     public static <U extends Block>
@@ -99,6 +98,16 @@ public final class ModelGen {
             }
             ctx.provider.horizontalBlock(ctx.object, model);
         };
+    }
+
+    public static <S extends BlockBuilder<? extends Block, ?, S>>
+    Transformer<S> primitiveMachine(ResourceLocation casing, ResourceLocation front) {
+        return $ -> $.blockState(ctx -> {
+            var model = ctx.provider.models()
+                    .withExistingParent(ctx.id, modLoc("block/machine/casing"));
+            MachineModel.applyTextures(model, casing, front);
+            ctx.provider.horizontalBlock(ctx.object, model);
+        }).translucent();
     }
 
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;

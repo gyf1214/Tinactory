@@ -61,6 +61,11 @@ public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> imple
         }
 
         @Override
+        public NullRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
+            return new NullRecipe(this.type, loc);
+        }
+
+        @Override
         public void toJson(JsonObject jo, NullRecipe recipe) {}
 
         @Override
@@ -70,14 +75,8 @@ public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> imple
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, NullRecipe recipe) {}
-
-        @Override
-        public NullRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
-            return new NullRecipe(this.type, loc);
-        }
     }
 
-    public static SmartRecipeSerializer<NullRecipe, Builder> serializer(RecipeTypeEntry<NullRecipe, Builder> type) {
-        return new Serializer(type);
-    }
+    public static final SmartRecipeSerializer.SimpleFactory<NullRecipe, Builder>
+            SERIALIZER = Serializer::new;
 }

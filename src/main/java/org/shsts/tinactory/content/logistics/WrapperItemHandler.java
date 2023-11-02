@@ -21,7 +21,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         void accept(int slot, Player player, ItemStack stack);
     }
 
-    protected final IItemHandlerModifiable compose;
+    public final IItemHandlerModifiable compose;
     protected final List<Runnable> updateListener = new ArrayList<>();
     protected final List<OnTakeListener> onTakeListener = new ArrayList<>();
     public boolean allowInput = true;

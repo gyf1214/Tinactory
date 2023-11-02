@@ -64,11 +64,16 @@ public final class MachineModel {
         this.front = front;
     }
 
+    public static <B extends ModelBuilder<B>>
+    B applyTextures(B model, ResourceLocation casing, ResourceLocation front) {
+        return model.texture("top", ModelGen.extend(casing, "top"))
+                .texture("bottom", ModelGen.extend(casing, "bottom"))
+                .texture("side", ModelGen.extend(casing, "side"))
+                .texture("front_overlay", front);
+    }
+
     private <B extends ModelBuilder<B>> B applyTextures(B model) {
-        return model.texture("top", ModelGen.extend(this.casing, "top"))
-                .texture("bottom", ModelGen.extend(this.casing, "bottom"))
-                .texture("side", ModelGen.extend(this.casing, "side"))
-                .texture("front_overlay", this.front);
+        return applyTextures(model, this.casing, this.front);
     }
 
     private ModelFile genModel(String id, BlockModelProvider prov) {

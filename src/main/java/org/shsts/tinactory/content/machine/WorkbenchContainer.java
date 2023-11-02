@@ -129,7 +129,7 @@ public class WorkbenchContainer implements NullContainer, ICapabilityProvider, I
 
         LOGGER.debug("{} check recipe", this);
         var recipeManager = world.getRecipeManager();
-        var toolRecipe = recipeManager.getRecipeFor(AllRecipes.TOOL_RECIPE_TYPE.getProperType(), this, world);
+        var toolRecipe = recipeManager.getRecipeFor(AllRecipes.TOOL.getProperType(), this, world);
         if (toolRecipe.isEmpty()) {
             var shapedRecipe = recipeManager.getRecipeFor(RecipeType.CRAFTING, this.craftingStack, world);
             if (shapedRecipe.isEmpty()) {

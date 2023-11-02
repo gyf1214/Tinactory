@@ -2,9 +2,12 @@ package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
@@ -19,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -87,6 +91,16 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
 
     public S capability(Supplier<CapabilityProviderType<? super U, ?>> cap) {
         this.capabilities.add(cap);
+        return self();
+    }
+
+    @FunctionalInterface
+    public interface CapabilityFactory<T1 extends BlockEntity, U1 extends ICapabilityProvider>
+            extends Function<T1, U1> {}
+
+    public S capability(String id, CapabilityFactory<? super U, ?> factory) {
+        var loc = new ResourceLocation(this.registrate.modid, id);
+        this.capabilities.add(() -> new CapabilityProviderType<>(loc, factory));
         return self();
     }
 

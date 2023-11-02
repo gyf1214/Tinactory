@@ -17,16 +17,19 @@ import java.util.Map;
 @MethodsReturnNonnullByDefault
 public class ItemHandlerCollection implements IItemCollection {
     public final IItemHandler itemHandler;
-    public final boolean acceptInput;
 
-    public ItemHandlerCollection(IItemHandler itemHandler, boolean acceptInput) {
+    public ItemHandlerCollection(IItemHandler itemHandler) {
         this.itemHandler = itemHandler;
-        this.acceptInput = acceptInput;
     }
 
     @Override
-    public boolean acceptInput() {
-        return this.acceptInput;
+    public boolean acceptInput(ItemStack stack) {
+        for (var i = 0; i < this.itemHandler.getSlots(); i++) {
+            if (this.itemHandler.isItemValid(i, stack)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -36,8 +39,7 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public ItemStack insertItem(ItemStack stack, boolean simulate) {
-        return !this.acceptInput ? stack :
-                ItemHandlerHelper.insertItemStacked(this.itemHandler, stack, simulate);
+        return ItemHandlerHelper.insertItemStacked(this.itemHandler, stack, simulate);
     }
 
     @Override

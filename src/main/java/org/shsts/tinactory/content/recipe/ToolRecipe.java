@@ -230,6 +230,16 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
         }
 
         @Override
+        public ToolRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
+            var shaped = SHAPED_SERIALIZER.fromJson(loc, jo, context);
+            var damage = GsonHelper.getAsInt(jo, "damage");
+            var tools = Streams.stream(GsonHelper.getAsJsonArray(jo, "tools"))
+                    .map(Ingredient::fromJson)
+                    .toList();
+            return new ToolRecipe(this.type, loc, shaped, damage, tools);
+        }
+
+        @Override
         public void toJson(JsonObject jo, ToolRecipe recipe) {}
 
         @Override
@@ -247,19 +257,8 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
             buf.writeVarInt(recipe.damage);
             buf.writeCollection(recipe.toolIngredients, (buf1, ingredient) -> ingredient.toNetwork(buf1));
         }
-
-        @Override
-        public ToolRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
-            var shaped = SHAPED_SERIALIZER.fromJson(loc, jo, context);
-            var damage = GsonHelper.getAsInt(jo, "damage");
-            var tools = Streams.stream(GsonHelper.getAsJsonArray(jo, "tools"))
-                    .map(Ingredient::fromJson)
-                    .toList();
-            return new ToolRecipe(this.type, loc, shaped, damage, tools);
-        }
     }
 
-    public static SmartRecipeSerializer<ToolRecipe, Builder> serializer(RecipeTypeEntry<ToolRecipe, Builder> type) {
-        return new Serializer(type);
-    }
+    public static final SmartRecipeSerializer.SimpleFactory<ToolRecipe, Builder>
+            SERIALIZER = Serializer::new;
 }

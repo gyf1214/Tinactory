@@ -21,18 +21,20 @@ public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
         S create(RecipeTypeEntry<T1, B1> type);
     }
 
+    @FunctionalInterface
+    public interface SimpleFactory<T1 extends SmartRecipe<?, T1>, B1>
+            extends Factory<T1, B1, SmartRecipeSerializer<T1, B1>> {}
+
     protected final RecipeTypeEntry<T, B> type;
 
     protected SmartRecipeSerializer(RecipeTypeEntry<T, B> type) {
         this.type = type;
     }
 
-    public abstract void toJson(JsonObject jo, T recipe);
-
     @Override
-    public T fromJson(ResourceLocation loc, JsonObject jo) {
-        return this.fromJson(loc, jo, ICondition.IContext.EMPTY);
-    }
+    public abstract T fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context);
+
+    public abstract void toJson(JsonObject jo, T recipe);
 
     @Override
     public abstract T fromNetwork(ResourceLocation loc, FriendlyByteBuf buf);
@@ -41,5 +43,7 @@ public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
     public abstract void toNetwork(FriendlyByteBuf buf, T recipe);
 
     @Override
-    public abstract T fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context);
+    public T fromJson(ResourceLocation loc, JsonObject jo) {
+        return this.fromJson(loc, jo, ICondition.IContext.EMPTY);
+    }
 }

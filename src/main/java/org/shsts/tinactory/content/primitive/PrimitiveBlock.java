@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.primitive;
 
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;

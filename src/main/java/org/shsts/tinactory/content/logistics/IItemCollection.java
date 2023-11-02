@@ -13,7 +13,7 @@ import java.util.Collection;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IItemCollection {
-    boolean acceptInput();
+    boolean acceptInput(ItemStack stack);
 
     boolean acceptOutput();
 

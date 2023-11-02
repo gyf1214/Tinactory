@@ -3,10 +3,11 @@ package org.shsts.tinactory.content;
 import net.minecraft.world.item.CreativeModeTab;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
-import org.shsts.tinactory.content.machine.PrimitiveBlock;
+import org.shsts.tinactory.content.machine.PrimitiveMachine;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.CableSetting;
 import org.shsts.tinactory.content.network.NetworkController;
+import org.shsts.tinactory.content.primitive.PrimitiveBlock;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
@@ -19,6 +20,8 @@ public final class AllBlocks {
     public static final RegistryEntry<CableBlock> DENSE_CABLE;
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
+
+    public static final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> PRIMITIVE_STONE_GENERATOR;
 
     static {
         REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
@@ -44,6 +47,15 @@ public final class AllBlocks {
         WORKBENCH = REGISTRATE.entityBlock("primitive/workbench", PrimitiveBlock<SmartBlockEntity>::new)
                 .type(() -> AllBlockEntities.WORKBENCH)
                 .blockState(ModelGen.primitive(ModelGen.vendorLoc("gregtech", "blocks/casings/crafting_table")))
+                .defaultBlockItem()
+                .register();
+
+        PRIMITIVE_STONE_GENERATOR = REGISTRATE.entityBlock(
+                        "primitive/stone_generator", PrimitiveBlock<PrimitiveMachine>::new)
+                .type(() -> AllBlockEntities.PRIMITIVE_STONE_GENERATOR)
+                .transform(ModelGen.primitiveMachine(
+                        ModelGen.vendorLoc("gregtech", "blocks/casings/voltage/mv"),
+                        ModelGen.vendorLoc("gregtech", "blocks/machines/rock_crusher/overlay_front")))
                 .defaultBlockItem()
                 .register();
     }

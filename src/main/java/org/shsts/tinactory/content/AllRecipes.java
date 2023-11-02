@@ -12,6 +12,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.recipe.NullRecipe;
+import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
@@ -23,24 +24,29 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public final class AllRecipes {
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
-    public static final RecipeTypeEntry<NullRecipe, NullRecipe.Builder> NULL_RECIPE_TYPE;
-    public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL_RECIPE_TYPE;
+    public static final RecipeTypeEntry<NullRecipe, NullRecipe.Builder> NULL;
+    public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
+    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> STONE_GENERATOR;
 
     static {
-        NULL_RECIPE_TYPE = REGISTRATE.recipeType("null", NullRecipe::serializer)
+        NULL = REGISTRATE.recipeType("null", NullRecipe.SERIALIZER)
                 .builder(NullRecipe.Builder::new)
                 .existingType(() -> RecipeType.CRAFTING)
                 .register();
 
-        TOOL_RECIPE_TYPE = REGISTRATE.recipeType("tool", ToolRecipe::serializer)
+        TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
-        NULL_RECIPE_TYPE.recipe(Items.WOODEN_AXE);
-        NULL_RECIPE_TYPE.recipe(Items.WOODEN_HOE);
-        NULL_RECIPE_TYPE.recipe(Items.WOODEN_PICKAXE);
-        NULL_RECIPE_TYPE.recipe(Items.WOODEN_SHOVEL);
-        NULL_RECIPE_TYPE.recipe(Items.WOODEN_SWORD);
+        STONE_GENERATOR = REGISTRATE.recipeType("stone", ProcessingRecipe.SIMPLE_SERIALIZER)
+                .builder(ProcessingRecipe.SimpleBuilder::new)
+                .register();
+
+        NULL.recipe(Items.WOODEN_AXE);
+        NULL.recipe(Items.WOODEN_HOE);
+        NULL.recipe(Items.WOODEN_PICKAXE);
+        NULL.recipe(Items.WOODEN_SHOVEL);
+        NULL.recipe(Items.WOODEN_SWORD);
 
         woodRecipes("oak");
         woodRecipes("spruce");
@@ -50,6 +56,11 @@ public final class AllRecipes {
         woodRecipes("dark_oak");
         woodRecipes("crimson");
         woodRecipes("warped");
+
+        STONE_GENERATOR.modRecipe("generate_cobblestone")
+                .output(0, Items.COBBLESTONE, 1)
+                .workTicks(100)
+                .build();
     }
 
     private static void woodRecipes(String prefix) {
@@ -60,15 +71,15 @@ public final class AllRecipes {
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;
 
-        TOOL_RECIPE_TYPE.modRecipe(planks.id + "_saw")
+        TOOL.modRecipe(planks.id + "_saw")
                 .result(planks, 4)
                 .pattern("X")
                 .define('X', logTag)
                 .damage(100)
                 .toolTag(AllTags.TOOL_SAW)
                 .build();
-        NULL_RECIPE_TYPE.recipe(wood).build();
-        NULL_RECIPE_TYPE.recipe(woodStripped).build();
+        NULL.recipe(wood).build();
+        NULL.recipe(woodStripped).build();
         REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(planks.get(), 2)
                 .requires(logTag)
