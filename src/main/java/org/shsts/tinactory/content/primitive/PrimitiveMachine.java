@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.primitive;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
