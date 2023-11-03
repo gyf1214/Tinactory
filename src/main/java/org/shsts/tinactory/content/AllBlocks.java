@@ -46,7 +46,8 @@ public final class AllBlocks {
 
         WORKBENCH = REGISTRATE.entityBlock("primitive/workbench", PrimitiveBlock<SmartBlockEntity>::new)
                 .type(() -> AllBlockEntities.WORKBENCH)
-                .blockState(ModelGen.primitive(ModelGen.vendorLoc("gregtech", "blocks/casings/crafting_table")))
+                .blockState(ModelGen.primitiveAllFaces(
+                        ModelGen.vendorLoc("gregtech", "blocks/casings/crafting_table")))
                 .defaultBlockItem()
                 .register();
 
@@ -54,7 +55,7 @@ public final class AllBlocks {
                         "primitive/stone_generator", PrimitiveBlock<PrimitiveMachine>::new)
                 .type(() -> AllBlockEntities.PRIMITIVE_STONE_GENERATOR)
                 .transform(ModelGen.primitiveMachine(
-                        ModelGen.vendorLoc("gregtech", "blocks/casings/voltage/mv"),
+                        ModelGen.vendorLoc("gregtech", "blocks/casings/wood_wall"),
                         ModelGen.vendorLoc("gregtech", "blocks/machines/rock_crusher/overlay_front")))
                 .defaultBlockItem()
                 .register();

@@ -89,9 +89,11 @@ public final class ModelGen {
     }
 
     public static <U extends Block>
-    Consumer<RegistryDataContext<Block, U, BlockStateProvider>> primitive(ResourceLocation tex) {
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>> primitiveAllFaces(ResourceLocation tex) {
         return ctx -> {
-            var model = ctx.provider.models().withExistingParent(ctx.id, "block/cube");
+            var model = ctx.provider.models()
+                    .withExistingParent(ctx.id, "block/cube")
+                    .texture("particle", "#front");
             for (var entry : DIR_TEX_KEYS.entrySet()) {
                 var faceTex = extend(tex, entry.getValue());
                 model = model.texture(entry.getKey().getName(), faceTex);
