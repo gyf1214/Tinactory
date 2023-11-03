@@ -16,10 +16,13 @@ import org.shsts.tinactory.content.logistics.IItemCollection;
 import org.shsts.tinactory.content.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.content.logistics.WrapperItemHandler;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
+import org.shsts.tinactory.registrate.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -32,11 +35,11 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
     protected final List<IItemCollection> internalPorts;
 
     public ProcessingStackContainer(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe<?>> recipeType,
-                                    PortInfo[] ports) {
+                                    Collection<PortInfo> ports) {
         super(blockEntity, recipeType);
-        this.ports = new ArrayList<>(ports.length);
-        this.internalPorts = new ArrayList<>(ports.length);
-        var views = new ArrayList<WrapperItemHandler>(ports.length);
+        this.ports = new ArrayList<>(ports.size());
+        this.internalPorts = new ArrayList<>(ports.size());
+        var views = new ArrayList<WrapperItemHandler>(ports.size());
         for (var port : ports) {
             var view = new WrapperItemHandler(port.slots);
             var collection = new ItemHandlerCollection(view);
@@ -65,5 +68,32 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
             return LazyOptional.of(() -> this.combinedStack).cast();
         }
         return super.getCapability(cap, side);
+    }
+
+    public static class Builder implements Function<BlockEntity, ICapabilityProvider> {
+        @Nullable
+        private RecipeType<? extends ProcessingRecipe<?>> recipeType = null;
+        private final List<PortInfo> ports = new ArrayList<>();
+
+        public Builder recipeType(RecipeType<? extends ProcessingRecipe<?>> recipeType) {
+            this.recipeType = recipeType;
+            return this;
+        }
+
+        public Builder recipeType(RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType) {
+            this.recipeType = recipeType.getProperType();
+            return this;
+        }
+
+        public Builder port(int slots, boolean output) {
+            this.ports.add(new PortInfo(slots, output));
+            return this;
+        }
+
+        @Override
+        public ICapabilityProvider apply(BlockEntity be) {
+            assert this.recipeType != null;
+            return new ProcessingStackContainer(be, this.recipeType, this.ports);
+        }
     }
 }

@@ -4,7 +4,6 @@ import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.IProcessingMachine;
 import org.shsts.tinactory.content.machine.PrimitiveMachine;
-import org.shsts.tinactory.content.machine.ProcessingStackContainer;
 import org.shsts.tinactory.content.network.NetworkController;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
@@ -34,17 +33,17 @@ public class AllBlockEntities {
                 .entityClass(SmartBlockEntity.class)
                 .ticking()
                 .validBlock(AllBlocks.WORKBENCH)
-                .capability(AllCapabilities.WORKBENCH_CONTAINER::get)
-                .menu(WorkbenchMenu::new)
-                .build().register();
+                .capability(AllCapabilities.WORKBENCH_CONTAINER)
+                .menu(WorkbenchMenu::new).build()
+                .register();
 
         PRIMITIVE_STONE_GENERATOR = REGISTRATE.blockEntity("primitive/stone_generator", PrimitiveMachine::new)
                 .entityClass(PrimitiveMachine.class)
                 .validBlock(AllBlocks.PRIMITIVE_STONE_GENERATOR)
                 .ticking()
-                .capability("primitive/processing_container", be ->
-                        new ProcessingStackContainer(be, AllRecipes.STONE_GENERATOR.getProperType(),
-                                new ProcessingStackContainer.PortInfo[]{new ProcessingStackContainer.PortInfo(1, true)}))
+                .capability(AllCapabilities.PROCESSING_STACK_CONTAINER, $ -> $
+                        .recipeType(AllRecipes.STONE_GENERATOR)
+                        .port(1, true))
                 .menu()
                 .title($ -> new TextComponent("Stone Generator"))
                 .slot(0, ContainerMenu.SLOT_SIZE * 5, 1)

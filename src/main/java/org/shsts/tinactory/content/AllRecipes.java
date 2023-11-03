@@ -59,7 +59,7 @@ public final class AllRecipes {
 
         STONE_GENERATOR.modRecipe("generate_cobblestone")
                 .output(0, Items.COBBLESTONE, 1)
-                .workTicks(100)
+                .workTicks(40)
                 .build();
     }
 

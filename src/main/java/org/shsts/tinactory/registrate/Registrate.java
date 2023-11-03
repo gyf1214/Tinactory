@@ -251,10 +251,17 @@ public class Registrate implements IBlockParent, IItemParent {
         return this.capabilityHandler.register(clazz, token);
     }
 
-    public <T extends BlockEntity, U extends ICapabilityProvider>
-    RegistryEntry<CapabilityProviderType<T, U>> capabilityProvider(String id, Function<T, U> factory) {
-        return this.registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY,
-                () -> new CapabilityProviderType<>(factory));
+    public <T extends BlockEntity> RegistryEntry<CapabilityProviderType<T, ?>>
+    capabilityProvider(String id, Function<T, ? extends ICapabilityProvider> factory) {
+        return this.registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY, () ->
+                CapabilityProviderType.simple(factory));
+    }
+
+    public <T extends BlockEntity, B extends Function<T, ICapabilityProvider>>
+    RegistryEntry<CapabilityProviderType<T, B>>
+    capabilityProvider(String id, Supplier<B> builderFactory) {
+        return this.registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY, () ->
+                new CapabilityProviderType<>(builderFactory));
     }
 
     public SchedulingBuilder<Registrate> scheduling(String id) {

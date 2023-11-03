@@ -76,7 +76,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     public void insertOutputs(ProcessingContainer container) {
         for (var output : this.outputs) {
             var collection = container.getPort(output.port, true);
-            collection.insertItem(output.object, false);
+            collection.insertItem(output.object.copy(), false);
         }
     }
 

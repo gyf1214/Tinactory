@@ -11,16 +11,18 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
+import org.shsts.tinactory.core.Transformer;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.shsts.tinactory.gui.ContainerMenuType;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -41,7 +43,8 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
     protected boolean ticking = false;
     @Nullable
     protected Class<U> entityClass = null;
-    protected final List<Supplier<CapabilityProviderType<? super U, ?>>> capabilities = new ArrayList<>();
+    protected final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>> capabilities =
+            new HashMap<>();
     @Nullable
     protected Supplier<ContainerMenuType<U, ?>> menu = null;
 
@@ -89,18 +92,21 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
         return this.menu(ContainerMenu::new);
     }
 
-    public S capability(Supplier<CapabilityProviderType<? super U, ?>> cap) {
-        this.capabilities.add(cap);
+    public S capability(RegistryEntry<? extends CapabilityProviderType<? super U, ?>> cap) {
+        this.capabilities.put(cap.loc, be -> cap.get().getBuilder().apply(be));
         return self();
     }
 
-    @FunctionalInterface
-    public interface CapabilityFactory<T1 extends BlockEntity, U1 extends ICapabilityProvider>
-            extends Function<T1, U1> {}
+    @SuppressWarnings("unchecked")
+    public <U1 extends BlockEntity, B extends Function<U1, ICapabilityProvider>>
+    S capability(RegistryEntry<? extends CapabilityProviderType<U1, B>> cap, Transformer<B> transform) {
+        this.capabilities.put(cap.loc, be -> transform.apply(cap.get().getBuilder()).apply((U1) be));
+        return self();
+    }
 
-    public S capability(String id, CapabilityFactory<? super U, ?> factory) {
+    public S capability(String id, Function<? super U, ? extends ICapabilityProvider> factory) {
         var loc = new ResourceLocation(this.registrate.modid, id);
-        this.capabilities.add(() -> new CapabilityProviderType<>(loc, factory));
+        this.capabilities.put(loc, factory);
         return self();
     }
 
