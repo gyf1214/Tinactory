@@ -5,7 +5,9 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -42,12 +44,14 @@ public final class AllRecipes {
                 .builder(ProcessingRecipe.SimpleBuilder::new)
                 .register();
 
+        // disable add wooden tools
         NULL.recipe(Items.WOODEN_AXE);
         NULL.recipe(Items.WOODEN_HOE);
         NULL.recipe(Items.WOODEN_PICKAXE);
         NULL.recipe(Items.WOODEN_SHOVEL);
         NULL.recipe(Items.WOODEN_SWORD);
 
+        // all wood recipes
         woodRecipes("oak");
         woodRecipes("spruce");
         woodRecipes("birch");
@@ -57,6 +61,17 @@ public final class AllRecipes {
         woodRecipes("crimson");
         woodRecipes("warped");
 
+        // primitive stone generator
+        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(AllBlocks.PRIMITIVE_STONE_GENERATOR.get())
+                .pattern("WLW")
+                .pattern("L L")
+                .pattern("WLW")
+                .define('W', ItemTags.PLANKS)
+                .define('L', ItemTags.LOGS)
+                .unlockedBy("has_planks", has(ItemTags.PLANKS)));
+
+        // generate cobblestone
         STONE_GENERATOR.modRecipe("generate_cobblestone")
                 .output(0, Items.COBBLESTONE, 1)
                 .workTicks(40)
@@ -71,15 +86,19 @@ public final class AllRecipes {
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;
 
-        TOOL.modRecipe(planks.id + "_saw")
+        // saw
+        TOOL.modRecipe("tool_recipe/saw/" + planks.id)
                 .result(planks, 4)
                 .pattern("X")
                 .define('X', logTag)
                 .damage(100)
                 .toolTag(AllTags.TOOL_SAW)
                 .build();
+        // disable wood and woodStripped recipes
+        // TODO: maybe not necessary
         NULL.recipe(wood).build();
         NULL.recipe(woodStripped).build();
+        // reduce vanilla recipe to 2 planks
         REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(planks.get(), 2)
                 .requires(logTag)
