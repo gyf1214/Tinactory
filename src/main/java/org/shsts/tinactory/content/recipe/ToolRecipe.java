@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.network.FriendlyByteBuf;
@@ -207,8 +206,8 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
             return self();
         }
 
-        public Builder toolTag(ResourceLocation toolTag) {
-            return this.tool(() -> Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, toolTag)));
+        public Builder toolTag(TagKey<Item> toolTag) {
+            return this.tool(() -> Ingredient.of(toolTag));
         }
 
         @Override

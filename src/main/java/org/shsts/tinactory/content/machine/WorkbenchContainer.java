@@ -73,7 +73,7 @@ public class WorkbenchContainer implements NullContainer, ICapabilityProvider, I
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return stack.is(AllTags.item(AllTags.TOOL));
+            return stack.is(AllTags.TOOL);
         }
     }
 

@@ -11,11 +11,11 @@ import static org.shsts.tinactory.gui.ContainerMenu.WIDTH;
 @ParametersAreNonnullByDefault
 public record Texture(ResourceLocation loc, int width, int height) {
     public static final Texture BACKGROUND = new Texture(
-            ModelGen.vendorLoc("gregtech", "gui/base/background"), WIDTH, 166);
+            ModelGen.gregtech("gui/base/background"), WIDTH, 166);
     public static final Texture SLOT_BACKGROUND = new Texture(
-            ModelGen.vendorLoc("gregtech", "gui/base/slot"), SLOT_SIZE, SLOT_SIZE);
+            ModelGen.gregtech("gui/base/slot"), SLOT_SIZE, SLOT_SIZE);
     public static final Texture PROGRESS_ARROW = new Texture(
-            ModelGen.vendorLoc("gregtech", "gui/progress_bar/progress_bar_arrow"), 20, 40);
+            ModelGen.gregtech("gui/progress_bar/progress_bar_arrow"), 20, 40);
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = new ResourceLocation(loc.getNamespace(), "textures/" + loc.getPath() + ".png");

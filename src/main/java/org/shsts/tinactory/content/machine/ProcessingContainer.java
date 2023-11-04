@@ -37,7 +37,7 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
     protected ResourceLocation currentRecipeId = null;
     @Nullable
     protected ProcessingRecipe<?> currentRecipe = null;
-    protected boolean initialized = false;
+    protected boolean needUpdate = true;
 
     protected ProcessingContainer(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe<?>> recipeType) {
         this.blockEntity = blockEntity;
@@ -48,6 +48,9 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
     public abstract IItemCollection getPort(int port, boolean internal);
 
     protected void updateRecipe() {
+        if (this.currentRecipe != null || !this.needUpdate) {
+            return;
+        }
         var world = this.blockEntity.getLevel();
         if (world == null) {
             return;
@@ -57,33 +60,35 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
         if (this.currentRecipe != null) {
             this.currentRecipe.consumeInputs(this);
         }
+        this.needUpdate = false;
     }
 
     protected void initializeRecipe() {
-        if (this.currentRecipeId != null) {
-            var world = this.blockEntity.getLevel();
-            assert world != null;
-            var recipe = world.getRecipeManager().byKey(this.currentRecipeId);
-            if (recipe.isPresent() && recipe.get() instanceof ProcessingRecipe<?> processingRecipe) {
-                this.currentRecipe = processingRecipe;
-            }
-            this.currentRecipeId = null;
+        if (this.currentRecipeId == null) {
+            return;
         }
-        this.initialized = true;
+        var world = this.blockEntity.getLevel();
+        assert world != null;
+        var recipe = world.getRecipeManager().byKey(this.currentRecipeId);
+        if (recipe.isPresent() && recipe.get() instanceof ProcessingRecipe<?> processingRecipe) {
+            this.currentRecipe = processingRecipe;
+        }
+        this.currentRecipeId = null;
+        if (this.currentRecipe != null) {
+            this.needUpdate = false;
+        }
     }
 
     protected void onInputUpdate() {
         if (this.currentRecipe == null) {
-            this.updateRecipe();
+            this.needUpdate = true;
         }
     }
 
     @Override
     public void onWorkTick(double partial) {
-        if (!this.initialized) {
-            this.initializeRecipe();
-            this.onInputUpdate();
-        }
+        this.initializeRecipe();
+        this.updateRecipe();
         if (this.currentRecipe == null) {
             return;
         }
@@ -91,7 +96,8 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
         this.workProgress += progress;
         if (this.workProgress >= this.currentRecipe.workTicks * PROGRESS_PER_TICK) {
             this.currentRecipe.insertOutputs(this);
-            this.updateRecipe();
+            this.currentRecipe = null;
+            this.needUpdate = true;
         }
     }
 
@@ -115,9 +121,7 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
 
     @Override
     public CompoundTag serializeNBT() {
-        if (!this.initialized) {
-            this.initializeRecipe();
-        }
+        this.initializeRecipe();
         var tag = new CompoundTag();
         if (this.currentRecipe != null) {
             tag.putString("currentRecipe", this.currentRecipe.getId().toString());

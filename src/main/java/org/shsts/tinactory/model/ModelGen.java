@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
+import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.network.CableBlock;
@@ -19,7 +20,6 @@ import org.shsts.tinactory.registrate.context.RegistryDataContext;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -59,20 +59,32 @@ public final class ModelGen {
         return modLoc(ModelGen.VENDOR_PATH.formatted(vendor, id));
     }
 
+    public static ResourceLocation gregtech(String id) {
+        return vendorLoc("gregtech", id);
+    }
+
     public static ResourceLocation extend(ResourceLocation loc, String suffix) {
+        if (StringUtils.isEmpty(suffix)) {
+            return loc;
+        }
         return new ResourceLocation(loc.getNamespace(), loc.getPath() + "/" + suffix);
     }
 
-    public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
-    basicItem(ResourceLocation loc) {
-        return basicItem($ -> loc);
+    public static ResourceLocation prepend(ResourceLocation loc, String prefix) {
+        if (StringUtils.isEmpty(prefix)) {
+            return loc;
+        }
+        return new ResourceLocation(loc.getNamespace(), prefix + "/" + loc.getPath());
     }
 
     public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
-    basicItem(Function<RegistryDataContext<Item, U, ItemModelProvider>, ResourceLocation> texture) {
-        return ctx -> ctx.provider
-                .withExistingParent(ctx.id, "item/generated")
-                .texture("layer0", texture.apply(ctx));
+    basicItem(ResourceLocation... loc) {
+        return ctx -> {
+            var provider = ctx.provider.withExistingParent(ctx.id, "item/generated");
+            for (var i = 0; i < loc.length; i++) {
+                provider.texture("layer" + i, loc[i]);
+            }
+        };
     }
 
     public static <S extends BlockBuilder<? extends CableBlock, ?, S>>
@@ -93,7 +105,7 @@ public final class ModelGen {
         return ctx -> {
             var model = ctx.provider.models()
                     .withExistingParent(ctx.id, "block/cube")
-                    .texture("particle", "#front");
+                    .texture("particle", "#north");
             for (var entry : DIR_TEX_KEYS.entrySet()) {
                 var faceTex = extend(tex, entry.getValue());
                 model = model.texture(entry.getKey().getName(), faceTex);

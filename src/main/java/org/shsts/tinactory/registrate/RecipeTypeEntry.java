@@ -6,12 +6,13 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
-import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.model.ModelGen.prepend;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -46,19 +47,17 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
     }
 
     public B recipe(ResourceLocation loc) {
-        var prefix = StringUtils.isEmpty(this.prefix) ? "" : this.prefix + "/";
-        var loc1 = new ResourceLocation(loc.getNamespace(), prefix + loc.getPath());
-        return this.builderFactory.create(this.registrate, this, loc1);
+        return this.builderFactory.create(this.registrate, this, loc);
     }
 
     public B recipe(ItemLike item) {
         var loc = item.asItem().getRegistryName();
         assert loc != null;
-        return this.recipe(loc);
+        return this.recipe(prepend(loc, this.prefix));
     }
 
     public B recipe(String id) {
-        return this.recipe(new ResourceLocation(id));
+        return this.recipe(prepend(new ResourceLocation(id), this.prefix));
     }
 
     public B modRecipe(ItemLike item) {
@@ -68,6 +67,6 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
     }
 
     public B modRecipe(String id) {
-        return this.recipe(new ResourceLocation(this.modid, id));
+        return this.recipe(prepend(new ResourceLocation(this.modid, id), this.prefix));
     }
 }

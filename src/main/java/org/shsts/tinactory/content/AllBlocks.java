@@ -39,15 +39,15 @@ public final class AllBlocks {
         NETWORK_CONTROLLER = REGISTRATE.entityBlock("network/controller", MachineBlock<NetworkController>::new)
                 .type(() -> AllBlockEntities.NETWORK_CONTROLLER)
                 .transform(ModelGen.machine(
-                        ModelGen.vendorLoc("gregtech", "blocks/casings/voltage/mv"),
-                        ModelGen.vendorLoc("gregtech", "blocks/overlay/machine/overlay_screen")))
+                        ModelGen.gregtech("blocks/casings/voltage/mv"),
+                        ModelGen.gregtech("blocks/overlay/machine/overlay_screen")))
                 .defaultBlockItem()
                 .register();
 
         WORKBENCH = REGISTRATE.entityBlock("primitive/workbench", PrimitiveBlock<SmartBlockEntity>::new)
                 .type(() -> AllBlockEntities.WORKBENCH)
                 .blockState(ModelGen.primitiveAllFaces(
-                        ModelGen.vendorLoc("gregtech", "blocks/casings/crafting_table")))
+                        ModelGen.gregtech("blocks/casings/crafting_table")))
                 .defaultBlockItem()
                 .register();
 
@@ -55,8 +55,8 @@ public final class AllBlocks {
                         "primitive/stone_generator", PrimitiveBlock<PrimitiveMachine>::new)
                 .type(() -> AllBlockEntities.PRIMITIVE_STONE_GENERATOR)
                 .transform(ModelGen.primitiveMachine(
-                        ModelGen.vendorLoc("gregtech", "blocks/casings/wood_wall"),
-                        ModelGen.vendorLoc("gregtech", "blocks/machines/rock_crusher/overlay_front")))
+                        ModelGen.gregtech("blocks/casings/wood_wall"),
+                        ModelGen.gregtech("blocks/machines/rock_crusher/overlay_front")))
                 .defaultBlockItem()
                 .register();
     }
