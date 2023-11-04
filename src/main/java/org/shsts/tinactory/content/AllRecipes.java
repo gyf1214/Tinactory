@@ -37,10 +37,12 @@ public final class AllRecipes {
                 .register();
 
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
+                .prefix("tool_recipe")
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
         STONE_GENERATOR = REGISTRATE.recipeType("stone", ProcessingRecipe.SIMPLE_SERIALIZER)
+                .prefix("processing/stone_generator")
                 .builder(ProcessingRecipe.SimpleBuilder::new)
                 .register();
 
@@ -72,7 +74,7 @@ public final class AllRecipes {
                 .unlockedBy("has_planks", has(ItemTags.PLANKS)));
 
         // generate cobblestone
-        STONE_GENERATOR.modRecipe("generate_cobblestone")
+        STONE_GENERATOR.modRecipe(Items.COBBLESTONE)
                 .output(0, Items.COBBLESTONE, 1)
                 .workTicks(40)
                 .build();
@@ -87,7 +89,7 @@ public final class AllRecipes {
         var woodStripped = "stripped_" + wood;
 
         // saw
-        TOOL.modRecipe("tool_recipe/saw/" + planks.id)
+        TOOL.modRecipe("saw/" + planks.id)
                 .result(planks, 4)
                 .pattern("X")
                 .define('X', logTag)

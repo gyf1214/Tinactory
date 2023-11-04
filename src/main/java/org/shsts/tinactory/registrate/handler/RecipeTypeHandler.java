@@ -32,9 +32,11 @@ public class RecipeTypeHandler {
         this.builders.add(builder);
         if (builder.willCreateType()) {
             var object = this.recipeTypeRegister.register(builder.id, builder::buildObject);
-            return new RecipeTypeEntry<>(registrate, builder.id, object::get, builder.getBuilderFactory());
+            return new RecipeTypeEntry<>(registrate, builder.id,
+                    object::get, builder.getBuilderFactory(), builder.getPrefix());
         } else {
-            return new RecipeTypeEntry<>(registrate, builder.id, builder.getExistingType(), builder.getBuilderFactory());
+            return new RecipeTypeEntry<>(registrate, builder.id,
+                    builder.getExistingType(), builder.getBuilderFactory(), builder.getPrefix());
         }
     }
 

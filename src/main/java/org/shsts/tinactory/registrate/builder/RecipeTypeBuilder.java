@@ -26,6 +26,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
     protected Supplier<RecipeType<? super T>> existingType = null;
     @Nullable
     protected SmartRecipeBuilder.Factory<T, B> builderFactory = null;
+    protected String prefix = "";
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
                              SmartRecipeSerializer.Factory<T, B, S> serializer) {
@@ -40,6 +41,11 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
 
     public RecipeTypeBuilder<T, B, S, P> builder(SmartRecipeBuilder.Factory<T, B> factory) {
         this.builderFactory = factory;
+        return self();
+    }
+
+    public RecipeTypeBuilder<T, B, S, P> prefix(String prefix) {
+        this.prefix = prefix;
         return self();
     }
 
@@ -75,6 +81,10 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
     public SmartRecipeBuilder.Factory<T, B> getBuilderFactory() {
         assert this.builderFactory != null;
         return this.builderFactory;
+    }
+
+    public String getPrefix() {
+        return this.prefix;
     }
 
     @Override
