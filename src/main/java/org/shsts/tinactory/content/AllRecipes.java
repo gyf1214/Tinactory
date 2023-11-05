@@ -87,6 +87,7 @@ public final class AllRecipes {
                 .workTicks(40)
                 .build();
 
+        // stone hammer
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(AllItems.STONE_HAMMER.get())
                 .pattern("SS ")
@@ -94,8 +95,9 @@ public final class AllRecipes {
                 .pattern("SS ")
                 .define('S', ItemTags.STONE_TOOL_MATERIALS)
                 .define('H', Items.STICK)
-                .unlockedBy("has_cobblestones", has(ItemTags.STONE_TOOL_MATERIALS)));
+                .unlockedBy("has_cobblestone", has(ItemTags.STONE_TOOL_MATERIALS)));
 
+        // hammer recipes for stone
         TOOL.modRecipe("hammer/" + itemId(Items.GRAVEL))
                 .result(Items.GRAVEL, 1)
                 .pattern("#").pattern("#")
@@ -108,6 +110,25 @@ public final class AllRecipes {
                 .pattern("###")
                 .define('#', Items.GRAVEL)
                 .toolTag(AllTags.TOOL_HAMMER)
+                .damage(20)
+                .build();
+
+        // flint mortar
+        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(AllItems.FLINT_MORTAR.get())
+                .pattern(" F ")
+                .pattern("SFS")
+                .pattern("SSS")
+                .define('F', Items.FLINT)
+                .define('S', ItemTags.STONE_TOOL_MATERIALS)
+                .unlockedBy("has_flint", has(Items.FLINT)));
+
+        // mortar recipes for stone
+        TOOL.modRecipe("mortar/" + itemId(Items.SAND))
+                .result(Items.SAND, 1)
+                .pattern("#")
+                .define('#', Items.GRAVEL)
+                .toolTag(AllTags.TOOL_MORTAR)
                 .damage(20)
                 .build();
     }
@@ -148,6 +169,10 @@ public final class AllRecipes {
 
     private static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
         return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
+    }
+
+    private static InventoryChangeTrigger.TriggerInstance has(ItemLike item) {
+        return inventoryTrigger(ItemPredicate.Builder.item().of(item.asItem()).build());
     }
 
     private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {

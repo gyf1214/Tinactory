@@ -17,6 +17,7 @@ public final class AllTags {
     public static final TagKey<Item> TOOL_CUTTER = extend(TOOL, "cutter");
     public static final TagKey<Item> TOOL_SAW = extend(TOOL, "saw");
     public static final TagKey<Item> TOOL_HAMMER = extend(TOOL, "hammer");
+    public static final TagKey<Item> TOOL_MORTAR = extend(TOOL, "mortar");
 
     public static TagKey<Item> item(ResourceLocation loc) {
         return TagKey.create(Registry.ITEM_REGISTRY, loc);
