@@ -12,6 +12,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.recipe.NullRecipe;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
@@ -63,6 +64,20 @@ public final class AllRecipes {
         woodRecipes("crimson");
         woodRecipes("warped");
 
+        // sticks
+        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(Items.STICK, 2)
+                .define('#', ItemTags.PLANKS)
+                .pattern("#").pattern("#")
+                .unlockedBy("has_planks", has(ItemTags.PLANKS)));
+        TOOL.modRecipe("saw/" + itemId(Items.STICK))
+                .result(Items.STICK, 4)
+                .pattern("#").pattern("#")
+                .define('#', ItemTags.PLANKS)
+                .toolTag(AllTags.TOOL_SAW)
+                .damage(80)
+                .build();
+
         // primitive stone generator
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(AllBlocks.PRIMITIVE_STONE_GENERATOR.get())
@@ -77,6 +92,30 @@ public final class AllRecipes {
         STONE_GENERATOR.modRecipe(Items.COBBLESTONE)
                 .output(0, Items.COBBLESTONE, 1)
                 .workTicks(40)
+                .build();
+
+        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(AllItems.STONE_HAMMER.get())
+                .pattern("SS ")
+                .pattern("SSH")
+                .pattern("SS ")
+                .define('S', ItemTags.STONE_TOOL_MATERIALS)
+                .define('H', Items.STICK)
+                .unlockedBy("has_cobblestones", has(ItemTags.STONE_TOOL_MATERIALS)));
+
+        TOOL.modRecipe("hammer/" + itemId(Items.GRAVEL))
+                .result(Items.GRAVEL, 1)
+                .pattern("#").pattern("#")
+                .define('#', ItemTags.STONE_CRAFTING_MATERIALS)
+                .toolTag(AllTags.TOOL_HAMMER)
+                .damage(20)
+                .build();
+        TOOL.modRecipe("hammer/" + itemId(Items.FLINT))
+                .result(Items.FLINT, 1)
+                .pattern("###")
+                .define('#', Items.GRAVEL)
+                .toolTag(AllTags.TOOL_HAMMER)
+                .damage(20)
                 .build();
     }
 
@@ -93,8 +132,8 @@ public final class AllRecipes {
                 .result(planks, 4)
                 .pattern("X")
                 .define('X', logTag)
-                .damage(100)
                 .toolTag(AllTags.TOOL_SAW)
+                .damage(80)
                 .build();
         // disable wood and woodStripped recipes
         // TODO: maybe not necessary
@@ -106,6 +145,12 @@ public final class AllRecipes {
                 .requires(logTag)
                 .group("planks")
                 .unlockedBy("has_logs", has(logTag)));
+    }
+
+    private static String itemId(ItemLike item) {
+        var loc = item.asItem().getRegistryName();
+        assert loc != null;
+        return loc.getPath();
     }
 
     private static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {

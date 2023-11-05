@@ -24,8 +24,8 @@ public final class AllItems {
 
     static {
         TEST_WRENCH = toolItem("wrench", "test", 0xFFFFFF, 500);
-        STONE_HAMMER = toolItem("hammer", "stone", materialColor(Material.STONE), 500);
-        FLINT_MORTAR = toolItem("mortar", "flint", 0x2E2D2D, 500);
+        STONE_HAMMER = toolItem("hammer", "stone", materialColor(Material.STONE), 320);
+        FLINT_MORTAR = toolItem("mortar", "flint", 0x2E2D2D, 320);
     }
 
     private static int materialColor(Material material) {
