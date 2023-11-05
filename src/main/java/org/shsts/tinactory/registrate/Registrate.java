@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.shsts.tinactory.content.recipe.NullRecipe;
 import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartEntityBlock;
@@ -271,6 +273,20 @@ public class Registrate implements IBlockParent, IItemParent {
     public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>
     RecipeTypeBuilder<T, B, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B, S> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
+    }
+
+    public void nullRecipe(ResourceLocation loc) {
+        this.recipeDataHandler.addCallback(prov -> prov.addRecipe(new NullRecipe(loc)));
+    }
+
+    public void nullRecipe(String loc) {
+        this.nullRecipe(new ResourceLocation(loc));
+    }
+
+    public void nullRecipe(ItemLike item) {
+        var loc = item.asItem().getRegistryName();
+        assert loc != null;
+        this.nullRecipe(loc);
     }
 
     public void vanillaRecipe(Supplier<RecipeBuilder> recipe) {

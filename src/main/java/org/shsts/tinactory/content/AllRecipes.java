@@ -11,10 +11,8 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.content.recipe.NullRecipe;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
@@ -27,15 +25,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public final class AllRecipes {
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
-    public static final RecipeTypeEntry<NullRecipe, NullRecipe.Builder> NULL;
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> STONE_GENERATOR;
 
     static {
-        NULL = REGISTRATE.recipeType("null", NullRecipe.SERIALIZER)
-                .builder(NullRecipe.Builder::new)
-                .existingType(() -> RecipeType.CRAFTING)
-                .register();
 
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
                 .prefix("tool_recipe")
@@ -48,11 +41,11 @@ public final class AllRecipes {
                 .register();
 
         // disable add wooden tools
-        NULL.recipe(Items.WOODEN_AXE);
-        NULL.recipe(Items.WOODEN_HOE);
-        NULL.recipe(Items.WOODEN_PICKAXE);
-        NULL.recipe(Items.WOODEN_SHOVEL);
-        NULL.recipe(Items.WOODEN_SWORD);
+        REGISTRATE.nullRecipe(Items.WOODEN_AXE);
+        REGISTRATE.nullRecipe(Items.WOODEN_HOE);
+        REGISTRATE.nullRecipe(Items.WOODEN_PICKAXE);
+        REGISTRATE.nullRecipe(Items.WOODEN_SHOVEL);
+        REGISTRATE.nullRecipe(Items.WOODEN_SWORD);
 
         // all wood recipes
         woodRecipes("oak");
@@ -137,8 +130,8 @@ public final class AllRecipes {
                 .build();
         // disable wood and woodStripped recipes
         // TODO: maybe not necessary
-        NULL.recipe(wood).build();
-        NULL.recipe(woodStripped).build();
+        REGISTRATE.nullRecipe(wood);
+        REGISTRATE.nullRecipe(woodStripped);
         // reduce vanilla recipe to 2 planks
         REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(planks.get(), 2)

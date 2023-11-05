@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -23,8 +22,6 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
 
     protected final SmartRecipeSerializer.Factory<T, B, S> serializer;
     @Nullable
-    protected Supplier<RecipeType<? super T>> existingType = null;
-    @Nullable
     protected SmartRecipeBuilder.Factory<T, B> builderFactory = null;
     protected String prefix = "";
 
@@ -32,11 +29,6 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
                              SmartRecipeSerializer.Factory<T, B, S> serializer) {
         super(registrate, id, parent);
         this.serializer = serializer;
-    }
-
-    public RecipeTypeBuilder<T, B, S, P> existingType(Supplier<RecipeType<? super T>> existingType) {
-        this.existingType = existingType;
-        return self();
     }
 
     public RecipeTypeBuilder<T, B, S, P> builder(SmartRecipeBuilder.Factory<T, B> factory) {
@@ -67,15 +59,6 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
                 return loc;
             }
         };
-    }
-
-    public boolean willCreateType() {
-        return this.existingType == null;
-    }
-
-    public Supplier<RecipeType<? super T>> getExistingType() {
-        assert this.existingType != null;
-        return this.existingType;
     }
 
     public SmartRecipeBuilder.Factory<T, B> getBuilderFactory() {

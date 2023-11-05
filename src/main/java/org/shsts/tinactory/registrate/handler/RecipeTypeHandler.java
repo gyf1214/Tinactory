@@ -30,14 +30,9 @@ public class RecipeTypeHandler {
     public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>
     RecipeTypeEntry<T, B> register(RecipeTypeBuilder<T, B, S, ?> builder) {
         this.builders.add(builder);
-        if (builder.willCreateType()) {
-            var object = this.recipeTypeRegister.register(builder.id, builder::buildObject);
-            return new RecipeTypeEntry<>(registrate, builder.id,
-                    object::get, builder.getBuilderFactory(), builder.getPrefix());
-        } else {
-            return new RecipeTypeEntry<>(registrate, builder.id,
-                    builder.getExistingType(), builder.getBuilderFactory(), builder.getPrefix());
-        }
+        var recipeType = this.recipeTypeRegister.register(builder.id, builder::buildObject);
+        return new RecipeTypeEntry<>(registrate, builder.id, recipeType,
+                builder.getBuilderFactory(), builder.getPrefix());
     }
 
     public void onRegisterSerializer(RegistryEvent.Register<RecipeSerializer<?>> event) {

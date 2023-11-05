@@ -81,7 +81,7 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
         }
 
         public Builder recipeType(RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType) {
-            this.recipeType = recipeType.getProperType();
+            this.recipeType = recipeType.get();
             return this;
         }
 

@@ -1,82 +1,52 @@
 package org.shsts.tinactory.content.recipe;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import org.shsts.tinactory.core.SmartRecipe;
-import org.shsts.tinactory.core.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.FalseCondition;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NullRecipe extends SmartRecipe<CraftingContainer, NullRecipe> implements CraftingRecipe {
-    public NullRecipe(RecipeTypeEntry<NullRecipe, Builder> type, ResourceLocation loc) {
-        super(type, loc);
+public class NullRecipe implements FinishedRecipe {
+    private final ResourceLocation loc;
+
+    public NullRecipe(ResourceLocation loc) {
+        this.loc = loc;
     }
 
     @Override
-    public boolean matches(CraftingContainer container, Level world) {
-        return false;
+    public void serializeRecipeData(JsonObject jo) {
+        var je = new JsonArray();
+        je.add(CraftingHelper.serialize(FalseCondition.INSTANCE));
+        jo.add("conditions", je);
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer container) {
-        return ItemStack.EMPTY;
+    public ResourceLocation getId() {
+        return this.loc;
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return false;
+    public RecipeSerializer<?> getType() {
+        return RecipeSerializer.SHAPED_RECIPE;
     }
 
+    @Nullable
     @Override
-    public ItemStack getResultItem() {
-        return ItemStack.EMPTY;
+    public JsonObject serializeAdvancement() {
+        return null;
     }
 
-    public static class Builder extends SmartRecipeBuilder<NullRecipe, Builder> {
-        public Builder(Registrate registrate, RecipeTypeEntry<NullRecipe, Builder> parent, ResourceLocation loc) {
-            super(registrate, parent, loc);
-        }
-
-        @Override
-        public NullRecipe createObject() {
-            return new NullRecipe(this.parent, this.loc);
-        }
+    @Nullable
+    @Override
+    public ResourceLocation getAdvancementId() {
+        return null;
     }
-
-    private static class Serializer extends SmartRecipeSerializer<NullRecipe, Builder> {
-        protected Serializer(RecipeTypeEntry<NullRecipe, Builder> type) {
-            super(type);
-        }
-
-        @Override
-        public NullRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
-            return new NullRecipe(this.type, loc);
-        }
-
-        @Override
-        public void toJson(JsonObject jo, NullRecipe recipe) {}
-
-        @Override
-        public NullRecipe fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
-            return new NullRecipe(this.type, loc);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, NullRecipe recipe) {}
-    }
-
-    public static final SmartRecipeSerializer.SimpleFactory<NullRecipe, Builder>
-            SERIALIZER = Serializer::new;
 }

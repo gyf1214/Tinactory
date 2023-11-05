@@ -16,7 +16,7 @@ import static org.shsts.tinactory.model.ModelGen.prepend;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<RecipeType<? super T>> {
+public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<RecipeType<T>> {
     private final Registrate registrate;
     private final SmartRecipeBuilder.Factory<T, B> builderFactory;
     @Nullable
@@ -24,7 +24,7 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
     private final String prefix;
 
     public RecipeTypeEntry(Registrate registrate, String id,
-                           Supplier<RecipeType<? super T>> supplier,
+                           Supplier<RecipeType<T>> supplier,
                            SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix) {
         super(registrate.modid, id, supplier);
         this.registrate = registrate;
@@ -39,11 +39,6 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
 
     public void setSerializer(RecipeSerializer<T> serializer) {
         this.serializer = serializer;
-    }
-
-    @SuppressWarnings("unchecked")
-    public RecipeType<T> getProperType() {
-        return (RecipeType<T>) this.get();
     }
 
     public B recipe(ResourceLocation loc) {
