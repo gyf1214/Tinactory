@@ -52,15 +52,18 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
     }
 
     private static class Forge<T1 extends IForgeRegistryEntry<T1>> extends RegistryEntryHandler<T1> {
+        private final ResourceLocation loc;
         private final Supplier<IForgeRegistry<T1>> registry;
         private final Class<T1> entryClass;
 
         public Forge(IForgeRegistry<T1> registry) {
+            this.loc = registry.getRegistryName();
             this.registry = () -> registry;
             this.entryClass = registry.getRegistrySuperType();
         }
 
-        public Forge(Class<T1> entryClass, Supplier<IForgeRegistry<T1>> registry) {
+        public Forge(ResourceLocation loc, Class<T1> entryClass, Supplier<IForgeRegistry<T1>> registry) {
+            this.loc = loc;
             this.registry = registry;
             this.entryClass = entryClass;
         }
@@ -83,7 +86,7 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
     }
 
     public static <T1 extends IForgeRegistryEntry<T1>> RegistryEntryHandler<T1>
-    forge(Class<T1> entryClass, Supplier<IForgeRegistry<T1>> forgeRegistry) {
-        return new Forge<>(entryClass, forgeRegistry);
+    forge(ResourceLocation loc, Class<T1> entryClass, Supplier<IForgeRegistry<T1>> forgeRegistry) {
+        return new Forge<>(loc, entryClass, forgeRegistry);
     }
 }

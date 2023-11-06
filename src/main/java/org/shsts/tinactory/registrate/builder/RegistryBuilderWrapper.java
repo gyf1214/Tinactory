@@ -57,9 +57,9 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
     @Override
     protected SmartRegistry<T> createEntry() {
         var entry = this.registrate.registryHandler.register(this);
-        var handler = RegistryEntryHandler.forge(this.entryClass, entry);
+        var handler = RegistryEntryHandler.forge(this.loc, this.entryClass, entry);
         entry.setHandler(handler);
-        this.registrate.putHandler(handler);
+        this.registrate.putHandler(this.loc, handler);
         return entry;
     }
 

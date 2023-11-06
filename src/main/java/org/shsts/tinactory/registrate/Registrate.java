@@ -3,6 +3,7 @@ package org.shsts.tinactory.registrate;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
@@ -22,6 +23,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.content.recipe.NullRecipe;
 import org.shsts.tinactory.core.CapabilityProviderType;
@@ -55,7 +57,9 @@ import org.shsts.tinactory.registrate.handler.TintHandler;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -65,18 +69,19 @@ import java.util.function.Supplier;
 public class Registrate implements IBlockParent, IItemParent {
     public final String modid;
 
+    private final Map<ResourceLocation, RegistryEntryHandler<?>> registryEntryHandlers = new HashMap<>();
+    private final List<DataHandler<?>> dataHandlers = new ArrayList<>();
+
     // Registry
     public final RegistryHandler registryHandler = new RegistryHandler(this);
 
     // Registry Entries
-    public final RegistryEntryHandler<Block> blockHandler =
-            RegistryEntryHandler.forge(ForgeRegistries.BLOCKS);
-    public final RegistryEntryHandler<Item> itemHandler =
-            RegistryEntryHandler.forge(ForgeRegistries.ITEMS);
+    public final RegistryEntryHandler<Block> blockHandler = forgeHandler(ForgeRegistries.BLOCKS);
+    public final RegistryEntryHandler<Item> itemHandler = forgeHandler(ForgeRegistries.ITEMS);
     public final RegistryEntryHandler<BlockEntityType<?>> blockEntityHandler =
-            RegistryEntryHandler.forge(ForgeRegistries.BLOCK_ENTITIES);
+            forgeHandler(ForgeRegistries.BLOCK_ENTITIES);
     public final RegistryEntryHandler<MenuType<?>> menuTypeHandler =
-            RegistryEntryHandler.forge(ForgeRegistries.CONTAINERS);
+            forgeHandler(ForgeRegistries.CONTAINERS);
 
     // Others
     public final CapabilityHandler capabilityHandler = new CapabilityHandler(this);
@@ -96,25 +101,37 @@ public class Registrate implements IBlockParent, IItemParent {
     public final MenuScreenHandler menuScreenHandler = new MenuScreenHandler();
     public final TintHandler tintHandler = new TintHandler();
 
-    private final List<RegistryEntryHandler<?>> registryEntryHandlers = new ArrayList<>();
-    private final List<DataHandler<?>> dataHandlers = new ArrayList<>();
-
     public Registrate(String modid) {
         this.modid = modid;
-
-        this.putHandler(this.blockHandler);
-        this.putHandler(this.itemHandler);
-        this.putHandler(this.blockEntityHandler);
-        this.putHandler(this.menuTypeHandler);
-
         this.putDataHandler(this.blockStateHandler);
         this.putDataHandler(this.itemModelHandler);
         this.putDataHandler(this.itemTagsHandler);
         this.putDataHandler(this.recipeDataHandler);
     }
 
-    public void putHandler(RegistryEntryHandler<?> handler) {
-        this.registryEntryHandlers.add(handler);
+    public <T extends IForgeRegistryEntry<T>>
+    void putHandler(ResourceLocation loc, RegistryEntryHandler<T> handler) {
+        this.registryEntryHandlers.put(loc, handler);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends IForgeRegistryEntry<T>>
+    RegistryEntryHandler<T> forgeHandler(IForgeRegistry<T> registry) {
+        return (RegistryEntryHandler<T>) this.registryEntryHandlers.computeIfAbsent(
+                registry.getRegistryName(),
+                loc -> RegistryEntryHandler.forge(registry));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>
+    forgeHandler(ResourceLocation loc, Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
+        return (RegistryEntryHandler<T>) this.registryEntryHandlers.computeIfAbsent(loc,
+                loc1 -> RegistryEntryHandler.forge(loc1, entryClass, registry));
+    }
+
+    public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>
+    forgeHandler(ResourceKey<Registry<T>> key, Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
+        return this.forgeHandler(key.location(), entryClass, registry);
     }
 
     public void putDataHandler(DataHandler<?> handler) {
@@ -130,7 +147,7 @@ public class Registrate implements IBlockParent, IItemParent {
     public void register(IEventBus modEventBus) {
         // mod BUS
         modEventBus.addListener(this.registryHandler::onNewRegistry);
-        for (var handler : this.registryEntryHandlers) {
+        for (var handler : this.registryEntryHandlers.values()) {
             handler.addListener(modEventBus);
         }
         for (var handler : this.dataHandlers) {
@@ -247,6 +264,11 @@ public class Registrate implements IBlockParent, IItemParent {
     public <T extends IForgeRegistryEntry<T>, U extends T>
     RegistryEntry<U> registryEntry(String id, SmartRegistry<T> registry, Supplier<U> factory) {
         return (new SimpleRegistryEntryBuilder<>(registry.getHandler(), id, factory)).register();
+    }
+
+    public <T extends IForgeRegistryEntry<T>, U extends T>
+    RegistryEntry<U> registryEntry(String id, RegistryEntryHandler<T> handler, Supplier<U> factory) {
+        return (new SimpleRegistryEntryBuilder<>(handler, id, factory)).register();
     }
 
     public <T> RegistryEntry<Capability<T>> capability(Class<T> clazz, CapabilityToken<T> token) {
