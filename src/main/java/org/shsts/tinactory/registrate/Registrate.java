@@ -3,12 +3,14 @@ package org.shsts.tinactory.registrate;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -44,6 +46,7 @@ import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.handler.BlockStateHandler;
 import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.DataHandler;
+import org.shsts.tinactory.registrate.handler.DynamicHandler;
 import org.shsts.tinactory.registrate.handler.ItemModelHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RecipeDataHandler;
@@ -82,6 +85,10 @@ public class Registrate implements IBlockParent, IItemParent {
             forgeHandler(ForgeRegistries.BLOCK_ENTITIES);
     public final RegistryEntryHandler<MenuType<?>> menuTypeHandler =
             forgeHandler(ForgeRegistries.CONTAINERS);
+
+    // Dynamic
+    public final DynamicHandler<Biome> biomeHandler =
+            new DynamicHandler<>(Biome.class, OverworldBiomes::theVoid);
 
     // Others
     public final CapabilityHandler capabilityHandler = new CapabilityHandler(this);
@@ -150,6 +157,7 @@ public class Registrate implements IBlockParent, IItemParent {
         for (var handler : this.registryEntryHandlers.values()) {
             handler.addListener(modEventBus);
         }
+        this.biomeHandler.addListener(modEventBus);
         for (var handler : this.dataHandlers) {
             modEventBus.addListener(handler::onGatherData);
         }
@@ -295,6 +303,12 @@ public class Registrate implements IBlockParent, IItemParent {
     public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>
     RecipeTypeBuilder<T, B, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B, S> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
+    }
+
+    public void biome(String... ids) {
+        for (var id : ids) {
+            this.biomeHandler.addLocation(new ResourceLocation(this.modid, id));
+        }
     }
 
     public void nullRecipe(ResourceLocation loc) {
