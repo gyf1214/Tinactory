@@ -19,7 +19,6 @@ public class VoidPreset extends ForgeWorldPreset {
             var structureSets = registryAccess.registryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
             FlatLevelGeneratorSettings settings = new FlatLevelGeneratorSettings(Optional.empty(), biomes);
             settings.setBiome(biomes.getOrCreateHolder(AllWorldGens.VOID_BIOME));
-            settings.getLayersInfo().clear();
             settings.updateLayers();
             return new FlatLevelSource(structureSets, settings);
         });
