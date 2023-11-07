@@ -6,6 +6,7 @@ import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -235,6 +236,15 @@ public class Registrate implements IBlockParent, IItemParent {
 
     public void itemModel(Consumer<DataContext<ItemModelProvider>> cons) {
         this.itemModelHandler.addCallback(prov -> cons.accept(new DataContext<>(this.modid, prov)));
+    }
+
+    @SafeVarargs
+    public final void itemTag(Supplier<? extends Item> item, TagKey<Item>... tags) {
+        this.itemTagsHandler.addTags(item, tags);
+    }
+
+    public void itemTag(TagKey<Item> item, TagKey<Item> tag) {
+        this.itemTagsHandler.addTag(item, tag);
     }
 
     public <T extends IForgeRegistryEntry<T>>

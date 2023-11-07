@@ -2,7 +2,6 @@ package org.shsts.tinactory;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -15,6 +14,7 @@ import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllBlocks;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllItems;
+import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllWorldGens;
 import org.shsts.tinactory.content.network.AllNetworks;
@@ -39,14 +39,11 @@ public class Tinactory {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> onCreateClient(modEventBus));
     }
 
-    public static ResourceLocation modLoc(String id) {
-        return new ResourceLocation(ID, id);
-    }
-
     private static void onCreate(IEventBus modEventBus) {
         AllRegistries.init();
 
         ModelGen.init();
+        AllMaterials.init();
         AllBlocks.init();
         AllItems.init();
         AllCapabilities.init();

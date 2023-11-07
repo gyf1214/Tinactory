@@ -34,6 +34,10 @@ public class TagsHandler<T> extends DataHandler<TagsProvider<T>> {
             this.tag(key).add(object);
         }
 
+        public void addTag(TagKey<T> key, TagKey<T> object) {
+            this.tag(key).addTag(object);
+        }
+
         @Override
         protected void addTags() {
             TagsHandler.this.register(this);
@@ -57,6 +61,10 @@ public class TagsHandler<T> extends DataHandler<TagsProvider<T>> {
         for (var tag : tags) {
             this.callbacks.add(prov -> ((Provider) prov).addTag(tag, object.get()));
         }
+    }
+
+    public void addTag(TagKey<T> object, TagKey<T> tag) {
+        this.callbacks.add(prov -> ((Provider) prov).addTag(tag, object));
     }
 
     @Override

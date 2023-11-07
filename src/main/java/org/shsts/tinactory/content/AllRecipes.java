@@ -12,6 +12,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
@@ -87,15 +88,15 @@ public final class AllRecipes {
                 .workTicks(40)
                 .build();
 
-        // stone hammer
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllItems.STONE_HAMMER.get())
-                .pattern("SS ")
-                .pattern("SSH")
-                .pattern("SS ")
-                .define('S', ItemTags.STONE_TOOL_MATERIALS)
-                .define('H', Items.STICK)
-                .unlockedBy("has_cobblestone", has(ItemTags.STONE_TOOL_MATERIALS)));
+                .shaped(AllBlocks.WORKBENCH.get())
+                .pattern("WSW")
+                .pattern("SCS")
+                .pattern("WSW")
+                .define('S', ItemTags.STONE_CRAFTING_MATERIALS)
+                .define('W', Items.STICK)
+                .define('C', Blocks.CRAFTING_TABLE)
+                .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS)));
 
         // hammer recipes for stone
         TOOL.modRecipe("hammer/" + itemId(Items.GRAVEL))
@@ -112,16 +113,6 @@ public final class AllRecipes {
                 .toolTag(AllTags.TOOL_HAMMER)
                 .damage(20)
                 .build();
-
-        // flint mortar
-        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllItems.FLINT_MORTAR.get())
-                .pattern(" F ")
-                .pattern("SFS")
-                .pattern("SSS")
-                .define('F', Items.FLINT)
-                .define('S', ItemTags.STONE_TOOL_MATERIALS)
-                .unlockedBy("has_flint", has(Items.FLINT)));
 
         // mortar recipes for stone
         TOOL.modRecipe("mortar/" + itemId(Items.SAND))
@@ -167,12 +158,8 @@ public final class AllRecipes {
         return loc.getPath();
     }
 
-    private static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
+    public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
         return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
-    }
-
-    private static InventoryChangeTrigger.TriggerInstance has(ItemLike item) {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(item.asItem()).build());
     }
 
     private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {
