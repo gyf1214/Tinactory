@@ -14,10 +14,12 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,14 +38,18 @@ public class MaterialSet {
     private final int color;
     private final List<Runnable> callbacks = new ArrayList<>();
 
-    private record Entry(TagKey<Item> tag, @Nullable Supplier<Item> item) {
-        public Entry(TagKey<Item> tag) {
-            this(tag, null);
+    private record Entry(ResourceLocation loc, TagKey<Item> tag, @Nullable Supplier<Item> item) {
+        public Entry(ResourceLocation loc, TagKey<Item> tag) {
+            this(loc, tag, null);
         }
 
         public Item getItem() {
+            return this.getEntry().get();
+        }
+
+        public Supplier<Item> getEntry() {
             assert this.item != null;
-            return this.item.get();
+            return this.item;
         }
     }
 
@@ -66,7 +72,7 @@ public class MaterialSet {
         return AllTags.modItem(prefix(sub) + "/" + this.name);
     }
 
-    private Entry safePut(String sub, Supplier<? extends Item> item) {
+    private Entry safePut(String sub, ResourceLocation loc, Supplier<Item> item) {
         if (this.isFrozen) {
             throw new IllegalStateException("Material set %s is frozen".formatted(this.name));
         }
@@ -75,33 +81,32 @@ public class MaterialSet {
             var prefixTag = prefixTag(sub);
             REGISTRATE.itemTag(item, tag);
             REGISTRATE.itemTag(tag, prefixTag);
-            return new Entry(tag, item::get);
+            return new Entry(loc, tag, item);
         });
     }
 
-    public TagKey<Item> getTag(String sub) {
-        var entry = this.items.get(sub);
-        assert entry != null;
-        return entry.tag;
+    private Entry safePut(String sub, ItemLike itemLike) {
+        var item = itemLike.asItem();
+        var loc = item.getRegistryName();
+        assert loc != null;
+        return this.safePut(sub, loc, () -> item);
     }
 
-    public Optional<TagKey<Item>> get(String sub) {
-        return Optional.ofNullable(this.items.get(sub)).map(x -> x.tag);
+    private Entry safePut(String sub, RegistryEntry<? extends Item> item) {
+        return this.safePut(sub, item.loc, item::get);
     }
 
-    public Optional<Item> getItem(String sub) {
-        return Optional.ofNullable(this.items.get(sub))
-                .flatMap(x -> Optional.ofNullable(x.item))
-                .map(Supplier::get);
+    private Optional<Entry> get(String sub) {
+        return Optional.ofNullable(this.items.get(sub));
     }
 
     public MaterialSet existing(String sub, ItemLike item) {
-        this.safePut(sub, item::asItem);
+        this.safePut(sub, item);
         return this;
     }
 
     public MaterialSet existing(String sub, TagKey<Item> tag) {
-        this.items.put(sub, new Entry(tag));
+        this.items.put(sub, new Entry(this.loc(sub), tag));
         REGISTRATE.itemTag(tag, prefixTag(sub));
         return this;
     }
@@ -114,21 +119,35 @@ public class MaterialSet {
         return this;
     }
 
-    private String extend(String sub) {
+    private String id(String sub) {
         return sub + "/" + this.name;
     }
 
-    private ResourceLocation tex(String subFolder, String sub) {
+    public ResourceLocation loc(String sub) {
+        return new ResourceLocation(REGISTRATE.modid, this.id(sub));
+    }
+
+    private static ResourceLocation icon(String subFolder, String sub) {
         return new ResourceLocation(SET_LOC.getNamespace(), SET_LOC.getPath() + "/" + subFolder + "/" + sub);
     }
 
-    public ResourceLocation loc(String sub) {
-        return new ResourceLocation(REGISTRATE.modid, this.extend(sub));
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    private void optional(Consumer<Entry[]> cons, String... names) {
+        var optionals = Arrays.stream(names).map(this::get).toList();
+        if (optionals.stream().anyMatch(Optional::isEmpty)) {
+            return;
+        }
+        cons.accept(optionals.stream().map(Optional::get).toArray(Entry[]::new));
+    }
+
+    private MaterialSet defer(Consumer<Entry[]> cons, String... names) {
+        this.callbacks.add(() -> this.optional(cons, names));
+        return this;
     }
 
     private Entry dummy(String subFolder, String sub) {
-        return safePut(sub, REGISTRATE.item(this.extend(sub), Item::new)
-                .model(ModelGen.basicItem(tex(subFolder, sub)))
+        return safePut(sub, REGISTRATE.item(this.id(sub), Item::new)
+                .model(ModelGen.basicItem(icon(subFolder, sub)))
                 .tint(this.color)
                 .register());
     }
@@ -147,6 +166,16 @@ public class MaterialSet {
         return this;
     }
 
+    public MaterialSet grind(int damage) {
+        return defer(entries -> AllRecipes.TOOL.modRecipe("mortar/" + entries[0].loc.getPath())
+                .result(entries[0].getEntry(), 1)
+                .pattern("#")
+                .define('#', entries[1].tag)
+                .toolTag(AllTags.TOOL_MORTAR)
+                .damage(damage)
+                .build(), "dust", "primary");
+    }
+
     private static ResourceLocation toolTex(String sub) {
         return ModelGen.gregtech("items/tools/" + sub);
     }
@@ -160,17 +189,12 @@ public class MaterialSet {
         };
         var head = ModelGen.gregtech("items/tools/" + category);
         var sub = "tool/" + category;
-        return safePut(sub, REGISTRATE.item(this.extend(sub), properties -> new ToolItem(properties, 1, durability))
+        return safePut(sub, REGISTRATE.item(this.id(sub),
+                        properties -> new ToolItem(properties, 1, durability))
                 .model(ModelGen.basicItem(handle, head))
                 .tag(AllTags.TOOL)
                 .tint(0xFFFFFF, this.color)
                 .register());
-    }
-
-    private MaterialSet putTool(String sub, int durability, Consumer<Entry> cons) {
-        var entry = this.putTool(sub, durability);
-        this.callbacks.add(() -> cons.accept(entry));
-        return this;
     }
 
     public MaterialSet tool(String sub, int durability) {
@@ -178,51 +202,42 @@ public class MaterialSet {
         return this;
     }
 
-    private void hammerRecipe(Entry entry) {
-        this.get("tool_material").ifPresent(material -> REGISTRATE.vanillaRecipe(
-                () -> ShapedRecipeBuilder
-                        .shaped(entry.getItem())
-                        .pattern("MM ")
-                        .pattern("MMS")
-                        .pattern("MM ")
-                        .define('M', material)
-                        .define('S', Items.STICK)
-                        .unlockedBy("has_material", AllRecipes.has(material))));
-    }
-
     public MaterialSet hammer(int durability) {
-        return this.putTool("hammer", durability, this::hammerRecipe);
-    }
-
-    private void mortarRecipe(Entry entry) {
-        this.get("tool_material").ifPresent(material -> REGISTRATE.vanillaRecipe(
-                () -> ShapedRecipeBuilder
-                        .shaped(entry.getItem())
-                        .pattern(" M ")
-                        .pattern("SMS")
-                        .pattern("SSS")
-                        .define('M', material)
-                        .define('S', ItemTags.STONE_TOOL_MATERIALS)
-                        .unlockedBy("has_material", AllRecipes.has(material))));
+        var tool = this.putTool("hammer", durability);
+        return this.defer(materials -> REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(tool.getItem())
+                .pattern("MM ")
+                .pattern("MMS")
+                .pattern("MM ")
+                .define('M', materials[0].tag)
+                .define('S', Items.STICK)
+                .unlockedBy("has_material", AllRecipes.has(materials[0].tag))
+        ), "primary");
     }
 
     public MaterialSet mortar(int durability) {
-        return this.putTool("mortar", durability, this::mortarRecipe);
-    }
-
-    private void wrenchRecipe(Entry entry) {
-        this.get("plate").ifPresent(plate -> AllRecipes.TOOL.recipe(entry.getItem())
-                .pattern("P P")
-                .pattern("PPP")
-                .pattern(" P ")
-                .define('P', plate)
-                .damage(80)
-                .toolTag(AllTags.TOOL_HAMMER)
-                .build());
+        var tool = this.putTool("mortar", durability);
+        return this.defer(materials -> REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(tool.getItem())
+                .pattern(" M ")
+                .pattern("SMS")
+                .pattern("SSS")
+                .define('M', materials[0].tag)
+                .define('S', ItemTags.STONE_TOOL_MATERIALS)
+                .unlockedBy("has_material", AllRecipes.has(materials[0].tag))
+        ), "primary");
     }
 
     public MaterialSet wrench(int durability) {
-        return this.putTool("wrench", durability, this::wrenchRecipe);
+        var tool = this.putTool("wrench", durability);
+        return this.defer(materials -> AllRecipes.TOOL.recipe(tool.getItem())
+                .pattern("P P")
+                .pattern("PPP")
+                .pattern(" P ")
+                .define('P', materials[0].tag)
+                .damage(80)
+                .toolTag(AllTags.TOOL_HAMMER)
+                .build(), "plate");
     }
 
     public void freeze() {

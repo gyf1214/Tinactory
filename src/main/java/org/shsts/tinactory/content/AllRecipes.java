@@ -88,6 +88,7 @@ public final class AllRecipes {
                 .workTicks(40)
                 .build();
 
+        // workbench
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(AllBlocks.WORKBENCH.get())
                 .pattern("WSW")
@@ -98,7 +99,7 @@ public final class AllRecipes {
                 .define('C', Blocks.CRAFTING_TABLE)
                 .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS)));
 
-        // hammer recipes for stone
+        // hammer recipes for stone & gravel
         TOOL.modRecipe("hammer/" + itemId(Items.GRAVEL))
                 .result(Items.GRAVEL, 1)
                 .pattern("#").pattern("#")
@@ -114,7 +115,7 @@ public final class AllRecipes {
                 .damage(20)
                 .build();
 
-        // mortar recipes for stone
+        // mortar recipes for gravel
         TOOL.modRecipe("mortar/" + itemId(Items.SAND))
                 .result(Items.SAND, 1)
                 .pattern("#")
