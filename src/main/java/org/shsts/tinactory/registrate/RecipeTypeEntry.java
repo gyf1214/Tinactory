@@ -2,10 +2,10 @@ package org.shsts.tinactory.registrate;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.Nullable;
@@ -45,23 +45,14 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
         return this.builderFactory.create(this.registrate, this, loc);
     }
 
-    public B recipe(ItemLike item) {
-        var loc = item.asItem().getRegistryName();
+    public B modRecipe(Item item) {
+        var loc = item.getRegistryName();
         assert loc != null;
-        return this.recipe(prepend(loc, this.prefix));
+        return this.modRecipe(loc);
     }
 
-    public B recipe(String id) {
-        return this.recipe(prepend(new ResourceLocation(id), this.prefix));
-    }
-
-    public B modRecipe(ItemLike item) {
-        var loc = item.asItem().getRegistryName();
-        assert loc != null;
-        return this.modRecipe(loc.getNamespace() + "/" + loc.getPath());
-    }
-
-    public B modRecipe(String id) {
+    public B modRecipe(ResourceLocation loc) {
+        var id = loc.getNamespace() + "/" + loc.getPath();
         return this.recipe(prepend(new ResourceLocation(this.modid, id), this.prefix));
     }
 }

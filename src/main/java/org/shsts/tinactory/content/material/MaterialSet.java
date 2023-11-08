@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content;
+package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -7,16 +7,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.content.AllRecipes;
+import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,18 +30,14 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 public class MaterialSet {
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
-    private static final ResourceLocation SET_LOC = ModelGen.gregtech("items/material_sets");
 
     private boolean isFrozen = false;
     private final String name;
+    private final IconSet icon;
     private final int color;
     private final List<Runnable> callbacks = new ArrayList<>();
 
-    private record Entry(ResourceLocation loc, TagKey<Item> tag, @Nullable Supplier<Item> item) {
-        public Entry(ResourceLocation loc, TagKey<Item> tag) {
-            this(loc, tag, null);
-        }
-
+    private record Entry(ResourceLocation loc, TagKey<Item> tag, Supplier<Item> item) {
         public Item getItem() {
             return this.getEntry().get();
         }
@@ -55,8 +50,9 @@ public class MaterialSet {
 
     private final Map<String, Entry> items = new HashMap<>();
 
-    public MaterialSet(String name, int color) {
+    public MaterialSet(String name, IconSet icon, int color) {
         this.name = name;
+        this.icon = icon;
         this.color = color;
     }
 
@@ -85,29 +81,34 @@ public class MaterialSet {
         });
     }
 
-    private Entry safePut(String sub, ItemLike itemLike) {
-        var item = itemLike.asItem();
-        var loc = item.getRegistryName();
-        assert loc != null;
-        return this.safePut(sub, loc, () -> item);
-    }
-
-    private Entry safePut(String sub, RegistryEntry<? extends Item> item) {
-        return this.safePut(sub, item.loc, item::get);
+    private Entry safePut(String sub, Supplier<RegistryEntry<? extends Item>> item) {
+        if (this.items.containsKey(sub)) {
+            return this.items.get(sub);
+        }
+        var entry = item.get();
+        return this.safePut(sub, entry.loc, entry::get);
     }
 
     private Optional<Entry> get(String sub) {
         return Optional.ofNullable(this.items.get(sub));
     }
 
-    public MaterialSet existing(String sub, ItemLike item) {
-        this.safePut(sub, item);
+    public MaterialSet existing(String sub, Item item) {
+        assert !this.items.containsKey(sub);
+        var loc = item.getRegistryName();
+        assert loc != null;
+        this.safePut(sub, loc, () -> item);
         return this;
     }
 
-    public MaterialSet existing(String sub, TagKey<Item> tag) {
-        this.items.put(sub, new Entry(this.loc(sub), tag));
+    public MaterialSet existing(String sub, TagKey<Item> targetTag, Item item) {
+        assert !this.items.containsKey(sub);
+        var tag = this.tag(sub);
+        REGISTRATE.itemTag(targetTag, tag);
         REGISTRATE.itemTag(tag, prefixTag(sub));
+        var loc = item.getRegistryName();
+        assert loc != null;
+        this.items.put(sub, new Entry(loc, tag, () -> item));
         return this;
     }
 
@@ -127,10 +128,6 @@ public class MaterialSet {
         return new ResourceLocation(REGISTRATE.modid, this.id(sub));
     }
 
-    private static ResourceLocation icon(String subFolder, String sub) {
-        return new ResourceLocation(SET_LOC.getNamespace(), SET_LOC.getPath() + "/" + subFolder + "/" + sub);
-    }
-
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private void optional(Consumer<Entry[]> cons, String... names) {
         var optionals = Arrays.stream(names).map(this::get).toList();
@@ -145,105 +142,166 @@ public class MaterialSet {
         return this;
     }
 
-    private Entry dummy(String subFolder, String sub) {
-        return safePut(sub, REGISTRATE.item(this.id(sub), Item::new)
-                .model(ModelGen.basicItem(icon(subFolder, sub)))
+    private Entry dummy(String sub) {
+        return safePut(sub, () -> REGISTRATE.item(this.id(sub), Item::new)
+                .model(this.icon.itemModel(sub))
                 .tint(this.color)
                 .register());
     }
 
-    public MaterialSet dust(String subFolder) {
-        var dust = dummy(subFolder, "dust");
-        var dustSmall = dummy(subFolder, "dust_tiny");
+    public MaterialSet dust() {
+        this.dummy("dust");
+        return this;
+    }
+
+    public MaterialSet dustSet() {
+        var dust = this.dummy("dust");
+        var dustTiny = this.dummy("dust_tiny");
         REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
-                .shapeless(dustSmall.getItem(), 9)
+                .shapeless(dustTiny.getItem(), 9)
                 .requires(dust.tag)
                 .unlockedBy("has_dust", AllRecipes.has(dust.tag)));
         REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(dust.getItem())
-                .requires(Ingredient.of(dustSmall.tag), 9)
-                .unlockedBy("has_dust_small", AllRecipes.has(dustSmall.tag)));
+                .requires(Ingredient.of(dustTiny.tag), 9)
+                .unlockedBy("has_dust_small", AllRecipes.has(dustTiny.tag)));
         return this;
     }
 
-    public MaterialSet grind(int damage) {
-        return defer(entries -> AllRecipes.TOOL.modRecipe("mortar/" + entries[0].loc.getPath())
-                .result(entries[0].getEntry(), 1)
+    public MaterialSet metalSet() {
+        this.dustSet();
+        this.dummy("ingot");
+        this.alias("primary", "ingot");
+        this.dummy("nugget");
+        this.dummy("plate");
+        this.dummy("stick");
+        return this;
+    }
+
+    public MaterialSet mechanicalSet() {
+        this.metalSet();
+        this.dummy("bolt");
+        this.dummy("screw");
+        this.dummy("gear");
+        this.dummy("rotor");
+        this.dummy("spring");
+        return this;
+    }
+
+    private void simpleToolProcess(String resultSub, String materialSub, int count, TagKey<Item> tool) {
+        this.defer(entries -> AllRecipes.TOOL.modRecipe(entries[0].loc)
+                .result(entries[0].getEntry(), count)
                 .pattern("#")
                 .define('#', entries[1].tag)
-                .toolTag(AllTags.TOOL_MORTAR)
-                .damage(damage)
-                .build(), "dust", "primary");
+                .toolTag(tool)
+                .build(), resultSub, materialSub);
+    }
+
+    public MaterialSet toolProcess() {
+        // grind dust
+        this.simpleToolProcess("dust", "primary", 1, AllTags.TOOL_MORTAR);
+        this.simpleToolProcess("dust_tiny", "nugget", 1, AllTags.TOOL_MORTAR);
+        // ingot to plate
+        this.defer(entries -> AllRecipes.TOOL.modRecipe(entries[0].loc)
+                .result(entries[0].getEntry(), 1)
+                .pattern("#").pattern("#")
+                .define('#', entries[1].tag)
+                .toolTag(AllTags.TOOL_HAMMER)
+                .build(), "plate", "ingot");
+        // plate to stick
+        this.simpleToolProcess("stick", "plate", 1, AllTags.TOOL_FILE);
+        // stick to bolt
+        this.simpleToolProcess("bolt", "stick", 2, AllTags.TOOL_SAW);
+        // bolt to screw
+        this.simpleToolProcess("screw", "bolt", 1, AllTags.TOOL_FILE);
+        return this;
     }
 
     private static ResourceLocation toolTex(String sub) {
         return ModelGen.gregtech("items/tools/" + sub);
     }
 
-    private Entry putTool(String category, int durability) {
+    private Entry tool(String category, int durability) {
         var handle = switch (category) {
             case "saw" -> toolTex("handle_saw");
             case "hammer" -> toolTex("handle_hammer");
             case "mortar" -> toolTex("mortar_base");
+            case "file" -> toolTex("handle_file");
             default -> ModelGen.VOID_TEX;
         };
         var head = ModelGen.gregtech("items/tools/" + category);
         var sub = "tool/" + category;
-        return safePut(sub, REGISTRATE.item(this.id(sub),
-                        properties -> new ToolItem(properties, 1, durability))
+        return safePut(sub, () -> REGISTRATE.item(this.id(sub),
+                        properties -> new ToolItem(properties, durability))
                 .model(ModelGen.basicItem(handle, head))
                 .tag(AllTags.TOOL)
                 .tint(0xFFFFFF, this.color)
                 .register());
     }
 
-    public MaterialSet tool(String sub, int durability) {
-        this.putTool(sub, durability);
-        return this;
-    }
-
     public MaterialSet hammer(int durability) {
-        var tool = this.putTool("hammer", durability);
+        var tool = this.tool("hammer", durability);
         return this.defer(materials -> REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(tool.getItem())
-                .pattern("MM ")
-                .pattern("MMS")
-                .pattern("MM ")
-                .define('M', materials[0].tag)
-                .define('S', Items.STICK)
+                .pattern("## ")
+                .pattern("##S")
+                .pattern("## ")
+                .define('#', materials[0].tag)
+                .define('S', AllTags.TOOL_HANDLE)
                 .unlockedBy("has_material", AllRecipes.has(materials[0].tag))
         ), "primary");
     }
 
     public MaterialSet mortar(int durability) {
-        var tool = this.putTool("mortar", durability);
+        var tool = this.tool("mortar", durability);
         return this.defer(materials -> REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(tool.getItem())
-                .pattern(" M ")
-                .pattern("SMS")
+                .pattern(" # ")
+                .pattern("S#S")
                 .pattern("SSS")
-                .define('M', materials[0].tag)
+                .define('#', materials[0].tag)
                 .define('S', ItemTags.STONE_TOOL_MATERIALS)
                 .unlockedBy("has_material", AllRecipes.has(materials[0].tag))
         ), "primary");
     }
 
-    public MaterialSet wrench(int durability) {
-        var tool = this.putTool("wrench", durability);
-        return this.defer(materials -> AllRecipes.TOOL.recipe(tool.getItem())
-                .pattern("P P")
-                .pattern("PPP")
-                .pattern(" P ")
-                .define('P', materials[0].tag)
-                .damage(80)
+    public MaterialSet toolSet(int durability) {
+        this.hammer(durability).mortar(durability);
+
+        var wrench = this.tool("wrench", durability);
+        this.defer(materials -> AllRecipes.TOOL.modRecipe(wrench.loc)
+                .result(wrench::getItem, 1)
+                .pattern("# #")
+                .pattern("###")
+                .pattern(" # ")
+                .define('#', materials[0].tag)
                 .toolTag(AllTags.TOOL_HAMMER)
                 .build(), "plate");
+
+        var file = this.tool("file", durability);
+        this.defer(materials -> REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(file.getItem())
+                .pattern("#").pattern("#").pattern("S")
+                .define('#', materials[0].tag)
+                .define('S', AllTags.TOOL_HANDLE)
+        ), "plate");
+
+        var saw = this.tool("saw", durability);
+        this.defer(materials -> AllRecipes.TOOL.modRecipe(saw.loc)
+                .result(saw::getItem, 1)
+                .pattern("##S").pattern("  S")
+                .define('#', materials[0].tag)
+                .define('S', AllTags.TOOL_HANDLE)
+                .build(), "plate");
+
+        return this;
     }
 
     public void freeze() {
         for (var cb : this.callbacks) {
             cb.run();
         }
+        this.callbacks.clear();
         this.isFrozen = true;
     }
 }

@@ -10,7 +10,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -239,6 +238,11 @@ public class Registrate implements IBlockParent, IItemParent {
     }
 
     @SafeVarargs
+    public final void itemTag(Item item, TagKey<Item>... tags) {
+        this.itemTag(() -> item, tags);
+    }
+
+    @SafeVarargs
     public final void itemTag(Supplier<? extends Item> item, TagKey<Item>... tags) {
         this.itemTagsHandler.addTags(item, tags);
     }
@@ -329,8 +333,8 @@ public class Registrate implements IBlockParent, IItemParent {
         this.nullRecipe(new ResourceLocation(loc));
     }
 
-    public void nullRecipe(ItemLike item) {
-        var loc = item.asItem().getRegistryName();
+    public void nullRecipe(Item item) {
+        var loc = item.getRegistryName();
         assert loc != null;
         this.nullRecipe(loc);
     }

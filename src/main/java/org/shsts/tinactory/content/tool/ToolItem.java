@@ -20,13 +20,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class ToolItem extends Item implements IToolItem {
     public static final int WRENCH_RADIUS = 4;
     public static final double WRENCH_RADIUS_NORM = (double) WRENCH_RADIUS / 16d;
-
-    protected final int level;
     protected final int maxDurability;
 
-    public ToolItem(Properties properties, int level, int maxDurability) {
+    public ToolItem(Properties properties, int maxDurability) {
         super(properties);
-        this.level = level;
         this.maxDurability = maxDurability;
     }
 
@@ -39,11 +36,6 @@ public class ToolItem extends Item implements IToolItem {
     public void setDurability(ItemStack stack, int value) {
         var tag = stack.getOrCreateTag();
         tag.putInt("durability", value);
-    }
-
-    @Override
-    public int getLevel() {
-        return this.level;
     }
 
     /**

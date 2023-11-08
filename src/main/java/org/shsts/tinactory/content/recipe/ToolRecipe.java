@@ -16,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.items.IItemHandler;
@@ -44,14 +43,12 @@ import java.util.stream.Collectors;
 @ParametersAreNonnullByDefault
 public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
     private final ShapedRecipe shapedRecipe;
-    private final int damage;
     private final List<Ingredient> toolIngredients;
 
     public ToolRecipe(RecipeTypeEntry<ToolRecipe, Builder> type, ResourceLocation loc, ShapedRecipe shapedRecipe,
-                      int damage, List<Ingredient> toolIngredients) {
+                      List<Ingredient> toolIngredients) {
         super(type, loc);
         this.shapedRecipe = shapedRecipe;
-        this.damage = damage;
         this.toolIngredients = toolIngredients;
     }
 
@@ -92,7 +89,7 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
                 }
             }
             if (found != -1) {
-                damages[found] += this.damage;
+                damages[found] += 1;
             }
         }
 
@@ -147,21 +144,18 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
 
     private static class Finished extends SimpleFinished<ToolRecipe> {
         private final FinishedRecipe shaped;
-        private final int damage;
         private final List<Ingredient> tools;
 
         public Finished(ResourceLocation loc, RecipeTypeEntry<ToolRecipe, Builder> type,
-                        FinishedRecipe shaped, int damage, List<Ingredient> tools) {
+                        FinishedRecipe shaped, List<Ingredient> tools) {
             super(loc, type.getSerializer());
             this.shaped = shaped;
-            this.damage = damage;
             this.tools = tools;
         }
 
         @Override
         public void serializeRecipeData(JsonObject jo) {
             this.shaped.serializeRecipeData(jo);
-            jo.addProperty("damage", this.damage);
             var tools = new JsonArray();
             this.tools.stream().map(Ingredient::toJson).forEach(tools::add);
             jo.add("tools", tools);
@@ -174,7 +168,6 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
         private int count = 0;
         private final List<String> rows = new ArrayList<>();
         private final Map<Character, Supplier<Ingredient>> key = new HashMap<>();
-        private int damage = 0;
         private final List<Supplier<Ingredient>> tools = new ArrayList<>();
 
         public Builder(Registrate registrate, RecipeTypeEntry<ToolRecipe, Builder> parent, ResourceLocation loc) {
@@ -187,8 +180,8 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
             return self();
         }
 
-        public Builder result(ItemLike result, int count) {
-            this.result = result::asItem;
+        public Builder result(Item result, int count) {
+            this.result = () -> result;
             this.count = count;
             return self();
         }
@@ -203,13 +196,8 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
             return self();
         }
 
-        public Builder define(Character key, ItemLike item) {
+        public Builder define(Character key, Item item) {
             this.key.put(key, () -> Ingredient.of(item));
-            return self();
-        }
-
-        public Builder damage(int damage) {
-            this.damage = damage;
             return self();
         }
 
@@ -229,7 +217,7 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
             var tools = this.tools.stream().map(Supplier::get).toList();
             var shaped = new FinishedShaped(this.loc, this.result.get(), this.count, this.rows, key);
-            return new Finished(this.loc, this.parent, shaped, this.damage, tools);
+            return new Finished(this.loc, this.parent, shaped, tools);
         }
     }
 
@@ -243,11 +231,10 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
         @Override
         public ToolRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
             var shaped = SHAPED_SERIALIZER.fromJson(loc, jo, context);
-            var damage = GsonHelper.getAsInt(jo, "damage");
             var tools = Streams.stream(GsonHelper.getAsJsonArray(jo, "tools"))
                     .map(Ingredient::fromJson)
                     .toList();
-            return new ToolRecipe(this.type, loc, shaped, damage, tools);
+            return new ToolRecipe(this.type, loc, shaped, tools);
         }
 
         @Override
@@ -257,15 +244,13 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
         public ToolRecipe fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
             var shaped = SHAPED_SERIALIZER.fromNetwork(loc, buf);
             assert shaped != null;
-            var damage = buf.readVarInt();
             var tools = buf.readCollection(ArrayList::new, Ingredient::fromNetwork);
-            return new ToolRecipe(this.type, loc, shaped, damage, tools);
+            return new ToolRecipe(this.type, loc, shaped, tools);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, ToolRecipe recipe) {
             SHAPED_SERIALIZER.toNetwork(buf, recipe.shapedRecipe);
-            buf.writeVarInt(recipe.damage);
             buf.writeCollection(recipe.toolIngredients, (buf1, ingredient) -> ingredient.toNetwork(buf1));
         }
     }

@@ -18,6 +18,10 @@ public final class AllTags {
     public static final TagKey<Item> TOOL_SAW = extend(TOOL, "saw");
     public static final TagKey<Item> TOOL_HAMMER = extend(TOOL, "hammer");
     public static final TagKey<Item> TOOL_MORTAR = extend(TOOL, "mortar");
+    public static final TagKey<Item> TOOL_FILE = extend(TOOL, "file");
+
+    public static final TagKey<Item> TOOL_HANDLE = modItem("tool_handle");
+    public static final TagKey<Item> TOOL_SCREW = modItem("tool_screw");
 
     public static TagKey<Item> item(ResourceLocation loc) {
         return TagKey.create(Registry.ITEM_REGISTRY, loc);
