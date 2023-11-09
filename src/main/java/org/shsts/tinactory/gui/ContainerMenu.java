@@ -12,6 +12,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import org.shsts.tinactory.gui.layout.Rect;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     public static final int SPACING_VERTICAL = 3;
     public static final int MARGIN_VERTICAL = 3 + SPACING_VERTICAL;
     public static final int MARGIN_TOP = MARGIN_VERTICAL + FONT_HEIGHT + SPACING_VERTICAL;
+    public static final int DEFAULT_Z_INDEX = 20;
 
     public final boolean isClientSide;
     public final T blockEntity;
@@ -152,10 +154,6 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     @FunctionalInterface
     public interface SlotFactory<T extends Slot> {
         T create(IItemHandler itemHandler, int index, int posX, int posY);
-    }
-
-    public void addSlot(int slotIndex, int posX, int posY) {
-        this.addSlot(WrapperSlot::new, slotIndex, posX, posY);
     }
 
     public void addSlot(SlotFactory<?> factory, int slotIndex, int posX, int posY) {

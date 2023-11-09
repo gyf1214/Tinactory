@@ -30,11 +30,13 @@ public final class AllRecipes {
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
+                .clazz(ToolRecipe.class)
                 .prefix("tool_recipe")
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
         STONE_GENERATOR = REGISTRATE.recipeType("stone", ProcessingRecipe.SIMPLE_SERIALIZER)
+                .clazz(ProcessingRecipe.Simple.class)
                 .prefix("processing/stone_generator")
                 .builder(ProcessingRecipe.SimpleBuilder::new)
                 .register();

@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.gui.ContainerMenu;
-import org.shsts.tinactory.gui.Rect;
-import org.shsts.tinactory.gui.Texture;
+import org.shsts.tinactory.gui.layout.Rect;
+import org.shsts.tinactory.gui.layout.Texture;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

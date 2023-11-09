@@ -22,14 +22,15 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
     @Nullable
     private RecipeSerializer<T> serializer;
     private final String prefix;
+    public final Class<T> clazz;
 
-    public RecipeTypeEntry(Registrate registrate, String id,
-                           Supplier<RecipeType<T>> supplier,
-                           SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix) {
+    public RecipeTypeEntry(Registrate registrate, String id, Supplier<RecipeType<T>> supplier,
+                           SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix, Class<T> clazz) {
         super(registrate.modid, id, supplier);
         this.registrate = registrate;
         this.builderFactory = builderFactory;
         this.prefix = prefix;
+        this.clazz = clazz;
     }
 
     public RecipeSerializer<T> getSerializer() {

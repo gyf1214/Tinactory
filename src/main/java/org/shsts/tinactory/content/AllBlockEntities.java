@@ -1,15 +1,12 @@
 package org.shsts.tinactory.content;
 
-import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.content.machine.IProcessingMachine;
 import org.shsts.tinactory.content.network.NetworkController;
 import org.shsts.tinactory.content.primitive.PrimitiveMachine;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
-import org.shsts.tinactory.gui.ContainerMenu;
-import org.shsts.tinactory.gui.Texture;
 import org.shsts.tinactory.gui.WorkbenchMenu;
+import org.shsts.tinactory.gui.layout.AllLayouts;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
@@ -34,7 +31,7 @@ public class AllBlockEntities {
                 .ticking()
                 .validBlock(AllBlocks.WORKBENCH)
                 .capability(AllCapabilities.WORKBENCH_CONTAINER)
-                .menu(WorkbenchMenu::new).build()
+                .menu(WorkbenchMenu::new).layout(AllLayouts.WORKBENCH).build()
                 .register();
 
         PRIMITIVE_STONE_GENERATOR = REGISTRATE.blockEntity("primitive/stone_generator", PrimitiveMachine::new)
@@ -44,12 +41,7 @@ public class AllBlockEntities {
                 .capability(AllCapabilities.PROCESSING_STACK_CONTAINER, $ -> $
                         .recipeType(AllRecipes.STONE_GENERATOR)
                         .port(1, true))
-                .menu()
-                .title($ -> new TextComponent("Stone Generator"))
-                .slot(0, ContainerMenu.SLOT_SIZE * 5, 1)
-                .progressBar(Texture.PROGRESS_ARROW, ContainerMenu.SLOT_SIZE * 3 + 8, 0,
-                        IProcessingMachine::getProgress)
-                .build()
+                .menu().layout(AllLayouts.STONE_GENERATOR).build()
                 .register();
     }
 

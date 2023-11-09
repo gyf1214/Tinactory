@@ -1,4 +1,4 @@
-package org.shsts.tinactory.gui;
+package org.shsts.tinactory.gui.layout;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

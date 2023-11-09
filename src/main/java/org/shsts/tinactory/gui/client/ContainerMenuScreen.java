@@ -8,8 +8,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.gui.ContainerMenu;
-import org.shsts.tinactory.gui.Rect;
-import org.shsts.tinactory.gui.Texture;
+import org.shsts.tinactory.gui.layout.Rect;
+import org.shsts.tinactory.gui.layout.Texture;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -42,7 +42,8 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
     protected void addSlotWidget(Slot slot) {
         var x = slot.x + this.leftPos - 1;
         var y = slot.y + this.topPos - 1;
-        this.renderables.add(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND, 20, x, y));
+        this.renderables.add(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND,
+                ContainerMenu.DEFAULT_Z_INDEX, x, y));
     }
 
     @Override

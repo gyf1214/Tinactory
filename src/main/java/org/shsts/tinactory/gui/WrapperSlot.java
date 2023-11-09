@@ -6,22 +6,29 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.content.logistics.WrapperItemHandler;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class WrapperSlot extends SlotItemHandler {
-    protected final WrapperItemHandler wrapperHandler;
+    protected final @Nullable WrapperItemHandler wrapperHandler;
     protected final int index;
 
-    public WrapperSlot(IItemHandler wrapperHandler, int index, int xPos, int yPos) {
-        super(wrapperHandler, index, xPos, yPos);
+    public WrapperSlot(IItemHandler handler, int index, int xPos, int yPos) {
+        super(handler, index, xPos, yPos);
         this.index = index;
-        this.wrapperHandler = (WrapperItemHandler) wrapperHandler;
+        if (handler instanceof WrapperItemHandler wrapperHandler1) {
+            this.wrapperHandler = wrapperHandler1;
+        } else {
+            this.wrapperHandler = null;
+        }
     }
 
     @Override
     public void onTake(Player player, ItemStack stack) {
         super.onTake(player, stack);
-        this.wrapperHandler.invokeTake(this.index, player, stack);
+        if (this.wrapperHandler != null) {
+            this.wrapperHandler.invokeTake(this.index, player, stack);
+        }
     }
 }

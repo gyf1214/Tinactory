@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.gui.ContainerMenu;
-import org.shsts.tinactory.gui.Rect;
-import org.shsts.tinactory.gui.Texture;
+import org.shsts.tinactory.gui.layout.Rect;
+import org.shsts.tinactory.gui.layout.Texture;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -16,7 +16,7 @@ public class ProgressBar extends ContainerWidget {
     private final int dataIndex;
 
     public ProgressBar(ContainerMenu<?> menu, Rect rect, Texture texture, int dataIndex) {
-        super(menu, rect, 20);
+        super(menu, rect, ContainerMenu.DEFAULT_Z_INDEX);
         this.texture = texture;
         this.dataIndex = dataIndex;
     }

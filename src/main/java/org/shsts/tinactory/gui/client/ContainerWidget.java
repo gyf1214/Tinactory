@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.Widget;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.gui.ContainerMenu;
-import org.shsts.tinactory.gui.Rect;
+import org.shsts.tinactory.gui.layout.Rect;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiFunction;
