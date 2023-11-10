@@ -81,6 +81,10 @@ public final class ModelGen {
         return new ResourceLocation(loc.getNamespace(), prefix + "/" + loc.getPath());
     }
 
+    public static String translate(ResourceLocation id) {
+        return id.getNamespace() + "." + id.getPath().replace('/', '.');
+    }
+
     public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
     basicItem(ResourceLocation... loc) {
         return ctx -> {

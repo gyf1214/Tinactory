@@ -36,8 +36,6 @@ import org.slf4j.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-import static org.shsts.tinactory.gui.WorkbenchMenu.OUTPUT_SLOT;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WorkbenchContainer implements NullContainer, ICapabilityProvider, INBTSerializable<CompoundTag> {
@@ -149,7 +147,7 @@ public class WorkbenchContainer implements NullContainer, ICapabilityProvider, I
     }
 
     protected void onCraft(int slot, Player player, ItemStack stack) {
-        if (slot != OUTPUT_SLOT || stack.isEmpty() || this.currentRecipe == null) {
+        if (slot != 0 || stack.isEmpty() || this.currentRecipe == null) {
             return;
         }
 

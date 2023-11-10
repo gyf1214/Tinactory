@@ -12,8 +12,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WorkbenchMenu extends ContainerMenu<SmartBlockEntity> {
-    public static final int OUTPUT_SLOT = 0;
-
     public WorkbenchMenu(ContainerMenuType<SmartBlockEntity, ?> type, int id,
                          Inventory inventory, SmartBlockEntity blockEntity) {
         super(type, id, inventory, blockEntity);

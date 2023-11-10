@@ -42,8 +42,8 @@ import java.util.stream.Collectors;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
-    private final ShapedRecipe shapedRecipe;
-    private final List<Ingredient> toolIngredients;
+    public final ShapedRecipe shapedRecipe;
+    public final List<Ingredient> toolIngredients;
 
     public ToolRecipe(RecipeTypeEntry<ToolRecipe, Builder> type, ResourceLocation loc, ShapedRecipe shapedRecipe,
                       List<Ingredient> toolIngredients) {

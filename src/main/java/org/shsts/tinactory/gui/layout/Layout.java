@@ -14,15 +14,15 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Layout {
-    private record WidgetInfo(Rect rect, Texture texture) {}
+    public record WidgetInfo(Rect rect, Texture texture) {}
 
-    private record SlotInfo(int index, int x, int y) {}
+    public record SlotInfo(int index, int x, int y, int port) {}
 
-    private final List<SlotInfo> slots;
-    private final List<WidgetInfo> images;
+    public final List<SlotInfo> slots;
+    public final List<WidgetInfo> images;
     @Nullable
-    private final WidgetInfo progressBar;
-    private final Rect rect;
+    public final WidgetInfo progressBar;
+    public final Rect rect;
 
     private Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable WidgetInfo progressBar) {
         this.slots = slots;
@@ -71,7 +71,12 @@ public class Layout {
         private WidgetInfo progressBar = null;
 
         public Builder slot(int slot, int x, int y) {
-            this.slots.add(new SlotInfo(slot, x, y));
+            this.slots.add(new SlotInfo(slot, x, y, 0));
+            return this;
+        }
+
+        public Builder slot(int slot, int x, int y, int port) {
+            this.slots.add(new SlotInfo(slot, x, y, port));
             return this;
         }
 

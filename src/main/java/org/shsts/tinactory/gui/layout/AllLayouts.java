@@ -1,7 +1,5 @@
 package org.shsts.tinactory.gui.layout;
 
-import org.shsts.tinactory.gui.WorkbenchMenu;
-
 import static org.shsts.tinactory.gui.ContainerMenu.SLOT_SIZE;
 import static org.shsts.tinactory.gui.ContainerMenu.SPACING_VERTICAL;
 
@@ -16,7 +14,7 @@ public final class AllLayouts {
                 .build();
 
         var workbenchBuilder = Layout.builder()
-                .slot(WorkbenchMenu.OUTPUT_SLOT, 6 * SLOT_SIZE, SLOT_SIZE);
+                .slot(0, 6 * SLOT_SIZE, SLOT_SIZE);
         for (var j = 0; j < 9; j++) {
             workbenchBuilder.slot(1 + j, j * SLOT_SIZE, 3 * SLOT_SIZE + SPACING_VERTICAL);
         }
