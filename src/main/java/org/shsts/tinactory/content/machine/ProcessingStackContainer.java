@@ -16,19 +16,22 @@ import org.shsts.tinactory.content.logistics.IItemCollection;
 import org.shsts.tinactory.content.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.content.logistics.WrapperItemHandler;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
+import org.shsts.tinactory.gui.layout.Layout;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingStackContainer extends ProcessingContainer implements ICapabilityProvider {
 
-    public record PortInfo(int slots, boolean output) {}
+    protected record PortInfo(int slots, boolean output) {}
 
     protected final IItemHandlerModifiable combinedStack;
     protected final List<IItemCollection> ports;
@@ -75,18 +78,18 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
         private RecipeType<? extends ProcessingRecipe<?>> recipeType = null;
         private final List<PortInfo> ports = new ArrayList<>();
 
-        public Builder recipeType(RecipeType<? extends ProcessingRecipe<?>> recipeType) {
-            this.recipeType = recipeType;
-            return this;
-        }
-
         public Builder recipeType(RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType) {
             this.recipeType = recipeType.get();
             return this;
         }
 
-        public Builder port(int slots, boolean output) {
-            this.ports.add(new PortInfo(slots, output));
+        public Builder layout(Layout layout) {
+            Map<Integer, PortInfo> map = new HashMap<>();
+            for (var slot : layout.slots) {
+                map.merge(slot.port(), new PortInfo(1, slot.output()),
+                        ($, v) -> new PortInfo(v.slots + 1, slot.output()));
+            }
+            this.ports.addAll(map.values());
             return this;
         }
 

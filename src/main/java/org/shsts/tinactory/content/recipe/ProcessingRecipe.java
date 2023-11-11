@@ -30,12 +30,12 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe<ProcessingContainer, S> {
-    protected record Input(int port, Ingredient ingredient, int amount) {}
+    public record Input(int port, Ingredient ingredient, int amount) {}
 
-    protected record WithPort<U>(int port, U object) {}
+    public record WithPort<U>(int port, U object) {}
 
-    protected final List<Input> inputs;
-    protected final List<WithPort<ItemStack>> outputs;
+    public final List<Input> inputs;
+    public final List<WithPort<ItemStack>> outputs;
 
     public final long workTicks;
 

@@ -87,4 +87,9 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
 
     @Override
     public abstract void setRecipe(IRecipeLayoutBuilder builder, T recipe, IFocusGroup focuses);
+
+    @FunctionalInterface
+    public interface Factory<T1 extends Recipe<?>> {
+        RecipeCategory<T1> create(RecipeType<T1> type, IJeiHelpers helpers);
+    }
 }

@@ -1,16 +1,26 @@
 package org.shsts.tinactory.content;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.network.NetworkController;
 import org.shsts.tinactory.content.primitive.PrimitiveMachine;
+import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
+import org.shsts.tinactory.core.Transformer;
 import org.shsts.tinactory.gui.WorkbenchMenu;
 import org.shsts.tinactory.gui.layout.AllLayouts;
+import org.shsts.tinactory.gui.layout.Layout;
+import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 
-public class AllBlockEntities {
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public final class AllBlockEntities {
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
     public static final RegistryEntry<SmartBlockEntityType<NetworkController>> NETWORK_CONTROLLER;
@@ -38,11 +48,17 @@ public class AllBlockEntities {
                 .entityClass(PrimitiveMachine.class)
                 .validBlock(AllBlocks.PRIMITIVE_STONE_GENERATOR)
                 .ticking()
-                .capability(AllCapabilities.PROCESSING_STACK_CONTAINER, $ -> $
-                        .recipeType(AllRecipes.STONE_GENERATOR)
-                        .port(1, true))
-                .menu().layout(AllLayouts.STONE_GENERATOR).build()
+                .transform(processingStack(AllRecipes.STONE_GENERATOR, AllLayouts.STONE_GENERATOR))
                 .register();
+    }
+
+    private static <S extends BlockEntityBuilder<?, ?, S>> Transformer<S>
+    processingStack(RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType, Layout layout) {
+        return builder -> builder
+                .capability(AllCapabilities.PROCESSING_STACK_CONTAINER, $ -> $
+                        .recipeType(recipeType)
+                        .layout(layout))
+                .menu().layout(layout).build();
     }
 
     public static void init() {}

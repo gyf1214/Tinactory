@@ -9,7 +9,7 @@ public final class AllLayouts {
 
     static {
         STONE_GENERATOR = Layout.builder()
-                .slot(0, SLOT_SIZE * 2, 1)
+                .slot(0, SLOT_SIZE * 2, 1, 0, true)
                 .progressBar(Texture.PROGRESS_ARROW, 8, 0)
                 .build();
 

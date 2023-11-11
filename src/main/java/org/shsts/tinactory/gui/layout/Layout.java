@@ -16,7 +16,7 @@ import java.util.List;
 public class Layout {
     public record WidgetInfo(Rect rect, Texture texture) {}
 
-    public record SlotInfo(int index, int x, int y, int port) {}
+    public record SlotInfo(int index, int x, int y, int port, boolean output) {}
 
     public final List<SlotInfo> slots;
     public final List<WidgetInfo> images;
@@ -71,12 +71,12 @@ public class Layout {
         private WidgetInfo progressBar = null;
 
         public Builder slot(int slot, int x, int y) {
-            this.slots.add(new SlotInfo(slot, x, y, 0));
+            this.slots.add(new SlotInfo(slot, x, y, 0, false));
             return this;
         }
 
-        public Builder slot(int slot, int x, int y, int port) {
-            this.slots.add(new SlotInfo(slot, x, y, port));
+        public Builder slot(int slot, int x, int y, int port, boolean output) {
+            this.slots.add(new SlotInfo(slot, x, y, port, output));
             return this;
         }
 
