@@ -7,14 +7,17 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
+import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -124,6 +127,14 @@ public final class AllRecipes {
                 .define('#', Items.GRAVEL)
                 .toolTag(AllTags.TOOL_MORTAR)
                 .build();
+
+        // smelt wrought iron nugget
+        REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+                        .smelting(Ingredient.of(AllMaterials.IRON.getTag("nugget")),
+                                AllMaterials.WROUGHT_IRON.getItem("nugget"),
+                                0, 200)
+                        .unlockedBy("has_material", has(AllMaterials.IRON.getTag("nugget"))),
+                ModelGen.modLoc("material/nugget/wrought_iron_from_iron"));
     }
 
     private static void woodRecipes(String prefix) {

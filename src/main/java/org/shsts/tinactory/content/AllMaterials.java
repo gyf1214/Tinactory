@@ -47,11 +47,13 @@ public final class AllMaterials {
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
                 .mechanicalSet()
                 .toolProcess()
+                .smelt(200)
                 .freeze();
 
         WROUGHT_IRON.metalSet()
                 .toolSet(64)
                 .toolProcess()
+                .smelt(200)
                 .freeze();
 
         // tool component tags

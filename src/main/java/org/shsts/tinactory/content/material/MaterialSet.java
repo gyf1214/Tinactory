@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -100,6 +101,11 @@ public class MaterialSet {
         return this.items.get(sub).tag;
     }
 
+    public Item getItem(String sub) {
+        assert this.items.containsKey(sub);
+        return this.items.get(sub).getItem();
+    }
+
     public MaterialSet existing(String sub, Item item) {
         assert !this.items.containsKey(sub);
         var loc = item.getRegistryName();
@@ -128,7 +134,8 @@ public class MaterialSet {
     }
 
     private String id(String sub) {
-        return sub + "/" + this.name;
+        var prefix = sub.startsWith("tool/") ? "" : "material/";
+        return prefix + sub + "/" + this.name;
     }
 
     public ResourceLocation loc(String sub) {
@@ -294,6 +301,18 @@ public class MaterialSet {
         // spring
         this.toolProcess("spring", 1, "A\nA", "stick", AllTags.TOOL_FILE, AllTags.TOOL_SAW, AllTags.TOOL_WIRE_CUTTER);
 
+        return this;
+    }
+
+    private Consumer<Entry[]> smeltRecipe(int time) {
+        return materials -> REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+                .smelting(Ingredient.of(materials[1].tag), materials[0].getItem(), 0, time)
+                .unlockedBy("has_material", AllRecipes.has(materials[1].tag)));
+    }
+
+    public MaterialSet smelt(int time) {
+        this.defer(this.smeltRecipe(time), "ingot", "dust");
+        this.defer(this.smeltRecipe(time), "nugget", "dust_tiny");
         return this;
     }
 
