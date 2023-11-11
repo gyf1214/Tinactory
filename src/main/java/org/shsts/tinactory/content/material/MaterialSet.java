@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.material;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -36,6 +37,7 @@ public class MaterialSet {
     private final IconSet icon;
     private final int color;
     private final List<Runnable> callbacks = new ArrayList<>();
+    private int durability = 0;
 
     private record Entry(ResourceLocation loc, TagKey<Item> tag, Supplier<Item> item) {
         public Item getItem() {
@@ -93,6 +95,11 @@ public class MaterialSet {
         return Optional.ofNullable(this.items.get(sub));
     }
 
+    public TagKey<Item> getTag(String sub) {
+        assert this.items.containsKey(sub);
+        return this.items.get(sub).tag;
+    }
+
     public MaterialSet existing(String sub, Item item) {
         assert !this.items.containsKey(sub);
         var loc = item.getRegistryName();
@@ -137,9 +144,8 @@ public class MaterialSet {
         cons.accept(optionals.stream().map(Optional::get).toArray(Entry[]::new));
     }
 
-    private MaterialSet defer(Consumer<Entry[]> cons, String... names) {
+    private void defer(Consumer<Entry[]> cons, String... names) {
         this.callbacks.add(() -> this.optional(cons, names));
-        return this;
     }
 
     private Entry dummy(String sub) {
@@ -221,14 +227,20 @@ public class MaterialSet {
         return ModelGen.gregtech("items/tools/" + sub);
     }
 
-    private Entry tool(String category, int durability) {
-        var handle = switch (category) {
-            case "saw" -> toolTex("handle_saw");
-            case "hammer" -> toolTex("handle_hammer");
-            case "mortar" -> toolTex("mortar_base");
-            case "file" -> toolTex("handle_file");
-            default -> ModelGen.VOID_TEX;
-        };
+    private static final Map<String, String> TOOL_HANDLE_TEX = ImmutableMap.<String, String>builder()
+            .put("hammer", "handle_hammer")
+            .put("mortar", "mortar_base")
+            .put("file", "handle_file")
+            .put("saw", "handle_saw")
+            .put("screwdriver", "handle_screwdriver")
+            .put("wire_cutter", "wire_cutter_base")
+            .build();
+
+    private Entry tool(String category) {
+        var durability = this.durability;
+        var handle = Optional.ofNullable(TOOL_HANDLE_TEX.get(category))
+                .map(MaterialSet::toolTex)
+                .orElse(ModelGen.VOID_TEX);
         var head = ModelGen.gregtech("items/tools/" + category);
         var sub = "tool/" + category;
         return safePut(sub, () -> REGISTRATE.item(this.id(sub),
@@ -239,60 +251,105 @@ public class MaterialSet {
                 .register());
     }
 
+    @SuppressWarnings("unchecked")
+    private MaterialSet tool(String category, String pattern, Object... args) {
+        var entry = this.tool(category);
+        var patterns = pattern.split("\n");
+        var materialCount = 1 + pattern.chars().filter(x -> x >= 'A' && x <= 'Z').map(x -> x - 'A').max().orElse(-1);
+        this.callbacks.add(() -> {
+            if (Arrays.stream(args).anyMatch(o -> o instanceof String s && !this.items.containsKey(s))) {
+                return;
+            }
+            if (args.length > materialCount) {
+                var builder = AllRecipes.TOOL.modRecipe(entry.loc).result(entry::getItem, 1);
+                for (var pat : patterns) {
+                    builder.pattern(pat);
+                }
+                for (var i = 0; i < materialCount; i++) {
+                    var material = args[i];
+                    var key = (char) ('A' + i);
+                    if (material instanceof String s) {
+                        builder.define(key, this.items.get(s).tag);
+                    } else if (material instanceof TagKey<?> tag) {
+                        builder.define(key, (TagKey<Item>) tag);
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                }
+                for (var i = materialCount; i < args.length; i++) {
+                    var material = args[i];
+                    if (material instanceof TagKey<?> tag) {
+                        builder.toolTag((TagKey<Item>) tag);
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                }
+                builder.build();
+            } else {
+                REGISTRATE.vanillaRecipe(() -> {
+                    var builder = ShapedRecipeBuilder.shaped(entry.getItem());
+                    TagKey<Item> unlock = null;
+                    for (var pat : patterns) {
+                        builder.pattern(pat);
+                    }
+                    for (var i = 0; i < args.length; i++) {
+                        var material = args[i];
+                        var key = (char) ('A' + i);
+                        if (material instanceof String s) {
+                            var tag = this.items.get(s).tag;
+                            if (unlock == null) {
+                                unlock = tag;
+                            }
+                            builder.define(key, tag);
+                        } else if (material instanceof TagKey<?> tag) {
+                            if (unlock == null) {
+                                unlock = (TagKey<Item>) tag;
+                            }
+                            builder.define(key, (TagKey<Item>) tag);
+                        } else {
+                            throw new IllegalArgumentException();
+                        }
+                    }
+                    if (unlock == null) {
+                        throw new IllegalArgumentException();
+                    }
+                    return builder.unlockedBy("has_material", AllRecipes.has(unlock));
+                });
+            }
+        });
+        return this;
+    }
+
+    private MaterialSet hammer() {
+        return this.tool("hammer", "AA \nAAB\nAA ", "primary", AllTags.TOOL_HANDLE);
+    }
+
     public MaterialSet hammer(int durability) {
-        var tool = this.tool("hammer", durability);
-        return this.defer(materials -> REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(tool.getItem())
-                .pattern("## ")
-                .pattern("##S")
-                .pattern("## ")
-                .define('#', materials[0].tag)
-                .define('S', AllTags.TOOL_HANDLE)
-                .unlockedBy("has_material", AllRecipes.has(materials[0].tag))
-        ), "primary");
+        this.durability = durability;
+        return this.hammer();
+    }
+
+    private MaterialSet mortar() {
+        return this.tool("mortar", " A \nBAB\nBBB", "primary", ItemTags.STONE_TOOL_MATERIALS);
     }
 
     public MaterialSet mortar(int durability) {
-        var tool = this.tool("mortar", durability);
-        return this.defer(materials -> REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(tool.getItem())
-                .pattern(" # ")
-                .pattern("S#S")
-                .pattern("SSS")
-                .define('#', materials[0].tag)
-                .define('S', ItemTags.STONE_TOOL_MATERIALS)
-                .unlockedBy("has_material", AllRecipes.has(materials[0].tag))
-        ), "primary");
+        this.durability = durability;
+        return this.mortar();
     }
 
     public MaterialSet toolSet(int durability) {
-        this.hammer(durability).mortar(durability);
+        this.durability = durability;
 
-        var wrench = this.tool("wrench", durability);
-        this.defer(materials -> AllRecipes.TOOL.modRecipe(wrench.loc)
-                .result(wrench::getItem, 1)
-                .pattern("# #")
-                .pattern("###")
-                .pattern(" # ")
-                .define('#', materials[0].tag)
-                .toolTag(AllTags.TOOL_HAMMER)
-                .build(), "plate");
-
-        var file = this.tool("file", durability);
-        this.defer(materials -> REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(file.getItem())
-                .pattern("#").pattern("#").pattern("S")
-                .define('#', materials[0].tag)
-                .define('S', AllTags.TOOL_HANDLE)
-        ), "plate");
-
-        var saw = this.tool("saw", durability);
-        this.defer(materials -> AllRecipes.TOOL.modRecipe(saw.loc)
-                .result(saw::getItem, 1)
-                .pattern("##S").pattern("  S")
-                .define('#', materials[0].tag)
-                .define('S', AllTags.TOOL_HANDLE)
-                .build(), "plate");
+        this.hammer().mortar();
+        this.tool("file", "A\nA\nB", "plate", AllTags.TOOL_HANDLE);
+        this.tool("saw", "AAB\n  B", "plate", AllTags.TOOL_HANDLE,
+                AllTags.TOOL_FILE, AllTags.TOOL_HAMMER);
+        this.tool("screwdriver", "  A\n A \nB  ", "stick", AllTags.TOOL_HANDLE,
+                AllTags.TOOL_FILE, AllTags.TOOL_HAMMER);
+        this.tool("wrench", "A A\nAAA\n A ", "plate", AllTags.TOOL_HAMMER);
+        this.tool("wire_cutter", "A A\n A \nBCB", "plate", AllTags.TOOL_HANDLE, AllTags.TOOL_SCREW,
+                AllTags.TOOL_HAMMER, AllTags.TOOL_FILE, AllTags.TOOL_SCREWDRIVER);
 
         return this;
     }

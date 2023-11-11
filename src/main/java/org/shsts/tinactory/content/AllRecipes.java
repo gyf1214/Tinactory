@@ -47,6 +47,11 @@ public final class AllRecipes {
         REGISTRATE.nullRecipe(Items.WOODEN_PICKAXE);
         REGISTRATE.nullRecipe(Items.WOODEN_SHOVEL);
         REGISTRATE.nullRecipe(Items.WOODEN_SWORD);
+        REGISTRATE.nullRecipe(Items.IRON_AXE);
+        REGISTRATE.nullRecipe(Items.IRON_HOE);
+        REGISTRATE.nullRecipe(Items.IRON_PICKAXE);
+        REGISTRATE.nullRecipe(Items.IRON_SHOVEL);
+        REGISTRATE.nullRecipe(Items.IRON_SWORD);
 
         // all wood recipes
         woodRecipes("oak");
@@ -97,9 +102,6 @@ public final class AllRecipes {
                 .define('W', Items.STICK)
                 .define('C', Blocks.CRAFTING_TABLE)
                 .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS)));
-
-        // tool handle tag
-        REGISTRATE.itemTag(Items.STICK, AllTags.TOOL_HANDLE);
 
         // hammer recipes for stone & gravel
         TOOL.modRecipe(Items.GRAVEL)

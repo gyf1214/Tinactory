@@ -13,12 +13,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public final class AllTags {
     public static final TagKey<Item> TOOL = modItem("tool");
-    public static final TagKey<Item> TOOL_WRENCH = extend(TOOL, "wrench");
-    public static final TagKey<Item> TOOL_CUTTER = extend(TOOL, "cutter");
-    public static final TagKey<Item> TOOL_SAW = extend(TOOL, "saw");
     public static final TagKey<Item> TOOL_HAMMER = extend(TOOL, "hammer");
     public static final TagKey<Item> TOOL_MORTAR = extend(TOOL, "mortar");
     public static final TagKey<Item> TOOL_FILE = extend(TOOL, "file");
+    public static final TagKey<Item> TOOL_SAW = extend(TOOL, "saw");
+    public static final TagKey<Item> TOOL_SCREWDRIVER = extend(TOOL, "screwdriver");
+    public static final TagKey<Item> TOOL_WRENCH = extend(TOOL, "wrench");
+    public static final TagKey<Item> TOOL_WIRE_CUTTER = extend(TOOL, "wire_cutter");
 
     public static final TagKey<Item> TOOL_HANDLE = modItem("tool_handle");
     public static final TagKey<Item> TOOL_SCREW = modItem("tool_screw");
