@@ -194,7 +194,7 @@ public class MaterialSet {
         return this;
     }
 
-    private void simpleToolProcess(String resultSub, String materialSub, int count, TagKey<Item> tool) {
+    private void simpleToolProcess(String resultSub, int count, String materialSub, TagKey<Item> tool) {
         this.defer(entries -> AllRecipes.TOOL.modRecipe(entries[0].loc)
                 .result(entries[0].getEntry(), count)
                 .pattern("#")
@@ -203,23 +203,97 @@ public class MaterialSet {
                 .build(), resultSub, materialSub);
     }
 
+    @SuppressWarnings("unchecked")
+    private void toolProcess(Entry entry, int count, String pattern, Object... args) {
+        var patterns = pattern.split("\n");
+        var materialCount = 1 + pattern.chars().filter(x -> x >= 'A' && x <= 'Z').map(x -> x - 'A').max().orElse(-1);
+        this.callbacks.add(() -> {
+            if (Arrays.stream(args).anyMatch(o -> o instanceof String s && !this.items.containsKey(s))) {
+                return;
+            }
+            if (args.length > materialCount) {
+                var builder = AllRecipes.TOOL.modRecipe(entry.loc).result(entry::getItem, count);
+                for (var pat : patterns) {
+                    builder.pattern(pat);
+                }
+                for (var i = 0; i < materialCount; i++) {
+                    var material = args[i];
+                    var key = (char) ('A' + i);
+                    if (material instanceof String s) {
+                        builder.define(key, this.items.get(s).tag);
+                    } else if (material instanceof TagKey<?> tag) {
+                        builder.define(key, (TagKey<Item>) tag);
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                }
+                for (var i = materialCount; i < args.length; i++) {
+                    var material = args[i];
+                    if (material instanceof TagKey<?> tag) {
+                        builder.toolTag((TagKey<Item>) tag);
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                }
+                builder.build();
+            } else {
+                REGISTRATE.vanillaRecipe(() -> {
+                    var builder = ShapedRecipeBuilder.shaped(entry.getItem(), count);
+                    TagKey<Item> unlock = null;
+                    for (var pat : patterns) {
+                        builder.pattern(pat);
+                    }
+                    for (var i = 0; i < args.length; i++) {
+                        var material = args[i];
+                        var key = (char) ('A' + i);
+                        if (material instanceof String s) {
+                            var tag = this.items.get(s).tag;
+                            if (unlock == null) {
+                                unlock = tag;
+                            }
+                            builder.define(key, tag);
+                        } else if (material instanceof TagKey<?> tag) {
+                            if (unlock == null) {
+                                unlock = (TagKey<Item>) tag;
+                            }
+                            builder.define(key, (TagKey<Item>) tag);
+                        } else {
+                            throw new IllegalArgumentException();
+                        }
+                    }
+                    if (unlock == null) {
+                        throw new IllegalArgumentException();
+                    }
+                    return builder.unlockedBy("has_material", AllRecipes.has(unlock));
+                });
+            }
+        });
+    }
+
+    private void toolProcess(String sub, int count, String pattern, Object... args) {
+        this.get(sub).ifPresent(entry -> this.toolProcess(entry, count, pattern, args));
+    }
+
     public MaterialSet toolProcess() {
         // grind dust
-        this.simpleToolProcess("dust", "primary", 1, AllTags.TOOL_MORTAR);
-        this.simpleToolProcess("dust_tiny", "nugget", 1, AllTags.TOOL_MORTAR);
-        // ingot to plate
-        this.defer(entries -> AllRecipes.TOOL.modRecipe(entries[0].loc)
-                .result(entries[0].getEntry(), 1)
-                .pattern("#").pattern("#")
-                .define('#', entries[1].tag)
-                .toolTag(AllTags.TOOL_HAMMER)
-                .build(), "plate", "ingot");
-        // plate to stick
-        this.simpleToolProcess("stick", "plate", 1, AllTags.TOOL_FILE);
-        // stick to bolt
-        this.simpleToolProcess("bolt", "stick", 2, AllTags.TOOL_SAW);
-        // bolt to screw
-        this.simpleToolProcess("screw", "bolt", 1, AllTags.TOOL_FILE);
+        this.simpleToolProcess("dust", 1, "primary", AllTags.TOOL_MORTAR);
+        this.simpleToolProcess("dust_tiny", 1, "nugget", AllTags.TOOL_MORTAR);
+        // plate
+        this.toolProcess("plate", 1, "A\nA", "ingot", AllTags.TOOL_HAMMER);
+        // stick
+        this.simpleToolProcess("stick", 1, "plate", AllTags.TOOL_FILE);
+        // bolt
+        this.simpleToolProcess("bolt", 2, "stick", AllTags.TOOL_SAW);
+        // screw
+        this.simpleToolProcess("screw", 1, "bolt", AllTags.TOOL_FILE);
+        // gear
+        this.toolProcess("gear", 1, "A\nB\nA", "stick", "plate", AllTags.TOOL_HAMMER, AllTags.TOOL_WIRE_CUTTER);
+        // rotor
+        this.toolProcess("rotor", 1, "A A\nBC \nA A", "plate", "stick", "screw",
+                AllTags.TOOL_HAMMER, AllTags.TOOL_FILE, AllTags.TOOL_SCREWDRIVER);
+        // spring
+        this.toolProcess("spring", 1, "A\nA", "stick", AllTags.TOOL_FILE, AllTags.TOOL_SAW, AllTags.TOOL_WIRE_CUTTER);
+
         return this;
     }
 
@@ -251,72 +325,9 @@ public class MaterialSet {
                 .register());
     }
 
-    @SuppressWarnings("unchecked")
     private MaterialSet tool(String category, String pattern, Object... args) {
         var entry = this.tool(category);
-        var patterns = pattern.split("\n");
-        var materialCount = 1 + pattern.chars().filter(x -> x >= 'A' && x <= 'Z').map(x -> x - 'A').max().orElse(-1);
-        this.callbacks.add(() -> {
-            if (Arrays.stream(args).anyMatch(o -> o instanceof String s && !this.items.containsKey(s))) {
-                return;
-            }
-            if (args.length > materialCount) {
-                var builder = AllRecipes.TOOL.modRecipe(entry.loc).result(entry::getItem, 1);
-                for (var pat : patterns) {
-                    builder.pattern(pat);
-                }
-                for (var i = 0; i < materialCount; i++) {
-                    var material = args[i];
-                    var key = (char) ('A' + i);
-                    if (material instanceof String s) {
-                        builder.define(key, this.items.get(s).tag);
-                    } else if (material instanceof TagKey<?> tag) {
-                        builder.define(key, (TagKey<Item>) tag);
-                    } else {
-                        throw new IllegalArgumentException();
-                    }
-                }
-                for (var i = materialCount; i < args.length; i++) {
-                    var material = args[i];
-                    if (material instanceof TagKey<?> tag) {
-                        builder.toolTag((TagKey<Item>) tag);
-                    } else {
-                        throw new IllegalArgumentException();
-                    }
-                }
-                builder.build();
-            } else {
-                REGISTRATE.vanillaRecipe(() -> {
-                    var builder = ShapedRecipeBuilder.shaped(entry.getItem());
-                    TagKey<Item> unlock = null;
-                    for (var pat : patterns) {
-                        builder.pattern(pat);
-                    }
-                    for (var i = 0; i < args.length; i++) {
-                        var material = args[i];
-                        var key = (char) ('A' + i);
-                        if (material instanceof String s) {
-                            var tag = this.items.get(s).tag;
-                            if (unlock == null) {
-                                unlock = tag;
-                            }
-                            builder.define(key, tag);
-                        } else if (material instanceof TagKey<?> tag) {
-                            if (unlock == null) {
-                                unlock = (TagKey<Item>) tag;
-                            }
-                            builder.define(key, (TagKey<Item>) tag);
-                        } else {
-                            throw new IllegalArgumentException();
-                        }
-                    }
-                    if (unlock == null) {
-                        throw new IllegalArgumentException();
-                    }
-                    return builder.unlockedBy("has_material", AllRecipes.has(unlock));
-                });
-            }
-        });
+        this.toolProcess(entry, 1, pattern, args);
         return this;
     }
 
