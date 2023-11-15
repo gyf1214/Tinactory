@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.CreativeModeTab;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
@@ -28,12 +29,14 @@ public final class AllBlocks {
         NORMAL_CABLE = REGISTRATE.block("network/cable/normal", CableBlock.factory(CableSetting.NORMAL))
                 .transform(ModelGen.cable())
                 .tint(0x363636, 0xFFFFFF)
-                .defaultBlockItem()
+                .tag(AllTags.MINEABLE_WITH_CUTTER)
+                .defaultBlockItem().dropSelf()
                 .register();
         DENSE_CABLE = REGISTRATE.block("network/cable/dense", CableBlock.factory(CableSetting.DENSE))
                 .transform(ModelGen.cable())
                 .tint(0x363636, 0xFFFFFF)
-                .defaultBlockItem()
+                .tag(AllTags.MINEABLE_WITH_CUTTER)
+                .defaultBlockItem().dropSelf()
                 .register();
 
         NETWORK_CONTROLLER = REGISTRATE.entityBlock("network/controller", MachineBlock<NetworkController>::new)
@@ -41,14 +44,16 @@ public final class AllBlocks {
                 .transform(ModelGen.machine(
                         ModelGen.gregtech("blocks/casings/voltage/mv"),
                         ModelGen.gregtech("blocks/overlay/machine/overlay_screen")))
-                .defaultBlockItem()
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
                 .register();
 
         WORKBENCH = REGISTRATE.entityBlock("primitive/workbench", PrimitiveBlock<SmartBlockEntity>::new)
                 .type(() -> AllBlockEntities.WORKBENCH)
                 .blockState(ModelGen.primitiveAllFaces(
                         ModelGen.gregtech("blocks/casings/crafting_table")))
-                .defaultBlockItem()
+                .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
                 .register();
 
         PRIMITIVE_STONE_GENERATOR = REGISTRATE.entityBlock(
@@ -57,7 +62,8 @@ public final class AllBlocks {
                 .transform(ModelGen.primitiveMachine(
                         ModelGen.gregtech("blocks/casings/wood_wall"),
                         ModelGen.gregtech("blocks/machines/rock_crusher/overlay_front")))
-                .defaultBlockItem()
+                .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
                 .register();
     }
 

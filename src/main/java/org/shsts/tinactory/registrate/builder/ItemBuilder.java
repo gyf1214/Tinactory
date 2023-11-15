@@ -2,7 +2,6 @@ package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
@@ -55,16 +54,9 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
         return tint(() -> () -> ($, index) -> index < colors.length ? colors[index] : 0xFFFFFF);
     }
 
-    public S tag(ResourceLocation... loc) {
-        this.onCreateEntry.add(entry ->
-                this.registrate.itemTagsHandler.addTags(entry, loc));
-        return self();
-    }
-
     @SafeVarargs
-    public final S tag(TagKey<Item>... tag) {
-        this.onCreateEntry.add(entry ->
-                this.registrate.itemTagsHandler.addTags(entry, tag));
+    public final S tag(TagKey<Item>... tags) {
+        this.onCreateEntry.add(entry -> this.registrate.tag(entry, tags));
         return self();
     }
 

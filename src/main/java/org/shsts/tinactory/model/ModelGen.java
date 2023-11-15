@@ -13,6 +13,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
+import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.core.Transformer;
 import org.shsts.tinactory.registrate.Registrate;
@@ -86,11 +87,11 @@ public final class ModelGen {
     }
 
     public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
-    basicItem(ResourceLocation... loc) {
+    basicItem(ResourceLocation... layers) {
         return ctx -> {
             var provider = ctx.provider.withExistingParent(ctx.id, "item/generated");
-            for (var i = 0; i < loc.length; i++) {
-                provider.texture("layer" + i, loc[i]);
+            for (var i = 0; i < layers.length; i++) {
+                provider.texture("layer" + i, layers[i]);
             }
         };
     }
@@ -139,5 +140,17 @@ public final class ModelGen {
         REGISTRATE.blockState(MachineModel::genBlockModels);
 
         REGISTRATE.itemModel(CableModel::genItemModels);
+
+        REGISTRATE.blockState(ctx -> ctx.provider.models()
+                .withExistingParent("cube_tint", ctx.provider.mcLoc("block/block"))
+                .element()
+                .from(0, 0, 0).to(16, 16, 16)
+                .allFaces((dir, face) -> face
+                        .texture("#all").cullface(dir).tintindex(0)
+                        .end())
+                .end()
+                .texture("particle", "#all"));
+
+        REGISTRATE.blockState(ctx -> IconSet.DULL.blockOverlay(ctx.provider.models(), "material/ore", "ore"));
     }
 }

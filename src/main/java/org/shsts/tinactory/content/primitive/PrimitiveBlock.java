@@ -18,7 +18,7 @@ public class PrimitiveBlock<T extends BlockEntity> extends SmartEntityBlock<T> {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public PrimitiveBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType) {
-        super(properties, entityType);
+        super(properties.strength(2.0f).requiresCorrectToolForDrops(), entityType);
     }
 
     @Override

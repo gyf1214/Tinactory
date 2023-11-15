@@ -5,6 +5,7 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -15,6 +16,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.core.Transformer;
+import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.IBlockParent;
 import org.shsts.tinactory.registrate.IItemParent;
@@ -27,6 +29,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -84,6 +87,12 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
         return this.tint(() -> () -> ($1, $2, $3, index) -> index < colors.length ? colors[index] : 0xFFFFFF);
     }
 
+    @SafeVarargs
+    public final S tag(TagKey<Block>... tags) {
+        this.onCreateObject.add(entry -> this.registrate.tag(entry, tags));
+        return self();
+    }
+
     public Optional<DistLazy<ItemColor>> getItemTint() {
         var tint = this.tint;
         return tint == null ? Optional.empty() : Optional.of(() -> () -> (itemStack, index) -> {
@@ -131,6 +140,19 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
 
     public S defaultBlockItem() {
         return this.blockItem().build();
+    }
+
+    public S drop(Supplier<? extends Item> item) {
+        var loc = ModelGen.prepend(this.loc, "blocks");
+        this.registrate.lootTableHandler.blockLoot(loot -> loot.dropSingle(loc, item.get()));
+        return self();
+    }
+
+    public S dropSelf() {
+        var loc = ModelGen.prepend(this.loc, "blocks");
+        this.onCreateEntry.add(block ->
+                this.registrate.lootTableHandler.blockLoot(loot -> loot.dropSingle(loc, block.get())));
+        return self();
     }
 
     @Override

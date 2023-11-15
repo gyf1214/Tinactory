@@ -4,6 +4,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.client.model.generators.ModelBuilder;
+import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
@@ -16,7 +18,8 @@ import java.util.function.Consumer;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record IconSet(String subfolder, @Nullable IconSet parent) {
-    private static final ResourceLocation BASE_LOC = ModelGen.gregtech("items/material_sets");
+    private static final ResourceLocation ITEM_LOC = ModelGen.gregtech("items/material_sets");
+    private static final ResourceLocation BLOCK_LOC = ModelGen.gregtech("blocks/material_sets");
 
     public static final IconSet DULL = new IconSet();
     public static final IconSet ROUGH = new IconSet("rough");
@@ -30,9 +33,9 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         this(subfolder, DULL);
     }
 
-    private Optional<ResourceLocation> getTex(ExistingFileHelper helper, String sub) {
+    private Optional<ResourceLocation> getTex(ResourceLocation baseLoc, ExistingFileHelper helper, String sub) {
         for (var set = this; set != null; set = set.parent) {
-            var loc = ModelGen.extend(BASE_LOC, set.subfolder + "/" + sub);
+            var loc = ModelGen.extend(baseLoc, set.subfolder + "/" + sub);
             if (helper.exists(loc, ModelGen.TEXTURE_TYPE)) {
                 return Optional.of(loc);
             }
@@ -44,12 +47,19 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     Consumer<RegistryDataContext<Item, U, P>> itemModel(String sub) {
         return ctx -> {
             var helper = ctx.provider.existingFileHelper;
-            var base = this.getTex(helper, sub).orElseThrow(() -> new IllegalArgumentException(
+            var base = this.getTex(ITEM_LOC, helper, sub).orElseThrow(() -> new IllegalArgumentException(
                     "No icon %s for icon set %s".formatted(sub, this.subfolder)));
-            var overlay = this.getTex(helper, sub + "_overlay");
+            var overlay = this.getTex(ITEM_LOC, helper, sub + "_overlay");
             var model = ctx.provider.withExistingParent(ctx.id, "item/generated")
                     .texture("layer0", base);
             overlay.ifPresent(resourceLocation -> model.texture("layer1", resourceLocation));
         };
+    }
+
+    public <T extends ModelBuilder<T>> T blockOverlay(ModelProvider<T> prov, String id, String sub) {
+        var tex = this.getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() -> new IllegalArgumentException(
+                "No block overlay %s for icon set %s".formatted(sub, this.subfolder)));
+        return prov.withExistingParent(id + "_overlay", ModelGen.modLoc("block/cube_tint"))
+                .texture("all", tex);
     }
 }

@@ -44,7 +44,7 @@ public final class AllRecipes {
                 .builder(ProcessingRecipe.SimpleBuilder::new)
                 .register();
 
-        // disable add wooden tools
+        // disable wooden and iron tools
         REGISTRATE.nullRecipe(Items.WOODEN_AXE);
         REGISTRATE.nullRecipe(Items.WOODEN_HOE);
         REGISTRATE.nullRecipe(Items.WOODEN_PICKAXE);

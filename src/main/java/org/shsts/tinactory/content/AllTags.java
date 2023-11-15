@@ -5,13 +5,18 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllTags {
+    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
+
     public static final TagKey<Item> TOOL = modItem("tool");
     public static final TagKey<Item> TOOL_HAMMER = extend(TOOL, "hammer");
     public static final TagKey<Item> TOOL_MORTAR = extend(TOOL, "mortar");
@@ -23,6 +28,9 @@ public final class AllTags {
 
     public static final TagKey<Item> TOOL_HANDLE = modItem("tool_handle");
     public static final TagKey<Item> TOOL_SCREW = modItem("tool_screw");
+
+    public static final TagKey<Block> MINEABLE_WITH_WRENCH = modBlock("mineable/wrench");
+    public static final TagKey<Block> MINEABLE_WITH_CUTTER = modBlock("mineable/cutter");
 
     public static TagKey<Item> item(ResourceLocation loc) {
         return TagKey.create(Registry.ITEM_REGISTRY, loc);
@@ -36,9 +44,15 @@ public final class AllTags {
         return item(ModelGen.modLoc(id));
     }
 
+    public static TagKey<Block> modBlock(String id) {
+        return TagKey.create(Registry.BLOCK_REGISTRY, ModelGen.modLoc(id));
+    }
+
     public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {
         var loc = tag.location();
         var loc1 = new ResourceLocation(loc.getNamespace(), loc.getPath() + "/" + suffix);
-        return TagKey.create(tag.registry(), loc1);
+        var tag1 = TagKey.create(tag.registry(), loc1);
+        REGISTRATE.tag(tag1, tag);
+        return tag1;
     }
 }

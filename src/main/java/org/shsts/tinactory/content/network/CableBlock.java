@@ -20,7 +20,7 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.shsts.tinactory.content.tool.IWrenchable;
-import org.shsts.tinactory.content.tool.ToolItem;
+import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.network.IConnector;
 import org.shsts.tinactory.network.NetworkManager;
 
@@ -45,7 +45,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector {
     public final CableSetting cableSetting;
 
     private CableBlock(Properties properties, CableSetting cableSetting) {
-        super(properties);
+        super(properties.strength(2.0f).requiresCorrectToolForDrops());
         this.cableSetting = cableSetting;
 
         this.shapes = this.makeShapes(cableSetting.radius);
@@ -105,7 +105,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector {
     protected boolean shouldRenderOverlay(CollisionContext ctx) {
         return ctx instanceof EntityCollisionContext collision &&
                 collision.getEntity() instanceof LocalPlayer player &&
-                player.getMainHandItem().getItem() instanceof ToolItem &&
+                player.getMainHandItem().getItem() instanceof UsableToolItem &&
                 this.canWrenchWith(player.getMainHandItem());
     }
 

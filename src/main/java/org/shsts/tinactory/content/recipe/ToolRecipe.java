@@ -95,10 +95,8 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
 
         for (var i = 0; i < toolStorage.getSlots(); i++) {
             var stack = toolStorage.getStackInSlot(i);
-            if (stack.getItem() instanceof ToolItem item) {
-                var stack1 = item.doDamage(stack, damages[i]);
-                toolStorage.setStackInSlot(i, stack1);
-            }
+            var stack1 = ToolItem.doDamage(stack, damages[i]);
+            toolStorage.setStackInSlot(i, stack1);
         }
     }
 

@@ -29,7 +29,7 @@ public class MachineBlock<T extends Machine> extends SmartEntityBlock<T> impleme
     public static final DirectionProperty IO_FACING = DirectionProperty.create("io_facing");
 
     public MachineBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType) {
-        super(properties, entityType);
+        super(properties.strength(2.0f, 6.0f).requiresCorrectToolForDrops(), entityType);
     }
 
     @Override

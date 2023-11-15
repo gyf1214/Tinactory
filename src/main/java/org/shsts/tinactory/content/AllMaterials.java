@@ -1,26 +1,37 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMaterials {
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
+    private static final List<ResourceLocation> ORE_BASE_OVERWORLD = blockModels(
+            Blocks.STONE, Blocks.DEEPSLATE);
+
     public static final MaterialSet TEST = set("test", IconSet.DULL, 0xFFFFFF);
     public static final MaterialSet STONE = set("stone", IconSet.ROUGH, 0xCDCDCD);
     public static final MaterialSet FLINT = set("flint", IconSet.DULL, 0x002040);
     public static final MaterialSet IRON = set("iron", IconSet.METALLIC, 0xC8C8C8);
     public static final MaterialSet WROUGHT_IRON = set("wrought_iron", IconSet.METALLIC, 0xC8B4B4);
+    public static final MaterialSet MAGNETITE = set("magnetite", IconSet.METALLIC, 0x1E1E1E);
 
     static {
         TEST.toolSet(12800000).freeze();
@@ -56,10 +67,21 @@ public final class AllMaterials {
                 .smelt(200)
                 .freeze();
 
+        MAGNETITE.ore(ORE_BASE_OVERWORLD, Tiers.IRON, 3.0f)
+                .freeze();
+
         // tool component tags
-        REGISTRATE.itemTag(Items.STICK, AllTags.TOOL_HANDLE);
-        REGISTRATE.itemTag(WROUGHT_IRON.getTag("stick"), AllTags.TOOL_HANDLE);
-        REGISTRATE.itemTag(IRON.getTag("screw"), AllTags.TOOL_SCREW);
+        REGISTRATE.tag(Items.STICK, AllTags.TOOL_HANDLE);
+        REGISTRATE.tag(WROUGHT_IRON.getTag("stick"), AllTags.TOOL_HANDLE);
+        REGISTRATE.tag(IRON.getTag("screw"), AllTags.TOOL_SCREW);
+    }
+
+    private static List<ResourceLocation> blockModels(Block... blocks) {
+        return Arrays.stream(blocks).map(block -> {
+            var loc = block.getRegistryName();
+            assert loc != null;
+            return ModelGen.prepend(loc, "block");
+        }).toList();
     }
 
     private static MaterialSet set(String id, IconSet icon, int color) {

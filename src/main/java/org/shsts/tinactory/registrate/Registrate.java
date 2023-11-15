@@ -48,6 +48,7 @@ import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.DynamicHandler;
 import org.shsts.tinactory.registrate.handler.ItemModelHandler;
+import org.shsts.tinactory.registrate.handler.LootTableHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RecipeDataHandler;
 import org.shsts.tinactory.registrate.handler.RecipeTypeHandler;
@@ -74,6 +75,7 @@ public class Registrate implements IBlockParent, IItemParent {
 
     private final Map<ResourceLocation, RegistryEntryHandler<?>> registryEntryHandlers = new HashMap<>();
     private final List<DataHandler<?>> dataHandlers = new ArrayList<>();
+    private final Map<ResourceKey<? extends Registry<?>>, TagsHandler<?>> tagsHandlers = new HashMap<>();
 
     // Registry
     public final RegistryHandler registryHandler = new RegistryHandler(this);
@@ -97,23 +99,25 @@ public class Registrate implements IBlockParent, IItemParent {
     // ModelGen
     public final BlockStateHandler blockStateHandler = new BlockStateHandler(this);
     public final ItemModelHandler itemModelHandler = new ItemModelHandler(this);
-    @SuppressWarnings("deprecation")
-    public final TagsHandler<Item> itemTagsHandler = new TagsHandler<>(this, Registry.ITEM);
 
     // DataGen
     public final RecipeDataHandler recipeDataHandler = new RecipeDataHandler(this);
+    public final LootTableHandler lootTableHandler = new LootTableHandler(this);
 
     // Client
     public final RenderTypeHandler renderTypeHandler = new RenderTypeHandler();
     public final MenuScreenHandler menuScreenHandler = new MenuScreenHandler();
     public final TintHandler tintHandler = new TintHandler();
 
+    @SuppressWarnings("deprecation")
     public Registrate(String modid) {
         this.modid = modid;
+        this.tagsHandler(Registry.ITEM);
+        this.tagsHandler(Registry.BLOCK);
         this.putDataHandler(this.blockStateHandler);
         this.putDataHandler(this.itemModelHandler);
-        this.putDataHandler(this.itemTagsHandler);
         this.putDataHandler(this.recipeDataHandler);
+        this.putDataHandler(this.lootTableHandler);
     }
 
     public <T extends IForgeRegistryEntry<T>>
@@ -129,6 +133,12 @@ public class Registrate implements IBlockParent, IItemParent {
                 loc -> RegistryEntryHandler.forge(registry));
     }
 
+    private <T> void tagsHandler(Registry<T> registry) {
+        var handler = new TagsHandler<>(this, registry);
+        this.putDataHandler(handler);
+        this.tagsHandlers.put(registry.key(), handler);
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>
     forgeHandler(ResourceLocation loc, Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
@@ -141,7 +151,7 @@ public class Registrate implements IBlockParent, IItemParent {
         return this.forgeHandler(key.location(), entryClass, registry);
     }
 
-    public void putDataHandler(DataHandler<?> handler) {
+    private void putDataHandler(DataHandler<?> handler) {
         this.dataHandlers.add(handler);
     }
 
@@ -237,18 +247,26 @@ public class Registrate implements IBlockParent, IItemParent {
         this.itemModelHandler.addCallback(prov -> cons.accept(new DataContext<>(this.modid, prov)));
     }
 
-    @SafeVarargs
-    public final void itemTag(Item item, TagKey<Item>... tags) {
-        this.itemTag(() -> item, tags);
+    @SuppressWarnings("unchecked")
+    private <T> TagsHandler<T> getTagsHandler(ResourceKey<? extends Registry<T>> key) {
+        assert this.tagsHandlers.containsKey(key);
+        return (TagsHandler<T>) this.tagsHandlers.get(key);
     }
 
     @SafeVarargs
-    public final void itemTag(Supplier<? extends Item> item, TagKey<Item>... tags) {
-        this.itemTagsHandler.addTags(item, tags);
+    public final <T> void tag(T object, TagKey<T>... tags) {
+        Supplier<T> supplier = () -> object;
+        this.tag(supplier, tags);
     }
 
-    public void itemTag(TagKey<Item> item, TagKey<Item> tag) {
-        this.itemTagsHandler.addTag(item, tag);
+    @SafeVarargs
+    public final <T> void tag(Supplier<? extends T> object, TagKey<T>... tags) {
+        assert tags.length > 0;
+        this.getTagsHandler(tags[0].registry()).addTags(object, tags);
+    }
+
+    public <T> void tag(TagKey<T> object, TagKey<T> tag) {
+        this.getTagsHandler(tag.registry()).addTag(object, tag);
     }
 
     public <T extends IForgeRegistryEntry<T>>

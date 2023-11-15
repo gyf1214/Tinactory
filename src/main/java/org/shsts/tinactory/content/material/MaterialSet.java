@@ -6,14 +6,18 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.tool.ToolItem;
+import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
@@ -26,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -78,8 +83,8 @@ public class MaterialSet {
         return this.items.computeIfAbsent(sub, $ -> {
             var tag = this.tag(sub);
             var prefixTag = prefixTag(sub);
-            REGISTRATE.itemTag(item, tag);
-            REGISTRATE.itemTag(tag, prefixTag);
+            REGISTRATE.tag(item, tag);
+            REGISTRATE.tag(tag, prefixTag);
             return new Entry(loc, tag, item);
         });
     }
@@ -117,8 +122,8 @@ public class MaterialSet {
     public MaterialSet existing(String sub, TagKey<Item> targetTag, Item item) {
         assert !this.items.containsKey(sub);
         var tag = this.tag(sub);
-        REGISTRATE.itemTag(targetTag, tag);
-        REGISTRATE.itemTag(tag, prefixTag(sub));
+        REGISTRATE.tag(targetTag, tag);
+        REGISTRATE.tag(tag, prefixTag(sub));
         var loc = item.getRegistryName();
         assert loc != null;
         this.items.put(sub, new Entry(loc, tag, () -> item));
@@ -129,7 +134,7 @@ public class MaterialSet {
         var entry = this.items.get(sub2);
         assert entry != null;
         this.items.put(sub, entry);
-        REGISTRATE.itemTag(entry.tag, prefixTag(sub));
+        REGISTRATE.tag(entry.tag, prefixTag(sub));
         return this;
     }
 
@@ -162,9 +167,22 @@ public class MaterialSet {
                 .register());
     }
 
-    public MaterialSet dust() {
-        this.dummy("dust");
+    private Entry dummy(String sub, ResourceLocation... layers) {
+        return safePut(sub, () -> REGISTRATE.item(this.id(sub), Item::new)
+                .model(ModelGen.basicItem(layers))
+                .tint(this.color)
+                .register());
+    }
+
+    private MaterialSet dummies(String... subs) {
+        for (var sub : subs) {
+            this.dummy(sub);
+        }
         return this;
+    }
+
+    public MaterialSet dust() {
+        return this.dummies("dust");
     }
 
     public MaterialSet dustSet() {
@@ -182,23 +200,15 @@ public class MaterialSet {
     }
 
     public MaterialSet metalSet() {
-        this.dustSet();
-        this.dummy("ingot");
-        this.alias("primary", "ingot");
-        this.dummy("nugget");
-        this.dummy("plate");
-        this.dummy("stick");
-        return this;
+        return this.dustSet()
+                .dummies("ingot")
+                .alias("primary", "ingot")
+                .dummies("nugget", "plate", "stick");
     }
 
     public MaterialSet mechanicalSet() {
-        this.metalSet();
-        this.dummy("bolt");
-        this.dummy("screw");
-        this.dummy("gear");
-        this.dummy("rotor");
-        this.dummy("spring");
-        return this;
+        return this.metalSet()
+                .dummies("bolt", "screw", "gear", "rotor", "spring");
     }
 
     private void simpleToolProcess(String resultSub, int count, String materialSub, TagKey<Item> tool) {
@@ -316,6 +326,36 @@ public class MaterialSet {
         return this;
     }
 
+    public MaterialSet ore(List<ResourceLocation> baseModels, Tier mineTier, float strength) {
+        var raw = this.dummy("raw", ModelGen.modLoc("items/material/raw"));
+        REGISTRATE.block(this.id("ore"), properties -> new OreBlock(properties, baseModels.size()))
+                .properties(p -> p.strength(strength, strength * 2))
+                .drop(raw::getItem)
+                .blockState(ctx -> {
+                    var block = ctx.object;
+                    var models = ctx.provider.models();
+                    var multipart = ctx.provider.getMultipartBuilder(block);
+                    var i = 0;
+                    for (var baseModel : baseModels) {
+                        multipart.part()
+                                .modelFile(models.getExistingFile(baseModel)).addModel()
+                                .condition(block.getProperty(), i++).end();
+                    }
+                    var overlay = models.getExistingFile(ModelGen.modLoc("block/material/ore_overlay"));
+                    multipart.part()
+                            .modelFile(overlay)
+                            .addModel().end();
+                })
+                .translucent()
+                .tint(this.color)
+                .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                .tag(mineTier.getTag())
+                .register();
+        return this.dustSet()
+                .dummies("crushed", "crushed_centrifuged", "crushed_purified")
+                .dummies("dust_impure", "dust_pure");
+    }
+
     private static ResourceLocation toolTex(String sub) {
         return ModelGen.gregtech("items/tools/" + sub);
     }
@@ -329,23 +369,28 @@ public class MaterialSet {
             .put("wire_cutter", "wire_cutter_base")
             .build();
 
-    private Entry tool(String category) {
-        var durability = this.durability;
+    private Entry tool(String category, Function<Item.Properties, ToolItem> factory) {
         var handle = Optional.ofNullable(TOOL_HANDLE_TEX.get(category))
                 .map(MaterialSet::toolTex)
                 .orElse(ModelGen.VOID_TEX);
         var head = ModelGen.gregtech("items/tools/" + category);
         var sub = "tool/" + category;
-        return safePut(sub, () -> REGISTRATE.item(this.id(sub),
-                        properties -> new ToolItem(properties, durability))
+        return safePut(sub, () -> REGISTRATE.item(this.id(sub), factory)
                 .model(ModelGen.basicItem(handle, head))
-                .tag(AllTags.TOOL)
                 .tint(0xFFFFFF, this.color)
                 .register());
     }
 
     private MaterialSet tool(String category, String pattern, Object... args) {
-        var entry = this.tool(category);
+        var durability = this.durability;
+
+        Function<Item.Properties, ToolItem> factory = switch (category) {
+            case "wrench" -> p -> new UsableToolItem(p, durability, Tiers.IRON, AllTags.MINEABLE_WITH_WRENCH);
+            case "wire_cutter" -> p -> new UsableToolItem(p, durability, Tiers.IRON, AllTags.MINEABLE_WITH_CUTTER);
+            default -> p -> new ToolItem(p, durability);
+        };
+
+        var entry = this.tool(category, factory);
         this.toolProcess(entry, 1, pattern, args);
         return this;
     }
@@ -371,17 +416,15 @@ public class MaterialSet {
     public MaterialSet toolSet(int durability) {
         this.durability = durability;
 
-        this.hammer().mortar();
-        this.tool("file", "A\nA\nB", "plate", AllTags.TOOL_HANDLE);
-        this.tool("saw", "AAB\n  B", "plate", AllTags.TOOL_HANDLE,
-                AllTags.TOOL_FILE, AllTags.TOOL_HAMMER);
-        this.tool("screwdriver", "  A\n A \nB  ", "stick", AllTags.TOOL_HANDLE,
-                AllTags.TOOL_FILE, AllTags.TOOL_HAMMER);
-        this.tool("wrench", "A A\nAAA\n A ", "plate", AllTags.TOOL_HAMMER);
-        this.tool("wire_cutter", "A A\n A \nBCB", "plate", AllTags.TOOL_HANDLE, AllTags.TOOL_SCREW,
-                AllTags.TOOL_HAMMER, AllTags.TOOL_FILE, AllTags.TOOL_SCREWDRIVER);
-
-        return this;
+        return this.hammer().mortar()
+                .tool("file", "A\nA\nB", "plate", AllTags.TOOL_HANDLE)
+                .tool("saw", "AAB\n  B", "plate", AllTags.TOOL_HANDLE,
+                        AllTags.TOOL_FILE, AllTags.TOOL_HAMMER)
+                .tool("screwdriver", "  A\n A \nB  ", "stick", AllTags.TOOL_HANDLE,
+                        AllTags.TOOL_FILE, AllTags.TOOL_HAMMER)
+                .tool("wrench", "A A\nAAA\n A ", "plate", AllTags.TOOL_HAMMER)
+                .tool("wire_cutter", "A A\n A \nBCB", "plate", AllTags.TOOL_HANDLE, AllTags.TOOL_SCREW,
+                        AllTags.TOOL_HAMMER, AllTags.TOOL_FILE, AllTags.TOOL_SCREWDRIVER);
     }
 
     public void freeze() {
