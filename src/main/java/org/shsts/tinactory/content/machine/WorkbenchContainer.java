@@ -28,9 +28,9 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.logistics.ItemHelper;
-import org.shsts.tinactory.content.logistics.NullContainer;
 import org.shsts.tinactory.content.logistics.WrapperItemHandler;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
+import org.shsts.tinactory.core.SmartRecipe;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -38,7 +38,7 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WorkbenchContainer implements NullContainer, ICapabilityProvider, INBTSerializable<CompoundTag> {
+public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected static class CraftingStack extends CraftingContainer {
@@ -127,7 +127,7 @@ public class WorkbenchContainer implements NullContainer, ICapabilityProvider, I
 
         LOGGER.debug("{} check recipe", this);
         var recipeManager = world.getRecipeManager();
-        var toolRecipe = recipeManager.getRecipeFor(AllRecipes.TOOL.get(), this, world);
+        var toolRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL.get(), this, world);
         if (toolRecipe.isEmpty()) {
             var shapedRecipe = recipeManager.getRecipeFor(RecipeType.CRAFTING, this.craftingStack, world);
             if (shapedRecipe.isEmpty()) {

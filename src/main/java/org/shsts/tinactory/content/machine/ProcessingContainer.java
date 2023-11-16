@@ -15,15 +15,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.logistics.IItemCollection;
-import org.shsts.tinactory.content.logistics.NullContainer;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.SmartRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class ProcessingContainer implements ICapabilityProvider, IProcessingMachine,
-        NullContainer, INBTSerializable<CompoundTag> {
+        INBTSerializable<CompoundTag> {
     protected static final long PROGRESS_PER_TICK = 100;
 
     protected final BlockEntity blockEntity;
@@ -55,7 +55,7 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
         if (world == null) {
             return;
         }
-        this.currentRecipe = world.getRecipeManager().getRecipeFor(this.recipeType, this, world).orElse(null);
+        this.currentRecipe = SmartRecipe.getRecipeFor(this.recipeType, this, world).orElse(null);
         this.workProgress = 0;
         if (this.currentRecipe != null) {
             this.currentRecipe.consumeInputs(this);

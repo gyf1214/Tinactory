@@ -15,7 +15,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.content.logistics.ItemHelper;
-import org.shsts.tinactory.content.machine.ProcessingContainer;
+import org.shsts.tinactory.content.machine.IProcessingMachine;
 import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe<ProcessingContainer, S> {
+public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe<IProcessingMachine, S> {
     public record Input(int port, Ingredient ingredient, int amount) {}
 
     public record WithPort<U>(int port, U object) {}
@@ -48,7 +48,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     }
 
     @Override
-    public boolean matches(ProcessingContainer container, Level world) {
+    public boolean matches(IProcessingMachine container, Level world) {
         for (var input : this.inputs) {
             var collection = container.getPort(input.port, true);
             // TODO: there is a problem here when two ingredients overlap
@@ -65,7 +65,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         return true;
     }
 
-    public void consumeInputs(ProcessingContainer container) {
+    public void consumeInputs(IProcessingMachine container) {
         for (var input : this.inputs) {
             var collection = container.getPort(input.port, true);
             // TODO: there is a problem here when two ingredients overlap
@@ -73,7 +73,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
     }
 
-    public void insertOutputs(ProcessingContainer container) {
+    public void insertOutputs(IProcessingMachine container) {
         for (var output : this.outputs) {
             var collection = container.getPort(output.port, true);
             collection.insertItem(output.object.copy(), false);
@@ -81,7 +81,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     }
 
     @Override
-    public ItemStack assemble(ProcessingContainer container) {
+    public ItemStack assemble(IProcessingMachine container) {
         return ItemStack.EMPTY;
     }
 
@@ -179,7 +179,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             super(type);
         }
 
-        public B buildFromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
+        protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
             var builder = this.type.recipe(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                     .map(JsonElement::getAsJsonObject)
@@ -198,7 +198,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
         @Override
         public T fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
-            return this.buildFromJson(loc, jo, context).buildObject();
+            return this.buildFromJson(loc, jo).buildObject();
         }
 
         @Override

@@ -5,21 +5,22 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.content.logistics.NullContainer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class SmartRecipe<C extends Container, T extends SmartRecipe<C, T>>
-        implements Recipe<C>, ISelf<T> {
+public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
+        implements Recipe<SmartRecipe.ContainerWrapper<C>>, ISelf<T> {
 
     @FunctionalInterface
     public interface Factory<T extends SmartRecipe<?, T>> {
@@ -34,6 +35,14 @@ public abstract class SmartRecipe<C extends Container, T extends SmartRecipe<C, 
         this.loc = loc;
         this.type = type.get();
         this.serializer = type.getSerializer();
+    }
+
+    public static class ContainerWrapper<C1> implements NullContainer {
+        private final C1 compose;
+
+        public ContainerWrapper(C1 compose) {
+            this.compose = compose;
+        }
     }
 
     @Override
@@ -52,17 +61,34 @@ public abstract class SmartRecipe<C extends Container, T extends SmartRecipe<C, 
     }
 
     @Override
+    public boolean matches(ContainerWrapper<C> wrapper, Level world) {
+        return this.matches(wrapper.compose, world);
+    }
+
     public abstract boolean matches(C container, Level world);
 
     @Override
+    public ItemStack assemble(ContainerWrapper<C> wrapper) {
+        return this.assemble(wrapper.compose);
+    }
+
     public abstract ItemStack assemble(C container);
 
     @Override
     public abstract boolean canCraftInDimensions(int width, int height);
 
     @Override
+    public NonNullList<ItemStack> getRemainingItems(ContainerWrapper<C> container) {
+        return this.getRemainingItems(container.compose);
+    }
+
     public NonNullList<ItemStack> getRemainingItems(C container) {
-        return Recipe.super.getRemainingItems(container);
+        return NonNullList.create();
+    }
+
+    public static <C1, T1 extends SmartRecipe<C1, ?>> Optional<T1>
+    getRecipeFor(RecipeType<T1> type, C1 container, Level world) {
+        return world.getRecipeManager().getRecipeFor(type, new ContainerWrapper<>(container), world);
     }
 
     protected abstract static class SimpleFinished<T extends Recipe<?>> implements FinishedRecipe {
