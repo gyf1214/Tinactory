@@ -81,6 +81,6 @@ public final class ItemHelper {
                 amount -= extracted.getCount();
             }
         }
-        return false;
+        return amount <= 0;
     }
 }

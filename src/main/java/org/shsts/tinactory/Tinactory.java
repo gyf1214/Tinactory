@@ -43,15 +43,16 @@ public class Tinactory {
         AllRegistries.init();
 
         ModelGen.init();
+        AllRecipes.init();
         AllMaterials.init();
         AllBlocks.init();
         AllItems.init();
         AllCapabilities.init();
         AllBlockEntities.init();
         AllNetworks.init();
-
-        AllRecipes.init();
         AllWorldGens.init();
+
+        AllRecipes.initRecipes();
 
         REGISTRATE.register(modEventBus);
         modEventBus.addListener(Tinactory::init);

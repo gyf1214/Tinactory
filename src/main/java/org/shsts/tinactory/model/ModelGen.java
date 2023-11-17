@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -109,26 +108,33 @@ public final class ModelGen {
         return $ -> $.blockState(model::blockState).translucent();
     }
 
-    public static <U extends Block>
-    Consumer<RegistryDataContext<Block, U, BlockStateProvider>> primitiveAllFaces(ResourceLocation tex) {
-        return ctx -> {
+    public static <S extends BlockBuilder<? extends Block, ?, S>>
+    Transformer<S> primitive(ResourceLocation tex) {
+        return $ -> $.blockState(ctx -> {
             var model = ctx.provider.models()
                     .withExistingParent(ctx.id, "block/cube")
                     .texture("particle", "#north");
             for (var entry : DIR_TEX_KEYS.entrySet()) {
                 var faceTex = extend(tex, entry.getValue());
-                model = model.texture(entry.getKey().getName(), faceTex);
+                model.texture(entry.getKey().getName(), faceTex);
             }
             ctx.provider.horizontalBlock(ctx.object, model);
-        };
+        });
     }
 
     public static <S extends BlockBuilder<? extends Block, ?, S>>
-    Transformer<S> primitiveMachine(ResourceLocation casing, ResourceLocation front) {
+    Transformer<S> primitiveMachine(ResourceLocation overlay) {
         return $ -> $.blockState(ctx -> {
+            var existingHelper = ctx.provider.models().existingFileHelper;
             var model = ctx.provider.models()
                     .withExistingParent(ctx.id, modLoc("block/machine/casing"));
-            MachineModel.applyTextures(model, casing, front);
+            MachineModel.casing(model, gregtech("blocks/casings/wood_wall"));
+            for (var dir : DIR_TEX_KEYS.values()) {
+                var faceTex = new ResourceLocation(overlay.getNamespace(), overlay.getPath() + "_" + dir);
+                if (existingHelper.exists(faceTex, TEXTURE_TYPE)) {
+                    model.texture(dir + "_overlay", faceTex);
+                }
+            }
             ctx.provider.horizontalBlock(ctx.object, model);
         }).translucent();
     }

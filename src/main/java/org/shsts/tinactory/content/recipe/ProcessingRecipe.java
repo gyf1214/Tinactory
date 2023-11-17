@@ -25,6 +25,7 @@ import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -32,15 +33,15 @@ import java.util.function.Supplier;
 public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe<IProcessingMachine, S> {
     public record Input(int port, Ingredient ingredient, int amount) {}
 
-    public record WithPort<U>(int port, U object) {}
+    public record Output(int port, ItemStack itemStack, float rate) {}
 
     public final List<Input> inputs;
-    public final List<WithPort<ItemStack>> outputs;
+    public final List<Output> outputs;
 
     public final long workTicks;
 
     public ProcessingRecipe(RecipeTypeEntry<S, ?> type, ResourceLocation loc,
-                            List<Input> inputs, List<WithPort<ItemStack>> outputs, long workTicks) {
+                            List<Input> inputs, List<Output> outputs, long workTicks) {
         super(type, loc);
         this.inputs = inputs;
         this.outputs = outputs;
@@ -58,7 +59,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
         for (var output : this.outputs) {
             var collection = container.getPort(output.port, true);
-            if (!collection.insertItem(output.object, true).isEmpty()) {
+            if (!collection.insertItem(output.itemStack, true).isEmpty()) {
                 return false;
             }
         }
@@ -73,10 +74,13 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
     }
 
-    public void insertOutputs(IProcessingMachine container) {
+    public void insertOutputs(IProcessingMachine container, Random random) {
         for (var output : this.outputs) {
+            if (random.nextDouble() > output.rate) {
+                continue;
+            }
             var collection = container.getPort(output.port, true);
-            collection.insertItem(output.object.copy(), false);
+            collection.insertItem(output.itemStack.copy(), false);
         }
     }
 
@@ -97,7 +101,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     public static class Simple extends ProcessingRecipe<Simple> {
         public Simple(RecipeTypeEntry<Simple, ?> type, ResourceLocation loc,
-                      List<Input> inputs, List<WithPort<ItemStack>> outputs,
+                      List<Input> inputs, List<Output> outputs,
                       long workTicks) {
             super(type, loc, inputs, outputs, workTicks);
         }
@@ -106,7 +110,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     public abstract static class Builder<U extends ProcessingRecipe<U>, S extends Builder<U, S>>
             extends SmartRecipeBuilder<U, S> {
         protected final List<Supplier<Input>> inputs = new ArrayList<>();
-        protected final List<Supplier<WithPort<ItemStack>>> outputs = new ArrayList<>();
+        protected final List<Supplier<Output>> outputs = new ArrayList<>();
         protected long workTicks = 0;
 
         public Builder(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
@@ -130,17 +134,22 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             return this.inputItem(port, () -> item, amount);
         }
 
-        public S output(int port, Supplier<ItemStack> itemStack) {
-            this.outputs.add(() -> new WithPort<>(port, itemStack.get()));
+        public S output(int port, Supplier<ItemStack> itemStack, float rate) {
+            this.outputs.add(() -> new Output(port, itemStack.get(), rate));
             return self();
         }
 
-        public S output(int port, ItemStack itemStack) {
-            return this.output(port, () -> itemStack);
+        public S output(int port, Supplier<Item> item, int amount, float rate) {
+            this.outputs.add(() -> new Output(port, new ItemStack(item.get(), amount), rate));
+            return self();
+        }
+
+        public S output(int port, ItemStack itemStack, float rate) {
+            return this.output(port, () -> itemStack, rate);
         }
 
         public S output(int port, Supplier<Item> item, int amount) {
-            return this.output(port, () -> new ItemStack(item.get(), amount));
+            return this.output(port, () -> new ItemStack(item.get(), amount), 1.0f);
         }
 
         public S output(int port, Item item, int amount) {
@@ -156,7 +165,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             return this.inputs.stream().map(Supplier::get).toList();
         }
 
-        protected List<WithPort<ItemStack>> getOutputs() {
+        protected List<Output> getOutputs() {
             return this.outputs.stream().map(Supplier::get).toList();
         }
     }
@@ -192,7 +201,8 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                     .forEach(je -> builder.output(
                             GsonHelper.getAsInt(je, "port"),
                             ItemStack.CODEC.parse(JsonOps.INSTANCE, GsonHelper.getAsJsonObject(je, "item"))
-                                    .getOrThrow(false, $ -> {})));
+                                    .getOrThrow(false, $ -> {}),
+                            GsonHelper.getAsFloat(je, "rate", 1.0f)));
             return builder.workTicks(GsonHelper.getAsLong(jo, "workTicks"));
         }
 
@@ -217,8 +227,11 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                     .map(output -> {
                         var je = new JsonObject();
                         je.addProperty("port", output.port);
-                        je.add("item", ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, output.object)
+                        je.add("item", ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, output.itemStack)
                                 .getOrThrow(false, $ -> {}));
+                        if (output.rate < 1.0f) {
+                            je.addProperty("rate", output.rate);
+                        }
                         return je;
                     }).forEach(outputs::add);
             jo.add("inputs", inputs);
@@ -234,7 +247,8 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                     buf1.readVarInt()));
             buf.readWithCount(buf1 -> builder.output(
                     buf1.readVarInt(),
-                    buf1.readItem()));
+                    buf1.readItem(),
+                    buf1.readFloat()));
             return builder.workTicks(buf.readVarLong());
         }
 
@@ -252,7 +266,8 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             });
             buf.writeCollection(recipe.outputs, (buf1, output) -> {
                 buf1.writeVarInt(output.port);
-                buf1.writeItem(output.object);
+                buf1.writeItem(output.itemStack);
+                buf1.writeFloat(output.rate);
             });
             buf.writeVarLong(recipe.workTicks);
         }

@@ -65,15 +65,15 @@ public final class MachineModel {
     }
 
     public static <B extends ModelBuilder<B>>
-    B applyTextures(B model, ResourceLocation casing, ResourceLocation front) {
-        return model.texture("top", ModelGen.extend(casing, "top"))
-                .texture("bottom", ModelGen.extend(casing, "bottom"))
-                .texture("side", ModelGen.extend(casing, "side"))
-                .texture("front_overlay", front);
+    B casing(B model, ResourceLocation tex) {
+        return model.texture("top", ModelGen.extend(tex, "top"))
+                .texture("bottom", ModelGen.extend(tex, "bottom"))
+                .texture("side", ModelGen.extend(tex, "side"));
     }
 
     private <B extends ModelBuilder<B>> B applyTextures(B model) {
-        return applyTextures(model, this.casing, this.front);
+        return casing(model, this.casing)
+                .texture("front_overlay", this.front);
     }
 
     private ModelFile genModel(String id, BlockModelProvider prov) {

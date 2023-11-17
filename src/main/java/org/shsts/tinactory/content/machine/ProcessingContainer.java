@@ -94,8 +94,10 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
         }
         var progress = (long) Math.floor(partial * (double) PROGRESS_PER_TICK);
         this.workProgress += progress;
+        var world = this.blockEntity.getLevel();
+        assert world != null;
         if (this.workProgress >= this.currentRecipe.workTicks * PROGRESS_PER_TICK) {
-            this.currentRecipe.insertOutputs(this);
+            this.currentRecipe.insertOutputs(this, world.random);
             this.currentRecipe = null;
             this.needUpdate = true;
         }

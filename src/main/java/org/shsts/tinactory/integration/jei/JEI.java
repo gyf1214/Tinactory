@@ -18,10 +18,9 @@ import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.content.AllBlocks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.machine.IProcessingMachine;
+import org.shsts.tinactory.content.primitive.PrimitiveSet;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.SmartRecipe;
-import org.shsts.tinactory.gui.layout.AllLayouts;
-import org.shsts.tinactory.gui.layout.Layout;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
@@ -68,14 +67,14 @@ public class JEI implements IModPlugin {
     }
 
     private static <T extends ProcessingRecipe<T>> CategoryInfo<SmartRecipe.ContainerWrapper<IProcessingMachine>, T>
-    processing(RecipeTypeEntry<T, ?> typeEntry, Layout layout, ItemLike icon) {
-        return category(typeEntry, (type, helpers) ->
-                new ProcessingCategory<>(type, helpers, layout, icon), icon);
+    processing(PrimitiveSet<T> set) {
+        return category(set.recipeType(), (type, helpers) ->
+                new ProcessingCategory<>(type, helpers, set.layout(), set.getBlock()), set.getBlock());
     }
 
     private final List<CategoryInfo<?, ?>> categories = List.of(
             category(AllRecipes.TOOL, ToolCategory::new, AllBlocks.WORKBENCH.get()),
-            processing(AllRecipes.STONE_GENERATOR, AllLayouts.STONE_GENERATOR, AllBlocks.PRIMITIVE_STONE_GENERATOR.get())
+            processing(AllBlocks.PRIMITIVE_STONE_GENERATOR)
     );
 
     @Override

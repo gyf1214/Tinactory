@@ -49,7 +49,7 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
             this.addIngredient(builder, currentSlotIndex, input.port(), input.ingredient());
         }
         for (var output : recipe.outputs) {
-            this.addIngredient(builder, currentSlotIndex, output.port(), Ingredient.of(output.object()));
+            this.addIngredient(builder, currentSlotIndex, output.port(), Ingredient.of(output.itemStack()));
         }
     }
 }

@@ -111,6 +111,11 @@ public class MaterialSet {
         return this.items.get(sub).getItem();
     }
 
+    public Supplier<Item> getItemEntry(String sub) {
+        assert this.items.containsKey(sub);
+        return this.items.get(sub).item();
+    }
+
     public MaterialSet existing(String sub, Item item) {
         assert !this.items.containsKey(sub);
         var loc = item.getRegistryName();
@@ -351,7 +356,7 @@ public class MaterialSet {
                 .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .tag(mineTier.getTag())
                 .register();
-        return this.dustSet()
+        return this.dust()
                 .dummies("crushed", "crushed_centrifuged", "crushed_purified")
                 .dummies("dust_impure", "dust_pure");
     }

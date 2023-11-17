@@ -30,6 +30,7 @@ public final class AllRecipes {
 
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> STONE_GENERATOR;
+    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> ORE_ANALYZER;
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
@@ -38,12 +39,11 @@ public final class AllRecipes {
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
-        STONE_GENERATOR = REGISTRATE.recipeType("stone", ProcessingRecipe.SIMPLE_SERIALIZER)
-                .clazz(ProcessingRecipe.Simple.class)
-                .prefix("processing/stone_generator")
-                .builder(ProcessingRecipe.SimpleBuilder::new)
-                .register();
+        STONE_GENERATOR = REGISTRATE.simpleProcessingRecipeType("processing/stone_generator");
+        ORE_ANALYZER = REGISTRATE.simpleProcessingRecipeType("processing/ore_analyzer");
+    }
 
+    public static void initRecipes() {
         // disable wooden and iron tools
         REGISTRATE.nullRecipe(Items.WOODEN_AXE);
         REGISTRATE.nullRecipe(Items.WOODEN_HOE);
@@ -81,7 +81,7 @@ public final class AllRecipes {
 
         // primitive stone generator
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlocks.PRIMITIVE_STONE_GENERATOR.get())
+                .shaped(AllBlocks.PRIMITIVE_STONE_GENERATOR.getBlock())
                 .pattern("WLW")
                 .pattern("L L")
                 .pattern("WLW")
@@ -135,6 +135,12 @@ public final class AllRecipes {
                                 0, 200)
                         .unlockedBy("has_material", has(AllMaterials.IRON.getTag("nugget"))),
                 ModelGen.modLoc("material/nugget/wrought_iron_from_iron"));
+
+        ORE_ANALYZER.modRecipe(AllMaterials.MAGNETITE.loc("raw"))
+                .output(1, AllMaterials.MAGNETITE.getItemEntry("raw"), 1, 0.25f)
+                .inputItem(0, AllMaterials.STONE.getItemEntry("dust"), 1)
+                .workTicks(200)
+                .build();
     }
 
     private static void woodRecipes(String prefix) {

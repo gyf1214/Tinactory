@@ -28,6 +28,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.content.recipe.NullRecipe;
+import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.CapabilityProviderType;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartEntityBlock;
@@ -335,6 +336,15 @@ public class Registrate implements IBlockParent, IItemParent {
     public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>
     RecipeTypeBuilder<T, B, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B, S> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
+    }
+
+    public RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder>
+    simpleProcessingRecipeType(String id) {
+        return this.recipeType(id, ProcessingRecipe.SIMPLE_SERIALIZER)
+                .clazz(ProcessingRecipe.Simple.class)
+                .prefix(id)
+                .builder(ProcessingRecipe.SimpleBuilder::new)
+                .register();
     }
 
     public void biome(String... ids) {
