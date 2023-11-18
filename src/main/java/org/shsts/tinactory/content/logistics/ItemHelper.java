@@ -1,10 +1,13 @@
 package org.shsts.tinactory.content.logistics;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -82,5 +85,13 @@ public final class ItemHelper {
             }
         }
         return amount <= 0;
+    }
+
+    public static void dropItemHandler(Level world, BlockPos pos, IItemHandler itemHandler) {
+        var slots = itemHandler.getSlots();
+        for (var i = 0; i < slots; i++) {
+            var stack = itemHandler.getStackInSlot(i);
+            Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+        }
     }
 }
