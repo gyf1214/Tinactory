@@ -4,11 +4,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.content.AllWorldGens;
 import org.shsts.tinactory.core.SmartBlockEntityType;
+import org.shsts.tinactory.tech.TechManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
@@ -20,6 +22,11 @@ public final class AllEvents {
         if (event.getObject().getType() instanceof SmartBlockEntityType<?> type) {
             type.attachCapabilities(event);
         }
+    }
+
+    @SubscribeEvent
+    public static void onAddReloadListener(AddReloadListenerEvent event) {
+        event.addListener(TechManager.RELOAD_LISTENER);
     }
 
     @SubscribeEvent
