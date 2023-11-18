@@ -109,6 +109,6 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
 
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
-        return this.allowOutput && this.compose.isItemValid(slot, stack);
+        return this.allowInput && this.compose.isItemValid(slot, stack);
     }
 }

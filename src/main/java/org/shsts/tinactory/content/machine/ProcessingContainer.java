@@ -83,6 +83,11 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
         if (this.currentRecipe == null) {
             this.needUpdate = true;
         }
+        this.blockEntity.setChanged();
+    }
+
+    protected void onOutputUpdate() {
+        this.blockEntity.setChanged();
     }
 
     @Override
@@ -101,6 +106,7 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
             this.currentRecipe = null;
             this.needUpdate = true;
         }
+        this.blockEntity.setChanged();
     }
 
     @Override

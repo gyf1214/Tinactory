@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.logistics.IItemCollection;
 import org.shsts.tinactory.content.logistics.ItemHandlerCollection;
+import org.shsts.tinactory.content.logistics.ItemHelper;
 import org.shsts.tinactory.content.logistics.WrapperItemHandler;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.gui.layout.Layout;
@@ -44,19 +46,27 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
         this.internalPorts = new ArrayList<>(ports.size());
         var views = new ArrayList<WrapperItemHandler>(ports.size());
         for (var port : ports) {
-            var view = new WrapperItemHandler(port.slots);
-            var collection = new ItemHandlerCollection(view);
+            IItemCollection collection;
+            WrapperItemHandler view;
             if (port.output) {
+                var inner = new WrapperItemHandler(port.slots);
+                view = new WrapperItemHandler(inner);
+                collection = new ItemHandlerCollection(view);
+
+                inner.onUpdate(this::onOutputUpdate);
                 view.allowInput = false;
-                this.internalPorts.add(new ItemHandlerCollection(view.compose));
+                this.internalPorts.add(new ItemHandlerCollection(inner));
             } else {
+                view = new WrapperItemHandler(port.slots);
+                collection = new ItemHandlerCollection(view);
+
                 view.onUpdate(this::onInputUpdate);
                 this.internalPorts.add(collection);
             }
             this.ports.add(collection);
             views.add(view);
         }
-        this.combinedStack = new CombinedInvWrapper(views.toArray(WrapperItemHandler[]::new));
+        this.combinedStack = new CombinedInvWrapper(views.toArray(IItemHandlerModifiable[]::new));
     }
 
     @Override
@@ -71,6 +81,19 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
             return LazyOptional.of(() -> this.combinedStack).cast();
         }
         return super.getCapability(cap, side);
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        var tag = super.serializeNBT();
+        tag.put("stack", ItemHelper.serializeItemHandler(this.combinedStack));
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        super.deserializeNBT(tag);
+        ItemHelper.deserializeItemHandler(this.combinedStack, tag.getCompound("stack"));
     }
 
     public static class Builder implements Function<BlockEntity, ICapabilityProvider> {

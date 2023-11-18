@@ -112,7 +112,7 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
         if (this.currentRecipe instanceof CraftingRecipe) {
             return func.apply((R) this.currentRecipe, (C) this.craftingStack);
         } else if (this.currentRecipe instanceof ToolRecipe) {
-            return func.apply((R) this.currentRecipe, (C) this);
+            return func.apply((R) this.currentRecipe, (C) new SmartRecipe.ContainerWrapper<>(this));
         } else {
             throw new IllegalStateException();
         }
@@ -125,7 +125,6 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
             return;
         }
 
-        LOGGER.debug("{} check recipe", this);
         var recipeManager = world.getRecipeManager();
         var toolRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL.get(), this, world);
         if (toolRecipe.isEmpty()) {
@@ -210,5 +209,6 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
     @Override
     public void deserializeNBT(CompoundTag tag) {
         ItemHelper.deserializeItemHandler(this.itemView, tag);
+        this.onUpdate();
     }
 }
