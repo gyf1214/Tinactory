@@ -36,11 +36,11 @@ public abstract class Machine extends SmartBlockEntity {
 
     @Override
     protected void onRemovedInWorld(Level world) {
-        super.onRemovedInWorld(world);
-        LOGGER.debug("machine {}: removed in world", this);
         if (this.network != null) {
             this.network.invalidate();
         }
+        LOGGER.debug("machine {}: removed in world", this);
+        super.onRemovedInWorld(world);
     }
 
     @Override

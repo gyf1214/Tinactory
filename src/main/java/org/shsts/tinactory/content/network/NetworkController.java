@@ -50,10 +50,10 @@ public class NetworkController extends Machine {
 
     @Override
     protected void onRemovedInWorld(Level world) {
-        super.onRemovedInWorld(world);
         if (this.network != null) {
             this.network.destroy();
         }
+        super.onRemovedInWorld(world);
     }
 
     @Override

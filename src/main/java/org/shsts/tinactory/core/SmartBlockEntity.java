@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.items.CapabilityItemHandler;
+import org.shsts.tinactory.content.logistics.ItemHelper;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -36,13 +38,13 @@ public class SmartBlockEntity extends BlockEntity {
 
     @Override
     public final void setRemoved() {
-        super.setRemoved();
         assert this.level != null;
         if (!this.isChunkUnloaded) {
             onRemovedInWorld(this.level);
         } else {
             onRemovedByChunk(this.level);
         }
+        super.setRemoved();
     }
 
     public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T be) {
@@ -117,7 +119,10 @@ public class SmartBlockEntity extends BlockEntity {
     /**
      * callback when this blockEntity is truly removed in world
      */
-    protected void onRemovedInWorld(Level world) {}
+    protected void onRemovedInWorld(Level world) {
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .ifPresent(itemHandler -> ItemHelper.dropItemHandler(world, this.worldPosition, itemHandler));
+    }
 
     /**
      * callback when this blockEntity is removed because of chunk unload
