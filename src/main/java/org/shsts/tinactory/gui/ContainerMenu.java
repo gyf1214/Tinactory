@@ -152,8 +152,17 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     @FunctionalInterface
+    public interface BasicSlotFactory<T extends Slot> {
+        T create(int posX, int posY);
+    }
+
+    @FunctionalInterface
     public interface SlotFactory<T extends Slot> {
         T create(IItemHandler itemHandler, int index, int posX, int posY);
+    }
+
+    public void addSlot(BasicSlotFactory<?> factory, int posX, int posY) {
+        this.addSlot(factory.create(posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 
     public void addSlot(SlotFactory<?> factory, int slotIndex, int posX, int posY) {

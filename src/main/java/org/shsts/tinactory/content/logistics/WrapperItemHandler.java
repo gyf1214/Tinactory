@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.logistics;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
@@ -16,14 +15,8 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WrapperItemHandler implements IItemHandlerModifiable {
-    @FunctionalInterface
-    public interface OnTakeListener {
-        void accept(int slot, Player player, ItemStack stack);
-    }
-
     public final IItemHandlerModifiable compose;
     protected final List<Runnable> updateListener = new ArrayList<>();
-    protected final List<OnTakeListener> onTakeListener = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
@@ -43,19 +36,9 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         this.updateListener.add(cons);
     }
 
-    public void onTake(OnTakeListener cons) {
-        this.onTakeListener.add(cons);
-    }
-
     protected void invokeUpdate() {
         for (var cons : this.updateListener) {
             cons.run();
-        }
-    }
-
-    public void invokeTake(int slot, Player player, ItemStack stack) {
-        for (var cons : this.onTakeListener) {
-            cons.accept(slot, player, stack);
         }
     }
 

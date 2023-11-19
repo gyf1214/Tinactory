@@ -21,13 +21,13 @@ public final class AllLayouts {
                 .build();
 
         var workbenchBuilder = Layout.builder()
-                .slot(0, 6 * SLOT_SIZE, SLOT_SIZE);
+                .slot(-1, 6 * SLOT_SIZE, SLOT_SIZE);
         for (var j = 0; j < 9; j++) {
-            workbenchBuilder.slot(1 + j, j * SLOT_SIZE, 3 * SLOT_SIZE + SPACING_VERTICAL);
+            workbenchBuilder.slot(j, j * SLOT_SIZE, 3 * SLOT_SIZE + SPACING_VERTICAL);
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
-                workbenchBuilder.slot(10 + i * 3 + j, (2 + j) * SLOT_SIZE, i * SLOT_SIZE);
+                workbenchBuilder.slot(9 + i * 3 + j, (2 + j) * SLOT_SIZE, i * SLOT_SIZE);
             }
         }
         WORKBENCH = workbenchBuilder.build();

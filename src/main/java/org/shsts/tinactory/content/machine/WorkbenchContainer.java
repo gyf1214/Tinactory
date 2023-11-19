@@ -25,6 +25,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.logistics.ItemHelper;
@@ -38,7 +39,7 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable<CompoundTag>, IWorkbench {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected static class CraftingStack extends CraftingContainer {
@@ -75,11 +76,12 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
         }
     }
 
+    protected boolean initialized = false;
     protected final BlockEntity blockEntity;
     protected final CraftingStack craftingStack;
     protected final WrapperItemHandler craftingView;
     protected final ToolItemHandler toolStorage;
-    protected final WrapperItemHandler output;
+    protected ItemStack output;
     protected final WrapperItemHandler itemView;
     @Nullable
     protected Recipe<?> currentRecipe = null;
@@ -90,15 +92,13 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
         this.craftingStack = new CraftingStack(3, 3);
         this.craftingView = new WrapperItemHandler(this.craftingStack);
 
-        this.output = new WrapperItemHandler(1);
-        this.output.allowInput = false;
+        this.output = ItemStack.EMPTY;
 
         this.toolStorage = new ToolItemHandler(9);
 
         this.itemView = new WrapperItemHandler(
-                new CombinedInvWrapper(this.output, this.toolStorage, this.craftingView));
+                new CombinedInvWrapper(this.toolStorage, this.craftingView));
         this.itemView.onUpdate(this::onUpdate);
-        this.itemView.onTake(this::onCraft);
     }
 
     @FunctionalInterface
@@ -138,15 +138,34 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
             this.currentRecipe = toolRecipe.get();
         }
         if (this.currentRecipe != null) {
-            this.output.setStackInSlot(0, this.applyRecipeFunc(Recipe::assemble));
+            this.output = this.applyRecipeFunc(Recipe::assemble);
         } else {
-            this.output.setStackInSlot(0, ItemStack.EMPTY);
+            this.output = ItemStack.EMPTY;
         }
         this.blockEntity.setChanged();
     }
 
-    protected void onCraft(int slot, Player player, ItemStack stack) {
-        if (slot != 0 || stack.isEmpty() || this.currentRecipe == null) {
+    @Override
+    public ItemStack getResult() {
+        if (!this.initialized) {
+            this.onUpdate();
+            this.initialized = true;
+        }
+        return this.output;
+    }
+
+    @Override
+    public void setResult(ItemStack stack) {
+        var world = this.blockEntity.getLevel();
+        if (world == null || !world.isClientSide) {
+            return;
+        }
+        this.output = stack;
+    }
+
+    @Override
+    public void onTake(Player player, ItemStack stack) {
+        if (stack.isEmpty() || this.currentRecipe == null) {
             return;
         }
 
@@ -197,6 +216,8 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return LazyOptional.of(() -> this.itemView).cast();
+        } else if (cap == AllCapabilities.WORKBENCH.get()) {
+            return LazyOptional.of(() -> this).cast();
         }
         return LazyOptional.empty();
     }
@@ -209,6 +230,5 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
     @Override
     public void deserializeNBT(CompoundTag tag) {
         ItemHelper.deserializeItemHandler(this.itemView, tag);
-        this.onUpdate();
     }
 }

@@ -51,7 +51,9 @@ public class Layout {
         return builder -> {
             var xOffset = (ContainerMenu.CONTENT_WIDTH - this.rect.width()) / 2;
             for (var slot : this.slots) {
-                builder.slot(slot.index, xOffset + slot.x, yOffset + slot.y);
+                if (slot.index >= 0) {
+                    builder.slot(slot.index, xOffset + slot.x, yOffset + slot.y);
+                }
             }
             for (var image : this.images) {
                 builder.staticWidget(image.rect.offset(xOffset, yOffset), image.texture);

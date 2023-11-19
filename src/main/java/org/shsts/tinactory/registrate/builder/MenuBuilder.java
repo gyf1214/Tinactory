@@ -8,12 +8,12 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.shsts.tinactory.gui.ContainerMenuType;
 import org.shsts.tinactory.gui.ContainerSyncData;
-import org.shsts.tinactory.gui.WrapperSlot;
 import org.shsts.tinactory.gui.client.ContainerMenuScreen;
 import org.shsts.tinactory.gui.client.ContainerWidget;
 import org.shsts.tinactory.gui.client.ProgressBar;
@@ -109,7 +109,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     public S slot(int slotIndex, int posX, int posY) {
-        return slot(WrapperSlot::new, slotIndex, posX, posY);
+        return slot(SlotItemHandler::new, slotIndex, posX, posY);
     }
 
     public S slot(ContainerMenu.SlotFactory<?> factory, int slotIndex, int posX, int posY) {
