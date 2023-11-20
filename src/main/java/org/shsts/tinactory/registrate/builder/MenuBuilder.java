@@ -13,7 +13,6 @@ import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.shsts.tinactory.gui.ContainerMenuType;
-import org.shsts.tinactory.gui.ContainerSyncData;
 import org.shsts.tinactory.gui.client.ContainerMenuScreen;
 import org.shsts.tinactory.gui.client.ContainerWidget;
 import org.shsts.tinactory.gui.client.ProgressBar;
@@ -21,6 +20,7 @@ import org.shsts.tinactory.gui.client.StaticWidget;
 import org.shsts.tinactory.gui.layout.Layout;
 import org.shsts.tinactory.gui.layout.Rect;
 import org.shsts.tinactory.gui.layout.Texture;
+import org.shsts.tinactory.gui.sync.ContainerSyncPacket;
 import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -32,6 +32,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToDoubleFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -118,16 +119,18 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
-    public S progressBar(Texture tex, Rect rect, Function<T, Double> progressReader) {
-        var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncData(
-                ContainerSyncData.simpleReader(menu, menu1 ->
-                        (short) (progressReader.apply(menu1.blockEntity) * Short.MAX_VALUE))));
+    public S progressBar(Texture tex, Rect rect, ToDoubleFunction<T> progressReader) {
+        var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(
+                ContainerSyncPacket.Double.class,
+                (containerId, index, $, be) ->
+                        new ContainerSyncPacket.Double(containerId, index,
+                                progressReader.applyAsDouble(be))));
         this.menuCallbacks.add(callback);
         return this.widget(rect, () -> (menu, rect1) ->
                 new ProgressBar(menu, rect1, tex, callback.get()));
     }
 
-    public S progressBar(Texture tex, int posX, int posY, Function<T, Double> progressReader) {
+    public S progressBar(Texture tex, int posX, int posY, ToDoubleFunction<T> progressReader) {
         int w = tex.width();
         int h = tex.height() / 2;
         return this.progressBar(tex, new Rect(posX, posY, w, h), progressReader);

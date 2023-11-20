@@ -1,4 +1,4 @@
-package org.shsts.tinactory.gui;
+package org.shsts.tinactory.gui.sync;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.Container;

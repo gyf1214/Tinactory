@@ -6,6 +6,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.shsts.tinactory.gui.layout.Rect;
 import org.shsts.tinactory.gui.layout.Texture;
+import org.shsts.tinactory.gui.sync.ContainerSyncPacket;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -13,17 +14,18 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class ProgressBar extends ContainerWidget {
     private final Texture texture;
-    private final int dataIndex;
+    private final int syncIndex;
 
-    public ProgressBar(ContainerMenu<?> menu, Rect rect, Texture texture, int dataIndex) {
+    public ProgressBar(ContainerMenu<?> menu, Rect rect, Texture texture, int syncIndex) {
         super(menu, rect, ContainerMenu.DEFAULT_Z_INDEX);
         this.texture = texture;
-        this.dataIndex = dataIndex;
+        this.syncIndex = syncIndex;
     }
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var progress = Math.max(0, (double) this.menu.getSimpleData(this.dataIndex) / (double) Short.MAX_VALUE);
+        var progress = Math.max(this.menu.getSyncPacket(this.syncIndex, ContainerSyncPacket.Double.class)
+                .map(p -> p.data).orElse(0d), 0d);
         int w1 = (int) (progress * (double) this.rect.width());
         int w2 = this.rect.width() - w1;
         int h = this.rect.height();

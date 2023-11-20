@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.gui.ContainerMenu;
@@ -39,18 +38,18 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         this.widgetBuilders.add(factory);
     }
 
-    protected void addSlotWidget(Slot slot) {
-        var x = slot.x + this.leftPos - 1;
-        var y = slot.y + this.topPos - 1;
+    protected void addSlotWidget(int x, int y) {
+        var pX = x + this.leftPos - 1;
+        var pY = y + this.topPos - 1;
         this.renderables.add(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND,
-                ContainerMenu.DEFAULT_Z_INDEX, x, y));
+                ContainerMenu.DEFAULT_Z_INDEX, pX, pY));
     }
 
     @Override
     protected void init() {
         super.init();
         for (var slot : this.menu.slots) {
-            this.addSlotWidget(slot);
+            this.addSlotWidget(slot.x, slot.y);
         }
         for (var builder : this.widgetBuilders) {
             var widget = builder.factory().apply(this.menu, builder.rect().offset(

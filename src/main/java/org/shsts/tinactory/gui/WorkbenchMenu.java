@@ -8,6 +8,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.logistics.ItemHelper;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.gui.layout.AllLayouts;
+import org.shsts.tinactory.gui.sync.CraftingSlot;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.NoSuchElementException;

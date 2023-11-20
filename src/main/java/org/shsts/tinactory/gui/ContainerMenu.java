@@ -1,6 +1,7 @@
 package org.shsts.tinactory.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -12,12 +13,17 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import net.minecraftforge.network.PacketDistributor;
+import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.gui.layout.Rect;
+import org.shsts.tinactory.gui.sync.ContainerSyncPacket;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -41,7 +47,38 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     protected int containerSlotCount;
     protected boolean hasInventory;
     protected int height;
-    protected final List<ContainerSyncData<?, ContainerMenu<T>>> syncData = new ArrayList<>();
+
+    @FunctionalInterface
+    public interface PacketFactory<T extends BlockEntity, P extends ContainerSyncPacket> {
+        P create(int containerId, int index, ContainerMenu<T> menu, T be);
+    }
+
+    protected static abstract class SyncSlot<T extends BlockEntity, P extends ContainerSyncPacket> {
+        private final Class<P> clazz;
+        private @Nullable P packet = null;
+
+        protected SyncSlot(Class<P> clazz) {
+            this.clazz = clazz;
+        }
+
+        protected abstract P getPacket(ContainerMenu<T> menu, T be);
+
+        public void syncPacket(ContainerMenu<T> menu, T be) {
+            if (menu.player instanceof ServerPlayer player) {
+                var packet = this.getPacket(menu, be);
+                if (!packet.equals(this.packet)) {
+                    this.packet = packet;
+                    Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+                }
+            }
+        }
+
+        public void setPacket(ContainerSyncPacket packet) {
+            this.packet = clazz.cast(packet);
+        }
+    }
+
+    protected final List<SyncSlot<T, ?>> syncSlots = new ArrayList<>();
 
     public ContainerMenu(ContainerMenuType<T, ?> type, int id, Inventory inventory, T blockEntity) {
         super(type, id);
@@ -171,18 +208,46 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
                 posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 
-    public <U> int addSyncData(ContainerSyncData<U, ContainerMenu<T>> syncData) {
-        this.syncData.add(syncData);
-        this.addDataSlots(syncData);
-        return this.syncData.size() - 1;
+    public <P extends ContainerSyncPacket>
+    int addSyncSlot(Class<P> clazz, PacketFactory<T, P> packetFactory) {
+        int index = this.syncSlots.size();
+        this.syncSlots.add(new SyncSlot<>(clazz) {
+            @Override
+            protected P getPacket(ContainerMenu<T> menu, T be) {
+                return packetFactory.create(menu.containerId, index, menu, be);
+            }
+        });
+        return index;
     }
 
-    public <U> U getSyncData(int index, Class<U> clazz) {
-        return clazz.cast(this.syncData.get(index).value);
+    /**
+     * Called by client bound handler.
+     */
+    public void onSyncPacket(int index, ContainerSyncPacket packet) {
+        var slot = this.syncSlots.get(index);
+        if (slot == null || !slot.clazz.isInstance(packet)) {
+            return;
+        }
+        slot.setPacket(packet);
     }
 
-    public short getSimpleData(int index) {
-        return this.getSyncData(index, Short.class);
+    /**
+     * Called by Screen.
+     */
+    public <P extends ContainerSyncPacket> Optional<P> getSyncPacket(int index, Class<P> clazz) {
+        var slot = this.syncSlots.get(index);
+        if (slot == null || !clazz.isInstance(slot.packet)) {
+            return Optional.empty();
+        }
+        return Optional.of(clazz.cast(slot.packet));
+    }
+
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        for (var slot : this.syncSlots) {
+            slot.syncPacket(this, this.blockEntity);
+        }
     }
 
     public interface Factory<T1 extends BlockEntity, M1 extends ContainerMenu<T1>> {
