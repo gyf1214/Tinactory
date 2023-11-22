@@ -84,7 +84,7 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
     }
 
     public S tint(int... colors) {
-        return this.tint(() -> () -> ($1, $2, $3, index) -> index < colors.length ? colors[index] : 0xFFFFFF);
+        return this.tint(() -> () -> ($1, $2, $3, index) -> index < colors.length ? colors[index] : 0xFFFFFFFF);
     }
 
     @SafeVarargs

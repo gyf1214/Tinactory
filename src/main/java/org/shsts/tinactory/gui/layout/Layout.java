@@ -16,7 +16,16 @@ import java.util.List;
 public class Layout {
     public record WidgetInfo(Rect rect, Texture texture) {}
 
-    public record SlotInfo(int index, int x, int y, int port, boolean output) {}
+    public enum SlotType {
+        NONE(false), ITEM_INPUT(false), ITEM_OUTPUT(true), FLUID_INPUT(false), FLUID_OUTPUT(true);
+        public final boolean output;
+
+        SlotType(boolean output) {
+            this.output = output;
+        }
+    }
+
+    public record SlotInfo(int index, int x, int y, int port, SlotType type) {}
 
     public final List<SlotInfo> slots;
     public final List<WidgetInfo> images;
@@ -51,8 +60,11 @@ public class Layout {
         return builder -> {
             var xOffset = (ContainerMenu.CONTENT_WIDTH - this.rect.width()) / 2;
             for (var slot : this.slots) {
-                if (slot.index >= 0) {
-                    builder.slot(slot.index, xOffset + slot.x, yOffset + slot.y);
+                var x = xOffset + slot.x;
+                var y = yOffset + slot.y;
+                switch (slot.type) {
+                    case ITEM_INPUT, ITEM_OUTPUT -> builder.slot(slot.index, x, y);
+                    case FLUID_INPUT, FLUID_OUTPUT -> builder.fluidSlot(slot.index, x, y);
                 }
             }
             for (var image : this.images) {
@@ -72,13 +84,18 @@ public class Layout {
         @Nullable
         private WidgetInfo progressBar = null;
 
-        public Builder slot(int slot, int x, int y) {
-            this.slots.add(new SlotInfo(slot, x, y, 0, false));
+        public Builder slot(int x, int y) {
+            this.slots.add(new SlotInfo(0, x, y, 0, SlotType.NONE));
             return this;
         }
 
-        public Builder slot(int slot, int x, int y, int port, boolean output) {
-            this.slots.add(new SlotInfo(slot, x, y, port, output));
+        public Builder slot(int slot, int x, int y) {
+            this.slots.add(new SlotInfo(slot, x, y, 0, SlotType.ITEM_INPUT));
+            return this;
+        }
+
+        public Builder slot(int slot, int x, int y, int port, SlotType type) {
+            this.slots.add(new SlotInfo(slot, x, y, port, type));
             return this;
         }
 

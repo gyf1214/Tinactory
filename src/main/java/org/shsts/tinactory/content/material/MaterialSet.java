@@ -382,7 +382,7 @@ public class MaterialSet {
         var sub = "tool/" + category;
         return safePut(sub, () -> REGISTRATE.item(this.id(sub), factory)
                 .model(ModelGen.basicItem(handle, head))
-                .tint(0xFFFFFF, this.color)
+                .tint(0xFFFFFFFF, this.color)
                 .register());
     }
 

@@ -26,12 +26,12 @@ public final class AllMaterials {
     private static final List<ResourceLocation> ORE_BASE_OVERWORLD = blockModels(
             Blocks.STONE, Blocks.DEEPSLATE);
 
-    public static final MaterialSet TEST = set("test", IconSet.DULL, 0xFFFFFF);
-    public static final MaterialSet STONE = set("stone", IconSet.ROUGH, 0xCDCDCD);
-    public static final MaterialSet FLINT = set("flint", IconSet.DULL, 0x002040);
-    public static final MaterialSet IRON = set("iron", IconSet.METALLIC, 0xC8C8C8);
-    public static final MaterialSet WROUGHT_IRON = set("wrought_iron", IconSet.METALLIC, 0xC8B4B4);
-    public static final MaterialSet MAGNETITE = set("magnetite", IconSet.METALLIC, 0x1E1E1E);
+    public static final MaterialSet TEST = set("test", IconSet.DULL, 0xFFFFFFFF);
+    public static final MaterialSet STONE = set("stone", IconSet.ROUGH, 0xFFCDCDCD);
+    public static final MaterialSet FLINT = set("flint", IconSet.DULL, 0xFF002040);
+    public static final MaterialSet IRON = set("iron", IconSet.METALLIC, 0xFFC8C8C8);
+    public static final MaterialSet WROUGHT_IRON = set("wrought_iron", IconSet.METALLIC, 0xFFC8B4B4);
+    public static final MaterialSet MAGNETITE = set("magnetite", IconSet.METALLIC, 0xFF1E1E1E);
 
     static {
         TEST.toolSet(12800000).freeze();

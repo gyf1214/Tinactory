@@ -9,18 +9,21 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.SlotItemHandler;
+import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.shsts.tinactory.gui.ContainerMenuType;
 import org.shsts.tinactory.gui.client.ContainerMenuScreen;
 import org.shsts.tinactory.gui.client.ContainerWidget;
+import org.shsts.tinactory.gui.client.FluidSlot;
 import org.shsts.tinactory.gui.client.ProgressBar;
 import org.shsts.tinactory.gui.client.StaticWidget;
 import org.shsts.tinactory.gui.layout.Layout;
 import org.shsts.tinactory.gui.layout.Rect;
 import org.shsts.tinactory.gui.layout.Texture;
 import org.shsts.tinactory.gui.sync.ContainerSyncPacket;
+import org.shsts.tinactory.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -119,21 +122,36 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
-    public S progressBar(Texture tex, Rect rect, ToDoubleFunction<T> progressReader) {
-        var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(
-                ContainerSyncPacket.Double.class,
-                (containerId, index, $, be) ->
-                        new ContainerSyncPacket.Double(containerId, index,
-                                progressReader.applyAsDouble(be))));
+    protected <P1 extends ContainerSyncPacket>
+    Supplier<Integer> addSyncSlot(Class<P1> clazz, ContainerMenu.PacketFactory<T, P1> packetFactory) {
+        var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(clazz, packetFactory));
         this.menuCallbacks.add(callback);
+        return callback;
+    }
+
+    public S progressBar(Texture tex, Rect rect, ToDoubleFunction<T> progressReader) {
+        var syncSlot = this.addSyncSlot(ContainerSyncPacket.Double.class,
+                (containerId, index, $, be) -> new ContainerSyncPacket.Double(containerId, index,
+                        progressReader.applyAsDouble(be)));
         return this.widget(rect, () -> (menu, rect1) ->
-                new ProgressBar(menu, rect1, tex, callback.get()));
+                new ProgressBar(menu, rect1, tex, syncSlot.get()));
     }
 
     public S progressBar(Texture tex, int posX, int posY, ToDoubleFunction<T> progressReader) {
         int w = tex.width();
         int h = tex.height() / 2;
         return this.progressBar(tex, new Rect(posX, posY, w, h), progressReader);
+    }
+
+    public S fluidSlot(int tank, int x, int y) {
+        var syncSlot = this.addSyncSlot(FluidSyncPacket.class, (containerId, index, $, be) ->
+                new FluidSyncPacket(containerId, index, be.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
+                        .map(handler -> handler.getTank(tank).getFluidInTank(0))
+                        .orElseThrow()));
+        var rect = new Rect(x, y, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE);
+        return this.staticWidget(rect, Texture.SLOT_BACKGROUND)
+                .widget(rect.offset(1, 1).enlarge(-1, -1), () -> (menu, rect1) ->
+                        new FluidSlot(menu, rect1, syncSlot.get()));
     }
 
     public S layout(Layout layout, int yOffset) {

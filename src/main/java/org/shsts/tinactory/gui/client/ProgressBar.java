@@ -33,5 +33,9 @@ public class ProgressBar extends ContainerWidget {
                 this.rect.resize(w1, h), new Rect(0, h, w1, h));
         RenderUtil.blit(poseStack, this.texture, this.zIndex,
                 this.rect.resize(w2, h).offset(w1, 0), new Rect(w1, 0, w2, h));
+
+        if (this.rect.in(mouseX, mouseY)) {
+            RenderUtil.fill(poseStack, rect, 0x80FFFFFF);
+        }
     }
 }

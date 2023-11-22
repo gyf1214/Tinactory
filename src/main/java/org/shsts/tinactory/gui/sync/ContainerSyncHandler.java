@@ -34,5 +34,6 @@ public final class ContainerSyncHandler {
     public static void registerPackets() {
         register(ContainerSyncPacket.Long.class, ContainerSyncPacket.Long::create);
         register(ContainerSyncPacket.Double.class, ContainerSyncPacket.Double::create);
+        register(FluidSyncPacket.class, FluidSyncPacket::create);
     }
 }

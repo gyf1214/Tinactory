@@ -10,18 +10,18 @@ public final class AllLayouts {
 
     static {
         STONE_GENERATOR = Layout.builder()
-                .slot(0, SLOT_SIZE * 2, 1, 0, true)
+                .slot(0, SLOT_SIZE * 2, 1, 0, Layout.SlotType.ITEM_OUTPUT)
                 .progressBar(Texture.PROGRESS_ARROW, 8, 0)
                 .build();
 
         ORE_ANALYZER = Layout.builder()
-                .slot(0, 0, 1, 0, false)
-                .slot(1, SLOT_SIZE * 3, 1, 1, true)
+                .slot(0, 0, 1, 0, Layout.SlotType.ITEM_INPUT)
+                .slot(1, SLOT_SIZE * 3, 1, 1, Layout.SlotType.ITEM_OUTPUT)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build();
 
         var workbenchBuilder = Layout.builder()
-                .slot(-1, 6 * SLOT_SIZE, SLOT_SIZE);
+                .slot(6 * SLOT_SIZE, SLOT_SIZE);
         for (var j = 0; j < 9; j++) {
             workbenchBuilder.slot(j, j * SLOT_SIZE, 3 * SLOT_SIZE + SPACING_VERTICAL);
         }

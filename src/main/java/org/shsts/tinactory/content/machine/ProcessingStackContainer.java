@@ -33,7 +33,7 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class ProcessingStackContainer extends ProcessingContainer implements ICapabilityProvider {
 
-    protected record PortInfo(int slots, boolean output) {}
+    protected record PortInfo(int slots, Layout.SlotType type) {}
 
     protected final IItemHandlerModifiable combinedStack;
     protected final List<IItemCollection> ports;
@@ -46,25 +46,28 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
         this.internalPorts = new ArrayList<>(ports.size());
         var views = new ArrayList<WrapperItemHandler>(ports.size());
         for (var port : ports) {
-            IItemCollection collection;
-            WrapperItemHandler view;
-            if (port.output) {
-                var inner = new WrapperItemHandler(port.slots);
-                view = new WrapperItemHandler(inner);
-                collection = new ItemHandlerCollection(view);
+            switch (port.type()) {
+                case ITEM_INPUT -> {
+                    var view = new WrapperItemHandler(port.slots);
+                    view.onUpdate(this::onInputUpdate);
+                    views.add(view);
 
-                inner.onUpdate(this::onOutputUpdate);
-                view.allowInput = false;
-                this.internalPorts.add(new ItemHandlerCollection(inner));
-            } else {
-                view = new WrapperItemHandler(port.slots);
-                collection = new ItemHandlerCollection(view);
+                    var collection = new ItemHandlerCollection(view);
+                    this.internalPorts.add(collection);
+                    this.ports.add(collection);
+                }
+                case ITEM_OUTPUT -> {
+                    var inner = new WrapperItemHandler(port.slots);
+                    inner.onUpdate(this::onOutputUpdate);
 
-                view.onUpdate(this::onInputUpdate);
-                this.internalPorts.add(collection);
+                    var view = new WrapperItemHandler(inner);
+                    view.allowInput = false;
+                    views.add(view);
+
+                    this.internalPorts.add(new ItemHandlerCollection(inner));
+                    this.ports.add(new ItemHandlerCollection(view));
+                }
             }
-            this.ports.add(collection);
-            views.add(view);
         }
         this.combinedStack = new CombinedInvWrapper(views.toArray(IItemHandlerModifiable[]::new));
     }
@@ -109,8 +112,11 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
         public Builder layout(Layout layout) {
             Map<Integer, PortInfo> map = new HashMap<>();
             for (var slot : layout.slots) {
-                map.merge(slot.port(), new PortInfo(1, slot.output()),
-                        ($, v) -> new PortInfo(v.slots + 1, slot.output()));
+                if (slot.type() == Layout.SlotType.NONE) {
+                    continue;
+                }
+                map.merge(slot.port(), new PortInfo(1, slot.type()),
+                        ($, v) -> new PortInfo(v.slots + 1, slot.type()));
             }
             this.ports.addAll(map.values());
             return this;

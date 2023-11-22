@@ -51,7 +51,7 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
     }
 
     public S tint(int... colors) {
-        return tint(() -> () -> ($, index) -> index < colors.length ? colors[index] : 0xFFFFFF);
+        return tint(() -> () -> ($, index) -> index < colors.length ? colors[index] : 0xFFFFFFFF);
     }
 
     @SafeVarargs

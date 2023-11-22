@@ -15,7 +15,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WrapperItemHandler implements IItemHandlerModifiable {
-    public final IItemHandlerModifiable compose;
+    protected final IItemHandlerModifiable compose;
     protected final List<Runnable> updateListener = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
