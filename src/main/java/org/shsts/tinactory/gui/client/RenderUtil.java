@@ -36,7 +36,7 @@ public final class RenderUtil {
     }
 
     public static void blit(PoseStack poseStack, Texture tex, int zIndex, Rect dstRect, Rect srcRect) {
-        blit(poseStack, tex, zIndex, 0xFFFFFF, dstRect, srcRect);
+        blit(poseStack, tex, zIndex, 0xFFFFFFFF, dstRect, srcRect);
     }
 
     private static void setGLColor(int color) {

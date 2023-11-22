@@ -25,7 +25,7 @@ public class ProgressBar extends ContainerWidget {
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         var progress = Math.max(this.menu.getSyncPacket(this.syncIndex, ContainerSyncPacket.Double.class)
-                .map(p -> p.data).orElse(0d), 0d);
+                .map(ContainerSyncPacket.Double::getData).orElse(0d), 0d);
         int w1 = (int) (progress * (double) this.rect.width());
         int w2 = this.rect.width() - w1;
         int h = this.rect.height();

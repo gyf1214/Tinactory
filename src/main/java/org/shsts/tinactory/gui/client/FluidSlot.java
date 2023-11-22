@@ -29,7 +29,7 @@ public class FluidSlot extends ContainerWidget {
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         var fluidStack = this.menu.getSyncPacket(this.syncSlot, FluidSyncPacket.class)
-                .map(p -> p.fluidStack).orElse(FluidStack.EMPTY);
+                .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
         var fluid = fluidStack.getFluid();
 
         if (!fluidStack.isEmpty() && fluid != null) {

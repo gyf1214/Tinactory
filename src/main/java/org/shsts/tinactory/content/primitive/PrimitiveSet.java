@@ -34,16 +34,22 @@ public record PrimitiveSet<T extends ProcessingRecipe<T>>(
 
     public static <T extends ProcessingRecipe<T>> PrimitiveSet<T>
     create(String id, ResourceLocation overlay, RecipeTypeEntry<T, ?> recipeType, Layout layout) {
+        return create(REGISTRATE, id, overlay, recipeType, layout);
+    }
+
+    public static <T extends ProcessingRecipe<T>> PrimitiveSet<T>
+    create(Registrate registrate, String id, ResourceLocation overlay,
+           RecipeTypeEntry<T, ?> recipeType, Layout layout) {
         var holder = ValueHolder.<Supplier<SmartBlockEntityType<PrimitiveMachine>>>create();
 
-        var block = REGISTRATE.entityBlock(id, PrimitiveBlock<PrimitiveMachine>::new)
+        var block = registrate.entityBlock(id, PrimitiveBlock<PrimitiveMachine>::new)
                 .type(holder)
                 .transform(ModelGen.primitiveMachine(overlay))
                 .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .register();
 
-        var blockEntity = REGISTRATE.blockEntity(id, PrimitiveMachine::new)
+        var blockEntity = registrate.blockEntity(id, PrimitiveMachine::new)
                 .entityClass(PrimitiveMachine.class)
                 .validBlock(block)
                 .ticking()

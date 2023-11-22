@@ -37,7 +37,7 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
         if (slotIndex < slots.size()) {
             var slot = slots.get(slotIndex);
             this.addIngredient(builder, slot.index(), ingredient,
-                    slot.output() ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT);
+                    slot.type().output ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT);
             currentSlotIndex.put(port, slotIndex + 1);
         }
     }

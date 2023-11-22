@@ -2,7 +2,6 @@ package org.shsts.tinactory.gui.sync;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkEvent;
@@ -10,7 +9,7 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.slf4j.Logger;
 
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public final class ContainerSyncHandler {
@@ -20,20 +19,24 @@ public final class ContainerSyncHandler {
     void handle(P packet, NetworkEvent.Context ctx) {
         var player = Minecraft.getInstance().player;
         if (player != null && player.containerMenu instanceof ContainerMenu<?> menu &&
-                menu.containerId == packet.containerId) {
-            menu.onSyncPacket(packet.index, packet);
+                menu.containerId == packet.getContainerId()) {
+            menu.onSyncPacket(packet.getIndex(), packet);
         }
     }
 
     private static <P extends ContainerSyncPacket>
-    void register(Class<P> clazz, Function<FriendlyByteBuf, P> factory) {
+    void register(Class<P> clazz, Supplier<P> constructor) {
         LOGGER.debug("register container sync packet {}", clazz);
-        Tinactory.registryClientPacket(clazz, factory, ContainerSyncHandler::handle);
+        Tinactory.registryClientPacket(clazz, buf -> {
+            var p = constructor.get();
+            p.deserializeFromBuf(buf);
+            return p;
+        }, ContainerSyncHandler::handle);
     }
 
     public static void registerPackets() {
-        register(ContainerSyncPacket.Long.class, ContainerSyncPacket.Long::create);
-        register(ContainerSyncPacket.Double.class, ContainerSyncPacket.Double::create);
-        register(FluidSyncPacket.class, FluidSyncPacket::create);
+        register(ContainerSyncPacket.Long.class, ContainerSyncPacket.Long::new);
+        register(ContainerSyncPacket.Double.class, ContainerSyncPacket.Double::new);
+        register(FluidSyncPacket.class, FluidSyncPacket::new);
     }
 }

@@ -51,14 +51,14 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     @Override
     public boolean matches(IProcessingMachine container, Level world) {
         for (var input : this.inputs) {
-            var collection = container.getPort(input.port, true);
+            var collection = container.getPort(input.port, true).left().orElseThrow();
             // TODO: there is a problem here when two ingredients overlap
             if (!ItemHelper.consumeItemCollection(collection, input.ingredient, input.amount, true)) {
                 return false;
             }
         }
         for (var output : this.outputs) {
-            var collection = container.getPort(output.port, true);
+            var collection = container.getPort(output.port, true).left().orElseThrow();
             if (!collection.insertItem(output.itemStack, true).isEmpty()) {
                 return false;
             }
@@ -68,7 +68,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     public void consumeInputs(IProcessingMachine container) {
         for (var input : this.inputs) {
-            var collection = container.getPort(input.port, true);
+            var collection = container.getPort(input.port, true).left().orElseThrow();
             // TODO: there is a problem here when two ingredients overlap
             ItemHelper.consumeItemCollection(collection, input.ingredient, input.amount, false);
         }
@@ -79,7 +79,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             if (random.nextDouble() > output.rate) {
                 continue;
             }
-            var collection = container.getPort(output.port, true);
+            var collection = container.getPort(output.port, true).left().orElseThrow();
             collection.insertItem(output.itemStack.copy(), false);
         }
     }

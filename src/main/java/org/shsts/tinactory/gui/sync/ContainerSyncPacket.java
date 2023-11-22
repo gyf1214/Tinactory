@@ -10,8 +10,10 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class ContainerSyncPacket implements IPacket {
-    public final int containerId;
-    public final int index;
+    protected int containerId;
+    protected int index;
+
+    protected ContainerSyncPacket() {}
 
     protected ContainerSyncPacket(int containerId, int index) {
         this.containerId = containerId;
@@ -22,6 +24,12 @@ public abstract class ContainerSyncPacket implements IPacket {
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeVarInt(this.containerId);
         buf.writeVarInt(this.index);
+    }
+
+    @Override
+    public void deserializeFromBuf(FriendlyByteBuf buf) {
+        this.containerId = buf.readVarInt();
+        this.index = buf.readVarInt();
     }
 
     @Override
@@ -37,8 +45,18 @@ public abstract class ContainerSyncPacket implements IPacket {
         return Objects.hash(this.containerId, this.index);
     }
 
+    public int getContainerId() {
+        return this.containerId;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
     public static class Double extends ContainerSyncPacket {
-        public final double data;
+        protected double data;
+
+        public Double() {}
 
         public Double(int containerId, int index, double data) {
             super(containerId, index);
@@ -51,11 +69,10 @@ public abstract class ContainerSyncPacket implements IPacket {
             buf.writeDouble(this.data);
         }
 
-        public static Double create(FriendlyByteBuf buf) {
-            var containerId = buf.readVarInt();
-            var index = buf.readVarInt();
-            var data = buf.readDouble();
-            return new Double(containerId, index, data);
+        @Override
+        public void deserializeFromBuf(FriendlyByteBuf buf) {
+            super.deserializeFromBuf(buf);
+            this.data = buf.readDouble();
         }
 
         @Override
@@ -68,12 +85,18 @@ public abstract class ContainerSyncPacket implements IPacket {
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), data);
+            return Objects.hash(super.hashCode(), this.data);
+        }
+
+        public double getData() {
+            return this.data;
         }
     }
 
     public static class Long extends ContainerSyncPacket {
-        public final long data;
+        protected long data;
+
+        public Long() {}
 
         public Long(int containerId, int index, long data) {
             super(containerId, index);
@@ -86,11 +109,10 @@ public abstract class ContainerSyncPacket implements IPacket {
             buf.writeVarLong(this.data);
         }
 
-        public static Long create(FriendlyByteBuf buf) {
-            var containerId = buf.readVarInt();
-            var index = buf.readVarInt();
-            var data = buf.readVarLong();
-            return new Long(containerId, index, data);
+        @Override
+        public void deserializeFromBuf(FriendlyByteBuf buf) {
+            super.deserializeFromBuf(buf);
+            this.data = buf.readVarLong();
         }
 
         @Override
@@ -104,6 +126,10 @@ public abstract class ContainerSyncPacket implements IPacket {
         @Override
         public int hashCode() {
             return Objects.hash(super.hashCode(), this.data);
+        }
+
+        public long getData() {
+            return this.data;
         }
     }
 }

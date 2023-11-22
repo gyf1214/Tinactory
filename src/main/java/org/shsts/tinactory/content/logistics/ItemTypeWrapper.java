@@ -2,20 +2,17 @@ package org.shsts.tinactory.content.logistics;
 
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.Nonnull;
 import java.util.Objects;
 
 /**
  * Used to represent unique item type used in IItemCollection.
  * Two item stacks are equal if they have same item, NBT and caps.
  */
-@ParametersAreNonnullByDefault
-public class ItemTypeWrapper {
-    public final ItemStack stack;
-
-    public ItemTypeWrapper(ItemStack stack) {
-        assert !stack.isEmpty();
-        this.stack = stack;
+public record ItemTypeWrapper(@Nonnull ItemStack stack) {
+    @Override
+    public String toString() {
+        return "ItemTypeWrapper{%s}".formatted(this.stack.getItem());
     }
 
     @Override
@@ -25,16 +22,11 @@ public class ItemTypeWrapper {
     }
 
     @Override
-    public String toString() {
-        return "ItemTypeWrapper{%s}".formatted(this.stack.getItem());
-    }
-
-    @Override
     public boolean equals(Object obj) {
-        return obj instanceof ItemTypeWrapper o && this.canStackWith(o.stack);
+        return this == obj || (obj instanceof ItemTypeWrapper o && this.canStackWith(o.stack));
     }
 
-    public boolean canStackWith(ItemStack stack) {
+    public boolean canStackWith(@Nonnull ItemStack stack) {
         return ItemHelper.canItemsStack(this.stack, stack);
     }
 }

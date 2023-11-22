@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.machine;
 
+import com.mojang.datafixers.util.Either;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +15,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.logistics.IFluidCollection;
 import org.shsts.tinactory.content.logistics.IItemCollection;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.SmartRecipe;
@@ -45,7 +47,7 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
     }
 
     @Override
-    public abstract IItemCollection getPort(int port, boolean internal);
+    public abstract Either<IItemCollection, IFluidCollection> getPort(int port, boolean internal);
 
     protected void updateRecipe() {
         if (this.currentRecipe != null || !this.needUpdate) {

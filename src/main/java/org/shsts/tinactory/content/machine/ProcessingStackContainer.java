@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.machine;
 
+import com.mojang.datafixers.util.Either;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -13,9 +14,13 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.logistics.CombinedFluidTank;
+import org.shsts.tinactory.content.logistics.IFluidCollection;
 import org.shsts.tinactory.content.logistics.IItemCollection;
 import org.shsts.tinactory.content.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.content.logistics.ItemHelper;
+import org.shsts.tinactory.content.logistics.WrapperFluidTank;
 import org.shsts.tinactory.content.logistics.WrapperItemHandler;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.gui.layout.Layout;
@@ -32,29 +37,33 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingStackContainer extends ProcessingContainer implements ICapabilityProvider {
+    // TODO: Config
+    private static final int DEFAULT_FLUID_CAPACITY = 16000;
 
     protected record PortInfo(int slots, Layout.SlotType type) {}
 
-    protected final IItemHandlerModifiable combinedStack;
-    protected final List<IItemCollection> ports;
-    protected final List<IItemCollection> internalPorts;
+    protected final IItemHandlerModifiable combinedItems;
+    protected final CombinedFluidTank combinedFluids;
+    protected final List<Either<IItemCollection, IFluidCollection>> ports;
+    protected final List<Either<IItemCollection, IFluidCollection>> internalPorts;
 
     public ProcessingStackContainer(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe<?>> recipeType,
                                     Collection<PortInfo> ports) {
         super(blockEntity, recipeType);
         this.ports = new ArrayList<>(ports.size());
         this.internalPorts = new ArrayList<>(ports.size());
-        var views = new ArrayList<WrapperItemHandler>(ports.size());
+        var items = new ArrayList<WrapperItemHandler>(ports.size());
+        var fluids = new ArrayList<WrapperFluidTank>();
         for (var port : ports) {
             switch (port.type()) {
                 case ITEM_INPUT -> {
                     var view = new WrapperItemHandler(port.slots);
                     view.onUpdate(this::onInputUpdate);
-                    views.add(view);
+                    items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
-                    this.internalPorts.add(collection);
-                    this.ports.add(collection);
+                    this.internalPorts.add(Either.left(collection));
+                    this.ports.add(Either.left(collection));
                 }
                 case ITEM_OUTPUT -> {
                     var inner = new WrapperItemHandler(port.slots);
@@ -62,18 +71,51 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
 
                     var view = new WrapperItemHandler(inner);
                     view.allowInput = false;
-                    views.add(view);
+                    items.add(view);
 
-                    this.internalPorts.add(new ItemHandlerCollection(inner));
-                    this.ports.add(new ItemHandlerCollection(view));
+                    this.internalPorts.add(Either.left(new ItemHandlerCollection(inner)));
+                    this.ports.add(Either.left(new ItemHandlerCollection(view)));
+                }
+                case FLUID_INPUT -> {
+                    var views = new WrapperFluidTank[port.slots];
+                    for (var i = 0; i < port.slots; i++) {
+                        var view = new WrapperFluidTank(DEFAULT_FLUID_CAPACITY);
+                        view.onUpdate(this::onInputUpdate);
+
+                        views[i] = view;
+                        fluids.add(view);
+                    }
+
+                    var collection = new CombinedFluidTank(views);
+                    this.internalPorts.add(Either.right(collection));
+                    this.ports.add(Either.right(collection));
+                }
+                case FLUID_OUTPUT -> {
+                    var inners = new WrapperFluidTank[port.slots];
+                    var views = new WrapperFluidTank[port.slots];
+
+                    for (var i = 0; i < port.slots; i++) {
+                        var inner = new WrapperFluidTank(DEFAULT_FLUID_CAPACITY);
+                        inner.onUpdate(this::onInputUpdate);
+                        inners[i] = inner;
+
+                        var view = new WrapperFluidTank(inner);
+                        view.allowInput = false;
+                        views[i] = view;
+                        fluids.add(view);
+                    }
+
+                    this.internalPorts.add(Either.right(new CombinedFluidTank(inners)));
+                    this.ports.add(Either.right(new CombinedFluidTank(views)));
                 }
             }
         }
-        this.combinedStack = new CombinedInvWrapper(views.toArray(IItemHandlerModifiable[]::new));
+        this.combinedItems = new CombinedInvWrapper(items.toArray(IItemHandlerModifiable[]::new));
+        this.combinedFluids = new CombinedFluidTank(fluids.toArray(WrapperFluidTank[]::new));
     }
 
     @Override
-    public IItemCollection getPort(int port, boolean internal) {
+    public Either<IItemCollection, IFluidCollection> getPort(int port, boolean internal) {
         return internal ? this.internalPorts.get(port) : this.ports.get(port);
     }
 
@@ -81,7 +123,9 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> this.combinedStack).cast();
+            return LazyOptional.of(() -> this.combinedItems).cast();
+        } else if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
+            return LazyOptional.of(() -> this.combinedFluids).cast();
         }
         return super.getCapability(cap, side);
     }
@@ -89,14 +133,16 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
     @Override
     public CompoundTag serializeNBT() {
         var tag = super.serializeNBT();
-        tag.put("stack", ItemHelper.serializeItemHandler(this.combinedStack));
+        tag.put("stack", ItemHelper.serializeItemHandler(this.combinedItems));
+        tag.put("fluid", this.combinedFluids.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         super.deserializeNBT(tag);
-        ItemHelper.deserializeItemHandler(this.combinedStack, tag.getCompound("stack"));
+        ItemHelper.deserializeItemHandler(this.combinedItems, tag.getCompound("stack"));
+        this.combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 
     public static class Builder implements Function<BlockEntity, ICapabilityProvider> {

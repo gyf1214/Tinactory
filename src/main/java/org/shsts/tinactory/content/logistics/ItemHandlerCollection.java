@@ -24,7 +24,8 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public boolean acceptInput(ItemStack stack) {
-        for (var i = 0; i < this.itemHandler.getSlots(); i++) {
+        var size = this.itemHandler.getSlots();
+        for (var i = 0; i < size; i++) {
             if (this.itemHandler.isItemValid(i, stack)) {
                 return true;
             }

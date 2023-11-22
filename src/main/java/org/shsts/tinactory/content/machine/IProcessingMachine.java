@@ -1,8 +1,10 @@
 package org.shsts.tinactory.content.machine;
 
+import com.mojang.datafixers.util.Either;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.logistics.IFluidCollection;
 import org.shsts.tinactory.content.logistics.IItemCollection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -15,7 +17,7 @@ public interface IProcessingMachine {
      */
     void onWorkTick(double partial);
 
-    IItemCollection getPort(int port, boolean internal);
+    Either<IItemCollection, IFluidCollection> getPort(int port, boolean internal);
 
     double getProgress();
 

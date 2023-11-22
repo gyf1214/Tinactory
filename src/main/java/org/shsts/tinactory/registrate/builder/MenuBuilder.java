@@ -146,7 +146,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     public S fluidSlot(int tank, int x, int y) {
         var syncSlot = this.addSyncSlot(FluidSyncPacket.class, (containerId, index, $, be) ->
                 new FluidSyncPacket(containerId, index, be.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
-                        .map(handler -> handler.getTank(tank).getFluidInTank(0))
+                        .map(handler -> handler.getTank(tank).getFluid())
                         .orElseThrow()));
         var rect = new Rect(x, y, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE);
         return this.staticWidget(rect, Texture.SLOT_BACKGROUND)
