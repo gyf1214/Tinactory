@@ -91,7 +91,7 @@ public final class AllRecipes {
 
         // generate cobblestone
         STONE_GENERATOR.modRecipe(Items.COBBLESTONE)
-                .output(0, Items.COBBLESTONE, 1)
+                .outputItem(0, Items.COBBLESTONE, 1)
                 .workTicks(40)
                 .build();
 
@@ -137,7 +137,7 @@ public final class AllRecipes {
                 ModelGen.modLoc("material/nugget/wrought_iron_from_iron"));
 
         ORE_ANALYZER.modRecipe(AllMaterials.MAGNETITE.loc("raw"))
-                .output(1, AllMaterials.MAGNETITE.getItemEntry("raw"), 1, 0.25f)
+                .outputItem(1, AllMaterials.MAGNETITE.getItemEntry("raw"), 1, 0.25f)
                 .inputItem(0, AllMaterials.STONE.getItemEntry("dust"), 1)
                 .workTicks(200)
                 .build();

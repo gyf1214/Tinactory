@@ -1,6 +1,8 @@
 package org.shsts.tinactory.integration.jei.category;
 
+import com.mojang.datafixers.util.Either;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IJeiHelpers;
@@ -15,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.gui.layout.Layout;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
 import org.shsts.tinactory.model.ModelGen;
@@ -78,10 +81,16 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
 
     protected void addIngredient(IRecipeLayoutBuilder builder, int slot,
                                  Ingredient ingredient, RecipeIngredientRole role) {
+        this.addIngredient(builder, slot, Either.left(ingredient), role);
+    }
+
+    protected void addIngredient(IRecipeLayoutBuilder builder, int slot,
+                                 Either<Ingredient, FluidStack> ingredient, RecipeIngredientRole role) {
         if (this.slotsInfo.containsKey(slot)) {
             var slotInfo = this.slotsInfo.get(slot);
-            builder.addSlot(role, slotInfo.x() + 1, slotInfo.y() + 1)
-                    .addIngredients(ingredient);
+            var slotBuilder = builder.addSlot(role, slotInfo.x() + 1, slotInfo.y() + 1);
+            ingredient.ifLeft(slotBuilder::addIngredients)
+                    .ifRight(fluid -> slotBuilder.addIngredient(ForgeTypes.FLUID_STACK, fluid));
         }
     }
 

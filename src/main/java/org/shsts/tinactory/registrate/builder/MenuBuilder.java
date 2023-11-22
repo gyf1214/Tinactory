@@ -150,7 +150,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
                         .orElseThrow()));
         var rect = new Rect(x, y, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE);
         return this.staticWidget(rect, Texture.SLOT_BACKGROUND)
-                .widget(rect.offset(1, 1).enlarge(-1, -1), () -> (menu, rect1) ->
+                .widget(rect.offset(1, 1).enlarge(-2, -2), () -> (menu, rect1) ->
                         new FluidSlot(menu, rect1, syncSlot.get()));
     }
 

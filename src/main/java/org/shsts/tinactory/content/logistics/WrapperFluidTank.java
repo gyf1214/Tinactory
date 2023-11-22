@@ -100,8 +100,9 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
             fluidTank.setFluid(stack);
         } else if (this.tank instanceof IFluidTankModifiable modifiable) {
             modifiable.setFluid(stack);
+        } else {
+            throw new IllegalCallerException();
         }
-        throw new IllegalCallerException();
     }
 
     @Override
@@ -112,8 +113,9 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
             return tag;
         } else if (this.tank instanceof INBTSerializable<?> serializable) {
             return (CompoundTag) serializable.serializeNBT();
+        } else {
+            throw new IllegalCallerException();
         }
-        throw new IllegalCallerException();
     }
 
     @SuppressWarnings("unchecked")
@@ -128,7 +130,8 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
             fluidTank.readFromNBT(tag);
         } else if (this.tank instanceof INBTSerializable<?> serializable) {
             deserializeNBT(serializable, tag);
+        } else {
+            throw new IllegalCallerException();
         }
-        throw new IllegalCallerException();
     }
 }

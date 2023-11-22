@@ -1,6 +1,7 @@
 package org.shsts.tinactory.integration.jei.category;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.mojang.datafixers.util.Either;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -10,6 +11,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.gui.layout.Layout;
 
@@ -31,13 +33,13 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
     }
 
     protected void addIngredient(IRecipeLayoutBuilder builder, Map<Integer, Integer> currentSlotIndex,
-                                 int port, Ingredient ingredient) {
+                                 int port, Either<Ingredient, FluidStack> ingredient) {
         var slotIndex = currentSlotIndex.getOrDefault(port, 0);
         var slots = this.slotsMap.get(port);
         if (slotIndex < slots.size()) {
             var slot = slots.get(slotIndex);
-            this.addIngredient(builder, slot.index(), ingredient,
-                    slot.type().output ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT);
+            var role = slot.type().output ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT;
+            this.addIngredient(builder, slot.index(), ingredient, role);
             currentSlotIndex.put(port, slotIndex + 1);
         }
     }
@@ -49,7 +51,7 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
             this.addIngredient(builder, currentSlotIndex, input.port(), input.ingredient());
         }
         for (var output : recipe.outputs) {
-            this.addIngredient(builder, currentSlotIndex, output.port(), Ingredient.of(output.itemStack()));
+            this.addIngredient(builder, currentSlotIndex, output.port(), output.result().mapLeft(Ingredient::of));
         }
     }
 }

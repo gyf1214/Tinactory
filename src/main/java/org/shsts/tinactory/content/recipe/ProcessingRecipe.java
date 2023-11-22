@@ -4,6 +4,9 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Decoder;
+import com.mojang.serialization.Encoder;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,7 +16,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.logistics.ItemHelper;
 import org.shsts.tinactory.content.machine.IProcessingMachine;
 import org.shsts.tinactory.core.SmartRecipe;
@@ -26,14 +31,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe<IProcessingMachine, S> {
-    public record Input(int port, Ingredient ingredient, int amount) {}
+    public record Input(int port, Either<Ingredient, FluidStack> ingredient, int amount) {}
 
-    public record Output(int port, ItemStack itemStack, float rate) {}
+    public record Output(int port, Either<ItemStack, FluidStack> result, float rate) {}
 
     public final List<Input> inputs;
     public final List<Output> outputs;
@@ -48,29 +54,37 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         this.workTicks = workTicks;
     }
 
+    protected boolean consumeInput(IProcessingMachine container, Input input, boolean simulate) {
+        return container.getPort(input.port, true).map(
+                collection -> input.ingredient.left()
+                        .map(item -> ItemHelper.consumeItemCollection(collection, item, input.amount, simulate))
+                        .orElse(false),
+                collection -> input.ingredient.right()
+                        .map(fluid -> collection.drain(fluid, simulate).getAmount() >= fluid.getAmount())
+                        .orElse(false));
+    }
+
+    protected boolean insertOutput(IProcessingMachine container, Output output, boolean simulate) {
+        return container.getPort(output.port, true).map(
+                collection -> output.result.left()
+                        .map(item -> (simulate && output.rate < 1d) ||
+                                collection.insertItem(item.copy(), simulate).isEmpty())
+                        .orElse(false),
+                collection -> output.result.right()
+                        .map(fluid -> (simulate && output.rate < 1d) ||
+                                collection.fill(fluid, simulate) == fluid.getAmount())
+                        .orElse(false));
+    }
+
     @Override
     public boolean matches(IProcessingMachine container, Level world) {
-        for (var input : this.inputs) {
-            var collection = container.getPort(input.port, true).left().orElseThrow();
-            // TODO: there is a problem here when two ingredients overlap
-            if (!ItemHelper.consumeItemCollection(collection, input.ingredient, input.amount, true)) {
-                return false;
-            }
-        }
-        for (var output : this.outputs) {
-            var collection = container.getPort(output.port, true).left().orElseThrow();
-            if (!collection.insertItem(output.itemStack, true).isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return this.inputs.stream().allMatch(input -> this.consumeInput(container, input, true)) &&
+                this.outputs.stream().allMatch(output -> this.insertOutput(container, output, true));
     }
 
     public void consumeInputs(IProcessingMachine container) {
         for (var input : this.inputs) {
-            var collection = container.getPort(input.port, true).left().orElseThrow();
-            // TODO: there is a problem here when two ingredients overlap
-            ItemHelper.consumeItemCollection(collection, input.ingredient, input.amount, false);
+            this.consumeInput(container, input, false);
         }
     }
 
@@ -79,8 +93,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             if (random.nextDouble() > output.rate) {
                 continue;
             }
-            var collection = container.getPort(output.port, true).left().orElseThrow();
-            collection.insertItem(output.itemStack.copy(), false);
+            this.insertOutput(container, output, false);
         }
     }
 
@@ -117,43 +130,46 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             super(registrate, parent, loc);
         }
 
-        public S input(int port, Supplier<Ingredient> ingredient, int amount) {
+        public S input(int port, Supplier<Either<Ingredient, FluidStack>> ingredient, int amount) {
             this.inputs.add(() -> new Input(port, ingredient.get(), amount));
             return self();
         }
 
-        public S input(int port, Ingredient ingredient, int amount) {
+        public S input(int port, Either<Ingredient, FluidStack> ingredient, int amount) {
             return this.input(port, () -> ingredient, amount);
         }
 
         public S inputItem(int port, Supplier<Item> item, int amount) {
-            return this.input(port, () -> Ingredient.of(item.get()), amount);
+            return this.input(port, () -> Either.left(Ingredient.of(item.get())), amount);
         }
 
-        public S inputItem(int port, Item item, int amount) {
-            return this.inputItem(port, () -> item, amount);
-        }
-
-        public S output(int port, Supplier<ItemStack> itemStack, float rate) {
-            this.outputs.add(() -> new Output(port, itemStack.get(), rate));
+        public S output(int port, Supplier<Either<ItemStack, FluidStack>> result, float rate) {
+            this.outputs.add(() -> new Output(port, result.get(), rate));
             return self();
         }
 
-        public S output(int port, Supplier<Item> item, int amount, float rate) {
-            this.outputs.add(() -> new Output(port, new ItemStack(item.get(), amount), rate));
-            return self();
+        public S output(int port, Either<ItemStack, FluidStack> ingredient, float rate) {
+            return this.output(port, () -> ingredient, rate);
         }
 
-        public S output(int port, ItemStack itemStack, float rate) {
-            return this.output(port, () -> itemStack, rate);
+        public S outputItem(int port, Supplier<Item> item, int amount, float rate) {
+            return this.output(port, () -> Either.left(new ItemStack(item.get(), amount)), rate);
         }
 
-        public S output(int port, Supplier<Item> item, int amount) {
-            return this.output(port, () -> new ItemStack(item.get(), amount), 1.0f);
+        public S outputItem(int port, Supplier<Item> item, int amount) {
+            return this.outputItem(port, item, amount, 1.0f);
         }
 
-        public S output(int port, Item item, int amount) {
-            return this.output(port, () -> item, amount);
+        public S outputItem(int port, Item item, int amount) {
+            return this.outputItem(port, () -> item, amount);
+        }
+
+        public S outputFluid(int port, Fluid fluid, int amount, float rate) {
+            return this.output(port, () -> Either.right(new FluidStack(fluid, amount)), rate);
+        }
+
+        public S outputFluid(int port, Fluid fluid, int amount) {
+            return this.outputFluid(port, fluid, amount, 1.0f);
         }
 
         public S workTicks(long workTicks) {
@@ -188,20 +204,35 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             super(type);
         }
 
+        protected <L, R> Either<L, R> ifThenElse(boolean cond, Supplier<L> left, Supplier<R> right) {
+            return cond ? Either.left(left.get()) : Either.right(right.get());
+        }
+
+        protected <P> P parseFromJson(Decoder<P> codec, JsonElement je) {
+            return codec.parse(JsonOps.INSTANCE, je).getOrThrow(false, $ -> {});
+        }
+
+        protected static <T> Function<T, JsonElement> encodeToJson(Encoder<T> codec) {
+            return x -> codec.encodeStart(JsonOps.INSTANCE, x).getOrThrow(false, $ -> {});
+        }
+
         protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
             var builder = this.type.recipe(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                     .map(JsonElement::getAsJsonObject)
                     .forEach(je -> builder.input(
                             GsonHelper.getAsInt(je, "port"),
-                            Ingredient.fromJson(GsonHelper.getAsJsonObject(je, "ingredient")),
+                            ifThenElse(je.has("item"),
+                                    () -> Ingredient.fromJson(GsonHelper.getAsJsonObject(je, "item")),
+                                    () -> parseFromJson(FluidStack.CODEC, GsonHelper.getAsJsonObject(je, "fluid"))),
                             GsonHelper.getAsInt(je, "amount")));
             Streams.stream(GsonHelper.getAsJsonArray(jo, "outputs"))
                     .map(JsonElement::getAsJsonObject)
                     .forEach(je -> builder.output(
                             GsonHelper.getAsInt(je, "port"),
-                            ItemStack.CODEC.parse(JsonOps.INSTANCE, GsonHelper.getAsJsonObject(je, "item"))
-                                    .getOrThrow(false, $ -> {}),
+                            ifThenElse(je.has("item"),
+                                    () -> parseFromJson(ItemStack.CODEC, GsonHelper.getAsJsonObject(je, "item")),
+                                    () -> parseFromJson(FluidStack.CODEC, GsonHelper.getAsJsonObject(je, "fluid"))),
                             GsonHelper.getAsFloat(je, "rate", 1.0f)));
             return builder.workTicks(GsonHelper.getAsLong(jo, "workTicks"));
         }
@@ -218,7 +249,9 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                     .map(input -> {
                         var je = new JsonObject();
                         je.addProperty("port", input.port);
-                        je.add("ingredient", input.ingredient.toJson());
+                        input.ingredient.mapBoth(Ingredient::toJson, encodeToJson(FluidStack.CODEC))
+                                .ifLeft(je1 -> je.add("item", je1))
+                                .ifRight(je1 -> je.add("fluid", je1));
                         je.addProperty("amount", input.amount);
                         return je;
                     }).forEach(inputs::add);
@@ -227,8 +260,9 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                     .map(output -> {
                         var je = new JsonObject();
                         je.addProperty("port", output.port);
-                        je.add("item", ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, output.itemStack)
-                                .getOrThrow(false, $ -> {}));
+                        output.result.mapBoth(encodeToJson(ItemStack.CODEC), encodeToJson(FluidStack.CODEC))
+                                .ifLeft(je1 -> je.add("item", je1))
+                                .ifRight(je1 -> je.add("fluid", je1));
                         if (output.rate < 1.0f) {
                             je.addProperty("rate", output.rate);
                         }
@@ -243,11 +277,15 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             var builder = this.type.recipe(loc);
             buf.readWithCount(buf1 -> builder.input(
                     buf1.readVarInt(),
-                    Ingredient.fromNetwork(buf1),
+                    buf1.readBoolean() ?
+                            Either.left(Ingredient.fromNetwork(buf1)) :
+                            Either.right(FluidStack.readFromPacket(buf1)),
                     buf1.readVarInt()));
             buf.readWithCount(buf1 -> builder.output(
                     buf1.readVarInt(),
-                    buf1.readItem(),
+                    buf1.readBoolean() ?
+                            Either.left(buf1.readItem()) :
+                            Either.right(buf1.readFluidStack()),
                     buf1.readFloat()));
             return builder.workTicks(buf.readVarLong());
         }
@@ -261,12 +299,14 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         public void toNetwork(FriendlyByteBuf buf, T recipe) {
             buf.writeCollection(recipe.inputs, (buf1, input) -> {
                 buf1.writeVarInt(input.port);
-                input.ingredient.toNetwork(buf1);
+                buf1.writeBoolean(input.ingredient.left().isPresent());
+                input.ingredient.ifLeft(ingredient -> ingredient.toNetwork(buf1)).ifRight(buf1::writeFluidStack);
                 buf1.writeVarInt(input.amount);
             });
             buf.writeCollection(recipe.outputs, (buf1, output) -> {
                 buf1.writeVarInt(output.port);
-                buf1.writeItem(output.itemStack);
+                buf1.writeBoolean(output.result.left().isPresent());
+                output.result.ifLeft(buf1::writeItem).ifRight(buf1::writeFluidStack);
                 buf1.writeFloat(output.rate);
             });
             buf.writeVarLong(recipe.workTicks);
