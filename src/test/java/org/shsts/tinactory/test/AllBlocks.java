@@ -43,7 +43,7 @@ public final class AllBlocks {
 
         TEST_RECIPE_TYPE.modRecipe(TinactoryTest.modLoc("test"))
                 .outputFluid(1, Fluids.WATER, 1000)
-                .workTicks(10 * 20)
+                .workTicks(50)
                 .build();
     }
 

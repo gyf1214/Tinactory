@@ -16,7 +16,7 @@ public class FluidSyncPacket extends ContainerSyncPacket {
 
     public FluidSyncPacket(int containerId, int index, FluidStack fluidStack) {
         super(containerId, index);
-        this.fluidStack = fluidStack;
+        this.fluidStack = fluidStack.copy();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class FluidSyncPacket extends ContainerSyncPacket {
         if (this == o) return true;
         if (!(o instanceof FluidSyncPacket that)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(this.fluidStack, that.fluidStack);
+        return this.fluidStack.isFluidStackIdentical(that.fluidStack);
     }
 
     @Override
