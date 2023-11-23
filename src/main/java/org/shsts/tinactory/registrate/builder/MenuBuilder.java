@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.SlotItemHandler;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.gui.ContainerMenu;
@@ -23,7 +22,6 @@ import org.shsts.tinactory.gui.layout.Layout;
 import org.shsts.tinactory.gui.layout.Rect;
 import org.shsts.tinactory.gui.layout.Texture;
 import org.shsts.tinactory.gui.sync.ContainerSyncPacket;
-import org.shsts.tinactory.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -123,8 +121,8 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     protected <P1 extends ContainerSyncPacket>
-    Supplier<Integer> addSyncSlot(Class<P1> clazz, ContainerMenu.PacketFactory<T, P1> packetFactory) {
-        var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(clazz, packetFactory));
+    Supplier<Integer> addSyncSlot(Class<P1> clazz, ContainerMenu.SyncPacketFactory<T, P1> factory) {
+        var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(clazz, factory));
         this.menuCallbacks.add(callback);
         return callback;
     }
@@ -144,14 +142,12 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     public S fluidSlot(int tank, int x, int y) {
-        var syncSlot = this.addSyncSlot(FluidSyncPacket.class, (containerId, index, $, be) ->
-                new FluidSyncPacket(containerId, index, be.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
-                        .map(handler -> handler.getTank(tank).getFluid())
-                        .orElseThrow()));
+        var syncSlot = new MenuCallback<M, Integer>(menu -> menu.addFluidSlot(tank));
+        this.menuCallbacks.add(syncSlot);
         var rect = new Rect(x, y, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE);
         return this.staticWidget(rect, Texture.SLOT_BACKGROUND)
                 .widget(rect.offset(1, 1).enlarge(-2, -2), () -> (menu, rect1) ->
-                        new FluidSlot(menu, rect1, syncSlot.get()));
+                        new FluidSlot(menu, rect1, tank, syncSlot.get()));
     }
 
     public S layout(Layout layout, int yOffset) {

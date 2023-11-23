@@ -1,5 +1,6 @@
 package org.shsts.tinactory.gui;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,19 +16,31 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import net.minecraftforge.network.PacketDistributor;
 import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.logistics.IFluidStackHandler;
 import org.shsts.tinactory.gui.layout.Rect;
+import org.shsts.tinactory.gui.sync.ContainerEventHandler;
+import org.shsts.tinactory.gui.sync.ContainerEventPacket;
 import org.shsts.tinactory.gui.sync.ContainerSyncPacket;
+import org.shsts.tinactory.gui.sync.FluidEventPacket;
+import org.shsts.tinactory.gui.sync.FluidSyncPacket;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     public static final int WIDTH = 176;
     public static final int SLOT_SIZE = 18;
     public static final int CONTENT_WIDTH = 9 * SLOT_SIZE;
@@ -44,12 +57,23 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     public final Inventory inventory;
 
     protected final LazyOptional<IItemHandler> container;
+    protected final LazyOptional<IFluidStackHandler> fluidContainer;
     protected int containerSlotCount;
     protected boolean hasInventory;
     protected int height;
 
+    protected record EventHandler<P extends ContainerEventPacket>(Class<P> clazz, Consumer<P> handler) {
+        public void handle(ContainerEventPacket packet) {
+            if (clazz.isInstance(packet)) {
+                this.handler.accept(clazz.cast(packet));
+            }
+        }
+    }
+
+    protected final Map<Integer, EventHandler<?>> eventHandlers = new HashMap<>();
+
     @FunctionalInterface
-    public interface PacketFactory<T extends BlockEntity, P extends ContainerSyncPacket> {
+    public interface SyncPacketFactory<T extends BlockEntity, P extends ContainerSyncPacket> {
         P create(int containerId, int index, ContainerMenu<T> menu, T be);
     }
 
@@ -88,6 +112,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         assert blockEntity.getLevel() != null;
         this.isClientSide = blockEntity.getLevel().isClientSide;
         this.container = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get());
         this.height = 0;
     }
 
@@ -119,7 +144,9 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     /**
      * This is called before any menu callbacks
      */
-    public void initLayout() {}
+    public void initLayout() {
+        this.registerEvent(ContainerEventHandler.FLUID_CLICK, this::handleFluidEvent);
+    }
 
     /**
      * This is called after all menu callbacks
@@ -209,15 +236,35 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     public <P extends ContainerSyncPacket>
-    int addSyncSlot(Class<P> clazz, PacketFactory<T, P> packetFactory) {
+    int addSyncSlot(Class<P> clazz, SyncPacketFactory<T, P> factory) {
         int index = this.syncSlots.size();
         this.syncSlots.add(new SyncSlot<>(clazz) {
             @Override
             protected P getPacket(ContainerMenu<T> menu, T be) {
-                return packetFactory.create(menu.containerId, index, menu, be);
+                return factory.create(menu.containerId, index, menu, be);
             }
         });
         return index;
+    }
+
+    public int addFluidSlot(int tank) {
+        var fluidHandler = fluidContainer.orElseThrow(NoSuchElementException::new);
+        return this.addSyncSlot(FluidSyncPacket.class, (containerId1, index, menu, be) ->
+                new FluidSyncPacket(containerId, index, fluidHandler.getTank(tank).getFluid()));
+    }
+
+    public void handleFluidEvent(FluidEventPacket packet) {
+        this.fluidContainer.ifPresent(handler -> {
+            var tank = handler.getTank(packet.getTankIndex());
+            LOGGER.debug("fluid event tank={} item={} button={}", tank.getFluid(),
+                    this.getCarried(), packet.getButton());
+        });
+    }
+
+    public <P extends ContainerEventPacket>
+    void registerEvent(ContainerEventHandler.Event<P> event, Consumer<P> handler) {
+        assert !this.eventHandlers.containsKey(event.id());
+        this.eventHandlers.put(event.id(), new EventHandler<>(event.clazz(), handler));
     }
 
     /**
@@ -240,6 +287,23 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             return Optional.empty();
         }
         return Optional.of(clazz.cast(slot.packet));
+    }
+
+    @FunctionalInterface
+    public interface EventPacketFactory<P extends ContainerEventPacket> {
+        P create(int containerId, int eventId);
+    }
+
+    public <P extends ContainerEventPacket>
+    void triggerEvent(ContainerEventHandler.Event<P> event, EventPacketFactory<P> factory) {
+        Tinactory.CHANNEL.sendToServer(factory.create(this.containerId, event.id()));
+    }
+
+    public void onEventPacket(ContainerEventPacket packet) {
+        var handler = this.eventHandlers.get(packet.getEventId());
+        if (handler != null) {
+            handler.handle(packet);
+        }
     }
 
     @Override

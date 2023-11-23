@@ -106,4 +106,15 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
                     this.renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
         }
     }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        for (var widget : this.widgets) {
+            if (widget.isClicking(mouseX, mouseY)) {
+                widget.onMouseClicked(mouseX, mouseY, button);
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
 }

@@ -13,6 +13,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.shsts.tinactory.gui.layout.Rect;
+import org.shsts.tinactory.gui.sync.ContainerEventHandler;
+import org.shsts.tinactory.gui.sync.FluidEventPacket;
 import org.shsts.tinactory.gui.sync.FluidSyncPacket;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -26,10 +28,12 @@ import java.util.Optional;
 public class FluidSlot extends ContainerWidget {
     protected static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
 
+    protected final int tank;
     protected final int syncSlot;
 
-    public FluidSlot(ContainerMenu<?> menu, Rect rect, int syncSlot) {
+    public FluidSlot(ContainerMenu<?> menu, Rect rect, int tank, int syncSlot) {
         super(menu, rect, ContainerMenu.DEFAULT_Z_INDEX);
+        this.tank = tank;
         this.syncSlot = syncSlot;
     }
 
@@ -57,6 +61,17 @@ public class FluidSlot extends ContainerWidget {
         tooltip.add(amountString.withStyle(ChatFormatting.GRAY));
 
         return Optional.of(tooltip);
+    }
+
+    @Override
+    protected boolean canClick() {
+        return !this.menu.getCarried().isEmpty();
+    }
+
+    @Override
+    public void onMouseClicked(double mouseX, double mouseY, int button) {
+        this.menu.triggerEvent(ContainerEventHandler.FLUID_CLICK, (containerId, eventId) ->
+                new FluidEventPacket(containerId, eventId, this.tank, button));
     }
 
     @Override

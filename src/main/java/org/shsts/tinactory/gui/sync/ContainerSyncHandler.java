@@ -27,11 +27,7 @@ public final class ContainerSyncHandler {
     private static <P extends ContainerSyncPacket>
     void register(Class<P> clazz, Supplier<P> constructor) {
         LOGGER.debug("register container sync packet {}", clazz);
-        Tinactory.registryClientPacket(clazz, buf -> {
-            var p = constructor.get();
-            p.deserializeFromBuf(buf);
-            return p;
-        }, ContainerSyncHandler::handle);
+        Tinactory.registryClientPacket(clazz, constructor, ContainerSyncHandler::handle);
     }
 
     public static void registerPackets() {

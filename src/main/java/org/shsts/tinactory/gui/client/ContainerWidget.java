@@ -38,13 +38,26 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
         return false;
     }
 
-    public boolean isHovering(int mouseX, int mouseY) {
+    public boolean isHovering(double mouseX, double mouseY) {
         return this.canHover() && this.rect.in(mouseX, mouseY);
     }
 
     public Optional<List<Component>> getTooltip() {
         return Optional.empty();
     }
+
+    protected boolean canClick() {
+        return false;
+    }
+
+    public boolean isClicking(double mouseX, double mouseY) {
+        return this.canClick() && this.rect.in(mouseX, mouseY);
+    }
+
+    /**
+     * Do not consider drag now.
+     */
+    public void onMouseClicked(double mouseX, double mouseY, int button) {}
 
     public record Builder<M extends ContainerMenu<?>>
             (Rect rect, BiFunction<M, Rect, ContainerWidget> factory) {}
