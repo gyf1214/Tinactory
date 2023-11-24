@@ -14,6 +14,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
@@ -93,5 +94,19 @@ public final class ItemHelper {
             var stack = itemHandler.getStackInSlot(i);
             Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
         }
+    }
+
+    public static Optional<ItemStack> combineStack(ItemStack item1, ItemStack item2) {
+        if (item1.isEmpty()) {
+            return Optional.of(item2);
+        }
+        if (item2.isEmpty()) {
+            return Optional.of(item1);
+        }
+        if (ItemHandlerHelper.canItemStacksStack(item1, item2) &&
+                item1.getCount() + item2.getCount() <= item1.getMaxStackSize()) {
+            return Optional.of(ItemHandlerHelper.copyStackWithSize(item1, item1.getCount() + item2.getCount()));
+        }
+        return Optional.empty();
     }
 }

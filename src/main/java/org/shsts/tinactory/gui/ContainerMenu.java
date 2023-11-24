@@ -1,6 +1,5 @@
 package org.shsts.tinactory.gui;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -9,7 +8,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidTank;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -18,13 +20,12 @@ import net.minecraftforge.network.PacketDistributor;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.logistics.IFluidStackHandler;
+import org.shsts.tinactory.content.logistics.ItemHelper;
 import org.shsts.tinactory.gui.layout.Rect;
 import org.shsts.tinactory.gui.sync.ContainerEventHandler;
 import org.shsts.tinactory.gui.sync.ContainerEventPacket;
 import org.shsts.tinactory.gui.sync.ContainerSyncPacket;
-import org.shsts.tinactory.gui.sync.FluidEventPacket;
 import org.shsts.tinactory.gui.sync.FluidSyncPacket;
-import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -32,15 +33,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     public static final int WIDTH = 176;
     public static final int SLOT_SIZE = 18;
     public static final int CONTENT_WIDTH = 9 * SLOT_SIZE;
@@ -56,8 +54,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     public final Player player;
     public final Inventory inventory;
 
-    protected final LazyOptional<IItemHandler> container;
-    protected final LazyOptional<IFluidStackHandler> fluidContainer;
+    protected final @Nullable IItemHandler container;
+    protected final @Nullable IFluidStackHandler fluidContainer;
     protected int containerSlotCount;
     protected boolean hasInventory;
     protected int height;
@@ -111,8 +109,10 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         this.blockEntity = blockEntity;
         assert blockEntity.getLevel() != null;
         this.isClientSide = blockEntity.getLevel().isClientSide;
-        this.container = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-        this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get());
+        this.container = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .resolve().orElse(null);
+        this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
+                .resolve().orElse(null);
         this.height = 0;
     }
 
@@ -145,7 +145,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
      * This is called before any menu callbacks
      */
     public void initLayout() {
-        this.registerEvent(ContainerEventHandler.FLUID_CLICK, this::handleFluidEvent);
+        this.registerEvent(ContainerEventHandler.FLUID_CLICK, p ->
+                this.clickFluidSlot(p.getTankIndex(), p.getButton()));
     }
 
     /**
@@ -230,8 +231,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     public void addSlot(SlotFactory<?> factory, int slotIndex, int posX, int posY) {
-        var itemHandler = this.container.orElseThrow(NoSuchElementException::new);
-        this.addSlot(factory.create(itemHandler, slotIndex,
+        assert this.container != null;
+        this.addSlot(factory.create(this.container, slotIndex,
                 posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 
@@ -248,17 +249,90 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     public int addFluidSlot(int tank) {
-        var fluidHandler = fluidContainer.orElseThrow(NoSuchElementException::new);
+        assert this.fluidContainer != null;
         return this.addSyncSlot(FluidSyncPacket.class, (containerId1, index, menu, be) ->
-                new FluidSyncPacket(containerId, index, fluidHandler.getTank(tank).getFluid()));
+                new FluidSyncPacket(containerId, index, fluidContainer.getTank(tank).getFluid()));
     }
 
-    public void handleFluidEvent(FluidEventPacket packet) {
-        this.fluidContainer.ifPresent(handler -> {
-            var tank = handler.getTank(packet.getTankIndex());
-            LOGGER.debug("fluid event tank={} item={} button={}", tank.getFluid(),
-                    this.getCarried(), packet.getButton());
-        });
+    protected enum FluidClickAction {
+        NONE, FILL, DRAIN
+    }
+
+    protected record FluidClickResult(FluidClickAction action, ItemStack stack) {
+        public FluidClickResult() {
+            this(FluidClickAction.NONE, ItemStack.EMPTY);
+        }
+    }
+
+    protected FluidClickResult doClickFluidSlot(ItemStack item, IFluidTank tank,
+                                                boolean mayDrain, boolean mayFill) {
+        var cap = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).resolve();
+        if (cap.isEmpty()) {
+            return new FluidClickResult();
+        }
+        var handler = cap.get();
+        if (mayFill) {
+            var capacity = tank.getCapacity() - tank.getFluidAmount();
+            var fluid1 = handler.drain(capacity, IFluidHandler.FluidAction.SIMULATE);
+            if (!fluid1.isEmpty()) {
+                int amount = tank.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
+                if (amount > 0) {
+                    var fluid2 = new FluidStack(fluid1, amount);
+                    var fluid3 = handler.drain(fluid2, IFluidHandler.FluidAction.EXECUTE);
+                    tank.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
+                    return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
+                }
+            }
+        }
+        if (mayDrain && tank.getFluidAmount() > 0) {
+            var fluid1 = tank.drain(tank.getFluidAmount(), IFluidHandler.FluidAction.SIMULATE);
+            int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
+            if (amount > 0) {
+                var fluid2 = new FluidStack(fluid1, amount);
+                var fluid3 = tank.drain(fluid2, IFluidHandler.FluidAction.EXECUTE);
+                handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
+                return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer());
+            }
+        }
+        return new FluidClickResult();
+    }
+
+    public void clickFluidSlot(int tankIndex, int button) {
+        if (this.fluidContainer == null) {
+            return;
+        }
+        var tank = this.fluidContainer.getTank(tankIndex);
+        var item = this.getCarried();
+        var outputItem = ItemStack.EMPTY;
+        var mayDrain = true;
+        var mayFill = true;
+        while (!item.isEmpty()) {
+            var item1 = ItemHandlerHelper.copyStackWithSize(item, 1);
+            var clickResult = this.doClickFluidSlot(item1, tank, mayDrain, mayFill);
+            if (clickResult.action == FluidClickAction.NONE) {
+                break;
+            } else if (clickResult.action == FluidClickAction.FILL) {
+                mayDrain = false;
+            } else {
+                mayFill = false;
+            }
+            item.shrink(1);
+            var retItem = clickResult.stack;
+            var combinedItem = ItemHelper.combineStack(outputItem, retItem);
+            if (combinedItem.isEmpty()) {
+                ItemHandlerHelper.giveItemToPlayer(this.player, retItem);
+            } else {
+                outputItem = combinedItem.get();
+            }
+            if (button != 0) {
+                break;
+            }
+        }
+        if (item.isEmpty()) {
+            this.setCarried(outputItem);
+        } else {
+            ItemHandlerHelper.giveItemToPlayer(this.player, outputItem);
+        }
     }
 
     public <P extends ContainerEventPacket>
