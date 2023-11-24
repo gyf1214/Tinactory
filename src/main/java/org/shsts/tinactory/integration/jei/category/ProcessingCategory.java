@@ -1,8 +1,10 @@
 package org.shsts.tinactory.integration.jei.category;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -53,5 +55,10 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
         for (var output : recipe.outputs) {
             this.addIngredient(builder, currentSlotIndex, output.port(), output.result().mapLeft(Ingredient::of));
         }
+    }
+
+    @Override
+    public void draw(T recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+        this.drawProgressBar(stack, (int) recipe.workTicks);
     }
 }
