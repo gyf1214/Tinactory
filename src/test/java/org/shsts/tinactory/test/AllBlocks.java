@@ -32,8 +32,10 @@ public final class AllBlocks {
         TEST_RECIPE_TYPE = REGISTRATE.simpleProcessingRecipeType("test");
 
         TEST_FLUID_LAYOUT = Layout.builder()
-                .slot(0, 0, 1, 0, Layout.SlotType.FLUID_INPUT)
-                .slot(1, ContainerMenu.SLOT_SIZE * 3, 1, 1, Layout.SlotType.FLUID_OUTPUT)
+                .port(Layout.SlotType.FLUID_INPUT)
+                .slot(0, 1)
+                .port(Layout.SlotType.FLUID_OUTPUT)
+                .slot(ContainerMenu.SLOT_SIZE * 3, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build();
 

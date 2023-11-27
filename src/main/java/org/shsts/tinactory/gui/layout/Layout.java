@@ -83,19 +83,24 @@ public class Layout {
         private final List<WidgetInfo> images = new ArrayList<>();
         @Nullable
         private WidgetInfo progressBar = null;
+        private SlotType curSlotType = SlotType.NONE;
+        private int curPort = -1;
+        private int curSlot = 0;
 
-        public Builder slot(int x, int y) {
+
+        public Builder dummySlot(int x, int y) {
             this.slots.add(new SlotInfo(0, x, y, 0, SlotType.NONE));
             return this;
         }
 
-        public Builder slot(int slot, int x, int y) {
-            this.slots.add(new SlotInfo(slot, x, y, 0, SlotType.ITEM_INPUT));
+        public Builder port(SlotType type) {
+            this.curPort++;
+            this.curSlotType = type;
             return this;
         }
 
-        public Builder slot(int slot, int x, int y, int port, SlotType type) {
-            this.slots.add(new SlotInfo(slot, x, y, port, type));
+        public Builder slot(int x, int y) {
+            this.slots.add(new SlotInfo(this.curSlot++, x, y, this.curPort, this.curSlotType));
             return this;
         }
 
