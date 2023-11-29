@@ -2,6 +2,7 @@ package org.shsts.tinactory.gui.layout;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.content.machine.IProcessingMachine;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.Transformer;
 import org.shsts.tinactory.gui.ContainerMenu;
 import org.shsts.tinactory.registrate.builder.MenuBuilder;
@@ -25,7 +26,11 @@ public class Layout {
         }
     }
 
-    public record SlotInfo(int index, int x, int y, int port, SlotType type) {}
+    public record SlotInfo(int index, int x, int y, int port, SlotType type, Voltage requiredVoltage) {
+        public SlotInfo setIndex(int index) {
+            return new SlotInfo(index, this.x, this.y, this.port, this.type, this.requiredVoltage);
+        }
+    }
 
     public final List<SlotInfo> slots;
     public final List<WidgetInfo> images;
@@ -57,9 +62,14 @@ public class Layout {
     }
 
     public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu(int yOffset) {
+        return this.applyMenu(yOffset, Voltage.MAXIMUM);
+    }
+
+    public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu(int yOffset, Voltage voltage) {
         return builder -> {
             var xOffset = (ContainerMenu.CONTENT_WIDTH - this.rect.width()) / 2;
-            for (var slot : this.slots) {
+            var slots = this.getStackSlots(voltage);
+            for (var slot : slots) {
                 var x = xOffset + slot.x;
                 var y = yOffset + slot.y;
                 switch (slot.type) {
@@ -78,6 +88,22 @@ public class Layout {
         };
     }
 
+    public List<SlotInfo> getStackSlots() {
+        return this.getStackSlots(Voltage.MAXIMUM);
+    }
+
+    public List<SlotInfo> getStackSlots(Voltage voltage) {
+        var ret = new ArrayList<SlotInfo>();
+        for (var slot : this.slots) {
+            if (slot.port < 0 || slot.type == SlotType.NONE ||
+                    voltage.compareTo(slot.requiredVoltage) < 0) {
+                continue;
+            }
+            ret.add(slot.setIndex(ret.size()));
+        }
+        return ret;
+    }
+
     public static class Builder {
         private final List<SlotInfo> slots = new ArrayList<>();
         private final List<WidgetInfo> images = new ArrayList<>();
@@ -87,9 +113,8 @@ public class Layout {
         private int curPort = -1;
         private int curSlot = 0;
 
-
         public Builder dummySlot(int x, int y) {
-            this.slots.add(new SlotInfo(0, x, y, 0, SlotType.NONE));
+            this.slots.add(new SlotInfo(0, x, y, 0, SlotType.NONE, Voltage.PRIMITIVE));
             return this;
         }
 
@@ -99,9 +124,14 @@ public class Layout {
             return this;
         }
 
-        public Builder slot(int x, int y) {
-            this.slots.add(new SlotInfo(this.curSlot++, x, y, this.curPort, this.curSlotType));
+        public Builder slot(int x, int y, Voltage requiredVoltage) {
+            assert this.curPort >= 0;
+            this.slots.add(new SlotInfo(this.curSlot++, x, y, this.curPort, this.curSlotType, requiredVoltage));
             return this;
+        }
+
+        public Builder slot(int x, int y) {
+            return this.slot(x, y, Voltage.PRIMITIVE);
         }
 
         public Builder image(Rect rect, Texture tex) {

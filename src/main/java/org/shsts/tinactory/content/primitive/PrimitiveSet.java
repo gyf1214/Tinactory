@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.core.ValueHolder;
@@ -55,7 +56,7 @@ public record PrimitiveSet<T extends ProcessingRecipe<T>>(
                 .ticking()
                 .capability(AllCapabilities.PROCESSING_STACK_CONTAINER, $ -> $
                         .recipeType(recipeType)
-                        .layout(layout))
+                        .layout(layout, Voltage.PRIMITIVE))
                 .menu().layout(layout).build()
                 .register();
 

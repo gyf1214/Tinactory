@@ -24,24 +24,25 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCategory<T> {
-    protected final ArrayListMultimap<Integer, Layout.SlotInfo> slotsMap;
+    protected final ArrayListMultimap<Integer, Layout.SlotInfo> portSlots;
 
     public ProcessingCategory(RecipeType<T> type, IJeiHelpers helpers, Layout layout, ItemLike icon) {
         super(type, helpers, layout, new ItemStack(icon));
-        this.slotsMap = ArrayListMultimap.create();
-        for (var slot : layout.slots) {
-            this.slotsMap.put(slot.port(), slot);
+        this.portSlots = ArrayListMultimap.create();
+        var slots = layout.getStackSlots();
+        for (var slot : slots) {
+            this.portSlots.put(slot.port(), slot);
         }
     }
 
     protected void addIngredient(IRecipeLayoutBuilder builder, Map<Integer, Integer> currentSlotIndex,
                                  int port, Either<Ingredient, FluidStack> ingredient) {
         var slotIndex = currentSlotIndex.getOrDefault(port, 0);
-        var slots = this.slotsMap.get(port);
+        var slots = this.portSlots.get(port);
         if (slotIndex < slots.size()) {
             var slot = slots.get(slotIndex);
             var role = slot.type().output ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT;
-            this.addIngredient(builder, slot.index(), ingredient, role);
+            this.addIngredient(builder, slot, ingredient, role);
             currentSlotIndex.put(port, slotIndex + 1);
         }
     }

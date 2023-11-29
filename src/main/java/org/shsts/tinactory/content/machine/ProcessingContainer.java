@@ -47,6 +47,9 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
     }
 
     @Override
+    public abstract boolean hasPort(int port);
+
+    @Override
     public abstract Either<IItemCollection, IFluidCollection> getPort(int port, boolean internal);
 
     protected void updateRecipe() {

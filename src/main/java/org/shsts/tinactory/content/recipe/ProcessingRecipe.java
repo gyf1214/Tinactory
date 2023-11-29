@@ -55,7 +55,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     }
 
     protected boolean consumeInput(IProcessingMachine container, Input input, boolean simulate) {
-        return container.getPort(input.port, true).map(
+        return container.hasPort(input.port) && container.getPort(input.port, true).map(
                 collection -> input.ingredient.left()
                         .map(item -> ItemHelper.consumeItemCollection(collection, item, input.amount, simulate))
                         .orElse(false),
@@ -65,14 +65,15 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     }
 
     protected boolean insertOutput(IProcessingMachine container, Output output, boolean simulate) {
+        if (!container.hasPort(output.port) || (simulate && output.rate < 1.0d)) {
+            return true;
+        }
         return container.getPort(output.port, true).map(
                 collection -> output.result.left()
-                        .map(item -> (simulate && output.rate < 1d) ||
-                                collection.insertItem(item.copy(), simulate).isEmpty())
+                        .map(item -> collection.insertItem(item.copy(), simulate).isEmpty())
                         .orElse(false),
                 collection -> output.result.right()
-                        .map(fluid -> (simulate && output.rate < 1d) ||
-                                collection.fill(fluid, simulate) == fluid.getAmount())
+                        .map(fluid -> collection.fill(fluid, simulate) == fluid.getAmount())
                         .orElse(false));
     }
 

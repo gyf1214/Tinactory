@@ -17,6 +17,8 @@ public interface IProcessingMachine {
      */
     void onWorkTick(double partial);
 
+    boolean hasPort(int port);
+
     Either<IItemCollection, IFluidCollection> getPort(int port, boolean internal);
 
     double getProgress();

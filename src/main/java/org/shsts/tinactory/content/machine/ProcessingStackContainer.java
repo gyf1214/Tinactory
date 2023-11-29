@@ -29,9 +29,8 @@ import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
@@ -115,7 +114,15 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
     }
 
     @Override
+    public boolean hasPort(int port) {
+        return port >= 0 && port < this.ports.size();
+    }
+
+    @Override
     public Either<IItemCollection, IFluidCollection> getPort(int port, boolean internal) {
+        if (!this.hasPort(port)) {
+            return Either.left(ItemHandlerCollection.EMPTY);
+        }
         return internal ? this.internalPorts.get(port) : this.ports.get(port);
     }
 
@@ -155,16 +162,19 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
             return this;
         }
 
-        public Builder layout(Layout layout) {
-            Map<Integer, PortInfo> map = new HashMap<>();
-            for (var slot : layout.slots) {
-                if (slot.type() == Layout.SlotType.NONE) {
-                    continue;
-                }
-                map.merge(slot.port(), new PortInfo(1, slot.type()),
-                        ($, v) -> new PortInfo(v.slots + 1, slot.type()));
+        public Builder layout(Layout layout, Voltage voltage) {
+            this.ports.clear();
+            var slots = layout.getStackSlots(voltage);
+            if (slots.isEmpty()) {
+                return this;
             }
-            this.ports.addAll(map.values());
+            var portCount = 1 + slots.stream().mapToInt(Layout.SlotInfo::port).max().getAsInt();
+            var ports = new ArrayList<>(Collections.nCopies(portCount, new PortInfo(0, Layout.SlotType.NONE)));
+            for (var slot : slots) {
+                var info = ports.get(slot.port());
+                ports.set(slot.port(), new PortInfo(info.slots + 1, slot.type()));
+            }
+            this.ports.addAll(ports);
             return this;
         }
 

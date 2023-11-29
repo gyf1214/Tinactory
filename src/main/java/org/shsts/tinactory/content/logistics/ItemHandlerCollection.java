@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
@@ -16,6 +17,8 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemHandlerCollection implements IItemCollection {
+    public static final ItemHandlerCollection EMPTY = new ItemHandlerCollection(EmptyHandler.INSTANCE);
+
     public final IItemHandler itemHandler;
 
     public ItemHandlerCollection(IItemHandler itemHandler) {

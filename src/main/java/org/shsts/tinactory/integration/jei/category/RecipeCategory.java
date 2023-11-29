@@ -30,6 +30,7 @@ import org.shsts.tinactory.model.ModelGen;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ParametersAreNonnullByDefault
@@ -39,6 +40,7 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
     protected final Component title;
     protected final IDrawable background;
     protected final IDrawable icon;
+    protected final List<Layout.SlotInfo> slots;
     protected final Map<Integer, Layout.SlotInfo> slotsInfo = new HashMap<>();
 
     protected final @Nullable LoadingCache<Integer, IDrawable> cachedProgressBar;
@@ -50,9 +52,10 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
         var guiHelper = helpers.getGuiHelper();
         this.background = DrawableHelper.createBackground(guiHelper, layout);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, icon);
+        this.slots = layout.slots;
 
         for (var slot : layout.slots) {
-            slotsInfo.put(slot.index(), slot);
+            this.slotsInfo.put(slot.index(), slot);
         }
 
         if (layout.progressBar != null) {
@@ -104,19 +107,16 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
         return this.type;
     }
 
-    protected void addIngredient(IRecipeLayoutBuilder builder, int slot,
+    protected void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot,
                                  Ingredient ingredient, RecipeIngredientRole role) {
         this.addIngredient(builder, slot, Either.left(ingredient), role);
     }
 
-    protected void addIngredient(IRecipeLayoutBuilder builder, int slot,
+    protected void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot,
                                  Either<Ingredient, FluidStack> ingredient, RecipeIngredientRole role) {
-        if (this.slotsInfo.containsKey(slot)) {
-            var slotInfo = this.slotsInfo.get(slot);
-            var slotBuilder = builder.addSlot(role, slotInfo.x() + 1, slotInfo.y() + 1);
-            ingredient.ifLeft(slotBuilder::addIngredients)
-                    .ifRight(fluid -> slotBuilder.addIngredient(ForgeTypes.FLUID_STACK, fluid));
-        }
+        var slotBuilder = builder.addSlot(role, slot.x() + 1, slot.y() + 1);
+        ingredient.ifLeft(slotBuilder::addIngredients)
+                .ifRight(fluid -> slotBuilder.addIngredient(ForgeTypes.FLUID_STACK, fluid));
     }
 
     @Override

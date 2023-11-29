@@ -25,11 +25,12 @@ public class ToolCategory extends RecipeCategory<ToolRecipe> {
     public void setRecipe(IRecipeLayoutBuilder builder, ToolRecipe recipe, IFocusGroup focuses) {
         var shaped = recipe.shapedRecipe;
 
-        this.addIngredient(builder, -1, Ingredient.of(shaped.getResultItem()), RecipeIngredientRole.OUTPUT);
+        this.addIngredient(builder, this.slots.get(0),
+                Ingredient.of(shaped.getResultItem()), RecipeIngredientRole.OUTPUT);
 
         var k = 0;
         for (var toolIngredient : recipe.toolIngredients) {
-            this.addIngredient(builder, k, toolIngredient, RecipeIngredientRole.INPUT);
+            this.addIngredient(builder, this.slots.get(1 + k), toolIngredient, RecipeIngredientRole.INPUT);
             if (++k >= 9) {
                 break;
             }
@@ -37,7 +38,7 @@ public class ToolCategory extends RecipeCategory<ToolRecipe> {
         for (var i = 0; i < shaped.getHeight(); i++) {
             for (var j = 0; j < shaped.getWidth(); j++) {
                 var ingredient = recipe.shapedRecipe.getIngredients().get(i * shaped.getWidth() + j);
-                this.addIngredient(builder, 9 + i * 3 + j, ingredient, RecipeIngredientRole.INPUT);
+                this.addIngredient(builder, this.slots.get(10 + i * 3 + j), ingredient, RecipeIngredientRole.INPUT);
             }
         }
     }

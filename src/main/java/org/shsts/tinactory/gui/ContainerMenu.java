@@ -197,18 +197,20 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         } else {
             var invIndex = index - this.containerSlotCount;
             var oldStack = inv.getStackInSlot(invIndex).copy();
-            var reminder = oldStack.copy();
-            var amount = reminder.getCount();
+            var stack = oldStack.copy();
+            var amount = stack.getCount();
             for (var i = 0; i < this.containerSlotCount; i++) {
-                if (reminder.isEmpty()) {
-                    break;
-                }
                 var targetSlot = this.slots.get(i);
-                reminder = targetSlot.safeInsert(reminder);
+                if (!targetSlot.mayPlace(stack)) {
+                    continue;
+                }
+                var reminder = targetSlot.safeInsert(stack);
+                if (reminder.getCount() < amount) {
+                    inv.extractItem(invIndex, amount - reminder.getCount(), false);
+                    return oldStack;
+                }
             }
-            inv.extractItem(invIndex, amount - reminder.getCount(), false);
-
-            return oldStack;
+            return ItemStack.EMPTY;
         }
     }
 
