@@ -26,6 +26,7 @@ public final class AllBlocks {
 
     public static final PrimitiveSet<ProcessingRecipe.Simple> PRIMITIVE_STONE_GENERATOR;
     public static final PrimitiveSet<ProcessingRecipe.Simple> PRIMITIVE_ORE_ANALYZER;
+    public static final PrimitiveSet<ProcessingRecipe.Simple> PRIMITIVE_ORE_WASHER;
 
     static {
         REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
@@ -65,6 +66,8 @@ public final class AllBlocks {
         PRIMITIVE_ORE_ANALYZER = PrimitiveSet.create("primitive/ore_analyzer",
                 ModelGen.gregtech("blocks/machines/electromagnetic_separator/overlay"),
                 AllRecipes.ORE_ANALYZER, AllLayouts.ORE_ANALYZER);
+        PRIMITIVE_ORE_WASHER = PrimitiveSet.create("primitive/ore_washer",
+                ModelGen.VOID_TEX, AllRecipes.ORE_WASHER, AllLayouts.ORE_WASHER);
     }
 
     public static void init() {}

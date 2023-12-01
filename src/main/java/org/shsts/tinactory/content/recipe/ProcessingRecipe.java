@@ -144,6 +144,10 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             return this.input(port, () -> Either.left(Ingredient.of(item.get())), amount);
         }
 
+        public S inputFluid(int port, Fluid fluid, int amount) {
+            return this.input(port, Either.right(new FluidStack(fluid, amount)), amount);
+        }
+
         public S output(int port, Supplier<Either<ItemStack, FluidStack>> result, float rate) {
             this.outputs.add(() -> new Output(port, result.get(), rate));
             return self();
@@ -218,7 +222,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
 
         protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
-            var builder = this.type.recipe(loc);
+            var builder = this.type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                     .map(JsonElement::getAsJsonObject)
                     .forEach(je -> builder.input(
@@ -275,7 +279,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
 
         public B buildFromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
-            var builder = this.type.recipe(loc);
+            var builder = this.type.getBuilder(loc);
             buf.readWithCount(buf1 -> builder.input(
                     buf1.readVarInt(),
                     buf1.readBoolean() ?

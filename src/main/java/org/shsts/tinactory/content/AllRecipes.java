@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.recipe.ProcessingRecipe;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
@@ -31,6 +32,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> STONE_GENERATOR;
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> ORE_ANALYZER;
+    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> ORE_WASHER;
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
@@ -41,6 +43,9 @@ public final class AllRecipes {
 
         STONE_GENERATOR = REGISTRATE.simpleProcessingRecipeType("processing/stone_generator");
         ORE_ANALYZER = REGISTRATE.simpleProcessingRecipeType("processing/ore_analyzer");
+        ORE_WASHER = REGISTRATE.simpleProcessingRecipeType("processing/ore_washer",
+                $ -> $.inputFluid(1, Fluids.WATER, 1000)
+                        .outputItem(3, AllMaterials.STONE.getItemEntry("dust"), 1));
     }
 
     public static void initRecipes() {

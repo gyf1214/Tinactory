@@ -57,7 +57,7 @@ public record PrimitiveSet<T extends ProcessingRecipe<T>>(
                 .capability(AllCapabilities.PROCESSING_STACK_CONTAINER, $ -> $
                         .recipeType(recipeType)
                         .layout(layout, Voltage.PRIMITIVE))
-                .menu().layout(layout).build()
+                .menu().layout(layout, Voltage.PRIMITIVE).build()
                 .register();
 
         holder.setValue(blockEntity);

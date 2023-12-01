@@ -54,6 +54,11 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
         var items = new ArrayList<WrapperItemHandler>(ports.size());
         var fluids = new ArrayList<WrapperFluidTank>();
         for (var port : ports) {
+            if (ports.size() == 0) {
+                this.internalPorts.add(Either.left(ItemHandlerCollection.EMPTY));
+                this.ports.add(Either.left(ItemHandlerCollection.EMPTY));
+                continue;
+            }
             switch (port.type()) {
                 case ITEM_INPUT -> {
                     var view = new WrapperItemHandler(port.slots);
@@ -115,7 +120,8 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
 
     @Override
     public boolean hasPort(int port) {
-        return port >= 0 && port < this.ports.size();
+        return port >= 0 && port < this.ports.size() &&
+                !this.ports.get(port).left().map(c -> c == ItemHandlerCollection.EMPTY).orElse(false);
     }
 
     @Override

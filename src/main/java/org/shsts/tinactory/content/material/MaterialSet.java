@@ -356,9 +356,17 @@ public class MaterialSet {
                 .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .tag(mineTier.getTag())
                 .register();
-        return this.dust()
+        this.dust()
                 .dummies("crushed", "crushed_centrifuged", "crushed_purified")
                 .dummies("dust_impure", "dust_pure");
+
+        AllRecipes.ORE_WASHER.modRecipe(this.loc("crushed_purified"))
+                .inputItem(0, this.getItemEntry("crushed"), 1)
+                .outputItem(2, this.getItemEntry("crushed_purified"), 1)
+                .workTicks(200)
+                .build();
+
+        return this;
     }
 
     private static ResourceLocation toolTex(String sub) {

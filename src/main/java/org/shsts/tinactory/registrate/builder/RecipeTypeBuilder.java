@@ -7,6 +7,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.shsts.tinactory.core.SmartRecipe;
 import org.shsts.tinactory.core.SmartRecipeSerializer;
+import org.shsts.tinactory.core.Transformer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 import org.slf4j.Logger;
@@ -23,9 +24,11 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
     protected final SmartRecipeSerializer.Factory<T, B, S> serializer;
     @Nullable
     protected SmartRecipeBuilder.Factory<T, B> builderFactory = null;
-    protected String prefix = "";
+    @Nullable
+    protected String prefix = null;
     @Nullable
     protected Class<T> clazz;
+    protected Transformer<B> defaultTransformer = $ -> $;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
                              SmartRecipeSerializer.Factory<T, B, S> serializer) {
@@ -46,6 +49,11 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
     public RecipeTypeBuilder<T, B, S, P> clazz(Class<T> clazz) {
         this.clazz = clazz;
         return self();
+    }
+
+    public RecipeTypeBuilder<T, B, S, P> builderTransform(Transformer<B> trans) {
+        this.defaultTransformer = this.defaultTransformer.chain(trans);
+        return this;
     }
 
     public void registerSerializer(IForgeRegistry<RecipeSerializer<?>> registry) {
@@ -74,12 +82,16 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
     }
 
     public String getPrefix() {
-        return this.prefix;
+        return this.prefix == null ? this.id : this.prefix;
     }
 
     public Class<T> getClazz() {
         assert this.clazz != null;
         return this.clazz;
+    }
+
+    public Transformer<B> getDefaultTransformer() {
+        return this.defaultTransformer;
     }
 
     @Override

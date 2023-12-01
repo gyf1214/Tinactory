@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.SlotItemHandler;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.SmartBlockEntity;
 import org.shsts.tinactory.core.SmartBlockEntityType;
 import org.shsts.tinactory.gui.ContainerMenu;
@@ -135,12 +136,6 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
                 new ProgressBar(menu, rect1, tex, syncSlot.get()));
     }
 
-    public S progressBar(Texture tex, int posX, int posY, ToDoubleFunction<T> progressReader) {
-        int w = tex.width();
-        int h = tex.height() / 2;
-        return this.progressBar(tex, new Rect(posX, posY, w, h), progressReader);
-    }
-
     public S fluidSlot(int tank, int x, int y) {
         var syncSlot = new MenuCallback<M, Integer>(menu -> menu.addFluidSlot(tank));
         this.menuCallbacks.add(syncSlot);
@@ -150,12 +145,16 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
                         new FluidSlot(menu, rect1, tank, syncSlot.get()));
     }
 
-    public S layout(Layout layout, int yOffset) {
-        return this.transform(layout.applyMenu(yOffset));
+    public S layout(Layout layout, int yOffset, Voltage voltage) {
+        return this.transform(layout.applyMenu(yOffset, voltage));
+    }
+
+    public S layout(Layout layout, Voltage voltage) {
+        return this.layout(layout, 0, voltage);
     }
 
     public S layout(Layout layout) {
-        return this.layout(layout, 0);
+        return this.layout(layout, Voltage.MAXIMUM);
     }
 
     public S noInventory() {

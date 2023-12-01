@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import org.shsts.tinactory.core.Transformer;
 import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.Nullable;
@@ -22,15 +23,18 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
     @Nullable
     private RecipeSerializer<T> serializer;
     private final String prefix;
+    private final Transformer<B> defaultTransformer;
     public final Class<T> clazz;
 
     public RecipeTypeEntry(Registrate registrate, String id, Supplier<RecipeType<T>> supplier,
-                           SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix, Class<T> clazz) {
+                           SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix, Class<T> clazz,
+                           Transformer<B> defaultTransformer) {
         super(registrate.modid, id, supplier);
         this.registrate = registrate;
         this.builderFactory = builderFactory;
         this.prefix = prefix;
         this.clazz = clazz;
+        this.defaultTransformer = defaultTransformer;
     }
 
     public RecipeSerializer<T> getSerializer() {
@@ -42,8 +46,12 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
         this.serializer = serializer;
     }
 
-    public B recipe(ResourceLocation loc) {
+    public B getBuilder(ResourceLocation loc) {
         return this.builderFactory.create(this.registrate, this, loc);
+    }
+
+    public B recipe(ResourceLocation loc) {
+        return this.defaultTransformer.apply(this.getBuilder(loc));
     }
 
     public B modRecipe(Item item) {

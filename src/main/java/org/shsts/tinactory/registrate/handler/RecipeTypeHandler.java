@@ -32,7 +32,8 @@ public class RecipeTypeHandler {
         this.builders.add(builder);
         var recipeType = this.recipeTypeRegister.register(builder.id, builder::buildObject);
         return new RecipeTypeEntry<>(registrate, builder.id, recipeType,
-                builder.getBuilderFactory(), builder.getPrefix(), builder.getClazz());
+                builder.getBuilderFactory(), builder.getPrefix(), builder.getClazz(),
+                builder.getDefaultTransformer());
     }
 
     public void onRegisterSerializer(RegistryEvent.Register<RecipeSerializer<?>> event) {

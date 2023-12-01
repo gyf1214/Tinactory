@@ -40,7 +40,7 @@ public final class AllBlocks {
                 .build();
 
         TEST_MACHINE = PrimitiveSet.create(REGISTRATE, "test",
-                ModelGen.gregtech("machines/alloy_smelter/overlay"),
+                ModelGen.gregtech("blocks/machines/alloy_smelter/overlay"),
                 TEST_RECIPE_TYPE, TEST_FLUID_LAYOUT);
 
         TEST_RECIPE_TYPE.modRecipe(TinactoryTest.modLoc("test"))

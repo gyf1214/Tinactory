@@ -18,11 +18,18 @@ public class Layout {
     public record WidgetInfo(Rect rect, Texture texture) {}
 
     public enum SlotType {
-        NONE(false), ITEM_INPUT(false), ITEM_OUTPUT(true), FLUID_INPUT(false), FLUID_OUTPUT(true);
-        public final boolean output;
+        NONE(false, false),
+        ITEM_INPUT(false, true),
+        ITEM_OUTPUT(true, true),
+        FLUID_INPUT(false, false),
+        FLUID_OUTPUT(true, false);
 
-        SlotType(boolean output) {
+        public final boolean output;
+        public final boolean isItem;
+
+        SlotType(boolean output, boolean isItem) {
             this.output = output;
+            this.isItem = isItem;
         }
     }
 
@@ -61,10 +68,6 @@ public class Layout {
         this.rect = new Rect(0, 0, maxX, maxY);
     }
 
-    public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu(int yOffset) {
-        return this.applyMenu(yOffset, Voltage.MAXIMUM);
-    }
-
     public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu(int yOffset, Voltage voltage) {
         return builder -> {
             var xOffset = (ContainerMenu.CONTENT_WIDTH - this.rect.width()) / 2;
@@ -72,9 +75,10 @@ public class Layout {
             for (var slot : slots) {
                 var x = xOffset + slot.x;
                 var y = yOffset + slot.y;
-                switch (slot.type) {
-                    case ITEM_INPUT, ITEM_OUTPUT -> builder.slot(slot.index, x, y);
-                    case FLUID_INPUT, FLUID_OUTPUT -> builder.fluidSlot(slot.index, x, y);
+                if (slot.type.isItem) {
+                    builder.slot(slot.index, x, y);
+                } else {
+                    builder.fluidSlot(slot.index, x, y);
                 }
             }
             for (var image : this.images) {
@@ -94,12 +98,15 @@ public class Layout {
 
     public List<SlotInfo> getStackSlots(Voltage voltage) {
         var ret = new ArrayList<SlotInfo>();
+        var fluidSlots = 0;
+        var itemSlots = 0;
         for (var slot : this.slots) {
             if (slot.port < 0 || slot.type == SlotType.NONE ||
                     voltage.compareTo(slot.requiredVoltage) < 0) {
                 continue;
             }
-            ret.add(slot.setIndex(ret.size()));
+            var index = slot.type.isItem ? itemSlots++ : fluidSlots++;
+            ret.add(slot.setIndex(index));
         }
         return ret;
     }
