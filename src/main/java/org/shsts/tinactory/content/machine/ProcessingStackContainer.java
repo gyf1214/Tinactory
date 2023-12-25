@@ -14,6 +14,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.logistics.CombinedFluidTank;
 import org.shsts.tinactory.content.logistics.IFluidCollection;
@@ -36,9 +37,6 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingStackContainer extends ProcessingContainer implements ICapabilityProvider {
-    // TODO: Config
-    private static final int DEFAULT_FLUID_CAPACITY = 16000;
-
     protected record PortInfo(int slots, Layout.SlotType type) {}
 
     protected final IItemHandlerModifiable combinedItems;
@@ -83,7 +81,7 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
                 case FLUID_INPUT -> {
                     var views = new WrapperFluidTank[port.slots];
                     for (var i = 0; i < port.slots; i++) {
-                        var view = new WrapperFluidTank(DEFAULT_FLUID_CAPACITY);
+                        var view = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
                         view.onUpdate(this::onInputUpdate);
 
                         views[i] = view;
@@ -99,7 +97,7 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
                     var views = new WrapperFluidTank[port.slots];
 
                     for (var i = 0; i < port.slots; i++) {
-                        var inner = new WrapperFluidTank(DEFAULT_FLUID_CAPACITY);
+                        var inner = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
                         inner.onUpdate(this::onInputUpdate);
                         inners[i] = inner;
 

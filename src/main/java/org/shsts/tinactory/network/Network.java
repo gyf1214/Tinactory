@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.TinactoryConfig;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -193,11 +194,13 @@ public class Network {
     }
 
     protected void doConnect() {
-        if (this.delayTicks < CONNECT_DELAY) {
+        var connectDelay = TinactoryConfig.INSTANCE.networkConnectDelay.get();
+        var maxConnects = TinactoryConfig.INSTANCE.networkMaxConnectsPerTick.get();
+        if (this.delayTicks < connectDelay) {
             this.delayTicks++;
             return;
         }
-        for (var i = 0; i < MAX_CONNECT_PER_TICK; i++) {
+        for (var i = 0; i < maxConnects; i++) {
             if (!connectNextBlock()) {
                 return;
             }

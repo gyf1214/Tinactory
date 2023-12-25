@@ -24,7 +24,7 @@ import static org.shsts.tinactory.gui.ContainerMenu.WIDTH;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractContainerScreen<M> {
-    public static final int TEXT_COLOR = 4210752;
+    public static final int TEXT_COLOR = 0xFF404040;
 
     protected final List<ContainerWidget.Builder<M>> widgetBuilders = new ArrayList<>();
     protected final List<ContainerWidget> widgets = new ArrayList<>();

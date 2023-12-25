@@ -7,7 +7,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -80,6 +82,8 @@ public class Tinactory {
     }
 
     private static void onCreate(IEventBus modEventBus) {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
+
         AllRegistries.init();
 
         ModelGen.init();
@@ -110,6 +114,7 @@ public class Tinactory {
 
     private static void init(final FMLCommonSetupEvent event) {
         LOGGER.info("hello Tinactory!");
+        LOGGER.info("primitiveWorkSpeed={}", TinactoryConfig.INSTANCE.primitiveWorkSpeed.get());
     }
 
     private static void initClient(FMLClientSetupEvent event) {
