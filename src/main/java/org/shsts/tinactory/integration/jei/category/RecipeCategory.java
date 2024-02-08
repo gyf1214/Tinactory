@@ -4,9 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.datafixers.util.Either;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IJeiHelpers;
@@ -21,7 +19,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.gui.layout.Layout;
 import org.shsts.tinactory.gui.layout.Rect;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
@@ -109,14 +106,8 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
 
     protected void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot,
                                  Ingredient ingredient, RecipeIngredientRole role) {
-        this.addIngredient(builder, slot, Either.left(ingredient), role);
-    }
-
-    protected void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot,
-                                 Either<Ingredient, FluidStack> ingredient, RecipeIngredientRole role) {
-        var slotBuilder = builder.addSlot(role, slot.x() + 1, slot.y() + 1);
-        ingredient.ifLeft(slotBuilder::addIngredients)
-                .ifRight(fluid -> slotBuilder.addIngredient(ForgeTypes.FLUID_STACK, fluid));
+        builder.addSlot(role, slot.x() + 1, slot.y() + 1)
+                .addIngredients(ingredient);
     }
 
     @Override

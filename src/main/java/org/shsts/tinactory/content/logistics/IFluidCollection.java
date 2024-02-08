@@ -8,7 +8,7 @@ import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IFluidCollection {
+public interface IFluidCollection extends IPort {
     boolean acceptInput(FluidStack stack);
 
     boolean acceptOutput();

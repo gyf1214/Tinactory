@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IItemCollection {
+public interface IItemCollection extends IPort {
     boolean acceptInput(ItemStack stack);
 
     boolean acceptOutput();

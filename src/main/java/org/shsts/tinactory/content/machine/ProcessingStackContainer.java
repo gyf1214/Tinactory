@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.machine;
 
-import com.mojang.datafixers.util.Either;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -17,8 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.logistics.CombinedFluidTank;
-import org.shsts.tinactory.content.logistics.IFluidCollection;
-import org.shsts.tinactory.content.logistics.IItemCollection;
+import org.shsts.tinactory.content.logistics.IPort;
 import org.shsts.tinactory.content.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.content.logistics.ItemHelper;
 import org.shsts.tinactory.content.logistics.WrapperFluidTank;
@@ -41,8 +39,8 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
 
     protected final IItemHandlerModifiable combinedItems;
     protected final CombinedFluidTank combinedFluids;
-    protected final List<Either<IItemCollection, IFluidCollection>> ports;
-    protected final List<Either<IItemCollection, IFluidCollection>> internalPorts;
+    protected final List<IPort> ports;
+    protected final List<IPort> internalPorts;
 
     public ProcessingStackContainer(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe<?>> recipeType,
                                     Collection<PortInfo> ports) {
@@ -53,8 +51,8 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
         var fluids = new ArrayList<WrapperFluidTank>();
         for (var port : ports) {
             if (ports.size() == 0) {
-                this.internalPorts.add(Either.left(ItemHandlerCollection.EMPTY));
-                this.ports.add(Either.left(ItemHandlerCollection.EMPTY));
+                this.internalPorts.add(IPort.EMPTY);
+                this.ports.add(IPort.EMPTY);
                 continue;
             }
             switch (port.type()) {
@@ -64,8 +62,8 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
                     items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
-                    this.internalPorts.add(Either.left(collection));
-                    this.ports.add(Either.left(collection));
+                    this.internalPorts.add(collection);
+                    this.ports.add(collection);
                 }
                 case ITEM_OUTPUT -> {
                     var inner = new WrapperItemHandler(port.slots);
@@ -75,8 +73,8 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
                     view.allowInput = false;
                     items.add(view);
 
-                    this.internalPorts.add(Either.left(new ItemHandlerCollection(inner)));
-                    this.ports.add(Either.left(new ItemHandlerCollection(view)));
+                    this.internalPorts.add(new ItemHandlerCollection(inner));
+                    this.ports.add(new ItemHandlerCollection(view));
                 }
                 case FLUID_INPUT -> {
                     var views = new WrapperFluidTank[port.slots];
@@ -89,8 +87,8 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
                     }
 
                     var collection = new CombinedFluidTank(views);
-                    this.internalPorts.add(Either.right(collection));
-                    this.ports.add(Either.right(collection));
+                    this.internalPorts.add(collection);
+                    this.ports.add(collection);
                 }
                 case FLUID_OUTPUT -> {
                     var inners = new WrapperFluidTank[port.slots];
@@ -107,8 +105,8 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
                         fluids.add(view);
                     }
 
-                    this.internalPorts.add(Either.right(new CombinedFluidTank(inners)));
-                    this.ports.add(Either.right(new CombinedFluidTank(views)));
+                    this.internalPorts.add(new CombinedFluidTank(inners));
+                    this.ports.add(new CombinedFluidTank(views));
                 }
             }
         }
@@ -119,13 +117,13 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
     @Override
     public boolean hasPort(int port) {
         return port >= 0 && port < this.ports.size() &&
-                !this.ports.get(port).left().map(c -> c == ItemHandlerCollection.EMPTY).orElse(false);
+                this.ports.get(port) != IPort.EMPTY;
     }
 
     @Override
-    public Either<IItemCollection, IFluidCollection> getPort(int port, boolean internal) {
+    public IPort getPort(int port, boolean internal) {
         if (!this.hasPort(port)) {
-            return Either.left(ItemHandlerCollection.EMPTY);
+            return IPort.EMPTY;
         }
         return internal ? this.internalPorts.get(port) : this.ports.get(port);
     }
