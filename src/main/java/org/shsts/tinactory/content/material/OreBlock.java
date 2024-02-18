@@ -11,11 +11,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class OreBlock extends Block {
-    protected IntegerProperty variant;
+    protected final IntegerProperty variant;
 
     public OreBlock(Properties properties, int states) {
         super(properties.requiresCorrectToolForDrops());
         this.variant = IntegerProperty.create("variant", 0, states);
+        // hack to re-assign stateDefinition
         var builder = new StateDefinition.Builder<Block, BlockState>(this);
         builder.add(this.variant);
         this.stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
