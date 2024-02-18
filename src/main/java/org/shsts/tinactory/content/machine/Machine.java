@@ -6,10 +6,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.shsts.tinactory.core.SmartBlockEntity;
-import org.shsts.tinactory.network.Component;
-import org.shsts.tinactory.network.CompositeNetwork;
-import org.shsts.tinactory.network.Scheduling;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.network.Component;
+import org.shsts.tinactory.core.network.CompositeNetwork;
+import org.shsts.tinactory.core.network.Scheduling;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;

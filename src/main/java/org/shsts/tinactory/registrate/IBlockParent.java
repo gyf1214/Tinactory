@@ -2,7 +2,7 @@ package org.shsts.tinactory.registrate;
 
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
-import org.shsts.tinactory.core.Transformer;
+import org.shsts.tinactory.core.common.Transformer;
 
 public interface IBlockParent {
     Material getDefaultMaterial();

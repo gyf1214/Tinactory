@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import org.shsts.tinactory.core.SmartBlockEntityType;
-import org.shsts.tinactory.core.SmartEntityBlock;
+import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinactory.core.common.SmartEntityBlock;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;

@@ -11,7 +11,7 @@ import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;

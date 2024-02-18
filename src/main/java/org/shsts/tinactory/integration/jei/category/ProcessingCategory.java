@@ -12,10 +12,10 @@ import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import org.shsts.tinactory.content.recipe.ProcessingIngredients;
-import org.shsts.tinactory.content.recipe.ProcessingRecipe;
-import org.shsts.tinactory.content.recipe.ProcessingResults;
-import org.shsts.tinactory.gui.layout.Layout;
+import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ProcessingResults;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;

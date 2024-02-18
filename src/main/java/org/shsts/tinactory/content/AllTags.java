@@ -7,7 +7,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;

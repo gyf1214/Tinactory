@@ -13,10 +13,11 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IProcessingMachine;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.logistics.IPort;
-import org.shsts.tinactory.content.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.SmartRecipe;
+import org.shsts.tinactory.core.common.SmartRecipe;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

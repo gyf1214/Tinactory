@@ -6,7 +6,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import org.shsts.tinactory.core.Transformer;
+import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.IItemParent;
 import org.shsts.tinactory.registrate.Registrate;

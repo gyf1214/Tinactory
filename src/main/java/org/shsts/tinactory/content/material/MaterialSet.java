@@ -16,9 +16,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
-import org.shsts.tinactory.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 

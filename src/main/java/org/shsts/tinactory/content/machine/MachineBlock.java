@@ -14,10 +14,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.shsts.tinactory.content.tool.IWrenchable;
-import org.shsts.tinactory.core.SmartBlockEntityType;
-import org.shsts.tinactory.core.SmartEntityBlock;
-import org.shsts.tinactory.network.IConnector;
-import org.shsts.tinactory.network.NetworkManager;
+import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinactory.core.network.IConnector;
+import org.shsts.tinactory.core.network.NetworkManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;

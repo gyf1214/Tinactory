@@ -1,9 +1,9 @@
 package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import org.shsts.tinactory.core.SmartBlockEntity;
-import org.shsts.tinactory.core.SmartBlockEntityType;
-import org.shsts.tinactory.core.SmartEntityBlock;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.registrate.IBlockParent;
 import org.shsts.tinactory.registrate.IItemParent;
 import org.shsts.tinactory.registrate.Registrate;

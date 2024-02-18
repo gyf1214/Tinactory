@@ -5,9 +5,9 @@ import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.helpers.IGuiHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.gui.layout.Layout;
-import org.shsts.tinactory.gui.layout.Rect;
-import org.shsts.tinactory.gui.layout.Texture;
+import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.Texture;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

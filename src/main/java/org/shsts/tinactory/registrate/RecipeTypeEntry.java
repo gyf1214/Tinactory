@@ -6,14 +6,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import org.shsts.tinactory.core.Transformer;
+import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.model.ModelGen.prepend;
+import static org.shsts.tinactory.content.model.ModelGen.prepend;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

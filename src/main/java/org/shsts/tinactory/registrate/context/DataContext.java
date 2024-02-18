@@ -3,7 +3,7 @@ package org.shsts.tinactory.registrate.context;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

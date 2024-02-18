@@ -9,8 +9,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.AllBlocks;
-import org.shsts.tinactory.content.recipe.ToolRecipe;
-import org.shsts.tinactory.gui.layout.AllLayouts;
+import org.shsts.tinactory.content.AllLayouts;
+import org.shsts.tinactory.core.recipe.ToolRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

@@ -3,7 +3,7 @@ package org.shsts.tinactory.registrate.builder;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
-import org.shsts.tinactory.core.SmartRecipe;
+import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 

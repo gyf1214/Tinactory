@@ -2,8 +2,8 @@ package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.ISelf;
-import org.shsts.tinactory.core.Transformer;
+import org.shsts.tinactory.core.common.ISelf;
+import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;

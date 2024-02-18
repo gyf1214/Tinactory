@@ -16,9 +16,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.content.recipe.ProcessingRecipe;
-import org.shsts.tinactory.content.recipe.ToolRecipe;
-import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 

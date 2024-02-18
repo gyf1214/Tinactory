@@ -8,12 +8,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import org.shsts.tinactory.core.CapabilityProviderType;
-import org.shsts.tinactory.core.SmartBlockEntity;
-import org.shsts.tinactory.core.SmartBlockEntityType;
-import org.shsts.tinactory.core.Transformer;
-import org.shsts.tinactory.gui.ContainerMenu;
-import org.shsts.tinactory.gui.ContainerMenuType;
+import org.shsts.tinactory.core.common.CapabilityProviderType;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.ContainerMenuType;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 

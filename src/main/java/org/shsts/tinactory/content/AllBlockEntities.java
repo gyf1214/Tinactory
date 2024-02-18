@@ -2,11 +2,10 @@ package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.content.network.NetworkController;
-import org.shsts.tinactory.core.SmartBlockEntity;
-import org.shsts.tinactory.core.SmartBlockEntityType;
-import org.shsts.tinactory.gui.WorkbenchMenu;
-import org.shsts.tinactory.gui.layout.AllLayouts;
+import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 

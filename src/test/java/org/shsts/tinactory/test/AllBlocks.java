@@ -3,18 +3,18 @@ package org.shsts.tinactory.test;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.material.Fluids;
+import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.primitive.PrimitiveSet;
-import org.shsts.tinactory.content.recipe.ProcessingRecipe;
-import org.shsts.tinactory.gui.ContainerMenu;
-import org.shsts.tinactory.gui.layout.Layout;
-import org.shsts.tinactory.gui.layout.Texture;
-import org.shsts.tinactory.model.ModelGen;
+import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static org.shsts.tinactory.gui.ContainerMenu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.ContainerMenu.SLOT_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -28,10 +28,10 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.logistics.ItemHelper;
-import org.shsts.tinactory.content.logistics.WrapperItemHandler;
-import org.shsts.tinactory.content.recipe.ToolRecipe;
-import org.shsts.tinactory.core.SmartRecipe;
+import org.shsts.tinactory.core.common.SmartRecipe;
+import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;

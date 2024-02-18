@@ -21,8 +21,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.content.tool.UsableToolItem;
-import org.shsts.tinactory.network.IConnector;
-import org.shsts.tinactory.network.NetworkManager;
+import org.shsts.tinactory.core.network.IConnector;
+import org.shsts.tinactory.core.network.NetworkManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;

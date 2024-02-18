@@ -4,12 +4,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.content.logistics.IFluidStackHandler;
-import org.shsts.tinactory.content.machine.IProcessingMachine;
+import org.shsts.tinactory.api.logistics.IProcessingMachine;
 import org.shsts.tinactory.content.machine.IWorkbench;
 import org.shsts.tinactory.content.machine.ProcessingStackContainer;
 import org.shsts.tinactory.content.machine.WorkbenchContainer;
-import org.shsts.tinactory.core.CapabilityProviderType;
+import org.shsts.tinactory.core.common.CapabilityProviderType;
+import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
