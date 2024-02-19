@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IProcessingMachine;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe<IProcessingMachine, S> {
+public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe<IContainer, S> {
     public record Input(int port, IProcessingIngredient ingredient) {}
 
     public record Output(int port, IProcessingResult result) {}
@@ -54,35 +54,35 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         this.workTicks = workTicks;
     }
 
-    protected boolean consumeInput(IProcessingMachine container, Input input, boolean simulate) {
+    protected boolean consumeInput(IContainer container, Input input, boolean simulate) {
         return container.hasPort(input.port) &&
                 input.ingredient.consumePort(container.getPort(input.port, true), simulate);
     }
 
-    protected boolean insertOutput(IProcessingMachine container, Output output, Random random, boolean simulate) {
+    protected boolean insertOutput(IContainer container, Output output, Random random, boolean simulate) {
         return output.result.insertPort(container.getPort(output.port, true), random, simulate);
     }
 
     @Override
-    public boolean matches(IProcessingMachine container, Level world) {
+    public boolean matches(IContainer container, Level world) {
         return this.inputs.stream().allMatch(input -> this.consumeInput(container, input, true)) &&
                 this.outputs.stream().allMatch(output -> this.insertOutput(container, output, world.random, true));
     }
 
-    public void consumeInputs(IProcessingMachine container) {
+    public void consumeInputs(IContainer container) {
         for (var input : this.inputs) {
             this.consumeInput(container, input, false);
         }
     }
 
-    public void insertOutputs(IProcessingMachine container, Random random) {
+    public void insertOutputs(IContainer container, Random random) {
         for (var output : this.outputs) {
             this.insertOutput(container, output, random, false);
         }
     }
 
     @Override
-    public ItemStack assemble(IProcessingMachine container) {
+    public ItemStack assemble(IContainer container) {
         return ItemStack.EMPTY;
     }
 

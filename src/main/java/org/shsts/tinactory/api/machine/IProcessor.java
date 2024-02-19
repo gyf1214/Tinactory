@@ -1,4 +1,4 @@
-package org.shsts.tinactory.api.logistics;
+package org.shsts.tinactory.api.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 
@@ -6,15 +6,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public interface IProcessingMachine {
+public interface IProcessor {
     /**
      * Must be called from Server.
      */
     void onWorkTick(double partial);
-
-    boolean hasPort(int port);
-
-    IPort getPort(int port, boolean internal);
 
     double getProgress();
 }

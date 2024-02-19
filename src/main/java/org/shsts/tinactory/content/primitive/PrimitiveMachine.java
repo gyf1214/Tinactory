@@ -19,7 +19,7 @@ public class PrimitiveMachine extends SmartBlockEntity {
     @Override
     protected void onServerTick(Level world, BlockPos pos, BlockState state) {
         var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
-        this.getCapability(AllCapabilities.PROCESSING_MACHINE.get())
+        this.getCapability(AllCapabilities.PROCESSOR.get())
                 .ifPresent(container -> container.onWorkTick(workSpeed));
     }
 }

@@ -6,10 +6,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.CompositeNetwork;
-import org.shsts.tinactory.core.network.Scheduling;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class Machine extends SmartBlockEntity {
+public class Machine extends SmartBlockEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Nullable
@@ -59,7 +59,9 @@ public abstract class Machine extends SmartBlockEntity {
         this.network = network;
     }
 
-    public abstract void buildSchedulings(BiConsumer<Supplier<Scheduling>, Component.Ticker> cons);
+    public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Component.Ticker> cons) {
+
+    }
 
     /**
      * Called when disconnect from the network

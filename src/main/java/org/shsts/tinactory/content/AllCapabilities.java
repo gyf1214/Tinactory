@@ -4,7 +4,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.api.logistics.IProcessingMachine;
+import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.IWorkbench;
 import org.shsts.tinactory.content.machine.ProcessingStackContainer;
 import org.shsts.tinactory.content.machine.WorkbenchContainer;
@@ -16,7 +16,7 @@ import org.shsts.tinactory.registrate.RegistryEntry;
 public final class AllCapabilities {
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
-    public static final RegistryEntry<Capability<IProcessingMachine>> PROCESSING_MACHINE;
+    public static final RegistryEntry<Capability<IProcessor>> PROCESSOR;
     public static final RegistryEntry<Capability<IWorkbench>> WORKBENCH;
     public static final RegistryEntry<Capability<IFluidStackHandler>> FLUID_STACK_HANDLER;
 
@@ -25,7 +25,7 @@ public final class AllCapabilities {
             PROCESSING_STACK_CONTAINER;
 
     static {
-        PROCESSING_MACHINE = REGISTRATE.capability(IProcessingMachine.class, new CapabilityToken<>() {});
+        PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
         WORKBENCH = REGISTRATE.capability(IWorkbench.class, new CapabilityToken<>() {});
         FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
 

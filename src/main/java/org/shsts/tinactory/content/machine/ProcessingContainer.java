@@ -13,8 +13,9 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.logistics.IProcessingMachine;
+import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -23,7 +24,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class ProcessingContainer implements ICapabilityProvider, IProcessingMachine,
+public abstract class ProcessingContainer implements ICapabilityProvider, IProcessor, IContainer,
         INBTSerializable<CompoundTag> {
     protected static final long PROGRESS_PER_TICK = 100;
 
@@ -128,7 +129,7 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
     @NotNull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.PROCESSING_MACHINE.get()) {
+        if (cap == AllCapabilities.PROCESSOR.get()) {
             return LazyOptional.of(() -> this).cast();
         }
         return LazyOptional.empty();

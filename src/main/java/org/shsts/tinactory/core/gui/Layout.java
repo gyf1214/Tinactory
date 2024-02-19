@@ -85,7 +85,7 @@ public class Layout {
             }
             if (this.progressBar != null) {
                 builder.progressBar(this.progressBar.texture, this.progressBar.rect.offset(xOffset, yOffset),
-                        be -> be.getCapability(AllCapabilities.PROCESSING_MACHINE.get())
+                        be -> be.getCapability(AllCapabilities.PROCESSOR.get())
                                 .map(machine -> machine.getProgress())
                                 .orElse(0.0d));
             }

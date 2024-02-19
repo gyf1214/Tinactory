@@ -15,7 +15,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ItemLike;
-import org.shsts.tinactory.api.logistics.IProcessingMachine;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllBlocks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.model.ModelGen;
@@ -66,7 +66,7 @@ public class JEI implements IModPlugin {
         return category(typeEntry, factory, Ingredient.of(catalyst));
     }
 
-    private static <T extends ProcessingRecipe<T>> CategoryInfo<SmartRecipe.ContainerWrapper<IProcessingMachine>, T>
+    private static <T extends ProcessingRecipe<T>> CategoryInfo<SmartRecipe.ContainerWrapper<IContainer>, T>
     processing(PrimitiveSet<T> set) {
         return category(set.recipeType(), (type, helpers) ->
                 new ProcessingCategory<>(type, helpers, set.layout(), set.getBlock()), set.getBlock());

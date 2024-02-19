@@ -9,8 +9,6 @@ import org.shsts.tinactory.content.machine.Machine;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -60,7 +58,4 @@ public class NetworkController extends Machine {
             this.network.destroy();
         }
     }
-
-    @Override
-    public void buildSchedulings(BiConsumer<Supplier<Scheduling>, Component.Ticker> cons) {}
 }
