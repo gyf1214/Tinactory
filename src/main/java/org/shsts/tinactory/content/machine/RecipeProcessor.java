@@ -89,10 +89,15 @@ public class RecipeProcessor implements ICapabilityProvider, IProcessor, INBTSer
     }
 
     @Override
-    public void onContainerUpdate() {
+    public void onInputUpdate() {
         if (this.currentRecipe == null) {
             this.needUpdate = true;
         }
+    }
+
+    @Override
+    public void onOutputUpdate() {
+        this.onInputUpdate();
     }
 
     @Override

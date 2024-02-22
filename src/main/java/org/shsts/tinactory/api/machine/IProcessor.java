@@ -14,5 +14,7 @@ public interface IProcessor {
 
     double getProgress();
 
-    void onContainerUpdate();
+    void onInputUpdate();
+
+    void onOutputUpdate();
 }

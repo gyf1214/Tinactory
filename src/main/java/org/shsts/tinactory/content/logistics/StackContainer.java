@@ -61,7 +61,7 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
             switch (port.type()) {
                 case ITEM_INPUT -> {
                     var view = new WrapperItemHandler(port.slots);
-                    view.onUpdate(this::onUpdate);
+                    view.onUpdate(this::onInputUpdate);
                     items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
@@ -70,7 +70,7 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
                 }
                 case ITEM_OUTPUT -> {
                     var inner = new WrapperItemHandler(port.slots);
-                    inner.onUpdate(this::onUpdate);
+                    inner.onUpdate(this::onOutputUpdate);
 
                     var view = new WrapperItemHandler(inner);
                     view.allowInput = false;
@@ -83,7 +83,7 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
                     var views = new WrapperFluidTank[port.slots];
                     for (var i = 0; i < port.slots; i++) {
                         var view = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
-                        view.onUpdate(this::onUpdate);
+                        view.onUpdate(this::onInputUpdate);
 
                         views[i] = view;
                         fluids.add(view);
@@ -99,7 +99,7 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
 
                     for (var i = 0; i < port.slots; i++) {
                         var inner = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
-                        inner.onUpdate(this::onUpdate);
+                        inner.onUpdate(this::onOutputUpdate);
                         inners[i] = inner;
 
                         var view = new WrapperFluidTank(inner);
@@ -124,8 +124,13 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
         return this.processor;
     }
 
-    protected void onUpdate() {
-        this.getProcessor().onContainerUpdate();
+    protected void onInputUpdate() {
+        this.getProcessor().onInputUpdate();
+        this.blockEntity.setChanged();
+    }
+
+    protected void onOutputUpdate() {
+        this.getProcessor().onOutputUpdate();
         this.blockEntity.setChanged();
     }
 

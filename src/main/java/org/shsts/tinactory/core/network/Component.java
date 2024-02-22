@@ -36,6 +36,7 @@ public abstract class Component {
      */
     public void onDisconnect() {}
 
+    @FunctionalInterface
     public interface Ticker {
         void tick(Level world, Network network);
     }
