@@ -39,7 +39,7 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable<CompoundTag>, IWorkbench {
+public class Workbench implements ICapabilityProvider, INBTSerializable<CompoundTag>, IWorkbench {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected static class CraftingStack extends CraftingContainer {
@@ -86,7 +86,7 @@ public class WorkbenchContainer implements ICapabilityProvider, INBTSerializable
     @Nullable
     protected Recipe<?> currentRecipe = null;
 
-    public WorkbenchContainer(BlockEntity blockEntity) {
+    public Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
 
         this.craftingStack = new CraftingStack(3, 3);

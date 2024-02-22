@@ -44,7 +44,8 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public ItemStack insertItem(ItemStack stack, boolean simulate) {
-        return ItemHandlerHelper.insertItemStacked(this.itemHandler, stack, simulate);
+        // need to make sure stack is not set to some itemHandler
+        return ItemHandlerHelper.insertItemStacked(this.itemHandler, stack.copy(), simulate);
     }
 
     @Override

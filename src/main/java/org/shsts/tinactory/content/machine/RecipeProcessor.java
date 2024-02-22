@@ -14,18 +14,18 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class ProcessingContainer implements ICapabilityProvider, IProcessor, IContainer,
-        INBTSerializable<CompoundTag> {
+public class RecipeProcessor implements ICapabilityProvider, IProcessor, INBTSerializable<CompoundTag> {
     protected static final long PROGRESS_PER_TICK = 100;
 
     protected final BlockEntity blockEntity;
@@ -39,18 +39,22 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
     protected ResourceLocation currentRecipeId = null;
     @Nullable
     protected ProcessingRecipe<?> currentRecipe = null;
+    @Nullable
+    protected IContainer container = null;
     protected boolean needUpdate = true;
 
-    protected ProcessingContainer(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe<?>> recipeType) {
+    public RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe<?>> recipeType) {
         this.blockEntity = blockEntity;
         this.recipeType = recipeType;
     }
 
-    @Override
-    public abstract boolean hasPort(int port);
-
-    @Override
-    public abstract IPort getPort(int port, boolean internal);
+    protected IContainer getContainer() {
+        if (this.container == null) {
+            this.container = this.blockEntity.getCapability(AllCapabilities.CONTAINER.get())
+                    .orElseThrow(NoSuchElementException::new);
+        }
+        return this.container;
+    }
 
     protected void updateRecipe() {
         if (this.currentRecipe != null || !this.needUpdate) {
@@ -60,10 +64,12 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
         if (world == null) {
             return;
         }
-        this.currentRecipe = SmartRecipe.getRecipeFor(this.recipeType, this, world).orElse(null);
+        this.currentRecipe = SmartRecipe.getRecipeFor(this.recipeType, this.getContainer(), world)
+                .orElse(null);
         this.workProgress = 0;
         if (this.currentRecipe != null) {
-            this.currentRecipe.consumeInputs(this);
+            this.currentRecipe.consumeInputs(this.getContainer());
+            this.blockEntity.setChanged();
         }
         this.needUpdate = false;
     }
@@ -84,18 +90,11 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
         }
     }
 
-    protected void onInputUpdate() {
+    @Override
+    public void onContainerUpdate() {
         if (this.currentRecipe == null) {
             this.needUpdate = true;
         }
-        this.blockEntity.setChanged();
-    }
-
-    protected void onOutputUpdate() {
-        if (this.currentRecipe == null) {
-            this.needUpdate = true;
-        }
-        this.blockEntity.setChanged();
     }
 
     @Override
@@ -110,7 +109,7 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
         var world = this.blockEntity.getLevel();
         assert world != null;
         if (this.workProgress >= this.currentRecipe.workTicks * PROGRESS_PER_TICK) {
-            this.currentRecipe.insertOutputs(this, world.random);
+            this.currentRecipe.insertOutputs(this.getContainer(), world.random);
             this.currentRecipe = null;
             this.needUpdate = true;
         }
@@ -154,6 +153,22 @@ public abstract class ProcessingContainer implements ICapabilityProvider, IProce
             this.workProgress = tag.getLong("workProgress");
         } else {
             this.currentRecipeId = null;
+        }
+    }
+
+    public static class Builder implements Function<BlockEntity, ICapabilityProvider> {
+        @Nullable
+        private RecipeType<? extends ProcessingRecipe<?>> recipeType = null;
+
+        public Builder recipeType(RecipeType<? extends ProcessingRecipe<?>> recipeType) {
+            this.recipeType = recipeType;
+            return this;
+        }
+
+        @Override
+        public ICapabilityProvider apply(BlockEntity blockEntity) {
+            assert this.recipeType != null;
+            return new RecipeProcessor(blockEntity, this.recipeType);
         }
     }
 }

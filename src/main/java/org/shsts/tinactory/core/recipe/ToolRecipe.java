@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import org.shsts.tinactory.content.machine.WorkbenchContainer;
+import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
+public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
     public final ShapedRecipe shapedRecipe;
     public final List<Ingredient> toolIngredients;
 
@@ -70,7 +70,7 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
     }
 
     @Override
-    public boolean matches(WorkbenchContainer container, Level world) {
+    public boolean matches(Workbench container, Level world) {
         return this.shapedRecipe.matches(container.getCraftingContainer(), world) &&
                 this.matchTools(container.getToolStorage());
     }
@@ -101,7 +101,7 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
     }
 
     @Override
-    public ItemStack assemble(WorkbenchContainer container) {
+    public ItemStack assemble(Workbench container) {
         return this.shapedRecipe.assemble(container.getCraftingContainer());
     }
 
@@ -116,7 +116,7 @@ public class ToolRecipe extends SmartRecipe<WorkbenchContainer, ToolRecipe> {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(WorkbenchContainer container) {
+    public NonNullList<ItemStack> getRemainingItems(Workbench container) {
         return this.shapedRecipe.getRemainingItems(container.getCraftingContainer());
     }
 

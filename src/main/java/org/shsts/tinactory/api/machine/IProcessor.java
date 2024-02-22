@@ -13,4 +13,6 @@ public interface IProcessor {
     void onWorkTick(double partial);
 
     double getProgress();
+
+    void onContainerUpdate();
 }

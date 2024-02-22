@@ -1,12 +1,12 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.logistics;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -14,37 +14,41 @@ import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.TinactoryConfig;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingStackContainer extends ProcessingContainer implements ICapabilityProvider {
+public class StackContainer implements ICapabilityProvider, IContainer, INBTSerializable<CompoundTag> {
     protected record PortInfo(int slots, Layout.SlotType type) {}
 
+    protected final BlockEntity blockEntity;
     protected final IItemHandlerModifiable combinedItems;
     protected final CombinedFluidTank combinedFluids;
     protected final List<IPort> ports;
     protected final List<IPort> internalPorts;
+    @Nullable
+    protected IProcessor processor = null;
 
-    public ProcessingStackContainer(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe<?>> recipeType,
-                                    Collection<PortInfo> ports) {
-        super(blockEntity, recipeType);
+    public StackContainer(BlockEntity blockEntity, Collection<PortInfo> ports) {
+        this.blockEntity = blockEntity;
         this.ports = new ArrayList<>(ports.size());
         this.internalPorts = new ArrayList<>(ports.size());
         var items = new ArrayList<WrapperItemHandler>(ports.size());
@@ -58,7 +62,7 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
             switch (port.type()) {
                 case ITEM_INPUT -> {
                     var view = new WrapperItemHandler(port.slots);
-                    view.onUpdate(this::onInputUpdate);
+                    view.onUpdate(this::onUpdate);
                     items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
@@ -67,7 +71,7 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
                 }
                 case ITEM_OUTPUT -> {
                     var inner = new WrapperItemHandler(port.slots);
-                    inner.onUpdate(this::onOutputUpdate);
+                    inner.onUpdate(this::onUpdate);
 
                     var view = new WrapperItemHandler(inner);
                     view.allowInput = false;
@@ -80,7 +84,7 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
                     var views = new WrapperFluidTank[port.slots];
                     for (var i = 0; i < port.slots; i++) {
                         var view = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
-                        view.onUpdate(this::onInputUpdate);
+                        view.onUpdate(this::onUpdate);
 
                         views[i] = view;
                         fluids.add(view);
@@ -96,7 +100,7 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
 
                     for (var i = 0; i < port.slots; i++) {
                         var inner = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
-                        inner.onUpdate(this::onInputUpdate);
+                        inner.onUpdate(this::onUpdate);
                         inners[i] = inner;
 
                         var view = new WrapperFluidTank(inner);
@@ -112,6 +116,19 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
         }
         this.combinedItems = new CombinedInvWrapper(items.toArray(IItemHandlerModifiable[]::new));
         this.combinedFluids = new CombinedFluidTank(fluids.toArray(WrapperFluidTank[]::new));
+    }
+
+    protected IProcessor getProcessor() {
+        if (this.processor == null) {
+            this.processor = this.blockEntity.getCapability(AllCapabilities.PROCESSOR.get())
+                    .orElseThrow(NoSuchElementException::new);
+        }
+        return this.processor;
+    }
+
+    protected void onUpdate() {
+        this.getProcessor().onContainerUpdate();
+        this.blockEntity.setChanged();
     }
 
     @Override
@@ -135,13 +152,15 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
             return LazyOptional.of(() -> this.combinedItems).cast();
         } else if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
             return LazyOptional.of(() -> this.combinedFluids).cast();
+        } else if (cap == AllCapabilities.CONTAINER.get()) {
+            return LazyOptional.of(() -> this).cast();
         }
-        return super.getCapability(cap, side);
+        return LazyOptional.empty();
     }
 
     @Override
     public CompoundTag serializeNBT() {
-        var tag = super.serializeNBT();
+        var tag = new CompoundTag();
         tag.put("stack", ItemHelper.serializeItemHandler(this.combinedItems));
         tag.put("fluid", this.combinedFluids.serializeNBT());
         return tag;
@@ -149,20 +168,12 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        super.deserializeNBT(tag);
         ItemHelper.deserializeItemHandler(this.combinedItems, tag.getCompound("stack"));
         this.combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 
     public static class Builder implements Function<BlockEntity, ICapabilityProvider> {
-        @Nullable
-        private RecipeType<? extends ProcessingRecipe<?>> recipeType = null;
         private final List<PortInfo> ports = new ArrayList<>();
-
-        public Builder recipeType(RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType) {
-            this.recipeType = recipeType.get();
-            return this;
-        }
 
         public Builder layout(Layout layout, Voltage voltage) {
             this.ports.clear();
@@ -182,8 +193,7 @@ public class ProcessingStackContainer extends ProcessingContainer implements ICa
 
         @Override
         public ICapabilityProvider apply(BlockEntity be) {
-            assert this.recipeType != null;
-            return new ProcessingStackContainer(be, this.recipeType, this.ports);
+            return new StackContainer(be, this.ports);
         }
     }
 }
