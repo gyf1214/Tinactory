@@ -18,7 +18,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -312,7 +311,7 @@ public class Registrate implements IBlockParent, IItemParent {
         return (new SimpleRegistryEntryBuilder<>(handler, id, factory)).register();
     }
 
-    public <T> RegistryEntry<Capability<T>> capability(Class<T> clazz, CapabilityToken<T> token) {
+    public <T> CapabilityEntry<T> capability(Class<T> clazz, CapabilityToken<T> token) {
         return this.capabilityHandler.register(clazz, token);
     }
 

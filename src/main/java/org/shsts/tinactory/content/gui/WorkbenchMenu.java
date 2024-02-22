@@ -13,7 +13,6 @@ import org.shsts.tinactory.core.gui.sync.CraftingSlot;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.NoSuchElementException;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -26,8 +25,7 @@ public class WorkbenchMenu extends ContainerMenu<SmartBlockEntity> {
     @Override
     public void initLayout() {
         super.initLayout();
-        var workbench = this.blockEntity.getCapability(AllCapabilities.WORKBENCH.get())
-                .orElseThrow(NoSuchElementException::new);
+        var workbench = AllCapabilities.WORKBENCH.getCapability(this.blockEntity);
 
         var layout = AllLayouts.WORKBENCH;
         var slotInfo = layout.slots.get(0);

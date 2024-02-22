@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
@@ -120,8 +119,7 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
 
     protected IProcessor getProcessor() {
         if (this.processor == null) {
-            this.processor = this.blockEntity.getCapability(AllCapabilities.PROCESSOR.get())
-                    .orElseThrow(NoSuchElementException::new);
+            this.processor = AllCapabilities.PROCESSOR.getCapability(this.blockEntity);
         }
         return this.processor;
     }

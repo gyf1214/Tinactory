@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.Transformer;
@@ -86,7 +87,7 @@ public class Layout {
             if (this.progressBar != null) {
                 builder.progressBar(this.progressBar.texture, this.progressBar.rect.offset(xOffset, yOffset),
                         be -> be.getCapability(AllCapabilities.PROCESSOR.get())
-                                .map(machine -> machine.getProgress())
+                                .map(IProcessor::getProgress)
                                 .orElse(0.0d));
             }
             return builder;

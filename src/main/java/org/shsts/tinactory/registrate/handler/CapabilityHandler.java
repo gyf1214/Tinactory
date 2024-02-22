@@ -1,12 +1,10 @@
 package org.shsts.tinactory.registrate.handler;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import org.shsts.tinactory.registrate.CapabilityEntry;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -29,9 +27,8 @@ public class CapabilityHandler {
         this.capabilities.clear();
     }
 
-    public <T> RegistryEntry<Capability<T>> register(Class<T> clazz, CapabilityToken<T> token) {
+    public <T> CapabilityEntry<T> register(Class<T> clazz, CapabilityToken<T> token) {
         this.capabilities.add(clazz);
-        // ignore id
-        return new RegistryEntry<>(this.registrate.modid, "", () -> CapabilityManager.get(token));
+        return new CapabilityEntry<>(this.registrate.modid, token);
     }
 }

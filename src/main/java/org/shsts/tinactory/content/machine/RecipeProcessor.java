@@ -20,7 +20,6 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
@@ -50,8 +49,7 @@ public class RecipeProcessor implements ICapabilityProvider, IProcessor, INBTSer
 
     protected IContainer getContainer() {
         if (this.container == null) {
-            this.container = this.blockEntity.getCapability(AllCapabilities.CONTAINER.get())
-                    .orElseThrow(NoSuchElementException::new);
+            this.container = AllCapabilities.CONTAINER.getCapability(this.blockEntity);
         }
         return this.container;
     }
