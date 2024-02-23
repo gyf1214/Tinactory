@@ -1,10 +1,12 @@
 package org.shsts.tinactory.core.network;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryManager;
 import org.shsts.tinactory.api.network.IScheduling;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -13,13 +15,15 @@ import java.util.List;
 import java.util.Queue;
 
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public final class SchedulingManager {
     private static class SortInfo {
         public int degree = 0;
         public final List<IScheduling> edges = new ArrayList<>();
     }
 
-    private static List<IScheduling> sortedSchedulings;
+    @Nullable
+    private static List<IScheduling> sortedSchedulings = null;
 
     public static void onBake(IForgeRegistry<IScheduling> registry, RegistryManager stage) {
         var nodes = new HashMap<IScheduling, SortInfo>();
@@ -64,6 +68,7 @@ public final class SchedulingManager {
     }
 
     public static List<IScheduling> getSortedSchedulings() {
+        assert sortedSchedulings != null;
         return sortedSchedulings;
     }
 }
