@@ -3,6 +3,7 @@ package org.shsts.tinactory.content;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.logistics.StackContainer;
@@ -20,6 +21,7 @@ public final class AllCapabilities {
 
     public static final CapabilityEntry<IProcessor> PROCESSOR;
     public static final CapabilityEntry<IContainer> CONTAINER;
+    public static final CapabilityEntry<IElectricMachine> ELECTRIC_MACHINE;
     public static final CapabilityEntry<IWorkbench> WORKBENCH;
     public static final CapabilityEntry<IFluidStackHandler> FLUID_STACK_HANDLER;
 
@@ -31,8 +33,9 @@ public final class AllCapabilities {
 
     static {
         PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
-        WORKBENCH = REGISTRATE.capability(IWorkbench.class, new CapabilityToken<>() {});
         CONTAINER = REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
+        ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
+        WORKBENCH = REGISTRATE.capability(IWorkbench.class, new CapabilityToken<>() {});
         FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
 
         WORKBENCH_CONTAINER = REGISTRATE.capabilityProvider("primitive/workbench_container",

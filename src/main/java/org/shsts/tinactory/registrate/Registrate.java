@@ -32,6 +32,8 @@ import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.network.Component;
+import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.recipe.NullRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
@@ -276,6 +278,12 @@ public class Registrate implements IBlockParent, IItemParent {
 
     @SuppressWarnings("unchecked")
     public <T extends IForgeRegistryEntry<T>>
+    RegistryBuilderWrapper<T, Registrate> genericRegistry(String id, Class<?> clazz) {
+        return new RegistryBuilderWrapper<>(this, id, (Class<T>) clazz, this);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends IForgeRegistryEntry<T>>
     SmartRegistry<T> simpleRegistry(String id, Class<?> clazz) {
         return (new RegistryBuilderWrapper<>(this, id, (Class<T>) clazz, this)).register();
     }
@@ -330,6 +338,12 @@ public class Registrate implements IBlockParent, IItemParent {
 
     public SchedulingBuilder<Registrate> scheduling(String id) {
         return this.registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
+    }
+
+    public <T extends Component>
+    RegistryEntry<ComponentType<T>> componentType(String id, Class<T> clazz, Component.Factory<T> factory) {
+        return this.registryEntry(id, AllRegistries.COMPONENT_TYPE_REGISTRY,
+                () -> new ComponentType<>(clazz, factory));
     }
 
     public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>

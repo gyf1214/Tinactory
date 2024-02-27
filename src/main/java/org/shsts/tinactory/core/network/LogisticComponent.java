@@ -169,6 +169,6 @@ public class LogisticComponent extends Component {
 
     @Override
     public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Ticker> cons) {
-        cons.accept(AllNetworks.LOGISTICS, this::onTick);
+        cons.accept(AllNetworks.LOGISTICS_SCHEDULING, this::onTick);
     }
 }

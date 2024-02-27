@@ -39,16 +39,16 @@ public class Machine extends SmartBlockEntity {
         if (this.network != null) {
             this.network.invalidate();
         }
-        LOGGER.debug("machine {}: removed in world", this);
         super.onRemovedInWorld(world);
+        LOGGER.debug("machine {}: removed in world", this);
     }
 
     @Override
     protected void onRemovedByChunk(Level world) {
-        LOGGER.debug("machine {}: removed by chunk unload", this);
         if (this.network != null) {
             this.network.invalidate();
         }
+        LOGGER.debug("machine {}: removed by chunk unload", this);
     }
 
     /**
@@ -59,15 +59,13 @@ public class Machine extends SmartBlockEntity {
         this.network = network;
     }
 
-    public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Component.Ticker> cons) {
-
-    }
+    public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Component.Ticker> cons) {}
 
     /**
      * Called when disconnect from the network
      */
     public void onDisconnectFromNetwork() {
-        LOGGER.debug("machine {}: disconnect from network", this);
         this.network = null;
+        LOGGER.debug("machine {}: disconnect from network", this);
     }
 }

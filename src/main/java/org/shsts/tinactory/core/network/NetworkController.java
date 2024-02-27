@@ -53,9 +53,9 @@ public class NetworkController extends Machine {
 
     @Override
     protected void onRemovedByChunk(Level world) {
-        super.onRemovedByChunk(world);
         if (this.network != null) {
             this.network.destroy();
         }
+        super.onRemovedByChunk(world);
     }
 }

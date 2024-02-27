@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -33,33 +34,31 @@ public class CompositeNetwork extends Network {
 
     public CompositeNetwork(Level world, BlockPos center) {
         super(world, center);
+        this.attachComponents();
     }
 
-    public <T extends Component> T getComponent(ComponentType<T> type) {
+    public <T extends Component> T getComponent(Supplier<ComponentType<T>> typeSupplier) {
+        var type = typeSupplier.get();
         return type.componentClass.cast(components.get(type));
     }
 
-    public void attachComponent(ComponentType<?> type) {
+    protected void attachComponent(ComponentType<?> type) {
         assert !this.components.containsKey(type);
-        this.invalidate();
         var component = type.create(this);
         this.components.put(type, component);
         component.buildSchedulings(((scheduling, ticker) ->
                 this.componentSchedulings.put(scheduling.get(), type, ticker)));
     }
 
-    public void detachComponent(ComponentType<?> type) {
-        assert this.components.containsKey(type);
-        this.invalidate();
-        this.components.remove(type);
-        this.componentSchedulings.removeAllSecondary(type);
+    protected void attachComponents() {
+        ComponentType.getComponentTypes().forEach(this::attachComponent);
     }
 
     protected void forEachComponent(Consumer<Component> cons) {
         this.components.values().forEach(cons);
     }
 
-    protected void forEachMachine(Consumer<Machine> cons) {
+    public void forEachMachine(Consumer<Machine> cons) {
         this.machines.forEach(cons);
     }
 
@@ -88,13 +87,12 @@ public class CompositeNetwork extends Network {
 
     @Override
     protected void onDisconnect() {
-        super.onDisconnect();
         this.forEachMachine(Machine::onDisconnectFromNetwork);
         this.forEachComponent(Component::onDisconnect);
         this.machines.clear();
         this.machineSchedulings.clear();
+        super.onDisconnect();
     }
-
 
     @Override
     protected void doTick() {

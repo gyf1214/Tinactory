@@ -128,16 +128,15 @@ public class Network {
         if (this.state == State.DESTROYED) {
             return;
         }
-        LOGGER.debug("network {}: invalidated", this);
         this.onDisconnect();
         if (this.ref != null) {
             this.ref.network = null;
         }
         this.reset();
+        LOGGER.debug("network {}: invalidated", this);
     }
 
     public void destroy() {
-        LOGGER.debug("network {}: destroyed", this);
         this.onDisconnect();
         if (this.ref != null) {
             this.ref.network = null;
@@ -146,6 +145,7 @@ public class Network {
         this.state = State.DESTROYED;
         this.bfsContext.reset();
         this.manager.unregisterNetwork(this);
+        LOGGER.debug("network {}: destroyed", this);
     }
 
     public Ref ref() {
