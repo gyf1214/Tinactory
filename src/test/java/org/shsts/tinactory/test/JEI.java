@@ -31,7 +31,7 @@ public class JEI implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new ProcessingCategory<>(
                 this.testType, registration.getJeiHelpers(), AllBlocks.TEST_FLUID_LAYOUT,
-                AllBlocks.TEST_MACHINE.getBlock()));
+                AllBlocks.TEST_MACHINE_BLOCK.get()));
     }
 
     @Override
@@ -45,6 +45,6 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(AllBlocks.TEST_MACHINE.getBlock()), this.testType);
+        registration.addRecipeCatalyst(new ItemStack(AllBlocks.TEST_MACHINE_BLOCK.get()), this.testType);
     }
 }

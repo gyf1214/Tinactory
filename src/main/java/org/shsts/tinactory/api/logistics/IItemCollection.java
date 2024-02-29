@@ -17,8 +17,14 @@ public interface IItemCollection extends IPort {
 
     boolean acceptOutput();
 
+    /**
+     * returns the remaining items not inserted
+     */
     ItemStack insertItem(ItemStack stack, boolean simulate);
 
+    /**
+     * returns the items taken
+     */
     ItemStack extractItem(ItemStack item, boolean simulate);
 
     int getItemCount(ItemStack item);

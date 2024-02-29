@@ -19,6 +19,7 @@ public class TinactoryTest {
 
     public TinactoryTest() {
         AllBlocks.init();
+        AllBlockEntities.init();
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(TinactoryTest::init);

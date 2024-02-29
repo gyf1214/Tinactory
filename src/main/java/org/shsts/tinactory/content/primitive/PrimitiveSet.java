@@ -55,7 +55,9 @@ public record PrimitiveSet<T extends ProcessingRecipe<T>>(
                 .validBlock(block)
                 .ticking()
                 .capability(AllCapabilities.STACK_CONTAINER, $ -> $.layout(layout, Voltage.PRIMITIVE))
-                .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $.recipeType(recipeType.get()))
+                .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $
+                        .recipeType(recipeType.get())
+                        .voltage(Voltage.PRIMITIVE))
                 .menu().layout(layout, Voltage.PRIMITIVE).build()
                 .register();
 

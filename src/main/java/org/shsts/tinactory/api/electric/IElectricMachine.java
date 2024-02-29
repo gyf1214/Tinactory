@@ -1,13 +1,13 @@
 package org.shsts.tinactory.api.electric;
 
 public interface IElectricMachine {
-    enum Type {
+    enum ElectricMachineType {
         GENERATOR, CONSUMER, BUFFER
     }
 
     long getVoltage();
 
-    Type getMachineType();
+    ElectricMachineType getMachineType();
 
     double getPower();
 }

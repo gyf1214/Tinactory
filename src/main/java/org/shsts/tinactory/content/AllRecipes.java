@@ -97,7 +97,7 @@ public final class AllRecipes {
         // generate cobblestone
         STONE_GENERATOR.modRecipe(Items.COBBLESTONE)
                 .outputItem(0, Items.COBBLESTONE, 1)
-                .workTicks(40)
+                .primitive().power(1).workTicks(40)
                 .build();
 
         // workbench

@@ -21,8 +21,6 @@ import java.util.Queue;
 @ParametersAreNonnullByDefault
 public class Network {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final int CONNECT_DELAY = 5;
-    private static final int MAX_CONNECT_PER_TICK = 100;
 
     protected final Level world;
 
@@ -91,11 +89,10 @@ public class Network {
                     continue;
                 }
                 var blockState1 = world.getBlockState(pos1);
-                if (!connected(pos1, blockState1, dir.getOpposite())) {
-                    continue;
+                if (connected(pos1, blockState1, dir.getOpposite())) {
+                    queue.add(pos1);
+                    visited.put(pos1, blockState1);
                 }
-                queue.add(pos1);
-                visited.put(pos1, blockState1);
             }
 
             return Optional.of(pos);

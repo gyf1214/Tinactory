@@ -13,8 +13,14 @@ public interface IFluidCollection extends IPort {
 
     boolean acceptOutput();
 
+    /**
+     * returns the amount of fluid inserted
+     */
     int fill(FluidStack fluid, boolean simulate);
 
+    /**
+     * returns the amount of fluid taken
+     */
     FluidStack drain(FluidStack fluid, boolean simulate);
 
     int getFluidAmount(FluidStack fluid);

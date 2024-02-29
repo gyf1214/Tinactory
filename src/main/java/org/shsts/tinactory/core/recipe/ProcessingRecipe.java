@@ -4,10 +4,6 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.Encoder;
-import com.mojang.serialization.JsonOps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +17,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
@@ -31,7 +28,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -45,13 +41,18 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     public final List<Output> outputs;
 
     public final long workTicks;
+    public final long voltage;
+    public final long power;
 
     public ProcessingRecipe(RecipeTypeEntry<S, ?> type, ResourceLocation loc,
-                            List<Input> inputs, List<Output> outputs, long workTicks) {
+                            List<Input> inputs, List<Output> outputs,
+                            long workTicks, long voltage, long power) {
         super(type, loc);
         this.inputs = inputs;
         this.outputs = outputs;
         this.workTicks = workTicks;
+        this.voltage = voltage;
+        this.power = power;
     }
 
     protected boolean consumeInput(IContainer container, Input input, boolean simulate) {
@@ -99,8 +100,8 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     public static class Simple extends ProcessingRecipe<Simple> {
         public Simple(RecipeTypeEntry<Simple, ?> type, ResourceLocation loc,
                       List<Input> inputs, List<Output> outputs,
-                      long workTicks) {
-            super(type, loc, inputs, outputs, workTicks);
+                      long workTicks, long voltage, long power) {
+            super(type, loc, inputs, outputs, workTicks, voltage, power);
         }
     }
 
@@ -109,6 +110,8 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         protected final List<Supplier<Input>> inputs = new ArrayList<>();
         protected final List<Supplier<Output>> outputs = new ArrayList<>();
         protected long workTicks = 0;
+        protected long voltage = 0;
+        protected long power = 0;
 
         public Builder(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
             super(registrate, parent, loc);
@@ -168,6 +171,31 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             return self();
         }
 
+        public S primitive() {
+            this.voltage = 0;
+            return self();
+        }
+
+        public S voltage(Voltage voltage) {
+            this.voltage = voltage.val;
+            return self();
+        }
+
+        public S voltage(long voltage) {
+            this.voltage = voltage;
+            return self();
+        }
+
+        public S power(long power) {
+            this.power = power;
+            return self();
+        }
+
+        public S amperage(double amperage) {
+            this.power = (long) (amperage * this.voltage);
+            return self();
+        }
+
         protected List<Input> getInputs() {
             return this.inputs.stream().map(Supplier::get).toList();
         }
@@ -185,7 +213,9 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
         @Override
         public Simple createObject() {
-            return new Simple(this.parent, this.loc, this.getInputs(), this.getOutputs(), this.workTicks);
+            return new Simple(this.parent, this.loc,
+                    this.getInputs(), this.getOutputs(),
+                    this.workTicks, this.voltage, this.power);
         }
     }
 
@@ -193,18 +223,6 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             extends SmartRecipeSerializer<T, B> {
         protected Serializer(RecipeTypeEntry<T, B> type) {
             super(type);
-        }
-
-        protected <L, R> Either<L, R> ifThenElse(boolean cond, Supplier<L> left, Supplier<R> right) {
-            return cond ? Either.left(left.get()) : Either.right(right.get());
-        }
-
-        protected <P> P parseFromJson(Decoder<P> codec, JsonElement je) {
-            return codec.parse(JsonOps.INSTANCE, je).getOrThrow(false, $ -> {});
-        }
-
-        protected static <T> Function<T, JsonElement> encodeToJson(Encoder<T> codec) {
-            return x -> codec.encodeStart(JsonOps.INSTANCE, x).getOrThrow(false, $ -> {});
         }
 
         protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
@@ -219,7 +237,10 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                     .forEach(je -> builder.output(
                             GsonHelper.getAsInt(je, "port"),
                             ProcessingResults.SERIALIZER.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
-            return builder.workTicks(GsonHelper.getAsLong(jo, "workTicks"));
+            return builder
+                    .workTicks(GsonHelper.getAsLong(jo, "workTicks"))
+                    .voltage(GsonHelper.getAsLong(jo, "voltage", 0))
+                    .power(GsonHelper.getAsLong(jo, "power", 0));
         }
 
         @Override
@@ -248,6 +269,10 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             jo.add("inputs", inputs);
             jo.add("outputs", outputs);
             jo.addProperty("workTicks", recipe.workTicks);
+            if (recipe.voltage > 0) {
+                jo.addProperty("voltage", recipe.voltage);
+                jo.addProperty("power", recipe.power);
+            }
         }
 
         public B buildFromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
@@ -258,7 +283,10 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             buf.readWithCount(buf1 -> builder.output(
                     buf1.readVarInt(),
                     ProcessingResults.SERIALIZER.fromNetwork(buf1)));
-            return builder.workTicks(buf.readVarLong());
+            return builder
+                    .workTicks(buf.readVarLong())
+                    .voltage(buf.readVarLong())
+                    .power(buf.readVarLong());
         }
 
         @Override
@@ -277,6 +305,8 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                 ProcessingResults.SERIALIZER.toNetwork(output.result, buf1);
             });
             buf.writeVarLong(recipe.workTicks);
+            buf.writeVarLong(recipe.voltage);
+            buf.writeVarLong(recipe.power);
         }
     }
 

@@ -3,14 +3,17 @@ package org.shsts.tinactory.test;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.material.Fluids;
+import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.content.primitive.PrimitiveSet;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -24,7 +27,8 @@ public final class AllBlocks {
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> TEST_RECIPE_TYPE;
 
     public static final Layout TEST_FLUID_LAYOUT;
-    public static final PrimitiveSet<ProcessingRecipe.Simple> TEST_MACHINE;
+    public static final RegistryEntry<MachineBlock<Machine>> TEST_MACHINE_BLOCK;
+    public static final RegistryEntry<MachineBlock<TestGenerator>> TEST_GENERATOR_BLOCK;
 
     static {
         REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
@@ -39,14 +43,28 @@ public final class AllBlocks {
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build();
 
-        TEST_MACHINE = PrimitiveSet.create(REGISTRATE, "test",
-                ModelGen.gregtech("blocks/machines/alloy_smelter/overlay"),
-                TEST_RECIPE_TYPE, TEST_FLUID_LAYOUT);
-
         TEST_RECIPE_TYPE.modRecipe(TinactoryTest.modLoc("test"))
                 .outputFluid(1, Fluids.WATER, 1000)
                 .workTicks(50)
                 .build();
+
+        TEST_MACHINE_BLOCK = REGISTRATE.entityBlock("machine/test", MachineBlock<Machine>::new)
+                .type(() -> AllBlockEntities.TEST_MACHINE)
+                .transform(ModelGen.machine(
+                        ModelGen.gregtech("blocks/casings/voltage/ulv"),
+                        ModelGen.gregtech("blocks/machines/alloy_smelter/overlay_front")))
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
+                .register();
+
+        TEST_GENERATOR_BLOCK = REGISTRATE.entityBlock("generator/test", MachineBlock<TestGenerator>::new)
+                .type(() -> AllBlockEntities.TEST_GENERATOR)
+                .transform(ModelGen.machine(
+                        ModelGen.gregtech("blocks/casings/voltage/ulv"),
+                        ModelGen.gregtech("blocks/overlay/machine/overlay_screen")))
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
+                .register();
     }
 
     public static void init() {}

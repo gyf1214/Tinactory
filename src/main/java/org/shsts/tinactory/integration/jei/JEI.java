@@ -75,8 +75,7 @@ public class JEI implements IModPlugin {
     private final List<CategoryInfo<?, ?>> categories = List.of(
             category(AllRecipes.TOOL, ToolCategory::new, AllBlocks.WORKBENCH.get()),
             processing(AllBlocks.PRIMITIVE_STONE_GENERATOR),
-            processing(AllBlocks.PRIMITIVE_ORE_ANALYZER),
-            processing(AllBlocks.PRIMITIVE_ORE_WASHER)
+            processing(AllBlocks.PRIMITIVE_ORE_ANALYZER)
     );
 
     @Override

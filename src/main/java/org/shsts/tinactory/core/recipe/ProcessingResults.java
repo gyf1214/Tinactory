@@ -117,7 +117,7 @@ public final class ProcessingResults {
 
         @Override
         protected boolean doInsertPort(IFluidCollection port, Random random, boolean simulate) {
-            return port.fill(this.stack, simulate) <= 0;
+            return port.fill(this.stack, simulate) == this.stack.getAmount();
         }
 
         public static final ICombinedSerializer<FluidResult> SERIALIZER = new ICombinedSerializer<>() {
