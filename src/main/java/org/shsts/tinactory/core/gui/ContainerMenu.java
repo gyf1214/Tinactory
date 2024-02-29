@@ -9,8 +9,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -267,7 +267,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
 
     protected FluidClickResult doClickFluidSlot(ItemStack item, IFluidTank tank,
                                                 boolean mayDrain, boolean mayFill) {
-        var cap = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).resolve();
+        var cap = FluidUtil.getFluidHandler(item).resolve();
         if (cap.isEmpty()) {
             return new FluidClickResult();
         }

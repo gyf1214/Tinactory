@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -27,6 +28,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.core.common.CapabilityProviderType;
+import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -89,6 +91,7 @@ public class Registrate implements IBlockParent, IItemParent {
             forgeHandler(ForgeRegistries.BLOCK_ENTITIES);
     public final RegistryEntryHandler<MenuType<?>> menuTypeHandler =
             forgeHandler(ForgeRegistries.CONTAINERS);
+    public final RegistryEntryHandler<Fluid> fluidHandler = forgeHandler(ForgeRegistries.FLUIDS);
 
     // Dynamic
     public final DynamicHandler<Biome> biomeHandler =
@@ -317,6 +320,14 @@ public class Registrate implements IBlockParent, IItemParent {
     public <T extends IForgeRegistryEntry<T>, U extends T>
     RegistryEntry<U> registryEntry(String id, RegistryEntryHandler<T> handler, Supplier<U> factory) {
         return (new SimpleRegistryEntryBuilder<>(handler, id, factory)).register();
+    }
+
+    public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation stillTexture, int color) {
+        return this.registryEntry(id, this.fluidHandler, () -> new SimpleFluid(stillTexture, color));
+    }
+
+    public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation stillTexture) {
+        return this.simpleFluid(id, stillTexture, 0xFFFFFFFF);
     }
 
     public <T> CapabilityEntry<T> capability(Class<T> clazz, CapabilityToken<T> token) {

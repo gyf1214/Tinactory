@@ -7,6 +7,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
@@ -29,6 +30,8 @@ public final class AllBlocks {
     public static final Layout TEST_FLUID_LAYOUT;
     public static final RegistryEntry<MachineBlock<Machine>> TEST_MACHINE_BLOCK;
     public static final RegistryEntry<MachineBlock<TestGenerator>> TEST_GENERATOR_BLOCK;
+    public static final RegistryEntry<SimpleFluid> TEST_STEAM;
+    public static final RegistryEntry<FluidCell> TEST_FLUID_CELL;
 
     static {
         REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
@@ -64,6 +67,12 @@ public final class AllBlocks {
                         ModelGen.gregtech("blocks/overlay/machine/overlay_screen")))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
+                .register();
+
+        TEST_STEAM = REGISTRATE.simpleFluid("steam", ModelGen.gregtech("blocks/fluids/fluid.steam"));
+
+        TEST_FLUID_CELL = REGISTRATE.item("fluid_cell", properties -> new FluidCell(properties, 16000))
+                .model(ModelGen.basicItem(ModelGen.gregtech("items/metaitems/fluid_cell/base")))
                 .register();
     }
 
