@@ -364,15 +364,12 @@ public class Registrate implements IBlockParent, IItemParent {
 
     public RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder>
     simpleProcessingRecipeType(String id) {
-        return this.recipeType(id, ProcessingRecipe.SIMPLE_SERIALIZER)
-                .clazz(ProcessingRecipe.Simple.class)
-                .builder(ProcessingRecipe.SimpleBuilder::new)
-                .register();
+        return this.simpleProcessingRecipeType(id, $ -> $);
     }
 
     public RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder>
     simpleProcessingRecipeType(String id, Transformer<ProcessingRecipe.SimpleBuilder> builderTransformer) {
-        return this.recipeType(id, ProcessingRecipe.SIMPLE_SERIALIZER)
+        return this.recipeType("processing/" + id, ProcessingRecipe.SIMPLE_SERIALIZER)
                 .clazz(ProcessingRecipe.Simple.class)
                 .builder(ProcessingRecipe.SimpleBuilder::new)
                 .builderTransform(builderTransformer)

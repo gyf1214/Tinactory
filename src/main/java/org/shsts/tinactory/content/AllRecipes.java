@@ -41,11 +41,11 @@ public final class AllRecipes {
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
-        STONE_GENERATOR = REGISTRATE.simpleProcessingRecipeType("processing/stone_generator");
-        ORE_ANALYZER = REGISTRATE.simpleProcessingRecipeType("processing/ore_analyzer");
-        ORE_WASHER = REGISTRATE.simpleProcessingRecipeType("processing/ore_washer",
-                $ -> $.inputFluid(1, Fluids.WATER, 1000)
-                        .outputItem(3, AllMaterials.STONE.getItemEntry("dust"), 1));
+        STONE_GENERATOR = REGISTRATE.simpleProcessingRecipeType("stone_generator");
+        ORE_ANALYZER = REGISTRATE.simpleProcessingRecipeType("ore_analyzer");
+        ORE_WASHER = REGISTRATE.simpleProcessingRecipeType("ore_washer", $ -> $
+                .inputFluid(1, Fluids.WATER, 1000)
+                .outputItem(3, AllMaterials.STONE.getItemEntry("dust"), 1));
     }
 
     public static void initRecipes() {

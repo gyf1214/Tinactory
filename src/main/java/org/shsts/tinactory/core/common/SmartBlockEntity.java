@@ -102,6 +102,9 @@ public class SmartBlockEntity extends BlockEntity {
         }
     }
 
+    /**
+     * Call setChanged and also send block update to client.
+     */
     protected void notifyUpdate() {
         this.setChanged();
         if (this.level != null && !this.level.isClientSide) {
@@ -157,5 +160,11 @@ public class SmartBlockEntity extends BlockEntity {
 
     protected void deserializeOnUpdate(CompoundTag tag) {
         this.deserializeOnSave(tag);
+    }
+
+    @Override
+    public String toString() {
+        return "%s(%s)@%s:%s".formatted(this.getClass().getSimpleName(),
+                this.getType().getRegistryName(), this.level, this.worldPosition);
     }
 }

@@ -10,17 +10,21 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllBlocks;
+import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.AllRecipes;
+import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.content.primitive.PrimitiveSet;
 import org.shsts.tinactory.core.common.SmartRecipe;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
@@ -29,6 +33,7 @@ import org.shsts.tinactory.registrate.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.function.Supplier;
 
 @JeiPlugin
 @ParametersAreNonnullByDefault
@@ -39,7 +44,7 @@ public class JEI implements IModPlugin {
     private record CategoryInfo<C extends Container, T extends Recipe<C>>(
             RecipeType<T> type, RecipeTypeEntry<T, ?> typeEntry,
             RecipeCategory.Factory<T> factory,
-            Ingredient catalyst) {
+            Supplier<Ingredient> catalyst) {
         public void register(IRecipeCategoryRegistration registration) {
             registration.addRecipeCategories(this.factory.create(this.type, registration.getJeiHelpers()));
         }
@@ -49,33 +54,34 @@ public class JEI implements IModPlugin {
         }
 
         public void addCatalysts(IRecipeCatalystRegistration registration) {
-            for (var itemStack : this.catalyst.getItems()) {
+            for (var itemStack : this.catalyst.get().getItems()) {
                 registration.addRecipeCatalyst(VanillaTypes.ITEM_STACK, itemStack, this.type);
             }
         }
     }
 
     private static <C extends Container, T extends Recipe<C>> CategoryInfo<C, T>
-    category(RecipeTypeEntry<T, ?> typeEntry, RecipeCategory.Factory<T> factory, Ingredient catalyst) {
-        var type = new RecipeType<>(ModelGen.prepend(typeEntry.loc, "jei/category"), typeEntry.clazz);
-        return new CategoryInfo<>(type, typeEntry, factory, catalyst);
+    category(RecipeTypeEntry<T, ?> recipeType, RecipeCategory.Factory<T> factory, Supplier<Ingredient> catalyst) {
+        var type = new RecipeType<>(ModelGen.prepend(recipeType.loc, "jei/category"), recipeType.clazz);
+        return new CategoryInfo<>(type, recipeType, factory, catalyst);
     }
 
     private static <C extends Container, T extends Recipe<C>> CategoryInfo<C, T>
-    category(RecipeTypeEntry<T, ?> typeEntry, RecipeCategory.Factory<T> factory, ItemLike catalyst) {
-        return category(typeEntry, factory, Ingredient.of(catalyst));
+    category(RecipeTypeEntry<T, ?> recipeType, RecipeCategory.Factory<T> factory, TagKey<Item> catalyst) {
+        return category(recipeType, factory, () -> Ingredient.of(catalyst));
     }
 
     private static <T extends ProcessingRecipe<T>> CategoryInfo<SmartRecipe.ContainerWrapper<IContainer>, T>
-    processing(PrimitiveSet<T> set) {
-        return category(set.recipeType(), (type, helpers) ->
-                new ProcessingCategory<>(type, helpers, set.layout(), set.getBlock()), set.getBlock());
+    processing(RecipeTypeEntry<T, ?> recipeType, Layout layout,
+               Supplier<? extends Block> block) {
+        return category(recipeType, (type, helpers) ->
+                new ProcessingCategory<>(type, helpers, layout, block.get()), AllTags.processingMachine(recipeType));
     }
 
     private final List<CategoryInfo<?, ?>> categories = List.of(
-            category(AllRecipes.TOOL, ToolCategory::new, AllBlocks.WORKBENCH.get()),
-            processing(AllBlocks.PRIMITIVE_STONE_GENERATOR),
-            processing(AllBlocks.PRIMITIVE_ORE_ANALYZER)
+            category(AllRecipes.TOOL, ToolCategory::new, () -> Ingredient.of(AllBlocks.WORKBENCH.get())),
+            processing(AllRecipes.STONE_GENERATOR, AllLayouts.STONE_GENERATOR, AllBlocks.PRIMITIVE_STONE_GENERATOR::getBlock),
+            processing(AllRecipes.ORE_ANALYZER, AllLayouts.ORE_ANALYZER, AllBlocks.PRIMITIVE_STONE_GENERATOR::getBlock)
     );
 
     @Override

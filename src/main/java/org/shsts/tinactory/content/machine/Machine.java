@@ -33,6 +33,10 @@ public class Machine extends SmartBlockEntity {
         super(type, pos, state);
     }
 
+    public static Machine primitive(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        return new PrimitiveMachine(type, pos, state);
+    }
+
     @Override
     protected void onLoad(Level world) {
         LOGGER.debug("machine {}: loaded", this);

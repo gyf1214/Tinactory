@@ -7,4 +7,9 @@ public interface Transformer<T> {
     default Transformer<T> chain(Transformer<T> other) {
         return $ -> other.apply(this.apply($));
     }
+
+    @SuppressWarnings("unchecked")
+    default <U> Transformer<U> cast() {
+        return (Transformer<U>) this;
+    }
 }

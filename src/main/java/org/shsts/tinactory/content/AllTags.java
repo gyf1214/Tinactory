@@ -8,6 +8,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -32,6 +34,11 @@ public final class AllTags {
     public static final TagKey<Block> MINEABLE_WITH_WRENCH = modBlock("mineable/wrench");
     public static final TagKey<Block> MINEABLE_WITH_CUTTER = modBlock("mineable/cutter");
 
+    public static TagKey<Item>
+    processingMachine(RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType) {
+        return item(new ResourceLocation(recipeType.modid, "machine/" + recipeType.id));
+    }
+
     public static TagKey<Item> item(ResourceLocation loc) {
         return TagKey.create(Registry.ITEM_REGISTRY, loc);
     }
@@ -44,8 +51,12 @@ public final class AllTags {
         return item(ModelGen.modLoc(id));
     }
 
+    public static TagKey<Block> block(ResourceLocation loc) {
+        return TagKey.create(Registry.BLOCK_REGISTRY, loc);
+    }
+
     public static TagKey<Block> modBlock(String id) {
-        return TagKey.create(Registry.BLOCK_REGISTRY, ModelGen.modLoc(id));
+        return block(ModelGen.modLoc(id));
     }
 
     public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {

@@ -12,6 +12,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.core.common.Transformer;
@@ -102,6 +103,17 @@ public final class ModelGen {
                 .translucent();
     }
 
+    public static ResourceLocation casing(Voltage voltage) {
+        return voltage == Voltage.PRIMITIVE ?
+                ModelGen.gregtech("blocks/casings/wood_wall") :
+                ModelGen.gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
+    }
+
+    public static <S extends BlockBuilder<? extends MachineBlock<?>, ?, S>>
+    Transformer<S> machine(Voltage voltage, ResourceLocation front) {
+        return machine(casing(voltage), front);
+    }
+
     public static <S extends BlockBuilder<? extends MachineBlock<?>, ?, S>>
     Transformer<S> machine(ResourceLocation casing, ResourceLocation front) {
         var model = new MachineModel(casing, front);
@@ -120,23 +132,6 @@ public final class ModelGen {
             }
             ctx.provider.horizontalBlock(ctx.object, model);
         });
-    }
-
-    public static <S extends BlockBuilder<? extends Block, ?, S>>
-    Transformer<S> primitiveMachine(ResourceLocation overlay) {
-        return $ -> $.blockState(ctx -> {
-            var existingHelper = ctx.provider.models().existingFileHelper;
-            var model = ctx.provider.models()
-                    .withExistingParent(ctx.id, modLoc("block/machine/casing"));
-            MachineModel.casing(model, gregtech("blocks/casings/wood_wall"));
-            for (var dir : DIR_TEX_KEYS.values()) {
-                var faceTex = new ResourceLocation(overlay.getNamespace(), overlay.getPath() + "_" + dir);
-                if (existingHelper.exists(faceTex, TEXTURE_TYPE)) {
-                    model.texture(dir + "_overlay", faceTex);
-                }
-            }
-            ctx.provider.horizontalBlock(ctx.object, model);
-        }).translucent();
     }
 
     private static final Registrate REGISTRATE = Tinactory.REGISTRATE;

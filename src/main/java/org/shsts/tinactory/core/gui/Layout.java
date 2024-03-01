@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -11,6 +12,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -113,7 +115,10 @@ public class Layout {
         return ret;
     }
 
-    public static class Builder {
+    public static class Builder<P> {
+        private final P parent;
+        @Nullable
+        Consumer<Layout> onCreateObject = null;
         private final List<SlotInfo> slots = new ArrayList<>();
         private final List<WidgetInfo> images = new ArrayList<>();
         @Nullable
@@ -122,43 +127,60 @@ public class Layout {
         private int curPort = -1;
         private int curSlot = 0;
 
-        public Builder dummySlot(int x, int y) {
+        private Builder(P parent) {
+            this.parent = parent;
+        }
+
+        public Builder<P> dummySlot(int x, int y) {
             this.slots.add(new SlotInfo(0, x, y, 0, SlotType.NONE, Voltage.PRIMITIVE));
             return this;
         }
 
-        public Builder port(SlotType type) {
+        public Builder<P> port(SlotType type) {
             this.curPort++;
             this.curSlotType = type;
             return this;
         }
 
-        public Builder slot(int x, int y, Voltage requiredVoltage) {
+        public Builder<P> slot(int x, int y, Voltage requiredVoltage) {
             assert this.curPort >= 0;
             this.slots.add(new SlotInfo(this.curSlot++, x, y, this.curPort, this.curSlotType, requiredVoltage));
             return this;
         }
 
-        public Builder slot(int x, int y) {
+        public Builder<P> slot(int x, int y) {
             return this.slot(x, y, Voltage.PRIMITIVE);
         }
 
-        public Builder image(Rect rect, Texture tex) {
+        public Builder<P> image(Rect rect, Texture tex) {
             this.images.add(new WidgetInfo(rect, tex));
             return this;
         }
 
-        public Builder progressBar(Texture tex, int x, int y) {
+        public Builder<P> progressBar(Texture tex, int x, int y) {
             this.progressBar = new WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
             return this;
         }
 
         public Layout build() {
-            return new Layout(this.slots, this.images, this.progressBar);
+            var ret = new Layout(this.slots, this.images, this.progressBar);
+            if (this.onCreateObject != null) {
+                this.onCreateObject.accept(ret);
+            }
+            return ret;
+        }
+
+        public P end() {
+            this.build();
+            return this.parent;
         }
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static <P> Builder<P> builder(P parent) {
+        return new Builder<>(parent);
+    }
+
+    public static Builder<?> builder() {
+        return new Builder<>(Unit.INSTANCE);
     }
 }

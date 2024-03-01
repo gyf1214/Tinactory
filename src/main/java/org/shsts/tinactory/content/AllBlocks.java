@@ -4,11 +4,11 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.CreativeModeTab;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
+import org.shsts.tinactory.content.machine.PrimitiveBlock;
+import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.CableSetting;
-import org.shsts.tinactory.content.primitive.PrimitiveBlock;
-import org.shsts.tinactory.content.primitive.PrimitiveSet;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -23,8 +23,8 @@ public final class AllBlocks {
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
 
-    public static final PrimitiveSet<ProcessingRecipe.Simple> PRIMITIVE_STONE_GENERATOR;
-    public static final PrimitiveSet<ProcessingRecipe.Simple> PRIMITIVE_ORE_ANALYZER;
+    public static final ProcessingSet<ProcessingRecipe.Simple> PRIMITIVE_STONE_GENERATOR;
+    public static final ProcessingSet<ProcessingRecipe.Simple> PRIMITIVE_ORE_ANALYZER;
 
     static {
         REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
@@ -58,12 +58,14 @@ public final class AllBlocks {
                 .defaultBlockItem().dropSelf()
                 .register();
 
-        PRIMITIVE_STONE_GENERATOR = PrimitiveSet.create("primitive/stone_generator",
-                ModelGen.gregtech("blocks/machines/rock_crusher/overlay"),
-                AllRecipes.STONE_GENERATOR, AllLayouts.STONE_GENERATOR);
-        PRIMITIVE_ORE_ANALYZER = PrimitiveSet.create("primitive/ore_analyzer",
-                ModelGen.gregtech("blocks/machines/electromagnetic_separator/overlay"),
-                AllRecipes.ORE_ANALYZER, AllLayouts.ORE_ANALYZER);
+        PRIMITIVE_STONE_GENERATOR = ProcessingSet.primitive("primitive/stone_generator",
+                AllRecipes.STONE_GENERATOR,
+                ModelGen.gregtech("blocks/machines/rock_crusher/overlay_front"),
+                AllLayouts.STONE_GENERATOR);
+        PRIMITIVE_ORE_ANALYZER = ProcessingSet.primitive("primitive/ore_analyzer",
+                AllRecipes.ORE_ANALYZER,
+                ModelGen.gregtech("blocks/machines/electromagnetic_separator/overlay_front"),
+                AllLayouts.ORE_ANALYZER);
     }
 
     public static void init() {}

@@ -1,5 +1,6 @@
-package org.shsts.tinactory.content.primitive;
+package org.shsts.tinactory.content.machine;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -13,12 +14,16 @@ import org.shsts.tinactory.core.common.SmartEntityBlock;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
+/**
+ * Entity block that has a face and do not connect to a network.
+ */
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class PrimitiveBlock<T extends BlockEntity> extends SmartEntityBlock<T> {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public PrimitiveBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType) {
-        super(properties.strength(2.0f).requiresCorrectToolForDrops(), entityType);
+        super(properties.strength(2.0f, 6.0f).requiresCorrectToolForDrops(), entityType);
     }
 
     @Override

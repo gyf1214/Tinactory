@@ -1,6 +1,7 @@
 package org.shsts.tinactory.test;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -11,6 +12,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.shsts.tinactory.registrate.Registrate;
 import org.slf4j.Logger;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 @Mod(TinactoryTest.ID)
 public class TinactoryTest {
     public static final String ID = "tinactory_test";
@@ -27,7 +32,7 @@ public class TinactoryTest {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> REGISTRATE.registerClient(modEventBus));
     }
 
-    private static void init(final FMLCommonSetupEvent event) {
+    private static void init(FMLCommonSetupEvent event) {
         LOGGER.info("hello TinactoryTest!");
     }
 
