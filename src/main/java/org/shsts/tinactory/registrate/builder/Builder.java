@@ -20,6 +20,7 @@ public abstract class Builder<U, P, S extends Builder<U, P, S>> implements ISelf
     protected final Registrate registrate;
     protected final P parent;
     protected final List<Consumer<U>> onCreateObject = new ArrayList<>();
+    protected final List<Consumer<S>> onBuild = new ArrayList<>();
 
     public Builder(Registrate registrate, P parent, String id) {
         this.registrate = registrate;
@@ -47,7 +48,10 @@ public abstract class Builder<U, P, S extends Builder<U, P, S>> implements ISelf
     }
 
     public P build() {
-        this.buildObject();
+        for (var cb : this.onBuild) {
+            cb.accept(self());
+        }
+        this.onBuild.clear();
         return this.parent;
     }
 

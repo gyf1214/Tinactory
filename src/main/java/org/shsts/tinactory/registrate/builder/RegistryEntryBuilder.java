@@ -38,12 +38,6 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
         this.entry.setObject(object);
     }
 
-    @Override
-    public P build() {
-        this.register();
-        return this.parent;
-    }
-
     protected <P1 extends DataProvider>
     void addDataCallback(DataHandler<P1> handler, Consumer<RegistryDataContext<T, U, P1>> cons) {
         this.onCreateEntry.add(entry ->

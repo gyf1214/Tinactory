@@ -5,8 +5,10 @@ public enum Voltage {
     MAXIMUM(2147483648L);
 
     public final long val;
+    public final String id;
 
     Voltage(long val) {
         this.val = val;
+        this.id = this.name().toLowerCase();
     }
 }

@@ -12,8 +12,6 @@ public final class AllBlockEntities {
 
     public static final RegistryEntry<SmartBlockEntityType<Machine>> TEST_MACHINE;
 
-    public static final RegistryEntry<SmartBlockEntityType<TestGenerator>> TEST_GENERATOR;
-
     static {
         TEST_MACHINE = REGISTRATE.blockEntity("machine/test", Machine::new)
                 .entityClass(Machine.class)
@@ -24,12 +22,6 @@ public final class AllBlockEntities {
                         .voltage(Voltage.ULV)
                         .recipeType(AllBlocks.TEST_RECIPE_TYPE.get()))
                 .menu().layout(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV).build()
-                .register();
-
-        TEST_GENERATOR = REGISTRATE.blockEntity("generator/test", TestGenerator.factory(Voltage.ULV, 1))
-                .entityClass(TestGenerator.class)
-                .validBlock(AllBlocks.TEST_GENERATOR_BLOCK)
-                .ticking()
                 .register();
     }
 

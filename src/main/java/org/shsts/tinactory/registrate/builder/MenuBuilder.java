@@ -87,6 +87,10 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
             return parent.entry.get();
         };
         this.factory = factory;
+        this.onBuild.add($ -> {
+            $.parent.onCreateEntry.add($p -> $.register());
+            $.onCreateEntry.add(entry -> $.parent.setMenu(entry::get));
+        });
     }
 
     public S title(Function<T, Component> title) {
@@ -197,12 +201,5 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
                 this.registrate.menuScreenHandler.setMenuScreen(menuType, this.getScreenFactory()));
         return menuType;
-    }
-
-    @Override
-    public P build() {
-        this.parent.onCreateEntry.add($ -> this.register());
-        this.onCreateEntry.add(entry -> this.parent.setMenu(entry::get));
-        return this.parent;
     }
 }

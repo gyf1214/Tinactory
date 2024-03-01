@@ -21,11 +21,7 @@ public abstract class SmartRecipeBuilder<U extends SmartRecipe<?, U>, S extends 
 
     protected SmartRecipeBuilder(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
         super(registrate, parent, loc);
-    }
-
-    @Override
-    public RecipeTypeEntry<U, S> build() {
-        this.registrate.recipeDataHandler.addCallback(prov -> prov.addRecipe(this.buildObject().toFinished()));
-        return this.parent;
+        this.onBuild.add($ -> $.registrate.recipeDataHandler
+                .addCallback(prov -> prov.addRecipe($.buildObject().toFinished())));
     }
 }

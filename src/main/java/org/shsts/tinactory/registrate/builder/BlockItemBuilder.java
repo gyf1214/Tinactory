@@ -24,6 +24,7 @@ public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, 
             assert parent.entry != null;
             return factory.create(parent.entry.get(), properties);
         });
+        this.onBuild.add($ -> parent.onCreateEntry.add($p -> $.register()));
     }
 
     @Override
@@ -35,11 +36,5 @@ public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, 
             this.tint = this.parent.getItemTint().orElse(null);
         }
         return super.createEntry();
-    }
-
-    @Override
-    public P build() {
-        this.parent.onCreateEntry.add($ -> this.register());
-        return this.parent;
     }
 }

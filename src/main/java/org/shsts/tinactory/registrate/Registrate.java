@@ -203,16 +203,21 @@ public class Registrate {
         return new SimpleBlockBuilder<>(id, factory);
     }
 
-    private class SimpleEntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-            extends EntityBlockBuilder<T, U, Registrate, SimpleEntityBlockBuilder<T, U>> {
-        public SimpleEntityBlockBuilder(String id, Factory<T, U> factory) {
-            super(Registrate.this, id, Registrate.this, factory);
+    private class SimpleEntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>, P>
+            extends EntityBlockBuilder<T, U, P, SimpleEntityBlockBuilder<T, U, P>> {
+        public SimpleEntityBlockBuilder(P parent, String id, Factory<T, U> factory) {
+            super(Registrate.this, id, parent, factory);
         }
     }
 
     public <T extends SmartBlockEntity, U extends SmartEntityBlock<T>> EntityBlockBuilder<T, U, Registrate, ?>
     entityBlock(String id, EntityBlockBuilder.Factory<T, U> factory) {
-        return new SimpleEntityBlockBuilder<>(id, factory);
+        return new SimpleEntityBlockBuilder<>(this, id, factory);
+    }
+
+    public <T extends SmartBlockEntity, P, U extends SmartEntityBlock<T>> EntityBlockBuilder<T, U, P, ?>
+    entityBlock(P parent, String id, EntityBlockBuilder.Factory<T, U> factory) {
+        return new SimpleEntityBlockBuilder<>(parent, id, factory);
     }
 
     private class SimpleItemBuilder<U extends Item>
@@ -228,17 +233,22 @@ public class Registrate {
         return new SimpleItemBuilder<>(id, factory);
     }
 
-    private class SimpleBlockEntityBuilder<U extends SmartBlockEntity>
-            extends BlockEntityBuilder<U, Registrate, SimpleBlockEntityBuilder<U>> {
+    private class SimpleBlockEntityBuilder<U extends SmartBlockEntity, P>
+            extends BlockEntityBuilder<U, P, SimpleBlockEntityBuilder<U, P>> {
 
-        public SimpleBlockEntityBuilder(String id, Factory<U> factory) {
-            super(Registrate.this, id, Registrate.this, factory);
+        public SimpleBlockEntityBuilder(P parent, String id, Factory<U> factory) {
+            super(Registrate.this, id, parent, factory);
         }
     }
 
     public <U extends SmartBlockEntity> BlockEntityBuilder<U, Registrate, ?>
     blockEntity(String id, BlockEntityBuilder.Factory<U> factory) {
-        return new SimpleBlockEntityBuilder<>(id, factory);
+        return new SimpleBlockEntityBuilder<>(this, id, factory);
+    }
+
+    public <U extends SmartBlockEntity, P> BlockEntityBuilder<U, P, ?>
+    blockEntity(P parent, String id, BlockEntityBuilder.Factory<U> factory) {
+        return new SimpleBlockEntityBuilder<>(parent, id, factory);
     }
 
     public void blockState(Consumer<DataContext<BlockStateProvider>> cons) {
