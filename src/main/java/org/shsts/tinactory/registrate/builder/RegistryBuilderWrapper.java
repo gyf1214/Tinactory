@@ -48,7 +48,7 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
     }
 
     public void registerObject(NewRegistryEvent event) {
-        LOGGER.debug("register registry {} {}", this.entryClass, this.loc);
+        LOGGER.debug("register registry {} {}", this.entryClass.getSimpleName(), this.loc);
         assert this.entry != null;
         var builder = this.buildObject();
         this.entry.setSupplier(event.create(builder));

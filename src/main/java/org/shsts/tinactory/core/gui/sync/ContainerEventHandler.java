@@ -36,7 +36,7 @@ public final class ContainerEventHandler {
     private static <P extends ContainerEventPacket>
     Event<P> register(Class<P> clazz, Supplier<P> constructor) {
         var nextId = eventId.getAndIncrement();
-        LOGGER.debug("register container event packet {} id={}", clazz, nextId);
+        LOGGER.debug("register container event packet {} id={}", clazz.getSimpleName(), nextId);
         if (!handledClasses.contains(clazz)) {
             Tinactory.registryPacket(clazz, constructor, ContainerEventHandler::handle);
             handledClasses.add(clazz);

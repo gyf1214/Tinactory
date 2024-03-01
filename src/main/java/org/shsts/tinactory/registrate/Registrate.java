@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -16,7 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -62,7 +60,6 @@ import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
 import org.shsts.tinactory.registrate.handler.TagsHandler;
 import org.shsts.tinactory.registrate.handler.TintHandler;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +71,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Registrate implements IBlockParent, IItemParent {
+public class Registrate {
     public final String modid;
 
     private final Map<ResourceLocation, RegistryEntryHandler<?>> registryEntryHandlers = new HashMap<>();
@@ -402,67 +399,5 @@ public class Registrate implements IBlockParent, IItemParent {
 
     public void vanillaRecipe(Supplier<RecipeBuilder> recipe, ResourceLocation loc) {
         this.recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe, loc));
-    }
-
-    // defaults
-
-    private Material defaultMaterial = Material.STONE;
-    private Transformer<BlockBehaviour.Properties> defaultBlockProperties = $ -> $;
-
-    public void defaultBlockProperties(Material material) {
-        this.defaultMaterial = material;
-    }
-
-    public void defaultBlockProperties(Transformer<BlockBehaviour.Properties> trans) {
-        this.defaultBlockProperties = this.defaultBlockProperties.chain(trans);
-    }
-
-    public void resetDefaultBlockProperties(Transformer<BlockBehaviour.Properties> trans) {
-        this.defaultBlockProperties = trans;
-    }
-
-    public void resetDefaultBlockProperties() {
-        this.defaultBlockProperties = $ -> $;
-    }
-
-    @Override
-    public Material getDefaultMaterial() {
-        return defaultMaterial;
-    }
-
-    @Override
-    public Transformer<BlockBehaviour.Properties> getDefaultBlockProperties() {
-        return defaultBlockProperties;
-    }
-
-    @Nullable
-    private CreativeModeTab defaultCreativeModeTab = null;
-    private Transformer<Item.Properties> defaultItemProperties = $ -> $;
-
-    public void defaultItemProperties(Transformer<Item.Properties> trans) {
-        this.defaultItemProperties = this.defaultItemProperties.chain(trans);
-    }
-
-    public void resetDefaultItemProperties(Transformer<Item.Properties> trans) {
-        this.defaultItemProperties = trans;
-    }
-
-    public void resetDefaultItemProperties() {
-        this.defaultItemProperties = $ -> $;
-    }
-
-    public void creativeModeTab(CreativeModeTab tab) {
-        this.defaultCreativeModeTab = tab;
-    }
-
-    @Nullable
-    @Override
-    public CreativeModeTab getDefaultCreativeModeTab() {
-        return this.defaultCreativeModeTab;
-    }
-
-    @Override
-    public Transformer<Item.Properties> getDefaultItemProperties() {
-        return this.defaultItemProperties;
     }
 }

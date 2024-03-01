@@ -3,12 +3,12 @@ package org.shsts.tinactory.registrate.builder;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.DistLazy;
-import org.shsts.tinactory.registrate.IItemParent;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
@@ -20,10 +20,10 @@ import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBuilder<U, P, S>>
+public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
         extends RegistryEntryBuilder<Item, U, P, S> {
     protected final Function<Item.Properties, U> factory;
-    protected Transformer<Item.Properties> properties = $ -> $;
+    protected Transformer<Item.Properties> properties = $ -> $.tab(CreativeModeTab.TAB_MISC);
     @Nullable
     protected Consumer<RegistryDataContext<Item, U, ItemModelProvider>> modelCallback = null;
     @Nullable
@@ -75,13 +75,6 @@ public class ItemBuilder<U extends Item, P extends IItemParent, S extends ItemBu
 
     @Override
     public U createObject() {
-        var defaultTab = this.parent.getDefaultCreativeModeTab();
-        var properties = new Item.Properties();
-        if (defaultTab != null) {
-            properties = properties.tab(defaultTab);
-        }
-        properties = this.parent.getDefaultItemProperties().apply(properties);
-        properties = this.properties.apply(properties);
-        return this.factory.apply(properties);
+        return this.factory.apply(this.properties.apply(new Item.Properties()));
     }
 }

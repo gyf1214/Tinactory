@@ -1,7 +1,6 @@
 package org.shsts.tinactory.test;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Machine;
@@ -34,8 +33,6 @@ public final class AllBlocks {
     public static final RegistryEntry<FluidCell> TEST_FLUID_CELL;
 
     static {
-        REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
-
         TEST_RECIPE_TYPE = REGISTRATE.simpleProcessingRecipeType("test");
 
         TEST_FLUID_LAYOUT = Layout.builder()

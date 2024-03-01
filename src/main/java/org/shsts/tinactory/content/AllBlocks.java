@@ -1,7 +1,6 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.CreativeModeTab;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
@@ -27,7 +26,6 @@ public final class AllBlocks {
     public static final ProcessingSet<ProcessingRecipe.Simple> PRIMITIVE_ORE_ANALYZER;
 
     static {
-        REGISTRATE.creativeModeTab(CreativeModeTab.TAB_REDSTONE);
         NORMAL_CABLE = REGISTRATE.block("network/cable/normal", CableBlock.factory(CableSetting.NORMAL))
                 .transform(ModelGen.cable())
                 .tint(0xFF363636, 0xFFFFFFFF)

@@ -4,15 +4,13 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
-import org.shsts.tinactory.registrate.IBlockParent;
-import org.shsts.tinactory.registrate.IItemParent;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public class EntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>,
-        P extends IBlockParent & IItemParent, S extends EntityBlockBuilder<T, U, P, S>>
+        P, S extends EntityBlockBuilder<T, U, P, S>>
         extends BlockBuilder<U, P, S> {
 
     @FunctionalInterface

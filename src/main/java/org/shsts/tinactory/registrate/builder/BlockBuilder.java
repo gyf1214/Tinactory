@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -18,8 +17,6 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.DistLazy;
-import org.shsts.tinactory.registrate.IBlockParent;
-import org.shsts.tinactory.registrate.IItemParent;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
@@ -33,12 +30,11 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent, S extends BlockBuilder<U, P, S>>
-        extends RegistryEntryBuilder<Block, U, P, S> implements IItemParent {
+public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
+        extends RegistryEntryBuilder<Block, U, P, S> {
     @Nullable
     protected Function<BlockBehaviour.Properties, U> factory = null;
-    @Nullable
-    protected Material material = null;
+    protected Material material = Material.STONE;
     protected Transformer<BlockBehaviour.Properties> properties = $ -> $;
 
     @Nullable
@@ -170,21 +166,7 @@ public class BlockBuilder<U extends Block, P extends IBlockParent & IItemParent,
 
     @Override
     public U createObject() {
-        var material = this.material == null ? this.parent.getDefaultMaterial() : this.material;
-        var properties = this.properties.apply(
-                this.parent.getDefaultBlockProperties().apply(BlockBehaviour.Properties.of(material)));
         assert this.factory != null;
-        return this.factory.apply(properties);
-    }
-
-    @Nullable
-    @Override
-    public CreativeModeTab getDefaultCreativeModeTab() {
-        return this.parent.getDefaultCreativeModeTab();
-    }
-
-    @Override
-    public Transformer<Item.Properties> getDefaultItemProperties() {
-        return this.parent.getDefaultItemProperties();
+        return this.factory.apply(this.properties.apply(BlockBehaviour.Properties.of(this.material)));
     }
 }
