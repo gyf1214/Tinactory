@@ -23,8 +23,8 @@ public class TinactoryTest {
     public static final Registrate REGISTRATE = new Registrate(ID);
 
     public TinactoryTest() {
-        AllBlocks.init();
         AllBlockEntities.init();
+        AllBlocks.init();
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(TinactoryTest::init);

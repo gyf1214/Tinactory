@@ -25,6 +25,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.shsts.tinactory.core.common.BlockEntitySet;
 import org.shsts.tinactory.core.common.CapabilityProviderType;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -249,6 +250,13 @@ public class Registrate {
     public <U extends SmartBlockEntity, P> BlockEntityBuilder<U, P, ?>
     blockEntity(P parent, String id, BlockEntityBuilder.Factory<U> factory) {
         return new SimpleBlockEntityBuilder<>(parent, id, factory);
+    }
+
+    public <T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
+    BlockEntitySet.Builder<T, U, BlockEntitySet<T, U>, ?>
+    blockEntitySet(String id, BlockEntityBuilder.Factory<T> blockEntityFactory,
+                   EntityBlockBuilder.Factory<T, U> blockFactory) {
+        return BlockEntitySet.builder(this, id, blockEntityFactory, blockFactory);
     }
 
     public void blockState(Consumer<DataContext<BlockStateProvider>> cons) {

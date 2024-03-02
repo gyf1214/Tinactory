@@ -2,13 +2,7 @@ package org.shsts.tinactory.test;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.material.Fluids;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.content.machine.MachineBlock;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.core.common.BlockEntitySet;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Layout;
@@ -30,8 +24,6 @@ public final class AllBlocks {
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> TEST_RECIPE_TYPE;
 
     public static final Layout TEST_FLUID_LAYOUT;
-    public static final RegistryEntry<MachineBlock<Machine>> TEST_MACHINE_BLOCK;
-    public static final BlockEntitySet<TestGenerator, MachineBlock<TestGenerator>> TEST_GENERATOR;
     public static final RegistryEntry<SimpleFluid> TEST_STEAM;
     public static final RegistryEntry<FluidCell> TEST_FLUID_CELL;
 
@@ -50,36 +42,6 @@ public final class AllBlocks {
                 .outputFluid(1, Fluids.WATER, 1000)
                 .workTicks(50)
                 .build();
-
-        TEST_GENERATOR = BlockEntitySet.builder(REGISTRATE, "machine/test",
-                        TestGenerator.factory(Voltage.ULV, 1),
-                        MachineBlock<TestGenerator>::new)
-                .entityClass(TestGenerator.class)
-                .block()
-                .transform(ModelGen.machine(
-                        ModelGen.gregtech("blocks/casings/voltage/ulv"),
-                        ModelGen.gregtech("blocks/overlay/machine/overlay_screen")))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
-                .defaultBlockItem().dropSelf()
-                .build()
-                .blockEntity()
-                .ticking()
-                .capability(AllCapabilities.STACK_CONTAINER, $ -> $.layout(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV))
-                .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $
-                        .voltage(Voltage.ULV)
-                        .recipeType(AllBlocks.TEST_RECIPE_TYPE.get()))
-                .menu().layout(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV).build()
-                .build()
-                .register();
-
-        TEST_MACHINE_BLOCK = REGISTRATE.entityBlock("machine/test", MachineBlock<Machine>::new)
-                .type(() -> AllBlockEntities.TEST_MACHINE)
-                .transform(ModelGen.machine(
-                        ModelGen.gregtech("blocks/casings/voltage/ulv"),
-                        ModelGen.gregtech("blocks/machines/alloy_smelter/overlay_front")))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
-                .defaultBlockItem().dropSelf()
-                .register();
 
         TEST_STEAM = REGISTRATE.simpleFluid("steam", ModelGen.gregtech("blocks/fluids/fluid.steam"));
 

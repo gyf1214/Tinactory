@@ -21,6 +21,10 @@ public class BlockEntitySet<T extends SmartBlockEntity, U extends SmartEntityBlo
         this.block = block;
     }
 
+    public U getBlock() {
+        return this.block.get();
+    }
+
     public abstract static class Builder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>,
             R extends BlockEntitySet<T, U>, S extends Builder<T, U, R, S>> implements ISelf<S> {
         protected final ValueHolder<Supplier<U>> blockHolder = ValueHolder.create();
