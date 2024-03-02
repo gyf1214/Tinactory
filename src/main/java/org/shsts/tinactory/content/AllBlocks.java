@@ -1,7 +1,6 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.tags.BlockTags;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -11,12 +10,11 @@ import org.shsts.tinactory.content.network.CableSetting;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
-public final class AllBlocks {
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
+public final class AllBlocks {
     public static final RegistryEntry<CableBlock> NORMAL_CABLE;
     public static final RegistryEntry<CableBlock> DENSE_CABLE;
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;

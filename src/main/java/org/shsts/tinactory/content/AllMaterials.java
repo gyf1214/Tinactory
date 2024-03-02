@@ -8,21 +8,19 @@ import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMaterials {
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
-
     private static final List<ResourceLocation> ORE_BASE_OVERWORLD = blockModels(
             Blocks.STONE, Blocks.DEEPSLATE);
 

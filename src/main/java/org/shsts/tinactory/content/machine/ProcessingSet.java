@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.machine;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.model.ModelGen;
@@ -20,13 +19,14 @@ import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record ProcessingSet<T extends ProcessingRecipe<T>>(
         RegistryEntry<MachineBlock<Machine>> block,
         RegistryEntry<SmartBlockEntityType<Machine>> blockEntity,
         RecipeTypeEntry<T, ?> recipeType) {
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
     public MachineBlock<Machine> getBlock() {
         return this.block.get();

@@ -16,13 +16,14 @@ import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.core.common.Transformer;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -133,8 +134,6 @@ public final class ModelGen {
             ctx.provider.horizontalBlock(ctx.object, model);
         });
     }
-
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
 
     public static void init() {
         REGISTRATE.blockState(CableModel::genBlockModels);

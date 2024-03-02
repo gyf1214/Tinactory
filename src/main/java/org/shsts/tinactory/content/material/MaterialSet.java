@@ -13,13 +13,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -33,11 +31,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MaterialSet {
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
-
     private boolean isFrozen = false;
     private final String name;
     private final IconSet icon;

@@ -1,15 +1,13 @@
 package org.shsts.tinactory.content;
 
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
-public final class AllNetworks {
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
+public final class AllNetworks {
     public static final RegistryEntry<IScheduling> PRE_WORK_SCHEDULING;
     public static final RegistryEntry<IScheduling> LOGISTICS_SCHEDULING;
     public static final RegistryEntry<IScheduling> ELECTRIC_SCHEDULING;

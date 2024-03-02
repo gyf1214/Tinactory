@@ -9,18 +9,16 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.core.gui.ContainerMenu.SLOT_SIZE;
+import static org.shsts.tinactory.test.TinactoryTest.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllBlocks {
-    private static final Registrate REGISTRATE = TinactoryTest.REGISTRATE;
-
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> TEST_RECIPE_TYPE;
 
     public static final Layout TEST_FLUID_LAYOUT;

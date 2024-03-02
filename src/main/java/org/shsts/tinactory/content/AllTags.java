@@ -6,19 +6,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllTags {
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
-
     public static final TagKey<Item> TOOL = modItem("tool");
     public static final TagKey<Item> TOOL_HAMMER = extend(TOOL, "hammer");
     public static final TagKey<Item> TOOL_MORTAR = extend(TOOL, "mortar");

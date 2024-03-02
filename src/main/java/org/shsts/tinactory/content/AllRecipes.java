@@ -15,20 +15,18 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
-
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> STONE_GENERATOR;
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> ORE_ANALYZER;

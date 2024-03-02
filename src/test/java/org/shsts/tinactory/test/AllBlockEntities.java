@@ -7,11 +7,10 @@ import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.BlockEntitySet;
-import org.shsts.tinactory.registrate.Registrate;
+
+import static org.shsts.tinactory.test.TinactoryTest.REGISTRATE;
 
 public final class AllBlockEntities {
-    private static final Registrate REGISTRATE = TinactoryTest.REGISTRATE;
-
     public static final BlockEntitySet<Machine, MachineBlock<Machine>> TEST_MACHINE;
     public static final BlockEntitySet<TestGenerator, MachineBlock<TestGenerator>> TEST_GENERATOR;
 

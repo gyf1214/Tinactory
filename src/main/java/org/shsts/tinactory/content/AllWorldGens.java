@@ -8,20 +8,18 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.worldgen.PlayerStartFeature;
 import org.shsts.tinactory.content.worldgen.VoidPreset;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.RegistryEntry;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllWorldGens {
-    private static final Registrate REGISTRATE = Tinactory.REGISTRATE;
-
     public static final ResourceKey<Biome> VOID_BIOME;
 
     private static final RegistryEntryHandler<Feature<?>> FEATURE_HANDLER;
