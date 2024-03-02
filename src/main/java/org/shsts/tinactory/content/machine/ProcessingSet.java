@@ -3,75 +3,114 @@ package org.shsts.tinactory.content.machine;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
-import org.shsts.tinactory.core.common.Transformer;
-import org.shsts.tinactory.core.common.ValueHolder;
+import org.shsts.tinactory.core.common.BlockEntitySet;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.RegistryEntry;
-import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record ProcessingSet<T extends ProcessingRecipe<T>>(
-        RegistryEntry<MachineBlock<Machine>> block,
-        RegistryEntry<SmartBlockEntityType<Machine>> blockEntity,
-        RecipeTypeEntry<T, ?> recipeType) {
+public class ProcessingSet<T extends ProcessingRecipe<T>> {
+    public final RecipeTypeEntry<T, ?> recipeType;
+    public final Layout layout;
+    protected final Map<Voltage, BlockEntitySet<Machine, MachineBlock<Machine>>> machines;
 
-    public MachineBlock<Machine> getBlock() {
-        return this.block.get();
+    public ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Layout layout,
+                         ResourceLocation frontOverlay, Collection<Voltage> voltages) {
+        this.recipeType = recipeType;
+        this.layout = layout;
+        this.machines = voltages.stream()
+                .collect(Collectors.toMap($ -> $, voltage -> this.createMachine(voltage, frontOverlay)));
     }
 
-    public static <T extends ProcessingRecipe<T>> ProcessingSet<T>
-    primitive(String id, RecipeTypeEntry<T, ?> recipeType, ResourceLocation overlay, Layout layout) {
-        return create(id, recipeType, Voltage.PRIMITIVE, overlay, builder -> builder
-                .capability(AllCapabilities.STACK_CONTAINER, $ -> $.layout(layout, Voltage.PRIMITIVE))
-                .menu().layout(layout, Voltage.PRIMITIVE).build());
-    }
-
-    public static <T extends ProcessingRecipe<T>> ProcessingSet<T>
-    create(String id, RecipeTypeEntry<T, ?> recipeType,
-           Voltage voltage, ResourceLocation overlay,
-           Transformer<BlockEntityBuilder<Machine, Registrate, ?>> trans) {
-
-        var holder = ValueHolder.<Supplier<SmartBlockEntityType<Machine>>>create();
-
-        var blockBuilder = REGISTRATE.entityBlock(id, MachineBlock<Machine>::new)
-                .type(holder)
-                .transform(ModelGen.machine(voltage, overlay))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
-                .dropSelf().blockItem()
-                .tag(AllTags.processingMachine(recipeType))
-                .build();
-        if (voltage == Voltage.PRIMITIVE) {
-            blockBuilder.tag(BlockTags.MINEABLE_WITH_AXE);
-        }
-        var block = blockBuilder.register();
-
-        var entityBuilder = REGISTRATE.blockEntity(id,
-                        voltage == Voltage.PRIMITIVE ? Machine::primitive : Machine::new)
+    protected BlockEntitySet<Machine, MachineBlock<Machine>>
+    createMachine(Voltage voltage, ResourceLocation frontOverlay) {
+        var id = "machine/" + voltage.id + "/" + this.recipeType.id;
+        var builder = REGISTRATE.blockEntitySet(id, Machine.factory(voltage), MachineBlock<Machine>::new)
                 .entityClass(Machine.class)
-                .validBlock(block)
+                .blockEntity()
                 .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $
-                        .recipeType(recipeType.get()).voltage(voltage))
-                .transform(trans.cast());
+                        .recipeType(this.recipeType.get()).voltage(voltage))
+                .capability(AllCapabilities.STACK_CONTAINER, $ -> $
+                        .layout(this.layout, voltage))
+                .menu().layout(this.layout, voltage).build()
+                .build()
+                .block()
+                .transform(ModelGen.machine(voltage, frontOverlay))
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .dropSelf()
+                .blockItem().tag(AllTags.processingMachine(this.recipeType)).build()
+                .build();
+
         if (voltage == Voltage.PRIMITIVE) {
-            entityBuilder.ticking();
+            builder.blockEntity().ticking();
+            builder.block().tag(BlockTags.MINEABLE_WITH_AXE);
         }
-        var blockEntity = entityBuilder.register();
 
-        holder.setValue(blockEntity);
+        return builder.register();
+    }
 
-        return new ProcessingSet<>(block, blockEntity, recipeType);
+    public Block getBlock(Voltage voltage) {
+        return this.machines.get(voltage).getBlock();
+    }
+
+    public static class Builder<T extends ProcessingRecipe<T>> {
+        private final RecipeTypeEntry<T, ?> recipeType;
+        private final Set<Voltage> voltages = new HashSet<>();
+        @Nullable
+        private ResourceLocation frontOverlay = null;
+        @Nullable
+        private Layout layout = null;
+
+        private Builder(RecipeTypeEntry<T, ?> recipeType) {
+            this.recipeType = recipeType;
+        }
+
+        public Builder<T> voltage(Voltage... voltages) {
+            this.voltages.addAll(Arrays.asList(voltages));
+            return this;
+        }
+
+        public Builder<T> frontOverlay(ResourceLocation loc) {
+            this.frontOverlay = loc;
+            return this;
+        }
+
+        public Builder<T> layout(Layout layout) {
+            this.layout = layout;
+            return this;
+        }
+
+        public Layout.Builder<Builder<T>> layout() {
+            return Layout.builder(this)
+                    .onCreate(layout -> this.layout = layout);
+        }
+
+        public ProcessingSet<T> build() {
+            assert this.frontOverlay != null;
+            assert this.layout != null;
+            return new ProcessingSet<>(this.recipeType, this.layout,
+                    this.frontOverlay, this.voltages);
+        }
+    }
+
+    public static <T extends ProcessingRecipe<T>> Builder<T>
+    builder(RecipeTypeEntry<T, ?> recipeType) {
+        return new Builder<>(recipeType);
     }
 }

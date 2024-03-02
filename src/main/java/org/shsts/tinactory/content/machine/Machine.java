@@ -14,6 +14,7 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.CompositeNetwork;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -35,6 +36,10 @@ public class Machine extends SmartBlockEntity {
 
     public static Machine primitive(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         return new PrimitiveMachine(type, pos, state);
+    }
+
+    public static BlockEntityBuilder.Factory<Machine> factory(Voltage voltage) {
+        return voltage == Voltage.PRIMITIVE ? Machine::primitive : Machine::new;
     }
 
     @Override

@@ -162,6 +162,11 @@ public class Layout {
             return this;
         }
 
+        public Builder<P> onCreate(Consumer<Layout> cons) {
+            this.onCreateObject = cons;
+            return this;
+        }
+
         public Layout build() {
             var ret = new Layout(this.slots, this.images, this.progressBar);
             if (this.onCreateObject != null) {

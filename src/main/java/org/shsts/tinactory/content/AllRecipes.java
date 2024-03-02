@@ -15,6 +15,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
@@ -84,7 +85,7 @@ public final class AllRecipes {
 
         // primitive stone generator
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlocks.PRIMITIVE_STONE_GENERATOR.getBlock())
+                .shaped(AllBlocks.STONE_GENERATOR.getBlock(Voltage.PRIMITIVE))
                 .pattern("WLW")
                 .pattern("L L")
                 .pattern("WLW")

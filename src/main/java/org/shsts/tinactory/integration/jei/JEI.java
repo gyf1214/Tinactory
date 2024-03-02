@@ -16,15 +16,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllBlocks;
-import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.machine.ProcessingSet;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartRecipe;
-import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
@@ -72,17 +71,16 @@ public class JEI implements IModPlugin {
     }
 
     private static <T extends ProcessingRecipe<T>> CategoryInfo<SmartRecipe.ContainerWrapper<IContainer>, T>
-    processing(RecipeTypeEntry<T, ?> recipeType, Layout layout,
-               Supplier<? extends Block> block) {
-        return category(recipeType, (type, helpers) ->
-                new ProcessingCategory<>(type, helpers, layout, block.get()), AllTags.processingMachine(recipeType));
+    processing(ProcessingSet<T> processingSet) {
+        return category(processingSet.recipeType, (type, helpers) -> new ProcessingCategory<>(type, helpers,
+                        processingSet.layout, processingSet.getBlock(Voltage.LV)),
+                AllTags.processingMachine(processingSet.recipeType));
     }
 
     private final List<CategoryInfo<?, ?>> categories = List.of(
             category(AllRecipes.TOOL, ToolCategory::new, () -> Ingredient.of(AllBlocks.WORKBENCH.get())),
-            processing(AllRecipes.STONE_GENERATOR, AllLayouts.STONE_GENERATOR, AllBlocks.PRIMITIVE_STONE_GENERATOR::getBlock),
-            processing(AllRecipes.ORE_ANALYZER, AllLayouts.ORE_ANALYZER, AllBlocks.PRIMITIVE_STONE_GENERATOR::getBlock)
-    );
+            processing(AllBlocks.STONE_GENERATOR),
+            processing(AllBlocks.ORE_ANALYZER));
 
     @Override
     public ResourceLocation getPluginUid() {
