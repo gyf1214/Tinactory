@@ -10,8 +10,6 @@ import static org.shsts.tinactory.core.gui.ContainerMenu.SPACING_VERTICAL;
 
 public final class AllLayouts {
     public static final Layout WORKBENCH;
-    public static final Layout STONE_GENERATOR;
-    public static final Layout ORE_ANALYZER;
     public static final Layout ORE_WASHER;
 
     static {
@@ -27,20 +25,6 @@ public final class AllLayouts {
             }
         }
         WORKBENCH = workbenchBuilder.build();
-
-        STONE_GENERATOR = Layout.builder()
-                .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 2, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8, 0)
-                .build();
-
-        ORE_ANALYZER = Layout.builder()
-                .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
-                .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
-                .build();
 
         ORE_WASHER = Layout.builder()
                 .port(SlotType.ITEM_INPUT)

@@ -85,7 +85,7 @@ public final class AllRecipes {
 
         // primitive stone generator
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlocks.STONE_GENERATOR.getBlock(Voltage.PRIMITIVE))
+                .shaped(AllBlockEntities.STONE_GENERATOR.getBlock(Voltage.PRIMITIVE))
                 .pattern("WLW")
                 .pattern("L L")
                 .pattern("WLW")
@@ -101,7 +101,7 @@ public final class AllRecipes {
 
         // workbench
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlocks.WORKBENCH.get())
+                .shaped(AllBlockEntities.WORKBENCH.getBlock())
                 .pattern("WSW")
                 .pattern("SCS")
                 .pattern("WSW")

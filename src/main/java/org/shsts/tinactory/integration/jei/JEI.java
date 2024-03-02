@@ -17,7 +17,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.content.AllBlocks;
+import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -78,9 +78,9 @@ public class JEI implements IModPlugin {
     }
 
     private final List<CategoryInfo<?, ?>> categories = List.of(
-            category(AllRecipes.TOOL, ToolCategory::new, () -> Ingredient.of(AllBlocks.WORKBENCH.get())),
-            processing(AllBlocks.STONE_GENERATOR),
-            processing(AllBlocks.ORE_ANALYZER));
+            category(AllRecipes.TOOL, ToolCategory::new, () -> Ingredient.of(AllBlockEntities.WORKBENCH.getBlock())),
+            processing(AllBlockEntities.STONE_GENERATOR),
+            processing(AllBlockEntities.ORE_ANALYZER));
 
     @Override
     public ResourceLocation getPluginUid() {

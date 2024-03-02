@@ -8,7 +8,7 @@ import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.shsts.tinactory.content.AllBlocks;
+import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 
@@ -18,7 +18,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class ToolCategory extends RecipeCategory<ToolRecipe> {
     public ToolCategory(RecipeType<ToolRecipe> type, IJeiHelpers helpers) {
-        super(type, helpers, AllLayouts.WORKBENCH, new ItemStack(AllBlocks.WORKBENCH.get()));
+        super(type, helpers, AllLayouts.WORKBENCH, new ItemStack(AllBlockEntities.WORKBENCH.getBlock()));
     }
 
     @Override
