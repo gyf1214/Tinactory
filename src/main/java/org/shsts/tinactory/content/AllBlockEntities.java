@@ -29,7 +29,8 @@ public final class AllBlockEntities {
     public static final ProcessingSet<ProcessingRecipe.Simple> ORE_ANALYZER;
 
     static {
-        NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller", NetworkController::new,
+        NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller",
+                        NetworkController::new,
                         MachineBlock<NetworkController>::new)
                 .blockEntity().ticking().build()
                 .block()
@@ -41,7 +42,8 @@ public final class AllBlockEntities {
                 .build()
                 .register();
 
-        WORKBENCH = REGISTRATE.blockEntitySet("primitive/workbench", SmartBlockEntity::new,
+        WORKBENCH = REGISTRATE.blockEntitySet("primitive/workbench",
+                        SmartBlockEntity::new,
                         PrimitiveBlock<SmartBlockEntity>::new)
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
