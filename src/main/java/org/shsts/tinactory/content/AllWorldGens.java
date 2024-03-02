@@ -10,7 +10,7 @@ import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.content.worldgen.PlayerStartFeature;
 import org.shsts.tinactory.content.worldgen.VoidPreset;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;

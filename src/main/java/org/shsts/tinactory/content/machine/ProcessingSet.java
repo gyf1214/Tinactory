@@ -7,10 +7,10 @@ import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.core.common.BlockEntitySet;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.RecipeTypeEntry;
+import org.shsts.tinactory.registrate.common.BlockEntitySet;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

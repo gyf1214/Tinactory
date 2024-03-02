@@ -25,10 +25,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.shsts.tinactory.core.common.BlockEntitySet;
 import org.shsts.tinactory.core.common.CapabilityProviderType;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
@@ -39,12 +39,18 @@ import org.shsts.tinactory.core.recipe.NullRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
+import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.builder.ItemBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
+import org.shsts.tinactory.registrate.common.BlockEntitySet;
+import org.shsts.tinactory.registrate.common.CapabilityEntry;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinactory.registrate.common.SmartRegistry;
 import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.handler.BlockStateHandler;
 import org.shsts.tinactory.registrate.handler.CapabilityHandler;
@@ -252,11 +258,42 @@ public class Registrate {
         return new SimpleBlockEntityBuilder<>(parent, id, factory);
     }
 
+    private class SimpleBlockEntitySetBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
+            extends BlockEntitySetBuilder<T, U, BlockEntitySet<T, U>, SimpleBlockEntitySetBuilder<T, U>> {
+        private final String id;
+        private final BlockEntityBuilder.Factory<T> blockEntityFactory;
+        private final EntityBlockBuilder.Factory<T, U> blockFactory;
+
+        private SimpleBlockEntitySetBuilder(String id,
+                                            BlockEntityBuilder.Factory<T> blockEntityFactory,
+                                            EntityBlockBuilder.Factory<T, U> blockFactory) {
+            this.id = id;
+            this.blockEntityFactory = blockEntityFactory;
+            this.blockFactory = blockFactory;
+        }
+
+        @Override
+        protected BlockEntityBuilder<T, SimpleBlockEntitySetBuilder<T, U>, ?> createBlockEntityBuilder() {
+            return Registrate.this.blockEntity(this, this.id, this.blockEntityFactory);
+        }
+
+        @Override
+        protected EntityBlockBuilder<T, U, SimpleBlockEntitySetBuilder<T, U>, ?> createBlockBuilder() {
+            return Registrate.this.entityBlock(this, this.id, this.blockFactory);
+        }
+
+        @Override
+        protected BlockEntitySet<T, U>
+        createSet(RegistryEntry<SmartBlockEntityType<T>> blockEntity, RegistryEntry<U> block) {
+            return new BlockEntitySet<>(blockEntity, block);
+        }
+    }
+
     public <T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-    BlockEntitySet.Builder<T, U, BlockEntitySet<T, U>, ?>
+    BlockEntitySetBuilder<T, U, BlockEntitySet<T, U>, ?>
     blockEntitySet(String id, BlockEntityBuilder.Factory<T> blockEntityFactory,
                    EntityBlockBuilder.Factory<T, U> blockFactory) {
-        return BlockEntitySet.builder(this, id, blockEntityFactory, blockFactory);
+        return new SimpleBlockEntitySetBuilder<>(id, blockEntityFactory, blockFactory);
     }
 
     public void blockState(Consumer<DataContext<BlockStateProvider>> cons) {

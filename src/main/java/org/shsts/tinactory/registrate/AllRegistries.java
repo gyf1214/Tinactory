@@ -4,6 +4,7 @@ import org.shsts.tinactory.api.common.ICapabilityProviderType;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.SchedulingManager;
+import org.shsts.tinactory.registrate.common.SmartRegistry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 

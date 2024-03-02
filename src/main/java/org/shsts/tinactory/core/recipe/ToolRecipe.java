@@ -24,9 +24,9 @@ import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.SimpleRecipeBuilder;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

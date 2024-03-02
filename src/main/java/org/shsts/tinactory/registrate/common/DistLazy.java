@@ -1,4 +1,4 @@
-package org.shsts.tinactory.registrate;
+package org.shsts.tinactory.registrate.common;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;

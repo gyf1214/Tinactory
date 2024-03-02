@@ -8,13 +8,13 @@ import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.core.common.BlockEntitySet;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.registrate.common.BlockEntitySet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

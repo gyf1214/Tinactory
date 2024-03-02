@@ -3,7 +3,7 @@ package org.shsts.tinactory.registrate.context;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataProvider;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

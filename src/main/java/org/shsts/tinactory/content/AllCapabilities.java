@@ -11,8 +11,8 @@ import org.shsts.tinactory.content.machine.RecipeProcessor;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.core.common.CapabilityProviderType;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
-import org.shsts.tinactory.registrate.CapabilityEntry;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.CapabilityEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 

@@ -6,7 +6,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
 import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;

@@ -18,7 +18,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;

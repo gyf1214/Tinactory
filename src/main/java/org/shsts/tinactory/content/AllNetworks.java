@@ -3,7 +3,7 @@ package org.shsts.tinactory.content;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 

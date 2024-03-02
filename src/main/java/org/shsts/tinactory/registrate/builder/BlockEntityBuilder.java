@@ -15,7 +15,7 @@ import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.ContainerMenuType;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

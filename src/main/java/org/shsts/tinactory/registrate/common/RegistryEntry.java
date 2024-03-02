@@ -1,4 +1,4 @@
-package org.shsts.tinactory.registrate;
+package org.shsts.tinactory.registrate.common;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;

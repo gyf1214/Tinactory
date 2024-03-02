@@ -6,7 +6,7 @@ import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.core.common.BlockEntitySet;
+import org.shsts.tinactory.registrate.common.BlockEntitySet;
 
 import static org.shsts.tinactory.test.TinactoryTest.REGISTRATE;
 

@@ -12,7 +12,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.core.logistics.NullContainer;
-import org.shsts.tinactory.registrate.RecipeTypeEntry;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;

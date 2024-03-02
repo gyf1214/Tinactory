@@ -1,4 +1,4 @@
-package org.shsts.tinactory.registrate;
+package org.shsts.tinactory.registrate.common;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -7,6 +7,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.Nullable;

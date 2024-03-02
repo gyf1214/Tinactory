@@ -23,8 +23,8 @@ import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
-import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.common.DistLazy;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

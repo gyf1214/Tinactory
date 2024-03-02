@@ -3,8 +3,8 @@ package org.shsts.tinactory.registrate.handler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import org.shsts.tinactory.registrate.CapabilityEntry;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.common.CapabilityEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;

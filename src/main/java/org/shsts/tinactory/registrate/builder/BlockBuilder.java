@@ -16,9 +16,9 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.Transformer;
-import org.shsts.tinactory.registrate.DistLazy;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.DistLazy;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.Nullable;

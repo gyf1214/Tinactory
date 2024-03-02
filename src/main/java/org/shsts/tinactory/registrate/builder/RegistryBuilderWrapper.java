@@ -8,7 +8,7 @@ import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegistryBuilder;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.SmartRegistry;
+import org.shsts.tinactory.registrate.common.SmartRegistry;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.slf4j.Logger;
 

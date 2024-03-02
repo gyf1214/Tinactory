@@ -3,7 +3,7 @@ package org.shsts.tinactory.content;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.CableSetting;
-import org.shsts.tinactory.registrate.RegistryEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 

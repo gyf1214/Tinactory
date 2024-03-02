@@ -4,8 +4,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.NewRegistryEvent;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.SmartRegistry;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
+import org.shsts.tinactory.registrate.common.SmartRegistry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
