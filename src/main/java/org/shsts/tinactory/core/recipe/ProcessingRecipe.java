@@ -238,7 +238,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                             GsonHelper.getAsInt(je, "port"),
                             ProcessingResults.SERIALIZER.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
             return builder
-                    .workTicks(GsonHelper.getAsLong(jo, "workTicks"))
+                    .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
                     .voltage(GsonHelper.getAsLong(jo, "voltage", 0))
                     .power(GsonHelper.getAsLong(jo, "power", 0));
         }
@@ -268,7 +268,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                     }).forEach(outputs::add);
             jo.add("inputs", inputs);
             jo.add("outputs", outputs);
-            jo.addProperty("workTicks", recipe.workTicks);
+            jo.addProperty("work_ticks", recipe.workTicks);
             if (recipe.voltage > 0) {
                 jo.addProperty("voltage", recipe.voltage);
                 jo.addProperty("power", recipe.power);

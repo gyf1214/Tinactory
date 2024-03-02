@@ -51,7 +51,7 @@ public final class ProcessingResults {
         }
 
         protected void toJson(JsonObject jo) {
-            jo.addProperty("allowEmpty", this.allowEmpty);
+            jo.addProperty("allow_empty", this.allowEmpty);
             if (this.rate < 1.0d) {
                 jo.addProperty("rate", this.rate);
             }
@@ -100,7 +100,7 @@ public final class ProcessingResults {
             public ItemResult fromJson(JsonElement je) {
                 var jo = je.getAsJsonObject();
                 return new ItemResult(
-                        GsonHelper.getAsBoolean(jo, "allowEmpty"),
+                        GsonHelper.getAsBoolean(jo, "allow_empty"),
                         GsonHelper.getAsDouble(jo, "rate", 1.0d),
                         this.parseJson(ItemStack.CODEC, GsonHelper.getAsJsonObject(jo, "item")));
             }
@@ -149,7 +149,7 @@ public final class ProcessingResults {
             public FluidResult fromJson(JsonElement je) {
                 var jo = je.getAsJsonObject();
                 return new FluidResult(
-                        GsonHelper.getAsBoolean(jo, "allowEmpty"),
+                        GsonHelper.getAsBoolean(jo, "allow_empty"),
                         GsonHelper.getAsDouble(jo, "rate", 1.0d),
                         this.parseJson(FluidStack.CODEC, GsonHelper.getAsJsonObject(jo, "fluid")));
             }
