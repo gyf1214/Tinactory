@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -30,6 +31,7 @@ public class TinactoryTest {
         modEventBus.addListener(TinactoryTest::init);
         REGISTRATE.register(modEventBus);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> REGISTRATE.registerClient(modEventBus));
+        MinecraftForge.EVENT_BUS.register(AllEvents.class);
     }
 
     private static void init(FMLCommonSetupEvent event) {

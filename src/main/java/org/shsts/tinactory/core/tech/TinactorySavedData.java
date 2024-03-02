@@ -1,11 +1,14 @@
 package org.shsts.tinactory.core.tech;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraftforge.server.ServerLifecycleHooks;
+import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
@@ -15,10 +18,11 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TinactorySavedData extends SavedData {
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final String NAME = "tinactory_saved_data";
 
-    private final Map<UUID, TeamProfile> teams = new HashMap<>();
-    private final Map<UUID, TeamProfile> playerTeams = new HashMap<>();
+    public final Map<UUID, TeamProfile> teams = new HashMap<>();
+    public final Map<UUID, TeamProfile> playerTeams = new HashMap<>();
 
     private TinactorySavedData() {}
 
@@ -54,30 +58,30 @@ public class TinactorySavedData extends SavedData {
                     var team = this.teams.get(compoundTag.getUUID("team"));
                     if (team != null) {
                         this.playerTeams.put(playerId, team);
-                        team.addPlayer(playerId);
+                        team.players.add(playerId);
                     }
                 });
     }
 
-    public void invalidatePlayer(UUID playerId) {
-        var team = this.playerTeams.get(playerId);
-        if (team != null) {
-            team.removePlayer(playerId);
-        }
-        this.playerTeams.remove(playerId);
-    }
-
-    private static TinactorySavedData create() {
-        return new TinactorySavedData();
+    @Override
+    public void setDirty() {
+        LOGGER.debug("{} set dirty", this);
+        super.setDirty();
     }
 
     private static TinactorySavedData fromTag(CompoundTag tag) {
-        var data = create();
+        var data = new TinactorySavedData();
         data.load(tag);
         return data;
     }
 
-    public static TinactorySavedData get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(TinactorySavedData::fromTag, TinactorySavedData::create, NAME);
+    /**
+     * Must be called on Server!!
+     */
+    public static TinactorySavedData get() {
+        var overworld = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
+        assert overworld != null;
+        return overworld.getDataStorage()
+                .computeIfAbsent(TinactorySavedData::fromTag, TinactorySavedData::new, NAME);
     }
 }

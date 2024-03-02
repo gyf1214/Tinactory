@@ -34,7 +34,7 @@ public final class TechManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static class ReloadListener implements PreparableReloadListener {
-        private static final String PREFIX = "technology";
+        private static final String PREFIX = "technologies";
         private static final String SUFFIX = ".json";
 
         private final Gson gson = new Gson();
@@ -49,11 +49,15 @@ public final class TechManager {
             var path1 = path.substring(PREFIX.length() + 1, path.length() - SUFFIX.length());
             var loc1 = new ResourceLocation(loc.getNamespace(), path1);
             try (var resource = manager.getResource(loc)) {
-                var reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
+                var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
+                var reader = new BufferedReader(is);
                 var jo = GsonHelper.fromJson(this.gson, reader, JsonObject.class);
-                return Optional.of(codec.parse(JsonOps.INSTANCE, jo).getOrThrow(false, $ -> {}).setRegistryName(loc1));
+                return Optional.of(codec
+                        .parse(JsonOps.INSTANCE, jo)
+                        .getOrThrow(false, $ -> {})
+                        .setRegistryName(loc1));
             } catch (IOException | RuntimeException ex) {
-                LOGGER.debug("Decode resource {} failed: {}", loc, ex);
+                LOGGER.warn("Decode resource {} failed: {}", loc, ex);
             }
             return Optional.empty();
         }
@@ -86,7 +90,46 @@ public final class TechManager {
         return Optional.of(TECHNOLOGIES.get(loc));
     }
 
+    public static Collection<Technology> allTechs() {
+        return TECHNOLOGIES.values();
+    }
+
+    public static Optional<TeamProfile> teamByPlayer(ServerPlayer player) {
+        var uuid = player.getGameProfile().getId();
+        return Optional.ofNullable(TinactorySavedData.get().playerTeams.get(uuid));
+    }
+
+    public static void addPlayerToTeam(ServerPlayer player, TeamProfile team) {
+        var data = TinactorySavedData.get();
+        var uuid = player.getGameProfile().getId();
+        LOGGER.debug("add player {} to team {}", player, team);
+        data.playerTeams.put(uuid, team);
+        data.setDirty();
+    }
+
+    public static TeamProfile newTeam(ServerPlayer player, String name) {
+        var data = TinactorySavedData.get();
+        var team = TeamProfile.create(name);
+        LOGGER.debug("create new team {}", team);
+        data.teams.put(team.uuid, team);
+        addPlayerToTeam(player, team);
+        return team;
+    }
+
     public static void invalidatePlayer(ServerPlayer player) {
-        TinactorySavedData.get(player.getLevel()).invalidatePlayer(player.getGameProfile().getId());
+        var data = TinactorySavedData.get();
+        var uuid = player.getGameProfile().getId();
+        var team = data.playerTeams.get(uuid);
+        LOGGER.debug("invalidate player {}", player);
+        if (team != null) {
+            LOGGER.debug("remove player {} from team {}", player, team);
+            team.players.remove(uuid);
+            if (team.players.isEmpty()) {
+                LOGGER.debug("invalidate empty team {}", team);
+                data.teams.remove(team.uuid);
+            }
+        }
+        data.playerTeams.remove(uuid);
+        data.setDirty();
     }
 }

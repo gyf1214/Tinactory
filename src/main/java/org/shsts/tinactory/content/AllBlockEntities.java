@@ -32,6 +32,7 @@ public final class AllBlockEntities {
         NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller",
                         NetworkController::new,
                         MachineBlock<NetworkController>::new)
+                .entityClass(NetworkController.class)
                 .blockEntity().ticking().build()
                 .block()
                 .transform(ModelGen.machine(

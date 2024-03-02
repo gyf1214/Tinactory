@@ -116,7 +116,6 @@ public class Tinactory {
 
     private static void init(final FMLCommonSetupEvent event) {
         LOGGER.info("hello Tinactory!");
-        LOGGER.info("primitiveWorkSpeed={}", TinactoryConfig.INSTANCE.primitiveWorkSpeed.get());
     }
 
     private static void initClient(FMLClientSetupEvent event) {

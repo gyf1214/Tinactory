@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -15,6 +16,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public final class AllEvents {
     @SubscribeEvent
     public static void onAttachBlockEntity(AttachCapabilitiesEvent<BlockEntity> event) {
