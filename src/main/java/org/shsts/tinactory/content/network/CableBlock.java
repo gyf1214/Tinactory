@@ -27,7 +27,6 @@ import org.shsts.tinactory.core.network.NetworkManager;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -39,16 +38,14 @@ public class CableBlock extends Block implements IWrenchable, IConnector {
     public static final BooleanProperty WEST = PipeBlock.WEST;
     public static final BooleanProperty UP = PipeBlock.UP;
     public static final BooleanProperty DOWN = PipeBlock.DOWN;
+    public static final int RADIUS = 3;
 
     protected final Map<BlockState, VoxelShape> shapes;
 
-    public final CableSetting cableSetting;
-
-    private CableBlock(Properties properties, CableSetting cableSetting) {
+    public CableBlock(Properties properties) {
         super(properties.strength(2.0f).requiresCorrectToolForDrops());
-        this.cableSetting = cableSetting;
 
-        this.shapes = this.makeShapes(cableSetting.radius);
+        this.shapes = this.makeShapes();
 
         var defaultState = this.stateDefinition.any()
                 .setValue(NORTH, false)
@@ -60,13 +57,9 @@ public class CableBlock extends Block implements IWrenchable, IConnector {
         this.registerDefaultState(defaultState);
     }
 
-    public static Function<Properties, CableBlock> factory(CableSetting setting) {
-        return $ -> new CableBlock($, setting);
-    }
-
-    private Map<BlockState, VoxelShape> makeShapes(int radius) {
-        double st = 8d - (double) radius;
-        double ed = 8d + (double) radius;
+    private Map<BlockState, VoxelShape> makeShapes() {
+        double st = 8d - (double) RADIUS;
+        double ed = 8d + (double) RADIUS;
 
         var baseShape = Block.box(st, st, st, ed, ed, ed);
         var dirShapes = new HashMap<Direction, VoxelShape>();

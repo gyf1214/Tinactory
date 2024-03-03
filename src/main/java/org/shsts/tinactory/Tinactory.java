@@ -91,14 +91,15 @@ public class Tinactory {
         ModelGen.init();
         AllRecipes.init();
         AllMaterials.init();
+        AllCapabilities.init();
+        AllNetworks.init();
+
+        AllBlockEntities.init();
         AllBlocks.init();
         AllItems.init();
-        AllCapabilities.init();
-        AllBlockEntities.init();
-        AllNetworks.init();
+
         AllWorldGens.init();
         ContainerEventHandler.init();
-
         AllRecipes.initRecipes();
 
         REGISTRATE.register(modEventBus);

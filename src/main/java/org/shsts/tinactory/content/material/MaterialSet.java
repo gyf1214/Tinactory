@@ -39,7 +39,7 @@ public class MaterialSet {
     private boolean isFrozen = false;
     private final String name;
     private final IconSet icon;
-    private final int color;
+    public final int color;
     private final List<Runnable> callbacks = new ArrayList<>();
     private int durability = 0;
 
