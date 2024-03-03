@@ -3,6 +3,7 @@ package org.shsts.tinactory.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -10,6 +11,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tech.TechManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -42,5 +44,10 @@ public final class AllEvents {
             event.getSettings().setSpawn(spawn, 0.0f);
             event.setCanceled(true);
         }
+    }
+
+    @SubscribeEvent
+    public static void onUnloadWorld(WorldEvent.Unload event) {
+        NetworkManager.onUnload((Level) event.getWorld());
     }
 }

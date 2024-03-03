@@ -69,6 +69,11 @@ public class NetworkManager {
         this.invalidatePos(pos1);
     }
 
+    public void destroy() {
+        this.networkPosMap.clear();
+        this.networks.clear();
+    }
+
     private static final Map<ResourceKey<Level>, NetworkManager> MANAGERS = new HashMap<>();
 
     public static NetworkManager getInstance(Level world) {
@@ -83,6 +88,10 @@ public class NetworkManager {
 
     public static void onUnload(Level world) {
         LOGGER.debug("remove network manager for {}", world.dimension());
-        MANAGERS.remove(world.dimension());
+        var manager = MANAGERS.get(world.dimension());
+        if (manager != null) {
+            manager.destroy();
+            MANAGERS.remove(world.dimension());
+        }
     }
 }
