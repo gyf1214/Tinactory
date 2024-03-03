@@ -65,10 +65,8 @@ public class NetworkManager {
 
     public void invalidatePosDir(BlockPos pos, Direction dir) {
         var pos1 = pos.relative(dir);
-        if (IConnector.isConnectedInWorld(this.world, pos1, dir.getOpposite())) {
-            this.invalidatePos(pos);
-            this.invalidatePos(pos1);
-        }
+        this.invalidatePos(pos);
+        this.invalidatePos(pos1);
     }
 
     private static final Map<ResourceKey<Level>, NetworkManager> MANAGERS = new HashMap<>();

@@ -31,7 +31,7 @@ public final class AllBlockEntities {
     static {
         NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller",
                         NetworkController::new,
-                        MachineBlock<NetworkController>::new)
+                        MachineBlock.factory(Voltage.PRIMITIVE))
                 .entityClass(NetworkController.class)
                 .blockEntity().ticking().build()
                 .block()

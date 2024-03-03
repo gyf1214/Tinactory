@@ -41,7 +41,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
     protected BlockEntitySet<Machine, MachineBlock<Machine>>
     createMachine(Voltage voltage, ResourceLocation frontOverlay) {
         var id = "machine/" + voltage.id + "/" + this.recipeType.id;
-        var builder = REGISTRATE.blockEntitySet(id, Machine.factory(voltage), MachineBlock<Machine>::new)
+        var builder = REGISTRATE.blockEntitySet(id, Machine.factory(voltage), MachineBlock.factory(voltage))
                 .entityClass(Machine.class)
                 .blockEntity()
                 .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $

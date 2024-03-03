@@ -48,10 +48,6 @@ public class Network {
         public Optional<Network> get() {
             return Optional.ofNullable(this.network);
         }
-
-        public boolean valid() {
-            return this.network != null;
-        }
     }
 
     @Nullable
@@ -115,7 +111,7 @@ public class Network {
     }
 
     protected void reset() {
-        this.ref = new Ref(this);
+        this.ref = null;
         this.state = State.CONNECTING;
         this.bfsContext.reset();
         this.delayTicks = 0;
@@ -146,7 +142,9 @@ public class Network {
     }
 
     public Ref ref() {
-        assert this.ref != null;
+        if (this.ref == null) {
+            this.ref = new Ref(this);
+        }
         return ref;
     }
 
@@ -198,7 +196,7 @@ public class Network {
             return;
         }
         for (var i = 0; i < maxConnects; i++) {
-            if (!connectNextBlock()) {
+            if (!this.connectNextBlock()) {
                 return;
             }
         }

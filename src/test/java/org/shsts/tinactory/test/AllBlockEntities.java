@@ -15,7 +15,7 @@ public final class AllBlockEntities {
     public static final BlockEntitySet<TestGenerator, MachineBlock<TestGenerator>> TEST_GENERATOR;
 
     static {
-        TEST_MACHINE = REGISTRATE.blockEntitySet("machine/test", Machine::new, MachineBlock<Machine>::new)
+        TEST_MACHINE = REGISTRATE.blockEntitySet("machine/test", Machine::new, MachineBlock.factory(Voltage.ULV))
                 .entityClass(Machine.class)
                 .blockEntity()
                 .ticking()
@@ -37,7 +37,7 @@ public final class AllBlockEntities {
 
         TEST_GENERATOR = REGISTRATE.blockEntitySet("machine/test_generator",
                         TestGenerator.factory(Voltage.ULV, 1),
-                        MachineBlock<TestGenerator>::new)
+                        MachineBlock.factory(Voltage.ULV))
                 .entityClass(TestGenerator.class)
                 .block()
                 .transform(ModelGen.machine(

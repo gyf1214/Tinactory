@@ -35,15 +35,22 @@ public class ElectricComponent extends Component {
     @Override
     public void putBlock(BlockPos pos, BlockState state) {
         if (state.getBlock() instanceof IElectricBlock electricBlock) {
-            var voltage = (double) electricBlock.getVoltage(state);
-            var loss = electricBlock.getResistance(state) / voltage / voltage;
-            this.lossFactor += loss;
+            var voltage = electricBlock.getVoltage(state);
+            if (voltage > 0) {
+                var loss = electricBlock.getResistance(state) / voltage / voltage;
+                this.lossFactor += loss;
+            }
         }
     }
 
     @Override
     public void onConnect() {
         LOGGER.debug("{} on connect lossFactor = {}", this, this.lossFactor);
+    }
+
+    @Override
+    public void onDisconnect() {
+        this.lossFactor = 0d;
     }
 
     protected double solvePowerOut(double powerIn) {
