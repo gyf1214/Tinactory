@@ -90,6 +90,7 @@ minecraft {
             workingDirectory project.file('run/mainData')
             args '--mod', 'tinactory', '--all', '--output', file('src/main/generated/resources/')
             args '--existing', file('src/main/resources/')
+            args '--existing', file('libs/gtceu_resources_2.8.7.zip')
         }
 
         testData {
@@ -100,6 +101,7 @@ minecraft {
             args '--existing', file('src/test/resources/')
             args '--existing', file('src/main/resources/')
             args '--existing', file('src/main/generated/resources')
+            args '--existing', file('libs/gtceu_resources_2.8.7.zip')
         }
     }
 }

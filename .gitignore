@@ -24,3 +24,6 @@ run
 # generated
 src/main/generated
 src/test/generated
+
+# libs
+libs/

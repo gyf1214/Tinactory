@@ -31,7 +31,6 @@ public final class CableModel {
     private static final String OPEN_MODEL = "block/network/cable/open";
     private static final String CLOSED_MODEL = "block/network/cable/closed";
     private static final String ITEM_MODEL = "item/network/cable/item";
-    private static final String VENDOR = "gregtech";
     private static final String TEX_PREFIX = "blocks/cable/";
     private static final String INSULATION_OPEN_TEX = TEX_PREFIX + "insulation_1";
     private static final String INSULATION_TEX = TEX_PREFIX + "insulation_5";
@@ -91,18 +90,18 @@ public final class CableModel {
 
     public static void genBlockModels(DataContext<BlockStateProvider> ctx) {
         genOpenEnd(ctx.provider.models())
-                .texture("insulation", ctx.vendorLoc(VENDOR, INSULATION_TEX))
-                .texture("insulationOpen", ctx.vendorLoc(VENDOR, INSULATION_OPEN_TEX))
-                .texture("wire", ctx.vendorLoc(VENDOR, WIRE_TEX));
+                .texture("insulation", ModelGen.gregtech(INSULATION_TEX))
+                .texture("insulationOpen", ModelGen.gregtech(INSULATION_OPEN_TEX))
+                .texture("wire", ModelGen.gregtech(WIRE_TEX));
         genClosedEnd(ctx.provider.models())
-                .texture("insulation", ctx.vendorLoc(VENDOR, INSULATION_TEX));
+                .texture("insulation", ModelGen.gregtech(INSULATION_TEX));
     }
 
     public static void genItemModels(DataContext<ItemModelProvider> ctx) {
         genItem(ctx.provider)
-                .texture("insulation", ctx.vendorLoc(VENDOR, INSULATION_TEX))
-                .texture("insulationOpen", ctx.vendorLoc(VENDOR, INSULATION_OPEN_TEX))
-                .texture("wire", ctx.vendorLoc(VENDOR, WIRE_TEX));
+                .texture("insulation", ModelGen.gregtech(INSULATION_TEX))
+                .texture("insulationOpen", ModelGen.gregtech(INSULATION_OPEN_TEX))
+                .texture("wire", ModelGen.gregtech(WIRE_TEX));
     }
 
     public static void blockState(RegistryDataContext<Block, ? extends CableBlock, BlockStateProvider> ctx) {
@@ -116,12 +115,12 @@ public final class CableModel {
             var property = CableBlock.PROPERTY_BY_DIRECTION.get(dir);
             multipart.part()
                     // open end
-                    .modelFile(models.getExistingFile(prov.modLoc(OPEN_MODEL)))
+                    .modelFile(models.getExistingFile(ModelGen.modLoc(OPEN_MODEL)))
                     .rotationX(xRot).rotationY(yRot).addModel()
                     .condition(property, true)
                     .end().part()
                     // closed end
-                    .modelFile(models.getExistingFile(prov.modLoc(CLOSED_MODEL)))
+                    .modelFile(models.getExistingFile(ModelGen.modLoc(CLOSED_MODEL)))
                     .rotationX(xRot).rotationY(yRot).addModel()
                     .condition(property, false)
                     .end();
@@ -129,6 +128,6 @@ public final class CableModel {
     }
 
     public static void itemModel(RegistryDataContext<Item, BlockItem, ItemModelProvider> ctx) {
-        ctx.provider.withExistingParent(ctx.id, ctx.modLoc(ITEM_MODEL));
+        ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(ITEM_MODEL));
     }
 }

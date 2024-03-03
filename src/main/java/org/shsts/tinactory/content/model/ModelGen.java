@@ -55,18 +55,17 @@ public final class ModelGen {
     }
 
     public static final ResourceLocation VOID_TEX = new ResourceLocation(Tinactory.ID, "void");
-    public static final String VENDOR_PATH = "vendor/%s/%s";
+
+    public static ResourceLocation mcLoc(String id) {
+        return new ResourceLocation(id);
+    }
 
     public static ResourceLocation modLoc(String id) {
         return new ResourceLocation(Tinactory.ID, id);
     }
 
-    public static ResourceLocation vendorLoc(String vendor, String id) {
-        return modLoc(ModelGen.VENDOR_PATH.formatted(vendor, id));
-    }
-
     public static ResourceLocation gregtech(String id) {
-        return vendorLoc("gregtech", id);
+        return new ResourceLocation("gregtech", id);
     }
 
     public static ResourceLocation extend(ResourceLocation loc, String suffix) {
