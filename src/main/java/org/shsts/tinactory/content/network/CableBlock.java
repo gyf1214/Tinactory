@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -20,11 +21,13 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.content.tool.UsableToolItem;
+import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -33,7 +36,7 @@ import java.util.Map;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class CableBlock extends Block implements IWrenchable, IElectricConnector {
+public class CableBlock extends Block implements IWrenchable, IConnector, IElectricBlock {
     public static final Map<Direction, BooleanProperty> PROPERTY_BY_DIRECTION = PipeBlock.PROPERTY_BY_DIRECTION;
     public static final BooleanProperty NORTH = PipeBlock.NORTH;
     public static final BooleanProperty EAST = PipeBlock.EAST;
@@ -154,15 +157,14 @@ public class CableBlock extends Block implements IWrenchable, IElectricConnector
         var property = PROPERTY_BY_DIRECTION.get(dir);
         if (state.getValue(property)) {
             this.setConnected(world, pos, state, dir, false);
-        } else if (IElectricConnector.allowConnect(world, pos, state, dir)) {
+        } else if (IConnector.allowConnect(world, pos, state, dir)) {
             this.setConnected(world, pos, state, dir, true);
         }
     }
 
     @Override
     public boolean isConnected(Level world, BlockPos pos, BlockState state, Direction dir) {
-        return state.getValue(PROPERTY_BY_DIRECTION.get(dir)) &&
-                IElectricConnector.allowConnect(world, pos, state, dir);
+        return state.getValue(PROPERTY_BY_DIRECTION.get(dir));
     }
 
     @Override
@@ -183,19 +185,25 @@ public class CableBlock extends Block implements IWrenchable, IElectricConnector
     }
 
     @Override
-    public boolean allowAutoConnectFrom(Level world, BlockPos pos, BlockState state,
-                                        Direction dir, BlockState state1) {
-        return this.allowConnectFrom(world, pos, state, dir, state1);
-    }
-
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         var state = this.defaultBlockState();
         var dir = ctx.getClickedFace().getOpposite();
-        if (IElectricConnector.allowAutoConnect(ctx, state)) {
+        if (IConnector.autoConnectOnPlace(ctx, state)) {
             return state.setValue(PROPERTY_BY_DIRECTION.get(dir), true);
         }
         return state;
+    }
+
+    @Override
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state,
+                            @Nullable LivingEntity placer, ItemStack stack) {
+        NetworkManager.tryGetInstance(world).ifPresent(manager -> {
+            for (var dir : Direction.values()) {
+                if (this.isConnected(world, pos, state, dir)) {
+                    manager.invalidatePosDir(pos, dir);
+                }
+            }
+        });
     }
 
     @SuppressWarnings("deprecation")
@@ -203,12 +211,8 @@ public class CableBlock extends Block implements IWrenchable, IElectricConnector
     public BlockState updateShape(BlockState state, Direction dir, BlockState state1,
                                   LevelAccessor levelAccessor, BlockPos pos, BlockPos pos1) {
         var world = (Level) levelAccessor;
-        if (!IElectricConnector.allowConnect(world, pos, state, dir)) {
-            return this.setConnected(world, pos, state, dir, false);
-        } else if (IElectricConnector.allowAutoConnect(world, pos, state, dir)) {
-            return this.setConnected(world, pos, state, dir, true);
-        }
-        return state;
+        var connected = IConnector.autoConnectFromNeighbor(world, pos1, state1, dir.getOpposite(), state);
+        return this.setConnected(world, pos, state, dir, connected);
     }
 
     protected void onDestroy(Level world, BlockPos pos, BlockState state) {

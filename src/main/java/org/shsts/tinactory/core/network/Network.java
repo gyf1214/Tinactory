@@ -53,7 +53,7 @@ public class Network {
     @Nullable
     protected Ref ref;
 
-    protected class BFSContext {
+    private class BFSContext {
         private final Queue<BlockPos> queue = new ArrayDeque<>();
         public final Map<BlockPos, BlockState> visited = new HashMap<>();
 
