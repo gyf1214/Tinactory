@@ -1,6 +1,7 @@
-package org.shsts.tinactory.core.network;
+package org.shsts.tinactory.content.logistics;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -12,11 +13,13 @@ import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.ItemTypeWrapper;
+import org.shsts.tinactory.core.network.Component;
+import org.shsts.tinactory.core.network.ComponentType;
+import org.shsts.tinactory.core.network.CompositeNetwork;
+import org.shsts.tinactory.core.network.Network;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -25,14 +28,18 @@ import java.util.function.Supplier;
 public class LogisticComponent extends Component {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public enum RequestType {
-        PUSH, PULL
+    public enum Direction {
+        PUSH, PULL;
+
+        public Direction invert() {
+            return this == PUSH ? PULL : PUSH;
+        }
     }
 
-    private record Request(RequestType type, IItemCollection port, ItemStack item) {}
+    private record Request(Direction dir, IItemCollection port, ItemStack item) {}
 
     private final Multimap<ItemTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
-    private final Set<IItemCollection> passiveStorages = new HashSet<>();
+    private final Multimap<Direction, IItemCollection> passiveStorages = HashMultimap.create();
 
     public static class WorkerProperty {
         public int workerSize;
@@ -49,7 +56,8 @@ public class LogisticComponent extends Component {
     public final WorkerProperty workerProperty;
     private int ticks;
 
-    public LogisticComponent(ComponentType<LogisticComponent> type, CompositeNetwork network, WorkerProperty workerProperty) {
+    public LogisticComponent(ComponentType<LogisticComponent> type, CompositeNetwork network,
+                             WorkerProperty workerProperty) {
         super(type, network);
         this.workerProperty = workerProperty;
     }
@@ -100,7 +108,7 @@ public class LogisticComponent extends Component {
     }
 
     private ItemStack transmitItem(Request req, IItemCollection otherPort, ItemStack item, int limit) {
-        return req.type == RequestType.PULL ?
+        return req.dir == Direction.PULL ?
                 this.transmitItem(otherPort, req.port, item, limit) :
                 this.transmitItem(req.port, otherPort, item, limit);
     }
@@ -111,7 +119,7 @@ public class LogisticComponent extends Component {
             if (remaining.isEmpty()) {
                 return true;
             }
-            if (otherReq.type == req.type) {
+            if (otherReq.dir == req.dir) {
                 continue;
             }
             var limit = Math.min(remaining.getCount(), otherReq.item.getCount());
@@ -119,7 +127,7 @@ public class LogisticComponent extends Component {
             remaining = this.transmitItem(req, otherReq.port, remaining, limit);
             otherReq.item.shrink(originalCount - remaining.getCount());
         }
-        for (var storage : this.passiveStorages) {
+        for (var storage : this.passiveStorages.get(req.dir.invert())) {
             if (remaining.isEmpty()) {
                 return true;
             }
@@ -147,24 +155,24 @@ public class LogisticComponent extends Component {
         this.ticks++;
     }
 
-    public void addPassiveStorage(IItemCollection port) {
-        this.passiveStorages.add(port);
+    public void addPassiveStorage(Direction dir, IItemCollection port) {
+        this.passiveStorages.put(dir, port);
     }
 
-    public void deletePassiveStorage(IItemCollection port) {
-        this.passiveStorages.remove(port);
+    public void deletePassiveStorage(Direction dir, IItemCollection port) {
+        this.passiveStorages.remove(dir, port);
     }
 
-    public void addActiveRequest(RequestType type, IItemCollection port, ItemStack item) {
-        item = item.copy();
-        var req = new Request(type, port, item);
-        this.activeRequests.put(new ItemTypeWrapper(item), req);
+    public void addActiveRequest(Direction type, IItemCollection port, ItemStack item) {
+        var item1 = item.copy();
+        var req = new Request(type, port, item1);
+        this.activeRequests.put(new ItemTypeWrapper(item1), req);
     }
 
-    public void addActiveRequest(RequestType type, IItemCollection port, ItemStack item, int count) {
-        item = ItemHandlerHelper.copyStackWithSize(item, count);
-        var req = new Request(type, port, item);
-        this.activeRequests.put(new ItemTypeWrapper(item), req);
+    public void addActiveRequest(Direction type, IItemCollection port, ItemStack item, int count) {
+        var item1 = ItemHandlerHelper.copyStackWithSize(item, count);
+        var req = new Request(type, port, item1);
+        this.activeRequests.put(new ItemTypeWrapper(item1), req);
     }
 
     @Override
