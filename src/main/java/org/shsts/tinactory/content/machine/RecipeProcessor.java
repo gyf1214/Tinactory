@@ -161,7 +161,12 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>>
     }
 
     @Override
-    public double getPower() {
+    public double getPowerGen() {
+        return 0;
+    }
+
+    @Override
+    public double getPowerCons() {
         return this.voltage == Voltage.PRIMITIVE || this.currentRecipe == null ?
                 0 : this.currentRecipe.power;
     }

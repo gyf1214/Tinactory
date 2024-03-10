@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.IScheduling;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
@@ -24,7 +23,8 @@ public class ElectricComponent extends Component {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected double lossFactor = 0d;
-    protected double powerIn, powerOut, powerBuffer;
+    protected double powerGen, powerCons;
+    protected double powerBufferGen, powerBufferCons;
     protected double workFactor;
     protected double bufferFactor;
 
@@ -53,46 +53,63 @@ public class ElectricComponent extends Component {
         this.lossFactor = 0d;
     }
 
-    protected double solvePowerOut(double powerIn) {
-        return 2 * powerIn / (1 + Math.sqrt(1 + 4 * this.lossFactor * powerIn));
+    protected double solvePowerCons(double powerGen) {
+        return 2 * powerGen / (1 + Math.sqrt(1 + 4 * this.lossFactor * powerGen));
     }
 
     protected double solveBufferFactor(double power) {
-        if (this.powerBuffer < MathUtil.EPS) {
+        var comp = MathUtil.compare(power);
+        if (comp == 0) {
             return 0d;
+        } else if (comp > 0) {
+            /* consumer */
+            if (this.powerBufferCons < MathUtil.EPS) {
+                return 0d;
+            }
+            return MathUtil.clamp(power / this.powerBufferCons, 0d, 1d);
+        } else {
+            /* generator */
+            if (this.powerBufferGen < MathUtil.EPS) {
+                return 0d;
+            }
+            return MathUtil.clamp(power / this.powerBufferGen, 0d, 1d);
         }
-        return MathUtil.clamp(power / this.powerBuffer, 0d, 1d);
     }
 
     protected void solveNetwork() {
-        this.powerIn = 0d;
-        this.powerOut = 0d;
-        this.powerBuffer = 0d;
-        this.network.forEachMachine(machine -> machine
-                .getCapability(AllCapabilities.ELECTRIC_MACHINE.get()).ifPresent(electric -> {
-                    switch (electric.getMachineType()) {
-                        case GENERATOR -> this.powerIn += electric.getPower();
-                        case CONSUMER -> this.powerOut += electric.getPower();
-                        case BUFFER -> this.powerBuffer += electric.getPower();
+        this.powerGen = 0d;
+        this.powerCons = 0d;
+        this.powerBufferGen = 0d;
+        this.powerBufferCons = 0d;
+        for (var machine : this.network.getMachines()) {
+            machine.getElectric().ifPresent(electric -> {
+                switch (electric.getMachineType()) {
+                    case GENERATOR -> this.powerGen += electric.getPowerGen();
+                    case CONSUMER -> this.powerCons += electric.getPowerCons();
+                    case BUFFER -> {
+                        this.powerBufferGen += electric.getPowerGen();
+                        this.powerBufferCons += electric.getPowerCons();
                     }
-                }));
-        var needPower = this.powerOut + this.powerOut * this.powerOut * this.lossFactor;
-        if (needPower <= this.powerIn) {
+                }
+            });
+        }
+        var needPower = this.powerCons + this.powerCons * this.powerCons * this.lossFactor;
+        if (needPower <= this.powerGen) {
             this.workFactor = 1d;
             // buffer is consumer
-            this.bufferFactor = this.solveBufferFactor(this.solvePowerOut(this.powerIn) - this.powerOut);
-        } else if (needPower <= this.powerIn + this.powerBuffer) {
+            this.bufferFactor = this.solveBufferFactor(this.solvePowerCons(this.powerGen) - this.powerCons);
+        } else if (needPower <= this.powerGen + this.powerBufferGen) {
             this.workFactor = 1d;
             // buffer is generator
-            this.bufferFactor = -this.solveBufferFactor(needPower - this.powerIn);
+            this.bufferFactor = this.solveBufferFactor(this.powerGen - needPower);
         } else {
             // buffer is generator
             this.bufferFactor = -1d;
-            var powerOut = this.solvePowerOut(this.powerIn + this.powerBuffer);
-            if (this.powerOut < MathUtil.EPS) {
+            var powerOut = this.solvePowerCons(this.powerGen + this.powerBufferGen);
+            if (this.powerCons < MathUtil.EPS) {
                 this.workFactor = 0d;
             } else {
-                this.workFactor = MathUtil.clamp(powerOut / this.powerOut, 0d, 1d);
+                this.workFactor = MathUtil.clamp(powerOut / this.powerCons, 0d, 1d);
             }
         }
     }

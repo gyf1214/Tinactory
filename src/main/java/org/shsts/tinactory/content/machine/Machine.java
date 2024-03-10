@@ -6,6 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllCapabilities;
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -73,19 +76,30 @@ public class Machine extends SmartBlockEntity {
     }
 
     protected void onPreWork(Level world, Network network) {
-        this.getCapability(AllCapabilities.PROCESSOR.get()).ifPresent(IProcessor::onPreWork);
+        this.getProcessor().ifPresent(IProcessor::onPreWork);
     }
 
     protected void onWork(Level world, Network network) {
         assert this.network == network;
         var workFactor = this.network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
-        this.getCapability(AllCapabilities.PROCESSOR.get())
-                .ifPresent(processor -> processor.onWorkTick(workFactor));
+        this.getProcessor().ifPresent(processor -> processor.onWorkTick(workFactor));
     }
 
     public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Component.Ticker> cons) {
         cons.accept(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
         cons.accept(AllNetworks.WORK_SCHEDULING, this::onWork);
+    }
+
+    public Optional<IProcessor> getProcessor() {
+        return this.getCapability(AllCapabilities.PROCESSOR.get()).resolve();
+    }
+
+    public Optional<IElectricMachine> getElectric() {
+        return this.getCapability(AllCapabilities.ELECTRIC_MACHINE.get()).resolve();
+    }
+
+    public Optional<IContainer> getContainer() {
+        return this.getCapability(AllCapabilities.CONTAINER.get()).resolve();
     }
 
     /**

@@ -15,10 +15,10 @@ import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -37,8 +37,8 @@ public class CompositeNetwork extends Network {
         this.attachComponents();
     }
 
-    public <T extends Component> T getComponent(Supplier<ComponentType<T>> typeSupplier) {
-        var type = typeSupplier.get();
+    public <T extends Component> T getComponent(Supplier<ComponentType<T>> typeSupp) {
+        var type = typeSupp.get();
         return type.componentClass.cast(components.get(type));
     }
 
@@ -54,12 +54,8 @@ public class CompositeNetwork extends Network {
         ComponentType.getComponentTypes().forEach(this::attachComponent);
     }
 
-    protected void forEachComponent(Consumer<Component> cons) {
-        this.components.values().forEach(cons);
-    }
-
-    public void forEachMachine(Consumer<Machine> cons) {
-        this.machines.forEach(cons);
+    public Collection<Machine> getMachines() {
+        return this.machines;
     }
 
     protected void putMachine(Machine be) {
@@ -70,7 +66,9 @@ public class CompositeNetwork extends Network {
     @Override
     protected void putBlock(BlockPos pos, BlockState state) {
         super.putBlock(pos, state);
-        this.forEachComponent(component -> component.putBlock(pos, state));
+        for (var component : this.components.values()) {
+            component.putBlock(pos, state);
+        }
         if (state.getBlock() instanceof SmartEntityBlock<?> entityBlock) {
             entityBlock.getBlockEntity(this.world, pos, Machine.class).ifPresent(this::putMachine);
         }
@@ -79,16 +77,26 @@ public class CompositeNetwork extends Network {
     @Override
     protected void connectFinish() {
         super.connectFinish();
-        this.forEachComponent(Component::onConnect);
-        this.forEachMachine(machine -> machine.onConnectToNetwork(this));
-        this.forEachMachine(machine -> machine.buildSchedulings((scheduling, ticker) ->
-                this.machineSchedulings.put(scheduling.get(), ticker)));
+        for (var component : this.components.values()) {
+            component.onConnect();
+        }
+        for (var machine : this.machines) {
+            machine.onConnectToNetwork(this);
+        }
+        for (var machine : this.machines) {
+            machine.buildSchedulings((scheduling, ticker) ->
+                    this.machineSchedulings.put(scheduling.get(), ticker));
+        }
     }
 
     @Override
     protected void onDisconnect() {
-        this.forEachMachine(Machine::onDisconnectFromNetwork);
-        this.forEachComponent(Component::onDisconnect);
+        for (var machine : this.machines) {
+            machine.onDisconnectFromNetwork();
+        }
+        for (var component : this.components.values()) {
+            component.onDisconnect();
+        }
         this.machines.clear();
         this.machineSchedulings.clear();
         super.onDisconnect();

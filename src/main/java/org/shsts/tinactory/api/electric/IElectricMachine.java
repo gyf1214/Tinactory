@@ -9,5 +9,7 @@ public interface IElectricMachine {
 
     ElectricMachineType getMachineType();
 
-    double getPower();
+    double getPowerGen();
+
+    double getPowerCons();
 }

@@ -46,7 +46,12 @@ public class TestGenerator extends Machine implements IElectricMachine {
     }
 
     @Override
-    public double getPower() {
+    public double getPowerCons() {
+        return 0;
+    }
+
+    @Override
+    public double getPowerGen() {
         return this.power;
     }
 
