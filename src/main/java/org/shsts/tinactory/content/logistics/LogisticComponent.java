@@ -8,6 +8,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllNetworks;
@@ -56,10 +57,13 @@ public class LogisticComponent extends Component {
     public final WorkerProperty workerProperty;
     private int ticks;
 
-    public LogisticComponent(ComponentType<LogisticComponent> type, CompositeNetwork network,
-                             WorkerProperty workerProperty) {
+    public LogisticComponent(ComponentType<LogisticComponent> type, CompositeNetwork network) {
         super(type, network);
-        this.workerProperty = workerProperty;
+        this.workerProperty = new WorkerProperty(
+                TinactoryConfig.INSTANCE.initialWorkerSize.get(),
+                TinactoryConfig.INSTANCE.initialWorkerDelay.get(),
+                TinactoryConfig.INSTANCE.initialWorkerStack.get()
+        );
     }
 
     public void resetWorkers() {
