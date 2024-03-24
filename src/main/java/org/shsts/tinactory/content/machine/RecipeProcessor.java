@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -17,6 +18,8 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.core.common.EventManager;
+import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
@@ -26,8 +29,8 @@ import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeProcessor<T extends ProcessingRecipe<?>>
-        implements ICapabilityProvider, IProcessor, IElectricMachine, INBTSerializable<CompoundTag> {
+public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabilityProvider,
+        IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     protected static final long PROGRESS_PER_TICK = 256;
 
     protected final BlockEntity blockEntity;
@@ -59,14 +62,17 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>>
         return this.container;
     }
 
+    protected Level getWorld() {
+        var world = this.blockEntity.getLevel();
+        assert world != null;
+        return world;
+    }
+
     protected void updateRecipe() {
         if (this.currentRecipe != null || !this.needUpdate) {
             return;
         }
-        var world = this.blockEntity.getLevel();
-        if (world == null) {
-            return;
-        }
+        var world = this.getWorld();
         this.currentRecipe = SmartRecipe.getRecipeFor(this.recipeType, this.getContainer(), world)
                 .orElse(null);
         this.workProgress = 0;
@@ -75,36 +81,6 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>>
             this.blockEntity.setChanged();
         }
         this.needUpdate = false;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected void initializeRecipe() {
-        if (this.currentRecipeId == null) {
-            return;
-        }
-        var world = this.blockEntity.getLevel();
-        assert world != null;
-        world.getRecipeManager().byKey(this.currentRecipeId).ifPresent(recipe -> {
-            if (this.recipeType == recipe.getType()) {
-                this.currentRecipe = (T) recipe;
-            }
-        });
-        this.currentRecipeId = null;
-        if (this.currentRecipe != null) {
-            this.needUpdate = false;
-        }
-    }
-
-    @Override
-    public void onInputUpdate() {
-        if (this.currentRecipe == null) {
-            this.needUpdate = true;
-        }
-    }
-
-    @Override
-    public void onOutputUpdate() {
-        this.onInputUpdate();
     }
 
     protected long getMaxWorkTicks() {
@@ -116,7 +92,6 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>>
 
     @Override
     public void onPreWork() {
-        this.initializeRecipe();
         this.updateRecipe();
     }
 
@@ -127,8 +102,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>>
         }
         var progress = (long) Math.floor(partial * (double) PROGRESS_PER_TICK);
         this.workProgress += progress;
-        var world = this.blockEntity.getLevel();
-        assert world != null;
+        var world = this.getWorld();
         if (this.workProgress >= this.getMaxWorkTicks()) {
             this.currentRecipe.insertOutputs(this.getContainer(), world.random);
             this.currentRecipe = null;
@@ -171,6 +145,37 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>>
                 0 : this.currentRecipe.power;
     }
 
+    @SuppressWarnings("unchecked")
+    protected void onLoad() {
+        var world = this.getWorld();
+        if (!world.isClientSide) {
+            if (this.currentRecipeId == null) {
+                return;
+            }
+            world.getRecipeManager().byKey(this.currentRecipeId).ifPresent(recipe -> {
+                if (this.recipeType == recipe.getType()) {
+                    this.currentRecipe = (T) recipe;
+                }
+            });
+            this.currentRecipeId = null;
+            if (this.currentRecipe != null) {
+                this.needUpdate = false;
+            }
+        }
+    }
+
+    private void onContainerChange(boolean isInput) {
+        if (this.currentRecipe == null) {
+            this.needUpdate = true;
+        }
+    }
+
+    @Override
+    public void subscribeEvents(EventManager eventManager) {
+        eventManager.subscribe(AllCapabilities.LOAD_EVENT.get(), this::onLoad);
+        eventManager.subscribe(AllCapabilities.CONTAINER_CHANGE_EVENT.get(), this::onContainerChange);
+    }
+
     @NotNull
     @Override
     public <T1> LazyOptional<T1> getCapability(Capability<T1> cap, @Nullable Direction side) {
@@ -182,10 +187,11 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>>
 
     @Override
     public CompoundTag serializeNBT() {
-        this.initializeRecipe();
         var tag = new CompoundTag();
-        if (this.currentRecipe != null) {
-            tag.putString("currentRecipe", this.currentRecipe.getId().toString());
+        var recipeId = this.currentRecipeId != null ? this.currentRecipeId :
+                (this.currentRecipe != null ? this.currentRecipe.getId() : null);
+        if (recipeId != null) {
+            tag.putString("currentRecipe", recipeId.toString());
             tag.putLong("workProgress", this.workProgress);
         }
         return tag;

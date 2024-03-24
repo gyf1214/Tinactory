@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
+import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
 import javax.annotation.Nullable;
@@ -117,7 +118,9 @@ public class SmartBlockEntity extends BlockEntity {
     /**
      * callback when this blockEntity is loaded
      */
-    protected void onLoad(Level world) {}
+    protected void onLoad(Level world) {
+        EventManager.invoke(this, AllCapabilities.LOAD_EVENT.get());
+    }
 
     /**
      * callback when this blockEntity is truly removed in world

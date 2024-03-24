@@ -41,6 +41,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
     protected final Factory<U> factory;
     protected final Set<Supplier<? extends Block>> validBlocks = new HashSet<>();
     protected boolean ticking = false;
+    protected boolean hasEvent = false;
     @Nullable
     protected Class<U> entityClass = null;
     protected final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>> capabilities =
@@ -71,6 +72,15 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
 
     public S ticking() {
         return this.ticking(true);
+    }
+
+    public S hasEvent(boolean hasEvent) {
+        this.hasEvent = hasEvent;
+        return self();
+    }
+
+    public S hasEvent() {
+        return this.hasEvent(true);
     }
 
     public void setMenu(Supplier<ContainerMenuType<U, ?>> menu) {
@@ -115,12 +125,13 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEn
         var entry = this.entry;
         var entityClass = this.entityClass;
         var ticking = this.ticking;
+        var hasEvent = this.hasEvent;
         var factory = this.factory;
         var menu = this.menu;
         assert entry != null;
         assert entityClass != null;
         return new SmartBlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state),
                 validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()),
-                entityClass, ticking, this.capabilities, menu);
+                entityClass, ticking, hasEvent, this.capabilities, menu);
     }
 }

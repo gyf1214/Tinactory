@@ -22,8 +22,4 @@ public interface IProcessor {
     Optional<ProcessingRecipe<?>> getCurrentRecipe();
 
     double getProgress();
-
-    void onInputUpdate();
-
-    void onOutputUpdate();
 }

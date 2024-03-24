@@ -18,7 +18,7 @@ public final class AllBlockEntities {
         TEST_MACHINE = REGISTRATE.blockEntitySet("machine/test", Machine::new, MachineBlock.factory(Voltage.ULV))
                 .entityClass(Machine.class)
                 .blockEntity()
-                .ticking()
+                .ticking().hasEvent()
                 .capability(AllCapabilities.STACK_CONTAINER, $ -> $
                         .layout(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV))
                 .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $

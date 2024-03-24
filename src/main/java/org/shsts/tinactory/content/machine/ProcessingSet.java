@@ -44,6 +44,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
         var builder = REGISTRATE.blockEntitySet(id, Machine.factory(voltage), MachineBlock.factory(voltage))
                 .entityClass(Machine.class)
                 .blockEntity()
+                .hasEvent()
                 .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $
                         .recipeType(this.recipeType.get()).voltage(voltage))
                 .capability(AllCapabilities.STACK_CONTAINER, $ -> $

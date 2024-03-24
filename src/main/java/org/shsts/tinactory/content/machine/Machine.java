@@ -47,6 +47,7 @@ public class Machine extends SmartBlockEntity {
 
     @Override
     protected void onLoad(Level world) {
+        super.onLoad(world);
         LOGGER.debug("machine {}: loaded", this);
     }
 

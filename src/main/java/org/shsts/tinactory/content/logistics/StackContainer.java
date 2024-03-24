@@ -16,9 +16,9 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
@@ -43,8 +43,6 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
     protected final CombinedFluidTank combinedFluids;
     protected final List<IPort> ports;
     protected final List<IPort> internalPorts;
-    @Nullable
-    protected IProcessor processor = null;
 
     public StackContainer(BlockEntity blockEntity, Collection<PortInfo> ports) {
         this.blockEntity = blockEntity;
@@ -117,20 +115,13 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
         this.combinedFluids = new CombinedFluidTank(fluids.toArray(WrapperFluidTank[]::new));
     }
 
-    protected IProcessor getProcessor() {
-        if (this.processor == null) {
-            this.processor = AllCapabilities.PROCESSOR.getCapability(this.blockEntity);
-        }
-        return this.processor;
-    }
-
     protected void onInputUpdate() {
-        this.getProcessor().onInputUpdate();
+        EventManager.invoke(this.blockEntity, AllCapabilities.CONTAINER_CHANGE_EVENT.get(), true);
         this.blockEntity.setChanged();
     }
 
     protected void onOutputUpdate() {
-        this.getProcessor().onOutputUpdate();
+        EventManager.invoke(this.blockEntity, AllCapabilities.CONTAINER_CHANGE_EVENT.get(), false);
         this.blockEntity.setChanged();
     }
 

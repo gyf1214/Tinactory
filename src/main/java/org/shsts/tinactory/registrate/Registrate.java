@@ -26,6 +26,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.core.common.CapabilityProviderType;
+import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
@@ -407,6 +408,11 @@ public class Registrate {
     RegistryEntry<ComponentType<T>> componentType(String id, Class<T> clazz, Component.Factory<T> factory) {
         return this.registryEntry(id, AllRegistries.COMPONENT_TYPE_REGISTRY,
                 () -> new ComponentType<>(clazz, factory));
+    }
+
+    public <A> RegistryEntry<Event<A>> event(String id, Class<A> argClazz) {
+        return this.registryEntry(id, AllRegistries.EVENT,
+                () -> new Event<>(argClazz));
     }
 
     public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>

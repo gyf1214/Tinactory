@@ -2,6 +2,7 @@ package org.shsts.tinactory.registrate;
 
 import org.shsts.tinactory.api.common.ICapabilityProviderType;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.SchedulingManager;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
@@ -12,6 +13,7 @@ public final class AllRegistries {
     public static final SmartRegistry<IScheduling> SCHEDULING_REGISTRY;
     public static final SmartRegistry<ICapabilityProviderType<?, ?>> CAPABILITY_PROVIDER_TYPE_REGISTRY;
     public static final SmartRegistry<ComponentType<?>> COMPONENT_TYPE_REGISTRY;
+    public static final SmartRegistry<Event<?>> EVENT;
 
     static {
         SCHEDULING_REGISTRY = REGISTRATE.registry("scheduling", IScheduling.class)
@@ -22,6 +24,7 @@ public final class AllRegistries {
         COMPONENT_TYPE_REGISTRY = REGISTRATE.<ComponentType<?>>genericRegistry("component_type", ComponentType.class)
                 .onBake(ComponentType::onBake)
                 .register();
+        EVENT = REGISTRATE.simpleRegistry("event", Event.class);
     }
 
     public static void init() {}

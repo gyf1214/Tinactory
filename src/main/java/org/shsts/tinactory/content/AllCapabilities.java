@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -10,6 +11,8 @@ import org.shsts.tinactory.content.machine.IWorkbench;
 import org.shsts.tinactory.content.machine.RecipeProcessor;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.core.common.CapabilityProviderType;
+import org.shsts.tinactory.core.common.Event;
+import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.registrate.common.CapabilityEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -17,6 +20,7 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 public final class AllCapabilities {
+    public static final CapabilityEntry<EventManager> EVENT_MANAGER;
     public static final CapabilityEntry<IProcessor> PROCESSOR;
     public static final CapabilityEntry<IContainer> CONTAINER;
     public static final CapabilityEntry<IElectricMachine> ELECTRIC_MACHINE;
@@ -29,7 +33,11 @@ public final class AllCapabilities {
     public static final RegistryEntry<CapabilityProviderType<BlockEntity, RecipeProcessor.Builder>>
             RECIPE_PROCESSOR;
 
+    public static final RegistryEntry<Event<Unit>> LOAD_EVENT;
+    public static final RegistryEntry<Event<Boolean>> CONTAINER_CHANGE_EVENT;
+
     static {
+        EVENT_MANAGER = REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
         PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
         CONTAINER = REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
         ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
@@ -42,6 +50,9 @@ public final class AllCapabilities {
                 StackContainer.Builder::new);
         RECIPE_PROCESSOR = REGISTRATE.capabilityProvider("machine/recipe_processor",
                 RecipeProcessor.Builder::new);
+
+        LOAD_EVENT = REGISTRATE.event("on_load", Unit.class);
+        CONTAINER_CHANGE_EVENT = REGISTRATE.event("logistics/container_change", Boolean.class);
     }
 
     public static void init() {}
