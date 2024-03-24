@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticComponent extends Component {
+public class LogisticsComponent extends Component {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public enum Direction {
@@ -57,7 +57,7 @@ public class LogisticComponent extends Component {
     public final WorkerProperty workerProperty;
     private int ticks;
 
-    public LogisticComponent(ComponentType<LogisticComponent> type, CompositeNetwork network) {
+    public LogisticsComponent(ComponentType<LogisticsComponent> type, CompositeNetwork network) {
         super(type, network);
         this.workerProperty = new WorkerProperty(
                 TinactoryConfig.INSTANCE.initialWorkerSize.get(),

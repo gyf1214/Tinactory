@@ -135,6 +135,11 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
     }
 
     @Override
+    public int getMaxPort() {
+        return this.ports.size();
+    }
+
+    @Override
     public boolean hasPort(int port) {
         return port >= 0 && port < this.ports.size() &&
                 this.ports.get(port) != IPort.EMPTY;

@@ -21,11 +21,11 @@ public final class TinactoryConfig {
         builder.push("logistics");
         this.fluidSlotSize = builder.comment("Default size of a fluid slot.")
                 .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
-        this.initialWorkerSize = builder.comment("Initial worker size for logistic component")
+        this.initialWorkerSize = builder.comment("Initial worker size for logistics component")
                 .defineInRange("initial_worker_size", 1, 0, Integer.MAX_VALUE);
-        this.initialWorkerDelay = builder.comment("Initial worker delay for logistic component")
+        this.initialWorkerDelay = builder.comment("Initial worker delay for logistics component")
                 .defineInRange("initial_worker_delay", 40, 1, Integer.MAX_VALUE);
-        this.initialWorkerStack = builder.comment("Initial worker stack for logistic component")
+        this.initialWorkerStack = builder.comment("Initial worker stack for logistics component")
                 .defineInRange("initial_worker_stack", 4, 1, Integer.MAX_VALUE);
         builder.pop();
 
