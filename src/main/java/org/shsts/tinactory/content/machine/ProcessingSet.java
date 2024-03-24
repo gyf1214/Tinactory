@@ -4,7 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Layout;
@@ -45,9 +45,9 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                 .entityClass(Machine.class)
                 .blockEntity()
                 .hasEvent()
-                .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $
+                .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
                         .recipeType(this.recipeType.get()).voltage(voltage))
-                .capability(AllCapabilities.STACK_CONTAINER, $ -> $
+                .capability(AllCapabilityProviders.STACK_CONTAINER, $ -> $
                         .layout(this.layout, voltage))
                 .menu().layout(this.layout, voltage).build()
                 .build()

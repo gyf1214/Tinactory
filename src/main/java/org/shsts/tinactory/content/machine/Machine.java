@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.common.EventManager;
@@ -72,7 +73,7 @@ public class Machine extends SmartBlockEntity {
     public void onConnectToNetwork(CompositeNetwork network) {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
-        EventManager.invoke(this, AllCapabilities.CONNECT_EVENT, network);
+        EventManager.invoke(this, AllBlockEntityEvents.CONNECT, network);
     }
 
     protected void onPreWork(Level world, Network network) {
@@ -88,7 +89,7 @@ public class Machine extends SmartBlockEntity {
     public void buildSchedulings(Component.SchedulingBuilder builder) {
         builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
         builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
-        EventManager.invoke(this, AllCapabilities.BUILD_SCHEDULING_EVENT, builder);
+        EventManager.invoke(this, AllBlockEntityEvents.BUILD_SCHEDULING, builder);
     }
 
     public Optional<IProcessor> getProcessor() {

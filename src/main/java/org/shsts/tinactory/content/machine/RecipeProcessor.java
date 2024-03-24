@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
@@ -163,8 +164,8 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllCapabilities.SERVER_LOAD_EVENT, this::onLoad);
-        eventManager.subscribe(AllCapabilities.CONTAINER_CHANGE_EVENT, this::onContainerChange);
+        eventManager.subscribe(AllBlockEntityEvents.SERVER_LOAD, this::onLoad);
+        eventManager.subscribe(AllBlockEntityEvents.CONTAINER_CHANGE, this::onContainerChange);
     }
 
     @NotNull

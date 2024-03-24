@@ -18,6 +18,7 @@ import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -130,12 +131,12 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     protected void onInputUpdate() {
-        EventManager.invoke(this.blockEntity, AllCapabilities.CONTAINER_CHANGE_EVENT, true);
+        EventManager.invoke(this.blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, true);
         this.blockEntity.setChanged();
     }
 
     protected void onOutputUpdate() {
-        EventManager.invoke(this.blockEntity, AllCapabilities.CONTAINER_CHANGE_EVENT, false);
+        EventManager.invoke(this.blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, false);
         this.blockEntity.setChanged();
     }
 
@@ -185,8 +186,8 @@ public class StackContainer implements ICapabilityProvider,
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllCapabilities.CONNECT_EVENT, this::onConnect);
-        eventManager.subscribe(AllCapabilities.BUILD_SCHEDULING_EVENT, builder ->
+        eventManager.subscribe(AllBlockEntityEvents.CONNECT, this::onConnect);
+        eventManager.subscribe(AllBlockEntityEvents.BUILD_SCHEDULING, builder ->
                 builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::autoDumpOutput));
     }
 

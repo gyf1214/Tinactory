@@ -48,7 +48,7 @@ public final class AllBlockEntities {
                         PrimitiveBlock<SmartBlockEntity>::new)
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
-                .capability(AllCapabilities.WORKBENCH_CONTAINER)
+                .capability(AllCapabilityProviders.WORKBENCH_CONTAINER)
                 .menu(WorkbenchMenu::new).layout(AllLayouts.WORKBENCH).build()
                 .build()
                 .block()

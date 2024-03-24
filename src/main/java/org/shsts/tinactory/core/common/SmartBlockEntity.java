@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
-import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
 import javax.annotation.Nullable;
@@ -120,7 +120,7 @@ public class SmartBlockEntity extends BlockEntity {
      */
     protected void onLoad(Level world) {
         if (!world.isClientSide) {
-            EventManager.invoke(this, AllCapabilities.SERVER_LOAD_EVENT, world);
+            EventManager.invoke(this, AllBlockEntityEvents.SERVER_LOAD, world);
         }
     }
 

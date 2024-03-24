@@ -1,6 +1,6 @@
 package org.shsts.tinactory.test;
 
-import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
@@ -19,9 +19,9 @@ public final class AllBlockEntities {
                 .entityClass(Machine.class)
                 .blockEntity()
                 .ticking().hasEvent()
-                .capability(AllCapabilities.STACK_CONTAINER, $ -> $
+                .capability(AllCapabilityProviders.STACK_CONTAINER, $ -> $
                         .layout(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV))
-                .capability(AllCapabilities.RECIPE_PROCESSOR, $ -> $
+                .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
                         .voltage(Voltage.ULV)
                         .recipeType(AllBlocks.TEST_RECIPE_TYPE.get()))
                 .menu().layout(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV).build()
