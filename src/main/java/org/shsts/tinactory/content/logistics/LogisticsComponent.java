@@ -29,18 +29,10 @@ import java.util.function.Supplier;
 public class LogisticsComponent extends Component {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public enum Direction {
-        PUSH, PULL;
-
-        public Direction invert() {
-            return this == PUSH ? PULL : PUSH;
-        }
-    }
-
-    private record Request(Direction dir, IItemCollection port, ItemStack item) {}
+    private record Request(LogisticsDirection dir, IItemCollection port, ItemStack item) {}
 
     private final Multimap<ItemTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
-    private final Multimap<Direction, IItemCollection> passiveStorages = HashMultimap.create();
+    private final Multimap<LogisticsDirection, IItemCollection> passiveStorages = HashMultimap.create();
 
     public static class WorkerProperty {
         public int workerSize;
@@ -72,8 +64,13 @@ public class LogisticsComponent extends Component {
 
     @Override
     public void onConnect() {
-        super.onConnect();
         this.resetWorkers();
+    }
+
+    @Override
+    public void onDisconnect() {
+        this.activeRequests.clear();
+        this.passiveStorages.clear();
     }
 
     /**
@@ -112,7 +109,7 @@ public class LogisticsComponent extends Component {
     }
 
     private ItemStack transmitItem(Request req, IItemCollection otherPort, ItemStack item, int limit) {
-        return req.dir == Direction.PULL ?
+        return req.dir == LogisticsDirection.PULL ?
                 this.transmitItem(otherPort, req.port, item, limit) :
                 this.transmitItem(req.port, otherPort, item, limit);
     }
@@ -159,21 +156,21 @@ public class LogisticsComponent extends Component {
         this.ticks++;
     }
 
-    public void addPassiveStorage(Direction dir, IItemCollection port) {
+    public void addPassiveStorage(LogisticsDirection dir, IItemCollection port) {
         this.passiveStorages.put(dir, port);
     }
 
-    public void deletePassiveStorage(Direction dir, IItemCollection port) {
+    public void deletePassiveStorage(LogisticsDirection dir, IItemCollection port) {
         this.passiveStorages.remove(dir, port);
     }
 
-    public void addActiveRequest(Direction type, IItemCollection port, ItemStack item) {
+    public void addActiveRequest(LogisticsDirection type, IItemCollection port, ItemStack item) {
         var item1 = item.copy();
         var req = new Request(type, port, item1);
         this.activeRequests.put(new ItemTypeWrapper(item1), req);
     }
 
-    public void addActiveRequest(Direction type, IItemCollection port, ItemStack item, int count) {
+    public void addActiveRequest(LogisticsDirection type, IItemCollection port, ItemStack item, int count) {
         var item1 = ItemHandlerHelper.copyStackWithSize(item, count);
         var req = new Request(type, port, item1);
         this.activeRequests.put(new ItemTypeWrapper(item1), req);

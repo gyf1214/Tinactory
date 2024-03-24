@@ -7,6 +7,7 @@ import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -29,9 +30,9 @@ public final class AllBlocks {
         TEST_RECIPE_TYPE = REGISTRATE.simpleProcessingRecipeType("test");
 
         TEST_FLUID_LAYOUT = Layout.builder()
-                .port(Layout.SlotType.FLUID_INPUT)
+                .port(SlotType.FLUID_INPUT)
                 .slot(0, 1)
-                .port(Layout.SlotType.FLUID_OUTPUT)
+                .port(SlotType.FLUID_OUTPUT)
                 .slot(ContainerMenu.SLOT_SIZE * 3, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build();

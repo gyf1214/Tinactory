@@ -9,9 +9,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
+import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.CompositeNetwork;
@@ -22,8 +22,6 @@ import org.slf4j.Logger;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -74,6 +72,7 @@ public class Machine extends SmartBlockEntity {
     public void onConnectToNetwork(CompositeNetwork network) {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
+        EventManager.invoke(this, AllCapabilities.CONNECT_EVENT, network);
     }
 
     protected void onPreWork(Level world, Network network) {
@@ -86,9 +85,10 @@ public class Machine extends SmartBlockEntity {
         this.getProcessor().ifPresent(processor -> processor.onWorkTick(workFactor));
     }
 
-    public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Component.Ticker> cons) {
-        cons.accept(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
-        cons.accept(AllNetworks.WORK_SCHEDULING, this::onWork);
+    public void buildSchedulings(Component.SchedulingBuilder builder) {
+        builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
+        builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
+        EventManager.invoke(this, AllCapabilities.BUILD_SCHEDULING_EVENT, builder);
     }
 
     public Optional<IProcessor> getProcessor() {

@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.logistics;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -15,56 +16,68 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.EventManager;
+import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinactory.core.network.CompositeNetwork;
+import org.shsts.tinactory.core.network.Network;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class StackContainer implements ICapabilityProvider, IContainer, INBTSerializable<CompoundTag> {
-    protected record PortInfo(int slots, Layout.SlotType type) {}
+public class StackContainer implements ICapabilityProvider,
+        IContainer, IEventSubscriber, INBTSerializable<CompoundTag> {
+    protected record PortInfo(int startSlot, int endSlot, SlotType type,
+                              IPort port, IPort internalPort) {
+        public IItemCollection itemPort() {
+            assert type.isItem;
+            return (IItemCollection) this.port;
+        }
+    }
 
     protected final BlockEntity blockEntity;
     protected final IItemHandlerModifiable combinedItems;
     protected final CombinedFluidTank combinedFluids;
-    protected final List<IPort> ports;
-    protected final List<IPort> internalPorts;
+    protected final List<PortInfo> ports;
 
-    public StackContainer(BlockEntity blockEntity, Collection<PortInfo> ports) {
+    protected StackContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
-        this.ports = new ArrayList<>(ports.size());
-        this.internalPorts = new ArrayList<>(ports.size());
-        var items = new ArrayList<WrapperItemHandler>(ports.size());
+        this.ports = new ArrayList<>(portInfo.size());
+        var items = new ArrayList<WrapperItemHandler>(portInfo.size());
         var fluids = new ArrayList<WrapperFluidTank>();
-        for (var port : ports) {
-            if (ports.size() == 0) {
-                this.internalPorts.add(IPort.EMPTY);
-                this.ports.add(IPort.EMPTY);
+        var slotIdx = 0;
+        for (var port : portInfo) {
+            var type = port.type;
+            if (port.slots <= 0 || type == SlotType.NONE) {
+                this.ports.add(new PortInfo(slotIdx, slotIdx, SlotType.NONE,
+                        IPort.EMPTY, IPort.EMPTY));
                 continue;
             }
-            switch (port.type()) {
+            switch (type) {
                 case ITEM_INPUT -> {
                     var view = new WrapperItemHandler(port.slots);
                     view.onUpdate(this::onInputUpdate);
                     items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
-                    this.internalPorts.add(collection);
-                    this.ports.add(collection);
+                    this.ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                            collection, collection));
                 }
                 case ITEM_OUTPUT -> {
                     var inner = new WrapperItemHandler(port.slots);
@@ -74,8 +87,8 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
                     view.allowInput = false;
                     items.add(view);
 
-                    this.internalPorts.add(new ItemHandlerCollection(inner));
-                    this.ports.add(new ItemHandlerCollection(view));
+                    this.ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                            new ItemHandlerCollection(view), new ItemHandlerCollection(inner)));
                 }
                 case FLUID_INPUT -> {
                     var views = new WrapperFluidTank[port.slots];
@@ -88,8 +101,8 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
                     }
 
                     var collection = new CombinedFluidTank(views);
-                    this.internalPorts.add(collection);
-                    this.ports.add(collection);
+                    this.ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                            collection, collection));
                 }
                 case FLUID_OUTPUT -> {
                     var inners = new WrapperFluidTank[port.slots];
@@ -106,22 +119,23 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
                         fluids.add(view);
                     }
 
-                    this.internalPorts.add(new CombinedFluidTank(inners));
-                    this.ports.add(new CombinedFluidTank(views));
+                    this.ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                            new CombinedFluidTank(views), new CombinedFluidTank(inners)));
                 }
             }
+            slotIdx += port.slots;
         }
         this.combinedItems = new CombinedInvWrapper(items.toArray(IItemHandlerModifiable[]::new));
         this.combinedFluids = new CombinedFluidTank(fluids.toArray(WrapperFluidTank[]::new));
     }
 
     protected void onInputUpdate() {
-        EventManager.invoke(this.blockEntity, AllCapabilities.CONTAINER_CHANGE_EVENT.get(), true);
+        EventManager.invoke(this.blockEntity, AllCapabilities.CONTAINER_CHANGE_EVENT, true);
         this.blockEntity.setChanged();
     }
 
     protected void onOutputUpdate() {
-        EventManager.invoke(this.blockEntity, AllCapabilities.CONTAINER_CHANGE_EVENT.get(), false);
+        EventManager.invoke(this.blockEntity, AllCapabilities.CONTAINER_CHANGE_EVENT, false);
         this.blockEntity.setChanged();
     }
 
@@ -133,7 +147,7 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
     @Override
     public boolean hasPort(int port) {
         return port >= 0 && port < this.ports.size() &&
-                this.ports.get(port) != IPort.EMPTY;
+                this.ports.get(port).type != SlotType.NONE;
     }
 
     @Override
@@ -141,7 +155,39 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
         if (!this.hasPort(port)) {
             return IPort.EMPTY;
         }
-        return internal ? this.internalPorts.get(port) : this.ports.get(port);
+        var portInfo = this.ports.get(port);
+        return internal ? portInfo.internalPort : portInfo.port;
+    }
+
+    private void onConnect(CompositeNetwork network) {
+        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
+        for (var portInfo : this.ports) {
+            if (portInfo.type == SlotType.ITEM_INPUT) {
+                logistics.addPassiveStorage(LogisticsDirection.PULL, portInfo.itemPort());
+            }
+        }
+    }
+
+    private void autoDumpOutput(Level world, Network network) {
+        var logistics = ((CompositeNetwork) network).getComponent(AllNetworks.LOGISTICS_COMPONENT);
+        for (var portInfo : this.ports) {
+            if (portInfo.type == SlotType.ITEM_OUTPUT) {
+                var itemPort = portInfo.itemPort();
+                for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
+                    var item = this.combinedItems.getStackInSlot(slot);
+                    if (!item.isEmpty()) {
+                        logistics.addActiveRequest(LogisticsDirection.PUSH, itemPort, item);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void subscribeEvents(EventManager eventManager) {
+        eventManager.subscribe(AllCapabilities.CONNECT_EVENT, this::onConnect);
+        eventManager.subscribe(AllCapabilities.BUILD_SCHEDULING_EVENT, builder ->
+                builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::autoDumpOutput));
     }
 
     @NotNull
@@ -181,7 +227,7 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
                 return this;
             }
             var portCount = 1 + slots.stream().mapToInt(Layout.SlotInfo::port).max().getAsInt();
-            var ports = new ArrayList<>(Collections.nCopies(portCount, new PortInfo(0, Layout.SlotType.NONE)));
+            var ports = new ArrayList<>(Collections.nCopies(portCount, new PortInfo(0, SlotType.NONE)));
             for (var slot : slots) {
                 var info = ports.get(slot.port());
                 ports.set(slot.port(), new PortInfo(info.slots + 1, slot.type()));
@@ -194,5 +240,7 @@ public class StackContainer implements ICapabilityProvider, IContainer, INBTSeri
         public ICapabilityProvider apply(BlockEntity be) {
             return new StackContainer(be, this.ports);
         }
+
+        protected record PortInfo(int slots, SlotType type) {}
     }
 }

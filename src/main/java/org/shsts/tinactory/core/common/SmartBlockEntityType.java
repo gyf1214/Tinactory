@@ -47,7 +47,7 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
         var be = this.cast(e.getObject());
         EventManager eventManager = null;
         if (this.hasEvent) {
-            eventManager = new EventManager();
+            eventManager = new EventManager(be);
             e.addCapability(new ResourceLocation(Tinactory.ID, "event_manager"), eventManager);
         }
         for (var capEntry : this.capabilities.entrySet()) {

@@ -24,7 +24,6 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
@@ -112,11 +111,6 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     }
 
     @Override
-    public Optional<ProcessingRecipe<?>> getCurrentRecipe() {
-        return Optional.ofNullable(this.currentRecipe);
-    }
-
-    @Override
     public double getProgress() {
         if (this.currentRecipe == null) {
             return 0;
@@ -146,21 +140,18 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     }
 
     @SuppressWarnings("unchecked")
-    protected void onLoad() {
-        var world = this.getWorld();
-        if (!world.isClientSide) {
-            if (this.currentRecipeId == null) {
-                return;
+    protected void onLoad(Level world) {
+        if (this.currentRecipeId == null) {
+            return;
+        }
+        world.getRecipeManager().byKey(this.currentRecipeId).ifPresent(recipe -> {
+            if (this.recipeType == recipe.getType()) {
+                this.currentRecipe = (T) recipe;
             }
-            world.getRecipeManager().byKey(this.currentRecipeId).ifPresent(recipe -> {
-                if (this.recipeType == recipe.getType()) {
-                    this.currentRecipe = (T) recipe;
-                }
-            });
-            this.currentRecipeId = null;
-            if (this.currentRecipe != null) {
-                this.needUpdate = false;
-            }
+        });
+        this.currentRecipeId = null;
+        if (this.currentRecipe != null) {
+            this.needUpdate = false;
         }
     }
 
@@ -172,8 +163,8 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllCapabilities.LOAD_EVENT.get(), this::onLoad);
-        eventManager.subscribe(AllCapabilities.CONTAINER_CHANGE_EVENT.get(), this::onContainerChange);
+        eventManager.subscribe(AllCapabilities.SERVER_LOAD_EVENT, this::onLoad);
+        eventManager.subscribe(AllCapabilities.CONTAINER_CHANGE_EVENT, this::onContainerChange);
     }
 
     @NotNull

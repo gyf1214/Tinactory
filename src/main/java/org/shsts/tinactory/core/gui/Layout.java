@@ -6,6 +6,7 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.registrate.builder.MenuBuilder;
 
 import javax.annotation.Nullable;
@@ -18,22 +19,6 @@ import java.util.function.Consumer;
 @MethodsReturnNonnullByDefault
 public class Layout {
     public record WidgetInfo(Rect rect, Texture texture) {}
-
-    public enum SlotType {
-        NONE(false, false),
-        ITEM_INPUT(false, true),
-        ITEM_OUTPUT(true, true),
-        FLUID_INPUT(false, false),
-        FLUID_OUTPUT(true, false);
-
-        public final boolean output;
-        public final boolean isItem;
-
-        SlotType(boolean output, boolean isItem) {
-            this.output = output;
-            this.isItem = isItem;
-        }
-    }
 
     public record SlotInfo(int index, int x, int y, int port, SlotType type, Voltage requiredVoltage) {
         public SlotInfo setIndex(int index) {

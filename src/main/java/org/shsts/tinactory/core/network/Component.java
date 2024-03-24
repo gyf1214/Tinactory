@@ -41,5 +41,10 @@ public abstract class Component {
         void tick(Level world, Network network);
     }
 
+    @FunctionalInterface
+    public interface SchedulingBuilder {
+        void add(Supplier<IScheduling> scheduling, Component.Ticker ticker);
+    }
+
     public abstract void buildSchedulings(BiConsumer<Supplier<IScheduling>, Ticker> cons);
 }

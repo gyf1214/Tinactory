@@ -10,8 +10,8 @@ import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.ContainerMenu;
-import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
@@ -62,7 +62,7 @@ public final class AllBlockEntities {
                 .frontOverlay(ModelGen.gregtech("blocks/machines/rock_crusher/overlay_front"))
                 .voltage(Voltage.PRIMITIVE, Voltage.LV)
                 .layout()
-                .port(Layout.SlotType.ITEM_OUTPUT)
+                .port(SlotType.ITEM_OUTPUT)
                 .slot(ContainerMenu.SLOT_SIZE * 2, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8, 0)
                 .end()
@@ -72,9 +72,9 @@ public final class AllBlockEntities {
                 .frontOverlay(ModelGen.gregtech("blocks/machines/electromagnetic_separator/overlay_front"))
                 .voltage(Voltage.PRIMITIVE, Voltage.LV)
                 .layout()
-                .port(Layout.SlotType.ITEM_INPUT)
+                .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
-                .port(Layout.SlotType.ITEM_OUTPUT)
+                .port(SlotType.ITEM_OUTPUT)
                 .slot(ContainerMenu.SLOT_SIZE * 3, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + ContainerMenu.SLOT_SIZE, 0)
                 .end()

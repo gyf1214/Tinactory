@@ -119,7 +119,9 @@ public class SmartBlockEntity extends BlockEntity {
      * callback when this blockEntity is loaded
      */
     protected void onLoad(Level world) {
-        EventManager.invoke(this, AllCapabilities.LOAD_EVENT.get());
+        if (!world.isClientSide) {
+            EventManager.invoke(this, AllCapabilities.SERVER_LOAD_EVENT, world);
+        }
     }
 
     /**
