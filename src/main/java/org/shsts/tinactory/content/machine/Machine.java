@@ -32,6 +32,9 @@ public class Machine extends SmartBlockEntity {
     @Nullable
     protected CompositeNetwork network;
 
+    protected boolean autoDumpItem;
+    protected boolean autoDumpFluid;
+
     public Machine(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -42,6 +45,14 @@ public class Machine extends SmartBlockEntity {
 
     public static BlockEntityBuilder.Factory<Machine> factory(Voltage voltage) {
         return voltage == Voltage.PRIMITIVE ? Machine::primitive : Machine::new;
+    }
+
+    public void setAutoDumpItem(boolean autoDumpItem) {
+        this.autoDumpItem = autoDumpItem;
+    }
+
+    public void setAutoDumpFluid(boolean autoDumpFluid) {
+        this.autoDumpFluid = autoDumpFluid;
     }
 
     @Override
@@ -77,7 +88,15 @@ public class Machine extends SmartBlockEntity {
     }
 
     protected void onPreWork(Level world, Network network) {
+        assert this.network == network;
         this.getProcessor().ifPresent(IProcessor::onPreWork);
+        var logistics = this.network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
+        if (this.autoDumpItem) {
+            EventManager.invoke(this, AllBlockEntityEvents.DUMP_ITEM_OUTPUT, logistics);
+        }
+        if (this.autoDumpFluid) {
+            EventManager.invoke(this, AllBlockEntityEvents.DUMP_FLUID_OUTPUT, logistics);
+        }
     }
 
     protected void onWork(Level world, Network network) {

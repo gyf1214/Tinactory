@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.gui.client;
 
+import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
@@ -19,6 +20,7 @@ import org.shsts.tinactory.core.gui.Texture;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @OnlyIn(Dist.CLIENT)
+@MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class RenderUtil {
     public static void blit(PoseStack poseStack, Texture tex, int zIndex, int x, int y) {

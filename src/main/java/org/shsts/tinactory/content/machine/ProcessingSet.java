@@ -6,8 +6,11 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -49,8 +52,23 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                         .recipeType(this.recipeType.get()).voltage(voltage))
                 .capability(AllCapabilityProviders.STACK_CONTAINER, $ -> $
                         .layout(this.layout, voltage))
-                .menu().layout(this.layout, voltage).build()
-                .build()
+                .menu()
+                .layout(this.layout, voltage)
+                .switchButton(Texture.SWITCH_BUTTON, 1, 1, be -> be.autoDumpItem,
+                        (menu, value) -> menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
+                                SetMachineEventPacket.builder().autoDumpItem(value)))
+                .staticWidget(Texture.ITEM_OUT_BUTTON, 1, 1)
+                .switchButton(Texture.SWITCH_BUTTON, 21, 1, be -> be.autoDumpFluid,
+                        (menu, value) -> menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
+                                SetMachineEventPacket.builder().autoDumpFluid(value)))
+                .staticWidget(Texture.FLUID_OUT_BUTTON, 21, 1)
+                .registerEvent(ContainerEventHandler.SET_MACHINE, (menu, p) -> {
+                    var be = menu.blockEntity;
+                    p.getAutoDumpItem().ifPresent(be::setAutoDumpItem);
+                    p.getAutoDumpFluid().ifPresent(be::setAutoDumpFluid);
+                })
+                .build() // menu
+                .build() // blockEntity
                 .block()
                 .transform(ModelGen.machine(voltage, frontOverlay))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)

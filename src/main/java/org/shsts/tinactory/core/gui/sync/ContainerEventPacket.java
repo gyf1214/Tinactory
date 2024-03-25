@@ -38,4 +38,9 @@ public class ContainerEventPacket implements IPacket {
         this.containerId = buf.readVarInt();
         this.eventId = buf.readVarInt();
     }
+
+    @FunctionalInterface
+    public interface Factory<P extends ContainerEventPacket> {
+        P create(int containerId, int eventId);
+    }
 }

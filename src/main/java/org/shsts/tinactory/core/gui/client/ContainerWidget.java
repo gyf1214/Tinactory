@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.gui.client;
 
+import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Widget;
@@ -17,6 +18,7 @@ import java.util.function.BiFunction;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public abstract class ContainerWidget extends GuiComponent implements Widget {
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 
@@ -29,6 +31,10 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
         this.menu = menu;
         this.rect = rect;
         this.zIndex = zIndex;
+    }
+
+    public ContainerWidget(ContainerMenu<?> menu, Rect rect) {
+        this(menu, rect, ContainerMenu.DEFAULT_Z_INDEX);
     }
 
     @Override

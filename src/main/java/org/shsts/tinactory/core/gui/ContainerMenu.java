@@ -364,13 +364,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         return Optional.of(clazz.cast(slot.packet));
     }
 
-    @FunctionalInterface
-    public interface EventPacketFactory<P extends ContainerEventPacket> {
-        P create(int containerId, int eventId);
-    }
-
     public <P extends ContainerEventPacket>
-    void triggerEvent(ContainerEventHandler.Event<P> event, EventPacketFactory<P> factory) {
+    void triggerEvent(ContainerEventHandler.Event<P> event, ContainerEventPacket.Factory<P> factory) {
         Tinactory.CHANNEL.sendToServer(factory.create(this.containerId, event.id()));
     }
 

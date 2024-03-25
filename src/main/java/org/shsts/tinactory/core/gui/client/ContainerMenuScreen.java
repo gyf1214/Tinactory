@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.gui.client;
 
+import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -23,6 +24,7 @@ import static org.shsts.tinactory.core.gui.ContainerMenu.WIDTH;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractContainerScreen<M> {
     public static final int TEXT_COLOR = 0xFF404040;
 
@@ -50,8 +52,7 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
     protected void addSlotWidget(int x, int y) {
         var pX = x + this.leftPos - 1;
         var pY = y + this.topPos - 1;
-        this.addWidget(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND,
-                ContainerMenu.DEFAULT_Z_INDEX, pX, pY));
+        this.addWidget(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND, pX, pY));
     }
 
     @Override

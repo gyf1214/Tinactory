@@ -22,6 +22,9 @@ import org.shsts.tinactory.core.gui.client.ContainerWidget;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
+import org.shsts.tinactory.core.gui.client.SwitchButton;
+import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
+import org.shsts.tinactory.core.gui.sync.ContainerEventPacket;
 import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
@@ -30,9 +33,11 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
@@ -110,9 +115,12 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
+    public S staticWidget(Texture tex, int x, int y) {
+        return this.staticWidget(new Rect(x, y, tex.width(), tex.height()), tex);
+    }
+
     public S staticWidget(Rect rect, Texture tex) {
-        return this.widget(rect, () -> (menu, rect1) ->
-                new StaticWidget(menu, rect1, tex, ContainerMenu.DEFAULT_Z_INDEX));
+        return this.widget(rect, () -> (menu, rect1) -> new StaticWidget(menu, rect1, tex));
     }
 
     public S slot(int slotIndex, int posX, int posY) {
@@ -138,6 +146,28 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
                         progressReader.applyAsDouble(be)));
         return this.widget(rect, () -> (menu, rect1) ->
                 new ProgressBar(menu, rect1, tex, syncSlot.get()));
+    }
+
+    public S switchButton(Texture tex, int x, int y, Predicate<T> valueReader,
+                          BiConsumer<M, Boolean> onSwitch) {
+        var rect = new Rect(x, y, tex.width(), tex.height() / 2);
+        return this.switchButton(tex, rect, valueReader, onSwitch);
+    }
+
+    public S switchButton(Texture tex, Rect rect, Predicate<T> valueReader,
+                          BiConsumer<M, Boolean> onSwitch) {
+        var syncSlot = this.addSyncSlot(ContainerSyncPacket.Boolean.class,
+                (containerId, index, $, be) -> new ContainerSyncPacket.Boolean(containerId, index,
+                        valueReader.test(be)));
+        return this.widget(rect, () -> (menu, rect1) ->
+                new SwitchButton(menu, rect1, tex, syncSlot.get(), onSwitch));
+    }
+
+    public <P1 extends ContainerEventPacket>
+    S registerEvent(ContainerEventHandler.Event<P1> event, BiConsumer<M, P1> handler) {
+        this.menuCallbacks.add(MenuCallback.dummy(menu ->
+                menu.registerEvent(event, p -> handler.accept(menu, p))));
+        return self();
     }
 
     public S fluidSlot(int tank, int x, int y) {

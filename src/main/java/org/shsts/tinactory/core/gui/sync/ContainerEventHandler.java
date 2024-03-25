@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.network.NetworkEvent;
 import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.slf4j.Logger;
 
@@ -21,6 +22,7 @@ public final class ContainerEventHandler {
     public record Event<P extends ContainerEventPacket>(int id, Class<P> clazz) {}
 
     public static final Event<FluidEventPacket> FLUID_CLICK;
+    public static final Event<SetMachineEventPacket> SET_MACHINE;
 
     private static <P extends ContainerEventPacket> void handle(P packet, NetworkEvent.Context ctx) {
         var player = ctx.getSender();
@@ -46,6 +48,7 @@ public final class ContainerEventHandler {
 
     static {
         FLUID_CLICK = register(FluidEventPacket.class, FluidEventPacket::new);
+        SET_MACHINE = register(SetMachineEventPacket.class, SetMachineEventPacket::new);
     }
 
     public static void init() {}

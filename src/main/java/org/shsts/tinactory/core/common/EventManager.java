@@ -2,7 +2,6 @@ package org.shsts.tinactory.core.common;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -11,7 +10,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,18 +19,12 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class EventManager implements ICapabilityProvider {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    private final BlockEntity blockEntity;
     private final Multimap<Event<?>, Consumer<?>> handlers = HashMultimap.create();
 
-    public EventManager(BlockEntity blockEntity) {
-        this.blockEntity = blockEntity;
-    }
+    public EventManager() {}
 
     @SuppressWarnings("unchecked")
     public <A> void invoke(Event<A> event, A arg) {
-        LOGGER.debug("invoke event {} @ {}", event.getRegistryName(), blockEntity);
         for (var handler : this.handlers.get(event)) {
             ((Consumer<A>) handler).accept(arg);
         }

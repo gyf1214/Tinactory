@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.logistics;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -31,7 +30,6 @@ import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.network.CompositeNetwork;
-import org.shsts.tinactory.core.network.Network;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -163,8 +161,7 @@ public class StackContainer implements ICapabilityProvider,
         }
     }
 
-    private void autoDumpOutput(Level world, Network network) {
-        var logistics = ((CompositeNetwork) network).getComponent(AllNetworks.LOGISTICS_COMPONENT);
+    private void dumpItemOutput(LogisticsComponent logistics) {
         for (var portInfo : this.ports) {
             if (portInfo.type == SlotType.ITEM_OUTPUT) {
                 var itemPort = portInfo.port.asItem();
@@ -174,7 +171,13 @@ public class StackContainer implements ICapabilityProvider,
                         logistics.addActiveRequest(LogisticsDirection.PUSH, itemPort, item);
                     }
                 }
-            } else if (portInfo.type == SlotType.FLUID_OUTPUT) {
+            }
+        }
+    }
+
+    private void dumpFluidOutput(LogisticsComponent logistics) {
+        for (var portInfo : this.ports) {
+            if (portInfo.type == SlotType.FLUID_OUTPUT) {
                 var fluidPort = portInfo.port.asFluid();
                 for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
                     var fluid = this.combinedFluids.getFluidInTank(slot);
@@ -189,8 +192,8 @@ public class StackContainer implements ICapabilityProvider,
     @Override
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllBlockEntityEvents.CONNECT, this::onConnect);
-        eventManager.subscribe(AllBlockEntityEvents.BUILD_SCHEDULING, builder ->
-                builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::autoDumpOutput));
+        eventManager.subscribe(AllBlockEntityEvents.DUMP_ITEM_OUTPUT, this::dumpItemOutput);
+        eventManager.subscribe(AllBlockEntityEvents.DUMP_FLUID_OUTPUT, this::dumpFluidOutput);
     }
 
     @NotNull

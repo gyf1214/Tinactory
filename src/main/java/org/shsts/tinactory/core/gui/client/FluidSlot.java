@@ -32,7 +32,7 @@ public class FluidSlot extends ContainerWidget {
     protected final int syncSlot;
 
     public FluidSlot(ContainerMenu<?> menu, Rect rect, int tank, int syncSlot) {
-        super(menu, rect, ContainerMenu.DEFAULT_Z_INDEX);
+        super(menu, rect);
         this.tank = tank;
         this.syncSlot = syncSlot;
     }

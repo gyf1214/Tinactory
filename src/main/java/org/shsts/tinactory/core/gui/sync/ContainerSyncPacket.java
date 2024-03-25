@@ -53,8 +53,48 @@ public abstract class ContainerSyncPacket implements IPacket {
         return this.index;
     }
 
+    public static class Boolean extends ContainerSyncPacket {
+        private boolean value;
+
+        public Boolean() {}
+
+        public Boolean(int containerId, int index, boolean value) {
+            super(containerId, index);
+            this.value = value;
+        }
+
+        @Override
+        public void serializeToBuf(FriendlyByteBuf buf) {
+            super.serializeToBuf(buf);
+            buf.writeBoolean(this.value);
+        }
+
+        @Override
+        public void deserializeFromBuf(FriendlyByteBuf buf) {
+            super.deserializeFromBuf(buf);
+            this.value = buf.readBoolean();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Boolean that)) return false;
+            if (!super.equals(o)) return false;
+            return this.value == that.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), this.value);
+        }
+
+        public boolean getValue() {
+            return this.value;
+        }
+    }
+
     public static class Double extends ContainerSyncPacket {
-        protected double data;
+        private double data;
 
         public Double() {}
 
@@ -94,7 +134,7 @@ public abstract class ContainerSyncPacket implements IPacket {
     }
 
     public static class Long extends ContainerSyncPacket {
-        protected long data;
+        private long data;
 
         public Long() {}
 
