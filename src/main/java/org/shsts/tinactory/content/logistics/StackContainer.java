@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
@@ -45,12 +44,7 @@ import java.util.function.Function;
 public class StackContainer implements ICapabilityProvider,
         IContainer, IEventSubscriber, INBTSerializable<CompoundTag> {
     protected record PortInfo(int startSlot, int endSlot, SlotType type,
-                              IPort port, IPort internalPort) {
-        public IItemCollection itemPort() {
-            assert type.isItem;
-            return (IItemCollection) this.port;
-        }
-    }
+                              IPort port, IPort internalPort) {}
 
     protected final BlockEntity blockEntity;
     protected final IItemHandlerModifiable combinedItems;
@@ -163,8 +157,8 @@ public class StackContainer implements ICapabilityProvider,
     private void onConnect(CompositeNetwork network) {
         var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
         for (var portInfo : this.ports) {
-            if (portInfo.type == SlotType.ITEM_INPUT) {
-                logistics.addPassiveStorage(LogisticsDirection.PULL, portInfo.itemPort());
+            if (!portInfo.type.output) {
+                logistics.addPassiveStorage(LogisticsDirection.PULL, portInfo.port);
             }
         }
     }
@@ -173,11 +167,19 @@ public class StackContainer implements ICapabilityProvider,
         var logistics = ((CompositeNetwork) network).getComponent(AllNetworks.LOGISTICS_COMPONENT);
         for (var portInfo : this.ports) {
             if (portInfo.type == SlotType.ITEM_OUTPUT) {
-                var itemPort = portInfo.itemPort();
+                var itemPort = portInfo.port.asItem();
                 for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
                     var item = this.combinedItems.getStackInSlot(slot);
                     if (!item.isEmpty()) {
                         logistics.addActiveRequest(LogisticsDirection.PUSH, itemPort, item);
+                    }
+                }
+            } else if (portInfo.type == SlotType.FLUID_OUTPUT) {
+                var fluidPort = portInfo.port.asFluid();
+                for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
+                    var fluid = this.combinedFluids.getFluidInTank(slot);
+                    if (!fluid.isEmpty()) {
+                        logistics.addActiveRequest(LogisticsDirection.PUSH, fluidPort, fluid);
                     }
                 }
             }

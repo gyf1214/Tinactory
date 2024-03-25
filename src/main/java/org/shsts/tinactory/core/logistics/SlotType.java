@@ -1,17 +1,19 @@
 package org.shsts.tinactory.core.logistics;
 
+import org.shsts.tinactory.api.logistics.PortType;
+
 public enum SlotType {
-    NONE(false, false),
-    ITEM_INPUT(false, true),
-    ITEM_OUTPUT(true, true),
-    FLUID_INPUT(false, false),
-    FLUID_OUTPUT(true, false);
+    NONE(false, PortType.NONE),
+    ITEM_INPUT(false, PortType.ITEM),
+    ITEM_OUTPUT(true, PortType.ITEM),
+    FLUID_INPUT(false, PortType.FLUID),
+    FLUID_OUTPUT(true, PortType.FLUID);
 
     public final boolean output;
-    public final boolean isItem;
+    public final PortType portType;
 
-    SlotType(boolean output, boolean isItem) {
+    SlotType(boolean output, PortType portType) {
         this.output = output;
-        this.isItem = isItem;
+        this.portType = portType;
     }
 }

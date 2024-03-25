@@ -13,6 +13,11 @@ import java.util.Collection;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IItemCollection extends IPort {
+    @Override
+    default PortType getPortType() {
+        return PortType.ITEM;
+    }
+
     boolean acceptInput(ItemStack stack);
 
     boolean acceptOutput();

@@ -9,6 +9,11 @@ import java.util.Collection;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IFluidCollection extends IPort {
+    @Override
+    default PortType getPortType() {
+        return PortType.FLUID;
+    }
+
     boolean acceptInput(FluidStack stack);
 
     boolean acceptOutput();

@@ -7,12 +7,18 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.TinactoryConfig;
+import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllNetworks;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.FluidContentWrapper;
+import org.shsts.tinactory.core.logistics.FluidTypeWrapper;
+import org.shsts.tinactory.core.logistics.ILogisticsContentWrapper;
+import org.shsts.tinactory.core.logistics.ILogisticsTypeWrapper;
+import org.shsts.tinactory.core.logistics.ItemContentWrapper;
 import org.shsts.tinactory.core.logistics.ItemTypeWrapper;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
@@ -29,20 +35,30 @@ import java.util.function.Supplier;
 public class LogisticsComponent extends Component {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private record Request(LogisticsDirection dir, IItemCollection port, ItemStack item) {}
+    private record Request(LogisticsDirection dir, IPort port, ILogisticsContentWrapper content) {}
 
-    private final Multimap<ItemTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
-    private final Multimap<LogisticsDirection, IItemCollection> passiveStorages = HashMultimap.create();
+    private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
+    private final Multimap<LogisticsDirection, IPort> passiveStorages = HashMultimap.create();
 
     public static class WorkerProperty {
         public int workerSize;
         public int workerDelay;
         public int stackSize;
+        public int fluidStackSize;
 
-        public WorkerProperty(int workerSize, int workerDelay, int stackSize) {
+        public WorkerProperty(int workerSize, int workerDelay, int stackSize, int fluidStackSize) {
             this.workerSize = workerSize;
             this.workerDelay = workerDelay;
             this.stackSize = stackSize;
+            this.fluidStackSize = fluidStackSize;
+        }
+
+        public int getContentLimit(ILogisticsContentWrapper content) {
+            return switch (content.getPortType()) {
+                case ITEM -> this.stackSize;
+                case FLUID -> this.fluidStackSize;
+                default -> throw new IllegalArgumentException();
+            };
         }
     }
 
@@ -54,8 +70,8 @@ public class LogisticsComponent extends Component {
         this.workerProperty = new WorkerProperty(
                 TinactoryConfig.INSTANCE.initialWorkerSize.get(),
                 TinactoryConfig.INSTANCE.initialWorkerDelay.get(),
-                TinactoryConfig.INSTANCE.initialWorkerStack.get()
-        );
+                TinactoryConfig.INSTANCE.initialWorkerStack.get(),
+                TinactoryConfig.INSTANCE.initialWorkerFluidStack.get());
     }
 
     public void resetWorkers() {
@@ -76,61 +92,70 @@ public class LogisticsComponent extends Component {
     /**
      * Return remaining items.
      */
-    private ItemStack transmitItem(IItemCollection from, IItemCollection to, ItemStack item, boolean simulate) {
-        var extracted = from.extractItem(item, simulate);
-        var notExtracted = item.getCount() - extracted.getCount();
-        if (ItemHelper.canItemsStack(extracted, item)) {
-            var remaining = to.insertItem(extracted, simulate);
-            assert simulate || remaining.isEmpty();
+    private ILogisticsContentWrapper transmitItem(IPort from, IPort to,
+                                                  ILogisticsContentWrapper content, boolean simulate) {
+        var extracted = content.extractFrom(from, simulate);
+        var notExtracted = content.getCount() - extracted.getCount();
+        if (ILogisticsContentWrapper.canStack(extracted, content)) {
+            var remaining = extracted.insertInto(to, simulate);
+            if (!simulate && !remaining.isEmpty()) {
+                LOGGER.warn("transmitContent failed from={}, to={}, content={}", from, to, content);
+            }
             remaining.grow(notExtracted);
             return remaining;
         } else {
-            return item;
+            return content;
         }
     }
 
     /**
      * Return remaining items.
      */
-    private ItemStack transmitItem(IItemCollection from, IItemCollection to, ItemStack item, int limit) {
-        var size = Math.min(this.workerProperty.stackSize, limit);
-        var itemCopy = ItemHandlerHelper.copyStackWithSize(item, size);
-        var remaining = this.transmitItem(from, to, itemCopy, true);
+    private ILogisticsContentWrapper transmitItem(IPort from, IPort to,
+                                                  ILogisticsContentWrapper content, int limit) {
+
+        var size = Math.min(this.workerProperty.getContentLimit(content), limit);
+        var contentCopy = content.copyWithAmount(size);
+        var remaining = this.transmitItem(from, to, contentCopy, true);
         if (!remaining.isEmpty()) {
-            itemCopy.shrink(remaining.getCount());
+            contentCopy.shrink(remaining.getCount());
         }
-        if (itemCopy.isEmpty()) {
-            return item;
+        if (contentCopy.isEmpty()) {
+            return content;
         } else {
-            var remaining1 = this.transmitItem(from, to, itemCopy, false);
-            remaining1.grow(item.getCount() - itemCopy.getCount());
+            var remaining1 = this.transmitItem(from, to, contentCopy, false);
+            remaining1.grow(content.getCount() - contentCopy.getCount());
             return remaining1;
         }
     }
 
-    private ItemStack transmitItem(Request req, IItemCollection otherPort, ItemStack item, int limit) {
+    private ILogisticsContentWrapper transmitItem(Request req, IPort otherPort,
+                                                  ILogisticsContentWrapper item, int limit) {
         return req.dir == LogisticsDirection.PULL ?
                 this.transmitItem(otherPort, req.port, item, limit) :
                 this.transmitItem(req.port, otherPort, item, limit);
     }
 
-    private boolean handleActiveRequest(ItemTypeWrapper itemType, Request req) {
-        var remaining = req.item;
-        for (var otherReq : this.activeRequests.get(itemType)) {
+    private boolean handleItemActiveRequest(ILogisticsTypeWrapper type, Request req) {
+        var remaining = req.content;
+        for (var otherReq : this.activeRequests.get(type)) {
             if (remaining.isEmpty()) {
                 return true;
             }
             if (otherReq.dir == req.dir) {
                 continue;
             }
-            var limit = Math.min(remaining.getCount(), otherReq.item.getCount());
+            var limit = Math.min(remaining.getCount(), otherReq.content.getCount());
             var originalCount = remaining.getCount();
             remaining = this.transmitItem(req, otherReq.port, remaining, limit);
-            otherReq.item.shrink(originalCount - remaining.getCount());
+            otherReq.content.shrink(originalCount - remaining.getCount());
         }
         for (var storage : this.passiveStorages.get(req.dir.invert())) {
             if (remaining.isEmpty()) {
                 return true;
+            }
+            if (storage.getPortType() != remaining.getPortType()) {
+                continue;
             }
             remaining = this.transmitItem(req, storage, remaining, remaining.getCount());
         }
@@ -147,7 +172,7 @@ public class LogisticsComponent extends Component {
             if (cycles-- <= 0) {
                 break;
             }
-            var result = this.handleActiveRequest(entry.getKey(), entry.getValue());
+            var result = this.handleItemActiveRequest(entry.getKey(), entry.getValue());
             if (result) {
                 LOGGER.debug("deal with active request {}", entry.getValue());
             }
@@ -156,24 +181,20 @@ public class LogisticsComponent extends Component {
         this.ticks++;
     }
 
-    public void addPassiveStorage(LogisticsDirection dir, IItemCollection port) {
+    public void addPassiveStorage(LogisticsDirection dir, IPort port) {
         this.passiveStorages.put(dir, port);
-    }
-
-    public void deletePassiveStorage(LogisticsDirection dir, IItemCollection port) {
-        this.passiveStorages.remove(dir, port);
     }
 
     public void addActiveRequest(LogisticsDirection type, IItemCollection port, ItemStack item) {
         var item1 = item.copy();
-        var req = new Request(type, port, item1);
+        var req = new Request(type, port, new ItemContentWrapper(item1));
         this.activeRequests.put(new ItemTypeWrapper(item1), req);
     }
 
-    public void addActiveRequest(LogisticsDirection type, IItemCollection port, ItemStack item, int count) {
-        var item1 = ItemHandlerHelper.copyStackWithSize(item, count);
-        var req = new Request(type, port, item1);
-        this.activeRequests.put(new ItemTypeWrapper(item1), req);
+    public void addActiveRequest(LogisticsDirection type, IFluidCollection port, FluidStack fluid) {
+        var fluid1 = fluid.copy();
+        var req = new Request(type, port, new FluidContentWrapper(fluid1));
+        this.activeRequests.put(new FluidTypeWrapper(fluid1), req);
     }
 
     @Override

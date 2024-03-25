@@ -62,10 +62,9 @@ public class Layout {
             for (var slot : slots) {
                 var x = xOffset + slot.x;
                 var y = yOffset + slot.y;
-                if (slot.type.isItem) {
-                    builder.slot(slot.index, x, y);
-                } else {
-                    builder.fluidSlot(slot.index, x, y);
+                switch (slot.type.portType) {
+                    case ITEM -> builder.slot(slot.index, x, y);
+                    case FLUID -> builder.fluidSlot(slot.index, x, y);
                 }
             }
             for (var image : this.images) {
@@ -90,11 +89,14 @@ public class Layout {
         var fluidSlots = 0;
         var itemSlots = 0;
         for (var slot : this.slots) {
-            if (slot.port < 0 || slot.type == SlotType.NONE ||
-                    voltage.compareTo(slot.requiredVoltage) < 0) {
+            var index = -1;
+            switch (slot.type.portType) {
+                case ITEM -> index = itemSlots++;
+                case FLUID -> index = fluidSlots++;
+            }
+            if (slot.port < 0 || index < 0 || voltage.compareTo(slot.requiredVoltage) < 0) {
                 continue;
             }
-            var index = slot.type.isItem ? itemSlots++ : fluidSlots++;
             ret.add(slot.setIndex(index));
         }
         return ret;
