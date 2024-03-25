@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.gui;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -24,11 +25,15 @@ public final class MenuGen {
         var y = layout.rect.endY() + SPACING_VERTICAL;
         var x = CONTENT_WIDTH - SLOT_SIZE * 2;
         return $ -> $.layout(layout, voltage)
-                .switchButton(Texture.SWITCH_BUTTON, x, y, Machine::isAutoDumpItem,
+                .switchButton(Texture.SWITCH_BUTTON, x, y,
+                        new TranslatableComponent("tinactory.tooltip.autoDumpItem"),
+                        Machine::isAutoDumpItem,
                         (menu, value) -> menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
                                 SetMachineEventPacket.builder().autoDumpItem(value)))
                 .staticWidget(Texture.ITEM_OUT_BUTTON, x, y)
-                .switchButton(Texture.SWITCH_BUTTON, x + SLOT_SIZE, y, Machine::isAutoDumpFluid,
+                .switchButton(Texture.SWITCH_BUTTON, x + SLOT_SIZE, y,
+                        new TranslatableComponent("tinactory.tooltip.autoDumpFluid"),
+                        Machine::isAutoDumpFluid,
                         (menu, value) -> menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
                                 SetMachineEventPacket.builder().autoDumpFluid(value)))
                 .staticWidget(Texture.FLUID_OUT_BUTTON, x + SLOT_SIZE, y)

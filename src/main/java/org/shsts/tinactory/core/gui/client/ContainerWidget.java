@@ -14,7 +14,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -65,6 +64,4 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
      */
     public void onMouseClicked(double mouseX, double mouseY, int button) {}
 
-    public record Builder<M extends ContainerMenu<?>>
-            (Rect rect, BiFunction<M, Rect, ContainerWidget> factory) {}
 }

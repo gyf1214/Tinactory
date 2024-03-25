@@ -83,7 +83,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
 
     protected DistLazy<MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>>>
             screenFactory = () -> () -> ContainerMenuScreen::new;
-    protected final List<Supplier<ContainerWidget.Builder<M>>> widgets = new ArrayList<>();
+
+    private record WidgetBuilder<M extends ContainerMenu<?>>
+            (Rect rect, BiFunction<M, Rect, ContainerWidget> factory) {}
+
+    protected final List<Supplier<WidgetBuilder<M>>> widgets = new ArrayList<>();
 
     public MenuBuilder(Registrate registrate, String id, P parent, ContainerMenu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
@@ -111,7 +115,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     public S widget(Rect rect, Supplier<BiFunction<M, Rect, ContainerWidget>> factory) {
         this.widgetsRect.add(rect);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                this.widgets.add(() -> new ContainerWidget.Builder<>(rect, factory.get())));
+                this.widgets.add(() -> new WidgetBuilder<>(rect, factory.get())));
         return self();
     }
 
@@ -148,19 +152,19 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
                 new ProgressBar(menu, rect1, tex, syncSlot.get()));
     }
 
-    public S switchButton(Texture tex, int x, int y, Predicate<T> valueReader,
-                          BiConsumer<M, Boolean> onSwitch) {
+    public S switchButton(Texture tex, int x, int y, Component tooltip,
+                          Predicate<T> valueReader, BiConsumer<M, Boolean> onSwitch) {
         var rect = new Rect(x, y, tex.width(), tex.height() / 2);
-        return this.switchButton(tex, rect, valueReader, onSwitch);
+        return this.switchButton(tex, rect, tooltip, valueReader, onSwitch);
     }
 
-    public S switchButton(Texture tex, Rect rect, Predicate<T> valueReader,
-                          BiConsumer<M, Boolean> onSwitch) {
+    public S switchButton(Texture tex, Rect rect, Component tooltip,
+                          Predicate<T> valueReader, BiConsumer<M, Boolean> onSwitch) {
         var syncSlot = this.addSyncSlot(ContainerSyncPacket.Boolean.class,
                 (containerId, index, $, be) -> new ContainerSyncPacket.Boolean(containerId, index,
                         valueReader.test(be)));
         return this.widget(rect, () -> (menu, rect1) ->
-                new SwitchButton(menu, rect1, tex, syncSlot.get(), onSwitch));
+                new SwitchButton(menu, rect1, tex, tooltip, syncSlot.get(), onSwitch));
     }
 
     public <P1 extends ContainerEventPacket>
@@ -218,8 +222,9 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         var widgets = this.widgets;
         return (menu, inventory, title) -> {
             var screen = screenFactory.create(menu, inventory, title);
-            for (var widget : widgets) {
-                screen.addWidgetBuilder(widget.get());
+            for (var widgetSupp : widgets) {
+                var widget = widgetSupp.get();
+                screen.addWidgetBuilder(widget.rect(), widget.factory());
             }
             return screen;
         };

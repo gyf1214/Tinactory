@@ -16,6 +16,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_TOP;
@@ -28,7 +29,7 @@ import static org.shsts.tinactory.core.gui.ContainerMenu.WIDTH;
 public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractContainerScreen<M> {
     public static final int TEXT_COLOR = 0xFF404040;
 
-    protected final List<ContainerWidget.Builder<M>> widgetBuilders = new ArrayList<>();
+    private final List<Runnable> initCallbacks = new ArrayList<>();
     protected final List<ContainerWidget> widgets = new ArrayList<>();
     protected @Nullable ContainerWidget hoveredWidget = null;
 
@@ -40,11 +41,15 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         this.imageHeight = menu.getHeight();
     }
 
-    public void addWidgetBuilder(ContainerWidget.Builder<M> factory) {
-        this.widgetBuilders.add(factory);
+    public void addWidgetBuilder(Rect rect, BiFunction<M, Rect, ContainerWidget> factory) {
+        this.initCallbacks.add(() -> {
+            var widget = factory.apply(this.menu, rect.offset(
+                    MARGIN_HORIZONTAL + this.leftPos, MARGIN_TOP + this.topPos));
+            this.addWidget(widget);
+        });
     }
 
-    protected void addWidget(ContainerWidget widget) {
+    public void addWidget(ContainerWidget widget) {
         this.widgets.add(widget);
         this.renderables.add(widget);
     }
@@ -61,11 +66,10 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         for (var slot : this.menu.slots) {
             this.addSlotWidget(slot.x, slot.y);
         }
-        for (var builder : this.widgetBuilders) {
-            var widget = builder.factory().apply(this.menu, builder.rect().offset(
-                    MARGIN_HORIZONTAL + this.leftPos, MARGIN_TOP + this.topPos));
-            this.addWidget(widget);
+        for (var cb : this.initCallbacks) {
+            cb.run();
         }
+        this.initCallbacks.clear();
     }
 
     @Override
