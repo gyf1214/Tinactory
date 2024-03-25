@@ -47,8 +47,16 @@ public class Machine extends SmartBlockEntity {
         return voltage == Voltage.PRIMITIVE ? Machine::primitive : Machine::new;
     }
 
+    public boolean isAutoDumpItem() {
+        return autoDumpItem;
+    }
+
     public void setAutoDumpItem(boolean autoDumpItem) {
         this.autoDumpItem = autoDumpItem;
+    }
+
+    public boolean isAutoDumpFluid() {
+        return autoDumpFluid;
     }
 
     public void setAutoDumpFluid(boolean autoDumpFluid) {

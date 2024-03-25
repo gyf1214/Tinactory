@@ -2,6 +2,7 @@ package org.shsts.tinactory.test;
 
 import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.gui.MenuGen;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -24,8 +25,10 @@ public final class AllBlockEntities {
                 .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
                         .voltage(Voltage.ULV)
                         .recipeType(AllBlocks.TEST_RECIPE_TYPE.get()))
-                .menu().layout(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV).build()
-                .build()
+                .menu()
+                .transform(MenuGen.machineMenu(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV))
+                .build() // menu
+                .build() // blockEntity
                 .block()
                 .transform(ModelGen.machine(
                         ModelGen.gregtech("blocks/casings/voltage/ulv"),
