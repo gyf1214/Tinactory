@@ -108,6 +108,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
+    public S widget(Supplier<Function<M, ContainerWidget>> factory) {
+        this.widgets.add(factory);
+        return self();
+    }
+
     public S widget(Rect rect, Supplier<Function<M, ContainerWidget>> factory) {
         this.widgetsRect.add(rect);
         this.widgets.add(factory);

@@ -9,6 +9,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -36,7 +37,7 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         this.imageWidth = WIDTH;
         this.imageHeight = menu.getHeight();
 
-        this.rootPanel = new Panel(menu, MARGIN_HORIZONTAL, MARGIN_TOP);
+        this.rootPanel = new Panel(menu, RectD.FULL, Rect.corners(MARGIN_HORIZONTAL, MARGIN_TOP, 0, 0));
         for (var slot : this.menu.slots) {
             int x = slot.x - 1 - MARGIN_HORIZONTAL;
             int y = slot.y - 1 - MARGIN_TOP;
@@ -53,7 +54,7 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
     @Override
     protected void init() {
         super.init();
-        this.rootPanel.init(this.leftPos, this.topPos);
+        this.rootPanel.init(new Rect(this.leftPos, this.topPos, this.imageWidth, this.imageHeight));
         this.renderables.add(this.rootPanel);
     }
 

@@ -9,6 +9,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.RectD;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.NumberFormat;
@@ -22,24 +23,35 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 
     protected final ContainerMenu<?> menu;
-    protected final Rect localRect;
+    protected final RectD anchor;
+    protected final Rect offset;
     protected final int zIndex;
 
     protected Rect rect;
 
-    public ContainerWidget(ContainerMenu<?> menu, Rect rect, int zIndex) {
+    public ContainerWidget(ContainerMenu<?> menu, RectD anchor, Rect rect, int zIndex) {
         this.menu = menu;
-        this.localRect = rect;
+        this.offset = rect;
+        this.anchor = anchor;
         this.rect = rect;
         this.zIndex = zIndex;
     }
 
-    public void init(int parentX, int parentY) {
-        this.rect = this.localRect.offset(parentX, parentY);
+    public ContainerWidget(ContainerMenu<?> menu, RectD anchor, Rect offset) {
+        this(menu, anchor, offset, ContainerMenu.DEFAULT_Z_INDEX);
     }
 
     public ContainerWidget(ContainerMenu<?> menu, Rect rect) {
-        this(menu, rect, ContainerMenu.DEFAULT_Z_INDEX);
+        this(menu, RectD.ZERO, rect);
+    }
+
+    public void init(Rect parent) {
+        var sx = parent.inX(this.anchor.x()) + this.offset.x();
+        var tx = parent.inX(this.anchor.endX()) + this.offset.endX();
+        var sy = parent.inY(this.anchor.y()) + this.offset.y();
+        var ty = parent.inY(this.anchor.endY()) + this.offset.endY();
+
+        this.rect = Rect.corners(sx, sy, tx, ty);
     }
 
     @Override

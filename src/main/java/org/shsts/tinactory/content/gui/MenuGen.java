@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.TranslatableComponent;
+import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -37,6 +38,7 @@ public final class MenuGen {
                         (menu, value) -> menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
                                 SetMachineEventPacket.builder().autoDumpFluid(value)))
                 .staticWidget(Texture.FLUID_OUT_BUTTON, x + SLOT_SIZE, y)
+                .widget(() -> menu -> new MachineRecipeBook(menu, 0, y))
                 .registerEvent(ContainerEventHandler.SET_MACHINE, (menu, p) -> {
                     var be = menu.blockEntity;
                     p.getAutoDumpItem().ifPresent(be::setAutoDumpItem);
