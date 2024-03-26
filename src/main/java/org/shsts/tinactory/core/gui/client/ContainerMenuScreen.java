@@ -11,12 +11,9 @@ import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_TOP;
@@ -29,10 +26,8 @@ import static org.shsts.tinactory.core.gui.ContainerMenu.WIDTH;
 public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractContainerScreen<M> {
     public static final int TEXT_COLOR = 0xFF404040;
 
-    private final List<Runnable> initCallbacks = new ArrayList<>();
-    protected final List<ContainerWidget> widgets = new ArrayList<>();
-    @Nullable
-    protected ContainerWidget hoveredWidget = null;
+    protected final Panel rootPanel;
+    protected boolean isHovering = false;
 
     public ContainerMenuScreen(M menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -40,33 +35,26 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         this.titleLabelY = MARGIN_VERTICAL;
         this.imageWidth = WIDTH;
         this.imageHeight = menu.getHeight();
+
+        this.rootPanel = new Panel(menu, MARGIN_HORIZONTAL, MARGIN_TOP);
+        for (var slot : this.menu.slots) {
+            int x = slot.x - 1 - MARGIN_HORIZONTAL;
+            int y = slot.y - 1 - MARGIN_TOP;
+            var slotBg = new StaticWidget(this.menu, Texture.SLOT_BACKGROUND, x, y);
+            this.rootPanel.addWidget(slotBg);
+        }
     }
 
-    public void addWidgetBuilder(Rect rect, BiFunction<M, Rect, ContainerWidget> factory) {
-        this.initCallbacks.add(() -> {
-            var widget = factory.apply(this.menu, rect.offset(
-                    MARGIN_HORIZONTAL + this.leftPos, MARGIN_TOP + this.topPos));
-            this.addWidget(widget);
-        });
-    }
-
-    public void addWidget(ContainerWidget widget) {
-        this.widgets.add(widget);
-        this.renderables.add(widget);
+    public void addWidget(Function<M, ContainerWidget> factory) {
+        var widget = factory.apply(this.menu);
+        this.rootPanel.addWidget(widget);
     }
 
     @Override
     protected void init() {
         super.init();
-        this.widgets.clear();
-        for (var slot : this.menu.slots) {
-            var x = slot.x + this.leftPos - 1;
-            var y = slot.y + this.topPos - 1;
-            this.addWidget(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND, x, y));
-        }
-        for (var cb : this.initCallbacks) {
-            cb.run();
-        }
+        this.rootPanel.init(this.leftPos, this.topPos);
+        this.renderables.add(this.rootPanel);
     }
 
     @Override
@@ -74,13 +62,7 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         this.renderBackground(poseStack);
         super.render(poseStack, mouseX, mouseY, partialTick);
 
-        this.hoveredWidget = null;
-        for (var widget : this.widgets) {
-            if (widget.isHovering(mouseX, mouseY)) {
-                this.hoveredWidget = widget;
-            }
-        }
-
+        this.isHovering = this.rootPanel.isHovering(mouseX, mouseY);
         this.renderTooltip(poseStack, mouseX, mouseY);
     }
 
@@ -105,19 +87,17 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
     @Override
     protected void renderTooltip(PoseStack poseStack, int mouseX, int mouseY) {
         super.renderTooltip(poseStack, mouseX, mouseY);
-        if (this.menu.getCarried().isEmpty() && this.hoveredWidget != null) {
-            this.hoveredWidget.getTooltip().ifPresent(tooltip ->
+        if (this.menu.getCarried().isEmpty() && this.isHovering) {
+            this.rootPanel.getTooltip().ifPresent(tooltip ->
                     this.renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (var widget : this.widgets) {
-            if (widget.isClicking(mouseX, mouseY)) {
-                widget.onMouseClicked(mouseX, mouseY, button);
-                return true;
-            }
+        if (this.rootPanel.isClicking(mouseX, mouseY)) {
+            this.rootPanel.onMouseClicked(mouseX, mouseY, button);
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }

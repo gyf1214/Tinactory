@@ -2,6 +2,8 @@ package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
 
@@ -10,6 +12,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
+@OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class Button extends ContainerWidget {

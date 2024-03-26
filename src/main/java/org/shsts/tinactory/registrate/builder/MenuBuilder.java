@@ -34,7 +34,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -84,10 +83,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     protected DistLazy<MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>>>
             screenFactory = () -> () -> ContainerMenuScreen::new;
 
-    private record WidgetBuilder<M extends ContainerMenu<?>>
-            (Rect rect, BiFunction<M, Rect, ContainerWidget> factory) {}
-
-    protected final List<Supplier<WidgetBuilder<M>>> widgets = new ArrayList<>();
+    protected final List<Supplier<Function<M, ContainerWidget>>> widgets = new ArrayList<>();
 
     public MenuBuilder(Registrate registrate, String id, P parent, ContainerMenu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
@@ -112,10 +108,9 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
-    public S widget(Rect rect, Supplier<BiFunction<M, Rect, ContainerWidget>> factory) {
+    public S widget(Rect rect, Supplier<Function<M, ContainerWidget>> factory) {
         this.widgetsRect.add(rect);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                this.widgets.add(() -> new WidgetBuilder<>(rect, factory.get())));
+        this.widgets.add(factory);
         return self();
     }
 
@@ -124,7 +119,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     public S staticWidget(Rect rect, Texture tex) {
-        return this.widget(rect, () -> (menu, rect1) -> new StaticWidget(menu, rect1, tex));
+        return this.widget(rect, () -> menu -> new StaticWidget(menu, rect, tex));
     }
 
     public S slot(int slotIndex, int posX, int posY) {
@@ -148,8 +143,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         var syncSlot = this.addSyncSlot(ContainerSyncPacket.Double.class,
                 (containerId, index, $, be) -> new ContainerSyncPacket.Double(containerId, index,
                         progressReader.applyAsDouble(be)));
-        return this.widget(rect, () -> (menu, rect1) ->
-                new ProgressBar(menu, rect1, tex, syncSlot.get()));
+        return this.widget(rect, () -> menu -> new ProgressBar(menu, rect, tex, syncSlot.get()));
     }
 
     public S switchButton(Texture tex, int x, int y, Component tooltip,
@@ -163,8 +157,8 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         var syncSlot = this.addSyncSlot(ContainerSyncPacket.Boolean.class,
                 (containerId, index, $, be) -> new ContainerSyncPacket.Boolean(containerId, index,
                         valueReader.test(be)));
-        return this.widget(rect, () -> (menu, rect1) ->
-                new SwitchButton(menu, rect1, tex, tooltip, syncSlot.get(), onSwitch));
+        return this.widget(rect, () -> menu ->
+                new SwitchButton(menu, rect, tex, tooltip, syncSlot.get(), onSwitch));
     }
 
     public <P1 extends ContainerEventPacket>
@@ -178,9 +172,9 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         var syncSlot = new MenuCallback<M, Integer>(menu -> menu.addFluidSlot(tank));
         this.menuCallbacks.add(syncSlot);
         var rect = new Rect(x, y, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE);
+        var rect1 = rect.offset(1, 1).enlarge(-2, -2);
         return this.staticWidget(rect, Texture.SLOT_BACKGROUND)
-                .widget(rect.offset(1, 1).enlarge(-2, -2), () -> (menu, rect1) ->
-                        new FluidSlot(menu, rect1, tank, syncSlot.get()));
+                .widget(rect1, () -> menu -> new FluidSlot(menu, rect1, tank, syncSlot.get()));
     }
 
     public S layout(Layout layout, int yOffset, Voltage voltage) {
@@ -222,9 +216,8 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         var widgets = this.widgets;
         return (menu, inventory, title) -> {
             var screen = screenFactory.create(menu, inventory, title);
-            for (var widgetSupp : widgets) {
-                var widget = widgetSupp.get();
-                screen.addWidgetBuilder(widget.rect(), widget.factory());
+            for (var widget : widgets) {
+                screen.addWidget(widget.get());
             }
             return screen;
         };

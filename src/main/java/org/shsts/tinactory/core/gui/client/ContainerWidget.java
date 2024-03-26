@@ -21,15 +21,21 @@ import java.util.Optional;
 public abstract class ContainerWidget extends GuiComponent implements Widget {
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 
-    public final Rect rect;
-    public final int zIndex;
-
     protected final ContainerMenu<?> menu;
+    protected final Rect localRect;
+    protected final int zIndex;
+
+    protected Rect rect;
 
     public ContainerWidget(ContainerMenu<?> menu, Rect rect, int zIndex) {
         this.menu = menu;
+        this.localRect = rect;
         this.rect = rect;
         this.zIndex = zIndex;
+    }
+
+    public void init(int parentX, int parentY) {
+        this.rect = this.localRect.offset(parentX, parentY);
     }
 
     public ContainerWidget(ContainerMenu<?> menu, Rect rect) {
