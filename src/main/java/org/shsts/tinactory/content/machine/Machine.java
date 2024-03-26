@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.machine;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -137,5 +138,17 @@ public class Machine extends SmartBlockEntity {
     public void onDisconnectFromNetwork() {
         this.network = null;
         LOGGER.debug("machine {}: disconnect from network", this);
+    }
+
+    @Override
+    protected void serializeOnSave(CompoundTag tag) {
+        tag.putBoolean("autoDumpItem", this.autoDumpItem);
+        tag.putBoolean("autoDumpFluid", this.autoDumpFluid);
+    }
+
+    @Override
+    protected void deserializeOnSave(CompoundTag tag) {
+        this.autoDumpItem = tag.getBoolean("autoDumpItem");
+        this.autoDumpFluid = tag.getBoolean("autoDumpFluid");
     }
 }

@@ -159,13 +159,9 @@ public class SmartBlockEntity extends BlockEntity {
         return false;
     }
 
-    protected void serializeOnUpdate(CompoundTag tag) {
-        this.serializeOnSave(tag);
-    }
+    protected void serializeOnUpdate(CompoundTag tag) {}
 
-    protected void deserializeOnUpdate(CompoundTag tag) {
-        this.deserializeOnSave(tag);
-    }
+    protected void deserializeOnUpdate(CompoundTag tag) {}
 
     @Override
     public String toString() {
