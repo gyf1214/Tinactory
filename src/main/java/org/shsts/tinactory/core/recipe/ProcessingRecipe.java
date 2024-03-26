@@ -40,17 +40,20 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     public final List<Input> inputs;
     public final List<Output> outputs;
 
+    public final List<ResourceLocation> requiredTech;
     public final long workTicks;
     public final long voltage;
     public final long power;
 
     public ProcessingRecipe(RecipeTypeEntry<S, ?> type, ResourceLocation loc,
                             List<Input> inputs, List<Output> outputs,
+                            List<ResourceLocation> requiredTech,
                             long workTicks, long voltage, long power) {
         super(type, loc);
         this.inputs = inputs;
         this.outputs = outputs;
         this.workTicks = workTicks;
+        this.requiredTech = requiredTech;
         this.voltage = voltage;
         this.power = power;
     }
@@ -99,9 +102,9 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     public static class Simple extends ProcessingRecipe<Simple> {
         public Simple(RecipeTypeEntry<Simple, ?> type, ResourceLocation loc,
-                      List<Input> inputs, List<Output> outputs,
+                      List<Input> inputs, List<Output> outputs, List<ResourceLocation> requiredTech,
                       long workTicks, long voltage, long power) {
-            super(type, loc, inputs, outputs, workTicks, voltage, power);
+            super(type, loc, inputs, outputs, requiredTech, workTicks, voltage, power);
         }
     }
 
@@ -109,6 +112,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             extends SmartRecipeBuilder<U, S> {
         protected final List<Supplier<Input>> inputs = new ArrayList<>();
         protected final List<Supplier<Output>> outputs = new ArrayList<>();
+        protected final List<ResourceLocation> requiredTech = new ArrayList<>();
         protected long workTicks = 0;
         protected long voltage = 0;
         protected long power = 0;
@@ -166,6 +170,11 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             return this.outputFluid(port, fluid, amount, 1.0f);
         }
 
+        public S requireTech(ResourceLocation loc) {
+            this.requiredTech.add(loc);
+            return self();
+        }
+
         public S workTicks(long workTicks) {
             this.workTicks = workTicks;
             return self();
@@ -214,7 +223,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         @Override
         public Simple createObject() {
             return new Simple(this.parent, this.loc,
-                    this.getInputs(), this.getOutputs(),
+                    this.getInputs(), this.getOutputs(), this.requiredTech,
                     this.workTicks, this.voltage, this.power);
         }
     }
@@ -237,6 +246,10 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                     .forEach(je -> builder.output(
                             GsonHelper.getAsInt(je, "port"),
                             ProcessingResults.SERIALIZER.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
+            Streams.stream(GsonHelper.getAsJsonArray(jo, "required_tech"))
+                    .map(JsonElement::getAsString)
+                    .map(ResourceLocation::new)
+                    .forEach(builder::requireTech);
             return builder
                     .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
                     .voltage(GsonHelper.getAsLong(jo, "voltage", 0))
@@ -266,9 +279,13 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                         je.add("result", ProcessingResults.SERIALIZER.toJson(output.result));
                         return je;
                     }).forEach(outputs::add);
+            var requires = new JsonArray();
+            recipe.requiredTech.stream().map(ResourceLocation::toString)
+                    .forEach(requires::add);
             jo.add("inputs", inputs);
             jo.add("outputs", outputs);
             jo.addProperty("work_ticks", recipe.workTicks);
+            jo.add("required_tech", requires);
             if (recipe.voltage > 0) {
                 jo.addProperty("voltage", recipe.voltage);
                 jo.addProperty("power", recipe.power);
@@ -283,6 +300,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             buf.readWithCount(buf1 -> builder.output(
                     buf1.readVarInt(),
                     ProcessingResults.SERIALIZER.fromNetwork(buf1)));
+            buf.readWithCount(buf1 -> builder.requireTech(new ResourceLocation(buf1.readUtf())));
             return builder
                     .workTicks(buf.readVarLong())
                     .voltage(buf.readVarLong())
@@ -304,6 +322,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                 buf1.writeVarInt(output.port);
                 ProcessingResults.SERIALIZER.toNetwork(output.result, buf1);
             });
+            buf.writeCollection(recipe.requiredTech, (buf1, requires) -> buf1.writeUtf(requires.toString()));
             buf.writeVarLong(recipe.workTicks);
             buf.writeVarLong(recipe.voltage);
             buf.writeVarLong(recipe.power);
