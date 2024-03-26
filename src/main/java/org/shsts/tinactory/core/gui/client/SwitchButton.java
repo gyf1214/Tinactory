@@ -16,18 +16,17 @@ import java.util.function.BiConsumer;
 @MethodsReturnNonnullByDefault
 public class SwitchButton extends Button {
     private final Texture texture;
+    private final int syncSlot;
     private boolean value;
     private final BiConsumer<? extends ContainerMenu<?>, Boolean> onSwitch;
 
     public SwitchButton(ContainerMenu<?> menu, Rect rect, Texture texture,
-                        @Nullable Component tooltip, int syncIndex,
+                        @Nullable Component tooltip, int syncSlot,
                         BiConsumer<? extends ContainerMenu<?>, Boolean> onSwitch) {
         super(menu, rect, tooltip);
         this.texture = texture;
         this.onSwitch = onSwitch;
-        this.value = menu.getSyncPacket(syncIndex, ContainerSyncPacket.Boolean.class)
-                .map(ContainerSyncPacket.Boolean::getValue).orElse(false);
-
+        this.syncSlot = syncSlot;
     }
 
     public SwitchButton(ContainerMenu<?> menu, Rect rect, Texture texture,
@@ -36,6 +35,7 @@ public class SwitchButton extends Button {
         super(menu, rect, tooltip);
         this.texture = texture;
         this.onSwitch = onSwitch;
+        this.syncSlot = -1;
         this.value = initialValue;
     }
 
@@ -48,6 +48,10 @@ public class SwitchButton extends Button {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        if (this.syncSlot >= 0) {
+            this.menu.getSyncPacket(this.syncSlot, ContainerSyncPacket.Boolean.class)
+                    .ifPresent(value -> this.value = value.getValue());
+        }
         if (this.value) {
             RenderUtil.blit(poseStack, this.texture, this.zIndex, this.rect, 0, this.rect.height());
         } else {

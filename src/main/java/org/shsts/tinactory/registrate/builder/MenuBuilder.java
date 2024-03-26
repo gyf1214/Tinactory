@@ -62,7 +62,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         }
 
         public void resolve(M1 menu) {
-            this.result = func.apply(menu);
+            this.result = this.func.apply(menu);
         }
 
         @Override

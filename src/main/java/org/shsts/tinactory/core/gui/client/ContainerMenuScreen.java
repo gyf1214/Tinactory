@@ -31,7 +31,8 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
 
     private final List<Runnable> initCallbacks = new ArrayList<>();
     protected final List<ContainerWidget> widgets = new ArrayList<>();
-    protected @Nullable ContainerWidget hoveredWidget = null;
+    @Nullable
+    protected ContainerWidget hoveredWidget = null;
 
     public ContainerMenuScreen(M menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -54,34 +55,32 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         this.renderables.add(widget);
     }
 
-    protected void addSlotWidget(int x, int y) {
-        var pX = x + this.leftPos - 1;
-        var pY = y + this.topPos - 1;
-        this.addWidget(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND, pX, pY));
-    }
-
     @Override
     protected void init() {
         super.init();
+        this.widgets.clear();
         for (var slot : this.menu.slots) {
-            this.addSlotWidget(slot.x, slot.y);
+            var x = slot.x + this.leftPos - 1;
+            var y = slot.y + this.topPos - 1;
+            this.addWidget(new StaticWidget(this.menu, Texture.SLOT_BACKGROUND, x, y));
         }
         for (var cb : this.initCallbacks) {
             cb.run();
         }
-        this.initCallbacks.clear();
     }
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(poseStack);
         super.render(poseStack, mouseX, mouseY, partialTick);
+
         this.hoveredWidget = null;
         for (var widget : this.widgets) {
             if (widget.isHovering(mouseX, mouseY)) {
                 this.hoveredWidget = widget;
             }
         }
+
         this.renderTooltip(poseStack, mouseX, mouseY);
     }
 

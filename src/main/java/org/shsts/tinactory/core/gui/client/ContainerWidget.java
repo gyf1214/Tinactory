@@ -63,5 +63,4 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
      * Do not consider drag now.
      */
     public void onMouseClicked(double mouseX, double mouseY, int button) {}
-
 }

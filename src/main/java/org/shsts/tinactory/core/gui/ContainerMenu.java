@@ -76,7 +76,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
 
     protected static abstract class SyncSlot<T extends BlockEntity, P extends ContainerSyncPacket> {
         private final Class<P> clazz;
-        private @Nullable P packet = null;
+        @Nullable
+        private P packet = null;
 
         protected SyncSlot(Class<P> clazz) {
             this.clazz = clazz;

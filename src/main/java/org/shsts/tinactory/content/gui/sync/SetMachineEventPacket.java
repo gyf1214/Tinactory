@@ -11,8 +11,10 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SetMachineEventPacket extends ContainerEventPacket {
-    private @Nullable Boolean autoDumpItem = null;
-    private @Nullable Boolean autoDumpFluid = null;
+    @Nullable
+    private Boolean autoDumpItem = null;
+    @Nullable
+    private Boolean autoDumpFluid = null;
 
     public SetMachineEventPacket() {}
 
@@ -45,8 +47,10 @@ public class SetMachineEventPacket extends ContainerEventPacket {
     }
 
     public static class Builder implements ContainerEventPacket.Factory<SetMachineEventPacket> {
-        private @Nullable Boolean autoDumpItem = null;
-        private @Nullable Boolean autoDumpFluid = null;
+        @Nullable
+        private Boolean autoDumpItem = null;
+        @Nullable
+        private Boolean autoDumpFluid = null;
 
         public Builder autoDumpItem(boolean value) {
             this.autoDumpItem = value;
