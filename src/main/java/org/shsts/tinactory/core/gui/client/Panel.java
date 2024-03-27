@@ -19,7 +19,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Panel extends ContainerWidget {
-    private final List<ContainerWidget> children = new ArrayList<>();
+    protected final List<ContainerWidget> children = new ArrayList<>();
     @Nullable
     private ContainerWidget hoveringChild = null;
     @Nullable
@@ -39,12 +39,16 @@ public class Panel extends ContainerWidget {
         this.children.add(widget);
     }
 
-    @Override
-    public void init(Rect parent) {
-        super.init(parent);
+    protected void initChildren() {
         for (var child : this.children) {
             child.init(this.rect);
         }
+    }
+
+    @Override
+    public void init(Rect parent) {
+        super.init(parent);
+        this.initChildren();
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.MenuGen;
+import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -52,6 +53,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                         .layout(this.layout, voltage))
                 .menu()
                 .transform(MenuGen.machineMenu(this.layout, voltage))
+                .widget(() -> menu -> new MachineRecipeBook(menu, this.recipeType.get(), 0, 0))
                 .build() // menu
                 .build() // blockEntity
                 .block()

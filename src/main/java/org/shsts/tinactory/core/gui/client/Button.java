@@ -6,6 +6,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.RectD;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -17,6 +18,11 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 public abstract class Button extends ContainerWidget {
     private final @Nullable Component tooltip;
+
+    public Button(ContainerMenu<?> menu, RectD anchor, Rect offset, @Nullable Component tooltip) {
+        super(menu, anchor, offset);
+        this.tooltip = tooltip;
+    }
 
     public Button(ContainerMenu<?> menu, Rect rect, @Nullable Component tooltip) {
         super(menu, rect);

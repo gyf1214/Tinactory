@@ -26,6 +26,7 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -94,7 +95,12 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     @Override
     public ItemStack getResultItem() {
-        return ItemStack.EMPTY;
+        var output = this.outputs.stream().min(Comparator.comparingInt(a -> a.port));
+        if (output.isPresent() && output.get().result instanceof ProcessingResults.ItemResult itemResult) {
+            return itemResult.stack;
+        } else {
+            return ItemStack.EMPTY;
+        }
     }
 
     public static class Simple extends ProcessingRecipe<Simple> {

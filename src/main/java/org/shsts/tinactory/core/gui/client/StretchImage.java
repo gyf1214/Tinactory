@@ -29,30 +29,32 @@ public class StretchImage extends ContainerWidget {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var tex = this.texture;
+        render(poseStack, this.texture, this.zIndex, this.rect, this.texRect, this.border);
+    }
 
-        var b = this.border;
-        var w = this.rect.width() - b;
-        var h = this.rect.height() - b;
-        var tw = this.texRect.width() - b;
-        var th = this.texRect.height() - b;
+    public static void render(PoseStack poseStack, Texture texture, int zIndex,
+                              Rect rect, Rect texRect, int border) {
+        var w = rect.width() - border;
+        var h = rect.height() - border;
+        var tw = texRect.width() - border;
+        var th = texRect.height() - border;
 
-        var cR = this.rect.resize(b, b);
-        var wR = this.rect.offset(b, 0).resize(w - b, b);
-        var hR = this.rect.offset(0, b).resize(b, h - b);
-        var mR = this.rect.offset(b, b).resize(w - b, h - b);
-        var tR = this.texRect.resize(b, b);
+        var cR = rect.resize(border, border);
+        var wR = rect.offset(border, 0).resize(w - border, border);
+        var hR = rect.offset(0, border).resize(border, h - border);
+        var mR = rect.offset(border, border).resize(w - border, h - border);
+        var tR = texRect.resize(border, border);
 
-        RenderUtil.blit(poseStack, tex, this.zIndex, cR, tR);
-        RenderUtil.blit(poseStack, tex, this.zIndex, cR.offset(w, 0), tR.offset(tw, 0));
-        RenderUtil.blit(poseStack, tex, this.zIndex, cR.offset(0, h), tR.offset(0, th));
-        RenderUtil.blit(poseStack, tex, this.zIndex, cR.offset(w, h), tR.offset(tw, th));
+        RenderUtil.blit(poseStack, texture, zIndex, cR, tR);
+        RenderUtil.blit(poseStack, texture, zIndex, cR.offset(w, 0), tR.offset(tw, 0));
+        RenderUtil.blit(poseStack, texture, zIndex, cR.offset(0, h), tR.offset(0, th));
+        RenderUtil.blit(poseStack, texture, zIndex, cR.offset(w, h), tR.offset(tw, th));
 
-        RenderUtil.blit(poseStack, tex, this.zIndex, wR, tR.offset(b, 0));
-        RenderUtil.blit(poseStack, tex, this.zIndex, wR.offset(0, h), tR.offset(b, th));
-        RenderUtil.blit(poseStack, tex, this.zIndex, hR, tR.offset(0, b));
-        RenderUtil.blit(poseStack, tex, this.zIndex, hR.offset(w, 0), tR.offset(tw, b));
+        RenderUtil.blit(poseStack, texture, zIndex, wR, tR.offset(border, 0));
+        RenderUtil.blit(poseStack, texture, zIndex, wR.offset(0, h), tR.offset(border, th));
+        RenderUtil.blit(poseStack, texture, zIndex, hR, tR.offset(0, border));
+        RenderUtil.blit(poseStack, texture, zIndex, hR.offset(w, 0), tR.offset(tw, border));
 
-        RenderUtil.blit(poseStack, tex, this.zIndex, mR, tR.offset(tw - b, th - b));
+        RenderUtil.blit(poseStack, texture, zIndex, mR, tR.offset(tw - border, th - border));
     }
 }

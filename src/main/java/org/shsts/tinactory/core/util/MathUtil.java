@@ -25,6 +25,10 @@ public final class MathUtil {
         return Math.max(Math.min(x, max), min);
     }
 
+    public static int clamp(int x, int min, int max) {
+        return Math.max(Math.min(x, max), min);
+    }
+
     public static Vector3f mulVecf(Vector3f x, float k) {
         x = x.copy();
         x.mul(k);

@@ -7,10 +7,10 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -36,9 +36,7 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        var connection = Minecraft.getInstance().getConnection();
-        assert connection != null;
-        var recipeManager = connection.getRecipeManager();
+        var recipeManager = ClientUtil.getRecipeManager();
         var recipes = recipeManager.getAllRecipesFor(AllBlocks.TEST_RECIPE_TYPE.get());
         registration.addRecipes(this.testType, recipes);
     }
