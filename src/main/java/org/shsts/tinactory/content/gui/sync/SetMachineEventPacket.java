@@ -2,6 +2,8 @@ package org.shsts.tinactory.content.gui.sync;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.sync.ContainerEventPacket;
 
 import javax.annotation.Nullable;
@@ -15,6 +17,9 @@ public class SetMachineEventPacket extends ContainerEventPacket {
     private Boolean autoDumpItem = null;
     @Nullable
     private Boolean autoDumpFluid = null;
+    private boolean resetTargetRecipe = false;
+    @Nullable
+    private ResourceLocation targetRecipeLoc = null;
 
     public SetMachineEventPacket() {}
 
@@ -22,14 +27,22 @@ public class SetMachineEventPacket extends ContainerEventPacket {
         super(containerId, eventId);
         this.autoDumpItem = builder.autoDumpItem;
         this.autoDumpFluid = builder.autoDumpFluid;
+        this.resetTargetRecipe = builder.resetTargetRecipeLoc;
+        this.targetRecipeLoc = builder.targetRecipeLoc;
     }
 
-    public Optional<Boolean> getAutoDumpItem() {
-        return Optional.ofNullable(this.autoDumpItem);
-    }
-
-    public Optional<Boolean> getAutoDumpFluid() {
-        return Optional.ofNullable(this.autoDumpFluid);
+    public void applyMachine(Machine machine) {
+        if (this.autoDumpItem != null) {
+            machine.setAutoDumpItem(this.autoDumpItem);
+        }
+        if (this.autoDumpFluid != null) {
+            machine.setAutoDumpFluid(this.autoDumpFluid);
+        }
+        if (this.resetTargetRecipe) {
+            machine.setTargetRecipeLoc(null);
+        } else if (this.targetRecipeLoc != null) {
+            machine.setTargetRecipeLoc(this.targetRecipeLoc);
+        }
     }
 
     @Override
@@ -37,6 +50,7 @@ public class SetMachineEventPacket extends ContainerEventPacket {
         super.serializeToBuf(buf);
         buf.writeOptional(Optional.ofNullable(this.autoDumpItem), FriendlyByteBuf::writeBoolean);
         buf.writeOptional(Optional.ofNullable(this.autoDumpFluid), FriendlyByteBuf::writeBoolean);
+        buf.writeOptional(Optional.ofNullable(this.targetRecipeLoc), FriendlyByteBuf::writeResourceLocation);
     }
 
     @Override
@@ -44,6 +58,7 @@ public class SetMachineEventPacket extends ContainerEventPacket {
         super.deserializeFromBuf(buf);
         this.autoDumpItem = buf.readOptional(FriendlyByteBuf::readBoolean).orElse(null);
         this.autoDumpFluid = buf.readOptional(FriendlyByteBuf::readBoolean).orElse(null);
+        this.targetRecipeLoc = buf.readOptional(FriendlyByteBuf::readResourceLocation).orElse(null);
     }
 
     public static class Builder implements ContainerEventPacket.Factory<SetMachineEventPacket> {
@@ -51,6 +66,9 @@ public class SetMachineEventPacket extends ContainerEventPacket {
         private Boolean autoDumpItem = null;
         @Nullable
         private Boolean autoDumpFluid = null;
+        private boolean resetTargetRecipeLoc = false;
+        @Nullable
+        private ResourceLocation targetRecipeLoc = null;
 
         public Builder autoDumpItem(boolean value) {
             this.autoDumpItem = value;
@@ -59,6 +77,15 @@ public class SetMachineEventPacket extends ContainerEventPacket {
 
         public Builder autoDumpFluid(boolean value) {
             this.autoDumpFluid = value;
+            return this;
+        }
+
+        public Builder targetRecipeLoc(@Nullable ResourceLocation value) {
+            if (value == null) {
+                this.resetTargetRecipeLoc = true;
+            } else {
+                this.targetRecipeLoc = value;
+            }
             return this;
         }
 

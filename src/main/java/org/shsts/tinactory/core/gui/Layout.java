@@ -1,19 +1,27 @@
 package org.shsts.tinactory.core.gui;
 
+import com.google.common.collect.ArrayListMultimap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.logistics.SlotType;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.MenuBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -31,9 +39,13 @@ public class Layout {
     @Nullable
     public final WidgetInfo progressBar;
     public final Rect rect;
+    public final ArrayListMultimap<Integer, SlotInfo> portSlots = ArrayListMultimap.create();
 
     public Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable WidgetInfo progressBar) {
         this.slots = slots;
+        for (var slot : slots) {
+            this.portSlots.put(slot.port(), slot);
+        }
         this.images = images;
         this.progressBar = progressBar;
 
@@ -55,28 +67,60 @@ public class Layout {
         this.rect = new Rect(0, 0, maxX, maxY);
     }
 
-    public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu(int yOffset) {
+    public int getXOffset() {
+        return (ContainerMenu.CONTENT_WIDTH - this.rect.width()) / 2;
+    }
+
+    public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu() {
         return builder -> {
-            var xOffset = (ContainerMenu.CONTENT_WIDTH - this.rect.width()) / 2;
+            var xOffset = this.getXOffset();
             for (var slot : this.slots) {
                 var x = xOffset + slot.x;
-                var y = yOffset + slot.y;
+                var y = slot.y;
                 switch (slot.type.portType) {
                     case ITEM -> builder.slot(slot.index, x, y);
                     case FLUID -> builder.fluidSlot(slot.index, x, y);
                 }
             }
             for (var image : this.images) {
-                builder.staticWidget(image.rect.offset(xOffset, yOffset), image.texture);
+                builder.staticWidget(image.rect.offset(xOffset, 0), image.texture);
             }
             if (this.progressBar != null) {
-                builder.progressBar(this.progressBar.texture, this.progressBar.rect.offset(xOffset, yOffset),
+                builder.progressBar(this.progressBar.texture, this.progressBar.rect.offset(xOffset, 0),
                         be -> be.getCapability(AllCapabilities.PROCESSOR.get())
                                 .map(IProcessor::getProgress)
                                 .orElse(0.0d));
             }
             return builder;
         };
+    }
+
+    public record SlotWith<X>(SlotInfo slot, X val) {}
+
+    private <S, T> List<SlotWith<T>>
+    getSlotWithInfo(List<S> source, ToIntFunction<S> getPort, Function<S, T> getResult) {
+        var currentSlotIndex = new Int2IntOpenHashMap();
+        var ret = new ArrayList<SlotWith<T>>();
+
+        for (var item : source) {
+            var port = getPort.applyAsInt(item);
+            var slotIndex = currentSlotIndex.getOrDefault(port, 0);
+            var slots = this.portSlots.get(port);
+            if (slotIndex < slots.size()) {
+                var slot = slots.get(slotIndex);
+                ret.add(new SlotWith<>(slot, getResult.apply(item)));
+                currentSlotIndex.put(port, slotIndex + 1);
+            }
+        }
+        return ret;
+    }
+
+    public List<SlotWith<IProcessingIngredient>> getProcessingInputs(ProcessingRecipe<?> recipe) {
+        return getSlotWithInfo(recipe.inputs, ProcessingRecipe.Input::port, ProcessingRecipe.Input::ingredient);
+    }
+
+    public List<SlotWith<IProcessingResult>> getProcessingOutputs(ProcessingRecipe<?> recipe) {
+        return getSlotWithInfo(recipe.outputs, ProcessingRecipe.Output::port, ProcessingRecipe.Output::result);
     }
 
     public static <P> LayoutSetBuilder<P> builder(P parent, Consumer<Map<Voltage, Layout>> onCreate) {

@@ -1,6 +1,5 @@
 package org.shsts.tinactory.integration.jei.category;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -18,25 +17,16 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.HashMap;
-import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCategory<T> {
-    protected final ArrayListMultimap<Integer, Layout.SlotInfo> portSlots;
-
     public ProcessingCategory(RecipeType<T> type, IJeiHelpers helpers, Layout layout, ItemLike icon) {
         super(type, helpers, layout, new ItemStack(icon));
-        this.portSlots = ArrayListMultimap.create();
-        var slots = layout.slots;
-        for (var slot : slots) {
-            this.portSlots.put(slot.port(), slot);
-        }
     }
 
-    protected <I> void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot,
-                                     I ingredient, RecipeIngredientRole role) {
+    protected <I> void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot, I ingredient) {
+        var role = slot.type().output ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT;
         var slotBuilder = builder.addSlot(role, slot.x() + 1, slot.y() + 1);
         if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient simpleItemIngredient) {
             slotBuilder.addItemStack(simpleItemIngredient.stack());
@@ -54,26 +44,16 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
         }
     }
 
-    protected <I> void addIngredient(IRecipeLayoutBuilder builder, Map<Integer, Integer> currentSlotIndex,
-                                     int port, I ingredient) {
-        var slotIndex = currentSlotIndex.getOrDefault(port, 0);
-        var slots = this.portSlots.get(port);
-        if (slotIndex < slots.size()) {
-            var slot = slots.get(slotIndex);
-            var role = slot.type().output ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT;
-            this.addIngredient(builder, slot, ingredient, role);
-            currentSlotIndex.put(port, slotIndex + 1);
-        }
-    }
-
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, T recipe, IFocusGroup focuses) {
-        Map<Integer, Integer> currentSlotIndex = new HashMap<>();
-        for (var input : recipe.inputs) {
-            this.addIngredient(builder, currentSlotIndex, input.port(), input.ingredient());
+        var inputs = this.layout.getProcessingInputs(recipe);
+        var outputs = this.layout.getProcessingOutputs(recipe);
+
+        for (var input : inputs) {
+            this.addIngredient(builder, input.slot(), input.val());
         }
-        for (var output : recipe.outputs) {
-            this.addIngredient(builder, currentSlotIndex, output.port(), output.result());
+        for (var output : outputs) {
+            this.addIngredient(builder, output.slot(), output.val());
         }
     }
 

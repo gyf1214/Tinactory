@@ -42,7 +42,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
      * This is only used during deserializeNBT when world is not available.
      */
     @Nullable
-    protected ResourceLocation currentRecipeId = null;
+    protected ResourceLocation currentRecipeLoc = null;
     @Nullable
     protected T currentRecipe = null;
     @Nullable
@@ -142,15 +142,15 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
     @SuppressWarnings("unchecked")
     protected void onLoad(Level world) {
-        if (this.currentRecipeId == null) {
+        if (this.currentRecipeLoc == null) {
             return;
         }
-        world.getRecipeManager().byKey(this.currentRecipeId).ifPresent(recipe -> {
+        world.getRecipeManager().byKey(this.currentRecipeLoc).ifPresent(recipe -> {
             if (this.recipeType == recipe.getType()) {
                 this.currentRecipe = (T) recipe;
             }
         });
-        this.currentRecipeId = null;
+        this.currentRecipeLoc = null;
         if (this.currentRecipe != null) {
             this.needUpdate = false;
         }
@@ -180,10 +180,10 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        var recipeId = this.currentRecipeId != null ? this.currentRecipeId :
+        var recipeLoc = this.currentRecipeLoc != null ? this.currentRecipeLoc :
                 (this.currentRecipe != null ? this.currentRecipe.getId() : null);
-        if (recipeId != null) {
-            tag.putString("currentRecipe", recipeId.toString());
+        if (recipeLoc != null) {
+            tag.putString("currentRecipe", recipeLoc.toString());
             tag.putLong("workProgress", this.workProgress);
         }
         return tag;
@@ -193,10 +193,10 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     public void deserializeNBT(CompoundTag tag) {
         this.currentRecipe = null;
         if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
-            this.currentRecipeId = new ResourceLocation(tag.getString("currentRecipe"));
+            this.currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
             this.workProgress = tag.getLong("workProgress");
         } else {
-            this.currentRecipeId = null;
+            this.currentRecipeLoc = null;
         }
     }
 

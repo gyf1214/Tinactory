@@ -2,13 +2,13 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -18,10 +18,10 @@ import org.shsts.tinactory.core.gui.client.ContainerWidget;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
+import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.MathUtil;
-import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -37,8 +37,6 @@ import static org.shsts.tinactory.core.gui.ContainerMenu.SLOT_SIZE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineRecipeBook extends Panel {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     private static final Texture RECIPE_BOOK_BUTTON = new Texture(
             ModelGen.mcLoc("gui/recipe_button"), 256, 256);
     private static final Texture RECIPE_BOOK_BG = new Texture(
@@ -87,7 +85,7 @@ public class MachineRecipeBook extends Panel {
                 var item = this.recipe.getResultItem();
                 var x = this.rect.x() + 2;
                 var y = this.rect.y() + 2;
-                ClientUtil.getItemRenderer().renderGuiItem(item, x, y);
+                ClientUtil.getItemRenderer().renderAndDecorateFakeItem(item, x, y);
             }
         }
 
@@ -192,7 +190,8 @@ public class MachineRecipeBook extends Panel {
     }
 
     private void selectRecipe(ProcessingRecipe<?> recipe) {
-        LOGGER.debug("select recipe {}", recipe);
+        menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
+                SetMachineEventPacket.builder().targetRecipeLoc(recipe.getId()));
     }
 
     private void setPage(int index) {

@@ -2,13 +2,18 @@ package org.shsts.tinactory.content.gui;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.TranslatableComponent;
+import org.shsts.tinactory.content.gui.client.GhostRecipe;
+import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
+import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.MenuBuilder;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -36,10 +41,15 @@ public final class MenuGen {
                         (menu, value) -> menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
                                 SetMachineEventPacket.builder().autoDumpFluid(value)))
                 .staticWidget(Texture.FLUID_OUT_BUTTON, x + SLOT_SIZE, y)
-                .registerEvent(ContainerEventHandler.SET_MACHINE, (menu, p) -> {
-                    var be = menu.blockEntity;
-                    p.getAutoDumpItem().ifPresent(be::setAutoDumpItem);
-                    p.getAutoDumpFluid().ifPresent(be::setAutoDumpFluid);
-                });
+                .event(ContainerEventHandler.SET_MACHINE, (menu, p) -> p.applyMachine(menu.blockEntity));
+    }
+
+    public static <R extends ProcessingRecipe<R>, S extends MenuBuilder<? extends Machine, ?, ?, S>>
+    Transformer<S> machineRecipeBook(RecipeTypeEntry<R, ?> recipeType, Layout layout) {
+        return $ -> $
+                .widget(() -> menu -> new MachineRecipeBook(menu, recipeType.get(), 0, 0))
+                .syncWidget(ContainerSyncPacket.LocHolder.class, (containerId, index, $1, be) ->
+                                new ContainerSyncPacket.LocHolder(containerId, index, be.getTargetRecipeLoc()),
+                        () -> (menu, slot) -> new GhostRecipe(menu, slot, layout));
     }
 }

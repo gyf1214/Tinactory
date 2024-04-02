@@ -26,9 +26,6 @@ import org.shsts.tinactory.integration.jei.DrawableHelper;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -37,8 +34,7 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
     protected final Component title;
     protected final IDrawable background;
     protected final IDrawable icon;
-    protected final List<Layout.SlotInfo> slots;
-    protected final Map<Integer, Layout.SlotInfo> slotsInfo = new HashMap<>();
+    protected final Layout layout;
 
     protected final @Nullable LoadingCache<Integer, IDrawable> cachedProgressBar;
     protected final @Nullable Rect progressBarRect;
@@ -49,11 +45,7 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
         var guiHelper = helpers.getGuiHelper();
         this.background = DrawableHelper.createBackground(guiHelper, layout);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, icon);
-        this.slots = layout.slots;
-
-        for (var slot : layout.slots) {
-            this.slotsInfo.put(slot.index(), slot);
-        }
+        this.layout = layout;
 
         if (layout.progressBar != null) {
             var texture = layout.progressBar.texture();

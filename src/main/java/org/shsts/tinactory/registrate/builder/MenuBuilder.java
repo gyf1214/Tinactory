@@ -33,6 +33,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -55,7 +56,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         private X result;
         private final Function<M1, X> func;
 
-        protected MenuCallback(Function<M1, X> func) {
+        private MenuCallback(Function<M1, X> func) {
             this.func = func;
         }
 
@@ -118,6 +119,21 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
+    public <P1 extends ContainerSyncPacket>
+    S syncWidget(Class<P1> packetClazz, ContainerMenu.SyncPacketFactory<T, P1> packetFactory,
+                 Supplier<BiFunction<M, Integer, ContainerWidget>> widgetFactory) {
+        var syncSlot = this.addSyncSlot(packetClazz, packetFactory);
+        this.widgets.add(() -> menu -> widgetFactory.get().apply(menu, syncSlot.get()));
+        return self();
+    }
+
+    public <P1 extends ContainerSyncPacket>
+    S syncWidget(Rect rect, Class<P1> packetClazz, ContainerMenu.SyncPacketFactory<T, P1> packetFactory,
+                 Supplier<BiFunction<M, Integer, ContainerWidget>> widgetFactory) {
+        this.widgetsRect.add(rect);
+        return this.syncWidget(packetClazz, packetFactory, widgetFactory);
+    }
+
     public S staticWidget(Texture tex, int x, int y) {
         return this.staticWidget(new Rect(x, y, tex.width(), tex.height()), tex);
     }
@@ -144,10 +160,9 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     public S progressBar(Texture tex, Rect rect, ToDoubleFunction<T> progressReader) {
-        var syncSlot = this.addSyncSlot(ContainerSyncPacket.Double.class,
-                (containerId, index, $, be) -> new ContainerSyncPacket.Double(containerId, index,
-                        progressReader.applyAsDouble(be)));
-        return this.widget(rect, () -> menu -> new ProgressBar(menu, rect, tex, syncSlot.get()));
+        return this.syncWidget(rect, ContainerSyncPacket.Double.class, (containerId, index, $, be) ->
+                        new ContainerSyncPacket.Double(containerId, index, progressReader.applyAsDouble(be)),
+                () -> (menu, slot) -> new ProgressBar(menu, rect, tex, slot));
     }
 
     public S switchButton(Texture tex, int x, int y, Component tooltip,
@@ -158,15 +173,13 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
 
     public S switchButton(Texture tex, Rect rect, Component tooltip,
                           Predicate<T> valueReader, BiConsumer<M, Boolean> onSwitch) {
-        var syncSlot = this.addSyncSlot(ContainerSyncPacket.Boolean.class,
-                (containerId, index, $, be) -> new ContainerSyncPacket.Boolean(containerId, index,
-                        valueReader.test(be)));
-        return this.widget(rect, () -> menu ->
-                new SwitchButton(menu, rect, tex, tooltip, syncSlot.get(), onSwitch));
+        return this.syncWidget(rect, ContainerSyncPacket.Boolean.class, (containerId, index, $, be) ->
+                        new ContainerSyncPacket.Boolean(containerId, index, valueReader.test(be)),
+                () -> (menu, slot) -> new SwitchButton(menu, rect, tex, tooltip, slot, onSwitch));
     }
 
     public <P1 extends ContainerEventPacket>
-    S registerEvent(ContainerEventHandler.Event<P1> event, BiConsumer<M, P1> handler) {
+    S event(ContainerEventHandler.Event<P1> event, BiConsumer<M, P1> handler) {
         this.menuCallbacks.add(MenuCallback.dummy(menu ->
                 menu.registerEvent(event, p -> handler.accept(menu, p))));
         return self();
@@ -181,12 +194,8 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
                 .widget(rect1, () -> menu -> new FluidSlot(menu, rect1, tank, syncSlot.get()));
     }
 
-    public S layout(Layout layout, int yOffset) {
-        return this.transform(layout.applyMenu(yOffset));
-    }
-
     public S layout(Layout layout) {
-        return this.layout(layout, 0);
+        return this.transform(layout.applyMenu());
     }
 
     public S noInventory() {

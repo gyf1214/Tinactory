@@ -2,10 +2,13 @@ package org.shsts.tinactory.core.gui.sync;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.common.IPacket;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -174,11 +177,12 @@ public abstract class ContainerSyncPacket implements IPacket {
     }
 
     public static abstract class Holder<T> extends ContainerSyncPacket {
+        @Nullable
         private T data;
 
         public Holder() {}
 
-        public Holder(int containerId, int index, T data) {
+        public Holder(int containerId, int index, @Nullable T data) {
             super(containerId, index);
             this.data = data;
         }
@@ -190,13 +194,17 @@ public abstract class ContainerSyncPacket implements IPacket {
         @Override
         public void serializeToBuf(FriendlyByteBuf buf) {
             super.serializeToBuf(buf);
-            this.dataToBuf(buf, this.data);
+            buf.writeBoolean(this.data != null);
+            if (this.data != null) {
+                this.dataToBuf(buf, this.data);
+            }
         }
 
         @Override
         public void deserializeFromBuf(FriendlyByteBuf buf) {
             super.deserializeFromBuf(buf);
-            this.data = this.dataFromBuf(buf);
+            var present = buf.readBoolean();
+            this.data = present ? this.dataFromBuf(buf) : null;
         }
 
         @Override
@@ -204,7 +212,7 @@ public abstract class ContainerSyncPacket implements IPacket {
             if (this == o) return true;
             if (!(o instanceof Holder<?> other)) return false;
             if (!super.equals(o)) return false;
-            return this.data.equals(other.data);
+            return Objects.equals(this.data, other.data);
         }
 
         @Override
@@ -212,26 +220,26 @@ public abstract class ContainerSyncPacket implements IPacket {
             return Objects.hash(super.hashCode(), this.data);
         }
 
-        public T getData() {
-            return data;
+        public Optional<T> getData() {
+            return Optional.ofNullable(data);
         }
     }
 
-    public static class StringHolder extends Holder<String> {
-        public StringHolder() {}
+    public static class LocHolder extends Holder<ResourceLocation> {
+        public LocHolder() {}
 
-        public StringHolder(int containerId, int index, String data) {
+        public LocHolder(int containerId, int index, @Nullable ResourceLocation data) {
             super(containerId, index, data);
         }
 
         @Override
-        protected void dataToBuf(FriendlyByteBuf buf, String data) {
-            buf.writeUtf(data);
+        protected void dataToBuf(FriendlyByteBuf buf, ResourceLocation data) {
+            buf.writeResourceLocation(data);
         }
 
         @Override
-        protected String dataFromBuf(FriendlyByteBuf buf) {
-            return buf.readUtf();
+        protected ResourceLocation dataFromBuf(FriendlyByteBuf buf) {
+            return buf.readResourceLocation();
         }
     }
 }

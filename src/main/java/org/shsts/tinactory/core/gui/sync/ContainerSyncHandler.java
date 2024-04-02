@@ -38,7 +38,7 @@ public final class ContainerSyncHandler {
         register(ContainerSyncPacket.Boolean.class, ContainerSyncPacket.Boolean::new);
         register(ContainerSyncPacket.Long.class, ContainerSyncPacket.Long::new);
         register(ContainerSyncPacket.Double.class, ContainerSyncPacket.Double::new);
-        register(ContainerSyncPacket.StringHolder.class, ContainerSyncPacket.StringHolder::new);
+        register(ContainerSyncPacket.LocHolder.class, ContainerSyncPacket.LocHolder::new);
         register(FluidSyncPacket.class, FluidSyncPacket::new);
     }
 }
