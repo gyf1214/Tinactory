@@ -4,7 +4,6 @@ import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
@@ -21,10 +20,10 @@ import static org.shsts.tinactory.core.gui.ContainerMenu.SPACING_VERTICAL;
 @MethodsReturnNonnullByDefault
 public final class MenuGen {
     public static <S extends MenuBuilder<? extends Machine, ?, ?, S>>
-    Transformer<S> machineMenu(Layout layout, Voltage voltage) {
+    Transformer<S> machineMenu(Layout layout) {
         var y = layout.rect.endY() + SPACING_VERTICAL;
         var x = CONTENT_WIDTH - SLOT_SIZE * 2;
-        return $ -> $.layout(layout, voltage)
+        return $ -> $.layout(layout)
                 .switchButton(Texture.SWITCH_BUTTON, x, y,
                         new TranslatableComponent("tinactory.tooltip.autoDumpItem"),
                         Machine::isAutoDumpItem,

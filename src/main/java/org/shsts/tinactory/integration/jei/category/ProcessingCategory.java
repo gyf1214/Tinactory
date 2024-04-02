@@ -29,7 +29,7 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
     public ProcessingCategory(RecipeType<T> type, IJeiHelpers helpers, Layout layout, ItemLike icon) {
         super(type, helpers, layout, new ItemStack(icon));
         this.portSlots = ArrayListMultimap.create();
-        var slots = layout.getStackSlots();
+        var slots = layout.slots;
         for (var slot : slots) {
             this.portSlots.put(slot.port(), slot);
         }

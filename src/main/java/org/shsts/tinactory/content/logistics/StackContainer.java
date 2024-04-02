@@ -19,7 +19,6 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.gui.Layout;
@@ -226,9 +225,9 @@ public class StackContainer implements ICapabilityProvider,
     public static class Builder implements Function<BlockEntity, ICapabilityProvider> {
         private final List<PortInfo> ports = new ArrayList<>();
 
-        public Builder layout(Layout layout, Voltage voltage) {
+        public Builder layout(Layout layout) {
             this.ports.clear();
-            var slots = layout.getStackSlots(voltage);
+            var slots = layout.slots.stream().filter(s -> s.type() != SlotType.NONE).toList();
             if (slots.isEmpty()) {
                 return this;
             }

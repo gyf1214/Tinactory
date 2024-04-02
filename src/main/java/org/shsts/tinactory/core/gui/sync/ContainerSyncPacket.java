@@ -172,4 +172,66 @@ public abstract class ContainerSyncPacket implements IPacket {
             return this.data;
         }
     }
+
+    public static abstract class Holder<T> extends ContainerSyncPacket {
+        private T data;
+
+        public Holder() {}
+
+        public Holder(int containerId, int index, T data) {
+            super(containerId, index);
+            this.data = data;
+        }
+
+        protected abstract void dataToBuf(FriendlyByteBuf buf, T data);
+
+        protected abstract T dataFromBuf(FriendlyByteBuf buf);
+
+        @Override
+        public void serializeToBuf(FriendlyByteBuf buf) {
+            super.serializeToBuf(buf);
+            this.dataToBuf(buf, this.data);
+        }
+
+        @Override
+        public void deserializeFromBuf(FriendlyByteBuf buf) {
+            super.deserializeFromBuf(buf);
+            this.data = this.dataFromBuf(buf);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Holder<?> other)) return false;
+            if (!super.equals(o)) return false;
+            return this.data.equals(other.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), this.data);
+        }
+
+        public T getData() {
+            return data;
+        }
+    }
+
+    public static class StringHolder extends Holder<String> {
+        public StringHolder() {}
+
+        public StringHolder(int containerId, int index, String data) {
+            super(containerId, index, data);
+        }
+
+        @Override
+        protected void dataToBuf(FriendlyByteBuf buf, String data) {
+            buf.writeUtf(data);
+        }
+
+        @Override
+        protected String dataFromBuf(FriendlyByteBuf buf) {
+            return buf.readUtf();
+        }
+    }
 }

@@ -21,12 +21,12 @@ public final class AllBlockEntities {
                 .blockEntity()
                 .ticking().hasEvent()
                 .capability(AllCapabilityProviders.STACK_CONTAINER, $ -> $
-                        .layout(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV))
+                        .layout(AllBlocks.TEST_FLUID_LAYOUT))
                 .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
                         .voltage(Voltage.ULV)
                         .recipeType(AllBlocks.TEST_RECIPE_TYPE.get()))
                 .menu()
-                .transform(MenuGen.machineMenu(AllBlocks.TEST_FLUID_LAYOUT, Voltage.ULV))
+                .transform(MenuGen.machineMenu(AllBlocks.TEST_FLUID_LAYOUT))
                 .build() // menu
                 .build() // blockEntity
                 .block()

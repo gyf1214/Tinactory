@@ -35,7 +35,7 @@ public final class AllBlocks {
                 .port(SlotType.FLUID_OUTPUT)
                 .slot(ContainerMenu.SLOT_SIZE * 3, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
-                .build();
+                .buildLayout();
 
         TEST_RECIPE_TYPE.modRecipe(TinactoryTest.modLoc("test"))
                 .outputFluid(1, Fluids.WATER, 1000)

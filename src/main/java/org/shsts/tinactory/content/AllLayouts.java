@@ -5,12 +5,14 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.logistics.SlotType;
 
+import java.util.Map;
+
 import static org.shsts.tinactory.core.gui.ContainerMenu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.ContainerMenu.SPACING_VERTICAL;
 
 public final class AllLayouts {
     public static final Layout WORKBENCH;
-    public static final Layout ORE_WASHER;
+    public static final Map<Voltage, Layout> ORE_WASHER;
 
     static {
         var workbenchBuilder = Layout.builder()
@@ -24,7 +26,7 @@ public final class AllLayouts {
                 workbenchBuilder.slot((2 + j) * SLOT_SIZE, i * SLOT_SIZE);
             }
         }
-        WORKBENCH = workbenchBuilder.build();
+        WORKBENCH = workbenchBuilder.buildLayout();
 
         ORE_WASHER = Layout.builder()
                 .port(SlotType.ITEM_INPUT)
@@ -38,6 +40,6 @@ public final class AllLayouts {
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 5 + 8, 1, Voltage.HV)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
-                .build();
+                .buildObject();
     }
 }

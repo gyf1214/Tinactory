@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.SlotItemHandler;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.gui.ContainerMenu;
@@ -182,16 +181,12 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
                 .widget(rect1, () -> menu -> new FluidSlot(menu, rect1, tank, syncSlot.get()));
     }
 
-    public S layout(Layout layout, int yOffset, Voltage voltage) {
-        return this.transform(layout.applyMenu(yOffset, voltage));
-    }
-
-    public S layout(Layout layout, Voltage voltage) {
-        return this.layout(layout, 0, voltage);
+    public S layout(Layout layout, int yOffset) {
+        return this.transform(layout.applyMenu(yOffset));
     }
 
     public S layout(Layout layout) {
-        return this.layout(layout, Voltage.MAXIMUM);
+        return this.layout(layout, 0);
     }
 
     public S noInventory() {

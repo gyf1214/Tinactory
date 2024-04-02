@@ -10,6 +10,7 @@ import org.shsts.tinactory.content.gui.MenuGen;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -29,13 +30,13 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @MethodsReturnNonnullByDefault
 public class ProcessingSet<T extends ProcessingRecipe<T>> {
     public final RecipeTypeEntry<T, ?> recipeType;
-    public final Layout layout;
+    public final Map<Voltage, Layout> layoutSet;
     protected final Map<Voltage, BlockEntitySet<Machine, MachineBlock<Machine>>> machines;
 
-    public ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Layout layout,
+    public ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Map<Voltage, Layout> layoutSet,
                          ResourceLocation frontOverlay, Collection<Voltage> voltages) {
         this.recipeType = recipeType;
-        this.layout = layout;
+        this.layoutSet = layoutSet;
         this.machines = voltages.stream()
                 .collect(Collectors.toMap($ -> $, voltage -> this.createMachine(voltage, frontOverlay)));
     }
@@ -43,6 +44,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
     protected BlockEntitySet<Machine, MachineBlock<Machine>>
     createMachine(Voltage voltage, ResourceLocation frontOverlay) {
         var id = "machine/" + voltage.id + "/" + this.recipeType.id;
+        var layout = this.layoutSet.get(voltage);
         var builder = REGISTRATE.blockEntitySet(id, Machine.factory(voltage), MachineBlock.factory(voltage))
                 .entityClass(Machine.class)
                 .blockEntity()
@@ -50,9 +52,9 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                 .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
                         .recipeType(this.recipeType.get()).voltage(voltage))
                 .capability(AllCapabilityProviders.STACK_CONTAINER, $ -> $
-                        .layout(this.layout, voltage))
+                        .layout(layout))
                 .menu()
-                .transform(MenuGen.machineMenu(this.layout, voltage))
+                .transform(MenuGen.machineMenu(layout))
                 .widget(() -> menu -> new MachineRecipeBook(menu, this.recipeType.get(), 0, 0))
                 .build() // menu
                 .build() // blockEntity
@@ -81,7 +83,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
         @Nullable
         private ResourceLocation frontOverlay = null;
         @Nullable
-        private Layout layout = null;
+        private Map<Voltage, Layout> layoutSet = null;
 
         private Builder(RecipeTypeEntry<T, ?> recipeType) {
             this.recipeType = recipeType;
@@ -97,20 +99,14 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
             return this;
         }
 
-        public Builder<T> layout(Layout layout) {
-            this.layout = layout;
-            return this;
-        }
-
-        public Layout.Builder<Builder<T>> layout() {
-            return Layout.builder(this)
-                    .onCreate(layout -> this.layout = layout);
+        public LayoutSetBuilder<Builder<T>> layoutSet() {
+            return Layout.builder(this, layoutSet -> this.layoutSet = layoutSet);
         }
 
         public ProcessingSet<T> build() {
             assert this.frontOverlay != null;
-            assert this.layout != null;
-            return new ProcessingSet<>(this.recipeType, this.layout,
+            assert this.layoutSet != null;
+            return new ProcessingSet<>(this.recipeType, this.layoutSet,
                     this.frontOverlay, this.voltages);
         }
     }

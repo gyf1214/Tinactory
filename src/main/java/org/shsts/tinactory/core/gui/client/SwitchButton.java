@@ -32,16 +32,6 @@ public class SwitchButton extends Button {
         this.syncSlot = syncSlot;
     }
 
-    public SwitchButton(ContainerMenu<?> menu, Rect rect, Texture texture,
-                        @Nullable Component tooltip, boolean initialValue,
-                        BiConsumer<? extends ContainerMenu<?>, Boolean> onSwitch) {
-        super(menu, rect, tooltip);
-        this.texture = texture;
-        this.onSwitch = onSwitch;
-        this.syncSlot = -1;
-        this.value = initialValue;
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     public void onMouseClicked(double mouseX, double mouseY, int button) {

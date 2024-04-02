@@ -61,23 +61,23 @@ public final class AllBlockEntities {
         STONE_GENERATOR = ProcessingSet.builder(AllRecipes.STONE_GENERATOR)
                 .frontOverlay(ModelGen.gregtech("blocks/machines/rock_crusher/overlay_front"))
                 .voltage(Voltage.PRIMITIVE, Voltage.LV)
-                .layout()
+                .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(ContainerMenu.SLOT_SIZE * 2, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8, 0)
-                .end()
+                .build()
                 .build();
 
         ORE_ANALYZER = ProcessingSet.builder(AllRecipes.ORE_ANALYZER)
                 .frontOverlay(ModelGen.gregtech("blocks/machines/electromagnetic_separator/overlay_front"))
                 .voltage(Voltage.PRIMITIVE, Voltage.LV)
-                .layout()
+                .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(ContainerMenu.SLOT_SIZE * 3, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + ContainerMenu.SLOT_SIZE, 0)
-                .end()
+                .build()
                 .build();
     }
 

@@ -72,8 +72,9 @@ public class JEI implements IModPlugin {
 
     private static <T extends ProcessingRecipe<T>> CategoryInfo<SmartRecipe.ContainerWrapper<IContainer>, T>
     processing(ProcessingSet<T> processingSet) {
+        var layout = processingSet.layoutSet.get(Voltage.MAXIMUM);
         return category(processingSet.recipeType, (type, helpers) -> new ProcessingCategory<>(type, helpers,
-                        processingSet.layout, processingSet.getBlock(Voltage.LV)),
+                        layout, processingSet.getBlock(Voltage.LV)),
                 AllTags.processingMachine(processingSet.recipeType));
     }
 

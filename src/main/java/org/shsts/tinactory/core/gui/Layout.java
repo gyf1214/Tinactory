@@ -11,8 +11,8 @@ import org.shsts.tinactory.registrate.builder.MenuBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
@@ -20,9 +20,9 @@ import java.util.function.Consumer;
 public class Layout {
     public record WidgetInfo(Rect rect, Texture texture) {}
 
-    public record SlotInfo(int index, int x, int y, int port, SlotType type, Voltage requiredVoltage) {
+    public record SlotInfo(int index, int x, int y, int port, SlotType type) {
         public SlotInfo setIndex(int index) {
-            return new SlotInfo(index, this.x, this.y, this.port, this.type, this.requiredVoltage);
+            return new SlotInfo(index, this.x, this.y, this.port, this.type);
         }
     }
 
@@ -32,7 +32,7 @@ public class Layout {
     public final WidgetInfo progressBar;
     public final Rect rect;
 
-    private Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable WidgetInfo progressBar) {
+    public Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable WidgetInfo progressBar) {
         this.slots = slots;
         this.images = images;
         this.progressBar = progressBar;
@@ -55,11 +55,10 @@ public class Layout {
         this.rect = new Rect(0, 0, maxX, maxY);
     }
 
-    public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu(int yOffset, Voltage voltage) {
+    public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu(int yOffset) {
         return builder -> {
             var xOffset = (ContainerMenu.CONTENT_WIDTH - this.rect.width()) / 2;
-            var slots = this.getStackSlots(voltage);
-            for (var slot : slots) {
+            for (var slot : this.slots) {
                 var x = xOffset + slot.x;
                 var y = yOffset + slot.y;
                 switch (slot.type.portType) {
@@ -80,99 +79,11 @@ public class Layout {
         };
     }
 
-    public List<SlotInfo> getStackSlots() {
-        return this.getStackSlots(Voltage.MAXIMUM);
+    public static <P> LayoutSetBuilder<P> builder(P parent, Consumer<Map<Voltage, Layout>> onCreate) {
+        return new LayoutSetBuilder<>(parent, onCreate);
     }
 
-    public List<SlotInfo> getStackSlots(Voltage voltage) {
-        var ret = new ArrayList<SlotInfo>();
-        var fluidSlots = 0;
-        var itemSlots = 0;
-        for (var slot : this.slots) {
-            var index = -1;
-            switch (slot.type.portType) {
-                case ITEM -> index = itemSlots++;
-                case FLUID -> index = fluidSlots++;
-            }
-            if (slot.port < 0 || index < 0 || voltage.compareTo(slot.requiredVoltage) < 0) {
-                continue;
-            }
-            ret.add(slot.setIndex(index));
-        }
-        return ret;
-    }
-
-    public static class Builder<P> {
-        private final P parent;
-        @Nullable
-        Consumer<Layout> onCreateObject = null;
-        private final List<SlotInfo> slots = new ArrayList<>();
-        private final List<WidgetInfo> images = new ArrayList<>();
-        @Nullable
-        private WidgetInfo progressBar = null;
-        private SlotType curSlotType = SlotType.NONE;
-        private int curPort = -1;
-        private int curSlot = 0;
-
-        private Builder(P parent) {
-            this.parent = parent;
-        }
-
-        public Builder<P> dummySlot(int x, int y) {
-            this.slots.add(new SlotInfo(0, x, y, 0, SlotType.NONE, Voltage.PRIMITIVE));
-            return this;
-        }
-
-        public Builder<P> port(SlotType type) {
-            this.curPort++;
-            this.curSlotType = type;
-            return this;
-        }
-
-        public Builder<P> slot(int x, int y, Voltage requiredVoltage) {
-            assert this.curPort >= 0;
-            this.slots.add(new SlotInfo(this.curSlot++, x, y, this.curPort, this.curSlotType, requiredVoltage));
-            return this;
-        }
-
-        public Builder<P> slot(int x, int y) {
-            return this.slot(x, y, Voltage.PRIMITIVE);
-        }
-
-        public Builder<P> image(Rect rect, Texture tex) {
-            this.images.add(new WidgetInfo(rect, tex));
-            return this;
-        }
-
-        public Builder<P> progressBar(Texture tex, int x, int y) {
-            this.progressBar = new WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
-            return this;
-        }
-
-        public Builder<P> onCreate(Consumer<Layout> cons) {
-            this.onCreateObject = cons;
-            return this;
-        }
-
-        public Layout build() {
-            var ret = new Layout(this.slots, this.images, this.progressBar);
-            if (this.onCreateObject != null) {
-                this.onCreateObject.accept(ret);
-            }
-            return ret;
-        }
-
-        public P end() {
-            this.build();
-            return this.parent;
-        }
-    }
-
-    public static <P> Builder<P> builder(P parent) {
-        return new Builder<>(parent);
-    }
-
-    public static Builder<?> builder() {
-        return new Builder<>(Unit.INSTANCE);
+    public static LayoutSetBuilder<?> builder() {
+        return new LayoutSetBuilder<>(Unit.INSTANCE);
     }
 }
