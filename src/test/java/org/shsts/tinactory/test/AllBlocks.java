@@ -1,7 +1,11 @@
 package org.shsts.tinactory.test;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluids;
+import org.shsts.tinactory.content.AllMaterials;
+import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.gui.ContainerMenu;
@@ -25,6 +29,7 @@ public final class AllBlocks {
     public static final Layout TEST_FLUID_LAYOUT;
     public static final RegistryEntry<SimpleFluid> TEST_STEAM;
     public static final RegistryEntry<FluidCell> TEST_FLUID_CELL;
+    public static final RegistryEntry<Item> TEST_ORE;
 
     static {
         TEST_RECIPE_TYPE = REGISTRATE.simpleProcessingRecipeType("test");
@@ -47,6 +52,17 @@ public final class AllBlocks {
         TEST_FLUID_CELL = REGISTRATE.item("fluid_cell", properties -> new FluidCell(properties, 16000))
                 .model(ModelGen.basicItem(ModelGen.gregtech("items/metaitems/fluid_cell/base")))
                 .register();
+
+        TEST_ORE = REGISTRATE.item("test_ore", Item::new)
+                .model(ModelGen.basicItem(ModelGen.modLoc("items/material/raw")))
+                .tint(0xFFFF6400)
+                .register();
+
+        AllRecipes.ORE_ANALYZER.recipe(REGISTRATE, new ResourceLocation(TinactoryTest.ID, "test_ore"))
+                .inputItem(0, AllMaterials.STONE.getItemEntry("dust"), 1)
+                .outputItem(1, TEST_ORE, 1, 0.75f)
+                .workTicks(20)
+                .build();
     }
 
     public static void init() {}

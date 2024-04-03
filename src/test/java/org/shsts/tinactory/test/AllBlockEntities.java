@@ -27,6 +27,7 @@ public final class AllBlockEntities {
                         .recipeType(AllBlocks.TEST_RECIPE_TYPE.get()))
                 .menu()
                 .transform(MenuGen.machineMenu(AllBlocks.TEST_FLUID_LAYOUT))
+                .transform(MenuGen.machineRecipeBook(AllBlocks.TEST_RECIPE_TYPE, AllBlocks.TEST_FLUID_LAYOUT))
                 .build() // menu
                 .build() // blockEntity
                 .block()

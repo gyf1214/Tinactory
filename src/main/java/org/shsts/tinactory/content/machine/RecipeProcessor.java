@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,29 +26,34 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabilityProvider,
         IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
-    protected static final long PROGRESS_PER_TICK = 256;
+    private static final long PROGRESS_PER_TICK = 256;
 
-    protected final BlockEntity blockEntity;
-    protected final RecipeType<? extends T> recipeType;
-    protected final Voltage voltage;
-    protected long workProgress = 0;
+    private final BlockEntity blockEntity;
+    private final RecipeType<? extends T> recipeType;
+    private final Voltage voltage;
+    private long workProgress = 0;
 
     /**
      * This is only used during deserializeNBT when world is not available.
      */
     @Nullable
-    protected ResourceLocation currentRecipeLoc = null;
+    private ResourceLocation currentRecipeLoc = null;
     @Nullable
-    protected T currentRecipe = null;
+    private T currentRecipe = null;
     @Nullable
-    protected IContainer container = null;
-    protected boolean needUpdate = true;
+    private ResourceLocation targetRecipeLoc = null;
+    @Nullable
+    private T targetRecipe = null;
+    @Nullable
+    private IContainer container = null;
+    private boolean needUpdate = true;
 
     public RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
         this.blockEntity = blockEntity;
@@ -55,38 +61,46 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         this.voltage = voltage;
     }
 
-    protected IContainer getContainer() {
+    private IContainer getContainer() {
         if (this.container == null) {
             this.container = AllCapabilities.CONTAINER.getCapability(this.blockEntity);
         }
         return this.container;
     }
 
-    protected Level getWorld() {
+    private Level getWorld() {
         var world = this.blockEntity.getLevel();
         assert world != null;
         return world;
     }
 
-    protected void updateRecipe() {
+    private void updateRecipe() {
         if (this.currentRecipe != null || !this.needUpdate) {
             return;
         }
         var world = this.getWorld();
-        this.currentRecipe = SmartRecipe.getRecipeFor(this.recipeType, this.getContainer(), world)
-                .orElse(null);
+        assert this.currentRecipeLoc == null;
+        this.currentRecipe = null;
+        if (this.targetRecipe != null) {
+            if (this.targetRecipe.matches(this.getContainer(), world)) {
+                this.currentRecipe = this.targetRecipe;
+            }
+        } else {
+            var matches = SmartRecipe.getRecipesFor(this.recipeType, this.getContainer(), world);
+            if (matches.size() == 1) {
+                this.currentRecipe = matches.get(0);
+            }
+        }
         this.workProgress = 0;
         if (this.currentRecipe != null) {
             this.currentRecipe.consumeInputs(this.getContainer());
-            this.blockEntity.setChanged();
         }
         this.needUpdate = false;
+        this.blockEntity.setChanged();
     }
 
-    protected long getMaxWorkTicks() {
-        if (this.currentRecipe == null) {
-            return 0;
-        }
+    private long getMaxWorkTicks() {
+        assert this.currentRecipe != null;
         return this.currentRecipe.workTicks * PROGRESS_PER_TICK;
     }
 
@@ -104,6 +118,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         this.workProgress += progress;
         var world = this.getWorld();
         if (this.workProgress >= this.getMaxWorkTicks()) {
+            assert this.currentRecipe != null;
             this.currentRecipe.insertOutputs(this.getContainer(), world.random);
             this.currentRecipe = null;
             this.needUpdate = true;
@@ -117,6 +132,23 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
             return 0;
         }
         return (double) this.workProgress / (double) this.getMaxWorkTicks();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void setTargetRecipe(@Nullable ProcessingRecipe<?> recipe) {
+        assert this.targetRecipeLoc == null;
+        if (recipe == null) {
+            this.targetRecipe = null;
+        } else if (recipe.getType() == this.recipeType) {
+            this.targetRecipe = (T) recipe;
+        }
+        this.blockEntity.setChanged();
+    }
+
+    @Override
+    public Optional<ProcessingRecipe<?>> getTargetRecipe() {
+        return Optional.ofNullable(this.targetRecipe);
     }
 
     @Override
@@ -141,19 +173,25 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     }
 
     @SuppressWarnings("unchecked")
-    protected void onLoad(Level world) {
-        if (this.currentRecipeLoc == null) {
-            return;
-        }
-        world.getRecipeManager().byKey(this.currentRecipeLoc).ifPresent(recipe -> {
-            if (this.recipeType == recipe.getType()) {
-                this.currentRecipe = (T) recipe;
-            }
-        });
+    @Nullable
+    private T recipeByKey(RecipeManager recipeManager, @Nullable ResourceLocation loc) {
+        return (T) Optional.ofNullable(loc)
+                .flatMap(recipeManager::byKey)
+                .filter(r -> r.getType() == this.recipeType)
+                .orElse(null);
+    }
+
+    private void onLoad(Level world) {
+        var recipeManager = world.getRecipeManager();
+
+        this.currentRecipe = this.recipeByKey(recipeManager, this.currentRecipeLoc);
         this.currentRecipeLoc = null;
         if (this.currentRecipe != null) {
             this.needUpdate = false;
         }
+
+        this.targetRecipe = this.recipeByKey(recipeManager, this.targetRecipeLoc);
+        this.targetRecipeLoc = null;
     }
 
     private void onContainerChange(boolean isInput) {
@@ -186,6 +224,11 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
             tag.putString("currentRecipe", recipeLoc.toString());
             tag.putLong("workProgress", this.workProgress);
         }
+        var targetRecipeLoc = this.targetRecipeLoc != null ? this.targetRecipeLoc :
+                (this.targetRecipe != null ? this.targetRecipe.getId() : null);
+        if (targetRecipeLoc != null) {
+            tag.putString("targetRecipe", targetRecipeLoc.toString());
+        }
         return tag;
     }
 
@@ -197,6 +240,11 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
             this.workProgress = tag.getLong("workProgress");
         } else {
             this.currentRecipeLoc = null;
+        }
+        if (tag.contains("targetRecipe", Tag.TAG_STRING)) {
+            this.targetRecipeLoc = new ResourceLocation(tag.getString("targetRecipe"));
+        } else {
+            this.targetRecipeLoc = null;
         }
     }
 

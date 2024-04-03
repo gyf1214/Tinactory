@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -17,6 +16,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.CompositeNetwork;
 import org.shsts.tinactory.core.network.Network;
@@ -40,10 +40,6 @@ public class Machine extends SmartBlockEntity {
 
     protected boolean autoDumpItem;
     protected boolean autoDumpFluid;
-    @Nullable
-    protected ResourceLocation targetRecipeLoc;
-    @Nullable
-    protected ProcessingRecipe<?> targetRecipe;
 
     public Machine(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -73,34 +69,29 @@ public class Machine extends SmartBlockEntity {
         this.autoDumpFluid = autoDumpFluid;
     }
 
-    @Nullable
-    public ResourceLocation getTargetRecipeLoc() {
-        return this.targetRecipe == null ? null : this.targetRecipe.getId();
+    public Optional<ResourceLocation> getTargetRecipeLoc() {
+        return this.getProcessor()
+                .flatMap(IProcessor::getTargetRecipe)
+                .map(SmartRecipe::getId);
     }
 
     public void setTargetRecipeLoc(@Nullable ResourceLocation loc) {
-        if (this.level == null || this.level.isClientSide) {
+        var processor = this.getProcessor().orElse(null);
+        if (this.level == null || this.level.isClientSide || processor == null) {
             return;
         }
         if (loc == null) {
-            this.targetRecipe = null;
-            return;
+            processor.setTargetRecipe(null);
+        } else {
+            this.level.getRecipeManager().byKey(loc)
+                    .flatMap(optionalCastor(ProcessingRecipe.class))
+                    .ifPresent(processor::setTargetRecipe);
         }
-        var recipeManager = this.level.getRecipeManager();
-        this.targetRecipe = recipeManager.byKey(loc)
-                .flatMap(optionalCastor(ProcessingRecipe.class))
-                .orElse(null);
     }
 
     @Override
     protected void onLoad(Level world) {
         super.onLoad(world);
-        if (!world.isClientSide && this.targetRecipeLoc != null) {
-            var recipeManager = world.getRecipeManager();
-            this.targetRecipe = recipeManager.byKey(this.targetRecipeLoc)
-                    .flatMap(optionalCastor(ProcessingRecipe.class))
-                    .orElse(null);
-        }
         LOGGER.debug("machine {}: loaded", this);
     }
 
@@ -178,22 +169,11 @@ public class Machine extends SmartBlockEntity {
     protected void serializeOnSave(CompoundTag tag) {
         tag.putBoolean("autoDumpItem", this.autoDumpItem);
         tag.putBoolean("autoDumpFluid", this.autoDumpFluid);
-        var recipeLoc = this.targetRecipeLoc != null ? this.targetRecipeLoc :
-                (this.targetRecipe != null ? this.targetRecipe.getId() : null);
-        if (recipeLoc != null) {
-            tag.putString("targetRecipe", recipeLoc.toString());
-        }
     }
 
     @Override
     protected void deserializeOnSave(CompoundTag tag) {
         this.autoDumpItem = tag.getBoolean("autoDumpItem");
         this.autoDumpFluid = tag.getBoolean("autoDumpFluid");
-        if (tag.contains("targetRecipe", Tag.TAG_STRING)) {
-            this.targetRecipeLoc = new ResourceLocation(tag.getString("targetRecipe"));
-        } else {
-            this.targetRecipeLoc = null;
-            this.targetRecipe = null;
-        }
     }
 }

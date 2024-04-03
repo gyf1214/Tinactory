@@ -51,8 +51,16 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
         return this.builderFactory.create(this.registrate, this, loc);
     }
 
+    public B getBuilder(Registrate registrate, ResourceLocation loc) {
+        return this.builderFactory.create(registrate, this, loc);
+    }
+
     public B recipe(ResourceLocation loc) {
         return this.defaultTransformer.apply(this.getBuilder(loc));
+    }
+
+    public B recipe(Registrate registrate, ResourceLocation loc) {
+        return this.defaultTransformer.apply(this.getBuilder(registrate, loc));
     }
 
     public B modRecipe(Item item) {

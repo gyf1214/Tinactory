@@ -8,26 +8,30 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.core.recipe.ProcessingResults;
+import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class RenderUtil {
-    public static void blit(PoseStack poseStack, Texture tex, int zIndex, int x, int y) {
-        var width = tex.width();
-        var height = tex.height();
-        blit(poseStack, tex, zIndex, new Rect(x, y, width, height), new Rect(0, 0, width, height));
-    }
+    private static final int CYCLE_TIME = 1000;
 
     public static void blit(PoseStack poseStack, Texture tex, int zIndex, Rect dstRect) {
         blit(poseStack, tex, zIndex, dstRect, new Rect(0, 0, dstRect.width(), dstRect.height()));
@@ -63,6 +67,8 @@ public final class RenderUtil {
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         setGLColor(color);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderTexture(0, tex.loc());
         BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
@@ -72,6 +78,7 @@ public final class RenderUtil {
         bufferbuilder.vertex(mat, sx, sy, zz).uv(su, sv).endVertex();
         bufferbuilder.end();
         BufferUploader.end(bufferbuilder);
+        RenderSystem.disableBlend();
     }
 
     public static void blitAtlas(PoseStack poseStack, ResourceLocation atlas, TextureAtlasSprite sprite,
@@ -90,6 +97,8 @@ public final class RenderUtil {
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         setGLColor(color);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderTexture(0, atlas);
         BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
@@ -99,6 +108,68 @@ public final class RenderUtil {
         bufferbuilder.vertex(mat, sx, sy, zz).uv(su, sv).endVertex();
         bufferbuilder.end();
         BufferUploader.end(bufferbuilder);
+        RenderSystem.disableBlend();
+    }
+
+    public static int mixColor(int color1, int color2) {
+        var a1 = (color1 >> 24) & 0xFF;
+        var r1 = (color1 >> 16) & 0xFF;
+        var g1 = (color1 >> 8) & 0xFF;
+        var b1 = color1 & 0xFF;
+
+        var a2 = (color2 >> 24) & 0xFF;
+        var r2 = (color2 >> 16) & 0xFF;
+        var g2 = (color2 >> 8) & 0xFF;
+        var b2 = color2 & 0xFF;
+
+        var a = a1 * a2 / 0xFF;
+        var r = r1 * r2 / 0xFF;
+        var g = g1 * g2 / 0xFF;
+        var b = b1 * b2 / 0xFF;
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    public static void renderFluid(PoseStack poseStack, FluidStack stack, Rect rect, int color, int zIndex) {
+        var fluid = stack.getFluid();
+        if (!stack.isEmpty() && fluid != null) {
+            var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+            var attribute = fluid.getAttributes();
+            var sprite = atlas.apply(attribute.getStillTexture());
+            var renderColor = mixColor(attribute.getColor(), color);
+            RenderUtil.blitAtlas(poseStack, InventoryMenu.BLOCK_ATLAS, sprite, renderColor, zIndex, rect);
+        }
+    }
+
+    public static void renderFluid(PoseStack poseStack, FluidStack stack, Rect rect, int zIndex) {
+        renderFluid(poseStack, stack, rect, 0xFFFFFFFF, zIndex);
+    }
+
+    public static void renderItem(ItemStack stack, int x, int y) {
+        ClientUtil.getItemRenderer().renderAndDecorateFakeItem(stack, x, y);
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableBlend();
+    }
+
+    public static <I>
+    void renderIngredient(I ingredient, Consumer<ItemStack> itemRenderer,
+                          Consumer<FluidStack> fluidRenderer) {
+
+        if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
+            itemRenderer.accept(item.stack());
+        } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
+            var items = item.ingredient().getItems();
+            if (items.length > 0) {
+                var cycle = System.currentTimeMillis() / CYCLE_TIME;
+                var idx = (int) (cycle % items.length);
+                itemRenderer.accept(items[idx]);
+            }
+        } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
+            fluidRenderer.accept(fluid.fluid());
+        } else if (ingredient instanceof ProcessingResults.ItemResult item) {
+            itemRenderer.accept(item.stack);
+        } else if (ingredient instanceof ProcessingResults.FluidResult fluid) {
+            fluidRenderer.accept(fluid.stack);
+        }
     }
 
     public static void fill(PoseStack poseStack, Rect rect, int color) {

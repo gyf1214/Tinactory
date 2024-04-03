@@ -49,7 +49,8 @@ public final class MenuGen {
         return $ -> $
                 .widget(() -> menu -> new MachineRecipeBook(menu, recipeType.get(), 0, 0))
                 .syncWidget(ContainerSyncPacket.LocHolder.class, (containerId, index, $1, be) ->
-                                new ContainerSyncPacket.LocHolder(containerId, index, be.getTargetRecipeLoc()),
+                                new ContainerSyncPacket.LocHolder(containerId, index,
+                                        be.getTargetRecipeLoc().orElse(null)),
                         () -> (menu, slot) -> new GhostRecipe(menu, slot, layout));
     }
 }

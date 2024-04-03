@@ -4,10 +4,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
@@ -76,16 +74,7 @@ public class FluidSlot extends ContainerWidget {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var fluidStack = this.getFluidStack();
-        var fluid = fluidStack.getFluid();
-
-        if (!fluidStack.isEmpty() && fluid != null) {
-            var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
-            var attribute = fluid.getAttributes();
-            var sprite = atlas.apply(attribute.getStillTexture());
-            RenderUtil.blitAtlas(poseStack, InventoryMenu.BLOCK_ATLAS, sprite,
-                    attribute.getColor(), this.zIndex, this.rect);
-        }
+        RenderUtil.renderFluid(poseStack, this.getFluidStack(), this.rect, this.zIndex);
 
         if (this.isHovering(mouseX, mouseY)) {
             RenderSystem.colorMask(true, true, true, false);

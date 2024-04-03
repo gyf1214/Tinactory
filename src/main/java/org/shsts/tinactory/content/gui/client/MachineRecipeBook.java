@@ -16,6 +16,7 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.ContainerWidget;
 import org.shsts.tinactory.core.gui.client.Panel;
+import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
@@ -82,10 +83,13 @@ public class MachineRecipeBook extends Panel {
             if (this.recipe != null) {
                 StretchImage.render(poseStack, RECIPE_BOOK_BG, this.zIndex, this.rect,
                         BUTTON_TEX_RECT, BUTTON_BORDER);
-                var item = this.recipe.getResultItem();
                 var x = this.rect.x() + 2;
                 var y = this.rect.y() + 2;
-                ClientUtil.getItemRenderer().renderAndDecorateFakeItem(item, x, y);
+                var output = this.recipe.getResult();
+                RenderUtil.renderIngredient(output,
+                        stack -> RenderUtil.renderItem(stack, x, y),
+                        stack -> RenderUtil.renderFluid(poseStack, stack,
+                                new Rect(x, y, 16, 16), this.zIndex));
             }
         }
 

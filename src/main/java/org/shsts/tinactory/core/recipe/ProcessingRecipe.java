@@ -95,12 +95,18 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     @Override
     public ItemStack getResultItem() {
-        var output = this.outputs.stream().min(Comparator.comparingInt(a -> a.port));
-        if (output.isPresent() && output.get().result instanceof ProcessingResults.ItemResult itemResult) {
-            return itemResult.stack;
+        var output = this.getResult();
+        if (output instanceof ProcessingResults.ItemResult item) {
+            return item.stack;
         } else {
             return ItemStack.EMPTY;
         }
+    }
+
+    public IProcessingResult getResult() {
+        return this.outputs.stream().min(Comparator.comparingInt(a -> a.port))
+                .map(Output::result)
+                .orElse(new ProcessingResults.ItemResult(true, 0f, ItemStack.EMPTY));
     }
 
     public static class Simple extends ProcessingRecipe<Simple> {
@@ -194,11 +200,6 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
         public S power(long power) {
             this.power = power;
-            return self();
-        }
-
-        public S amperage(double amperage) {
-            this.power = (long) (amperage * this.voltage);
             return self();
         }
 

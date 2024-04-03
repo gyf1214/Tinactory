@@ -40,15 +40,15 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class StackContainer implements ICapabilityProvider,
         IContainer, IEventSubscriber, INBTSerializable<CompoundTag> {
-    protected record PortInfo(int startSlot, int endSlot, SlotType type,
-                              IPort port, IPort internalPort) {}
+    private record PortInfo(int startSlot, int endSlot, SlotType type,
+                            IPort port, IPort internalPort) {}
 
-    protected final BlockEntity blockEntity;
-    protected final IItemHandlerModifiable combinedItems;
-    protected final CombinedFluidTank combinedFluids;
-    protected final List<PortInfo> ports;
+    private final BlockEntity blockEntity;
+    private final IItemHandlerModifiable combinedItems;
+    private final CombinedFluidTank combinedFluids;
+    private final List<PortInfo> ports;
 
-    protected StackContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
+    private StackContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
         this.ports = new ArrayList<>(portInfo.size());
         var items = new ArrayList<WrapperItemHandler>(portInfo.size());
@@ -121,12 +121,12 @@ public class StackContainer implements ICapabilityProvider,
         this.combinedFluids = new CombinedFluidTank(fluids.toArray(WrapperFluidTank[]::new));
     }
 
-    protected void onInputUpdate() {
+    private void onInputUpdate() {
         EventManager.invoke(this.blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, true);
         this.blockEntity.setChanged();
     }
 
-    protected void onOutputUpdate() {
+    private void onOutputUpdate() {
         EventManager.invoke(this.blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, false);
         this.blockEntity.setChanged();
     }
