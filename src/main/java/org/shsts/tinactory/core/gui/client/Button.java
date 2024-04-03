@@ -2,11 +2,13 @@ package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,6 +31,10 @@ public abstract class Button extends ContainerWidget {
         this.tooltip = tooltip;
     }
 
+    protected void playDownSound() {
+        ClientUtil.playSound(SoundEvents.UI_BUTTON_CLICK);
+    }
+
     @Override
     protected boolean canHover() {
         return true;
@@ -40,10 +46,12 @@ public abstract class Button extends ContainerWidget {
     }
 
     @Override
-    protected boolean canClick() {
-        return true;
+    protected boolean canClick(int button) {
+        return button == 0;
     }
 
     @Override
-    public abstract void onMouseClicked(double mouseX, double mouseY, int button);
+    public void onMouseClicked(double mouseX, double mouseY, int button) {
+        this.playDownSound();
+    }
 }

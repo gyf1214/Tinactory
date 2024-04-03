@@ -96,7 +96,7 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.rootPanel.isClicking(mouseX, mouseY)) {
+        if (this.rootPanel.isClicking(mouseX, mouseY, button)) {
             this.rootPanel.onMouseClicked(mouseX, mouseY, button);
             return true;
         }

@@ -8,8 +8,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
         }
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public FluidStack getFluid() {
         return this.tank.getFluid();
@@ -74,7 +74,7 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
         return ret;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public FluidStack drain(FluidStack fluid, IFluidHandler.FluidAction action) {
         var ret = this.allowOutput ? this.tank.drain(fluid, action) : FluidStack.EMPTY;
@@ -84,7 +84,7 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
         return ret;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public FluidStack drain(int maxDrain, IFluidHandler.FluidAction action) {
         var ret = this.allowOutput ? this.tank.drain(maxDrain, action) : FluidStack.EMPTY;

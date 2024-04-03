@@ -3,12 +3,12 @@ package org.shsts.tinactory.core.gui.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
@@ -53,7 +53,4 @@ public abstract class SimpleButton extends Button {
             RenderUtil.blit(poseStack, this.texture, this.zIndex, this.rect, this.normalX, this.normalY);
         }
     }
-
-    @Override
-    public abstract void onMouseClicked(double mouseX, double mouseY, int button);
 }

@@ -13,8 +13,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -25,6 +23,8 @@ import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Function;
@@ -143,6 +143,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         } else if (recipe.getType() == this.recipeType) {
             this.targetRecipe = (T) recipe;
         }
+        this.needUpdate = true;
         this.blockEntity.setChanged();
     }
 
@@ -206,7 +207,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         eventManager.subscribe(AllBlockEntityEvents.CONTAINER_CHANGE, this::onContainerChange);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public <T1> LazyOptional<T1> getCapability(Capability<T1> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.PROCESSOR.get()) {

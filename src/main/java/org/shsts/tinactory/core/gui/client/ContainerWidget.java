@@ -69,12 +69,12 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
         return Optional.empty();
     }
 
-    protected boolean canClick() {
+    protected boolean canClick(int button) {
         return false;
     }
 
-    public boolean isClicking(double mouseX, double mouseY) {
-        return this.canClick() && this.rect.in(mouseX, mouseY);
+    public boolean isClicking(double mouseX, double mouseY, int button) {
+        return this.canClick(button) && this.rect.in(mouseX, mouseY);
     }
 
     /**

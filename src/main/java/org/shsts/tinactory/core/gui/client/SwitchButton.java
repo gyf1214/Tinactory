@@ -35,10 +35,9 @@ public class SwitchButton extends Button {
     @Override
     @SuppressWarnings("unchecked")
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
-            this.value = !this.value;
-            ((BiConsumer<ContainerMenu<?>, Boolean>) this.onSwitch).accept(this.menu, this.value);
-        }
+        super.onMouseClicked(mouseX, mouseY, button);
+        this.value = !this.value;
+        ((BiConsumer<ContainerMenu<?>, Boolean>) this.onSwitch).accept(this.menu, this.value);
     }
 
     @Override

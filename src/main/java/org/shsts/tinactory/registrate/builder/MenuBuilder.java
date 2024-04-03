@@ -36,6 +36,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
@@ -123,7 +124,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     S syncWidget(Class<P1> packetClazz, ContainerMenu.SyncPacketFactory<T, P1> packetFactory,
                  Supplier<BiFunction<M, Integer, ContainerWidget>> widgetFactory) {
         var syncSlot = this.addSyncSlot(packetClazz, packetFactory);
-        this.widgets.add(() -> menu -> widgetFactory.get().apply(menu, syncSlot.get()));
+        this.widgets.add(() -> menu -> widgetFactory.get().apply(menu, syncSlot.getAsInt()));
         return self();
     }
 
@@ -153,10 +154,10 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     protected <P1 extends ContainerSyncPacket>
-    Supplier<Integer> addSyncSlot(Class<P1> clazz, ContainerMenu.SyncPacketFactory<T, P1> factory) {
+    IntSupplier addSyncSlot(Class<P1> clazz, ContainerMenu.SyncPacketFactory<T, P1> factory) {
         var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(clazz, factory));
         this.menuCallbacks.add(callback);
-        return callback;
+        return callback::get;
     }
 
     public S progressBar(Texture tex, Rect rect, ToDoubleFunction<T> progressReader) {

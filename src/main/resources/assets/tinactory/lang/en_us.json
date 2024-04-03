@@ -2,5 +2,6 @@
   "tinactory.tooltip.liquid": "%s mB",
   "tinactory.tooltip.autoDumpItem": "Automatically output item to network",
   "tinactory.tooltip.autoDumpFluid": "Automatically output fluid to network",
-  "tinactory.tooltip.openRecipeBook": "Open recipe book"
+  "tinactory.tooltip.openRecipeBook": "Open recipe book",
+  "tinactory.tooltip.unselectRecipe": "Clear recipe"
 }

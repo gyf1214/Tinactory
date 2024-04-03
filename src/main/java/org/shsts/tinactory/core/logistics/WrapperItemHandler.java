@@ -6,8 +6,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +53,13 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         return this.compose.getSlots();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
         return this.compose.getStackInSlot(slot);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
         if (!this.allowInput) {
@@ -72,7 +72,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         return reminder;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (!this.allowOutput) {

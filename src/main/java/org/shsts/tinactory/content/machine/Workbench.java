@@ -23,8 +23,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
@@ -34,6 +32,8 @@ import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.slf4j.Logger;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
@@ -64,7 +64,7 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
             super(size);
         }
 
-        @NotNull
+        @Nonnull
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             return isItemValid(slot, stack) ? super.insertItem(slot, stack, simulate) : stack;
@@ -211,7 +211,7 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         return this.toolStorage;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {

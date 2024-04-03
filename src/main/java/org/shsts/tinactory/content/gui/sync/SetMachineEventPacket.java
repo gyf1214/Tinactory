@@ -50,6 +50,7 @@ public class SetMachineEventPacket extends ContainerEventPacket {
         super.serializeToBuf(buf);
         buf.writeOptional(Optional.ofNullable(this.autoDumpItem), FriendlyByteBuf::writeBoolean);
         buf.writeOptional(Optional.ofNullable(this.autoDumpFluid), FriendlyByteBuf::writeBoolean);
+        buf.writeBoolean(this.resetTargetRecipe);
         buf.writeOptional(Optional.ofNullable(this.targetRecipeLoc), FriendlyByteBuf::writeResourceLocation);
     }
 
@@ -58,6 +59,7 @@ public class SetMachineEventPacket extends ContainerEventPacket {
         super.deserializeFromBuf(buf);
         this.autoDumpItem = buf.readOptional(FriendlyByteBuf::readBoolean).orElse(null);
         this.autoDumpFluid = buf.readOptional(FriendlyByteBuf::readBoolean).orElse(null);
+        this.resetTargetRecipe = buf.readBoolean();
         this.targetRecipeLoc = buf.readOptional(FriendlyByteBuf::readResourceLocation).orElse(null);
     }
 
@@ -80,12 +82,13 @@ public class SetMachineEventPacket extends ContainerEventPacket {
             return this;
         }
 
-        public Builder targetRecipeLoc(@Nullable ResourceLocation value) {
-            if (value == null) {
-                this.resetTargetRecipeLoc = true;
-            } else {
-                this.targetRecipeLoc = value;
-            }
+        public Builder targetRecipeLoc(ResourceLocation value) {
+            this.targetRecipeLoc = value;
+            return this;
+        }
+
+        public Builder resetTargetRecipe() {
+            this.resetTargetRecipeLoc = true;
             return this;
         }
 

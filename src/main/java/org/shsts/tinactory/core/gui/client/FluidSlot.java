@@ -62,8 +62,8 @@ public class FluidSlot extends ContainerWidget {
     }
 
     @Override
-    protected boolean canClick() {
-        return !this.menu.getCarried().isEmpty();
+    protected boolean canClick(int button) {
+        return (button == 0 || button == 1) && !this.menu.getCarried().isEmpty();
     }
 
     @Override

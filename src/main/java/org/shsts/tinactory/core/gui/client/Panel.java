@@ -82,13 +82,13 @@ public class Panel extends ContainerWidget {
     }
 
     @Override
-    public boolean isClicking(double mouseX, double mouseY) {
+    public boolean isClicking(double mouseX, double mouseY, int button) {
         this.clickingChild = null;
         if (!this.visible) {
             return false;
         }
         for (var child : this.children) {
-            if (child.isClicking(mouseX, mouseY)) {
+            if (child.isClicking(mouseX, mouseY, button)) {
                 this.clickingChild = child;
                 return true;
             }
