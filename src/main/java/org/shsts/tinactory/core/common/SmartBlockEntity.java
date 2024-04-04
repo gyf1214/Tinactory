@@ -34,16 +34,16 @@ public class SmartBlockEntity extends BlockEntity {
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
-        this.isChunkUnloaded = true;
+        isChunkUnloaded = true;
     }
 
     @Override
     public final void setRemoved() {
-        assert this.level != null;
-        if (!this.isChunkUnloaded) {
-            onRemovedInWorld(this.level);
+        assert level != null;
+        if (!isChunkUnloaded) {
+            onRemovedInWorld(level);
         } else {
-            onRemovedByChunk(this.level);
+            onRemovedByChunk(level);
         }
         super.setRemoved();
     }
@@ -61,75 +61,67 @@ public class SmartBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        assert this.level != null;
-        this.onLoad(this.level);
+        assert level != null;
+        if (level.isClientSide) {
+            onClientLoad(level);
+        } else {
+            onServerLoad(level);
+        }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        this.serializeOnSave(tag);
+        serializeOnSave(tag);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        this.deserializeOnSave(tag);
+        deserializeOnSave(tag);
     }
 
     @Override
     public CompoundTag getUpdateTag() {
         var tag = new CompoundTag();
-        this.serializeOnUpdate(tag);
+        serializeOnUpdate(tag);
         return tag;
     }
 
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return this.shouldSendUpdate() ? ClientboundBlockEntityDataPacket.create(this) : null;
+        return shouldSendUpdate() ? ClientboundBlockEntityDataPacket.create(this) : null;
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
-        this.deserializeOnUpdate(tag);
+        deserializeOnUpdate(tag);
     }
 
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         var tag = pkt.getTag();
         if (tag != null) {
-            this.deserializeOnUpdate(tag);
-        }
-    }
-
-    /**
-     * Call setChanged and also send block update to client.
-     */
-    protected void notifyUpdate() {
-        this.setChanged();
-        if (this.level != null && !this.level.isClientSide) {
-            this.isUpdateForced = true;
-            var state = this.getBlockState();
-            this.level.sendBlockUpdated(this.worldPosition, state, state, 2);
+            deserializeOnUpdate(tag);
         }
     }
 
     /**
      * callback when this blockEntity is loaded
      */
-    protected void onLoad(Level world) {
-        if (!world.isClientSide) {
-            EventManager.invoke(this, AllBlockEntityEvents.SERVER_LOAD, world);
-        }
+    protected void onServerLoad(Level world) {
+        EventManager.invoke(this, AllBlockEntityEvents.SERVER_LOAD, world);
     }
+
+    protected void onClientLoad(Level world) {}
 
     /**
      * callback when this blockEntity is truly removed in world
      */
     protected void onRemovedInWorld(Level world) {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                .ifPresent(itemHandler -> ItemHelper.dropItemHandler(world, this.worldPosition, itemHandler));
+        getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .ifPresent(itemHandler -> ItemHelper.dropItemHandler(world, worldPosition, itemHandler));
     }
 
     /**
@@ -152,8 +144,8 @@ public class SmartBlockEntity extends BlockEntity {
     protected void deserializeOnSave(CompoundTag tag) {}
 
     protected boolean shouldSendUpdate() {
-        if (this.isUpdateForced) {
-            this.isUpdateForced = false;
+        if (isUpdateForced) {
+            isUpdateForced = false;
             return true;
         }
         return false;
@@ -165,7 +157,7 @@ public class SmartBlockEntity extends BlockEntity {
 
     @Override
     public String toString() {
-        return "%s(%s)@%s:%s".formatted(this.getClass().getSimpleName(),
-                this.getType().getRegistryName(), this.level, this.worldPosition);
+        return "%s(%s)@%s:%s".formatted(getClass().getSimpleName(),
+                getType().getRegistryName(), level, worldPosition);
     }
 }

@@ -14,47 +14,38 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class NetworkController extends Machine {
     @Nullable
-    private CompositeNetwork network;
+    private CompositeNetwork network = null;
 
     public NetworkController(BlockEntityType<NetworkController> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        this.network = null;
     }
 
     @Override
-    protected void onLoad(Level world) {
-        super.onLoad(world);
-        if (!world.isClientSide) {
-            assert this.network == null;
-            this.network = new CompositeNetwork(world, this.worldPosition);
-        }
-    }
-
-    public void invalidateNetwork() {
-        if (this.network != null) {
-            this.network.invalidate();
-        }
+    protected void onServerLoad(Level world) {
+        super.onServerLoad(world);
+        assert network == null;
+        network = new CompositeNetwork(world, worldPosition);
     }
 
     @Override
     protected void onServerTick(Level world, BlockPos pos, BlockState state) {
-        if (this.network != null) {
-            this.network.tick();
+        if (network != null) {
+            network.tick();
         }
     }
 
     @Override
     protected void onRemovedInWorld(Level world) {
-        if (this.network != null) {
-            this.network.destroy();
+        if (network != null) {
+            network.destroy();
         }
         super.onRemovedInWorld(world);
     }
 
     @Override
     protected void onRemovedByChunk(Level world) {
-        if (this.network != null) {
-            this.network.destroy();
+        if (network != null) {
+            network.destroy();
         }
         super.onRemovedByChunk(world);
     }

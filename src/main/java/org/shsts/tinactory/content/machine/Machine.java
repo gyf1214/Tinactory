@@ -4,31 +4,26 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
+import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.CompositeNetwork;
 import org.shsts.tinactory.core.network.Network;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
-
-import static org.shsts.tinactory.core.util.GeneralUtil.optionalCastor;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -38,8 +33,7 @@ public class Machine extends SmartBlockEntity {
     @Nullable
     protected CompositeNetwork network;
 
-    protected boolean autoDumpItem;
-    protected boolean autoDumpFluid;
+    public final MachineConfig machineConfig = new MachineConfig();
 
     public Machine(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -53,52 +47,23 @@ public class Machine extends SmartBlockEntity {
         return voltage == Voltage.PRIMITIVE ? Machine::primitive : Machine::new;
     }
 
-    public boolean isAutoDumpItem() {
-        return autoDumpItem;
-    }
-
-    public void setAutoDumpItem(boolean autoDumpItem) {
-        this.autoDumpItem = autoDumpItem;
-    }
-
-    public boolean isAutoDumpFluid() {
-        return autoDumpFluid;
-    }
-
-    public void setAutoDumpFluid(boolean autoDumpFluid) {
-        this.autoDumpFluid = autoDumpFluid;
-    }
-
-    public Optional<ResourceLocation> getTargetRecipeLoc() {
-        return this.getProcessor()
-                .flatMap(IProcessor::getTargetRecipe)
-                .map(SmartRecipe::getId);
-    }
-
-    public void setTargetRecipeLoc(@Nullable ResourceLocation loc) {
-        var processor = this.getProcessor().orElse(null);
-        if (this.level == null || this.level.isClientSide || processor == null) {
-            return;
-        }
-        if (loc == null) {
-            processor.setTargetRecipe(null);
-        } else {
-            this.level.getRecipeManager().byKey(loc)
-                    .flatMap(optionalCastor(ProcessingRecipe.class))
-                    .ifPresent(processor::setTargetRecipe);
-        }
+    public void setMachineConfig(SetMachineEventPacket packet) {
+        assert level != null && !level.isClientSide;
+        machineConfig.apply(level, packet);
+        EventManager.invoke(this, AllBlockEntityEvents.SET_MACHINE_CONFIG, packet);
     }
 
     @Override
-    protected void onLoad(Level world) {
-        super.onLoad(world);
+    protected void onServerLoad(Level world) {
+        machineConfig.onLoad(world);
+        super.onServerLoad(world);
         LOGGER.debug("machine {}: loaded", this);
     }
 
     @Override
     protected void onRemovedInWorld(Level world) {
-        if (this.network != null) {
-            this.network.invalidate();
+        if (network != null) {
+            network.invalidate();
         }
         super.onRemovedInWorld(world);
         LOGGER.debug("machine {}: removed in world", this);
@@ -106,8 +71,8 @@ public class Machine extends SmartBlockEntity {
 
     @Override
     protected void onRemovedByChunk(Level world) {
-        if (this.network != null) {
-            this.network.invalidate();
+        if (network != null) {
+            network.invalidate();
         }
         LOGGER.debug("machine {}: removed by chunk unload", this);
     }
@@ -123,12 +88,12 @@ public class Machine extends SmartBlockEntity {
 
     protected void onPreWork(Level world, Network network) {
         assert this.network == network;
-        this.getProcessor().ifPresent(IProcessor::onPreWork);
+        getProcessor().ifPresent(IProcessor::onPreWork);
         var logistics = this.network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-        if (this.autoDumpItem) {
+        if (machineConfig.isAutoDumpItem()) {
             EventManager.invoke(this, AllBlockEntityEvents.DUMP_ITEM_OUTPUT, logistics);
         }
-        if (this.autoDumpFluid) {
+        if (machineConfig.isAutoDumpFluid()) {
             EventManager.invoke(this, AllBlockEntityEvents.DUMP_FLUID_OUTPUT, logistics);
         }
     }
@@ -136,7 +101,7 @@ public class Machine extends SmartBlockEntity {
     protected void onWork(Level world, Network network) {
         assert this.network == network;
         var workFactor = this.network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
-        this.getProcessor().ifPresent(processor -> processor.onWorkTick(workFactor));
+        getProcessor().ifPresent(processor -> processor.onWorkTick(workFactor));
     }
 
     public void buildSchedulings(Component.SchedulingBuilder builder) {
@@ -146,34 +111,30 @@ public class Machine extends SmartBlockEntity {
     }
 
     public Optional<IProcessor> getProcessor() {
-        return this.getCapability(AllCapabilities.PROCESSOR.get()).resolve();
+        return getCapability(AllCapabilities.PROCESSOR.get()).resolve();
     }
 
     public Optional<IElectricMachine> getElectric() {
-        return this.getCapability(AllCapabilities.ELECTRIC_MACHINE.get()).resolve();
-    }
-
-    public Optional<IContainer> getContainer() {
-        return this.getCapability(AllCapabilities.CONTAINER.get()).resolve();
+        return getCapability(AllCapabilities.ELECTRIC_MACHINE.get()).resolve();
     }
 
     /**
      * Called when disconnect from the network
      */
     public void onDisconnectFromNetwork() {
-        this.network = null;
+        network = null;
         LOGGER.debug("machine {}: disconnect from network", this);
     }
 
     @Override
     protected void serializeOnSave(CompoundTag tag) {
-        tag.putBoolean("autoDumpItem", this.autoDumpItem);
-        tag.putBoolean("autoDumpFluid", this.autoDumpFluid);
+        var configTag = machineConfig.serializeNBT();
+        tag.put("config", configTag);
     }
 
     @Override
     protected void deserializeOnSave(CompoundTag tag) {
-        this.autoDumpItem = tag.getBoolean("autoDumpItem");
-        this.autoDumpFluid = tag.getBoolean("autoDumpFluid");
+        var configTag = tag.getCompound("config");
+        machineConfig.deserializeNBT(configTag);
     }
 }

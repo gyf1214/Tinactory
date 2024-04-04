@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -48,10 +47,6 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     @Nullable
     private T currentRecipe = null;
     @Nullable
-    private ResourceLocation targetRecipeLoc = null;
-    @Nullable
-    private T targetRecipe = null;
-    @Nullable
     private IContainer container = null;
     private boolean needUpdate = true;
 
@@ -62,99 +57,95 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     }
 
     private IContainer getContainer() {
-        if (this.container == null) {
-            this.container = AllCapabilities.CONTAINER.getCapability(this.blockEntity);
+        if (container == null) {
+            container = AllCapabilities.CONTAINER.getCapability(blockEntity);
         }
-        return this.container;
+        return container;
     }
 
     private Level getWorld() {
-        var world = this.blockEntity.getLevel();
+        var world = blockEntity.getLevel();
         assert world != null;
         return world;
     }
 
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private T getTargetRecipe() {
+        if (blockEntity instanceof Machine machine) {
+            var recipe = machine.machineConfig.getTargetRecipe();
+            if (recipe != null && recipe.getType() == recipeType) {
+                return (T) recipe;
+            }
+        }
+        return null;
+    }
+
     private void updateRecipe() {
-        if (this.currentRecipe != null || !this.needUpdate) {
+        if (currentRecipe != null || !needUpdate) {
             return;
         }
-        var world = this.getWorld();
-        assert this.currentRecipeLoc == null;
-        this.currentRecipe = null;
-        if (this.targetRecipe != null) {
-            if (this.targetRecipe.matches(this.getContainer(), world)) {
-                this.currentRecipe = this.targetRecipe;
+        var world = getWorld();
+        assert currentRecipeLoc == null;
+        currentRecipe = null;
+        var targetRecipe = getTargetRecipe();
+        var container = getContainer();
+        if (targetRecipe != null) {
+            if (targetRecipe.matches(container, world)) {
+                currentRecipe = targetRecipe;
             }
         } else {
-            var matches = SmartRecipe.getRecipesFor(this.recipeType, this.getContainer(), world);
+            var matches = SmartRecipe.getRecipesFor(recipeType, container, world);
             if (matches.size() == 1) {
-                this.currentRecipe = matches.get(0);
+                currentRecipe = matches.get(0);
             }
         }
-        this.workProgress = 0;
-        if (this.currentRecipe != null) {
-            this.currentRecipe.consumeInputs(this.getContainer());
+        workProgress = 0;
+        if (currentRecipe != null) {
+            currentRecipe.consumeInputs(container);
         }
-        this.needUpdate = false;
-        this.blockEntity.setChanged();
+        needUpdate = false;
+        blockEntity.setChanged();
     }
 
     private long getMaxWorkTicks() {
-        assert this.currentRecipe != null;
-        return this.currentRecipe.workTicks * PROGRESS_PER_TICK;
+        assert currentRecipe != null;
+        return currentRecipe.workTicks * PROGRESS_PER_TICK;
     }
 
     @Override
     public void onPreWork() {
-        this.updateRecipe();
+        updateRecipe();
     }
 
     @Override
     public void onWorkTick(double partial) {
-        if (this.currentRecipe == null) {
+        if (currentRecipe == null) {
             return;
         }
         var progress = (long) Math.floor(partial * (double) PROGRESS_PER_TICK);
-        this.workProgress += progress;
-        var world = this.getWorld();
-        if (this.workProgress >= this.getMaxWorkTicks()) {
-            assert this.currentRecipe != null;
-            this.currentRecipe.insertOutputs(this.getContainer(), world.random);
-            this.currentRecipe = null;
-            this.needUpdate = true;
+        workProgress += progress;
+        var world = getWorld();
+        if (workProgress >= getMaxWorkTicks()) {
+            assert currentRecipe != null;
+            currentRecipe.insertOutputs(getContainer(), world.random);
+            currentRecipe = null;
+            needUpdate = true;
         }
-        this.blockEntity.setChanged();
+        blockEntity.setChanged();
     }
 
     @Override
     public double getProgress() {
-        if (this.currentRecipe == null) {
+        if (currentRecipe == null) {
             return 0;
         }
-        return (double) this.workProgress / (double) this.getMaxWorkTicks();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void setTargetRecipe(@Nullable ProcessingRecipe<?> recipe) {
-        assert this.targetRecipeLoc == null;
-        if (recipe == null) {
-            this.targetRecipe = null;
-        } else if (recipe.getType() == this.recipeType) {
-            this.targetRecipe = (T) recipe;
-        }
-        this.needUpdate = true;
-        this.blockEntity.setChanged();
-    }
-
-    @Override
-    public Optional<ProcessingRecipe<?>> getTargetRecipe() {
-        return Optional.ofNullable(this.targetRecipe);
+        return (double) workProgress / (double) getMaxWorkTicks();
     }
 
     @Override
     public long getVoltage() {
-        return this.voltage.val;
+        return voltage.val;
     }
 
     @Override
@@ -169,42 +160,35 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
     @Override
     public double getPowerCons() {
-        return this.voltage == Voltage.PRIMITIVE || this.currentRecipe == null ?
-                0 : this.currentRecipe.power;
+        return voltage == Voltage.PRIMITIVE || currentRecipe == null ?
+                0 : currentRecipe.power;
     }
 
     @SuppressWarnings("unchecked")
-    @Nullable
-    private T recipeByKey(RecipeManager recipeManager, @Nullable ResourceLocation loc) {
-        return (T) Optional.ofNullable(loc)
-                .flatMap(recipeManager::byKey)
-                .filter(r -> r.getType() == this.recipeType)
-                .orElse(null);
-    }
-
     private void onLoad(Level world) {
         var recipeManager = world.getRecipeManager();
 
-        this.currentRecipe = this.recipeByKey(recipeManager, this.currentRecipeLoc);
-        this.currentRecipeLoc = null;
-        if (this.currentRecipe != null) {
-            this.needUpdate = false;
+        currentRecipe = (T) Optional.ofNullable(currentRecipeLoc)
+                .flatMap(recipeManager::byKey)
+                .filter(r -> r.getType() == recipeType)
+                .orElse(null);
+        currentRecipeLoc = null;
+        if (currentRecipe != null) {
+            needUpdate = false;
         }
-
-        this.targetRecipe = this.recipeByKey(recipeManager, this.targetRecipeLoc);
-        this.targetRecipeLoc = null;
     }
 
-    private void onContainerChange(boolean isInput) {
-        if (this.currentRecipe == null) {
-            this.needUpdate = true;
+    private void setUpdateRecipe() {
+        if (currentRecipe == null) {
+            needUpdate = true;
         }
     }
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllBlockEntityEvents.SERVER_LOAD, this::onLoad);
-        eventManager.subscribe(AllBlockEntityEvents.CONTAINER_CHANGE, this::onContainerChange);
+        eventManager.subscribe(AllBlockEntityEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
+        eventManager.subscribe(AllBlockEntityEvents.SET_MACHINE_CONFIG, $ -> setUpdateRecipe());
     }
 
     @Nonnull
@@ -219,33 +203,23 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        var recipeLoc = this.currentRecipeLoc != null ? this.currentRecipeLoc :
-                (this.currentRecipe != null ? this.currentRecipe.getId() : null);
+        var recipeLoc = currentRecipeLoc != null ? currentRecipeLoc :
+                (currentRecipe != null ? currentRecipe.getId() : null);
         if (recipeLoc != null) {
             tag.putString("currentRecipe", recipeLoc.toString());
-            tag.putLong("workProgress", this.workProgress);
-        }
-        var targetRecipeLoc = this.targetRecipeLoc != null ? this.targetRecipeLoc :
-                (this.targetRecipe != null ? this.targetRecipe.getId() : null);
-        if (targetRecipeLoc != null) {
-            tag.putString("targetRecipe", targetRecipeLoc.toString());
+            tag.putLong("workProgress", workProgress);
         }
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        this.currentRecipe = null;
+        currentRecipe = null;
         if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
-            this.currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
-            this.workProgress = tag.getLong("workProgress");
+            currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
+            workProgress = tag.getLong("workProgress");
         } else {
-            this.currentRecipeLoc = null;
-        }
-        if (tag.contains("targetRecipe", Tag.TAG_STRING)) {
-            this.targetRecipeLoc = new ResourceLocation(tag.getString("targetRecipe"));
-        } else {
-            this.targetRecipeLoc = null;
+            currentRecipeLoc = null;
         }
     }
 
@@ -267,9 +241,9 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
         @Override
         public ICapabilityProvider apply(BlockEntity blockEntity) {
-            assert this.recipeType != null;
-            assert this.voltage != null;
-            return new RecipeProcessor<>(blockEntity, this.recipeType, voltage);
+            assert recipeType != null;
+            assert voltage != null;
+            return new RecipeProcessor<>(blockEntity, recipeType, voltage);
         }
     }
 }

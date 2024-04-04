@@ -31,17 +31,17 @@ public final class MenuGen {
         return $ -> $.layout(layout)
                 .switchButton(Texture.SWITCH_BUTTON, x, y,
                         new TranslatableComponent("tinactory.tooltip.autoDumpItem"),
-                        Machine::isAutoDumpItem,
+                        be -> be.machineConfig.isAutoDumpItem(),
                         (menu, value) -> menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
                                 SetMachineEventPacket.builder().autoDumpItem(value)))
                 .staticWidget(Texture.ITEM_OUT_BUTTON, x, y)
                 .switchButton(Texture.SWITCH_BUTTON, x + SLOT_SIZE, y,
                         new TranslatableComponent("tinactory.tooltip.autoDumpFluid"),
-                        Machine::isAutoDumpFluid,
+                        be -> be.machineConfig.isAutoDumpFluid(),
                         (menu, value) -> menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
                                 SetMachineEventPacket.builder().autoDumpFluid(value)))
                 .staticWidget(Texture.FLUID_OUT_BUTTON, x + SLOT_SIZE, y)
-                .event(ContainerEventHandler.SET_MACHINE, (menu, p) -> p.applyMachine(menu.blockEntity));
+                .event(ContainerEventHandler.SET_MACHINE, (menu, p) -> menu.blockEntity.setMachineConfig(p));
     }
 
     public static <R extends ProcessingRecipe<R>, S extends MenuBuilder<? extends Machine, ?, ?, S>>
@@ -50,7 +50,7 @@ public final class MenuGen {
                 .widget(() -> menu -> new MachineRecipeBook(menu, recipeType.get(), 0, 0))
                 .syncWidget(ContainerSyncPacket.LocHolder.class, (containerId, index, $1, be) ->
                                 new ContainerSyncPacket.LocHolder(containerId, index,
-                                        be.getTargetRecipeLoc().orElse(null)),
+                                        be.machineConfig.getTargetRecipeLoc()),
                         () -> (menu, slot) -> new GhostRecipe(menu, slot, layout));
     }
 }

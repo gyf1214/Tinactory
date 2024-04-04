@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.world.level.Level;
+import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.logistics.LogisticsComponent;
 import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.network.Component;
@@ -16,6 +17,7 @@ public final class AllBlockEntityEvents {
     public static final RegistryEntry<Event<Component.SchedulingBuilder>> BUILD_SCHEDULING;
     public static final RegistryEntry<Event<LogisticsComponent>> DUMP_ITEM_OUTPUT;
     public static final RegistryEntry<Event<LogisticsComponent>> DUMP_FLUID_OUTPUT;
+    public static final RegistryEntry<Event<SetMachineEventPacket>> SET_MACHINE_CONFIG;
 
     static {
         SERVER_LOAD = REGISTRATE.event("on_server_load", Level.class);
@@ -24,6 +26,7 @@ public final class AllBlockEntityEvents {
         BUILD_SCHEDULING = REGISTRATE.event("network/build_scheduling", Component.SchedulingBuilder.class);
         DUMP_ITEM_OUTPUT = REGISTRATE.event("logistics/dump_item_output", LogisticsComponent.class);
         DUMP_FLUID_OUTPUT = REGISTRATE.event("logistics/dump_fluid_output", LogisticsComponent.class);
+        SET_MACHINE_CONFIG = REGISTRATE.event("machine/set_config", SetMachineEventPacket.class);
     }
 
     public static void init() {}
