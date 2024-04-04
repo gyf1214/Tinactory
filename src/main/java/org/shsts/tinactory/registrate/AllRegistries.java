@@ -22,7 +22,7 @@ public final class AllRegistries {
         CAPABILITY_PROVIDER_TYPE_REGISTRY = REGISTRATE.simpleRegistry("capability_provider_type",
                 ICapabilityProviderType.class);
         COMPONENT_TYPE_REGISTRY = REGISTRATE.<ComponentType<?>>genericRegistry("component_type", ComponentType.class)
-                .onBake(ComponentType::onBake)
+                .onBake((registry, stage) -> ComponentType.onBake(registry))
                 .register();
         EVENT = REGISTRATE.simpleRegistry("event", Event.class);
     }

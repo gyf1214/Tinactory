@@ -1,219 +1,117 @@
 package org.shsts.tinactory.core.network;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.shsts.tinactory.TinactoryConfig;
+import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinactory.core.util.BiKeyHashMap;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.function.Supplier;
 
-@MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Network {
+@MethodsReturnNonnullByDefault
+public class Network extends NetworkBase {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final Level world;
-
-    public final NetworkManager manager;
-    public final BlockPos center;
-
-    public enum State {
-        CONNECTED,
-        CONNECTING,
-        CONFLICT,
-        DESTROYED
-    }
-
-    protected State state;
-    private int delayTicks;
-
-    public static class Ref {
-        @Nullable
-        private Network network;
-
-        public Ref(Network network) {
-            this.network = network;
-        }
-
-        public Optional<Network> get() {
-            return Optional.ofNullable(this.network);
-        }
-    }
-
-    @Nullable
-    protected Ref ref;
-
-    private class BFSContext {
-        private final Queue<BlockPos> queue = new ArrayDeque<>();
-        public final Map<BlockPos, BlockState> visited = new HashMap<>();
-
-        public void reset() {
-            queue.clear();
-            visited.clear();
-
-            if (world.isLoaded(center)) {
-                queue.add(center);
-                visited.put(center, world.getBlockState(center));
-            }
-        }
-
-        private boolean connected(BlockPos pos, BlockState blockState, Direction dir) {
-            return IConnector.isConnectedInWorld(world, pos, blockState, dir);
-        }
-
-        public Optional<BlockPos> next() {
-            if (queue.isEmpty()) {
-                return Optional.empty();
-            }
-
-            var pos = queue.remove();
-            var blockState = visited.get(pos);
-            assert blockState != null;
-            for (var dir : Direction.values()) {
-                var pos1 = pos.relative(dir);
-                if (visited.containsKey(pos1) || !world.isLoaded(pos1) || !connected(pos, blockState, dir)) {
-                    continue;
-                }
-                var blockState1 = world.getBlockState(pos1);
-                if (connected(pos1, blockState1, dir.getOpposite())) {
-                    queue.add(pos1);
-                    visited.put(pos1, blockState1);
-                }
-            }
-
-            return Optional.of(pos);
-        }
-    }
-
-    protected final BFSContext bfsContext;
+    private final Map<ComponentType<?>, Component> components = new HashMap<>();
+    private final List<Machine> machines = new ArrayList<>();
+    private final BiKeyHashMap<IScheduling, ComponentType<?>, Component.Ticker> componentSchedulings =
+            new BiKeyHashMap<>();
+    private final Multimap<IScheduling, Component.Ticker> machineSchedulings = ArrayListMultimap.create();
 
     public Network(Level world, BlockPos center) {
-        this.world = world;
-        this.manager = NetworkManager.getInstance(world);
-        this.center = center;
-        this.bfsContext = new BFSContext();
-        this.reset();
-        this.manager.registerNetwork(this);
+        super(world, center);
+        attachComponents();
     }
 
-    protected void onDisconnect() {
-        LOGGER.debug("network {}: disconnect", this);
+    public <T extends Component> T getComponent(Supplier<ComponentType<T>> typeSupp) {
+        var type = typeSupp.get();
+        return type.componentClass.cast(components.get(type));
     }
 
-    protected void reset() {
-        this.ref = null;
-        this.state = State.CONNECTING;
-        this.bfsContext.reset();
-        this.delayTicks = 0;
+    protected void attachComponent(ComponentType<?> type) {
+        assert !components.containsKey(type);
+        var component = type.create(this);
+        components.put(type, component);
+        component.buildSchedulings(((scheduling, ticker) ->
+                componentSchedulings.put(scheduling.get(), type, ticker)));
     }
 
-    public void invalidate() {
-        if (this.state == State.DESTROYED) {
-            return;
-        }
-        this.onDisconnect();
-        if (this.ref != null) {
-            this.ref.network = null;
-        }
-        this.reset();
-        LOGGER.debug("network {}: invalidated", this);
+    protected void attachComponents() {
+        ComponentType.getComponentTypes().forEach(this::attachComponent);
     }
 
-    public void destroy() {
-        this.onDisconnect();
-        if (this.ref != null) {
-            this.ref.network = null;
-        }
-        this.ref = null;
-        this.state = State.DESTROYED;
-        this.bfsContext.reset();
-        this.manager.unregisterNetwork(this);
-        LOGGER.debug("network {}: destroyed", this);
+    public Collection<Machine> getMachines() {
+        return machines;
     }
 
-    public Ref ref() {
-        if (this.ref == null) {
-            this.ref = new Ref(this);
-        }
-        return ref;
+    protected void putMachine(Machine be) {
+        LOGGER.debug("network {}: put machine {}", this, be);
+        machines.add(be);
     }
 
-    protected void connectFinish() {
-        LOGGER.debug("network {}: connect finished", this);
-        this.state = State.CONNECTED;
-        this.bfsContext.reset();
-        this.ticks = 0;
-    }
-
-    protected void connectConflict(BlockPos pos) {
-        LOGGER.debug("network {}: conflict detected at {}:{}", this, this.world.dimension(), pos);
-        this.state = State.CONFLICT;
-        this.bfsContext.reset();
-    }
-
+    @Override
     protected void putBlock(BlockPos pos, BlockState state) {
-        LOGGER.debug("network {}: add block {} at {}:{}", this, state, this.world.dimension(), pos);
-    }
-
-    protected boolean connectNextBlock() {
-        if (!this.manager.registerNetwork(this)) {
-            this.connectConflict(this.center);
-            return false;
+        super.putBlock(pos, state);
+        for (var component : components.values()) {
+            component.putBlock(pos, state);
         }
-        var nextPos = this.bfsContext.next();
-        if (nextPos.isEmpty()) {
-            this.connectFinish();
-            return false;
-        }
-        var pos = nextPos.get();
-        if (pos != this.center) {
-            if (this.manager.hasNetworkAtPos(pos)) {
-                this.connectConflict(pos);
-                return false;
-            }
-            this.manager.putNetworkAtPos(pos, this);
-        }
-        var state = this.bfsContext.visited.get(pos);
-        this.putBlock(pos, state);
-        return true;
-    }
-
-    protected void doConnect() {
-        var connectDelay = TinactoryConfig.INSTANCE.networkConnectDelay.get();
-        var maxConnects = TinactoryConfig.INSTANCE.networkMaxConnectsPerTick.get();
-        if (this.delayTicks < connectDelay) {
-            this.delayTicks++;
-            return;
-        }
-        for (var i = 0; i < maxConnects; i++) {
-            if (!this.connectNextBlock()) {
-                return;
-            }
+        if (state.getBlock() instanceof SmartEntityBlock<?> entityBlock) {
+            entityBlock.getBlockEntity(world, pos, Machine.class).ifPresent(this::putMachine);
         }
     }
 
-    private int ticks;
+    @Override
+    protected void connectFinish() {
+        super.connectFinish();
+        for (var component : components.values()) {
+            component.onConnect();
+        }
+        for (var machine : machines) {
+            machine.onConnectToNetwork(this);
+        }
+        for (var machine : machines) {
+            machine.buildSchedulings((scheduling, ticker) ->
+                    machineSchedulings.put(scheduling.get(), ticker));
+        }
+    }
 
+    @Override
+    protected void onDisconnect() {
+        for (var machine : machines) {
+            machine.onDisconnectFromNetwork();
+        }
+        for (var component : components.values()) {
+            component.onDisconnect();
+        }
+        machines.clear();
+        machineSchedulings.clear();
+        super.onDisconnect();
+    }
+
+    @Override
     protected void doTick() {
-        if (ticks++ % 40 == 0) {
-            LOGGER.debug("network {}: tick", this);
-        }
-    }
-
-    public void tick() {
-        switch (this.state) {
-            case CONNECTING -> doConnect();
-            case CONNECTED -> doTick();
+        super.doTick();
+        for (var scheduling : SchedulingManager.getSortedSchedulings()) {
+            for (var entry : componentSchedulings.getPrimary(scheduling)) {
+                entry.getValue().tick(world, this);
+            }
+            for (var ticker : machineSchedulings.get(scheduling)) {
+                ticker.tick(world, this);
+            }
         }
     }
 }

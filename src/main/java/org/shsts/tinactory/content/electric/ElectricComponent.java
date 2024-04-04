@@ -9,7 +9,7 @@ import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.CompositeNetwork;
+import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.slf4j.Logger;
 
@@ -28,7 +28,7 @@ public class ElectricComponent extends Component {
     protected double workFactor;
     protected double bufferFactor;
 
-    public ElectricComponent(ComponentType<?> type, CompositeNetwork network) {
+    public ElectricComponent(ComponentType<?> type, Network network) {
         super(type, network);
     }
 
@@ -116,10 +116,6 @@ public class ElectricComponent extends Component {
 
     public double getWorkFactor() {
         return this.workFactor;
-    }
-
-    public double getBufferFactor() {
-        return this.bufferFactor;
     }
 
     @Override

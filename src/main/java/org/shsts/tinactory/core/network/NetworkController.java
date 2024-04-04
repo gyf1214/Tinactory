@@ -14,7 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class NetworkController extends Machine {
     @Nullable
-    private CompositeNetwork network = null;
+    private Network network = null;
 
     public NetworkController(BlockEntityType<NetworkController> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -24,7 +24,7 @@ public class NetworkController extends Machine {
     protected void onServerLoad(Level world) {
         super.onServerLoad(world);
         assert network == null;
-        network = new CompositeNetwork(world, worldPosition);
+        network = new Network(world, worldPosition);
     }
 
     @Override

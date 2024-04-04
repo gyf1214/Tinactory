@@ -3,7 +3,6 @@ package org.shsts.tinactory.core.network;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
@@ -19,13 +18,13 @@ public class ComponentType<T extends Component> extends ForgeRegistryEntry<Compo
         this.factory = factory;
     }
 
-    public T create(CompositeNetwork network) {
+    public T create(Network network) {
         return this.factory.create(this, network);
     }
 
     private static Collection<ComponentType<?>> componentTypes;
 
-    public static void onBake(IForgeRegistry<ComponentType<?>> registry, RegistryManager stage) {
+    public static void onBake(IForgeRegistry<ComponentType<?>> registry) {
         componentTypes = registry.getValues();
     }
 

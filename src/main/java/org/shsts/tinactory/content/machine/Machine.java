@@ -16,7 +16,6 @@ import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.network.Component;
-import org.shsts.tinactory.core.network.CompositeNetwork;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ public class Machine extends SmartBlockEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Nullable
-    protected CompositeNetwork network;
+    protected Network network;
 
     public final MachineConfig machineConfig = new MachineConfig();
 
@@ -80,7 +79,7 @@ public class Machine extends SmartBlockEntity {
     /**
      * Called when connect to the network
      */
-    public void onConnectToNetwork(CompositeNetwork network) {
+    public void onConnectToNetwork(Network network) {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
         EventManager.invoke(this, AllBlockEntityEvents.CONNECT, network);
@@ -89,7 +88,7 @@ public class Machine extends SmartBlockEntity {
     protected void onPreWork(Level world, Network network) {
         assert this.network == network;
         getProcessor().ifPresent(IProcessor::onPreWork);
-        var logistics = this.network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
+        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
         if (machineConfig.isAutoDumpItem()) {
             EventManager.invoke(this, AllBlockEntityEvents.DUMP_ITEM_OUTPUT, logistics);
         }
@@ -100,7 +99,7 @@ public class Machine extends SmartBlockEntity {
 
     protected void onWork(Level world, Network network) {
         assert this.network == network;
-        var workFactor = this.network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
+        var workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
         getProcessor().ifPresent(processor -> processor.onWorkTick(workFactor));
     }
 
@@ -110,7 +109,7 @@ public class Machine extends SmartBlockEntity {
         EventManager.invoke(this, AllBlockEntityEvents.BUILD_SCHEDULING, builder);
     }
 
-    public Optional<CompositeNetwork> getNetwork() {
+    public Optional<Network> getNetwork() {
         return Optional.ofNullable(network);
     }
 

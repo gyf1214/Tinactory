@@ -19,8 +19,8 @@ public class NetworkManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final Level world;
-    protected final Map<BlockPos, Network> networks = new HashMap<>();
-    protected final Map<BlockPos, Network.Ref> networkPosMap = new HashMap<>();
+    protected final Map<BlockPos, NetworkBase> networks = new HashMap<>();
+    protected final Map<BlockPos, NetworkBase.Ref> networkPosMap = new HashMap<>();
 
     public NetworkManager(Level world) {
         LOGGER.debug("create network manager for {}", world.dimension());
@@ -31,18 +31,18 @@ public class NetworkManager {
         return this.getNetworkAtPos(pos).isPresent();
     }
 
-    public Optional<Network> getNetworkAtPos(BlockPos pos) {
+    public Optional<NetworkBase> getNetworkAtPos(BlockPos pos) {
         return Optional.ofNullable(this.networks.get(pos)).or(() ->
-                Optional.ofNullable(this.networkPosMap.get(pos)).flatMap(Network.Ref::get));
+                Optional.ofNullable(this.networkPosMap.get(pos)).flatMap(NetworkBase.Ref::get));
     }
 
-    public void putNetworkAtPos(BlockPos pos, Network network) {
+    public void putNetworkAtPos(BlockPos pos, NetworkBase network) {
         assert !this.hasNetworkAtPos(pos);
         LOGGER.debug("track block at {}:{} to network {}", world.dimension(), pos, network);
         this.networkPosMap.put(pos, network.ref());
     }
 
-    public boolean registerNetwork(Network network) {
+    public boolean registerNetwork(NetworkBase network) {
         var center = network.center;
         if (this.networks.containsKey(center)) {
             return this.networks.get(center) == network;
@@ -54,13 +54,13 @@ public class NetworkManager {
         }
     }
 
-    public void unregisterNetwork(Network network) {
+    public void unregisterNetwork(NetworkBase network) {
         var center = network.center;
         this.networks.remove(center);
     }
 
     public void invalidatePos(BlockPos pos) {
-        this.getNetworkAtPos(pos).ifPresent(Network::invalidate);
+        this.getNetworkAtPos(pos).ifPresent(NetworkBase::invalidate);
     }
 
     public void invalidatePosDir(BlockPos pos, Direction dir) {

@@ -22,7 +22,6 @@ import org.shsts.tinactory.core.logistics.ItemContentWrapper;
 import org.shsts.tinactory.core.logistics.ItemTypeWrapper;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.CompositeNetwork;
 import org.shsts.tinactory.core.network.Network;
 import org.slf4j.Logger;
 
@@ -65,7 +64,7 @@ public class LogisticsComponent extends Component {
     public final WorkerProperty workerProperty;
     private int ticks;
 
-    public LogisticsComponent(ComponentType<LogisticsComponent> type, CompositeNetwork network) {
+    public LogisticsComponent(ComponentType<LogisticsComponent> type, Network network) {
         super(type, network);
         this.workerProperty = new WorkerProperty(
                 TinactoryConfig.INSTANCE.initialWorkerSize.get(),
