@@ -10,7 +10,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 
 import javax.annotation.Nullable;
@@ -28,6 +31,13 @@ public class FluidCell extends Item {
     public FluidCell(Properties properties, int capacity) {
         super(properties);
         this.capacity = capacity;
+    }
+
+    public ItemStack getFluidCell(FluidStack fluidStack) {
+        var stack = new ItemStack(this);
+        stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(handler ->
+                handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE));
+        return stack;
     }
 
     @Nullable

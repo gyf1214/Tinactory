@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.material.EmptyFluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.fluids.FluidAttributes;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -22,5 +23,10 @@ public class SimpleFluid extends EmptyFluid {
     @Override
     protected FluidAttributes createAttributes() {
         return this.builder.build(this);
+    }
+
+    @Override
+    public boolean isSource(FluidState state) {
+        return true;
     }
 }

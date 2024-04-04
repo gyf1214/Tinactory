@@ -110,6 +110,10 @@ public class Machine extends SmartBlockEntity {
         EventManager.invoke(this, AllBlockEntityEvents.BUILD_SCHEDULING, builder);
     }
 
+    public Optional<CompositeNetwork> getNetwork() {
+        return Optional.ofNullable(network);
+    }
+
     public Optional<IProcessor> getProcessor() {
         return getCapability(AllCapabilities.PROCESSOR.get()).resolve();
     }
@@ -128,13 +132,11 @@ public class Machine extends SmartBlockEntity {
 
     @Override
     protected void serializeOnSave(CompoundTag tag) {
-        var configTag = machineConfig.serializeNBT();
-        tag.put("config", configTag);
+        tag.put("config", machineConfig.serializeNBT());
     }
 
     @Override
     protected void deserializeOnSave(CompoundTag tag) {
-        var configTag = tag.getCompound("config");
-        machineConfig.deserializeNBT(configTag);
+        machineConfig.deserializeNBT(tag.getCompound("config"));
     }
 }

@@ -1,7 +1,6 @@
 package org.shsts.tinactory.core.gui;
 
 import com.google.common.collect.ArrayListMultimap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -17,6 +16,7 @@ import org.shsts.tinactory.registrate.builder.MenuBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -99,7 +99,7 @@ public class Layout {
 
     private <S, T> List<SlotWith<T>>
     getSlotWithInfo(List<S> source, ToIntFunction<S> getPort, Function<S, T> getResult) {
-        var currentSlotIndex = new Int2IntOpenHashMap();
+        var currentSlotIndex = new HashMap<Integer, Integer>();
         var ret = new ArrayList<SlotWith<T>>();
 
         for (var item : source) {

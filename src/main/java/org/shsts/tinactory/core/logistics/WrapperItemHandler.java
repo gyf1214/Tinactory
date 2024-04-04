@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -19,6 +20,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
     protected final List<Runnable> updateListener = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
+    public Predicate<ItemStack> filter = $ -> true;
 
     public WrapperItemHandler(int size) {
         this(new ItemStackHandler(size));
@@ -32,42 +34,46 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         this(new InvWrapper(inv));
     }
 
+    public void resetFilter() {
+        filter = $ -> true;
+    }
+
     public void onUpdate(Runnable cons) {
-        this.updateListener.add(cons);
+        updateListener.add(cons);
     }
 
     protected void invokeUpdate() {
-        for (var cons : this.updateListener) {
+        for (var cons : updateListener) {
             cons.run();
         }
     }
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
-        this.compose.setStackInSlot(slot, stack);
-        this.invokeUpdate();
+        compose.setStackInSlot(slot, stack);
+        invokeUpdate();
     }
 
     @Override
     public int getSlots() {
-        return this.compose.getSlots();
+        return compose.getSlots();
     }
 
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return this.compose.getStackInSlot(slot);
+        return compose.getStackInSlot(slot);
     }
 
     @Nonnull
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        if (!this.allowInput) {
+        if (!isItemValid(slot, stack)) {
             return stack;
         }
-        var reminder = this.compose.insertItem(slot, stack, simulate);
+        var reminder = compose.insertItem(slot, stack, simulate);
         if (!simulate && reminder.getCount() < stack.getCount()) {
-            this.invokeUpdate();
+            invokeUpdate();
         }
         return reminder;
     }
@@ -75,23 +81,23 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
     @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (!this.allowOutput) {
+        if (!allowOutput) {
             return ItemStack.EMPTY;
         }
-        var extracted = this.compose.extractItem(slot, amount, simulate);
+        var extracted = compose.extractItem(slot, amount, simulate);
         if (!simulate && !extracted.isEmpty()) {
-            this.invokeUpdate();
+            invokeUpdate();
         }
         return extracted;
     }
 
     @Override
     public int getSlotLimit(int slot) {
-        return this.compose.getSlotLimit(slot);
+        return compose.getSlotLimit(slot);
     }
 
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
-        return this.allowInput && this.compose.isItemValid(slot, stack);
+        return allowInput && filter.test(stack) && compose.isItemValid(slot, stack);
     }
 }

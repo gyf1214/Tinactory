@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.logistics;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +19,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.gui.Layout;
@@ -27,13 +30,16 @@ import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.network.CompositeNetwork;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
@@ -47,18 +53,23 @@ public class StackContainer implements ICapabilityProvider,
     private final IItemHandlerModifiable combinedItems;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports;
+    private final Map<Integer, WrapperItemHandler> itemInputs = new HashMap<>();
+    private final Multimap<Integer, WrapperFluidTank> fluidInputs = ArrayListMultimap.create();
 
     private StackContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
         this.ports = new ArrayList<>(portInfo.size());
+
         var items = new ArrayList<WrapperItemHandler>(portInfo.size());
         var fluids = new ArrayList<WrapperFluidTank>();
         var slotIdx = 0;
+        var portIdx = 0;
         for (var port : portInfo) {
             var type = port.type;
             if (port.slots <= 0 || type == SlotType.NONE) {
-                this.ports.add(new PortInfo(slotIdx, slotIdx, SlotType.NONE,
+                ports.add(new PortInfo(slotIdx, slotIdx, SlotType.NONE,
                         IPort.EMPTY, IPort.EMPTY));
+                portIdx++;
                 continue;
             }
             switch (type) {
@@ -68,7 +79,8 @@ public class StackContainer implements ICapabilityProvider,
                     items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
-                    this.ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                    itemInputs.put(portIdx, view);
+                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
                             collection, collection));
                 }
                 case ITEM_OUTPUT -> {
@@ -79,7 +91,7 @@ public class StackContainer implements ICapabilityProvider,
                     view.allowInput = false;
                     items.add(view);
 
-                    this.ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
                             new ItemHandlerCollection(view), new ItemHandlerCollection(inner)));
                 }
                 case FLUID_INPUT -> {
@@ -89,11 +101,12 @@ public class StackContainer implements ICapabilityProvider,
                         view.onUpdate(this::onInputUpdate);
 
                         views[i] = view;
+                        fluidInputs.put(portIdx, view);
                         fluids.add(view);
                     }
 
                     var collection = new CombinedFluidTank(views);
-                    this.ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
                             collection, collection));
                 }
                 case FLUID_OUTPUT -> {
@@ -111,10 +124,11 @@ public class StackContainer implements ICapabilityProvider,
                         fluids.add(view);
                     }
 
-                    this.ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
                             new CombinedFluidTank(views), new CombinedFluidTank(inners)));
                 }
             }
+            portIdx++;
             slotIdx += port.slots;
         }
         this.combinedItems = new CombinedInvWrapper(items.toArray(IItemHandlerModifiable[]::new));
@@ -122,38 +136,75 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     private void onInputUpdate() {
-        EventManager.invoke(this.blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, true);
-        this.blockEntity.setChanged();
+        EventManager.invoke(blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, true);
+        blockEntity.setChanged();
     }
 
     private void onOutputUpdate() {
-        EventManager.invoke(this.blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, false);
-        this.blockEntity.setChanged();
+        EventManager.invoke(blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, false);
+        blockEntity.setChanged();
     }
 
     @Override
     public int getMaxPort() {
-        return this.ports.size();
+        return ports.size();
     }
 
     @Override
     public boolean hasPort(int port) {
-        return port >= 0 && port < this.ports.size() &&
-                this.ports.get(port).type != SlotType.NONE;
+        return port >= 0 && port < ports.size() &&
+                ports.get(port).type != SlotType.NONE;
     }
 
     @Override
     public IPort getPort(int port, boolean internal) {
-        if (!this.hasPort(port)) {
+        if (!hasPort(port)) {
             return IPort.EMPTY;
         }
-        var portInfo = this.ports.get(port);
+        var portInfo = ports.get(port);
         return internal ? portInfo.internalPort : portInfo.port;
+    }
+
+    private void updateTargetRecipe() {
+        if (!(blockEntity instanceof Machine machine)) {
+            return;
+        }
+        var targetRecipe = machine.machineConfig.getTargetRecipe();
+        if (targetRecipe == null) {
+            for (var itemHandler : itemInputs.values()) {
+                itemHandler.resetFilter();
+            }
+            for (var tank : fluidInputs.values()) {
+                tank.resetFilter();
+            }
+            return;
+        }
+        for (var input : targetRecipe.inputs) {
+            var port = input.port();
+            var ingredient = input.ingredient();
+            if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
+                var handler = itemInputs.get(port);
+                if (handler != null) {
+                    handler.filter = item.ingredient();
+                }
+            } else if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
+                var handler = itemInputs.get(port);
+                if (handler != null) {
+                    var stack1 = item.stack();
+                    handler.filter = stack -> ItemHelper.canItemsStack(stack, stack1);
+                }
+            } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
+                for (var tank : fluidInputs.get(port)) {
+                    var stack1 = fluid.fluid();
+                    tank.filter = stack -> stack.isFluidEqual(stack1);
+                }
+            }
+        }
     }
 
     private void onConnect(CompositeNetwork network) {
         var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-        for (var portInfo : this.ports) {
+        for (var portInfo : ports) {
             if (!portInfo.type.output) {
                 logistics.addPassiveStorage(LogisticsDirection.PULL, portInfo.port);
             }
@@ -161,11 +212,11 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     private void dumpItemOutput(LogisticsComponent logistics) {
-        for (var portInfo : this.ports) {
+        for (var portInfo : ports) {
             if (portInfo.type == SlotType.ITEM_OUTPUT) {
                 var itemPort = portInfo.port.asItem();
                 for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
-                    var item = this.combinedItems.getStackInSlot(slot);
+                    var item = combinedItems.getStackInSlot(slot);
                     if (!item.isEmpty()) {
                         logistics.addActiveRequest(LogisticsDirection.PUSH, itemPort, item);
                     }
@@ -175,11 +226,11 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     private void dumpFluidOutput(LogisticsComponent logistics) {
-        for (var portInfo : this.ports) {
+        for (var portInfo : ports) {
             if (portInfo.type == SlotType.FLUID_OUTPUT) {
                 var fluidPort = portInfo.port.asFluid();
                 for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
-                    var fluid = this.combinedFluids.getFluidInTank(slot);
+                    var fluid = combinedFluids.getFluidInTank(slot);
                     if (!fluid.isEmpty()) {
                         logistics.addActiveRequest(LogisticsDirection.PUSH, fluidPort, fluid);
                     }
@@ -190,18 +241,20 @@ public class StackContainer implements ICapabilityProvider,
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
+        eventManager.subscribe(AllBlockEntityEvents.SERVER_LOAD, $ -> updateTargetRecipe());
         eventManager.subscribe(AllBlockEntityEvents.CONNECT, this::onConnect);
         eventManager.subscribe(AllBlockEntityEvents.DUMP_ITEM_OUTPUT, this::dumpItemOutput);
         eventManager.subscribe(AllBlockEntityEvents.DUMP_FLUID_OUTPUT, this::dumpFluidOutput);
+        eventManager.subscribe(AllBlockEntityEvents.SET_MACHINE_CONFIG, $ -> updateTargetRecipe());
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> this.combinedItems).cast();
+            return LazyOptional.of(() -> combinedItems).cast();
         } else if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
-            return LazyOptional.of(() -> this.combinedFluids).cast();
+            return LazyOptional.of(() -> combinedFluids).cast();
         } else if (cap == AllCapabilities.CONTAINER.get()) {
             return LazyOptional.of(() -> this).cast();
         }
@@ -211,15 +264,15 @@ public class StackContainer implements ICapabilityProvider,
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.put("stack", ItemHelper.serializeItemHandler(this.combinedItems));
-        tag.put("fluid", this.combinedFluids.serializeNBT());
+        tag.put("stack", ItemHelper.serializeItemHandler(combinedItems));
+        tag.put("fluid", combinedFluids.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(this.combinedItems, tag.getCompound("stack"));
-        this.combinedFluids.deserializeNBT(tag.getCompound("fluid"));
+        ItemHelper.deserializeItemHandler(combinedItems, tag.getCompound("stack"));
+        combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 
     public static class Builder implements Function<BlockEntity, ICapabilityProvider> {
@@ -243,7 +296,7 @@ public class StackContainer implements ICapabilityProvider,
 
         @Override
         public ICapabilityProvider apply(BlockEntity be) {
-            return new StackContainer(be, this.ports);
+            return new StackContainer(be, ports);
         }
 
         protected record PortInfo(int slots, SlotType type) {}

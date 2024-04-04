@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -23,6 +24,7 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     protected final List<Runnable> updateListeners = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
+    public Predicate<FluidStack> filter = $ -> true;
 
     public WrapperFluidTank(int capacity) {
         this(new FluidTank(capacity));
@@ -35,11 +37,15 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     }
 
     public void onUpdate(Runnable cb) {
-        this.updateListeners.add(cb);
+        updateListeners.add(cb);
+    }
+
+    public void resetFilter() {
+        filter = $ -> true;
     }
 
     protected void invokeUpdate() {
-        for (var cb : this.updateListeners) {
+        for (var cb : updateListeners) {
             cb.run();
         }
     }
@@ -47,29 +53,29 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     @Nonnull
     @Override
     public FluidStack getFluid() {
-        return this.tank.getFluid();
+        return tank.getFluid();
     }
 
     @Override
     public int getFluidAmount() {
-        return this.tank.getFluidAmount();
+        return tank.getFluidAmount();
     }
 
     @Override
     public int getCapacity() {
-        return this.tank.getCapacity();
+        return tank.getCapacity();
     }
 
     @Override
     public boolean isFluidValid(FluidStack fluid) {
-        return this.tank.isFluidValid(fluid);
+        return allowInput && filter.test(fluid) && tank.isFluidValid(fluid);
     }
 
     @Override
     public int fill(FluidStack fluid, IFluidHandler.FluidAction action) {
-        var ret = this.allowInput ? this.tank.fill(fluid, action) : 0;
+        var ret = isFluidValid(fluid) ? tank.fill(fluid, action) : 0;
         if (ret > 0) {
-            this.invokeUpdate();
+            invokeUpdate();
         }
         return ret;
     }
@@ -77,9 +83,9 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     @Nonnull
     @Override
     public FluidStack drain(FluidStack fluid, IFluidHandler.FluidAction action) {
-        var ret = this.allowOutput ? this.tank.drain(fluid, action) : FluidStack.EMPTY;
+        var ret = allowOutput ? tank.drain(fluid, action) : FluidStack.EMPTY;
         if (!ret.isEmpty()) {
-            this.invokeUpdate();
+            invokeUpdate();
         }
         return ret;
     }
@@ -87,18 +93,18 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     @Nonnull
     @Override
     public FluidStack drain(int maxDrain, IFluidHandler.FluidAction action) {
-        var ret = this.allowOutput ? this.tank.drain(maxDrain, action) : FluidStack.EMPTY;
+        var ret = allowOutput ? tank.drain(maxDrain, action) : FluidStack.EMPTY;
         if (!ret.isEmpty()) {
-            this.invokeUpdate();
+            invokeUpdate();
         }
         return ret;
     }
 
     @Override
     public void setFluid(FluidStack stack) {
-        if (this.tank instanceof FluidTank fluidTank) {
+        if (tank instanceof FluidTank fluidTank) {
             fluidTank.setFluid(stack);
-        } else if (this.tank instanceof IFluidTankModifiable modifiable) {
+        } else if (tank instanceof IFluidTankModifiable modifiable) {
             modifiable.setFluid(stack);
         } else {
             throw new IllegalCallerException();
@@ -107,11 +113,11 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
 
     @Override
     public CompoundTag serializeNBT() {
-        if (this.tank instanceof FluidTank fluidTank) {
+        if (tank instanceof FluidTank fluidTank) {
             var tag = new CompoundTag();
             fluidTank.writeToNBT(tag);
             return tag;
-        } else if (this.tank instanceof INBTSerializable<?> serializable) {
+        } else if (tank instanceof INBTSerializable<?> serializable) {
             return (CompoundTag) serializable.serializeNBT();
         } else {
             throw new IllegalCallerException();
@@ -126,9 +132,9 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        if (this.tank instanceof FluidTank fluidTank) {
+        if (tank instanceof FluidTank fluidTank) {
             fluidTank.readFromNBT(tag);
-        } else if (this.tank instanceof INBTSerializable<?> serializable) {
+        } else if (tank instanceof INBTSerializable<?> serializable) {
             deserializeNBT(serializable, tag);
         } else {
             throw new IllegalCallerException();

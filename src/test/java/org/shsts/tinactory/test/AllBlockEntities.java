@@ -24,10 +24,10 @@ public final class AllBlockEntities {
                         .layout(AllBlocks.TEST_FLUID_LAYOUT))
                 .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
                         .voltage(Voltage.ULV)
-                        .recipeType(AllBlocks.TEST_RECIPE_TYPE.get()))
+                        .recipeType(AllRecipes.TEST_RECIPE_TYPE.get()))
                 .menu()
                 .transform(MenuGen.machineMenu(AllBlocks.TEST_FLUID_LAYOUT))
-                .transform(MenuGen.machineRecipeBook(AllBlocks.TEST_RECIPE_TYPE, AllBlocks.TEST_FLUID_LAYOUT))
+                .transform(MenuGen.machineRecipeBook(AllRecipes.TEST_RECIPE_TYPE, AllBlocks.TEST_FLUID_LAYOUT))
                 .build() // menu
                 .build() // blockEntity
                 .block()

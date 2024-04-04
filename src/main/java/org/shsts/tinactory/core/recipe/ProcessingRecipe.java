@@ -67,19 +67,19 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     @Override
     public boolean matches(IContainer container, Level world) {
-        return this.inputs.stream().allMatch(input -> this.consumeInput(container, input, true)) &&
-                this.outputs.stream().allMatch(output -> this.insertOutput(container, output, world.random, true));
+        return inputs.stream().allMatch(input -> consumeInput(container, input, true)) &&
+                outputs.stream().allMatch(output -> insertOutput(container, output, world.random, true));
     }
 
     public void consumeInputs(IContainer container) {
-        for (var input : this.inputs) {
-            this.consumeInput(container, input, false);
+        for (var input : inputs) {
+            consumeInput(container, input, false);
         }
     }
 
     public void insertOutputs(IContainer container, Random random) {
-        for (var output : this.outputs) {
-            this.insertOutput(container, output, random, false);
+        for (var output : outputs) {
+            insertOutput(container, output, random, false);
         }
     }
 
@@ -95,7 +95,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     @Override
     public ItemStack getResultItem() {
-        var output = this.getResult();
+        var output = getResult();
         if (output instanceof ProcessingResults.ItemResult item) {
             return item.stack;
         } else {
@@ -104,7 +104,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     }
 
     public IProcessingResult getResult() {
-        return this.outputs.stream().min(Comparator.comparingInt(a -> a.port))
+        return outputs.stream().min(Comparator.comparingInt(a -> a.port))
                 .map(Output::result)
                 .orElse(new ProcessingResults.ItemResult(true, 0f, ItemStack.EMPTY));
     }
@@ -130,85 +130,105 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
 
         public S input(int port, Supplier<IProcessingIngredient> ingredient) {
-            this.inputs.add(() -> new Input(port, ingredient.get()));
+            inputs.add(() -> new Input(port, ingredient.get()));
             return self();
         }
 
         public S input(int port, IProcessingIngredient ingredient) {
-            return this.input(port, () -> ingredient);
+            return input(port, () -> ingredient);
         }
 
-        public S inputItem(int port, Supplier<Item> item, int amount) {
-            return this.input(port, () -> new ProcessingIngredients.SimpleItemIngredient(
+        public S inputItem(int port, Supplier<? extends Item> item, int amount) {
+            return input(port, () -> new ProcessingIngredients.SimpleItemIngredient(
                     new ItemStack(item.get(), amount)));
         }
 
+        public S inputItem(int port, Item item, int amount) {
+            return input(port, new ProcessingIngredients.SimpleItemIngredient(
+                    new ItemStack(item, amount)));
+        }
+
+        public S inputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
+            return input(port, () -> new ProcessingIngredients.FluidIngredient(
+                    new FluidStack(fluid.get(), amount)));
+        }
+
         public S inputFluid(int port, Fluid fluid, int amount) {
-            return this.input(port, () -> new ProcessingIngredients.FluidIngredient(
+            return input(port, new ProcessingIngredients.FluidIngredient(
                     new FluidStack(fluid, amount)));
         }
 
         public S output(int port, Supplier<IProcessingResult> result) {
-            this.outputs.add(() -> new Output(port, result.get()));
+            outputs.add(() -> new Output(port, result.get()));
             return self();
         }
 
         public S output(int port, IProcessingResult result) {
-            return this.output(port, () -> result);
+            return output(port, () -> result);
         }
 
-        public S outputItem(int port, Supplier<Item> item, int amount, float rate) {
-            return this.output(port, () ->
+        public S outputItem(int port, Supplier<? extends Item> item, int amount, float rate) {
+            return output(port, () ->
                     new ProcessingResults.ItemResult(true, rate, new ItemStack(item.get(), amount)));
         }
 
-        public S outputItem(int port, Supplier<Item> item, int amount) {
-            return this.outputItem(port, item, amount, 1.0f);
+        public S outputItem(int port, Supplier<? extends Item> item, int amount) {
+            return outputItem(port, item, amount, 1.0f);
         }
 
         public S outputItem(int port, Item item, int amount) {
-            return this.outputItem(port, () -> item, amount);
+            return outputItem(port, () -> item, amount);
+        }
+
+        public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount, float rate) {
+            return output(port, () -> new ProcessingResults.FluidResult(
+                    true, rate, new FluidStack(fluid.get(), amount)));
         }
 
         public S outputFluid(int port, Fluid fluid, int amount, float rate) {
-            return this.output(port, new ProcessingResults.FluidResult(true, rate, new FluidStack(fluid, amount)));
+            return output(port, new ProcessingResults.FluidResult(
+                    true, rate, new FluidStack(fluid, amount)));
+        }
+
+        public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
+            return outputFluid(port, fluid, amount, 1.0f);
         }
 
         public S outputFluid(int port, Fluid fluid, int amount) {
-            return this.outputFluid(port, fluid, amount, 1.0f);
+            return outputFluid(port, fluid, amount, 1.0f);
         }
 
-        public S workTicks(long workTicks) {
-            this.workTicks = workTicks;
+        public S workTicks(long value) {
+            workTicks = value;
             return self();
         }
 
         public S primitive() {
-            this.voltage = 0;
+            voltage = 0;
             return self();
         }
 
-        public S voltage(Voltage voltage) {
-            this.voltage = voltage.val;
+        public S voltage(Voltage value) {
+            voltage = value.val;
             return self();
         }
 
-        public S voltage(long voltage) {
-            this.voltage = voltage;
+        public S voltage(long value) {
+            voltage = value;
             return self();
         }
 
-        public S power(long power) {
-            this.power = power;
+        public S power(long value) {
+            power = value;
             return self();
         }
 
         protected List<Input> getInputs() {
-            return this.inputs.stream().map(Supplier::get).toList();
+            return inputs.stream().map(Supplier::get).toList();
         }
 
         protected List<Output> getOutputs() {
-            return this.outputs.stream().map(Supplier::get).toList();
+            return outputs.stream().map(Supplier::get).toList();
         }
     }
 
@@ -220,9 +240,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
         @Override
         public Simple createObject() {
-            return new Simple(this.parent, this.loc,
-                    this.getInputs(), this.getOutputs(),
-                    this.workTicks, this.voltage, this.power);
+            return new Simple(parent, loc, getInputs(), getOutputs(), workTicks, voltage, power);
         }
     }
 
@@ -233,7 +251,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
 
         protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
-            var builder = this.type.getBuilder(loc);
+            var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                     .map(JsonElement::getAsJsonObject)
                     .forEach(je -> builder.input(
@@ -252,7 +270,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
         @Override
         public T fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
-            return this.buildFromJson(loc, jo).buildObject();
+            return buildFromJson(loc, jo).buildObject();
         }
 
         @Override
@@ -283,7 +301,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
 
         public B buildFromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
-            var builder = this.type.getBuilder(loc);
+            var builder = type.getBuilder(loc);
             buf.readWithCount(buf1 -> builder.input(
                     buf1.readVarInt(),
                     ProcessingIngredients.SERIALIZER.fromNetwork(buf1)));
@@ -298,7 +316,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
         @Override
         public T fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
-            return this.buildFromNetwork(loc, buf).buildObject();
+            return buildFromNetwork(loc, buf).buildObject();
         }
 
         @Override
