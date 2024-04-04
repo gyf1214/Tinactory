@@ -182,7 +182,13 @@ public class LogisticsComponent extends Component {
     }
 
     public void addPassiveStorage(LogisticsDirection dir, IPort port) {
+        LOGGER.debug("add PassiveStorage {} {}", dir, port);
         this.passiveStorages.put(dir, port);
+    }
+
+    public void removePassiveStorage(LogisticsDirection dir, IPort port) {
+        LOGGER.debug("remove PassiveStorage {} {}", dir, port);
+        this.passiveStorages.remove(dir, port);
     }
 
     public void addActiveRequest(LogisticsDirection type, IItemCollection port, ItemStack item) {

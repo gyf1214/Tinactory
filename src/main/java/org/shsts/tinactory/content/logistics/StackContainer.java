@@ -29,7 +29,6 @@ import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
-import org.shsts.tinactory.core.network.CompositeNetwork;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 
 import javax.annotation.Nonnull;
@@ -165,48 +164,59 @@ public class StackContainer implements ICapabilityProvider,
         return internal ? portInfo.internalPort : portInfo.port;
     }
 
-    private void updateTargetRecipe() {
+    private void updateTargetRecipe(boolean updateFilter) {
         if (!(blockEntity instanceof Machine machine)) {
             return;
         }
         var targetRecipe = machine.machineConfig.getTargetRecipe();
+        var logistics = machine.getNetwork()
+                .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
+                .orElse(null);
         if (targetRecipe == null) {
-            for (var itemHandler : itemInputs.values()) {
-                itemHandler.resetFilter();
+            if (updateFilter) {
+                for (var itemHandler : itemInputs.values()) {
+                    itemHandler.resetFilter();
+                }
+                for (var tank : fluidInputs.values()) {
+                    tank.resetFilter();
+                }
             }
-            for (var tank : fluidInputs.values()) {
-                tank.resetFilter();
+            if (logistics != null) {
+                for (var portInfo : ports) {
+                    if (portInfo.type != SlotType.NONE && !portInfo.type.output) {
+                        logistics.removePassiveStorage(LogisticsDirection.PULL, portInfo.port);
+                    }
+                }
             }
             return;
         }
         for (var input : targetRecipe.inputs) {
             var port = input.port();
             var ingredient = input.ingredient();
-            if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                var handler = itemInputs.get(port);
-                if (handler != null) {
-                    handler.filter = item.ingredient();
-                }
-            } else if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
-                var handler = itemInputs.get(port);
-                if (handler != null) {
-                    var stack1 = item.stack();
-                    handler.filter = stack -> ItemHelper.canItemsStack(stack, stack1);
-                }
-            } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                for (var tank : fluidInputs.get(port)) {
-                    var stack1 = fluid.fluid();
-                    tank.filter = stack -> stack.isFluidEqual(stack1);
+            if (!hasPort(port)) {
+                continue;
+            }
+            if (updateFilter) {
+                if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
+                    var handler = itemInputs.get(port);
+                    if (handler != null) {
+                        handler.filter = item.ingredient();
+                    }
+                } else if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
+                    var handler = itemInputs.get(port);
+                    if (handler != null) {
+                        var stack1 = item.stack();
+                        handler.filter = stack -> ItemHelper.canItemsStack(stack, stack1);
+                    }
+                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
+                    for (var tank : fluidInputs.get(port)) {
+                        var stack1 = fluid.fluid();
+                        tank.filter = stack -> stack.isFluidEqual(stack1);
+                    }
                 }
             }
-        }
-    }
-
-    private void onConnect(CompositeNetwork network) {
-        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-        for (var portInfo : ports) {
-            if (!portInfo.type.output) {
-                logistics.addPassiveStorage(LogisticsDirection.PULL, portInfo.port);
+            if (logistics != null) {
+                logistics.addPassiveStorage(LogisticsDirection.PULL, getPort(port, false));
             }
         }
     }
@@ -241,11 +251,11 @@ public class StackContainer implements ICapabilityProvider,
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllBlockEntityEvents.SERVER_LOAD, $ -> updateTargetRecipe());
-        eventManager.subscribe(AllBlockEntityEvents.CONNECT, this::onConnect);
+        eventManager.subscribe(AllBlockEntityEvents.SERVER_LOAD, $ -> updateTargetRecipe(true));
+        eventManager.subscribe(AllBlockEntityEvents.CONNECT, $ -> updateTargetRecipe(false));
         eventManager.subscribe(AllBlockEntityEvents.DUMP_ITEM_OUTPUT, this::dumpItemOutput);
         eventManager.subscribe(AllBlockEntityEvents.DUMP_FLUID_OUTPUT, this::dumpFluidOutput);
-        eventManager.subscribe(AllBlockEntityEvents.SET_MACHINE_CONFIG, $ -> updateTargetRecipe());
+        eventManager.subscribe(AllBlockEntityEvents.SET_MACHINE_CONFIG, $ -> updateTargetRecipe(true));
     }
 
     @Nonnull
