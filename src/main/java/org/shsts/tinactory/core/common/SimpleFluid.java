@@ -12,7 +12,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SimpleFluid extends EmptyFluid {
-    protected final FluidAttributes.Builder builder;
+    private final FluidAttributes.Builder builder;
 
     public SimpleFluid(ResourceLocation stillTexture, int color) {
         this.builder = FluidAttributes.builder(stillTexture, null)
@@ -22,7 +22,7 @@ public class SimpleFluid extends EmptyFluid {
 
     @Override
     protected FluidAttributes createAttributes() {
-        return this.builder.build(this);
+        return builder.build(this);
     }
 
     @Override

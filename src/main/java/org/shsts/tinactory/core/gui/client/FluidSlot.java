@@ -24,10 +24,10 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FluidSlot extends ContainerWidget {
-    protected static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
+    private static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
 
-    protected final int tank;
-    protected final int syncSlot;
+    private final int tank;
+    private final int syncSlot;
 
     public FluidSlot(ContainerMenu<?> menu, Rect rect, int tank, int syncSlot) {
         super(menu, rect);
@@ -35,8 +35,8 @@ public class FluidSlot extends ContainerWidget {
         this.syncSlot = syncSlot;
     }
 
-    protected FluidStack getFluidStack() {
-        return this.menu.getSyncPacket(this.syncSlot, FluidSyncPacket.class)
+    private FluidStack getFluidStack() {
+        return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
                 .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
     }
 
@@ -47,7 +47,7 @@ public class FluidSlot extends ContainerWidget {
 
     @Override
     public Optional<List<Component>> getTooltip() {
-        var fluidStack = this.getFluidStack();
+        var fluidStack = getFluidStack();
         if (fluidStack.isEmpty() || fluidStack.getFluid() == null) {
             return Optional.empty();
         }
@@ -63,22 +63,22 @@ public class FluidSlot extends ContainerWidget {
 
     @Override
     protected boolean canClick(int button) {
-        return (button == 0 || button == 1) && !this.menu.getCarried().isEmpty();
+        return (button == 0 || button == 1) && !menu.getCarried().isEmpty();
     }
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        this.menu.triggerEvent(ContainerEventHandler.FLUID_CLICK, (containerId, eventId) ->
-                new FluidEventPacket(containerId, eventId, this.tank, button));
+        menu.triggerEvent(ContainerEventHandler.FLUID_CLICK, (containerId, eventId) ->
+                new FluidEventPacket(containerId, eventId, tank, button));
     }
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        RenderUtil.renderFluid(poseStack, this.getFluidStack(), this.rect, this.zIndex);
+        RenderUtil.renderFluid(poseStack, getFluidStack(), rect, zIndex);
 
-        if (this.isHovering(mouseX, mouseY)) {
+        if (isHovering(mouseX, mouseY)) {
             RenderSystem.colorMask(true, true, true, false);
-            RenderUtil.fill(poseStack, this.rect, HIGHLIGHT_COLOR);
+            RenderUtil.fill(poseStack, rect, HIGHLIGHT_COLOR);
             RenderSystem.colorMask(true, true, true, true);
         }
     }

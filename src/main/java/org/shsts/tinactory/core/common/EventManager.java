@@ -25,13 +25,13 @@ public class EventManager implements ICapabilityProvider {
 
     @SuppressWarnings("unchecked")
     public <A> void invoke(Event<A> event, A arg) {
-        for (var handler : this.handlers.get(event)) {
+        for (var handler : handlers.get(event)) {
             ((Consumer<A>) handler).accept(arg);
         }
     }
 
     public <A> void subscribe(Supplier<Event<A>> event, Consumer<A> handler) {
-        this.handlers.put(event.get(), handler);
+        handlers.put(event.get(), handler);
     }
 
     public static <A> void invoke(BlockEntity be, Supplier<Event<A>> event, A arg) {

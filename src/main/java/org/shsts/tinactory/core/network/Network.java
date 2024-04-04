@@ -39,7 +39,7 @@ public class Network extends NetworkBase {
 
     public <T extends Component> T getComponent(Supplier<ComponentType<T>> typeSupp) {
         var type = typeSupp.get();
-        return type.componentClass.cast(components.get(type));
+        return type.cast(components.get(type));
     }
 
     protected void attachComponent(ComponentType<?> type) {

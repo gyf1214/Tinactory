@@ -11,7 +11,7 @@ public class Event<A> extends ForgeRegistryEntry<Event<?>> {
     private final Class<A> argClass;
 
     public A cast(Object sth) {
-        return this.argClass.cast(sth);
+        return argClass.cast(sth);
     }
 
     public Event(Class<A> argClass) {

@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class SmartEntityBlock<T extends BlockEntity> extends Block implements EntityBlock {
-    protected final Supplier<SmartBlockEntityType<T>> entityType;
+    private final Supplier<SmartBlockEntityType<T>> entityType;
 
     protected SmartEntityBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType) {
         super(properties);
@@ -42,35 +42,35 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
 
     public Optional<T> getBlockEntity(Level world, BlockPos pos) {
         if (world.isLoaded(pos)) {
-            var clazz = this.getEntityClass();
-            return world.getBlockEntity(pos, this.getEntityType())
+            var clazz = getEntityClass();
+            return world.getBlockEntity(pos, getEntityType())
                     .flatMap(be -> clazz.isInstance(be) ? Optional.of(clazz.cast(be)) : Optional.empty());
         }
         return Optional.empty();
     }
 
     public <T1 extends BlockEntity> Optional<T1> getBlockEntity(Level world, BlockPos pos, Class<T1> clazz) {
-        return clazz.isAssignableFrom(this.getEntityClass()) ?
-                this.getBlockEntity(world, pos).map(clazz::cast) : Optional.empty();
+        return clazz.isAssignableFrom(getEntityClass()) ?
+                getBlockEntity(world, pos).map(clazz::cast) : Optional.empty();
     }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return this.getEntityType().create(pos, state);
+        return getEntityType().create(pos, state);
     }
 
     @Nullable
     @Override
     public <T1 extends BlockEntity> BlockEntityTicker<T1>
     getTicker(Level world, BlockState state, BlockEntityType<T1> type) {
-        return type == this.getEntityType() && this.getEntityType().ticking ? SmartBlockEntity::ticker : null;
+        return type == getEntityType() && getEntityType().ticking ? SmartBlockEntity::ticker : null;
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
                                  InteractionHand hand, BlockHitResult hitResult) {
-        var menu = this.entityType.get().menu;
+        var menu = entityType.get().menu;
         if (menu == null) {
             return InteractionResult.PASS;
         }

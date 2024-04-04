@@ -24,8 +24,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class SmartBlockEntity extends BlockEntity {
-    protected boolean isChunkUnloaded = false;
-    protected boolean isUpdateForced = false;
+    private boolean isChunkUnloaded = false;
+    private boolean isUpdateForced = false;
 
     public SmartBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -143,7 +143,7 @@ public class SmartBlockEntity extends BlockEntity {
 
     protected void deserializeOnSave(CompoundTag tag) {}
 
-    protected boolean shouldSendUpdate() {
+    private boolean shouldSendUpdate() {
         if (isUpdateForced) {
             isUpdateForced = false;
             return true;

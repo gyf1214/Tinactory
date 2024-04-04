@@ -20,8 +20,8 @@ public class ValueHolder<T> implements Supplier<T> {
 
     @Override
     public T get() {
-        assert this.value != null;
-        return this.value;
+        assert value != null;
+        return value;
     }
 
     public static <T1> ValueHolder<T1> create() {

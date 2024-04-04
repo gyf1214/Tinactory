@@ -22,11 +22,11 @@ import java.util.function.Supplier;
 public class ElectricComponent extends Component {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected double lossFactor = 0d;
-    protected double powerGen, powerCons;
-    protected double powerBufferGen, powerBufferCons;
-    protected double workFactor;
-    protected double bufferFactor;
+    private double lossFactor = 0d;
+    private double powerGen, powerCons;
+    private double powerBufferGen, powerBufferCons;
+    private double workFactor;
+    private double bufferFactor;
 
     public ElectricComponent(ComponentType<?> type, Network network) {
         super(type, network);
@@ -38,88 +38,92 @@ public class ElectricComponent extends Component {
             var voltage = electricBlock.getVoltage(state);
             if (voltage > 0) {
                 var loss = electricBlock.getResistance(state) / voltage / voltage;
-                this.lossFactor += loss;
+                lossFactor += loss;
             }
         }
     }
 
     @Override
     public void onConnect() {
-        LOGGER.debug("{} on connect lossFactor = {}", this, this.lossFactor);
+        LOGGER.debug("{} on connect lossFactor = {}", this, lossFactor);
     }
 
     @Override
     public void onDisconnect() {
-        this.lossFactor = 0d;
+        lossFactor = 0d;
     }
 
-    protected double solvePowerCons(double powerGen) {
-        return 2 * powerGen / (1 + Math.sqrt(1 + 4 * this.lossFactor * powerGen));
+    private double solvePowerCons(double powerGen) {
+        return 2 * powerGen / (1 + Math.sqrt(1 + 4 * lossFactor * powerGen));
     }
 
-    protected double solveBufferFactor(double power) {
+    private double solveBufferFactor(double power) {
         var comp = MathUtil.compare(power);
         if (comp == 0) {
             return 0d;
         } else if (comp > 0) {
             /* consumer */
-            if (this.powerBufferCons < MathUtil.EPS) {
+            if (powerBufferCons < MathUtil.EPS) {
                 return 0d;
             }
-            return MathUtil.clamp(power / this.powerBufferCons, 0d, 1d);
+            return MathUtil.clamp(power / powerBufferCons, 0d, 1d);
         } else {
             /* generator */
-            if (this.powerBufferGen < MathUtil.EPS) {
+            if (powerBufferGen < MathUtil.EPS) {
                 return 0d;
             }
-            return MathUtil.clamp(power / this.powerBufferGen, 0d, 1d);
+            return MathUtil.clamp(power / powerBufferGen, 0d, 1d);
         }
     }
 
-    protected void solveNetwork() {
-        this.powerGen = 0d;
-        this.powerCons = 0d;
-        this.powerBufferGen = 0d;
-        this.powerBufferCons = 0d;
-        for (var machine : this.network.getMachines()) {
+    private void solveNetwork() {
+        powerGen = 0d;
+        powerCons = 0d;
+        powerBufferGen = 0d;
+        powerBufferCons = 0d;
+        for (var machine : network.getMachines()) {
             machine.getElectric().ifPresent(electric -> {
                 switch (electric.getMachineType()) {
-                    case GENERATOR -> this.powerGen += electric.getPowerGen();
-                    case CONSUMER -> this.powerCons += electric.getPowerCons();
+                    case GENERATOR -> powerGen += electric.getPowerGen();
+                    case CONSUMER -> powerCons += electric.getPowerCons();
                     case BUFFER -> {
-                        this.powerBufferGen += electric.getPowerGen();
-                        this.powerBufferCons += electric.getPowerCons();
+                        powerBufferGen += electric.getPowerGen();
+                        powerBufferCons += electric.getPowerCons();
                     }
                 }
             });
         }
-        var needPower = this.powerCons + this.powerCons * this.powerCons * this.lossFactor;
-        if (needPower <= this.powerGen) {
-            this.workFactor = 1d;
+        var needPower = powerCons + powerCons * powerCons * lossFactor;
+        if (needPower <= powerGen) {
+            workFactor = 1d;
             // buffer is consumer
-            this.bufferFactor = this.solveBufferFactor(this.solvePowerCons(this.powerGen) - this.powerCons);
-        } else if (needPower <= this.powerGen + this.powerBufferGen) {
-            this.workFactor = 1d;
+            bufferFactor = solveBufferFactor(solvePowerCons(powerGen) - powerCons);
+        } else if (needPower <= powerGen + powerBufferGen) {
+            workFactor = 1d;
             // buffer is generator
-            this.bufferFactor = this.solveBufferFactor(this.powerGen - needPower);
+            bufferFactor = solveBufferFactor(powerGen - needPower);
         } else {
             // buffer is generator
-            this.bufferFactor = -1d;
-            var powerOut = this.solvePowerCons(this.powerGen + this.powerBufferGen);
-            if (this.powerCons < MathUtil.EPS) {
-                this.workFactor = 0d;
+            bufferFactor = -1d;
+            var powerOut = solvePowerCons(powerGen + powerBufferGen);
+            if (powerCons < MathUtil.EPS) {
+                workFactor = 0d;
             } else {
-                this.workFactor = MathUtil.clamp(powerOut / this.powerCons, 0d, 1d);
+                workFactor = MathUtil.clamp(powerOut / powerCons, 0d, 1d);
             }
         }
     }
 
     public double getWorkFactor() {
-        return this.workFactor;
+        return workFactor;
+    }
+
+    public double getBufferFactor() {
+        return bufferFactor;
     }
 
     @Override
     public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Ticker> cons) {
-        cons.accept(AllNetworks.ELECTRIC_SCHEDULING, (world, network) -> this.solveNetwork());
+        cons.accept(AllNetworks.ELECTRIC_SCHEDULING, (world, network) -> solveNetwork());
     }
 }

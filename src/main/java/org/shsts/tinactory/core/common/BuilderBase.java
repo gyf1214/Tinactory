@@ -21,20 +21,20 @@ public abstract class BuilderBase<U, P, S extends BuilderBase<U, P, S>> implemen
     public abstract U createObject();
 
     public U buildObject() {
-        var object = this.createObject();
-        for (var cb : this.onCreateObject) {
+        var object = createObject();
+        for (var cb : onCreateObject) {
             cb.accept(object);
         }
-        this.onCreateObject.clear();
+        onCreateObject.clear();
         return object;
     }
 
     public P build() {
-        for (var cb : this.onBuild) {
+        for (var cb : onBuild) {
             cb.accept(self());
         }
-        this.onBuild.clear();
-        return this.parent;
+        onBuild.clear();
+        return parent;
     }
 
     public S transform(Transformer<S> trans) {

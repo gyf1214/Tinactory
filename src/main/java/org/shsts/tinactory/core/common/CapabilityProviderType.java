@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 public class CapabilityProviderType<T extends BlockEntity, B extends Function<T, ICapabilityProvider>> extends
         ForgeRegistryEntry<ICapabilityProviderType<?, ?>> implements ICapabilityProviderType<T, B> {
-    protected final Supplier<B> builderFactory;
+    private final Supplier<B> builderFactory;
 
     public CapabilityProviderType(Supplier<B> builderFactory) {
         this.builderFactory = builderFactory;
@@ -27,6 +27,6 @@ public class CapabilityProviderType<T extends BlockEntity, B extends Function<T,
 
     @Override
     public B getBuilder() {
-        return this.builderFactory.get();
+        return builderFactory.get();
     }
 }

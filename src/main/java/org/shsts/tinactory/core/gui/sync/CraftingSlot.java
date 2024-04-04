@@ -30,7 +30,7 @@ public class CraftingSlot extends Slot {
 
     @Override
     public boolean mayPickup(Player player) {
-        return !this.getItem().isEmpty();
+        return !getItem().isEmpty();
     }
 
     @Override
@@ -45,21 +45,21 @@ public class CraftingSlot extends Slot {
 
     @Override
     public ItemStack getItem() {
-        return this.workbench.getResult();
+        return workbench.getResult();
     }
 
     @Override
     public void set(ItemStack stack) {
-        this.workbench.setResult(stack);
+        workbench.setResult(stack);
     }
 
     @Override
     public ItemStack remove(int amount) {
-        return ItemHandlerHelper.copyStackWithSize(this.getItem(), amount);
+        return ItemHandlerHelper.copyStackWithSize(getItem(), amount);
     }
 
     @Override
     public void onTake(Player player, ItemStack stack) {
-        this.workbench.onTake(player, stack);
+        workbench.onTake(player, stack);
     }
 }

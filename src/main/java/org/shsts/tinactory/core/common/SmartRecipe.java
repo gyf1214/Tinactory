@@ -28,9 +28,9 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
         T create(RecipeTypeEntry<T, ?> type, ResourceLocation loc);
     }
 
-    protected final ResourceLocation loc;
-    protected final RecipeType<? super T> type;
-    protected final RecipeSerializer<T> serializer;
+    private final ResourceLocation loc;
+    private final RecipeType<? super T> type;
+    private final RecipeSerializer<T> serializer;
 
     protected SmartRecipe(RecipeTypeEntry<T, ?> type, ResourceLocation loc) {
         this.loc = loc;
@@ -48,29 +48,29 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
 
     @Override
     public RecipeType<?> getType() {
-        return this.type;
+        return type;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return this.serializer;
+        return serializer;
     }
 
     @Override
     public ResourceLocation getId() {
-        return this.loc;
+        return loc;
     }
 
     @Override
     public boolean matches(ContainerWrapper<C> wrapper, Level world) {
-        return this.matches(wrapper.compose, world);
+        return matches(wrapper.compose, world);
     }
 
     public abstract boolean matches(C container, Level world);
 
     @Override
     public ItemStack assemble(ContainerWrapper<C> wrapper) {
-        return this.assemble(wrapper.compose);
+        return assemble(wrapper.compose);
     }
 
     public abstract ItemStack assemble(C container);
@@ -80,7 +80,7 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
 
     @Override
     public NonNullList<ItemStack> getRemainingItems(ContainerWrapper<C> container) {
-        return this.getRemainingItems(container.compose);
+        return getRemainingItems(container.compose);
     }
 
     public NonNullList<ItemStack> getRemainingItems(C container) {
@@ -132,7 +132,7 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
     }
 
     public FinishedRecipe toFinished() {
-        return new SimpleFinished<>(this.loc, this.serializer) {
+        return new SimpleFinished<>(loc, serializer) {
             @Override
             public void serializeRecipeData(JsonObject jo) {
                 ((SmartRecipeSerializer<T, ?>) serializer).toJson(jo, SmartRecipe.this.self());

@@ -36,40 +36,40 @@ public class Panel extends ContainerWidget {
     }
 
     public void addWidget(ContainerWidget widget) {
-        this.children.add(widget);
+        children.add(widget);
     }
 
     protected void initChildren() {
-        for (var child : this.children) {
-            child.init(this.rect);
+        for (var child : children) {
+            child.init(rect);
         }
     }
 
     @Override
     public void init(Rect parent) {
         super.init(parent);
-        this.initChildren();
+        initChildren();
     }
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        if (!this.visible) {
+        if (!visible) {
             return;
         }
-        for (var child : this.children) {
+        for (var child : children) {
             child.render(poseStack, mouseX, mouseY, partialTick);
         }
     }
 
     @Override
     public boolean isHovering(double mouseX, double mouseY) {
-        this.hoveringChild = null;
-        if (!this.visible) {
+        hoveringChild = null;
+        if (!visible) {
             return false;
         }
-        for (var child : this.children) {
+        for (var child : children) {
             if (child.isHovering(mouseX, mouseY)) {
-                this.hoveringChild = child;
+                hoveringChild = child;
                 return true;
             }
         }
@@ -78,18 +78,18 @@ public class Panel extends ContainerWidget {
 
     @Override
     public Optional<List<Component>> getTooltip() {
-        return Optional.ofNullable(this.hoveringChild).flatMap(ContainerWidget::getTooltip);
+        return Optional.ofNullable(hoveringChild).flatMap(ContainerWidget::getTooltip);
     }
 
     @Override
     public boolean isClicking(double mouseX, double mouseY, int button) {
-        this.clickingChild = null;
-        if (!this.visible) {
+        clickingChild = null;
+        if (!visible) {
             return false;
         }
-        for (var child : this.children) {
+        for (var child : children) {
             if (child.isClicking(mouseX, mouseY, button)) {
-                this.clickingChild = child;
+                clickingChild = child;
                 return true;
             }
         }
@@ -98,8 +98,8 @@ public class Panel extends ContainerWidget {
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        if (this.clickingChild != null) {
-            this.clickingChild.onMouseClicked(mouseX, mouseY, button);
+        if (clickingChild != null) {
+            clickingChild.onMouseClicked(mouseX, mouseY, button);
         }
     }
 }

@@ -29,7 +29,7 @@ public class StretchImage extends ContainerWidget {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        render(poseStack, this.texture, this.zIndex, this.rect, this.texRect, this.border);
+        render(poseStack, texture, zIndex, rect, texRect, border);
     }
 
     public static void render(PoseStack poseStack, Texture texture, int zIndex,

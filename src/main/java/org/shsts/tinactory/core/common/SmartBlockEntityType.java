@@ -40,20 +40,20 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
     }
 
     public T cast(BlockEntity be) {
-        return this.entityClass.cast(be);
+        return entityClass.cast(be);
     }
 
     public void attachCapabilities(AttachCapabilitiesEvent<BlockEntity> e) {
-        var be = this.cast(e.getObject());
+        var be = cast(e.getObject());
         EventManager eventManager = null;
-        if (this.hasEvent) {
+        if (hasEvent) {
             eventManager = new EventManager();
             e.addCapability(new ResourceLocation(Tinactory.ID, "event_manager"), eventManager);
         }
-        for (var capEntry : this.capabilities.entrySet()) {
+        for (var capEntry : capabilities.entrySet()) {
             var cap = capEntry.getValue().apply(be);
             e.addCapability(capEntry.getKey(), cap);
-            if (this.hasEvent && cap instanceof IEventSubscriber subscriber) {
+            if (hasEvent && cap instanceof IEventSubscriber subscriber) {
                 subscriber.subscribeEvents(eventManager);
             }
         }

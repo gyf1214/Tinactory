@@ -8,8 +8,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FluidEventPacket extends ContainerEventPacket {
-    protected int tankIndex;
-    protected int button;
+    private int tankIndex;
+    private int button;
 
     public FluidEventPacket() {}
 
@@ -22,15 +22,15 @@ public class FluidEventPacket extends ContainerEventPacket {
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         super.serializeToBuf(buf);
-        buf.writeVarInt(this.tankIndex);
-        buf.writeVarInt(this.button);
+        buf.writeVarInt(tankIndex);
+        buf.writeVarInt(button);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         super.deserializeFromBuf(buf);
-        this.tankIndex = buf.readVarInt();
-        this.button = buf.readVarInt();
+        tankIndex = buf.readVarInt();
+        button = buf.readVarInt();
     }
 
     public int getTankIndex() {

@@ -42,7 +42,7 @@ public abstract class Button extends ContainerWidget {
 
     @Override
     public Optional<List<Component>> getTooltip() {
-        return Optional.ofNullable(this.tooltip).map(List::of);
+        return Optional.ofNullable(tooltip).map(List::of);
     }
 
     @Override
@@ -52,6 +52,6 @@ public abstract class Button extends ContainerWidget {
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        this.playDownSound();
+        playDownSound();
     }
 }

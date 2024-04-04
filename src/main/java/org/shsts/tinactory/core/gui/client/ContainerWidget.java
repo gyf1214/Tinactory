@@ -22,11 +22,11 @@ import java.util.Optional;
 public abstract class ContainerWidget extends GuiComponent implements Widget {
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 
-    protected final ContainerMenu<?> menu;
-    protected final RectD anchor;
-    protected final Rect offset;
-    protected final int zIndex;
+    private final RectD anchor;
+    private final Rect offset;
 
+    protected final ContainerMenu<?> menu;
+    protected final int zIndex;
     protected Rect rect;
 
     public ContainerWidget(ContainerMenu<?> menu, RectD anchor, Rect rect, int zIndex) {
@@ -46,12 +46,12 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
     }
 
     public void init(Rect parent) {
-        var sx = parent.inX(this.anchor.x()) + this.offset.x();
-        var tx = parent.inX(this.anchor.endX()) + this.offset.endX();
-        var sy = parent.inY(this.anchor.y()) + this.offset.y();
-        var ty = parent.inY(this.anchor.endY()) + this.offset.endY();
+        var sx = parent.inX(anchor.x()) + offset.x();
+        var tx = parent.inX(anchor.endX()) + offset.endX();
+        var sy = parent.inY(anchor.y()) + offset.y();
+        var ty = parent.inY(anchor.endY()) + offset.endY();
 
-        this.rect = Rect.corners(sx, sy, tx, ty);
+        rect = Rect.corners(sx, sy, tx, ty);
     }
 
     @Override
@@ -62,7 +62,7 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
     }
 
     public boolean isHovering(double mouseX, double mouseY) {
-        return this.canHover() && this.rect.in(mouseX, mouseY);
+        return canHover() && rect.in(mouseX, mouseY);
     }
 
     public Optional<List<Component>> getTooltip() {
@@ -74,7 +74,7 @@ public abstract class ContainerWidget extends GuiComponent implements Widget {
     }
 
     public boolean isClicking(double mouseX, double mouseY, int button) {
-        return this.canClick(button) && this.rect.in(mouseX, mouseY);
+        return canClick(button) && rect.in(mouseX, mouseY);
     }
 
     /**

@@ -26,14 +26,12 @@ public class ProgressBar extends ContainerWidget {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var progress = Math.max(this.menu.getSyncPacket(this.syncIndex, ContainerSyncPacket.Double.class)
+        var progress = Math.max(menu.getSyncPacket(syncIndex, ContainerSyncPacket.Double.class)
                 .map(ContainerSyncPacket.Double::getData).orElse(0d), 0d);
-        int w1 = (int) (progress * (double) this.rect.width());
-        int w2 = this.rect.width() - w1;
-        int h = this.rect.height();
-        RenderUtil.blit(poseStack, this.texture, this.zIndex,
-                this.rect.resize(w1, h), new Rect(0, h, w1, h));
-        RenderUtil.blit(poseStack, this.texture, this.zIndex,
-                this.rect.resize(w2, h).offset(w1, 0), new Rect(w1, 0, w2, h));
+        int w1 = (int) (progress * (double) rect.width());
+        int w2 = rect.width() - w1;
+        int h = rect.height();
+        RenderUtil.blit(poseStack, texture, zIndex, rect.resize(w1, h), new Rect(0, h, w1, h));
+        RenderUtil.blit(poseStack, texture, zIndex, rect.resize(w2, h).offset(w1, 0), new Rect(w1, 0, w2, h));
     }
 }

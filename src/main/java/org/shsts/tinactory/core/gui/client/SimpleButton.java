@@ -47,10 +47,10 @@ public abstract class SimpleButton extends Button {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        if (this.isHovering(mouseX, mouseY)) {
-            RenderUtil.blit(poseStack, this.texture, this.zIndex, this.rect, this.hoverX, this.hoverY);
+        if (isHovering(mouseX, mouseY)) {
+            RenderUtil.blit(poseStack, texture, zIndex, rect, hoverX, hoverY);
         } else {
-            RenderUtil.blit(poseStack, this.texture, this.zIndex, this.rect, this.normalX, this.normalY);
+            RenderUtil.blit(poseStack, texture, zIndex, rect, normalX, normalY);
         }
     }
 }

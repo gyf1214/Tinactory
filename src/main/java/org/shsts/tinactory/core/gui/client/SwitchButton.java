@@ -36,20 +36,20 @@ public class SwitchButton extends Button {
     @SuppressWarnings("unchecked")
     public void onMouseClicked(double mouseX, double mouseY, int button) {
         super.onMouseClicked(mouseX, mouseY, button);
-        this.value = !this.value;
-        ((BiConsumer<ContainerMenu<?>, Boolean>) this.onSwitch).accept(this.menu, this.value);
+        value = !value;
+        ((BiConsumer<ContainerMenu<?>, Boolean>) onSwitch).accept(menu, value);
     }
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        if (this.syncSlot >= 0) {
-            this.menu.getSyncPacket(this.syncSlot, ContainerSyncPacket.Boolean.class)
-                    .ifPresent(value -> this.value = value.getValue());
+        if (syncSlot >= 0) {
+            menu.getSyncPacket(syncSlot, ContainerSyncPacket.Boolean.class)
+                    .ifPresent(packet -> value = packet.getValue());
         }
-        if (this.value) {
-            RenderUtil.blit(poseStack, this.texture, this.zIndex, this.rect, 0, this.rect.height());
+        if (value) {
+            RenderUtil.blit(poseStack, texture, zIndex, rect, 0, rect.height());
         } else {
-            RenderUtil.blit(poseStack, this.texture, this.zIndex, this.rect);
+            RenderUtil.blit(poseStack, texture, zIndex, rect);
         }
     }
 }

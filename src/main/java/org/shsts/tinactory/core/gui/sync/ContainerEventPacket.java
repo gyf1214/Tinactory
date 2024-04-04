@@ -13,11 +13,11 @@ public class ContainerEventPacket implements IPacket {
     protected int eventId;
 
     public int getContainerId() {
-        return this.containerId;
+        return containerId;
     }
 
     public int getEventId() {
-        return this.eventId;
+        return eventId;
     }
 
     public ContainerEventPacket() {}
@@ -29,14 +29,14 @@ public class ContainerEventPacket implements IPacket {
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeVarInt(this.containerId);
-        buf.writeVarInt(this.eventId);
+        buf.writeVarInt(containerId);
+        buf.writeVarInt(eventId);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        this.containerId = buf.readVarInt();
-        this.eventId = buf.readVarInt();
+        containerId = buf.readVarInt();
+        eventId = buf.readVarInt();
     }
 
     @FunctionalInterface

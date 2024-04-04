@@ -44,6 +44,6 @@ public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
 
     @Override
     public T fromJson(ResourceLocation loc, JsonObject jo) {
-        return this.fromJson(loc, jo, ICondition.IContext.EMPTY);
+        return fromJson(loc, jo, ICondition.IContext.EMPTY);
     }
 }

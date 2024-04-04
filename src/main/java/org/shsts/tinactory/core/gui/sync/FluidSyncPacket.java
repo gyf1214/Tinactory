@@ -10,7 +10,7 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FluidSyncPacket extends ContainerSyncPacket {
-    protected FluidStack fluidStack = FluidStack.EMPTY;
+    private FluidStack fluidStack = FluidStack.EMPTY;
 
     public FluidSyncPacket() {}
 
@@ -22,13 +22,13 @@ public class FluidSyncPacket extends ContainerSyncPacket {
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         super.serializeToBuf(buf);
-        this.fluidStack.writeToPacket(buf);
+        fluidStack.writeToPacket(buf);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         super.deserializeFromBuf(buf);
-        this.fluidStack = FluidStack.readFromPacket(buf);
+        fluidStack = FluidStack.readFromPacket(buf);
     }
 
     @Override
@@ -36,15 +36,15 @@ public class FluidSyncPacket extends ContainerSyncPacket {
         if (this == o) return true;
         if (!(o instanceof FluidSyncPacket that)) return false;
         if (!super.equals(o)) return false;
-        return this.fluidStack.isFluidStackIdentical(that.fluidStack);
+        return fluidStack.isFluidStackIdentical(that.fluidStack);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), this.fluidStack);
+        return Objects.hash(super.hashCode(), fluidStack);
     }
 
     public FluidStack getFluidStack() {
-        return this.fluidStack;
+        return fluidStack;
     }
 }

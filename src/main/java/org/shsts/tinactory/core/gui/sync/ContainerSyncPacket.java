@@ -25,35 +25,35 @@ public abstract class ContainerSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeVarInt(this.containerId);
-        buf.writeVarInt(this.index);
+        buf.writeVarInt(containerId);
+        buf.writeVarInt(index);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        this.containerId = buf.readVarInt();
-        this.index = buf.readVarInt();
+        containerId = buf.readVarInt();
+        index = buf.readVarInt();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         ContainerSyncPacket that = (ContainerSyncPacket) o;
-        return this.containerId == that.containerId && this.index == that.index;
+        return containerId == that.containerId && index == that.index;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.containerId, this.index);
+        return Objects.hash(containerId, index);
     }
 
     public int getContainerId() {
-        return this.containerId;
+        return containerId;
     }
 
     public int getIndex() {
-        return this.index;
+        return index;
     }
 
     public static class Boolean extends ContainerSyncPacket {
@@ -69,13 +69,13 @@ public abstract class ContainerSyncPacket implements IPacket {
         @Override
         public void serializeToBuf(FriendlyByteBuf buf) {
             super.serializeToBuf(buf);
-            buf.writeBoolean(this.value);
+            buf.writeBoolean(value);
         }
 
         @Override
         public void deserializeFromBuf(FriendlyByteBuf buf) {
             super.deserializeFromBuf(buf);
-            this.value = buf.readBoolean();
+            value = buf.readBoolean();
         }
 
         @Override
@@ -83,16 +83,16 @@ public abstract class ContainerSyncPacket implements IPacket {
             if (this == o) return true;
             if (!(o instanceof Boolean that)) return false;
             if (!super.equals(o)) return false;
-            return this.value == that.value;
+            return value == that.value;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), this.value);
+            return Objects.hash(super.hashCode(), value);
         }
 
         public boolean getValue() {
-            return this.value;
+            return value;
         }
     }
 
@@ -109,13 +109,13 @@ public abstract class ContainerSyncPacket implements IPacket {
         @Override
         public void serializeToBuf(FriendlyByteBuf buf) {
             super.serializeToBuf(buf);
-            buf.writeDouble(this.data);
+            buf.writeDouble(data);
         }
 
         @Override
         public void deserializeFromBuf(FriendlyByteBuf buf) {
             super.deserializeFromBuf(buf);
-            this.data = buf.readDouble();
+            data = buf.readDouble();
         }
 
         @Override
@@ -123,16 +123,16 @@ public abstract class ContainerSyncPacket implements IPacket {
             if (this == o) return true;
             if (!(o instanceof Double that)) return false;
             if (!super.equals(o)) return false;
-            return java.lang.Double.compare(that.data, this.data) == 0;
+            return java.lang.Double.compare(that.data, data) == 0;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), this.data);
+            return Objects.hash(super.hashCode(), data);
         }
 
         public double getData() {
-            return this.data;
+            return data;
         }
     }
 
@@ -149,13 +149,13 @@ public abstract class ContainerSyncPacket implements IPacket {
         @Override
         public void serializeToBuf(FriendlyByteBuf buf) {
             super.serializeToBuf(buf);
-            buf.writeVarLong(this.data);
+            buf.writeVarLong(data);
         }
 
         @Override
         public void deserializeFromBuf(FriendlyByteBuf buf) {
             super.deserializeFromBuf(buf);
-            this.data = buf.readVarLong();
+            data = buf.readVarLong();
         }
 
         @Override
@@ -163,16 +163,16 @@ public abstract class ContainerSyncPacket implements IPacket {
             if (this == o) return true;
             if (!(o instanceof Long that)) return false;
             if (!super.equals(o)) return false;
-            return this.data == that.data;
+            return data == that.data;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), this.data);
+            return Objects.hash(super.hashCode(), data);
         }
 
         public long getData() {
-            return this.data;
+            return data;
         }
     }
 
@@ -194,9 +194,9 @@ public abstract class ContainerSyncPacket implements IPacket {
         @Override
         public void serializeToBuf(FriendlyByteBuf buf) {
             super.serializeToBuf(buf);
-            buf.writeBoolean(this.data != null);
-            if (this.data != null) {
-                this.dataToBuf(buf, this.data);
+            buf.writeBoolean(data != null);
+            if (data != null) {
+                dataToBuf(buf, data);
             }
         }
 
@@ -204,7 +204,7 @@ public abstract class ContainerSyncPacket implements IPacket {
         public void deserializeFromBuf(FriendlyByteBuf buf) {
             super.deserializeFromBuf(buf);
             var present = buf.readBoolean();
-            this.data = present ? this.dataFromBuf(buf) : null;
+            data = present ? dataFromBuf(buf) : null;
         }
 
         @Override
@@ -212,12 +212,12 @@ public abstract class ContainerSyncPacket implements IPacket {
             if (this == o) return true;
             if (!(o instanceof Holder<?> other)) return false;
             if (!super.equals(o)) return false;
-            return Objects.equals(this.data, other.data);
+            return Objects.equals(data, other.data);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), this.data);
+            return Objects.hash(super.hashCode(), data);
         }
 
         public Optional<T> getData() {
