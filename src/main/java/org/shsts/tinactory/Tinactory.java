@@ -20,7 +20,6 @@ import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllBlocks;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllClientEvents;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllItems;
@@ -92,7 +91,6 @@ public class Tinactory {
 
         AllRecipes.init();
         AllCapabilities.init();
-        AllCapabilityProviders.init();
         AllBlockEntityEvents.init();
         AllNetworks.init();
 

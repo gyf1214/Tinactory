@@ -29,6 +29,7 @@ import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -281,10 +282,16 @@ public class StackContainer implements ICapabilityProvider,
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 
-    public static class Builder implements Function<Machine, ICapabilityProvider> {
+    public static class Builder<P> extends CapabilityProviderBuilder<Machine, P> {
+        private record PortInfo(int slots, SlotType type) {}
+
         private final List<PortInfo> ports = new ArrayList<>();
 
-        public Builder layout(Layout layout) {
+        public Builder(P parent) {
+            super(parent, "logistics/stack_container");
+        }
+
+        public Builder<P> layout(Layout layout) {
             ports.clear();
             var slots = layout.slots.stream().filter(s -> s.type() != SlotType.NONE).toList();
             if (slots.isEmpty()) {
@@ -301,10 +308,13 @@ public class StackContainer implements ICapabilityProvider,
         }
 
         @Override
-        public ICapabilityProvider apply(Machine be) {
-            return new StackContainer(be, ports);
+        public Function<Machine, ICapabilityProvider> createObject() {
+            var ports = this.ports;
+            return be -> new StackContainer(be, ports);
         }
+    }
 
-        protected record PortInfo(int slots, SlotType type) {}
+    public static <P> Builder<P> builder(P parent) {
+        return new Builder<>(parent);
     }
 }

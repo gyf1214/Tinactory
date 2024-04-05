@@ -4,9 +4,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.MenuGen;
+import org.shsts.tinactory.content.logistics.StackContainer;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
@@ -48,10 +48,12 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                 .entityClass(Machine.class)
                 .blockEntity()
                 .hasEvent()
-                .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
-                        .recipeType(recipeType.get()).voltage(voltage))
-                .capability(AllCapabilityProviders.STACK_CONTAINER, $ -> $
-                        .layout(layout))
+                .capability(RecipeProcessor::builder)
+                .recipeType(recipeType).voltage(voltage)
+                .build()
+                .capability(StackContainer::builder)
+                .layout(layout)
+                .build()
                 .menu()
                 .transform(MenuGen.machineMenu(layout))
                 .transform(MenuGen.machineRecipeBook(recipeType, layout))
@@ -100,7 +102,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
         }
 
         public LayoutSetBuilder<Builder<T>> layoutSet() {
-            return Layout.builder(this, value -> layoutSet = value);
+            return Layout.builder(this).onCreateObject(value -> layoutSet = value);
         }
 
         public ProcessingSet<T> build() {

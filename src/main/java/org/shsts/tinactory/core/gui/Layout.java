@@ -7,7 +7,6 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.logistics.SlotType;
@@ -20,8 +19,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
@@ -126,8 +123,8 @@ public class Layout {
         return getSlotWithInfo(recipe.outputs, ProcessingRecipe.Output::port, ProcessingRecipe.Output::result);
     }
 
-    public static <P> LayoutSetBuilder<P> builder(P parent, Consumer<Map<Voltage, Layout>> onCreate) {
-        return new LayoutSetBuilder<>(parent, onCreate);
+    public static <P> LayoutSetBuilder<P> builder(P parent) {
+        return new LayoutSetBuilder<>(parent);
     }
 
     public static LayoutSetBuilder<?> builder() {

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -28,11 +27,6 @@ public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, La
     public LayoutSetBuilder(P parent) {
         super(parent);
         onBuild.add(LayoutSetBuilder::buildObject);
-    }
-
-    public LayoutSetBuilder(P parent, Consumer<Map<Voltage, Layout>> onCreate) {
-        this(parent);
-        onCreateObject.add(onCreate);
     }
 
     public LayoutSetBuilder<P> dummySlot(int x, int y) {

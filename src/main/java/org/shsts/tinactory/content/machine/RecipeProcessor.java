@@ -20,12 +20,14 @@ import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -49,7 +51,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     private IContainer container = null;
     private boolean needUpdate = true;
 
-    public RecipeProcessor(Machine blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
+    private RecipeProcessor(Machine blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
         this.blockEntity = blockEntity;
         this.recipeType = recipeType;
         this.voltage = voltage;
@@ -220,27 +222,37 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         }
     }
 
-    public static class Builder implements Function<Machine, ICapabilityProvider> {
+    public static class Builder<P> extends CapabilityProviderBuilder<Machine, P> {
         @Nullable
-        private RecipeType<? extends ProcessingRecipe<?>> recipeType = null;
+        private Supplier<? extends RecipeType<? extends ProcessingRecipe<?>>> recipeType = null;
         @Nullable
         private Voltage voltage = null;
 
-        public Builder recipeType(RecipeType<? extends ProcessingRecipe<?>> recipeType) {
+        public Builder(P parent) {
+            super(parent, "machine/recipe_processor");
+        }
+
+        public Builder<P> recipeType(Supplier<? extends RecipeType<? extends ProcessingRecipe<?>>> recipeType) {
             this.recipeType = recipeType;
             return this;
         }
 
-        public Builder voltage(Voltage voltage) {
+        public Builder<P> voltage(Voltage voltage) {
             this.voltage = voltage;
             return this;
         }
 
         @Override
-        public ICapabilityProvider apply(Machine blockEntity) {
+        public Function<Machine, ICapabilityProvider> createObject() {
+            var recipeType = this.recipeType;
+            var voltage = this.voltage;
             assert recipeType != null;
             assert voltage != null;
-            return new RecipeProcessor<>(blockEntity, recipeType, voltage);
+            return be -> new RecipeProcessor<>(be, recipeType.get(), voltage);
         }
+    }
+
+    public static <P> Builder<P> builder(P parent) {
+        return new Builder<>(parent);
     }
 }

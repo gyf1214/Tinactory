@@ -40,4 +40,9 @@ public abstract class BuilderBase<U, P, S extends BuilderBase<U, P, S>> implemen
     public S transform(Transformer<S> trans) {
         return trans.apply(self());
     }
+
+    public S onCreateObject(Consumer<U> cons) {
+        onCreateObject.add(cons);
+        return self();
+    }
 }

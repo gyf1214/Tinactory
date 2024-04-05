@@ -30,19 +30,21 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
+import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Workbench implements ICapabilityProvider, INBTSerializable<CompoundTag>, IWorkbench {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected static class CraftingStack extends CraftingContainer {
+    private static class CraftingStack extends CraftingContainer {
         @SuppressWarnings("ConstantConditions")
         public CraftingStack(int width, int height) {
             super(null, width, height);
@@ -59,7 +61,7 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         }
     }
 
-    protected static class ToolItemHandler extends ItemStackHandler {
+    private static class ToolItemHandler extends ItemStackHandler {
         public ToolItemHandler(int size) {
             super(size);
         }
@@ -76,15 +78,15 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         }
     }
 
-    protected boolean initialized = false;
-    protected final BlockEntity blockEntity;
-    protected final CraftingStack craftingStack;
-    protected final WrapperItemHandler craftingView;
-    protected final ToolItemHandler toolStorage;
-    protected ItemStack output;
-    protected final WrapperItemHandler itemView;
+    private boolean initialized = false;
+    private final BlockEntity blockEntity;
+    private final CraftingStack craftingStack;
+    private final WrapperItemHandler craftingView;
+    private final ToolItemHandler toolStorage;
+    private ItemStack output;
+    private final WrapperItemHandler itemView;
     @Nullable
-    protected Recipe<?> currentRecipe = null;
+    private Recipe<?> currentRecipe = null;
 
     public Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
@@ -102,12 +104,12 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
     }
 
     @FunctionalInterface
-    protected interface RecipeFunction<C extends Container, R extends Recipe<C>, V> {
+    private interface RecipeFunction<C extends Container, R extends Recipe<C>, V> {
         V apply(R recipe, C container);
     }
 
     @SuppressWarnings("unchecked")
-    protected <C extends Container, R extends Recipe<C>, V>
+    private <C extends Container, R extends Recipe<C>, V>
     V applyRecipeFunc(RecipeFunction<C, R, V> func) {
         if (currentRecipe instanceof CraftingRecipe) {
             return func.apply((R) currentRecipe, (C) craftingStack);
@@ -118,8 +120,7 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         }
     }
 
-
-    protected void onUpdate() {
+    private void onUpdate() {
         var world = blockEntity.getLevel();
         if (world == null || world.isClientSide) {
             return;
@@ -230,5 +231,14 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
     @Override
     public void deserializeNBT(CompoundTag tag) {
         ItemHelper.deserializeItemHandler(itemView, tag);
+    }
+
+    public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
+        return new CapabilityProviderBuilder<>(parent, "primitive/workbench_container") {
+            @Override
+            public Function<BlockEntity, ICapabilityProvider> createObject() {
+                return Workbench::new;
+            }
+        };
     }
 }

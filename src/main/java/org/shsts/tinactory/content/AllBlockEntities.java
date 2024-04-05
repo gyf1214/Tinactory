@@ -7,6 +7,7 @@ import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.ContainerMenu;
@@ -48,7 +49,7 @@ public final class AllBlockEntities {
                         PrimitiveBlock<SmartBlockEntity>::new)
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
-                .capability(AllCapabilityProviders.WORKBENCH_CONTAINER)
+                .simpleCapability(Workbench::builder)
                 .menu(WorkbenchMenu::new).layout(AllLayouts.WORKBENCH).build()
                 .build()
                 .block()

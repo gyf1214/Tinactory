@@ -1,10 +1,11 @@
 package org.shsts.tinactory.test;
 
-import org.shsts.tinactory.content.AllCapabilityProviders;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.MenuGen;
+import org.shsts.tinactory.content.logistics.StackContainer;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
+import org.shsts.tinactory.content.machine.RecipeProcessor;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
@@ -20,11 +21,13 @@ public final class AllBlockEntities {
                 .entityClass(Machine.class)
                 .blockEntity()
                 .ticking().hasEvent()
-                .capability(AllCapabilityProviders.STACK_CONTAINER, $ -> $
-                        .layout(AllBlocks.TEST_FLUID_LAYOUT))
-                .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
-                        .voltage(Voltage.ULV)
-                        .recipeType(AllRecipes.TEST_RECIPE_TYPE.get()))
+                .capability(StackContainer::builder)
+                .layout(AllBlocks.TEST_FLUID_LAYOUT)
+                .build()
+                .capability(RecipeProcessor::builder)
+                .recipeType(AllRecipes.TEST_RECIPE_TYPE)
+                .voltage(Voltage.ULV)
+                .build()
                 .menu()
                 .transform(MenuGen.machineMenu(AllBlocks.TEST_FLUID_LAYOUT))
                 .transform(MenuGen.machineRecipeBook(AllRecipes.TEST_RECIPE_TYPE, AllBlocks.TEST_FLUID_LAYOUT))

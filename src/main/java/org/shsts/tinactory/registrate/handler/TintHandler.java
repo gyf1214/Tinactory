@@ -32,6 +32,6 @@ public class TintHandler {
         for (var entry : itemColors.entrySet()) {
             event.getItemColors().register(entry.getValue(), entry.getKey());
         }
-        blockColors.clear();
+        itemColors.clear();
     }
 }

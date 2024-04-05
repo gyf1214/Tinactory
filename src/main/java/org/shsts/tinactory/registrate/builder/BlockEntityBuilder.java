@@ -4,18 +4,14 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import org.shsts.tinactory.core.common.CapabilityProviderType;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
-import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.ContainerMenuType;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -96,25 +92,16 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
         return menu(ContainerMenu::new);
     }
 
-    public BlockEntityBuilder<U, P>
-    capability(RegistryEntry<? extends CapabilityProviderType<? super U, ?>> cap) {
-        capabilities.put(cap.loc, be -> cap.get().getBuilder().apply(be));
-        return self();
+    public <C extends CapabilityProviderBuilder<? super U, BlockEntityBuilder<U, P>>>
+    C capability(Function<BlockEntityBuilder<U, P>, C> builderFactory) {
+        var ret = builderFactory.apply(this);
+        ret.onCreateObject(factory -> capabilities.put(ret.loc, factory));
+        return ret;
     }
 
-    @SuppressWarnings("unchecked")
-    public <U1 extends BlockEntity, B extends Function<U1, ICapabilityProvider>>
-    BlockEntityBuilder<U, P>
-    capability(RegistryEntry<? extends CapabilityProviderType<U1, B>> cap, Transformer<B> transform) {
-        capabilities.put(cap.loc, be -> transform.apply(cap.get().getBuilder()).apply((U1) be));
-        return self();
-    }
-
-    public BlockEntityBuilder<U, P>
-    capability(String id, Function<? super U, ? extends ICapabilityProvider> factory) {
-        var loc = new ResourceLocation(registrate.modid, id);
-        capabilities.put(loc, factory);
-        return self();
+    public <C extends CapabilityProviderBuilder<? super U, BlockEntityBuilder<U, P>>>
+    BlockEntityBuilder<U, P> simpleCapability(Function<BlockEntityBuilder<U, P>, C> builderFactory) {
+        return capability(builderFactory).build();
     }
 
     @Override

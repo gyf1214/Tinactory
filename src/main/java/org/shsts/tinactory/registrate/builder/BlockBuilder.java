@@ -91,9 +91,12 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
 
     public Optional<DistLazy<ItemColor>> getItemTint() {
         var tint = this.tint;
-        return tint == null ? Optional.empty() : Optional.of(() -> () -> (itemStack, index) -> {
-            var item = (BlockItem) itemStack.getItem();
-            return tint.getValue().getColor(item.getBlock().defaultBlockState(), null, null, index);
+        return tint == null ? Optional.empty() : Optional.of(() -> {
+            var itemColor = tint.getValue();
+            return () -> (itemStack, index) -> {
+                var item = (BlockItem) itemStack.getItem();
+                return itemColor.getColor(item.getBlock().defaultBlockState(), null, null, index);
+            };
         });
     }
 
