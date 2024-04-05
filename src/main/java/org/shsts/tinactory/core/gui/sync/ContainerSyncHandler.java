@@ -3,8 +3,6 @@ package org.shsts.tinactory.core.gui.sync;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkEvent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.gui.ContainerMenu;
@@ -15,7 +13,6 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-@OnlyIn(Dist.CLIENT)
 public final class ContainerSyncHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -34,7 +31,7 @@ public final class ContainerSyncHandler {
         Tinactory.registryClientPacket(clazz, constructor, ContainerSyncHandler::handle);
     }
 
-    public static void registerPackets() {
+    public static void init() {
         register(ContainerSyncPacket.Boolean.class, ContainerSyncPacket.Boolean::new);
         register(ContainerSyncPacket.Long.class, ContainerSyncPacket.Long::new);
         register(ContainerSyncPacket.Double.class, ContainerSyncPacket.Double::new);

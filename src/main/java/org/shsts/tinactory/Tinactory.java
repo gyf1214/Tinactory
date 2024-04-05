@@ -101,6 +101,7 @@ public class Tinactory {
         AllItems.init();
 
         AllWorldGens.init();
+        ContainerSyncHandler.init();
         ContainerEventHandler.init();
         AllRecipes.initRecipes();
 
@@ -110,8 +111,6 @@ public class Tinactory {
     }
 
     private static void onCreateClient(IEventBus modEventBus) {
-        ContainerSyncHandler.registerPackets();
-
         REGISTRATE.registerClient(modEventBus);
         modEventBus.addListener(Tinactory::initClient);
         MinecraftForge.EVENT_BUS.register(AllClientEvents.class);

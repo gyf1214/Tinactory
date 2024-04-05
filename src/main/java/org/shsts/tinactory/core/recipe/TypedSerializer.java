@@ -28,6 +28,7 @@ public abstract class TypedSerializer<T> implements ICombinedSerializer<T> {
 
     @SuppressWarnings("unchecked")
     protected static <T1, T2> void toNetwork(ICombinedSerializer<T1> serializer, T2 sth, FriendlyByteBuf buf) {
+        buf.writeUtf(serializer.getTypeName());
         serializer.toNetwork((T1) sth, buf);
     }
 

@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.SlotItemHandler;
+import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.gui.ContainerMenu;
@@ -82,7 +83,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     private final List<MenuCallback<M, ?>> menuCallbacks = new ArrayList<>();
     private DistLazy<MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>>>
             screenFactory = () -> () -> ContainerMenuScreen::new;
-    private final List<Supplier<Function<M, ContainerWidget>>> widgets = new ArrayList<>();
+    private final List<Supplier<Function<M, ISelf<ContainerWidget>>>> widgets = new ArrayList<>();
 
     public MenuBuilder(Registrate registrate, String id, P parent, ContainerMenu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
@@ -108,12 +109,12 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
-    public MenuBuilder<T, M, P> widget(Supplier<Function<M, ContainerWidget>> factory) {
+    public MenuBuilder<T, M, P> widget(Supplier<Function<M, ISelf<ContainerWidget>>> factory) {
         widgets.add(factory);
         return self();
     }
 
-    public MenuBuilder<T, M, P> widget(Rect rect, Supplier<Function<M, ContainerWidget>> factory) {
+    public MenuBuilder<T, M, P> widget(Rect rect, Supplier<Function<M, ISelf<ContainerWidget>>> factory) {
         widgetsRect.add(rect);
         widgets.add(factory);
         return self();
@@ -121,15 +122,14 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
 
     public <P1 extends ContainerSyncPacket> MenuBuilder<T, M, P>
     syncWidget(Class<P1> packetClazz, ContainerMenu.SyncPacketFactory<T, P1> packetFactory,
-               Supplier<BiFunction<M, Integer, ContainerWidget>> widgetFactory) {
+               Supplier<BiFunction<M, Integer, ISelf<ContainerWidget>>> widgetFactory) {
         var syncSlot = addSyncSlot(packetClazz, packetFactory);
-        widgets.add(() -> menu -> widgetFactory.get().apply(menu, syncSlot.getAsInt()));
-        return self();
+        return widget(() -> menu -> widgetFactory.get().apply(menu, syncSlot.getAsInt()));
     }
 
     public <P1 extends ContainerSyncPacket> MenuBuilder<T, M, P>
     syncWidget(Rect rect, Class<P1> packetClazz, ContainerMenu.SyncPacketFactory<T, P1> packetFactory,
-               Supplier<BiFunction<M, Integer, ContainerWidget>> widgetFactory) {
+               Supplier<BiFunction<M, Integer, ISelf<ContainerWidget>>> widgetFactory) {
         widgetsRect.add(rect);
         return syncWidget(packetClazz, packetFactory, widgetFactory);
     }

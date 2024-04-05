@@ -11,21 +11,18 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.shsts.tinactory.core.common.CapabilityProviderType;
 import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -183,8 +180,6 @@ public class Registrate {
         }
         modEventBus.addListener(this::onCommonSetup);
         modEventBus.addListener(capabilityHandler::onRegisterEvent);
-        modEventBus.addListener(tintHandler::onRegisterBlockColors);
-        modEventBus.addListener(tintHandler::onRegisterItemColors);
         recipeTypeHandler.addListeners(modEventBus);
     }
 
@@ -194,6 +189,8 @@ public class Registrate {
     }
 
     public void registerClient(IEventBus modEventBus) {
+        modEventBus.addListener(tintHandler::onRegisterBlockColors);
+        modEventBus.addListener(tintHandler::onRegisterItemColors);
         modEventBus.addListener(this::onClientSetup);
     }
 
@@ -372,19 +369,6 @@ public class Registrate {
 
     public <T> CapabilityEntry<T> capability(Class<T> clazz, CapabilityToken<T> token) {
         return capabilityHandler.register(clazz, token);
-    }
-
-    public <T extends BlockEntity> RegistryEntry<CapabilityProviderType<T, ?>>
-    capabilityProvider(String id, Function<T, ? extends ICapabilityProvider> factory) {
-        return registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY, () ->
-                CapabilityProviderType.simple(factory));
-    }
-
-    public <T extends BlockEntity, B extends Function<T, ICapabilityProvider>>
-    RegistryEntry<CapabilityProviderType<T, B>>
-    capabilityProvider(String id, Supplier<B> builderFactory) {
-        return registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY, () ->
-                new CapabilityProviderType<>(builderFactory));
     }
 
     public SchedulingBuilder<Registrate> scheduling(String id) {

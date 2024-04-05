@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -46,9 +47,9 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         }
     }
 
-    public void addWidget(Function<M, ContainerWidget> factory) {
+    public void addWidget(Function<M, ISelf<ContainerWidget>> factory) {
         var widget = factory.apply(menu);
-        rootPanel.addWidget(widget);
+        rootPanel.addWidget(widget.self());
     }
 
     @Override
