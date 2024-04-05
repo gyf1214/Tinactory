@@ -26,7 +26,7 @@ public class RegistryEntry<U> implements Supplier<U> {
     public RegistryEntry(String modid, String id, @Nullable Supplier<U> supplier) {
         this.modid = modid;
         this.id = id;
-        this.loc = new ResourceLocation(this.modid, this.id);
+        this.loc = new ResourceLocation(modid, id);
         this.supplier = supplier;
     }
 
@@ -52,21 +52,21 @@ public class RegistryEntry<U> implements Supplier<U> {
         return create(new ResourceLocation(loc), registry);
     }
 
-    public void setObject(U object) {
-        this.object = object;
-        this.supplier = null;
+    public void setObject(U value) {
+        object = value;
+        supplier = null;
     }
 
-    public void setSupplier(Supplier<U> supplier) {
-        this.supplier = supplier;
+    public void setSupplier(Supplier<U> value) {
+        supplier = value;
     }
 
     @Override
     public U get() {
-        assert this.object != null || this.supplier != null;
-        if (this.object == null) {
-            this.setObject(this.supplier.get());
+        assert object != null || supplier != null;
+        if (object == null) {
+            setObject(supplier.get());
         }
-        return this.object;
+        return object;
     }
 }

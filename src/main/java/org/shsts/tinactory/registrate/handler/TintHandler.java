@@ -14,24 +14,24 @@ public class TintHandler {
     private final Map<Item, ItemColor> itemColors = new HashMap<>();
 
     public void addBlockColor(Block block, BlockColor blockColor) {
-        this.blockColors.put(block, blockColor);
+        blockColors.put(block, blockColor);
     }
 
     public void addItemColor(Item item, ItemColor itemColor) {
-        this.itemColors.put(item, itemColor);
+        itemColors.put(item, itemColor);
     }
 
     public void onRegisterBlockColors(ColorHandlerEvent.Block event) {
-        for (var entry : this.blockColors.entrySet()) {
+        for (var entry : blockColors.entrySet()) {
             event.getBlockColors().register(entry.getValue(), entry.getKey());
         }
-        this.blockColors.clear();
+        blockColors.clear();
     }
 
     public void onRegisterItemColors(ColorHandlerEvent.Item event) {
-        for (var entry : this.itemColors.entrySet()) {
+        for (var entry : itemColors.entrySet()) {
             event.getItemColors().register(entry.getValue(), entry.getKey());
         }
-        this.blockColors.clear();
+        blockColors.clear();
     }
 }

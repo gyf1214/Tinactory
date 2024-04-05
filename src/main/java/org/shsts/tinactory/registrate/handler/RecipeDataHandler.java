@@ -26,8 +26,8 @@ public class RecipeDataHandler extends DataHandler<RecipeDataHandler.Provider> {
         }
 
         public void addRecipe(FinishedRecipe recipe) {
-            assert this.cons != null;
-            this.cons.accept(recipe);
+            assert cons != null;
+            cons.accept(recipe);
         }
 
         @Override

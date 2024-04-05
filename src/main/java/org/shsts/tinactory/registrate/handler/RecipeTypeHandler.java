@@ -29,8 +29,8 @@ public class RecipeTypeHandler {
 
     public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>
     RecipeTypeEntry<T, B> register(RecipeTypeBuilder<T, B, S, ?> builder) {
-        this.builders.add(builder);
-        var recipeType = this.recipeTypeRegister.register(builder.id, builder::buildObject);
+        builders.add(builder);
+        var recipeType = recipeTypeRegister.register(builder.id, builder::buildObject);
         return new RecipeTypeEntry<>(registrate, builder.id, recipeType,
                 builder.getBuilderFactory(), builder.getPrefix(), builder.getClazz(),
                 builder.getDefaultTransformer());
@@ -40,11 +40,11 @@ public class RecipeTypeHandler {
         for (var builder : builders) {
             builder.registerSerializer(event.getRegistry());
         }
-        this.builders.clear();
+        builders.clear();
     }
 
     public void addListeners(IEventBus modEventBus) {
         modEventBus.addGenericListener(RecipeSerializer.class, this::onRegisterSerializer);
-        this.recipeTypeRegister.register(modEventBus);
+        recipeTypeRegister.register(modEventBus);
     }
 }

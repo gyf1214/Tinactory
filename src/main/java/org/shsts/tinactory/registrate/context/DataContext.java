@@ -18,6 +18,6 @@ public class DataContext<P extends DataProvider> {
     }
 
     public ResourceLocation modLoc(String id) {
-        return new ResourceLocation(this.modid, id);
+        return new ResourceLocation(modid, id);
     }
 }

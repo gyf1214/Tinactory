@@ -19,6 +19,6 @@ public class BlockEntitySet<T extends SmartBlockEntity, U extends SmartEntityBlo
     }
 
     public U getBlock() {
-        return this.block.get();
+        return block.get();
     }
 }

@@ -18,12 +18,12 @@ public class SmartRegistry<T extends IForgeRegistryEntry<T>> extends RegistryEnt
         super(modid, id);
     }
 
-    public void setHandler(RegistryEntryHandler<T> handler) {
-        this.handler = handler;
+    public void setHandler(RegistryEntryHandler<T> value) {
+        handler = value;
     }
 
     public RegistryEntryHandler<T> getHandler() {
-        assert this.handler != null;
-        return this.handler;
+        assert handler != null;
+        return handler;
     }
 }

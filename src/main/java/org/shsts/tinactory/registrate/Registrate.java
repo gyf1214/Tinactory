@@ -153,7 +153,7 @@ public class Registrate {
     public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>
     forgeHandler(ResourceLocation loc, Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
         return (RegistryEntryHandler<T>) this.registryEntryHandlers.computeIfAbsent(loc,
-                loc1 -> RegistryEntryHandler.forge(loc1, entryClass, registry));
+                $ -> RegistryEntryHandler.forge(entryClass, registry));
     }
 
     public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>

@@ -25,7 +25,7 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
     private final List<RegistryEntryBuilder<T, ?, ?, ?>> builders = new ArrayList<>();
 
     public <U extends T> RegistryEntry<U> getEntry(String id) {
-        return this.getEntry(new ResourceLocation(id));
+        return getEntry(new ResourceLocation(id));
     }
 
     public abstract <U extends T> RegistryEntry<U> getEntry(ResourceLocation loc);
@@ -39,43 +39,40 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
 
     private void onRegisterEvent(RegistryEvent.Register<T> event) {
         var registry = event.getRegistry();
-        LOGGER.info("Registry {} register {} objects", registry.getRegistryName(), this.builders.size());
-        for (var builder : this.builders) {
+        LOGGER.info("Registry {} register {} objects", registry.getRegistryName(), builders.size());
+        for (var builder : builders) {
             builder.registerObject(registry);
         }
         // free reference
-        this.builders.clear();
+        builders.clear();
     }
 
     public void addListener(IEventBus modEventBus) {
-        modEventBus.addGenericListener(this.getEntryClass(), this::onRegisterEvent);
+        modEventBus.addGenericListener(getEntryClass(), this::onRegisterEvent);
     }
 
     private static class Forge<T1 extends IForgeRegistryEntry<T1>> extends RegistryEntryHandler<T1> {
-        private final ResourceLocation loc;
         private final Supplier<IForgeRegistry<T1>> registry;
         private final Class<T1> entryClass;
 
         public Forge(IForgeRegistry<T1> registry) {
-            this.loc = registry.getRegistryName();
             this.registry = () -> registry;
             this.entryClass = registry.getRegistrySuperType();
         }
 
-        public Forge(ResourceLocation loc, Class<T1> entryClass, Supplier<IForgeRegistry<T1>> registry) {
-            this.loc = loc;
+        public Forge(Class<T1> entryClass, Supplier<IForgeRegistry<T1>> registry) {
             this.registry = registry;
             this.entryClass = entryClass;
         }
 
         @Override
         public <U extends T1> RegistryEntry<U> getEntry(ResourceLocation loc) {
-            return new RegistryEntry<>(loc, () -> RegistryObject.<T1, U>create(loc, this.registry.get()).get());
+            return new RegistryEntry<>(loc, () -> RegistryObject.<T1, U>create(loc, registry.get()).get());
         }
 
         @Override
         public Class<T1> getEntryClass() {
-            return this.entryClass;
+            return entryClass;
         }
 
     }
@@ -86,7 +83,7 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
     }
 
     public static <T1 extends IForgeRegistryEntry<T1>> RegistryEntryHandler<T1>
-    forge(ResourceLocation loc, Class<T1> entryClass, Supplier<IForgeRegistry<T1>> forgeRegistry) {
-        return new Forge<>(loc, entryClass, forgeRegistry);
+    forge(Class<T1> entryClass, Supplier<IForgeRegistry<T1>> forgeRegistry) {
+        return new Forge<>(entryClass, forgeRegistry);
     }
 }

@@ -24,23 +24,23 @@ public class DynamicHandler<T extends IForgeRegistryEntry<T>> {
     }
 
     public void addLocation(ResourceLocation loc) {
-        this.locations.add(loc);
+        locations.add(loc);
     }
 
     private T dummy(ResourceLocation loc) {
-        var object = this.dummyFactory.get();
+        var object = dummyFactory.get();
         object.setRegistryName(loc);
         return object;
     }
 
     private void onRegisterEvent(RegistryEvent.Register<T> event) {
         var registry = event.getRegistry();
-        for (var loc : this.locations) {
-            registry.register(this.dummy(loc));
+        for (var loc : locations) {
+            registry.register(dummy(loc));
         }
     }
 
     public void addListener(IEventBus modEventBus) {
-        modEventBus.addGenericListener(this.entryClass, this::onRegisterEvent);
+        modEventBus.addGenericListener(entryClass, this::onRegisterEvent);
     }
 }

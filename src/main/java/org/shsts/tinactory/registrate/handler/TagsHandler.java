@@ -31,11 +31,11 @@ public class TagsHandler<T> extends DataHandler<TagsProvider<T>> {
         }
 
         public void addTag(TagKey<T> key, T object) {
-            this.tag(key).add(object);
+            tag(key).add(object);
         }
 
         public void addTag(TagKey<T> key, TagKey<T> object) {
-            this.tag(key).addTag(object);
+            tag(key).addTag(object);
         }
 
         @Override
@@ -45,26 +45,26 @@ public class TagsHandler<T> extends DataHandler<TagsProvider<T>> {
 
         @Override
         public String getName() {
-            return this.modId + " item tags";
+            return modId + " item tags";
         }
     }
 
     public void addTags(Supplier<? extends T> object, ResourceLocation... tags) {
         for (var tag : tags) {
-            this.callbacks.add(prov -> ((Provider) prov)
-                    .addTag(TagKey.create(this.registryKey, tag), object.get()));
+            callbacks.add(prov -> ((Provider) prov)
+                    .addTag(TagKey.create(registryKey, tag), object.get()));
         }
     }
 
     @SafeVarargs
     public final void addTags(Supplier<? extends T> object, TagKey<T>... tags) {
         for (var tag : tags) {
-            this.callbacks.add(prov -> ((Provider) prov).addTag(tag, object.get()));
+            callbacks.add(prov -> ((Provider) prov).addTag(tag, object.get()));
         }
     }
 
     public void addTag(TagKey<T> object, TagKey<T> tag) {
-        this.callbacks.add(prov -> ((Provider) prov).addTag(tag, object));
+        callbacks.add(prov -> ((Provider) prov).addTag(tag, object));
     }
 
     @Override

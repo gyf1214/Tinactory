@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 public interface DistLazy<T> extends Supplier<Supplier<T>> {
     default T getValue() {
-        return this.get().get();
+        return get().get();
     }
 
     default void runOnDist(Dist dist, Supplier<Consumer<T>> cons) {

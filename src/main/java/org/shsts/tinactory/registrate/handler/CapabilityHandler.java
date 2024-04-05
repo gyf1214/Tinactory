@@ -21,14 +21,14 @@ public class CapabilityHandler {
     }
 
     public void onRegisterEvent(RegisterCapabilitiesEvent event) {
-        for (var cap : this.capabilities) {
+        for (var cap : capabilities) {
             event.register(cap);
         }
-        this.capabilities.clear();
+        capabilities.clear();
     }
 
     public <T> CapabilityEntry<T> register(Class<T> clazz, CapabilityToken<T> token) {
-        this.capabilities.add(clazz);
-        return new CapabilityEntry<>(this.registrate.modid, token);
+        capabilities.add(clazz);
+        return new CapabilityEntry<>(registrate.modid, token);
     }
 }

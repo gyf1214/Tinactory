@@ -23,15 +23,15 @@ public class RegistryHandler {
 
     public <T extends IForgeRegistryEntry<T>> SmartRegistry<T>
     register(RegistryBuilderWrapper<T, ?> builder) {
-        this.builders.add(builder);
-        return new SmartRegistry<>(this.registrate.modid, builder.id);
+        builders.add(builder);
+        return new SmartRegistry<>(registrate.modid, builder.id);
     }
 
     public void onNewRegistry(NewRegistryEvent event) {
-        for (var builder : this.builders) {
+        for (var builder : builders) {
             builder.registerObject(event);
         }
         // free reference
-        this.builders.clear();
+        builders.clear();
     }
 }

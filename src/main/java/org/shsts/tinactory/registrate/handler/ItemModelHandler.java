@@ -37,7 +37,7 @@ public class ItemModelHandler extends DataHandler<ItemModelProvider> {
          */
         @Override
         public ItemModelBuilder getBuilder(String path) {
-            return super.getBuilder(modelPath(path, this.modid, this.folder));
+            return super.getBuilder(modelPath(path, modid, folder));
         }
 
         @Override

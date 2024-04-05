@@ -14,7 +14,7 @@ public class MenuScreenHandler {
     private record Entry<M extends AbstractContainerMenu, U extends AbstractContainerScreen<M>>
             (MenuType<M> menuType, MenuScreens.ScreenConstructor<M, U> factory) {
         public void register() {
-            MenuScreens.register(this.menuType, this.factory);
+            MenuScreens.register(menuType, factory);
         }
     }
 
@@ -22,13 +22,13 @@ public class MenuScreenHandler {
 
     public <M extends AbstractContainerMenu, U extends AbstractContainerScreen<M>>
     void setMenuScreen(MenuType<M> menuType, MenuScreens.ScreenConstructor<M, U> factory) {
-        this.entries.add(new Entry<>(menuType, factory));
+        entries.add(new Entry<>(menuType, factory));
     }
 
     public void onClientSetup() {
-        for (var entry : this.entries) {
+        for (var entry : entries) {
             entry.register();
         }
-        this.entries.clear();
+        entries.clear();
     }
 }

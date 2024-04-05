@@ -20,11 +20,11 @@ public class CapabilityEntry<T> extends RegistryEntry<Capability<T>> {
     }
 
     public T getCapability(BlockEntity blockEntity) {
-        return this.getCapability(blockEntity, null);
+        return getCapability(blockEntity, null);
     }
 
     public T getCapability(BlockEntity blockEntity, @Nullable Direction dir) {
-        return blockEntity.getCapability(this.get(), dir)
+        return blockEntity.getCapability(get(), dir)
                 .orElseThrow(NoSuchElementException::new);
     }
 }

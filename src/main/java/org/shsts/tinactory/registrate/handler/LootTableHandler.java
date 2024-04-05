@@ -34,12 +34,8 @@ public class LootTableHandler extends DataHandler<LootTableHandler.Provider> {
     public static class Loot implements Consumer<BiConsumer<ResourceLocation, LootTable.Builder>> {
         private final Map<ResourceLocation, LootTable.Builder> tables = new HashMap<>();
 
-        public void addTable(ResourceLocation loc, LootTable.Builder table) {
-            this.tables.put(loc, table);
-        }
-
         public void dropSingle(ResourceLocation loc, ItemLike item) {
-            this.tables.put(loc, LootTable.lootTable()
+            tables.put(loc, LootTable.lootTable()
                     .withPool(LootPool.lootPool()
                             .when(ExplosionCondition.survivesExplosion())
                             .add(LootItem.lootTableItem(item))));
@@ -47,7 +43,7 @@ public class LootTableHandler extends DataHandler<LootTableHandler.Provider> {
 
         @Override
         public void accept(BiConsumer<ResourceLocation, LootTable.Builder> writer) {
-            for (var table : this.tables.entrySet()) {
+            for (var table : tables.entrySet()) {
                 writer.accept(table.getKey(), table.getValue());
             }
         }
@@ -65,9 +61,8 @@ public class LootTableHandler extends DataHandler<LootTableHandler.Provider> {
         public Provider(GatherDataEvent event) {
             super(event.getGenerator());
             var lootMaps = List.of(
-                    Pair.of(this.blockLoot, LootContextParamSets.BLOCK)
-            );
-            this.tables = lootMaps.stream()
+                    Pair.of(blockLoot, LootContextParamSets.BLOCK));
+            tables = lootMaps.stream()
                     .map(p -> Pair.of(p.getFirst().toFactory(), p.getSecond()))
                     .toList();
         }
@@ -86,7 +81,7 @@ public class LootTableHandler extends DataHandler<LootTableHandler.Provider> {
     }
 
     public void blockLoot(Consumer<Loot> cb) {
-        this.callbacks.add(prov -> cb.accept(prov.blockLoot));
+        callbacks.add(prov -> cb.accept(prov.blockLoot));
     }
 
     @Override

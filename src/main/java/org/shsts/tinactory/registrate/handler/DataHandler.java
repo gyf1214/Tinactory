@@ -27,21 +27,21 @@ public abstract class DataHandler<P extends DataProvider> {
     }
 
     public void addCallback(Consumer<P> callback) {
-        this.callbacks.add(callback);
+        callbacks.add(callback);
     }
 
     public abstract void onGatherData(GatherDataEvent event);
 
     public void register(P provider) {
-        LOGGER.info("Data Handler {} add {} callbacks", this, this.callbacks.size());
-        for (var callback : this.callbacks) {
+        LOGGER.info("Data Handler {} add {} callbacks", this, callbacks.size());
+        for (var callback : callbacks) {
             callback.accept(provider);
         }
-        this.clear();
+        clear();
     }
 
     public void clear() {
-        this.callbacks.clear();
+        callbacks.clear();
     }
 
     public static String modelPath(String path, String modid, String folder) {

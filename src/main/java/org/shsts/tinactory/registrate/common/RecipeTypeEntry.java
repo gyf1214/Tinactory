@@ -39,38 +39,38 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
     }
 
     public RecipeSerializer<T> getSerializer() {
-        assert this.serializer != null;
-        return this.serializer;
+        assert serializer != null;
+        return serializer;
     }
 
-    public void setSerializer(RecipeSerializer<T> serializer) {
-        this.serializer = serializer;
+    public void setSerializer(RecipeSerializer<T> value) {
+        serializer = value;
     }
 
     public B getBuilder(ResourceLocation loc) {
-        return this.builderFactory.create(this.registrate, this, loc);
+        return builderFactory.create(registrate, this, loc);
     }
 
     public B getBuilder(Registrate registrate, ResourceLocation loc) {
-        return this.builderFactory.create(registrate, this, loc);
+        return builderFactory.create(registrate, this, loc);
     }
 
     public B recipe(ResourceLocation loc) {
-        return this.defaultTransformer.apply(this.getBuilder(loc));
+        return defaultTransformer.apply(getBuilder(loc));
     }
 
     public B recipe(Registrate registrate, ResourceLocation loc) {
-        return this.defaultTransformer.apply(this.getBuilder(registrate, loc));
+        return defaultTransformer.apply(getBuilder(registrate, loc));
     }
 
     public B modRecipe(Item item) {
         var loc = item.getRegistryName();
         assert loc != null;
-        return this.modRecipe(loc);
+        return modRecipe(loc);
     }
 
     public B modRecipe(ResourceLocation loc) {
         var id = loc.getNamespace() + "/" + loc.getPath();
-        return this.recipe(prepend(new ResourceLocation(this.modid, id), this.prefix));
+        return recipe(prepend(new ResourceLocation(modid, id), prefix));
     }
 }

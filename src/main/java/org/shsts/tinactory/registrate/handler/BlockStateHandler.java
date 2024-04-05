@@ -40,7 +40,7 @@ public class BlockStateHandler extends DataHandler<BlockStateProvider> {
          */
         @Override
         public BlockModelBuilder getBuilder(String path) {
-            return super.getBuilder(modelPath(path, this.modid, this.folder));
+            return super.getBuilder(modelPath(path, modid, folder));
         }
 
         @Override
@@ -67,7 +67,7 @@ public class BlockStateHandler extends DataHandler<BlockStateProvider> {
          */
         @Override
         public ItemModelBuilder getBuilder(String path) {
-            return super.getBuilder(modelPath(path, this.modid, this.folder));
+            return super.getBuilder(modelPath(path, modid, folder));
         }
 
         @Override
@@ -86,12 +86,12 @@ public class BlockStateHandler extends DataHandler<BlockStateProvider> {
 
         @Override
         public BlockModelProvider models() {
-            return this.blockModels;
+            return blockModels;
         }
 
         @Override
         public ItemModelProvider itemModels() {
-            return this.itemModels;
+            return itemModels;
         }
 
         @Override
