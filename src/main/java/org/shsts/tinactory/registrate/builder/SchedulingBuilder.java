@@ -35,7 +35,7 @@ public class SchedulingBuilder<P> extends RegistryEntryBuilder<IScheduling, ISch
 
     @Override
     public IScheduling createObject() {
-        return new Scheduling(this.befores.stream().map(Supplier::get).toList(),
-                this.afters.stream().map(Supplier::get).toList());
+        return new Scheduling(befores.stream().map(Supplier::get).toList(),
+                afters.stream().map(Supplier::get).toList());
     }
 }

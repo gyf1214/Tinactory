@@ -30,104 +30,97 @@ import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class BlockEntityBuilder<U extends SmartBlockEntity, P, S extends BlockEntityBuilder<U, P, S>>
-        extends RegistryEntryBuilder<BlockEntityType<?>, SmartBlockEntityType<U>, P, S> {
+public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryEntryBuilder<BlockEntityType<?>,
+        SmartBlockEntityType<U>, P, BlockEntityBuilder<U, P>> {
 
     @FunctionalInterface
     public interface Factory<U1 extends SmartBlockEntity> {
         U1 create(BlockEntityType<U1> type, BlockPos pos, BlockState state);
     }
 
-    protected final Factory<U> factory;
-    protected final Set<Supplier<? extends Block>> validBlocks = new HashSet<>();
-    protected boolean ticking = false;
-    protected boolean hasEvent = false;
+    private final Factory<U> factory;
+    private final Set<Supplier<? extends Block>> validBlocks = new HashSet<>();
+    private boolean ticking = false;
+    private boolean hasEvent = false;
     @Nullable
-    protected Class<U> entityClass = null;
-    protected final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>> capabilities =
-            new HashMap<>();
+    private Class<U> entityClass = null;
+    private final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>>
+            capabilities = new HashMap<>();
     @Nullable
-    protected Supplier<ContainerMenuType<U, ?>> menu = null;
+    private Supplier<ContainerMenuType<U, ?>> menu = null;
 
     public BlockEntityBuilder(Registrate registrate, String id, P parent, Factory<U> factory) {
         super(registrate, registrate.blockEntityHandler, id, parent);
         this.factory = factory;
     }
 
-    public S entityClass(Class<U> clazz) {
-        this.entityClass = clazz;
+    public BlockEntityBuilder<U, P> entityClass(Class<U> clazz) {
+        entityClass = clazz;
         return self();
     }
 
     @SafeVarargs
-    public final S validBlock(Supplier<? extends Block>... blocks) {
-        this.validBlocks.addAll(Arrays.asList(blocks));
+    public final BlockEntityBuilder<U, P> validBlock(Supplier<? extends Block>... blocks) {
+        validBlocks.addAll(Arrays.asList(blocks));
         return self();
     }
 
-    public S ticking(boolean ticking) {
-        this.ticking = ticking;
+    public BlockEntityBuilder<U, P> ticking(boolean value) {
+        ticking = value;
         return self();
     }
 
-    public S ticking() {
-        return this.ticking(true);
+    public BlockEntityBuilder<U, P> ticking() {
+        return ticking(true);
     }
 
-    public S hasEvent(boolean hasEvent) {
-        this.hasEvent = hasEvent;
+    public BlockEntityBuilder<U, P> hasEvent(boolean value) {
+        hasEvent = value;
         return self();
     }
 
-    public S hasEvent() {
-        return this.hasEvent(true);
+    public BlockEntityBuilder<U, P> hasEvent() {
+        return hasEvent(true);
     }
 
-    public void setMenu(Supplier<ContainerMenuType<U, ?>> menu) {
-        this.menu = menu;
+    public void setMenu(Supplier<ContainerMenuType<U, ?>> value) {
+        menu = value;
     }
 
-    private class SimpleMenuBuilder<M extends ContainerMenu<U>> extends MenuBuilder<U, M, S, SimpleMenuBuilder<M>> {
-        public SimpleMenuBuilder(String id, ContainerMenu.Factory<U, M> factory) {
-            super(BlockEntityBuilder.this.registrate, id, BlockEntityBuilder.this.self(), factory);
-        }
-    }
-
-    public <M extends ContainerMenu<U>> MenuBuilder<U, M, S, ?>
+    public <M extends ContainerMenu<U>> MenuBuilder<U, M, BlockEntityBuilder<U, P>>
     menu(ContainerMenu.Factory<U, M> factory) {
-        return new SimpleMenuBuilder<>(this.id, factory);
+        return new MenuBuilder<>(registrate, id, this, factory);
     }
 
-    public MenuBuilder<U, ContainerMenu<U>, S, ?> menu() {
-        return this.menu(ContainerMenu::new);
+    public MenuBuilder<U, ContainerMenu<U>, BlockEntityBuilder<U, P>> menu() {
+        return menu(ContainerMenu::new);
     }
 
-    public S capability(RegistryEntry<? extends CapabilityProviderType<? super U, ?>> cap) {
-        this.capabilities.put(cap.loc, be -> cap.get().getBuilder().apply(be));
+    public BlockEntityBuilder<U, P>
+    capability(RegistryEntry<? extends CapabilityProviderType<? super U, ?>> cap) {
+        capabilities.put(cap.loc, be -> cap.get().getBuilder().apply(be));
         return self();
     }
 
     @SuppressWarnings("unchecked")
     public <U1 extends BlockEntity, B extends Function<U1, ICapabilityProvider>>
-    S capability(RegistryEntry<? extends CapabilityProviderType<U1, B>> cap, Transformer<B> transform) {
-        this.capabilities.put(cap.loc, be -> transform.apply(cap.get().getBuilder()).apply((U1) be));
+    BlockEntityBuilder<U, P>
+    capability(RegistryEntry<? extends CapabilityProviderType<U1, B>> cap, Transformer<B> transform) {
+        capabilities.put(cap.loc, be -> transform.apply(cap.get().getBuilder()).apply((U1) be));
         return self();
     }
 
-    public S capability(String id, Function<? super U, ? extends ICapabilityProvider> factory) {
-        var loc = new ResourceLocation(this.registrate.modid, id);
-        this.capabilities.put(loc, factory);
+    public BlockEntityBuilder<U, P>
+    capability(String id, Function<? super U, ? extends ICapabilityProvider> factory) {
+        var loc = new ResourceLocation(registrate.modid, id);
+        capabilities.put(loc, factory);
         return self();
     }
 
     @Override
     public SmartBlockEntityType<U> createObject() {
         var entry = this.entry;
-        var entityClass = this.entityClass;
-        var ticking = this.ticking;
-        var hasEvent = this.hasEvent;
         var factory = this.factory;
-        var menu = this.menu;
         assert entry != null;
         assert entityClass != null;
         return new SmartBlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state),

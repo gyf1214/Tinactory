@@ -9,9 +9,8 @@ import org.shsts.tinactory.registrate.Registrate;
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
-public class EntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>,
-        P, S extends EntityBlockBuilder<T, U, P, S>>
-        extends BlockBuilder<U, P, S> {
+public class EntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>, P>
+        extends BlockBuilder<U, P, EntityBlockBuilder<T, U, P>> {
 
     @FunctionalInterface
     public interface Factory<T1 extends SmartBlockEntity, U1 extends SmartEntityBlock<T1>> {
@@ -19,9 +18,9 @@ public class EntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntit
     }
 
     @Nullable
-    protected Supplier<Supplier<SmartBlockEntityType<T>>> entityType = null;
+    private Supplier<Supplier<SmartBlockEntityType<T>>> entityType = null;
 
-    public S type(Supplier<Supplier<SmartBlockEntityType<T>>> entityType) {
+    public EntityBlockBuilder<T, U, P> type(Supplier<Supplier<SmartBlockEntityType<T>>> entityType) {
         this.entityType = entityType;
         return self();
     }
@@ -29,8 +28,8 @@ public class EntityBlockBuilder<T extends SmartBlockEntity, U extends SmartEntit
     public EntityBlockBuilder(Registrate registrate, String id, P parent, Factory<T, U> factory) {
         super(registrate, id, parent);
         this.factory = properties -> {
-            assert this.entityType != null;
-            return factory.create(properties, this.entityType.get());
+            assert entityType != null;
+            return factory.create(properties, entityType.get());
         };
     }
 }

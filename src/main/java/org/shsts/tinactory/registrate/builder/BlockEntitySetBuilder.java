@@ -18,15 +18,15 @@ public abstract class BlockEntitySetBuilder<T extends SmartBlockEntity, U extend
             ValueHolder.create();
 
     @Nullable
-    protected BlockEntityBuilder<T, S, ?> blockEntityBuilder = null;
+    protected BlockEntityBuilder<T, S> blockEntityBuilder = null;
     @Nullable
-    protected EntityBlockBuilder<T, U, S, ?> blockBuilder = null;
+    protected EntityBlockBuilder<T, U, S> blockBuilder = null;
 
-    protected abstract BlockEntityBuilder<T, S, ?> createBlockEntityBuilder();
+    protected abstract BlockEntityBuilder<T, S> createBlockEntityBuilder();
 
-    protected abstract EntityBlockBuilder<T, U, S, ?> createBlockBuilder();
+    protected abstract EntityBlockBuilder<T, U, S> createBlockBuilder();
 
-    public BlockEntityBuilder<T, S, ?> blockEntity() {
+    public BlockEntityBuilder<T, S> blockEntity() {
         if (this.blockEntityBuilder == null) {
             var blockHolder = this.blockHolder;
             this.blockEntityBuilder = this.createBlockEntityBuilder()
@@ -35,7 +35,7 @@ public abstract class BlockEntitySetBuilder<T extends SmartBlockEntity, U extend
         return this.blockEntityBuilder;
     }
 
-    public EntityBlockBuilder<T, U, S, ?> block() {
+    public EntityBlockBuilder<T, U, S> block() {
         if (this.blockBuilder == null) {
             var blockEntityHolder = this.blockEntityHolder;
             this.blockBuilder = this.createBlockBuilder()

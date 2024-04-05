@@ -22,48 +22,48 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final Class<T> entryClass;
+    private final Class<T> entryClass;
     @Nullable
-    protected Transformer<RegistryBuilder<T>> transformer = $ -> $;
+    private Transformer<RegistryBuilder<T>> transformer = $ -> $;
 
     public RegistryBuilderWrapper(Registrate registrate, String id, Class<T> entryClass, P parent) {
         super(registrate, id, parent);
         this.entryClass = entryClass;
     }
 
-    public RegistryBuilderWrapper<T, P> builder(Transformer<RegistryBuilder<T>> transformer) {
-        assert this.transformer != null;
-        this.transformer = this.transformer.chain(transformer);
+    public RegistryBuilderWrapper<T, P> builder(Transformer<RegistryBuilder<T>> trans) {
+        assert transformer != null;
+        transformer = transformer.chain(trans);
         return self();
     }
 
     @Override
     public RegistryBuilder<T> createObject() {
-        assert this.transformer != null;
+        assert transformer != null;
         var builder = new RegistryBuilder<T>();
-        builder = this.transformer.apply(builder.setName(this.loc).setType(this.entryClass));
+        builder = transformer.apply(builder.setName(loc).setType(entryClass));
         // free reference
-        this.transformer = null;
+        transformer = null;
         return builder;
     }
 
     public void registerObject(NewRegistryEvent event) {
-        LOGGER.debug("register registry {} {}", this.entryClass.getSimpleName(), this.loc);
-        assert this.entry != null;
-        var builder = this.buildObject();
-        this.entry.setSupplier(event.create(builder));
+        LOGGER.debug("register registry {} {}", entryClass.getSimpleName(), loc);
+        assert entry != null;
+        var builder = buildObject();
+        entry.setSupplier(event.create(builder));
     }
 
     @Override
     protected SmartRegistry<T> createEntry() {
-        var entry = this.registrate.registryHandler.register(this);
-        var handler = RegistryEntryHandler.forge(this.loc, this.entryClass, entry);
+        var entry = registrate.registryHandler.register(this);
+        var handler = RegistryEntryHandler.forge(loc, entryClass, entry);
         entry.setHandler(handler);
-        this.registrate.putHandler(this.loc, handler);
+        registrate.putHandler(loc, handler);
         return entry;
     }
 
     public RegistryBuilderWrapper<T, P> onBake(IForgeRegistry.BakeCallback<T> cb) {
-        return this.builder($ -> $.add(cb));
+        return builder($ -> $.add(cb));
     }
 }

@@ -11,8 +11,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, ?>, S extends BlockItemBuilder<U, P, S>>
-        extends ItemBuilder<U, P, S> {
+public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, ?>>
+        extends ItemBuilder<U, P, BlockItemBuilder<U, P>> {
 
     @FunctionalInterface
     public interface Factory<U1 extends BlockItem> {
@@ -24,16 +24,16 @@ public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, 
             assert parent.entry != null;
             return factory.create(parent.entry.get(), properties);
         });
-        this.onBuild.add($ -> parent.onCreateEntry.add($p -> $.register()));
+        onBuild.add($ -> parent.onCreateEntry.add($p -> $.register()));
     }
 
     @Override
     protected RegistryEntry<U> createEntry() {
-        if (this.modelCallback == null) {
-            this.modelCallback = this.parent.getItemModel();
+        if (modelCallback == null) {
+            modelCallback = parent.getItemModel();
         }
-        if (this.tint == null) {
-            this.tint = this.parent.getItemTint().orElse(null);
+        if (tint == null) {
+            tint = parent.getItemTint().orElse(null);
         }
         return super.createEntry();
     }

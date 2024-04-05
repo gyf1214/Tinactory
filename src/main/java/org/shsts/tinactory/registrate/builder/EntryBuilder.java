@@ -27,13 +27,13 @@ public abstract class EntryBuilder<U, E, P, S extends EntryBuilder<U, E, P, S>> 
     protected abstract E createEntry();
 
     public E register() {
-        LOGGER.debug("create entry {} {}", this.getClass().getSimpleName(), this.loc);
-        this.entry = this.createEntry();
-        for (var callback : this.onCreateEntry) {
-            callback.accept(this.entry);
+        LOGGER.debug("create entry {} {}", getClass().getSimpleName(), loc);
+        entry = createEntry();
+        for (var callback : onCreateEntry) {
+            callback.accept(entry);
         }
         // free reference
         onCreateEntry.clear();
-        return this.entry;
+        return entry;
     }
 }

@@ -22,7 +22,7 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
         extends EntryBuilder<U, RegistryEntry<U>, P, S> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final RegistryEntryHandler<T> handler;
+    private final RegistryEntryHandler<T> handler;
 
     protected RegistryEntryBuilder(Registrate registrate, RegistryEntryHandler<T> handler, String id, P parent) {
         super(registrate, id, parent);
@@ -30,24 +30,24 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
     }
 
     public void registerObject(IForgeRegistry<T> registry) {
-        LOGGER.debug("register object {} {}", registry.getRegistryName(), this.loc);
-        assert this.entry != null;
-        var object = this.buildObject();
-        object.setRegistryName(this.loc);
+        LOGGER.debug("register object {} {}", registry.getRegistryName(), loc);
+        assert entry != null;
+        var object = buildObject();
+        object.setRegistryName(loc);
         registry.register(object);
-        this.entry.setObject(object);
+        entry.setObject(object);
     }
 
     protected <P1 extends DataProvider>
     void addDataCallback(DataHandler<P1> handler, Consumer<RegistryDataContext<T, U, P1>> cons) {
-        this.onCreateEntry.add(entry ->
+        onCreateEntry.add(entry ->
                 handler.addCallback(provider ->
                         cons.accept(new RegistryDataContext<>(entry, provider))));
     }
 
     @Override
     protected RegistryEntry<U> createEntry() {
-        return this.handler.register(this);
+        return handler.register(this);
     }
 
     @FunctionalInterface

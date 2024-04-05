@@ -7,11 +7,13 @@ import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
 import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.MenuBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
@@ -24,8 +26,9 @@ import static org.shsts.tinactory.core.gui.ContainerMenu.SPACING_VERTICAL;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MenuGen {
-    public static <S extends MenuBuilder<? extends Machine, ?, ?, S>>
-    Transformer<S> machineMenu(Layout layout) {
+    public static <T extends Machine, M extends ContainerMenu<T>, P extends BlockEntityBuilder<T, ?>>
+    Transformer<MenuBuilder<T, M, P>>
+    machineMenu(Layout layout) {
         var y = layout.rect.endY() + SPACING_VERTICAL;
         var x = CONTENT_WIDTH - SLOT_SIZE * 2;
         return $ -> $.layout(layout)
@@ -44,8 +47,10 @@ public final class MenuGen {
                 .event(ContainerEventHandler.SET_MACHINE, (menu, p) -> menu.blockEntity.setMachineConfig(p));
     }
 
-    public static <R extends ProcessingRecipe<R>, S extends MenuBuilder<? extends Machine, ?, ?, S>>
-    Transformer<S> machineRecipeBook(RecipeTypeEntry<R, ?> recipeType, Layout layout) {
+    public static <R extends ProcessingRecipe<R>, T extends Machine,
+            M extends ContainerMenu<T>, P extends BlockEntityBuilder<T, ?>>
+    Transformer<MenuBuilder<T, M, P>>
+    machineRecipeBook(RecipeTypeEntry<R, ?> recipeType, Layout layout) {
         return $ -> $
                 .widget(() -> menu -> new MachineRecipeBook(menu, recipeType.get(), 0, 0))
                 .syncWidget(ContainerSyncPacket.LocHolder.class, (containerId, index, $1, be) ->

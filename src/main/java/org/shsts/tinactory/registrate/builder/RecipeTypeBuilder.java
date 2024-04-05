@@ -21,81 +21,81 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
         extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, S, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final SmartRecipeSerializer.Factory<T, B, S> serializer;
+    private final SmartRecipeSerializer.Factory<T, B, S> serializerFactory;
     @Nullable
-    protected SmartRecipeBuilder.Factory<T, B> builderFactory = null;
+    private SmartRecipeBuilder.Factory<T, B> builderFactory = null;
     @Nullable
-    protected String prefix = null;
+    private String prefix = null;
     @Nullable
-    protected Class<T> clazz;
-    protected Transformer<B> defaultTransformer = $ -> $;
+    private Class<T> clazz;
+    private Transformer<B> defaultTransformer = $ -> $;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
-                             SmartRecipeSerializer.Factory<T, B, S> serializer) {
+                             SmartRecipeSerializer.Factory<T, B, S> serializerFactory) {
         super(registrate, id, parent);
-        this.serializer = serializer;
+        this.serializerFactory = serializerFactory;
     }
 
     public RecipeTypeBuilder<T, B, S, P> builder(SmartRecipeBuilder.Factory<T, B> factory) {
-        this.builderFactory = factory;
+        builderFactory = factory;
         return self();
     }
 
-    public RecipeTypeBuilder<T, B, S, P> prefix(String prefix) {
-        this.prefix = prefix;
+    public RecipeTypeBuilder<T, B, S, P> prefix(String value) {
+        prefix = value;
         return self();
     }
 
-    public RecipeTypeBuilder<T, B, S, P> clazz(Class<T> clazz) {
-        this.clazz = clazz;
+    public RecipeTypeBuilder<T, B, S, P> clazz(Class<T> value) {
+        clazz = value;
         return self();
     }
 
     public RecipeTypeBuilder<T, B, S, P> builderTransform(Transformer<B> trans) {
-        this.defaultTransformer = this.defaultTransformer.chain(trans);
+        defaultTransformer = defaultTransformer.chain(trans);
         return this;
     }
 
     public void registerSerializer(IForgeRegistry<RecipeSerializer<?>> registry) {
-        LOGGER.debug("register object {} {}", registry.getRegistryName(), this.loc);
-        assert this.entry != null;
-        var serializer = this.serializer.create(this.entry);
-        serializer.setRegistryName(this.loc);
+        LOGGER.debug("register object {} {}", registry.getRegistryName(), loc);
+        assert entry != null;
+        var serializer = serializerFactory.create(entry);
+        serializer.setRegistryName(loc);
         registry.register(serializer);
-        this.entry.setSerializer(serializer);
+        entry.setSerializer(serializer);
     }
 
     @Override
     public RecipeType<T> createObject() {
-        var loc = this.loc.toString();
+        var loc1 = loc.toString();
         return new RecipeType<>() {
             @Override
             public String toString() {
-                return loc;
+                return loc1;
             }
         };
     }
 
     public SmartRecipeBuilder.Factory<T, B> getBuilderFactory() {
-        assert this.builderFactory != null;
-        return this.builderFactory;
+        assert builderFactory != null;
+        return builderFactory;
     }
 
     public String getPrefix() {
-        return this.prefix == null ? this.id : this.prefix;
+        return prefix == null ? id : prefix;
     }
 
     public Class<T> getClazz() {
-        assert this.clazz != null;
-        return this.clazz;
+        assert clazz != null;
+        return clazz;
     }
 
     public Transformer<B> getDefaultTransformer() {
-        return this.defaultTransformer;
+        return defaultTransformer;
     }
 
     @Override
     protected RecipeTypeEntry<T, B> createEntry() {
-        return this.registrate.recipeTypeHandler.register(this);
+        return registrate.recipeTypeHandler.register(this);
     }
 }

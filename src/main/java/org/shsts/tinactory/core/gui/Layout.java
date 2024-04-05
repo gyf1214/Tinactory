@@ -8,9 +8,11 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.MenuBuilder;
 
 import javax.annotation.Nullable;
@@ -71,7 +73,8 @@ public class Layout {
         return (ContainerMenu.CONTENT_WIDTH - rect.width()) / 2;
     }
 
-    public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu() {
+    public <T extends SmartBlockEntity, M extends ContainerMenu<T>, P extends BlockEntityBuilder<T, ?>>
+    Transformer<MenuBuilder<T, M, P>> applyMenu() {
         return builder -> {
             var xOffset = getXOffset();
             for (var slot : slots) {

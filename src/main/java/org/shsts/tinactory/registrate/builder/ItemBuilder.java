@@ -22,6 +22,7 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
         extends RegistryEntryBuilder<Item, U, P, S> {
+
     protected final Function<Item.Properties, U> factory;
     protected Transformer<Item.Properties> properties = $ -> $.tab(CreativeModeTab.TAB_MISC);
     @Nullable
@@ -36,17 +37,17 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
     }
 
     public S properties(Transformer<Item.Properties> trans) {
-        this.properties = this.properties.chain(trans);
+        properties = properties.chain(trans);
         return self();
     }
 
     public S model(Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
-        this.modelCallback = cons;
+        modelCallback = cons;
         return self();
     }
 
     public S tint(DistLazy<ItemColor> color) {
-        this.tint = color;
+        tint = color;
         return self();
     }
 
@@ -56,25 +57,25 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
 
     @SafeVarargs
     public final S tag(TagKey<Item>... tags) {
-        this.onCreateEntry.add(entry -> this.registrate.tag(entry, tags));
+        onCreateEntry.add(entry -> registrate.tag(entry, tags));
         return self();
     }
 
     @Override
     protected RegistryEntry<U> createEntry() {
-        if (this.modelCallback != null) {
-            this.addDataCallback(this.registrate.itemModelHandler, this.modelCallback);
+        if (modelCallback != null) {
+            addDataCallback(registrate.itemModelHandler, modelCallback);
         }
         var tint = this.tint;
-        if (this.tint != null) {
-            this.onCreateObject.add(item -> tint.runOnDist(Dist.CLIENT, () -> itemColor ->
-                    this.registrate.tintHandler.addItemColor(item, itemColor)));
+        if (tint != null) {
+            onCreateObject.add(item -> tint.runOnDist(Dist.CLIENT, () -> itemColor ->
+                    registrate.tintHandler.addItemColor(item, itemColor)));
         }
         return super.createEntry();
     }
 
     @Override
     public U createObject() {
-        return this.factory.apply(this.properties.apply(new Item.Properties()));
+        return factory.apply(properties.apply(new Item.Properties()));
     }
 }
