@@ -7,7 +7,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -34,7 +33,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final long PROGRESS_PER_TICK = 256;
 
-    private final BlockEntity blockEntity;
+    private final Machine blockEntity;
     private final RecipeType<? extends T> recipeType;
     private final Voltage voltage;
     private long workProgress = 0;
@@ -50,7 +49,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     private IContainer container = null;
     private boolean needUpdate = true;
 
-    public RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
+    public RecipeProcessor(Machine blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
         this.blockEntity = blockEntity;
         this.recipeType = recipeType;
         this.voltage = voltage;
@@ -72,11 +71,9 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     @SuppressWarnings("unchecked")
     @Nullable
     private T getTargetRecipe() {
-        if (blockEntity instanceof Machine machine) {
-            var recipe = machine.machineConfig.getTargetRecipe();
-            if (recipe != null && recipe.getType() == recipeType) {
-                return (T) recipe;
-            }
+        var recipe = blockEntity.machineConfig.getTargetRecipe();
+        if (recipe != null && recipe.getType() == recipeType) {
+            return (T) recipe;
         }
         return null;
     }
@@ -223,7 +220,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         }
     }
 
-    public static class Builder implements Function<BlockEntity, ICapabilityProvider> {
+    public static class Builder implements Function<Machine, ICapabilityProvider> {
         @Nullable
         private RecipeType<? extends ProcessingRecipe<?>> recipeType = null;
         @Nullable
@@ -240,7 +237,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         }
 
         @Override
-        public ICapabilityProvider apply(BlockEntity blockEntity) {
+        public ICapabilityProvider apply(Machine blockEntity) {
             assert recipeType != null;
             assert voltage != null;
             return new RecipeProcessor<>(blockEntity, recipeType, voltage);

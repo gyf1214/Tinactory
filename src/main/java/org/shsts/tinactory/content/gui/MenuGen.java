@@ -27,8 +27,7 @@ import static org.shsts.tinactory.core.gui.ContainerMenu.SPACING_VERTICAL;
 @MethodsReturnNonnullByDefault
 public final class MenuGen {
     public static <T extends Machine, M extends ContainerMenu<T>, P extends BlockEntityBuilder<T, ?>>
-    Transformer<MenuBuilder<T, M, P>>
-    machineMenu(Layout layout) {
+    Transformer<MenuBuilder<T, M, P>> machineMenu(Layout layout) {
         var y = layout.rect.endY() + SPACING_VERTICAL;
         var x = CONTENT_WIDTH - SLOT_SIZE * 2;
         return $ -> $.layout(layout)

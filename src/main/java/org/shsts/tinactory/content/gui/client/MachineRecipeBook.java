@@ -10,12 +10,13 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.ContainerWidget;
+import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
@@ -58,7 +59,7 @@ public class MachineRecipeBook extends Panel {
     private static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
 
 
-    private class RecipeButton extends ContainerWidget {
+    private class RecipeButton extends Button {
         private boolean isDisable = false;
         @Nullable
         private ProcessingRecipe<?> recipe = null;
@@ -66,7 +67,7 @@ public class MachineRecipeBook extends Panel {
         public RecipeButton(ContainerMenu<?> menu, int index) {
             super(menu, new Rect((index % BUTTON_PER_LINE) * BUTTON_SIZE,
                     (index / BUTTON_PER_LINE) * BUTTON_SIZE,
-                    BUTTON_SIZE, BUTTON_SIZE));
+                    BUTTON_SIZE, BUTTON_SIZE), null);
         }
 
         @Override
@@ -116,6 +117,7 @@ public class MachineRecipeBook extends Panel {
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
+            super.onMouseClicked(mouseX, mouseY, button);
             if (isDisable) {
                 unselectRecipe();
             } else if (recipe != null) {
@@ -211,7 +213,7 @@ public class MachineRecipeBook extends Panel {
 
     private int page;
 
-    public MachineRecipeBook(ContainerMenu<?> menu, int syncSlot,
+    public MachineRecipeBook(ContainerMenu<? extends Machine> menu, int syncSlot,
                              RecipeType<? extends ProcessingRecipe<?>> recipeType,
                              int buttonX, int buttonY) {
         super(menu);

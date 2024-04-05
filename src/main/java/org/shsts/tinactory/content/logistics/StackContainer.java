@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -48,14 +47,14 @@ public class StackContainer implements ICapabilityProvider,
     private record PortInfo(int startSlot, int endSlot, SlotType type,
                             IPort port, IPort internalPort) {}
 
-    private final BlockEntity blockEntity;
+    private final Machine blockEntity;
     private final IItemHandlerModifiable combinedItems;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports;
     private final Map<Integer, WrapperItemHandler> itemInputs = new HashMap<>();
     private final Multimap<Integer, WrapperFluidTank> fluidInputs = ArrayListMultimap.create();
 
-    private StackContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
+    private StackContainer(Machine blockEntity, List<Builder.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
         this.ports = new ArrayList<>(portInfo.size());
 
@@ -165,11 +164,8 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     private void updateTargetRecipe(boolean updateFilter) {
-        if (!(blockEntity instanceof Machine machine)) {
-            return;
-        }
-        var targetRecipe = machine.machineConfig.getTargetRecipe();
-        var logistics = machine.getNetwork()
+        var targetRecipe = blockEntity.machineConfig.getTargetRecipe();
+        var logistics = blockEntity.getNetwork()
                 .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
                 .orElse(null);
         if (targetRecipe == null) {
@@ -285,7 +281,7 @@ public class StackContainer implements ICapabilityProvider,
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 
-    public static class Builder implements Function<BlockEntity, ICapabilityProvider> {
+    public static class Builder implements Function<Machine, ICapabilityProvider> {
         private final List<PortInfo> ports = new ArrayList<>();
 
         public Builder layout(Layout layout) {
@@ -305,7 +301,7 @@ public class StackContainer implements ICapabilityProvider,
         }
 
         @Override
-        public ICapabilityProvider apply(BlockEntity be) {
+        public ICapabilityProvider apply(Machine be) {
             return new StackContainer(be, ports);
         }
 
