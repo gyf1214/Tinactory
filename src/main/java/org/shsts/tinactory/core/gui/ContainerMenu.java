@@ -62,7 +62,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     protected record EventHandler<P extends ContainerEventPacket>(Class<P> clazz, Consumer<P> handler) {
         public void handle(ContainerEventPacket packet) {
             if (clazz.isInstance(packet)) {
-                this.handler.accept(clazz.cast(packet));
+                handler.accept(clazz.cast(packet));
             }
         }
     }
@@ -87,10 +87,10 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
 
         public void syncPacket(ContainerMenu<T> menu, T be) {
             if (menu.player instanceof ServerPlayer player) {
-                var packet = this.getPacket(menu, be);
-                if (!packet.equals(this.packet)) {
-                    this.packet = packet;
-                    Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+                var packet1 = getPacket(menu, be);
+                if (!packet1.equals(packet)) {
+                    packet = packet1;
+                    Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet1);
                 }
             }
         }
@@ -118,7 +118,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
 
     @Override
     public boolean stillValid(Player player) {
-        var be = this.blockEntity;
+        var be = blockEntity;
         var level = be.getLevel();
         var pos = be.getBlockPos();
         return player == this.player &&
@@ -127,14 +127,14 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
                 player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64.0;
     }
 
-    protected int addInventorySlots(int y) {
+    private int addInventorySlots(int y) {
         var barY = y + 3 * SLOT_SIZE + SPACING_VERTICAL;
         for (var j = 0; j < 9; j++) {
-            this.addSlot(new Slot(this.inventory, j, MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, barY + 1));
+            addSlot(new Slot(inventory, j, MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, barY + 1));
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 9; j++) {
-                this.addSlot(new Slot(this.inventory, 9 + i * 9 + j,
+                addSlot(new Slot(inventory, 9 + i * 9 + j,
                         MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, y + i * SLOT_SIZE + 1));
             }
         }
@@ -145,8 +145,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
      * This is called before any menu callbacks
      */
     public void initLayout() {
-        this.registerEvent(ContainerEventHandler.FLUID_CLICK, p ->
-                this.clickFluidSlot(p.getTankIndex(), p.getButton()));
+        registerEvent(ContainerEventHandler.FLUID_CLICK, p ->
+                clickFluidSlot(p.getTankIndex(), p.getButton()));
     }
 
     /**
@@ -154,32 +154,32 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
      */
     public void setLayout(List<Rect> widgets, boolean hasInventory) {
         // here height does not include top margin and spacing
-        var y = this.height;
+        var y = height;
         for (var widget : widgets) {
             y = Math.max(y, widget.endY());
         }
         y += MARGIN_TOP + SPACING_VERTICAL;
-        this.containerSlotCount = this.slots.size();
+        containerSlotCount = slots.size();
         this.hasInventory = hasInventory;
         if (hasInventory) {
             y = addInventorySlots(y);
         } else {
             y += MARGIN_VERTICAL;
         }
-        this.height = y;
+        height = y;
     }
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        if (!this.hasInventory || index < 0 || index >= this.slots.size() || this.isClientSide) {
+        if (!hasInventory || index < 0 || index >= slots.size() || isClientSide) {
             return ItemStack.EMPTY;
         }
-        var slot = this.slots.get(index);
+        var slot = slots.get(index);
         if (!slot.hasItem()) {
             return ItemStack.EMPTY;
         }
-        var inv = new PlayerMainInvWrapper(this.inventory);
-        if (index < this.containerSlotCount) {
+        var inv = new PlayerMainInvWrapper(inventory);
+        if (index < containerSlotCount) {
             if (!slot.mayPickup(player)) {
                 return ItemStack.EMPTY;
             }
@@ -195,12 +195,12 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
 
             return oldStack;
         } else {
-            var invIndex = index - this.containerSlotCount;
+            var invIndex = index - containerSlotCount;
             var oldStack = inv.getStackInSlot(invIndex).copy();
             var stack = oldStack.copy();
             var amount = stack.getCount();
-            for (var i = 0; i < this.containerSlotCount; i++) {
-                var targetSlot = this.slots.get(i);
+            for (var i = 0; i < containerSlotCount; i++) {
+                var targetSlot = slots.get(i);
                 if (!targetSlot.mayPlace(stack)) {
                     continue;
                 }
@@ -229,19 +229,19 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     public void addSlot(BasicSlotFactory<?> factory, int posX, int posY) {
-        this.addSlot(factory.create(posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
+        addSlot(factory.create(posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 
     public void addSlot(SlotFactory<?> factory, int slotIndex, int posX, int posY) {
-        assert this.container != null;
-        this.addSlot(factory.create(this.container, slotIndex,
+        assert container != null;
+        addSlot(factory.create(container, slotIndex,
                 posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 
     public <P extends ContainerSyncPacket>
     int addSyncSlot(Class<P> clazz, SyncPacketFactory<T, P> factory) {
-        int index = this.syncSlots.size();
-        this.syncSlots.add(new SyncSlot<>(clazz) {
+        int index = syncSlots.size();
+        syncSlots.add(new SyncSlot<>(clazz) {
             @Override
             protected P getPacket(ContainerMenu<T> menu, T be) {
                 return factory.create(menu.containerId, index, menu, be);
@@ -251,8 +251,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     public int addFluidSlot(int tank) {
-        assert this.fluidContainer != null;
-        return this.addSyncSlot(FluidSyncPacket.class, (containerId1, index, menu, be) ->
+        assert fluidContainer != null;
+        return addSyncSlot(FluidSyncPacket.class, (containerId1, index, menu, be) ->
                 new FluidSyncPacket(containerId, index, fluidContainer.getTank(tank).getFluid()));
     }
 
@@ -300,17 +300,17 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     }
 
     public void clickFluidSlot(int tankIndex, int button) {
-        if (this.fluidContainer == null) {
+        if (fluidContainer == null) {
             return;
         }
-        var tank = this.fluidContainer.getTank(tankIndex);
-        var item = this.getCarried();
+        var tank = fluidContainer.getTank(tankIndex);
+        var item = getCarried();
         var outputItem = ItemStack.EMPTY;
         var mayDrain = true;
         var mayFill = true;
         while (!item.isEmpty()) {
             var item1 = ItemHandlerHelper.copyStackWithSize(item, 1);
-            var clickResult = this.doClickFluidSlot(item1, tank, mayDrain, mayFill);
+            var clickResult = doClickFluidSlot(item1, tank, mayDrain, mayFill);
             if (clickResult.action == FluidClickAction.NONE) {
                 break;
             } else if (clickResult.action == FluidClickAction.FILL) {
@@ -322,7 +322,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             var retItem = clickResult.stack;
             var combinedItem = ItemHelper.combineStack(outputItem, retItem);
             if (combinedItem.isEmpty()) {
-                ItemHandlerHelper.giveItemToPlayer(this.player, retItem);
+                ItemHandlerHelper.giveItemToPlayer(player, retItem);
             } else {
                 outputItem = combinedItem.get();
             }
@@ -331,23 +331,23 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             }
         }
         if (item.isEmpty()) {
-            this.setCarried(outputItem);
+            setCarried(outputItem);
         } else {
-            ItemHandlerHelper.giveItemToPlayer(this.player, outputItem);
+            ItemHandlerHelper.giveItemToPlayer(player, outputItem);
         }
     }
 
     public <P extends ContainerEventPacket>
     void registerEvent(ContainerEventHandler.Event<P> event, Consumer<P> handler) {
-        assert !this.eventHandlers.containsKey(event.id());
-        this.eventHandlers.put(event.id(), new EventHandler<>(event.clazz(), handler));
+        assert !eventHandlers.containsKey(event.id());
+        eventHandlers.put(event.id(), new EventHandler<>(event.clazz(), handler));
     }
 
     /**
      * Called by client bound handler.
      */
     public void onSyncPacket(int index, ContainerSyncPacket packet) {
-        var slot = this.syncSlots.get(index);
+        var slot = syncSlots.get(index);
         if (slot == null || !slot.clazz.isInstance(packet)) {
             return;
         }
@@ -358,7 +358,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
      * Called by Screen.
      */
     public <P extends ContainerSyncPacket> Optional<P> getSyncPacket(int index, Class<P> clazz) {
-        var slot = this.syncSlots.get(index);
+        var slot = syncSlots.get(index);
         if (slot == null || !clazz.isInstance(slot.packet)) {
             return Optional.empty();
         }
@@ -367,11 +367,11 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
 
     public <P extends ContainerEventPacket>
     void triggerEvent(ContainerEventHandler.Event<P> event, ContainerEventPacket.Factory<P> factory) {
-        Tinactory.CHANNEL.sendToServer(factory.create(this.containerId, event.id()));
+        Tinactory.CHANNEL.sendToServer(factory.create(containerId, event.id()));
     }
 
     public void onEventPacket(ContainerEventPacket packet) {
-        var handler = this.eventHandlers.get(packet.getEventId());
+        var handler = eventHandlers.get(packet.getEventId());
         if (handler != null) {
             handler.handle(packet);
         }
@@ -380,8 +380,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
-        for (var slot : this.syncSlots) {
-            slot.syncPacket(this, this.blockEntity);
+        for (var slot : syncSlots) {
+            slot.syncPacket(this, blockEntity);
         }
     }
 

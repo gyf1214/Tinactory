@@ -13,17 +13,17 @@ import java.util.Objects;
 public record FluidTypeWrapper(@Nonnull FluidStack stack) implements ILogisticsTypeWrapper {
     @Override
     public String toString() {
-        return "FluidTypeWrapper{%s}".formatted(this.stack.getFluid());
+        return "FluidTypeWrapper{%s}".formatted(stack.getFluid());
     }
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof FluidTypeWrapper o && this.stack.isFluidEqual(o.stack));
+        return this == other || (other instanceof FluidTypeWrapper o && stack.isFluidEqual(o.stack));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.stack.getFluid(), this.stack.getTag());
+        return Objects.hash(stack.getFluid(), stack.getTag());
     }
 
     @Override

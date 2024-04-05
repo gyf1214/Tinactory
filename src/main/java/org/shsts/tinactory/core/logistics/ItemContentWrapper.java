@@ -12,44 +12,44 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public record ItemContentWrapper(ItemStack itemStack) implements ILogisticsContentWrapper {
     @Override
     public int getCount() {
-        return this.itemStack.getCount();
+        return itemStack.getCount();
     }
 
     @Override
     public boolean isEmpty() {
-        return this.itemStack.isEmpty();
+        return itemStack.isEmpty();
     }
 
     @Override
     public void grow(int amount) {
-        this.itemStack.grow(amount);
+        itemStack.grow(amount);
     }
 
     @Override
     public void shrink(int amount) {
-        this.itemStack.shrink(amount);
+        itemStack.shrink(amount);
     }
 
     @Override
     public ILogisticsContentWrapper extractFrom(IPort port, boolean simulate) {
-        var stack = port.asItem().extractItem(this.itemStack, simulate);
+        var stack = port.asItem().extractItem(itemStack, simulate);
         return new ItemContentWrapper(stack);
     }
 
     @Override
     public ILogisticsContentWrapper insertInto(IPort port, boolean simulate) {
-        var stack = port.asItem().insertItem(this.itemStack, simulate);
+        var stack = port.asItem().insertItem(itemStack, simulate);
         return new ItemContentWrapper(stack);
     }
 
     @Override
     public ILogisticsTypeWrapper getType() {
-        return new ItemTypeWrapper(this.itemStack);
+        return new ItemTypeWrapper(itemStack);
     }
 
     @Override
     public ILogisticsContentWrapper copyWithAmount(int amount) {
-        var stack = ItemHandlerHelper.copyStackWithSize(this.itemStack, amount);
+        var stack = ItemHandlerHelper.copyStackWithSize(itemStack, amount);
         return new ItemContentWrapper(stack);
     }
 }

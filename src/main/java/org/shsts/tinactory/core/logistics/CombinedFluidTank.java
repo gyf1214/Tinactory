@@ -18,7 +18,7 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<CompoundTag> {
-    protected final WrapperFluidTank[] tanks;
+    private final WrapperFluidTank[] tanks;
 
     public CombinedFluidTank(WrapperFluidTank... tanks) {
         this.tanks = tanks;
@@ -26,53 +26,53 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
 
     @Override
     public int getTanks() {
-        return this.tanks.length;
+        return tanks.length;
     }
 
     @Override
     public IFluidTank getTank(int index) {
-        if (index < 0 || index >= this.tanks.length) {
+        if (index < 0 || index >= tanks.length) {
             return WrapperFluidTank.EMPTY;
         }
-        return this.tanks[index];
+        return tanks[index];
     }
 
     @Override
     public CompoundTag serializeNBT() {
-        var size = this.tanks.length;
-        var tanks = new ListTag();
+        var size = tanks.length;
+        var tankTags = new ListTag();
         for (var i = 0; i < size; i++) {
-            var tank = this.tanks[i];
+            var tank = tanks[i];
             if (!tank.getFluid().isEmpty()) {
                 var fluidTag = tank.serializeNBT();
                 fluidTag.putInt("Tank", i);
-                tanks.add(fluidTag);
+                tankTags.add(fluidTag);
             }
         }
         var tag = new CompoundTag();
         tag.putInt("Size", size);
-        tag.put("Tanks", tanks);
+        tag.put("Tanks", tankTags);
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        for (var tank : this.tanks) {
+        for (var tank : tanks) {
             tank.setFluid(FluidStack.EMPTY);
         }
         var listTag = tag.getList("Tanks", Tag.TAG_COMPOUND);
         for (var i = 0; i < listTag.size(); i++) {
             var tankTag = listTag.getCompound(i);
             var index = tankTag.getInt("Tank");
-            if (index >= 0 && index < this.tanks.length) {
-                this.tanks[index].deserializeNBT(tankTag);
+            if (index >= 0 && index < tanks.length) {
+                tanks[index].deserializeNBT(tankTag);
             }
         }
     }
 
     @Override
     public boolean acceptInput(FluidStack stack) {
-        return Arrays.stream(this.tanks).anyMatch(tank -> tank.isFluidValid(stack));
+        return Arrays.stream(tanks).anyMatch(tank -> tank.isFluidValid(stack));
     }
 
     @Override
@@ -87,7 +87,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
         }
         var action = simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE;
         var stack = fluid.copy();
-        for (var tank : this.tanks) {
+        for (var tank : tanks) {
             if (!tank.getFluid().isEmpty() && tank.getFluid().isFluidEqual(stack)) {
                 stack.shrink(tank.fill(stack, action));
                 if (stack.isEmpty()) {
@@ -95,7 +95,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
                 }
             }
         }
-        for (var tank : this.tanks) {
+        for (var tank : tanks) {
             if (tank.getFluid().isEmpty()) {
                 stack.shrink(tank.fill(stack, action));
                 if (stack.isEmpty()) {
@@ -114,7 +114,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
         var action = simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE;
         var stack = FluidStack.EMPTY;
         var amount = fluid.getAmount();
-        for (var tank : this.tanks) {
+        for (var tank : tanks) {
             if (amount <= 0) {
                 break;
             }
@@ -140,7 +140,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
             return 0;
         }
         var ret = 0;
-        for (var tank : this.tanks) {
+        for (var tank : tanks) {
             var stack = tank.getFluid();
             if (stack.isFluidEqual(fluid)) {
                 ret += stack.getAmount();
@@ -153,7 +153,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
     public Collection<FluidStack> getAllFluids() {
         Map<FluidTypeWrapper, FluidStack> allFluids = new HashMap<>();
 
-        for (var tank : this.tanks) {
+        for (var tank : tanks) {
             var stack = tank.getFluid();
             if (stack.isEmpty()) {
                 continue;

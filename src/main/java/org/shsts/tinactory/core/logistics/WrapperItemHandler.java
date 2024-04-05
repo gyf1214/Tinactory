@@ -16,8 +16,8 @@ import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WrapperItemHandler implements IItemHandlerModifiable {
-    protected final IItemHandlerModifiable compose;
-    protected final List<Runnable> updateListener = new ArrayList<>();
+    private final IItemHandlerModifiable compose;
+    private final List<Runnable> updateListener = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
     public Predicate<ItemStack> filter = $ -> true;
@@ -42,7 +42,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         updateListener.add(cons);
     }
 
-    protected void invokeUpdate() {
+    private void invokeUpdate() {
         for (var cons : updateListener) {
             cons.run();
         }

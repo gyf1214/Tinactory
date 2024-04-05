@@ -38,7 +38,7 @@ public class ContainerMenuType<T extends BlockEntity, M extends ContainerMenu<T>
 
     @Override
     public M create(int containerId, Inventory inventory) {
-        return this.create(containerId, inventory, null);
+        return create(containerId, inventory, null);
     }
 
     @Override
@@ -48,13 +48,13 @@ public class ContainerMenuType<T extends BlockEntity, M extends ContainerMenu<T>
         var level = Minecraft.getInstance().level;
         assert level != null;
         var be = level.getBlockEntity(pos);
-        var type = this.blockEntityType.get();
+        var type = blockEntityType.get();
         assert be != null && be.getType() == type;
-        return this.factory.create(this, containerId, inventory, type.cast(be));
+        return factory.create(this, containerId, inventory, type.cast(be));
     }
 
     public M createFromBlockEntity(int containerId, Inventory inventory, T blockEntity) {
-        return this.factory.create(this, containerId, inventory, blockEntity);
+        return factory.create(this, containerId, inventory, blockEntity);
     }
 
     private class Provider implements MenuProvider {
@@ -66,12 +66,12 @@ public class ContainerMenuType<T extends BlockEntity, M extends ContainerMenu<T>
 
         @Override
         public Component getDisplayName() {
-            return title.apply(this.blockEntity);
+            return title.apply(blockEntity);
         }
 
         @Override
         public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-            return createFromBlockEntity(containerId, inventory, this.blockEntity);
+            return createFromBlockEntity(containerId, inventory, blockEntity);
         }
     }
 

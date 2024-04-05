@@ -24,7 +24,7 @@ public interface ILogisticsContentWrapper {
     ILogisticsTypeWrapper getType();
 
     default PortType getPortType() {
-        return this.getType().getPortType();
+        return getType().getPortType();
     }
 
     ILogisticsContentWrapper copyWithAmount(int amount);

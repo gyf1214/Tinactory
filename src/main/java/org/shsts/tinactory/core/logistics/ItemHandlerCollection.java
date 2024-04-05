@@ -28,9 +28,9 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public boolean acceptInput(ItemStack stack) {
-        var size = this.itemHandler.getSlots();
+        var size = itemHandler.getSlots();
         for (var i = 0; i < size; i++) {
-            if (this.itemHandler.isItemValid(i, stack)) {
+            if (itemHandler.isItemValid(i, stack)) {
                 return true;
             }
         }
@@ -45,7 +45,7 @@ public class ItemHandlerCollection implements IItemCollection {
     @Override
     public ItemStack insertItem(ItemStack stack, boolean simulate) {
         // need to make sure stack is not set to some itemHandler
-        return ItemHandlerHelper.insertItemStacked(this.itemHandler, stack.copy(), simulate);
+        return ItemHandlerHelper.insertItemStacked(itemHandler, stack.copy(), simulate);
     }
 
     @Override
@@ -53,16 +53,16 @@ public class ItemHandlerCollection implements IItemCollection {
         if (item.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        var slots = this.itemHandler.getSlots();
+        var slots = itemHandler.getSlots();
         var ret = ItemStack.EMPTY;
         var amount = item.getCount();
         for (var i = 0; i < slots; i++) {
             if (amount <= 0) {
                 break;
             }
-            var slotItem = this.itemHandler.getStackInSlot(i);
+            var slotItem = itemHandler.getStackInSlot(i);
             if (ItemHelper.canItemsStack(item, slotItem)) {
-                var extractedItem = this.itemHandler.extractItem(i, amount, simulate);
+                var extractedItem = itemHandler.extractItem(i, amount, simulate);
                 if (extractedItem.isEmpty()) {
                     continue;
                 }
@@ -85,10 +85,10 @@ public class ItemHandlerCollection implements IItemCollection {
         if (item.isEmpty()) {
             return 0;
         }
-        var slots = this.itemHandler.getSlots();
+        var slots = itemHandler.getSlots();
         var ret = 0;
         for (var i = 0; i < slots; i++) {
-            var slotItem = this.itemHandler.getStackInSlot(i);
+            var slotItem = itemHandler.getStackInSlot(i);
             if (ItemHelper.canItemsStack(item, slotItem)) {
                 ret += slotItem.getCount();
             }
@@ -100,9 +100,9 @@ public class ItemHandlerCollection implements IItemCollection {
     public Collection<ItemStack> getAllItems() {
         Map<ItemTypeWrapper, ItemStack> allItems = new HashMap<>();
 
-        var slots = this.itemHandler.getSlots();
+        var slots = itemHandler.getSlots();
         for (var i = 0; i < slots; i++) {
-            var slotItem = this.itemHandler.getStackInSlot(i);
+            var slotItem = itemHandler.getStackInSlot(i);
             if (slotItem.isEmpty()) {
                 continue;
             }

@@ -20,8 +20,8 @@ import java.util.function.Predicate;
 public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<CompoundTag> {
     public static final WrapperFluidTank EMPTY = new WrapperFluidTank(0);
 
-    protected final IFluidTank tank;
-    protected final List<Runnable> updateListeners = new ArrayList<>();
+    private final IFluidTank tank;
+    private final List<Runnable> updateListeners = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
     public Predicate<FluidStack> filter = $ -> true;

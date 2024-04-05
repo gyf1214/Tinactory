@@ -17,18 +17,18 @@ import java.util.Objects;
 public record ItemTypeWrapper(@Nonnull ItemStack stack) implements ILogisticsTypeWrapper {
     @Override
     public String toString() {
-        return "ItemTypeWrapper{%s}".formatted(this.stack.getItem());
+        return "ItemTypeWrapper{%s}".formatted(stack.getItem());
     }
 
     @Override
     public int hashCode() {
         // unfortunately capNBT is protected
-        return Objects.hash(this.stack.getItem(), this.stack.getTag());
+        return Objects.hash(stack.getItem(), stack.getTag());
     }
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || (obj instanceof ItemTypeWrapper o && ItemHelper.canItemsStack(this.stack, o.stack));
+        return this == obj || (obj instanceof ItemTypeWrapper o && ItemHelper.canItemsStack(stack, o.stack));
     }
 
     @Override

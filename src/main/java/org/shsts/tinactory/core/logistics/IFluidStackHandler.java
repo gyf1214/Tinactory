@@ -15,6 +15,6 @@ public interface IFluidStackHandler extends IFluidCollection {
     IFluidTank getTank(int index);
 
     default FluidStack getFluidInTank(int index) {
-        return this.getTank(index).getFluid();
+        return getTank(index).getFluid();
     }
 }

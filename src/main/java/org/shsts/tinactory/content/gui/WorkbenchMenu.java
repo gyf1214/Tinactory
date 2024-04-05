@@ -25,13 +25,13 @@ public class WorkbenchMenu extends ContainerMenu<SmartBlockEntity> {
     @Override
     public void initLayout() {
         super.initLayout();
-        var workbench = AllCapabilities.WORKBENCH.getCapability(this.blockEntity);
+        var workbench = AllCapabilities.WORKBENCH.getCapability(blockEntity);
 
         var layout = AllLayouts.WORKBENCH;
         var slotInfo = layout.slots.get(0);
         var dx = (CONTENT_WIDTH - layout.rect.width()) / 2;
 
-        this.addSlot((x, y) -> new CraftingSlot(workbench, x, y), dx + slotInfo.x(), slotInfo.y());
+        addSlot((x, y) -> new CraftingSlot(workbench, x, y), dx + slotInfo.x(), slotInfo.y());
     }
 
     @Override
@@ -40,7 +40,7 @@ public class WorkbenchMenu extends ContainerMenu<SmartBlockEntity> {
         if (oldStack.isEmpty()) {
             return oldStack;
         }
-        var slot = this.slots.get(index);
+        var slot = slots.get(index);
         var newStack = slot.getItem();
         return ItemHelper.itemStackEqual(oldStack, newStack) ? newStack : ItemStack.EMPTY;
     }

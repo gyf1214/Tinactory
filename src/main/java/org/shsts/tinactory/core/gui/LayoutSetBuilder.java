@@ -27,39 +27,39 @@ public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, La
 
     public LayoutSetBuilder(P parent) {
         super(parent);
-        this.onBuild.add(LayoutSetBuilder::buildObject);
+        onBuild.add(LayoutSetBuilder::buildObject);
     }
 
     public LayoutSetBuilder(P parent, Consumer<Map<Voltage, Layout>> onCreate) {
         this(parent);
-        this.onCreateObject.add(onCreate);
+        onCreateObject.add(onCreate);
     }
 
     public LayoutSetBuilder<P> dummySlot(int x, int y) {
         var slot = new Layout.SlotInfo(0, x, y, 0, SlotType.NONE);
-        this.slots.add(new SlotAndVoltage(slot, Voltage.PRIMITIVE));
+        slots.add(new SlotAndVoltage(slot, Voltage.PRIMITIVE));
         return this;
     }
 
     public LayoutSetBuilder<P> port(SlotType type) {
-        this.curPort++;
-        this.curSlotType = type;
+        curPort++;
+        curSlotType = type;
         return this;
     }
 
     public LayoutSetBuilder<P> slot(int x, int y, Voltage requiredVoltage) {
-        assert this.curPort >= 0;
-        var slot = new Layout.SlotInfo(this.curSlot++, x, y, this.curPort, this.curSlotType);
-        this.slots.add(new SlotAndVoltage(slot, requiredVoltage));
+        assert curPort >= 0;
+        var slot = new Layout.SlotInfo(curSlot++, x, y, curPort, curSlotType);
+        slots.add(new SlotAndVoltage(slot, requiredVoltage));
         return this;
     }
 
     public LayoutSetBuilder<P> slot(int x, int y) {
-        return this.slot(x, y, Voltage.PRIMITIVE);
+        return slot(x, y, Voltage.PRIMITIVE);
     }
 
     public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {
-        this.progressBar = new Layout.WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
+        progressBar = new Layout.WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
         return this;
     }
 
@@ -67,7 +67,7 @@ public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, La
         var ret = new ArrayList<Layout.SlotInfo>();
         var fluidSlots = 0;
         var itemSlots = 0;
-        for (var slot : this.slots) {
+        for (var slot : slots) {
             if (voltage.compareTo(slot.voltage) < 0) {
                 continue;
             }
@@ -85,14 +85,14 @@ public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, La
     public Map<Voltage, Layout> createObject() {
         var ret = new HashMap<Voltage, Layout>();
         for (var voltage : Voltage.values()) {
-            var slots = this.getSlots(voltage);
-            ret.put(voltage, new Layout(slots, List.of(), this.progressBar));
+            var slots = getSlots(voltage);
+            ret.put(voltage, new Layout(slots, List.of(), progressBar));
         }
         return ret;
     }
 
     public Layout buildLayout() {
-        var slots = this.getSlots(Voltage.MAXIMUM);
-        return new Layout(slots, List.of(), this.progressBar);
+        var slots = getSlots(Voltage.MAXIMUM);
+        return new Layout(slots, List.of(), progressBar);
     }
 }

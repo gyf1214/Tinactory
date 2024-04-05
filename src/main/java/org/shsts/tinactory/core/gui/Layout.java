@@ -30,7 +30,7 @@ public class Layout {
 
     public record SlotInfo(int index, int x, int y, int port, SlotType type) {
         public SlotInfo setIndex(int index) {
-            return new SlotInfo(index, this.x, this.y, this.port, this.type);
+            return new SlotInfo(index, x, y, port, type);
         }
     }
 
@@ -44,7 +44,7 @@ public class Layout {
     public Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable WidgetInfo progressBar) {
         this.slots = slots;
         for (var slot : slots) {
-            this.portSlots.put(slot.port(), slot);
+            portSlots.put(slot.port(), slot);
         }
         this.images = images;
         this.progressBar = progressBar;
@@ -68,13 +68,13 @@ public class Layout {
     }
 
     public int getXOffset() {
-        return (ContainerMenu.CONTENT_WIDTH - this.rect.width()) / 2;
+        return (ContainerMenu.CONTENT_WIDTH - rect.width()) / 2;
     }
 
     public <S extends MenuBuilder<?, ?, ?, S>> Transformer<S> applyMenu() {
         return builder -> {
-            var xOffset = this.getXOffset();
-            for (var slot : this.slots) {
+            var xOffset = getXOffset();
+            for (var slot : slots) {
                 var x = xOffset + slot.x;
                 var y = slot.y;
                 switch (slot.type.portType) {
@@ -82,11 +82,11 @@ public class Layout {
                     case FLUID -> builder.fluidSlot(slot.index, x, y);
                 }
             }
-            for (var image : this.images) {
+            for (var image : images) {
                 builder.staticWidget(image.rect.offset(xOffset, 0), image.texture);
             }
-            if (this.progressBar != null) {
-                builder.progressBar(this.progressBar.texture, this.progressBar.rect.offset(xOffset, 0),
+            if (progressBar != null) {
+                builder.progressBar(progressBar.texture, progressBar.rect.offset(xOffset, 0),
                         be -> be.getCapability(AllCapabilities.PROCESSOR.get())
                                 .map(IProcessor::getProgress)
                                 .orElse(0.0d));
