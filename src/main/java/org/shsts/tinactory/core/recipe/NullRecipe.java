@@ -30,7 +30,7 @@ public class NullRecipe implements FinishedRecipe {
 
     @Override
     public ResourceLocation getId() {
-        return this.loc;
+        return loc;
     }
 
     @Override

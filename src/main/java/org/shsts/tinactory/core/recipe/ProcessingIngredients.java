@@ -23,7 +23,7 @@ public final class ProcessingIngredients {
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IItemCollection itemCollection &&
-                    itemCollection.extractItem(this.stack, simulate).getCount() >= stack.getCount();
+                    itemCollection.extractItem(stack, simulate).getCount() >= stack.getCount();
         }
 
         public static final ICombinedSerializer<SimpleItemIngredient> SERIALIZER = new ICombinedSerializer<>() {
@@ -44,12 +44,12 @@ public final class ProcessingIngredients {
 
             @Override
             public JsonElement toJson(SimpleItemIngredient sth) {
-                return this.encodeJson(ItemStack.CODEC, sth.stack);
+                return encodeJson(ItemStack.CODEC, sth.stack);
             }
 
             @Override
             public SimpleItemIngredient fromJson(JsonElement je) {
-                return new SimpleItemIngredient(this.parseJson(ItemStack.CODEC, je));
+                return new SimpleItemIngredient(parseJson(ItemStack.CODEC, je));
             }
         };
     }
@@ -59,7 +59,7 @@ public final class ProcessingIngredients {
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IItemCollection itemCollection &&
-                    ItemHelper.consumeItemCollection(itemCollection, this.ingredient, this.amount, simulate);
+                    ItemHelper.consumeItemCollection(itemCollection, ingredient, amount, simulate);
         }
 
         public static final ICombinedSerializer<ItemIngredient> SERIALIZER = new ICombinedSerializer<>() {
@@ -101,7 +101,7 @@ public final class ProcessingIngredients {
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IFluidCollection fluidCollection &&
-                    fluidCollection.drain(this.fluid, simulate).getAmount() >= this.fluid.getAmount();
+                    fluidCollection.drain(fluid, simulate).getAmount() >= fluid.getAmount();
         }
 
         public static final ICombinedSerializer<FluidIngredient> SERIALIZER = new ICombinedSerializer<>() {
@@ -122,12 +122,12 @@ public final class ProcessingIngredients {
 
             @Override
             public JsonElement toJson(FluidIngredient sth) {
-                return this.encodeJson(FluidStack.CODEC, sth.fluid);
+                return encodeJson(FluidStack.CODEC, sth.fluid);
             }
 
             @Override
             public FluidIngredient fromJson(JsonElement je) {
-                return new FluidIngredient(this.parseJson(FluidStack.CODEC, je));
+                return new FluidIngredient(parseJson(FluidStack.CODEC, je));
             }
         };
     }
@@ -140,9 +140,9 @@ public final class ProcessingIngredients {
 
         @Override
         protected void registerSerializers() {
-            this.registerSerializer(SimpleItemIngredient.class, SimpleItemIngredient.SERIALIZER);
-            this.registerSerializer(ItemIngredient.class, ItemIngredient.SERIALIZER);
-            this.registerSerializer(FluidIngredient.class, FluidIngredient.SERIALIZER);
+            registerSerializer(SimpleItemIngredient.class, SimpleItemIngredient.SERIALIZER);
+            registerSerializer(ItemIngredient.class, ItemIngredient.SERIALIZER);
+            registerSerializer(FluidIngredient.class, FluidIngredient.SERIALIZER);
         }
     };
 }

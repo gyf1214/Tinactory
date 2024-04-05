@@ -12,18 +12,18 @@ import java.util.Map;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class TypedSerializer<T> implements ICombinedSerializer<T> {
-    protected final Map<String, ICombinedSerializer<? extends T>> typeMap = new HashMap<>();
-    protected final Map<Class<? extends T>, ICombinedSerializer<? extends T>> classMap = new HashMap<>();
+    private final Map<String, ICombinedSerializer<? extends T>> typeMap = new HashMap<>();
+    private final Map<Class<? extends T>, ICombinedSerializer<? extends T>> classMap = new HashMap<>();
 
     public TypedSerializer() {
-        this.registerSerializers();
+        registerSerializers();
     }
 
     protected abstract void registerSerializers();
 
     protected <T1 extends T> void registerSerializer(Class<T1> clazz, ICombinedSerializer<T1> serializer) {
-        this.typeMap.put(serializer.getTypeName(), serializer);
-        this.classMap.put(clazz, serializer);
+        typeMap.put(serializer.getTypeName(), serializer);
+        classMap.put(clazz, serializer);
     }
 
     @SuppressWarnings("unchecked")
@@ -33,13 +33,13 @@ public abstract class TypedSerializer<T> implements ICombinedSerializer<T> {
 
     @Override
     public void toNetwork(T sth, FriendlyByteBuf buf) {
-        toNetwork(this.classMap.get(sth.getClass()), sth, buf);
+        toNetwork(classMap.get(sth.getClass()), sth, buf);
     }
 
     @Override
     public T fromNetwork(FriendlyByteBuf buf) {
         var type = buf.readUtf();
-        return this.typeMap.get(type).fromNetwork(buf);
+        return typeMap.get(type).fromNetwork(buf);
     }
 
     @SuppressWarnings("unchecked")
@@ -51,13 +51,13 @@ public abstract class TypedSerializer<T> implements ICombinedSerializer<T> {
 
     @Override
     public JsonElement toJson(T sth) {
-        return toJson(this.classMap.get(sth.getClass()), sth);
+        return toJson(classMap.get(sth.getClass()), sth);
     }
 
     @Override
     public T fromJson(JsonElement je) {
         var jo = je.getAsJsonObject();
         var type = GsonHelper.getAsString(jo, "type");
-        return this.typeMap.get(type).fromJson(jo);
+        return typeMap.get(type).fromJson(jo);
     }
 }

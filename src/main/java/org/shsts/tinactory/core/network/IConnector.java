@@ -18,7 +18,7 @@ public interface IConnector {
 
     default boolean allowAutoConnectFrom(Level world, BlockPos pos, BlockState state,
                                          Direction dir, BlockState state1) {
-        return this.allowConnectFrom(world, pos, state, dir, state1);
+        return allowConnectFrom(world, pos, state, dir, state1);
     }
 
     static boolean isConnectedInWorld(Level world, BlockPos pos, BlockState state, Direction dir) {

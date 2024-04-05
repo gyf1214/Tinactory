@@ -14,8 +14,8 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class Scheduling extends ForgeRegistryEntry<IScheduling> implements IScheduling {
-    protected final List<Supplier<IScheduling>> befores;
-    protected final List<Supplier<IScheduling>> afters;
+    private final List<Supplier<IScheduling>> befores;
+    private final List<Supplier<IScheduling>> afters;
 
     private static <T> List<Supplier<T>> toLazy(Collection<Supplier<T>> suppliers) {
         return suppliers.stream().<Supplier<T>>map(Lazy::of).toList();
@@ -28,10 +28,10 @@ public class Scheduling extends ForgeRegistryEntry<IScheduling> implements ISche
 
     @Override
     public void addConditions(BiConsumer<IScheduling, IScheduling> cons) {
-        for (var before : this.befores) {
+        for (var before : befores) {
             cons.accept(this, before.get());
         }
-        for (var after : this.afters) {
+        for (var after : afters) {
             cons.accept(after.get(), this);
         }
     }

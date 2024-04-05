@@ -18,9 +18,9 @@ import java.util.Optional;
 public class NetworkManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final Level world;
-    protected final Map<BlockPos, NetworkBase> networks = new HashMap<>();
-    protected final Map<BlockPos, NetworkBase.Ref> networkPosMap = new HashMap<>();
+    private final Level world;
+    private final Map<BlockPos, NetworkBase> networks = new HashMap<>();
+    private final Map<BlockPos, NetworkBase.Ref> networkPosMap = new HashMap<>();
 
     public NetworkManager(Level world) {
         LOGGER.debug("create network manager for {}", world.dimension());
@@ -28,50 +28,50 @@ public class NetworkManager {
     }
 
     public boolean hasNetworkAtPos(BlockPos pos) {
-        return this.getNetworkAtPos(pos).isPresent();
+        return getNetworkAtPos(pos).isPresent();
     }
 
     public Optional<NetworkBase> getNetworkAtPos(BlockPos pos) {
-        return Optional.ofNullable(this.networks.get(pos)).or(() ->
-                Optional.ofNullable(this.networkPosMap.get(pos)).flatMap(NetworkBase.Ref::get));
+        return Optional.ofNullable(networks.get(pos)).or(() ->
+                Optional.ofNullable(networkPosMap.get(pos)).flatMap(NetworkBase.Ref::get));
     }
 
     public void putNetworkAtPos(BlockPos pos, NetworkBase network) {
-        assert !this.hasNetworkAtPos(pos);
+        assert !hasNetworkAtPos(pos);
         LOGGER.debug("track block at {}:{} to network {}", world.dimension(), pos, network);
-        this.networkPosMap.put(pos, network.ref());
+        networkPosMap.put(pos, network.ref());
     }
 
     public boolean registerNetwork(NetworkBase network) {
         var center = network.center;
-        if (this.networks.containsKey(center)) {
-            return this.networks.get(center) == network;
+        if (networks.containsKey(center)) {
+            return networks.get(center) == network;
         } else {
             LOGGER.debug("register network {} at center {}:{}", network, world.dimension(), center);
-            this.invalidatePos(center);
-            this.networks.put(center, network);
+            invalidatePos(center);
+            networks.put(center, network);
             return true;
         }
     }
 
     public void unregisterNetwork(NetworkBase network) {
         var center = network.center;
-        this.networks.remove(center);
+        networks.remove(center);
     }
 
     public void invalidatePos(BlockPos pos) {
-        this.getNetworkAtPos(pos).ifPresent(NetworkBase::invalidate);
+        getNetworkAtPos(pos).ifPresent(NetworkBase::invalidate);
     }
 
     public void invalidatePosDir(BlockPos pos, Direction dir) {
         var pos1 = pos.relative(dir);
-        this.invalidatePos(pos);
-        this.invalidatePos(pos1);
+        invalidatePos(pos);
+        invalidatePos(pos1);
     }
 
     public void destroy() {
-        this.networkPosMap.clear();
-        this.networks.clear();
+        networkPosMap.clear();
+        networks.clear();
     }
 
     private static final Map<ResourceKey<Level>, NetworkManager> MANAGERS = new HashMap<>();

@@ -21,7 +21,7 @@ public final class ProcessingResults {
     public static abstract class RatedResult<T extends IPort> implements IProcessingResult {
         public final boolean allowEmpty;
         public final double rate;
-        protected final Class<T> portType;
+        private final Class<T> portType;
 
         public RatedResult(boolean allowEmpty, double rate, Class<T> portType) {
             this.allowEmpty = allowEmpty;
@@ -34,26 +34,26 @@ public final class ProcessingResults {
         @Override
         public boolean insertPort(IPort port, Random random, boolean simulate) {
             if (port == IPort.EMPTY) {
-                return this.allowEmpty;
+                return allowEmpty;
             }
-            if (this.portType.isInstance(port)) {
-                if (this.rate < 1.0d && (simulate || random.nextDouble() > this.rate)) {
+            if (portType.isInstance(port)) {
+                if (rate < 1.0d && (simulate || random.nextDouble() > rate)) {
                     return true;
                 }
-                return this.doInsertPort(this.portType.cast(port), random, simulate);
+                return doInsertPort(portType.cast(port), random, simulate);
             }
             return false;
         }
 
         protected void toNetwork(FriendlyByteBuf buf) {
-            buf.writeBoolean(this.allowEmpty);
-            buf.writeDouble(this.rate);
+            buf.writeBoolean(allowEmpty);
+            buf.writeDouble(rate);
         }
 
         protected void toJson(JsonObject jo) {
-            jo.addProperty("allow_empty", this.allowEmpty);
-            if (this.rate < 1.0d) {
-                jo.addProperty("rate", this.rate);
+            jo.addProperty("allow_empty", allowEmpty);
+            if (rate < 1.0d) {
+                jo.addProperty("rate", rate);
             }
         }
     }
@@ -68,7 +68,7 @@ public final class ProcessingResults {
 
         @Override
         protected boolean doInsertPort(IItemCollection port, Random random, boolean simulate) {
-            return port.insertItem(this.stack, simulate).isEmpty();
+            return port.insertItem(stack, simulate).isEmpty();
         }
 
         public static final ICombinedSerializer<ItemResult> SERIALIZER = new ICombinedSerializer<>() {
@@ -92,7 +92,7 @@ public final class ProcessingResults {
             public JsonElement toJson(ItemResult sth) {
                 var jo = new JsonObject();
                 sth.toJson(jo);
-                jo.add("item", this.encodeJson(ItemStack.CODEC, sth.stack));
+                jo.add("item", encodeJson(ItemStack.CODEC, sth.stack));
                 return jo;
             }
 
@@ -102,7 +102,7 @@ public final class ProcessingResults {
                 return new ItemResult(
                         GsonHelper.getAsBoolean(jo, "allow_empty"),
                         GsonHelper.getAsDouble(jo, "rate", 1.0d),
-                        this.parseJson(ItemStack.CODEC, GsonHelper.getAsJsonObject(jo, "item")));
+                        parseJson(ItemStack.CODEC, GsonHelper.getAsJsonObject(jo, "item")));
             }
         };
     }
@@ -117,7 +117,7 @@ public final class ProcessingResults {
 
         @Override
         protected boolean doInsertPort(IFluidCollection port, Random random, boolean simulate) {
-            return port.fill(this.stack, simulate) == this.stack.getAmount();
+            return port.fill(stack, simulate) == stack.getAmount();
         }
 
         public static final ICombinedSerializer<FluidResult> SERIALIZER = new ICombinedSerializer<>() {
@@ -141,7 +141,7 @@ public final class ProcessingResults {
             public JsonElement toJson(FluidResult sth) {
                 var jo = new JsonObject();
                 sth.toJson(jo);
-                jo.add("fluid", this.encodeJson(FluidStack.CODEC, sth.stack));
+                jo.add("fluid", encodeJson(FluidStack.CODEC, sth.stack));
                 return jo;
             }
 
@@ -151,7 +151,7 @@ public final class ProcessingResults {
                 return new FluidResult(
                         GsonHelper.getAsBoolean(jo, "allow_empty"),
                         GsonHelper.getAsDouble(jo, "rate", 1.0d),
-                        this.parseJson(FluidStack.CODEC, GsonHelper.getAsJsonObject(jo, "fluid")));
+                        parseJson(FluidStack.CODEC, GsonHelper.getAsJsonObject(jo, "fluid")));
             }
         };
     }
@@ -165,8 +165,8 @@ public final class ProcessingResults {
 
         @Override
         protected void registerSerializers() {
-            this.registerSerializer(ItemResult.class, ItemResult.SERIALIZER);
-            this.registerSerializer(FluidResult.class, FluidResult.SERIALIZER);
+            registerSerializer(ItemResult.class, ItemResult.SERIALIZER);
+            registerSerializer(FluidResult.class, FluidResult.SERIALIZER);
         }
     };
 }

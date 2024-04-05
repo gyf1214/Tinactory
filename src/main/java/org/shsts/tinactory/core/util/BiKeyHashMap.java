@@ -12,8 +12,8 @@ import java.util.Set;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BiKeyHashMap<K1, K2, V> {
-    protected final Map<K1, Map<K2, V>> primaryMap = new HashMap<>();
-    protected final Map<K2, Map<K1, V>> secondaryMap = new HashMap<>();
+    private final Map<K1, Map<K2, V>> primaryMap = new HashMap<>();
+    private final Map<K2, Map<K1, V>> secondaryMap = new HashMap<>();
 
     public void put(K1 k1, K2 k2, V v) {
         this.primaryMap.computeIfAbsent(k1, $ -> new HashMap<>()).put(k2, v);

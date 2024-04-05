@@ -52,8 +52,8 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
         this.toolIngredients = toolIngredients;
     }
 
-    protected boolean matchTools(IItemHandler toolStorage) {
-        for (var ingredient : this.toolIngredients) {
+    private boolean matchTools(IItemHandler toolStorage) {
+        for (var ingredient : toolIngredients) {
             var found = false;
             for (var i = 0; i < toolStorage.getSlots(); i++) {
                 var stack = toolStorage.getStackInSlot(i);
@@ -71,15 +71,15 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
 
     @Override
     public boolean matches(Workbench container, Level world) {
-        return this.shapedRecipe.matches(container.getCraftingContainer(), world) &&
-                this.matchTools(container.getToolStorage());
+        return shapedRecipe.matches(container.getCraftingContainer(), world) &&
+                matchTools(container.getToolStorage());
     }
 
     public void doDamage(IItemHandlerModifiable toolStorage) {
         var damages = new int[toolStorage.getSlots()];
         Arrays.fill(damages, 0);
 
-        for (var ingredient : this.toolIngredients) {
+        for (var ingredient : toolIngredients) {
             var found = -1;
             for (var i = 0; i < toolStorage.getSlots(); i++) {
                 var stack = toolStorage.getStackInSlot(i);
@@ -102,22 +102,22 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
 
     @Override
     public ItemStack assemble(Workbench container) {
-        return this.shapedRecipe.assemble(container.getCraftingContainer());
+        return shapedRecipe.assemble(container.getCraftingContainer());
     }
 
     @Override
     public boolean canCraftInDimensions(int width, int height) {
-        return this.shapedRecipe.canCraftInDimensions(width, height);
+        return shapedRecipe.canCraftInDimensions(width, height);
     }
 
     @Override
     public ItemStack getResultItem() {
-        return this.shapedRecipe.getResultItem();
+        return shapedRecipe.getResultItem();
     }
 
     @Override
     public NonNullList<ItemStack> getRemainingItems(Workbench container) {
-        return this.shapedRecipe.getRemainingItems(container.getCraftingContainer());
+        return shapedRecipe.getRemainingItems(container.getCraftingContainer());
     }
 
     private static class FinishedShaped extends ShapedRecipeBuilder.Result {
@@ -153,10 +153,10 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
 
         @Override
         public void serializeRecipeData(JsonObject jo) {
-            this.shaped.serializeRecipeData(jo);
-            var tools = new JsonArray();
-            this.tools.stream().map(Ingredient::toJson).forEach(tools::add);
-            jo.add("tools", tools);
+            shaped.serializeRecipeData(jo);
+            var toolTags = new JsonArray();
+            tools.stream().map(Ingredient::toJson).forEach(toolTags::add);
+            jo.add("tools", toolTags);
         }
     }
 
@@ -165,7 +165,7 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
         private Supplier<Item> result = null;
         private int count = 0;
         private final List<String> rows = new ArrayList<>();
-        private final Map<Character, Supplier<Ingredient>> key = new HashMap<>();
+        private final Map<Character, Supplier<Ingredient>> keys = new HashMap<>();
         private final List<Supplier<Ingredient>> tools = new ArrayList<>();
 
         public Builder(Registrate registrate, RecipeTypeEntry<ToolRecipe, Builder> parent, ResourceLocation loc) {
@@ -185,44 +185,44 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
         }
 
         public Builder pattern(String row) {
-            this.rows.add(row);
+            rows.add(row);
             return self();
         }
 
         public Builder define(Character key, TagKey<Item> tag) {
-            this.key.put(key, () -> Ingredient.of(tag));
+            keys.put(key, () -> Ingredient.of(tag));
             return self();
         }
 
         public Builder define(Character key, Item item) {
-            this.key.put(key, () -> Ingredient.of(item));
+            keys.put(key, () -> Ingredient.of(item));
             return self();
         }
 
         public Builder tool(Supplier<Ingredient> ingredient) {
-            this.tools.add(ingredient);
+            tools.add(ingredient);
             return self();
         }
 
         public Builder toolTag(TagKey<Item> toolTag) {
-            return this.tool(() -> Ingredient.of(toolTag));
+            return tool(() -> Ingredient.of(toolTag));
         }
 
         @Override
         public FinishedRecipe createObject() {
-            assert this.result != null;
-            var key = this.key.entrySet().stream()
+            assert result != null;
+            var key = keys.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
             var tools = this.tools.stream().map(Supplier::get).toList();
-            var shaped = new FinishedShaped(this.loc, this.result.get(), this.count, this.rows, key);
-            return new Finished(this.loc, this.parent, shaped, tools);
+            var shaped = new FinishedShaped(loc, result.get(), count, rows, key);
+            return new Finished(loc, parent, shaped, tools);
         }
     }
 
     private static class Serializer extends SmartRecipeSerializer<ToolRecipe, Builder> {
         private static final RecipeSerializer<ShapedRecipe> SHAPED_SERIALIZER = RecipeSerializer.SHAPED_RECIPE;
 
-        protected Serializer(RecipeTypeEntry<ToolRecipe, Builder> type) {
+        private Serializer(RecipeTypeEntry<ToolRecipe, Builder> type) {
             super(type);
         }
 
@@ -232,7 +232,7 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
             var tools = Streams.stream(GsonHelper.getAsJsonArray(jo, "tools"))
                     .map(Ingredient::fromJson)
                     .toList();
-            return new ToolRecipe(this.type, loc, shaped, tools);
+            return new ToolRecipe(type, loc, shaped, tools);
         }
 
         @Override
@@ -243,7 +243,7 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
             var shaped = SHAPED_SERIALIZER.fromNetwork(loc, buf);
             assert shaped != null;
             var tools = buf.readCollection(ArrayList::new, Ingredient::fromNetwork);
-            return new ToolRecipe(this.type, loc, shaped, tools);
+            return new ToolRecipe(type, loc, shaped, tools);
         }
 
         @Override
