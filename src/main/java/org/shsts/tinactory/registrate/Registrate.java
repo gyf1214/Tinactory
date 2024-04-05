@@ -122,75 +122,75 @@ public class Registrate {
     @SuppressWarnings("deprecation")
     public Registrate(String modid) {
         this.modid = modid;
-        this.tagsHandler(Registry.ITEM);
-        this.tagsHandler(Registry.BLOCK);
-        this.putDataHandler(this.blockStateHandler);
-        this.putDataHandler(this.itemModelHandler);
-        this.putDataHandler(this.recipeDataHandler);
-        this.putDataHandler(this.lootTableHandler);
+        tagsHandler(Registry.ITEM);
+        tagsHandler(Registry.BLOCK);
+        putDataHandler(blockStateHandler);
+        putDataHandler(itemModelHandler);
+        putDataHandler(recipeDataHandler);
+        putDataHandler(lootTableHandler);
     }
 
     public <T extends IForgeRegistryEntry<T>>
     void putHandler(ResourceLocation loc, RegistryEntryHandler<T> handler) {
-        this.registryEntryHandlers.put(loc, handler);
+        registryEntryHandlers.put(loc, handler);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends IForgeRegistryEntry<T>>
     RegistryEntryHandler<T> forgeHandler(IForgeRegistry<T> registry) {
-        return (RegistryEntryHandler<T>) this.registryEntryHandlers.computeIfAbsent(
+        return (RegistryEntryHandler<T>) registryEntryHandlers.computeIfAbsent(
                 registry.getRegistryName(),
                 loc -> RegistryEntryHandler.forge(registry));
     }
 
     private <T> void tagsHandler(Registry<T> registry) {
         var handler = new TagsHandler<>(this, registry);
-        this.putDataHandler(handler);
-        this.tagsHandlers.put(registry.key(), handler);
+        putDataHandler(handler);
+        tagsHandlers.put(registry.key(), handler);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>
     forgeHandler(ResourceLocation loc, Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
-        return (RegistryEntryHandler<T>) this.registryEntryHandlers.computeIfAbsent(loc,
+        return (RegistryEntryHandler<T>) registryEntryHandlers.computeIfAbsent(loc,
                 $ -> RegistryEntryHandler.forge(entryClass, registry));
     }
 
     public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>
     forgeHandler(ResourceKey<Registry<T>> key, Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
-        return this.forgeHandler(key.location(), entryClass, registry);
+        return forgeHandler(key.location(), entryClass, registry);
     }
 
     private void putDataHandler(DataHandler<?> handler) {
-        this.dataHandlers.add(handler);
+        dataHandlers.add(handler);
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event) {
-        for (var handler : this.dataHandlers) {
+        for (var handler : dataHandlers) {
             handler.clear();
         }
     }
 
     public void register(IEventBus modEventBus) {
         // mod BUS
-        modEventBus.addListener(this.registryHandler::onNewRegistry);
-        for (var handler : this.registryEntryHandlers.values()) {
+        modEventBus.addListener(registryHandler::onNewRegistry);
+        for (var handler : registryEntryHandlers.values()) {
             handler.addListener(modEventBus);
         }
-        this.biomeHandler.addListener(modEventBus);
-        for (var handler : this.dataHandlers) {
+        biomeHandler.addListener(modEventBus);
+        for (var handler : dataHandlers) {
             modEventBus.addListener(handler::onGatherData);
         }
         modEventBus.addListener(this::onCommonSetup);
-        modEventBus.addListener(this.capabilityHandler::onRegisterEvent);
-        modEventBus.addListener(this.tintHandler::onRegisterBlockColors);
-        modEventBus.addListener(this.tintHandler::onRegisterItemColors);
-        this.recipeTypeHandler.addListeners(modEventBus);
+        modEventBus.addListener(capabilityHandler::onRegisterEvent);
+        modEventBus.addListener(tintHandler::onRegisterBlockColors);
+        modEventBus.addListener(tintHandler::onRegisterItemColors);
+        recipeTypeHandler.addListeners(modEventBus);
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(this.renderTypeHandler::onClientSetup);
-        event.enqueueWork(this.menuScreenHandler::onClientSetup);
+        event.enqueueWork(renderTypeHandler::onClientSetup);
+        event.enqueueWork(menuScreenHandler::onClientSetup);
     }
 
     public void registerClient(IEventBus modEventBus) {
@@ -262,12 +262,12 @@ public class Registrate {
 
         @Override
         protected BlockEntityBuilder<T, SimpleBlockEntitySetBuilder<T, U>> createBlockEntityBuilder() {
-            return Registrate.this.blockEntity(this, this.id, this.blockEntityFactory);
+            return Registrate.this.blockEntity(this, id, blockEntityFactory);
         }
 
         @Override
         protected EntityBlockBuilder<T, U, SimpleBlockEntitySetBuilder<T, U>> createBlockBuilder() {
-            return Registrate.this.entityBlock(this, this.id, this.blockFactory);
+            return Registrate.this.entityBlock(this, id, blockFactory);
         }
 
         @Override
@@ -285,33 +285,33 @@ public class Registrate {
     }
 
     public void blockState(Consumer<DataContext<BlockStateProvider>> cons) {
-        this.blockStateHandler.addCallback(prov -> cons.accept(new DataContext<>(this.modid, prov)));
+        blockStateHandler.addCallback(prov -> cons.accept(new DataContext<>(modid, prov)));
     }
 
     public void itemModel(Consumer<DataContext<ItemModelProvider>> cons) {
-        this.itemModelHandler.addCallback(prov -> cons.accept(new DataContext<>(this.modid, prov)));
+        itemModelHandler.addCallback(prov -> cons.accept(new DataContext<>(modid, prov)));
     }
 
     @SuppressWarnings("unchecked")
     private <T> TagsHandler<T> getTagsHandler(ResourceKey<? extends Registry<T>> key) {
-        assert this.tagsHandlers.containsKey(key);
-        return (TagsHandler<T>) this.tagsHandlers.get(key);
+        assert tagsHandlers.containsKey(key);
+        return (TagsHandler<T>) tagsHandlers.get(key);
     }
 
     @SafeVarargs
     public final <T> void tag(T object, TagKey<T>... tags) {
         Supplier<T> supplier = () -> object;
-        this.tag(supplier, tags);
+        tag(supplier, tags);
     }
 
     @SafeVarargs
     public final <T> void tag(Supplier<? extends T> object, TagKey<T>... tags) {
         assert tags.length > 0;
-        this.getTagsHandler(tags[0].registry()).addTags(object, tags);
+        getTagsHandler(tags[0].registry()).addTags(object, tags);
     }
 
     public <T> void tag(TagKey<T> object, TagKey<T> tag) {
-        this.getTagsHandler(tag.registry()).addTag(object, tag);
+        getTagsHandler(tag.registry()).addTag(object, tag);
     }
 
     public <T extends IForgeRegistryEntry<T>>
@@ -348,7 +348,7 @@ public class Registrate {
 
         @Override
         public U createObject() {
-            return this.factory.get();
+            return factory.get();
         }
     }
 
@@ -363,42 +363,42 @@ public class Registrate {
     }
 
     public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation stillTexture, int color) {
-        return this.registryEntry(id, this.fluidHandler, () -> new SimpleFluid(stillTexture, color));
+        return registryEntry(id, fluidHandler, () -> new SimpleFluid(stillTexture, color));
     }
 
     public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation stillTexture) {
-        return this.simpleFluid(id, stillTexture, 0xFFFFFFFF);
+        return simpleFluid(id, stillTexture, 0xFFFFFFFF);
     }
 
     public <T> CapabilityEntry<T> capability(Class<T> clazz, CapabilityToken<T> token) {
-        return this.capabilityHandler.register(clazz, token);
+        return capabilityHandler.register(clazz, token);
     }
 
     public <T extends BlockEntity> RegistryEntry<CapabilityProviderType<T, ?>>
     capabilityProvider(String id, Function<T, ? extends ICapabilityProvider> factory) {
-        return this.registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY, () ->
+        return registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY, () ->
                 CapabilityProviderType.simple(factory));
     }
 
     public <T extends BlockEntity, B extends Function<T, ICapabilityProvider>>
     RegistryEntry<CapabilityProviderType<T, B>>
     capabilityProvider(String id, Supplier<B> builderFactory) {
-        return this.registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY, () ->
+        return registryEntry(id, AllRegistries.CAPABILITY_PROVIDER_TYPE_REGISTRY, () ->
                 new CapabilityProviderType<>(builderFactory));
     }
 
     public SchedulingBuilder<Registrate> scheduling(String id) {
-        return this.registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
+        return registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
     }
 
     public <T extends Component>
     RegistryEntry<ComponentType<T>> componentType(String id, Class<T> clazz, Component.Factory<T> factory) {
-        return this.registryEntry(id, AllRegistries.COMPONENT_TYPE_REGISTRY,
+        return registryEntry(id, AllRegistries.COMPONENT_TYPE_REGISTRY,
                 () -> new ComponentType<>(clazz, factory));
     }
 
     public <A> RegistryEntry<Event<A>> event(String id, Class<A> argClazz) {
-        return this.registryEntry(id, AllRegistries.EVENT,
+        return registryEntry(id, AllRegistries.EVENT,
                 () -> new Event<>(argClazz));
     }
 
@@ -409,12 +409,12 @@ public class Registrate {
 
     public RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder>
     simpleProcessingRecipeType(String id) {
-        return this.simpleProcessingRecipeType(id, $ -> $);
+        return simpleProcessingRecipeType(id, $ -> $);
     }
 
     public RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder>
     simpleProcessingRecipeType(String id, Transformer<ProcessingRecipe.SimpleBuilder> builderTransformer) {
-        return this.recipeType("processing/" + id, ProcessingRecipe.SIMPLE_SERIALIZER)
+        return recipeType("processing/" + id, ProcessingRecipe.SIMPLE_SERIALIZER)
                 .clazz(ProcessingRecipe.Simple.class)
                 .builder(ProcessingRecipe.SimpleBuilder::new)
                 .builderTransform(builderTransformer)
@@ -423,29 +423,29 @@ public class Registrate {
 
     public void biome(String... ids) {
         for (var id : ids) {
-            this.biomeHandler.addLocation(new ResourceLocation(this.modid, id));
+            biomeHandler.addLocation(new ResourceLocation(modid, id));
         }
     }
 
     public void nullRecipe(ResourceLocation loc) {
-        this.recipeDataHandler.addCallback(prov -> prov.addRecipe(new NullRecipe(loc)));
+        recipeDataHandler.addCallback(prov -> prov.addRecipe(new NullRecipe(loc)));
     }
 
     public void nullRecipe(String loc) {
-        this.nullRecipe(new ResourceLocation(loc));
+        nullRecipe(new ResourceLocation(loc));
     }
 
     public void nullRecipe(Item item) {
         var loc = item.getRegistryName();
         assert loc != null;
-        this.nullRecipe(loc);
+        nullRecipe(loc);
     }
 
     public void vanillaRecipe(Supplier<RecipeBuilder> recipe) {
-        this.recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe));
+        recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe));
     }
 
     public void vanillaRecipe(Supplier<RecipeBuilder> recipe, ResourceLocation loc) {
-        this.recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe, loc));
+        recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe, loc));
     }
 }
