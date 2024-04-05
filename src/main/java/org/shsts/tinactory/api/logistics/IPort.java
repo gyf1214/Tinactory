@@ -10,12 +10,12 @@ public interface IPort {
     PortType getPortType();
 
     default IItemCollection asItem() {
-        assert this.getPortType() == PortType.ITEM;
+        assert getPortType() == PortType.ITEM;
         return (IItemCollection) this;
     }
 
     default IFluidCollection asFluid() {
-        assert this.getPortType() == PortType.FLUID;
+        assert getPortType() == PortType.FLUID;
         return (IFluidCollection) this;
     }
 

@@ -24,7 +24,7 @@ public class CableSet {
     private CableSet(Map<Voltage, CableSetting> settings) {
         this.cables = settings.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey,
-                        e -> this.createBlock(e.getKey(), e.getValue())));
+                        e -> createBlock(e.getKey(), e.getValue())));
     }
 
     private RegistryEntry<CableBlock> createBlock(Voltage voltage, CableSetting setting) {
@@ -39,7 +39,7 @@ public class CableSet {
     }
 
     public CableBlock getBlock(Voltage voltage) {
-        return this.cables.get(voltage).get();
+        return cables.get(voltage).get();
     }
 
     public static class Builder {
@@ -48,12 +48,12 @@ public class CableSet {
         private Builder() {}
 
         public Builder add(Voltage voltage, MaterialSet material, double resistance) {
-            this.cableSettings.put(voltage, new CableSetting(material, resistance));
+            cableSettings.put(voltage, new CableSetting(material, resistance));
             return this;
         }
 
         public CableSet build() {
-            return new CableSet(this.cableSettings);
+            return new CableSet(cableSettings);
         }
     }
 

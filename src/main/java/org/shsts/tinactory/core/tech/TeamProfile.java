@@ -32,29 +32,29 @@ public class TeamProfile implements INBTSerializable<CompoundTag> {
     }
 
     public void advanceTechProgress(Technology tech, long progress) {
-        this.technologies.merge(tech, progress, ($, v) -> v + progress);
+        technologies.merge(tech, progress, ($, v) -> v + progress);
         TinactorySavedData.get().setDirty();
     }
 
     public long getTechProgress(Technology tech) {
-        return this.technologies.getOrDefault(tech, 0L);
+        return technologies.getOrDefault(tech, 0L);
     }
 
     public boolean isTechFinished(Technology tech) {
-        return this.getTechProgress(tech) >= tech.maxProgress;
+        return getTechProgress(tech) >= tech.maxProgress;
     }
 
     public boolean isTechAvailable(Technology tech) {
-        return this.getTechProgress(tech) > 0 || tech.depends.stream().allMatch(this::isTechFinished);
+        return getTechProgress(tech) > 0 || tech.depends.stream().allMatch(this::isTechFinished);
     }
 
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.putUUID("id", this.uuid);
-        tag.putString("name", this.name);
+        tag.putUUID("id", uuid);
+        tag.putString("name", name);
         var listTag = new ListTag();
-        for (var tech : this.technologies.entrySet()) {
+        for (var tech : technologies.entrySet()) {
             var loc = tech.getKey().getRegistryName();
             var tag1 = new CompoundTag();
             assert loc != null;
@@ -74,7 +74,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag> {
             var loc = tag2.getString("id");
             var progress = tag2.getLong("progress");
             TechManager.techByKey(new ResourceLocation(loc))
-                    .ifPresent(tech -> this.technologies.put(tech, progress));
+                    .ifPresent(tech -> technologies.put(tech, progress));
         }
     }
 
@@ -93,6 +93,6 @@ public class TeamProfile implements INBTSerializable<CompoundTag> {
 
     @Override
     public String toString() {
-        return "TeamProfile{%s, uuid=%s}".formatted(this.name, this.uuid);
+        return "TeamProfile{%s, uuid=%s}".formatted(name, uuid);
     }
 }

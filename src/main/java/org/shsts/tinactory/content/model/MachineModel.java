@@ -72,16 +72,16 @@ public final class MachineModel {
     }
 
     private <B extends ModelBuilder<B>> B applyTextures(B model) {
-        return casing(model, this.casing)
-                .texture("front_overlay", this.front);
+        return casing(model, casing)
+                .texture("front_overlay", front);
     }
 
     private ModelFile genModel(String id, BlockModelProvider prov) {
-        return this.applyTextures(prov.withExistingParent(id, ModelGen.modLoc(CASING_MODEL)));
+        return applyTextures(prov.withExistingParent(id, ModelGen.modLoc(CASING_MODEL)));
     }
 
     public void blockState(RegistryDataContext<Block, ? extends MachineBlock<?>, BlockStateProvider> ctx) {
-        var casing = this.genModel(ctx.id, ctx.provider.models());
+        var casing = genModel(ctx.id, ctx.provider.models());
         var io = ctx.provider.models().getExistingFile(ModelGen.modLoc(IO_MODEL));
         var multipart = ctx.provider.getMultipartBuilder(ctx.object);
 

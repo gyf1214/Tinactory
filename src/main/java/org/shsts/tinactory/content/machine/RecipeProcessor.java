@@ -145,7 +145,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
     @Override
     public long getVoltage() {
-        return voltage.val;
+        return voltage.value;
     }
 
     @Override

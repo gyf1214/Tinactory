@@ -27,6 +27,6 @@ public class StaticWidget extends ContainerWidget {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        RenderUtil.blit(poseStack, this.texture, this.zIndex, this.rect);
+        RenderUtil.blit(poseStack, texture, zIndex, rect);
     }
 }

@@ -20,10 +20,10 @@ public class Technology extends ForgeRegistryEntry<Technology> {
     }
 
     public void resolve() {
-        this.depends.clear();
-        this.dependIds.stream()
+        depends.clear();
+        dependIds.stream()
                 .flatMap(loc -> TechManager.techByKey(loc).stream())
-                .forEach(this.depends::add);
+                .forEach(depends::add);
     }
 
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(

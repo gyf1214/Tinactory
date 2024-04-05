@@ -51,7 +51,7 @@ public final class TechManager {
             try (var resource = manager.getResource(loc)) {
                 var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
                 var reader = new BufferedReader(is);
-                var jo = GsonHelper.fromJson(this.gson, reader, JsonObject.class);
+                var jo = GsonHelper.fromJson(gson, reader, JsonObject.class);
                 return Optional.of(codec
                         .parse(JsonOps.INSTANCE, jo)
                         .getOrThrow(false, $ -> {})
@@ -69,7 +69,7 @@ public final class TechManager {
 
             return stage.wait(Unit.INSTANCE)
                     .thenApplyAsync($ -> listResources(manager, PREFIX).stream()
-                            .flatMap(loc -> this.loadResource(manager, loc, Technology.CODEC).stream())
+                            .flatMap(loc -> loadResource(manager, loc, Technology.CODEC).stream())
                             .toList(), backgroundExecutor)
                     .thenAcceptAsync(techs -> {
                         TECHNOLOGIES.clear();

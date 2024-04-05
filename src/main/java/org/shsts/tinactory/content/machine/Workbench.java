@@ -50,12 +50,12 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
 
         @Override
         public ItemStack removeItem(int index, int count) {
-            return ContainerHelper.removeItem(this.items, index, count);
+            return ContainerHelper.removeItem(items, index, count);
         }
 
         @Override
         public void setItem(int index, ItemStack stack) {
-            this.items.set(index, stack);
+            items.set(index, stack);
         }
     }
 
@@ -90,14 +90,14 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         this.blockEntity = blockEntity;
 
         this.craftingStack = new CraftingStack(3, 3);
-        this.craftingView = new WrapperItemHandler(this.craftingStack);
+        this.craftingView = new WrapperItemHandler(craftingStack);
 
         this.output = ItemStack.EMPTY;
 
         this.toolStorage = new ToolItemHandler(9);
 
         this.itemView = new WrapperItemHandler(
-                new CombinedInvWrapper(this.toolStorage, this.craftingView));
+                new CombinedInvWrapper(toolStorage, craftingView));
         this.itemView.onUpdate(this::onUpdate);
     }
 
@@ -109,10 +109,10 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
     @SuppressWarnings("unchecked")
     protected <C extends Container, R extends Recipe<C>, V>
     V applyRecipeFunc(RecipeFunction<C, R, V> func) {
-        if (this.currentRecipe instanceof CraftingRecipe) {
-            return func.apply((R) this.currentRecipe, (C) this.craftingStack);
-        } else if (this.currentRecipe instanceof ToolRecipe) {
-            return func.apply((R) this.currentRecipe, (C) new SmartRecipe.ContainerWrapper<>(this));
+        if (currentRecipe instanceof CraftingRecipe) {
+            return func.apply((R) currentRecipe, (C) craftingStack);
+        } else if (currentRecipe instanceof ToolRecipe) {
+            return func.apply((R) currentRecipe, (C) new SmartRecipe.ContainerWrapper<>(this));
         } else {
             throw new IllegalStateException();
         }
@@ -120,7 +120,7 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
 
 
     protected void onUpdate() {
-        var world = this.blockEntity.getLevel();
+        var world = blockEntity.getLevel();
         if (world == null || world.isClientSide) {
             return;
         }
@@ -128,44 +128,44 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         var recipeManager = world.getRecipeManager();
         var toolRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL.get(), this, world);
         if (toolRecipe.isEmpty()) {
-            var shapedRecipe = recipeManager.getRecipeFor(RecipeType.CRAFTING, this.craftingStack, world);
+            var shapedRecipe = recipeManager.getRecipeFor(RecipeType.CRAFTING, craftingStack, world);
             if (shapedRecipe.isEmpty()) {
-                this.currentRecipe = null;
+                currentRecipe = null;
             } else {
-                this.currentRecipe = shapedRecipe.get();
+                currentRecipe = shapedRecipe.get();
             }
         } else {
-            this.currentRecipe = toolRecipe.get();
+            currentRecipe = toolRecipe.get();
         }
-        if (this.currentRecipe != null) {
-            this.output = this.applyRecipeFunc(Recipe::assemble);
+        if (currentRecipe != null) {
+            output = applyRecipeFunc(Recipe::assemble);
         } else {
-            this.output = ItemStack.EMPTY;
+            output = ItemStack.EMPTY;
         }
-        this.blockEntity.setChanged();
+        blockEntity.setChanged();
     }
 
     @Override
     public ItemStack getResult() {
-        if (!this.initialized) {
-            this.onUpdate();
-            this.initialized = true;
+        if (!initialized) {
+            onUpdate();
+            initialized = true;
         }
-        return this.output;
+        return output;
     }
 
     @Override
     public void setResult(ItemStack stack) {
-        var world = this.blockEntity.getLevel();
+        var world = blockEntity.getLevel();
         if (world == null || !world.isClientSide) {
             return;
         }
-        this.output = stack;
+        output = stack;
     }
 
     @Override
     public void onTake(Player player, ItemStack stack) {
-        if (stack.isEmpty() || this.currentRecipe == null) {
+        if (stack.isEmpty() || currentRecipe == null) {
             return;
         }
 
@@ -174,48 +174,48 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
 
         // vanilla logic of crafting triggers
         stack.onCraftedBy(player.level, player, amount);
-        ForgeEventFactory.firePlayerCraftingEvent(player, stack, this.craftingStack);
-        if (!this.currentRecipe.isSpecial()) {
-            player.awardRecipes(List.of(this.currentRecipe));
+        ForgeEventFactory.firePlayerCraftingEvent(player, stack, craftingStack);
+        if (!currentRecipe.isSpecial()) {
+            player.awardRecipes(List.of(currentRecipe));
         }
         ForgeHooks.setCraftingPlayer(player);
-        var remaining = this.applyRecipeFunc(Recipe::getRemainingItems);
+        var remaining = applyRecipeFunc(Recipe::getRemainingItems);
         ForgeHooks.setCraftingPlayer(null);
 
         for (var i = 0; i < remaining.size(); i++) {
             // vanilla logic of decreasing material and set remaining items
-            var slotItem = this.craftingView.getStackInSlot(i);
+            var slotItem = craftingView.getStackInSlot(i);
             var remainingItem = remaining.get(i);
             if (!slotItem.isEmpty()) {
-                this.craftingView.extractItem(i, 1, false);
+                craftingView.extractItem(i, 1, false);
             }
             if (!remainingItem.isEmpty()) {
-                var remainingItem1 = this.craftingView.insertItem(i, remainingItem, false);
+                var remainingItem1 = craftingView.insertItem(i, remainingItem, false);
                 player.drop(remainingItem1, false);
             }
         }
 
-        if (this.currentRecipe instanceof ToolRecipe toolRecipe) {
+        if (currentRecipe instanceof ToolRecipe toolRecipe) {
             // damage tool recipe
-            toolRecipe.doDamage(this.toolStorage);
+            toolRecipe.doDamage(toolStorage);
         }
 
-        this.onUpdate();
+        onUpdate();
     }
 
     public CraftingContainer getCraftingContainer() {
-        return this.craftingStack;
+        return craftingStack;
     }
 
     public IItemHandlerModifiable getToolStorage() {
-        return this.toolStorage;
+        return toolStorage;
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> this.itemView).cast();
+            return LazyOptional.of(() -> itemView).cast();
         } else if (cap == AllCapabilities.WORKBENCH.get()) {
             return LazyOptional.of(() -> this).cast();
         }
@@ -224,11 +224,11 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
 
     @Override
     public CompoundTag serializeNBT() {
-        return ItemHelper.serializeItemHandler(this.itemView);
+        return ItemHelper.serializeItemHandler(itemView);
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(this.itemView, tag);
+        ItemHelper.deserializeItemHandler(itemView, tag);
     }
 }

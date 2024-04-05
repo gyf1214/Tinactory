@@ -24,6 +24,6 @@ public class OreBlock extends Block {
     }
 
     public IntegerProperty getProperty() {
-        return this.variant;
+        return variant;
     }
 }

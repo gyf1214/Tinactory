@@ -27,14 +27,14 @@ public class PrimitiveMachine extends Machine {
     protected void onWork(Level world, Network network) {
         assert this.network == network;
         var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
-        this.getProcessor().ifPresent(processor -> processor.onWorkTick(workSpeed));
+        getProcessor().ifPresent(processor -> processor.onWorkTick(workSpeed));
     }
 
     @Override
     protected void onServerTick(Level world, BlockPos pos, BlockState state) {
         if (this.network == null) {
             var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
-            this.getProcessor().ifPresent(processor -> {
+            getProcessor().ifPresent(processor -> {
                 processor.onPreWork();
                 processor.onWorkTick(workSpeed);
             });

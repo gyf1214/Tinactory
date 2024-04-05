@@ -44,25 +44,25 @@ public class GhostRecipe extends ContainerWidget {
     }
 
     private void updateRecipe() {
-        var loc = this.menu.getSyncPacket(this.syncSlot, ContainerSyncPacket.LocHolder.class)
+        var loc = menu.getSyncPacket(syncSlot, ContainerSyncPacket.LocHolder.class)
                 .flatMap(ContainerSyncPacket.Holder::getData)
                 .orElse(null);
 
-        if (Objects.equals(loc, this.currentRecipeLoc)) {
+        if (Objects.equals(loc, currentRecipeLoc)) {
             return;
         }
-        this.currentRecipeLoc = loc;
+        currentRecipeLoc = loc;
         var recipe = Optional.ofNullable(loc)
                 .flatMap(ClientUtil.getRecipeManager()::byKey)
                 .flatMap(optionalCastor(ProcessingRecipe.class));
 
-        this.ingredients.clear();
-        recipe.map(this.layout::getProcessingInputs).ifPresent(this.ingredients::addAll);
-        recipe.map(this.layout::getProcessingOutputs).ifPresent(this.ingredients::addAll);
+        ingredients.clear();
+        recipe.map(layout::getProcessingInputs).ifPresent(ingredients::addAll);
+        recipe.map(layout::getProcessingOutputs).ifPresent(ingredients::addAll);
     }
 
     private void renderItem(PoseStack poseStack, ItemStack stack, int x, int y) {
-        this.itemRenderer.renderAndDecorateFakeItem(stack, x, y);
+        itemRenderer.renderAndDecorateFakeItem(stack, x, y);
         RenderSystem.depthFunc(516);
         RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), 0x808B8B8B);
         RenderSystem.depthFunc(515);
@@ -71,20 +71,20 @@ public class GhostRecipe extends ContainerWidget {
 
     private void renderFluid(PoseStack poseStack, FluidStack stack, int x, int y) {
         var rect = new Rect(x, y, 16, 16);
-        RenderUtil.renderFluid(poseStack, stack, rect, 0x80FFFFFF, this.zIndex);
+        RenderUtil.renderFluid(poseStack, stack, rect, 0x80FFFFFF, zIndex);
     }
 
     private <I> void renderIngredient(PoseStack poseStack, I ingredient, int x, int y) {
         RenderUtil.renderIngredient(ingredient,
-                stack -> this.renderItem(poseStack, stack, x, y),
-                stack -> this.renderFluid(poseStack, stack, x, y));
+                stack -> renderItem(poseStack, stack, x, y),
+                stack -> renderFluid(poseStack, stack, x, y));
     }
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        this.updateRecipe();
+        updateRecipe();
 
-        for (var ingredient : this.ingredients) {
+        for (var ingredient : ingredients) {
             var slot = ingredient.slot();
             var slotType = ingredient.slot().type();
             if (slotType == SlotType.NONE) {
@@ -92,7 +92,7 @@ public class GhostRecipe extends ContainerWidget {
             }
             var x = slot.x() + rect.x() + 1;
             var y = slot.y() + rect.y() + 1;
-            this.renderIngredient(poseStack, ingredient.val(), x, y);
+            renderIngredient(poseStack, ingredient.val(), x, y);
         }
     }
 }

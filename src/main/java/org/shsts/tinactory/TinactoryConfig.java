@@ -20,27 +20,27 @@ public final class TinactoryConfig {
 
     public TinactoryConfig(ForgeConfigSpec.Builder builder) {
         builder.push("logistics");
-        this.fluidSlotSize = builder.comment("Default size of a fluid slot.")
+        fluidSlotSize = builder.comment("Default size of a fluid slot.")
                 .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
-        this.initialWorkerSize = builder.comment("Initial worker size for logistics component")
+        initialWorkerSize = builder.comment("Initial worker size for logistics component")
                 .defineInRange("initial_worker_size", 1, 0, Integer.MAX_VALUE);
-        this.initialWorkerDelay = builder.comment("Initial worker delay for logistics component")
+        initialWorkerDelay = builder.comment("Initial worker delay for logistics component")
                 .defineInRange("initial_worker_delay", 40, 1, Integer.MAX_VALUE);
-        this.initialWorkerStack = builder.comment("Initial worker stack for logistics component")
+        initialWorkerStack = builder.comment("Initial worker stack for logistics component")
                 .defineInRange("initial_worker_stack", 1, 1, Integer.MAX_VALUE);
-        this.initialWorkerFluidStack = builder.comment("Initial worker fluid stack for logistics component")
+        initialWorkerFluidStack = builder.comment("Initial worker fluid stack for logistics component")
                 .defineInRange("initial_worker_fluid_stack", 250, 1, Integer.MAX_VALUE);
         builder.pop();
 
         builder.push("machine");
-        this.primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
+        primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
                 .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
         builder.pop();
 
         builder.push("network");
-        this.networkConnectDelay = builder.comment("Delay in ticks when network reconnects")
+        networkConnectDelay = builder.comment("Delay in ticks when network reconnects")
                 .defineInRange("connect_delay", 5, 0, Integer.MAX_VALUE);
-        this.networkMaxConnectsPerTick = builder.comment("Max connection iteration for network reconnects per tick")
+        networkMaxConnectsPerTick = builder.comment("Max connection iteration for network reconnects per tick")
                 .defineInRange("max_connects", 100, 1, Integer.MAX_VALUE);
         builder.pop();
     }

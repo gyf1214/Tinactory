@@ -289,18 +289,18 @@ public class StackContainer implements ICapabilityProvider,
         private final List<PortInfo> ports = new ArrayList<>();
 
         public Builder layout(Layout layout) {
-            this.ports.clear();
+            ports.clear();
             var slots = layout.slots.stream().filter(s -> s.type() != SlotType.NONE).toList();
             if (slots.isEmpty()) {
                 return this;
             }
             var portCount = 1 + slots.stream().mapToInt(Layout.SlotInfo::port).max().getAsInt();
-            var ports = new ArrayList<>(Collections.nCopies(portCount, new PortInfo(0, SlotType.NONE)));
+            var newPorts = new ArrayList<>(Collections.nCopies(portCount, new PortInfo(0, SlotType.NONE)));
             for (var slot : slots) {
-                var info = ports.get(slot.port());
-                ports.set(slot.port(), new PortInfo(info.slots + 1, slot.type()));
+                var info = newPorts.get(slot.port());
+                newPorts.set(slot.port(), new PortInfo(info.slots + 1, slot.type()));
             }
-            this.ports.addAll(ports);
+            ports.addAll(newPorts);
             return this;
         }
 

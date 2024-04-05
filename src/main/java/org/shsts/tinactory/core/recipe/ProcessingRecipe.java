@@ -209,7 +209,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
 
         public S voltage(Voltage value) {
-            voltage = value.val;
+            voltage = value.value;
             return self();
         }
 

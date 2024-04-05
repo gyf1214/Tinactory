@@ -76,7 +76,7 @@ public class UsableToolItem extends ToolItem {
 
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
-        return this.tier.getSpeed();
+        return tier.getSpeed();
     }
 
     @Override
@@ -89,6 +89,6 @@ public class UsableToolItem extends ToolItem {
 
     @Override
     public boolean isCorrectToolForDrops(BlockState state) {
-        return state.is(this.blockTag) && TierSortingRegistry.isCorrectTierForDrops(this.tier, state);
+        return state.is(blockTag) && TierSortingRegistry.isCorrectTierForDrops(tier, state);
     }
 }

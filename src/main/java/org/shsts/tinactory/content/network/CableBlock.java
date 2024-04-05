@@ -56,7 +56,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         this.resistance = resistance;
         this.shapes = this.makeShapes();
 
-        var defaultState = this.stateDefinition.any()
+        var defaultState = stateDefinition.any()
                 .setValue(NORTH, false)
                 .setValue(EAST, false)
                 .setValue(SOUTH, false)
@@ -82,7 +82,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         }
 
         var builder = ImmutableMap.<BlockState, VoxelShape>builder();
-        for (var state : this.getStateDefinition().getPossibleStates()) {
+        for (var state : getStateDefinition().getPossibleStates()) {
             var shape = baseShape;
             for (var dir : Direction.values()) {
                 if (state.getValue(PROPERTY_BY_DIRECTION.get(dir))) {
@@ -101,36 +101,36 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     }
 
     protected VoxelShape getRealShape(BlockState state) {
-        return this.shapes.get(state);
+        return shapes.get(state);
     }
 
     protected boolean shouldRenderOverlay(CollisionContext ctx) {
         return ctx instanceof EntityCollisionContext collision &&
                 collision.getEntity() instanceof LocalPlayer player &&
                 player.getMainHandItem().getItem() instanceof UsableToolItem &&
-                this.canWrenchWith(player.getMainHandItem());
+                canWrenchWith(player.getMainHandItem());
     }
 
     protected VoxelShape getRenderShape(BlockState state, CollisionContext ctx) {
-        return this.shouldRenderOverlay(ctx) ? Shapes.block() : this.getRealShape(state);
+        return shouldRenderOverlay(ctx) ? Shapes.block() : getRealShape(state);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext ctx) {
-        return this.getRealShape(state);
+        return getRealShape(state);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext ctx) {
-        return this.getRenderShape(state, ctx);
+        return getRenderShape(state, ctx);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
-        return this.getRealShape(state);
+        return getRealShape(state);
     }
 
     @Override
@@ -156,9 +156,9 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
                              Direction dir, boolean sneaky) {
         var property = PROPERTY_BY_DIRECTION.get(dir);
         if (state.getValue(property)) {
-            this.setConnected(world, pos, state, dir, false);
+            setConnected(world, pos, state, dir, false);
         } else if (IConnector.allowConnect(world, pos, state, dir)) {
-            this.setConnected(world, pos, state, dir, true);
+            setConnected(world, pos, state, dir, true);
         }
     }
 
@@ -169,24 +169,24 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     @Override
     public long getVoltage(BlockState state) {
-        return this.voltage.val;
+        return voltage.value;
     }
 
     @Override
     public double getResistance(BlockState state) {
-        return this.resistance;
+        return resistance;
     }
 
     @Override
     public boolean allowConnectFrom(Level world, BlockPos pos, BlockState state,
                                     Direction dir, BlockState state1) {
         return state1.getBlock() instanceof IElectricBlock block1 &&
-                (this.voltage == Voltage.PRIMITIVE || this.voltage.val == block1.getVoltage(state1));
+                (voltage == Voltage.PRIMITIVE || voltage.value == block1.getVoltage(state1));
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        var state = this.defaultBlockState();
+        var state = defaultBlockState();
         var dir = ctx.getClickedFace().getOpposite();
         if (IConnector.autoConnectOnPlace(ctx, state)) {
             return state.setValue(PROPERTY_BY_DIRECTION.get(dir), true);
@@ -199,7 +199,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
                             @Nullable LivingEntity placer, ItemStack stack) {
         NetworkManager.tryGetInstance(world).ifPresent(manager -> {
             for (var dir : Direction.values()) {
-                if (this.isConnected(world, pos, state, dir)) {
+                if (isConnected(world, pos, state, dir)) {
                     manager.invalidatePosDir(pos, dir);
                 }
             }
@@ -212,7 +212,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
                                   LevelAccessor levelAccessor, BlockPos pos, BlockPos pos1) {
         var world = (Level) levelAccessor;
         var connected = IConnector.autoConnectFromNeighbor(world, pos1, state1, dir.getOpposite(), state);
-        return this.setConnected(world, pos, state, dir, connected);
+        return setConnected(world, pos, state, dir, connected);
     }
 
     protected void onDestroy(Level world, BlockPos pos, BlockState state) {
@@ -229,12 +229,12 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     @Override
     public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
         super.onBlockExploded(state, world, pos, explosion);
-        this.onDestroy(world, pos, state);
+        onDestroy(world, pos, state);
     }
 
     @Override
     public void destroy(LevelAccessor world, BlockPos pos, BlockState state) {
         super.destroy(world, pos, state);
-        this.onDestroy((Level) world, pos, state);
+        onDestroy((Level) world, pos, state);
     }
 }

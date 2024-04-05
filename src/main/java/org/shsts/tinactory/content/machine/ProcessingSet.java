@@ -37,31 +37,31 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
         this.recipeType = recipeType;
         this.layoutSet = layoutSet;
         this.machines = voltages.stream()
-                .collect(Collectors.toMap($ -> $, voltage -> this.createMachine(voltage, frontOverlay)));
+                .collect(Collectors.toMap($ -> $, voltage -> createMachine(voltage, frontOverlay)));
     }
 
     protected BlockEntitySet<Machine, MachineBlock<Machine>>
     createMachine(Voltage voltage, ResourceLocation frontOverlay) {
-        var id = "machine/" + voltage.id + "/" + this.recipeType.id;
-        var layout = this.layoutSet.get(voltage);
+        var id = "machine/" + voltage.id + "/" + recipeType.id;
+        var layout = layoutSet.get(voltage);
         var builder = REGISTRATE.blockEntitySet(id, Machine.factory(voltage), MachineBlock.factory(voltage))
                 .entityClass(Machine.class)
                 .blockEntity()
                 .hasEvent()
                 .capability(AllCapabilityProviders.RECIPE_PROCESSOR, $ -> $
-                        .recipeType(this.recipeType.get()).voltage(voltage))
+                        .recipeType(recipeType.get()).voltage(voltage))
                 .capability(AllCapabilityProviders.STACK_CONTAINER, $ -> $
                         .layout(layout))
                 .menu()
                 .transform(MenuGen.machineMenu(layout))
-                .transform(MenuGen.machineRecipeBook(this.recipeType, layout))
+                .transform(MenuGen.machineRecipeBook(recipeType, layout))
                 .build() // menu
                 .build() // blockEntity
                 .block()
                 .transform(ModelGen.machine(voltage, frontOverlay))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .dropSelf()
-                .blockItem().tag(AllTags.processingMachine(this.recipeType)).build()
+                .blockItem().tag(AllTags.processingMachine(recipeType)).build()
                 .build();
 
         if (voltage == Voltage.PRIMITIVE) {
@@ -73,8 +73,9 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
     }
 
     public Block getBlock(Voltage voltage) {
-        return this.machines.get(voltage).getBlock();
+        return machines.get(voltage).getBlock();
     }
+
 
     public static class Builder<T extends ProcessingRecipe<T>> {
         private final RecipeTypeEntry<T, ?> recipeType;
@@ -84,29 +85,28 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
         @Nullable
         private Map<Voltage, Layout> layoutSet = null;
 
-        private Builder(RecipeTypeEntry<T, ?> recipeType) {
-            this.recipeType = recipeType;
+        private Builder(RecipeTypeEntry<T, ?> value) {
+            recipeType = value;
         }
 
-        public Builder<T> voltage(Voltage... voltages) {
-            this.voltages.addAll(Arrays.asList(voltages));
+        public Builder<T> voltage(Voltage... values) {
+            voltages.addAll(Arrays.asList(values));
             return this;
         }
 
         public Builder<T> frontOverlay(ResourceLocation loc) {
-            this.frontOverlay = loc;
+            frontOverlay = loc;
             return this;
         }
 
         public LayoutSetBuilder<Builder<T>> layoutSet() {
-            return Layout.builder(this, layoutSet -> this.layoutSet = layoutSet);
+            return Layout.builder(this, value -> layoutSet = value);
         }
 
         public ProcessingSet<T> build() {
-            assert this.frontOverlay != null;
-            assert this.layoutSet != null;
-            return new ProcessingSet<>(this.recipeType, this.layoutSet,
-                    this.frontOverlay, this.voltages);
+            assert frontOverlay != null;
+            assert layoutSet != null;
+            return new ProcessingSet<>(recipeType, layoutSet, frontOverlay, voltages);
         }
     }
 

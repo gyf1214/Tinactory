@@ -47,9 +47,9 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     Consumer<RegistryDataContext<Item, U, P>> itemModel(String sub) {
         return ctx -> {
             var helper = ctx.provider.existingFileHelper;
-            var base = this.getTex(ITEM_LOC, helper, sub).orElseThrow(() -> new IllegalArgumentException(
-                    "No icon %s for icon set %s".formatted(sub, this.subfolder)));
-            var overlay = this.getTex(ITEM_LOC, helper, sub + "_overlay");
+            var base = getTex(ITEM_LOC, helper, sub).orElseThrow(() -> new IllegalArgumentException(
+                    "No icon %s for icon set %s".formatted(sub, subfolder)));
+            var overlay = getTex(ITEM_LOC, helper, sub + "_overlay");
             var model = ctx.provider.withExistingParent(ctx.id, "item/generated")
                     .texture("layer0", base);
             overlay.ifPresent(resourceLocation -> model.texture("layer1", resourceLocation));
@@ -57,8 +57,9 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     }
 
     public <T extends ModelBuilder<T>> T blockOverlay(ModelProvider<T> prov, String id, String sub) {
-        var tex = this.getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() -> new IllegalArgumentException(
-                "No block overlay %s for icon set %s".formatted(sub, this.subfolder)));
+        var tex = getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() ->
+                new IllegalArgumentException("No block overlay %s for icon set %s"
+                        .formatted(sub, subfolder)));
         return prov.withExistingParent(id + "_overlay", ModelGen.modLoc("block/cube_tint"))
                 .texture("all", tex);
     }

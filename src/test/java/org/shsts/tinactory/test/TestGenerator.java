@@ -26,8 +26,8 @@ public class TestGenerator extends Machine implements IElectricMachine {
     public TestGenerator(BlockEntityType<?> type, BlockPos pos, BlockState state,
                          Voltage voltage, double amperage) {
         super(type, pos, state);
-        this.voltage = voltage.val;
-        this.power = amperage * voltage.val;
+        this.voltage = voltage.value;
+        this.power = amperage * voltage.value;
     }
 
     public static BlockEntityBuilder.Factory<TestGenerator> factory(Voltage voltage, double amperage) {

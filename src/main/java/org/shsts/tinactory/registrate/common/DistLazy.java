@@ -15,6 +15,6 @@ public interface DistLazy<T> extends Supplier<Supplier<T>> {
     }
 
     default void runOnDist(Dist dist, Supplier<Consumer<T>> cons) {
-        DistExecutor.unsafeRunWhenOn(dist, () -> () -> cons.get().accept(this.getValue()));
+        DistExecutor.unsafeRunWhenOn(dist, () -> () -> cons.get().accept(getValue()));
     }
 }

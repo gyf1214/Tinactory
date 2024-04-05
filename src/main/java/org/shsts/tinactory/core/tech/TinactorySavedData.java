@@ -28,36 +28,36 @@ public class TinactorySavedData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        var teams = new ListTag();
-        this.teams.values().stream()
+        var teamsTag = new ListTag();
+        teams.values().stream()
                 .map(TeamProfile::serializeNBT)
-                .forEach(teams::add);
-        tag.put("teams", teams);
-        var playerTeams = new ListTag();
-        this.playerTeams.entrySet().stream()
+                .forEach(teamsTag::add);
+        tag.put("teams", teamsTag);
+        var playerTeamsTag = new ListTag();
+        playerTeams.entrySet().stream()
                 .map(entry -> {
                     var tag1 = new CompoundTag();
                     tag1.putUUID("player", entry.getKey());
                     tag1.putUUID("team", entry.getValue().uuid);
                     return tag1;
-                }).forEach(playerTeams::add);
-        tag.put("playerTeams", playerTeams);
+                }).forEach(playerTeamsTag::add);
+        tag.put("playerTeams", playerTeamsTag);
         return tag;
     }
 
     private void load(CompoundTag tag) {
-        this.teams.clear();
+        teams.clear();
         tag.getList("teams", Tag.TAG_COMPOUND).stream()
                 .map(TeamProfile::fromTag)
-                .forEach(team -> this.teams.put(team.uuid, team));
-        this.playerTeams.clear();
+                .forEach(team -> teams.put(team.uuid, team));
+        playerTeams.clear();
         tag.getList("playerTeams", Tag.TAG_COMPOUND)
                 .forEach(tag1 -> {
                     var compoundTag = (CompoundTag) tag1;
                     var playerId = compoundTag.getUUID("player");
-                    var team = this.teams.get(compoundTag.getUUID("team"));
+                    var team = teams.get(compoundTag.getUUID("team"));
                     if (team != null) {
-                        this.playerTeams.put(playerId, team);
+                        playerTeams.put(playerId, team);
                         team.players.add(playerId);
                     }
                 });
