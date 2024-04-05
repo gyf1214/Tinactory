@@ -153,7 +153,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
-    private <P1 extends ContainerSyncPacket>
+    public <P1 extends ContainerSyncPacket>
     IntSupplier addSyncSlot(Class<P1> clazz, ContainerMenu.SyncPacketFactory<T, P1> factory) {
         var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(clazz, factory));
         menuCallbacks.add(callback);

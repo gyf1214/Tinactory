@@ -51,11 +51,12 @@ public final class MenuGen {
             M extends ContainerMenu<T>, P extends BlockEntityBuilder<T, ?>>
     Transformer<MenuBuilder<T, M, P>>
     machineRecipeBook(RecipeTypeEntry<R, ?> recipeType, Layout layout) {
-        return $ -> $
-                .widget(() -> menu -> new MachineRecipeBook(menu, recipeType.get(), 0, 0))
-                .syncWidget(ContainerSyncPacket.LocHolder.class, (containerId, index, $1, be) ->
-                                new ContainerSyncPacket.LocHolder(containerId, index,
-                                        be.machineConfig.getTargetRecipeLoc()),
-                        () -> (menu, slot) -> new GhostRecipe(menu, slot, layout));
+        return $ -> {
+            var slot = $.addSyncSlot(ContainerSyncPacket.LocHolder.class, (containerId, index, $1, be) ->
+                    new ContainerSyncPacket.LocHolder(containerId, index,
+                            be.machineConfig.getTargetRecipeLoc()));
+            return $.widget(() -> menu -> new MachineRecipeBook(menu, slot.getAsInt(), recipeType.get(), 0, 0))
+                    .widget(() -> menu -> new GhostRecipe(menu, slot.getAsInt(), layout));
+        };
     }
 }

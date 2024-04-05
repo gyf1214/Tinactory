@@ -21,6 +21,7 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
+import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -45,16 +46,16 @@ public class MachineRecipeBook extends Panel {
             ModelGen.mcLoc("gui/recipe_book"), 256, 256);
     private static final Texture DISABLE_BUTTON = new Texture(
             ModelGen.modLoc("gui/disable_recipe"), 16, 16);
+    private static final Texture RECIPE_BUTTON = new Texture(
+            ModelGen.modLoc("gui/recipe_book_button"), 42, 21);
 
     private static final int BUTTON_PER_LINE = 4;
     private static final int BUTTON_SIZE = SLOT_SIZE + 3;
-    private static final int BUTTON_BORDER = 3;
     private static final int PAGE_WIDTH = 12;
     private static final int PAGE_HEIGHT = 18;
     private static final int PANEL_BORDER = 8;
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
     private static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
-    private static final Rect BUTTON_TEX_RECT = new Rect(29, 206, 25, 25);
 
 
     private class RecipeButton extends ContainerWidget {
@@ -87,8 +88,12 @@ public class MachineRecipeBook extends Panel {
         @Override
         public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
             if (isDisable || recipe != null) {
-                StretchImage.render(poseStack, RECIPE_BOOK_BG, zIndex, rect,
-                        BUTTON_TEX_RECT, BUTTON_BORDER);
+                if (isCurrentRecipe(recipe)) {
+                    RenderUtil.blit(poseStack, RECIPE_BUTTON, zIndex, rect, 21, 0);
+                } else {
+                    RenderUtil.blit(poseStack, RECIPE_BUTTON, zIndex, rect);
+                }
+
             }
             if (isDisable) {
                 RenderUtil.blit(poseStack, DISABLE_BUTTON, zIndex,
@@ -197,6 +202,7 @@ public class MachineRecipeBook extends Panel {
         }
     }
 
+    private final int syncSlot;
     private final List<ProcessingRecipe<?>> recipes;
     private final Panel bookPanel;
     private final ButtonPanel buttonPanel;
@@ -205,9 +211,11 @@ public class MachineRecipeBook extends Panel {
 
     private int page;
 
-    public MachineRecipeBook(ContainerMenu<?> menu, RecipeType<? extends ProcessingRecipe<?>> recipeType,
+    public MachineRecipeBook(ContainerMenu<?> menu, int syncSlot,
+                             RecipeType<? extends ProcessingRecipe<?>> recipeType,
                              int buttonX, int buttonY) {
         super(menu);
+        this.syncSlot = syncSlot;
         this.recipes = new ArrayList<>(ClientUtil.getRecipeManager().getAllRecipesFor(recipeType));
 
         this.bookPanel = new Panel(menu, RectD.corners(0d, 0d, 0d, 1d),
@@ -242,6 +250,13 @@ public class MachineRecipeBook extends Panel {
     public void init(Rect parent) {
         super.init(parent);
         setPage(0);
+    }
+
+    private boolean isCurrentRecipe(@Nullable ProcessingRecipe<?> recipe) {
+        var loc = menu.getSyncPacket(syncSlot, ContainerSyncPacket.LocHolder.class)
+                .flatMap(ContainerSyncPacket.Holder::getData)
+                .orElse(null);
+        return recipe == null ? loc == null : recipe.getId().equals(loc);
     }
 
     private void unselectRecipe() {
