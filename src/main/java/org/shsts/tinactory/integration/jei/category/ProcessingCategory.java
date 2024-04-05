@@ -25,7 +25,7 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
         super(type, helpers, layout, new ItemStack(icon));
     }
 
-    protected <I> void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot, I ingredient) {
+    private <I> void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot, I ingredient) {
         var role = slot.type().output ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT;
         var slotBuilder = builder.addSlot(role, slot.x() + 1, slot.y() + 1);
         if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient simpleItemIngredient) {
@@ -46,19 +46,19 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, T recipe, IFocusGroup focuses) {
-        var inputs = this.layout.getProcessingInputs(recipe);
-        var outputs = this.layout.getProcessingOutputs(recipe);
+        var inputs = layout.getProcessingInputs(recipe);
+        var outputs = layout.getProcessingOutputs(recipe);
 
         for (var input : inputs) {
-            this.addIngredient(builder, input.slot(), input.val());
+            addIngredient(builder, input.slot(), input.val());
         }
         for (var output : outputs) {
-            this.addIngredient(builder, output.slot(), output.val());
+            addIngredient(builder, output.slot(), output.val());
         }
     }
 
     @Override
     public void draw(T recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        this.drawProgressBar(stack, (int) recipe.workTicks);
+        drawProgressBar(stack, (int) recipe.workTicks);
     }
 }

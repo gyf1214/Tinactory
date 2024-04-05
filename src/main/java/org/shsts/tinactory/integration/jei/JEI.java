@@ -45,16 +45,16 @@ public class JEI implements IModPlugin {
             RecipeCategory.Factory<T> factory,
             Supplier<Ingredient> catalyst) {
         public void register(IRecipeCategoryRegistration registration) {
-            registration.addRecipeCategories(this.factory.create(this.type, registration.getJeiHelpers()));
+            registration.addRecipeCategories(factory.create(type, registration.getJeiHelpers()));
         }
 
         public void addRecipes(IRecipeRegistration registration, RecipeManager recipeManager) {
-            registration.addRecipes(this.type, recipeManager.getAllRecipesFor(this.typeEntry.get()));
+            registration.addRecipes(type, recipeManager.getAllRecipesFor(typeEntry.get()));
         }
 
         public void addCatalysts(IRecipeCatalystRegistration registration) {
-            for (var itemStack : this.catalyst.get().getItems()) {
-                registration.addRecipeCatalyst(VanillaTypes.ITEM_STACK, itemStack, this.type);
+            for (var itemStack : catalyst.get().getItems()) {
+                registration.addRecipeCatalyst(VanillaTypes.ITEM_STACK, itemStack, type);
             }
         }
     }
@@ -90,7 +90,7 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
-        for (var category : this.categories) {
+        for (var category : categories) {
             category.register(registration);
         }
     }
@@ -98,14 +98,14 @@ public class JEI implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         var recipeManager = ClientUtil.getRecipeManager();
-        for (var category : this.categories) {
+        for (var category : categories) {
             category.addRecipes(registration, recipeManager);
         }
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        for (var category : this.categories) {
+        for (var category : categories) {
             category.addCatalysts(registration);
         }
     }

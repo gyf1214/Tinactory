@@ -31,17 +31,19 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCategory<T> {
     protected final RecipeType<T> type;
-    protected final Component title;
-    protected final IDrawable background;
-    protected final IDrawable icon;
+    private final Component title;
+    private final IDrawable background;
+    private final IDrawable icon;
     protected final Layout layout;
 
-    protected final @Nullable LoadingCache<Integer, IDrawable> cachedProgressBar;
-    protected final @Nullable Rect progressBarRect;
+    @Nullable
+    private final LoadingCache<Integer, IDrawable> cachedProgressBar;
+    @Nullable
+    private final Rect progressBarRect;
 
     public RecipeCategory(RecipeType<T> type, IJeiHelpers helpers, Layout layout, ItemStack icon) {
         this.type = type;
-        this.title = new TranslatableComponent(ModelGen.translate(this.type.getUid()));
+        this.title = new TranslatableComponent(ModelGen.translate(type.getUid()));
         var guiHelper = helpers.getGuiHelper();
         this.background = DrawableHelper.createBackground(guiHelper, layout);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, icon);
@@ -66,34 +68,34 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
 
     @Override
     public Component getTitle() {
-        return this.title;
+        return title;
     }
 
     @Override
     public IDrawable getBackground() {
-        return this.background;
+        return background;
     }
 
     @Override
     public IDrawable getIcon() {
-        return this.icon;
+        return icon;
     }
 
     @SuppressWarnings("removal")
     @Override
     public ResourceLocation getUid() {
-        return this.type.getUid();
+        return type.getUid();
     }
 
     @SuppressWarnings("removal")
     @Override
     public Class<? extends T> getRecipeClass() {
-        return this.type.getRecipeClass();
+        return type.getRecipeClass();
     }
 
     @Override
     public RecipeType<T> getRecipeType() {
-        return this.type;
+        return type;
     }
 
     protected void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot,
@@ -106,9 +108,9 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
     public abstract void setRecipe(IRecipeLayoutBuilder builder, T recipe, IFocusGroup focuses);
 
     protected void drawProgressBar(PoseStack stack, int cycle) {
-        if (this.cachedProgressBar != null && this.progressBarRect != null) {
-            var bar = this.cachedProgressBar.getUnchecked(cycle);
-            bar.draw(stack, this.progressBarRect.x(), this.progressBarRect.y());
+        if (cachedProgressBar != null && progressBarRect != null) {
+            var bar = cachedProgressBar.getUnchecked(cycle);
+            bar.draw(stack, progressBarRect.x(), progressBarRect.y());
         }
     }
 

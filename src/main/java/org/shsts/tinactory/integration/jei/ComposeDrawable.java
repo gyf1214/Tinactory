@@ -31,17 +31,17 @@ public class ComposeDrawable implements IDrawable {
 
     @Override
     public int getWidth() {
-        return this.width;
+        return width;
     }
 
     @Override
     public int getHeight() {
-        return this.height;
+        return height;
     }
 
     @Override
     public void draw(PoseStack poseStack, int xOffset, int yOffset) {
-        for (var component : this.components) {
+        for (var component : components) {
             component.drawable.draw(poseStack, xOffset + component.xOffset, yOffset + component.yOffset);
         }
     }
@@ -52,17 +52,17 @@ public class ComposeDrawable implements IDrawable {
         private Builder() {}
 
         public Builder add(IDrawable component, int xOffset, int yOffset) {
-            this.components.add(new ComponentInfo(component, xOffset, yOffset));
+            components.add(new ComponentInfo(component, xOffset, yOffset));
             return this;
         }
 
         public Builder add(IDrawable component) {
-            this.components.add(new ComponentInfo(component, 0, 0));
+            components.add(new ComponentInfo(component, 0, 0));
             return this;
         }
 
         public ComposeDrawable build() {
-            return new ComposeDrawable(this.components);
+            return new ComposeDrawable(components);
         }
     }
 
