@@ -13,6 +13,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.model.ModelGen;
@@ -266,6 +267,12 @@ public class MaterialSet {
             var loc = item.getRegistryName();
             assert loc != null;
             put(sub, loc, () -> item);
+            return this;
+        }
+
+        public Builder<P> existing(String sub, ResourceLocation loc) {
+            assert !items.containsKey(sub);
+            put(sub, loc, () -> Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(loc)));
             return this;
         }
 

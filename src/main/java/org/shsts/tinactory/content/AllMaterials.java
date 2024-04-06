@@ -8,6 +8,7 @@ import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
@@ -57,6 +58,7 @@ public final class AllMaterials {
                 .color(0xFFC8C8C8).icon(IconSet.METALLIC)
                 .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
+                .existing("wire", ModelGen.modLoc("network/cable/ulv"))
                 .mechanicalSet()
                 .toolProcess().smelt(200)
                 .buildObject();
