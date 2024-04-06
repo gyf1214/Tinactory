@@ -3,6 +3,7 @@ package org.shsts.tinactory.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -20,6 +21,7 @@ import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -34,11 +36,18 @@ public final class AllBlockEntities {
                         NetworkController::new,
                         MachineBlock.factory(Voltage.PRIMITIVE))
                 .entityClass(NetworkController.class)
-                .blockEntity().ticking().build()
+                .blockEntity()
+                .ticking()
+                .menu()
+                .screen(() -> () -> NetworkControllerScreen::new)
+                .noInventory()
+                .title("networkController")
+                .build()
+                .build()
                 .block()
                 .transform(ModelGen.machine(
-                        ModelGen.gregtech("blocks/casings/voltage/mv"),
-                        ModelGen.gregtech("blocks/overlay/machine/overlay_screen")))
+                        gregtech("blocks/casings/voltage/mv"),
+                        gregtech("blocks/overlay/machine/overlay_screen")))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .build()
@@ -53,14 +62,14 @@ public final class AllBlockEntities {
                 .menu(WorkbenchMenu::new).layout(AllLayouts.WORKBENCH).build()
                 .build()
                 .block()
-                .transform(ModelGen.primitive(ModelGen.gregtech("blocks/casings/crafting_table")))
+                .transform(ModelGen.primitive(gregtech("blocks/casings/crafting_table")))
                 .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .build()
                 .register();
 
         STONE_GENERATOR = ProcessingSet.builder(AllRecipes.STONE_GENERATOR)
-                .frontOverlay(ModelGen.gregtech("blocks/machines/rock_crusher/overlay_front"))
+                .frontOverlay(gregtech("blocks/machines/rock_crusher/overlay_front"))
                 .voltage(Voltage.PRIMITIVE, Voltage.LV)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
@@ -70,7 +79,7 @@ public final class AllBlockEntities {
                 .build();
 
         ORE_ANALYZER = ProcessingSet.builder(AllRecipes.ORE_ANALYZER)
-                .frontOverlay(ModelGen.gregtech("blocks/machines/electromagnetic_separator/overlay_front"))
+                .frontOverlay(gregtech("blocks/machines/electromagnetic_separator/overlay_front"))
                 .voltage(Voltage.PRIMITIVE, Voltage.LV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)

@@ -47,6 +47,10 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         }
     }
 
+    protected void addWidget(ContainerWidget widget) {
+        rootPanel.addWidget(widget);
+    }
+
     public void addWidget(Function<M, ISelf<ContainerWidget>> factory) {
         var widget = factory.apply(menu);
         rootPanel.addWidget(widget.self());

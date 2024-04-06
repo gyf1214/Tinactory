@@ -3,5 +3,7 @@
   "tinactory.tooltip.autoDumpItem": "Automatically output item to network",
   "tinactory.tooltip.autoDumpFluid": "Automatically output fluid to network",
   "tinactory.tooltip.openRecipeBook": "Open recipe book",
-  "tinactory.tooltip.unselectRecipe": "Clear recipe"
+  "tinactory.tooltip.unselectRecipe": "Clear recipe",
+  "tinactory.gui.networkController.title": "Network Controller",
+  "tinactory.gui.networkController.welcome": "Team Name: "
 }

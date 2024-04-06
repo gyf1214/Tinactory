@@ -29,7 +29,7 @@ public final class TinactoryConfig {
         initialWorkerStack = builder.comment("Initial worker stack for logistics component")
                 .defineInRange("initial_worker_stack", 1, 1, Integer.MAX_VALUE);
         initialWorkerFluidStack = builder.comment("Initial worker fluid stack for logistics component")
-                .defineInRange("initial_worker_fluid_stack", 250, 1, Integer.MAX_VALUE);
+                .defineInRange("initial_worker_fluid_stack", 1000, 1, Integer.MAX_VALUE);
         builder.pop();
 
         builder.push("machine");

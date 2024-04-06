@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
@@ -32,6 +33,7 @@ import java.util.function.Consumer;
 @ParametersAreNonnullByDefault
 public final class RenderUtil {
     private static final int CYCLE_TIME = 1000;
+    public static final int TEXT_COLOR = 0xFF404040;
 
     public static void blit(PoseStack poseStack, Texture tex, int zIndex, Rect dstRect) {
         blit(poseStack, tex, zIndex, dstRect, new Rect(0, 0, dstRect.width(), dstRect.height()));
@@ -174,5 +176,9 @@ public final class RenderUtil {
 
     public static void fill(PoseStack poseStack, Rect rect, int color) {
         GuiComponent.fill(poseStack, rect.x(), rect.y(), rect.endX(), rect.endY(), color);
+    }
+
+    public static void renderText(PoseStack poseStack, Component text, int x, int y, int color) {
+        ClientUtil.getFont().draw(poseStack, text, (float) x, (float) y, color);
     }
 }

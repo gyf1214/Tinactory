@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Unit;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -49,7 +50,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         extends RegistryEntryBuilder<MenuType<?>, ContainerMenuType<T, M>, P, MenuBuilder<T, M, P>> {
     private final Supplier<SmartBlockEntityType<T>> blockEntityType;
     private final ContainerMenu.Factory<T, M> factory;
-    private Function<T, Component> title = be -> new TextComponent(be.toString());
+    private Function<T, Component> title = $ -> TextComponent.EMPTY;
     private final List<Rect> widgetsRect = new ArrayList<>();
     private boolean showInventory = true;
 
@@ -98,8 +99,8 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         });
     }
 
-    public MenuBuilder<T, M, P> title(Function<T, Component> value) {
-        title = value;
+    public MenuBuilder<T, M, P> title(String key) {
+        title = $ -> new TranslatableComponent("tinactory.gui." + key + ".title");
         return self();
     }
 
