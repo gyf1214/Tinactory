@@ -29,10 +29,13 @@ public class CableSet {
 
     private RegistryEntry<CableBlock> createBlock(Voltage voltage, CableSetting setting) {
         var id = "network/cable/" + voltage.id;
-        var insulationColor = voltage == Voltage.ULV ? 0xFF896727 : 0xFF36302E;
-        return REGISTRATE.block(id, properties -> new CableBlock(properties, voltage, setting.resistance))
-                .transform(ModelGen.cable())
-                .tint(insulationColor, setting.material.color)
+        var wire = voltage == Voltage.ULV;
+        var radius = wire ? CableBlock.WIRE_RADIUS : CableBlock.RADIUS;
+        var wireColor = setting.material.color;
+        var baseColor = wire ? wireColor : CableBlock.INSULATION_COLOR;
+        return REGISTRATE.block(id, properties -> new CableBlock(properties, radius, voltage, setting.resistance))
+                .transform(ModelGen.cable(wire))
+                .tint(baseColor, setting.material.color)
                 .tag(AllTags.MINEABLE_WITH_CUTTER)
                 .defaultBlockItem().dropSelf()
                 .register();

@@ -8,7 +8,8 @@ public final class AllBlocks {
 
     static {
         CABLE_SET = CableSet.builder()
-                .add(Voltage.ULV, AllMaterials.IRON, 1.0d)
+                .add(Voltage.ULV, AllMaterials.IRON, 2.0d)
+                .add(Voltage.LV, AllMaterials.IRON, 1.0d)
                 .build();
     }
 

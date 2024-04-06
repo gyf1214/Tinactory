@@ -57,7 +57,8 @@ public final class ModelGen {
         return 90 * ((2 + dir.get2DDataValue()) % 4);
     }
 
-    public static final ResourceLocation VOID_TEX = new ResourceLocation(Tinactory.ID, "void");
+    public static final ResourceLocation VOID_TEX = modLoc("void");
+    public static final ResourceLocation WHITE_TEX = modLoc("white");
 
     public static ResourceLocation mcLoc(String id) {
         return new ResourceLocation(id);
@@ -100,9 +101,9 @@ public final class ModelGen {
     }
 
     public static <S extends BlockBuilder<? extends CableBlock, ?, S>>
-    Transformer<S> cable() {
-        return $ -> $.blockState(CableModel::blockState)
-                .itemModel(CableModel::itemModel)
+    Transformer<S> cable(boolean wire) {
+        return $ -> $.blockState(ctx -> CableModel.blockState(ctx, wire))
+                .itemModel(ctx -> CableModel.itemModel(ctx, wire))
                 .translucent();
     }
 

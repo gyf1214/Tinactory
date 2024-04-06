@@ -62,7 +62,7 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
             autoDumpItem = packet.getAutoDumpItem();
         }
         if (packet.getAutoDumpFluid() != null) {
-            autoDumpItem = packet.getAutoDumpFluid();
+            autoDumpFluid = packet.getAutoDumpFluid();
         }
         if (packet.isResetTargetRecipe()) {
             targetRecipe = null;

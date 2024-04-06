@@ -135,11 +135,11 @@ public class LogisticsComponent extends Component {
                 transmitItem(req.port, otherPort, item, limit);
     }
 
-    private boolean handleItemActiveRequest(ILogisticsTypeWrapper type, Request req) {
+    private void handleItemActiveRequest(ILogisticsTypeWrapper type, Request req) {
         var remaining = req.content;
         for (var otherReq : activeRequests.get(type)) {
             if (remaining.isEmpty()) {
-                return true;
+                return;
             }
             if (otherReq.dir == req.dir) {
                 continue;
@@ -151,14 +151,14 @@ public class LogisticsComponent extends Component {
         }
         for (var storage : passiveStorages.get(req.dir.invert())) {
             if (remaining.isEmpty()) {
-                return true;
+                return;
             }
             if (storage.getPortType() != remaining.getPortType()) {
                 continue;
             }
             remaining = transmitItem(req, storage, remaining, remaining.getCount());
         }
-        return remaining.isEmpty();
+        remaining.isEmpty();
     }
 
     private void onTick(Level world, Network network) {
@@ -171,10 +171,7 @@ public class LogisticsComponent extends Component {
             if (cycles-- <= 0) {
                 break;
             }
-            var result = handleItemActiveRequest(entry.getKey(), entry.getValue());
-            if (result) {
-                LOGGER.debug("deal with active request {}", entry.getValue());
-            }
+            handleItemActiveRequest(entry.getKey(), entry.getValue());
         }
         activeRequests.clear();
         ticks++;

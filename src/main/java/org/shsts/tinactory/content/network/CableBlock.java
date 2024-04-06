@@ -45,16 +45,20 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     public static final BooleanProperty UP = PipeBlock.UP;
     public static final BooleanProperty DOWN = PipeBlock.DOWN;
     public static final int RADIUS = 3;
+    public static final int WIRE_RADIUS = 2;
+    public static final int INSULATION_COLOR = 0xFF36302E;
 
-    public final Voltage voltage;
-    public final double resistance;
-    protected final Map<BlockState, VoxelShape> shapes;
+    private final int radius;
+    private final Voltage voltage;
+    private final double resistance;
+    private final Map<BlockState, VoxelShape> shapes;
 
-    public CableBlock(Properties properties, Voltage voltage, double resistance) {
+    public CableBlock(Properties properties, int radius, Voltage voltage, double resistance) {
         super(properties.strength(2.0f).requiresCorrectToolForDrops());
+        this.radius = radius;
         this.voltage = voltage;
         this.resistance = resistance;
-        this.shapes = this.makeShapes();
+        this.shapes = makeShapes();
 
         var defaultState = stateDefinition.any()
                 .setValue(NORTH, false)
@@ -63,12 +67,12 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
                 .setValue(WEST, false)
                 .setValue(UP, false)
                 .setValue(DOWN, false);
-        this.registerDefaultState(defaultState);
+        registerDefaultState(defaultState);
     }
 
     private Map<BlockState, VoxelShape> makeShapes() {
-        double st = 8d - (double) RADIUS;
-        double ed = 8d + (double) RADIUS;
+        double st = 8d - (double) radius;
+        double ed = 8d + (double) radius;
 
         var baseShape = Block.box(st, st, st, ed, ed, ed);
         var dirShapes = new HashMap<Direction, VoxelShape>();
@@ -100,18 +104,18 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN);
     }
 
-    protected VoxelShape getRealShape(BlockState state) {
+    private VoxelShape getRealShape(BlockState state) {
         return shapes.get(state);
     }
 
-    protected boolean shouldRenderOverlay(CollisionContext ctx) {
+    private boolean shouldRenderOverlay(CollisionContext ctx) {
         return ctx instanceof EntityCollisionContext collision &&
                 collision.getEntity() instanceof LocalPlayer player &&
                 player.getMainHandItem().getItem() instanceof UsableToolItem &&
                 canWrenchWith(player.getMainHandItem());
     }
 
-    protected VoxelShape getRenderShape(BlockState state, CollisionContext ctx) {
+    private VoxelShape getRenderShape(BlockState state, CollisionContext ctx) {
         return shouldRenderOverlay(ctx) ? Shapes.block() : getRealShape(state);
     }
 
@@ -138,8 +142,8 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         return item.is(AllTags.TOOL_WIRE_CUTTER);
     }
 
-    protected BlockState setConnected(Level world, BlockPos pos, BlockState state,
-                                      Direction dir, boolean connected) {
+    private BlockState setConnected(Level world, BlockPos pos, BlockState state,
+                                    Direction dir, boolean connected) {
         var property = PROPERTY_BY_DIRECTION.get(dir);
         if (state.getValue(property) == connected) {
             return state;
@@ -215,7 +219,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         return setConnected(world, pos, state, dir, connected);
     }
 
-    protected void onDestroy(Level world, BlockPos pos, BlockState state) {
+    private void onDestroy(Level world, BlockPos pos, BlockState state) {
         NetworkManager.tryGetInstance(world).ifPresent(manager -> {
             manager.invalidatePos(pos);
             for (var entry : PROPERTY_BY_DIRECTION.entrySet()) {
