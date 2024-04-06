@@ -1,90 +1,95 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMaterials {
-    private static final List<ResourceLocation> ORE_BASE_OVERWORLD = blockModels(
-            Blocks.STONE, Blocks.DEEPSLATE);
-
-    public static final MaterialSet TEST = set("test", IconSet.DULL, 0xFFFFFFFF);
-    public static final MaterialSet STONE = set("stone", IconSet.ROUGH, 0xFFCDCDCD);
-    public static final MaterialSet FLINT = set("flint", IconSet.DULL, 0xFF002040);
-    public static final MaterialSet IRON = set("iron", IconSet.METALLIC, 0xFFC8C8C8);
-    public static final MaterialSet WROUGHT_IRON = set("wrought_iron", IconSet.METALLIC, 0xFFC8B4B4);
-    public static final MaterialSet MAGNETITE = set("magnetite", IconSet.METALLIC, 0xFF1E1E1E);
+    public static final MaterialSet TEST;
+    public static final MaterialSet STONE;
+    public static final MaterialSet FLINT;
+    public static final MaterialSet IRON;
+    public static final MaterialSet WROUGHT_IRON;
+    public static final MaterialSet MAGNETITE;
 
     static {
-        TEST.toolSet(12800000).freeze();
+        MATERIALS = new HashSet<>();
 
-        STONE.existing("block", ItemTags.STONE_CRAFTING_MATERIALS, Items.COBBLESTONE)
+        TEST = set("test")
+                .durability(12800000).tier(Tiers.NETHERITE)
+                .toolSet()
+                .buildObject();
+
+        STONE = set("stone")
+                .color(0xFFCDCDCD).icon(IconSet.ROUGH).durability(16)
+                .existing("block", ItemTags.STONE_CRAFTING_MATERIALS, Items.COBBLESTONE)
                 .existing("tool/pickaxe", Items.STONE_PICKAXE)
                 .existing("tool/shovel", Items.STONE_SHOVEL)
                 .existing("tool/hoe", Items.STONE_HOE)
                 .existing("tool/axe", Items.STONE_AXE)
                 .existing("tool/sword", Items.STONE_SWORD)
                 .alias("primary", "block")
-                .hammer(16)
                 .dust()
-                .toolProcess()
-                .freeze();
+                .hammer().toolProcess()
+                .buildObject();
 
-        FLINT.existing("primary", Items.FLINT)
+        FLINT = set("flint")
+                .color(0xFF002040).icon(IconSet.DULL).durability(16)
+                .existing("primary", Items.FLINT)
                 .dust()
-                .mortar(16)
-                .toolProcess()
-                .freeze();
+                .mortar().toolProcess()
+                .buildObject();
 
-        IRON.existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
+        IRON = set("iron")
+                .color(0xFFC8C8C8).icon(IconSet.METALLIC)
+                .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
                 .mechanicalSet()
-                .toolProcess()
-                .smelt(200)
-                .freeze();
+                .toolProcess().smelt(200)
+                .buildObject();
 
-        WROUGHT_IRON.metalSet()
-                .toolSet(64)
-                .toolProcess()
-                .smelt(200)
-                .freeze();
+        WROUGHT_IRON = set("wrought_iron")
+                .color(0xFFC8B4B4).icon(IconSet.METALLIC).durability(200).tier(Tiers.IRON)
+                .metalSet().toolSet()
+                .toolProcess().smelt(200)
+                .buildObject();
 
-        MAGNETITE.ore(ORE_BASE_OVERWORLD, Tiers.IRON, 3.0f)
-                .freeze();
+        MAGNETITE = set("magnetite")
+                .color(0xFF1E1E1E).icon(IconSet.METALLIC)
+                .ore(Tiers.IRON, 3.0f)
+                .buildObject();
 
         // tool component tags
         REGISTRATE.tag(Items.STICK, AllTags.TOOL_HANDLE);
-        REGISTRATE.tag(WROUGHT_IRON.getTag("stick"), AllTags.TOOL_HANDLE);
-        REGISTRATE.tag(IRON.getTag("screw"), AllTags.TOOL_SCREW);
+        REGISTRATE.tag(WROUGHT_IRON.tag("stick"), AllTags.TOOL_HANDLE);
+        REGISTRATE.tag(IRON.tag("screw"), AllTags.TOOL_SCREW);
     }
 
-    private static List<ResourceLocation> blockModels(Block... blocks) {
-        return Arrays.stream(blocks).map(block -> {
-            var loc = block.getRegistryName();
-            assert loc != null;
-            return ModelGen.prepend(loc, "block");
-        }).toList();
-    }
+    private static final Set<MaterialSet> MATERIALS;
 
-    private static MaterialSet set(String id, IconSet icon, int color) {
-        return new MaterialSet(id, icon, color);
+    private static MaterialSet.Builder<?> set(String id) {
+        return (new MaterialSet.Builder<>(Unit.INSTANCE, id))
+                .onCreateObject(MATERIALS::add);
     }
 
     public static void init() {}
+
+    public static void initRecipes() {
+        for (var material : MATERIALS) {
+            material.freeze();
+        }
+    }
 }

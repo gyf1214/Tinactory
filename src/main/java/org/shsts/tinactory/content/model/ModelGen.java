@@ -14,12 +14,15 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.IconSet;
+import org.shsts.tinactory.content.material.OreBlock;
+import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -105,8 +108,8 @@ public final class ModelGen {
 
     public static ResourceLocation casing(Voltage voltage) {
         return voltage == Voltage.PRIMITIVE ?
-                ModelGen.gregtech("blocks/casings/wood_wall") :
-                ModelGen.gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
+                gregtech("blocks/casings/wood_wall") :
+                gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
     }
 
     public static <S extends BlockBuilder<? extends MachineBlock<?>, ?, S>>
@@ -132,6 +135,24 @@ public final class ModelGen {
             }
             ctx.provider.horizontalBlock(ctx.object, model);
         });
+    }
+
+    public static <S extends BlockBuilder<? extends Block, ?, S>>
+    Transformer<S> oreBlock(Collection<OreVariant> variants) {
+        return $ -> $.blockState(ctx -> {
+            var models = ctx.provider.models();
+            var multipart = ctx.provider.getMultipartBuilder(ctx.object);
+            for (var variant : variants) {
+                multipart.part()
+                        .modelFile(models.getExistingFile(prepend(variant.baseBlock, "block")))
+                        .addModel()
+                        .condition(OreBlock.VARIANT, variant)
+                        .end();
+            }
+            multipart.part()
+                    .modelFile(models.getExistingFile(modLoc("block/material/ore_overlay")))
+                    .addModel().end();
+        }).translucent();
     }
 
     public static void init() {

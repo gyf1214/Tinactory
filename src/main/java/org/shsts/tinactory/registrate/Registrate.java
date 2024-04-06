@@ -208,12 +208,6 @@ public class Registrate {
         return new SimpleBlockBuilder<>(id, factory);
     }
 
-    public <T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-    EntityBlockBuilder<T, U, Registrate>
-    entityBlock(String id, EntityBlockBuilder.Factory<T, U> factory) {
-        return entityBlock(this, id, factory);
-    }
-
     public <T extends SmartBlockEntity, P, U extends SmartEntityBlock<T>>
     EntityBlockBuilder<T, U, P>
     entityBlock(P parent, String id, EntityBlockBuilder.Factory<T, U> factory) {

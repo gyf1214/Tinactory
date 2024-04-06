@@ -32,12 +32,12 @@ public final class ContainerEventHandler {
         }
     }
 
-    private static final AtomicInteger eventId = new AtomicInteger(0);
+    private static final AtomicInteger EVENT_ID = new AtomicInteger(0);
     private static final Set<Class<? extends ContainerEventPacket>> handledClasses = new HashSet<>();
 
     private static <P extends ContainerEventPacket>
     Event<P> register(Class<P> clazz, Supplier<P> constructor) {
-        var nextId = eventId.getAndIncrement();
+        var nextId = EVENT_ID.getAndIncrement();
         LOGGER.debug("register container event packet {} id={}", clazz.getSimpleName(), nextId);
         if (!handledClasses.contains(clazz)) {
             Tinactory.registryPacket(clazz, constructor, ContainerEventHandler::handle);

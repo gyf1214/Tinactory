@@ -49,7 +49,7 @@ public class Tinactory {
     public static final Registrate REGISTRATE = new Registrate(ID);
 
     private static final String CHANNEL_VERSION = "1";
-    private static final AtomicInteger msgId = new AtomicInteger(0);
+    private static final AtomicInteger MSG_ID = new AtomicInteger(0);
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(ID, "channel"),
             () -> CHANNEL_VERSION,
@@ -59,7 +59,7 @@ public class Tinactory {
     public static <T extends IPacket>
     void registryPacket(Class<T> clazz, Supplier<T> constructor,
                         BiConsumer<T, NetworkEvent.Context> handler) {
-        CHANNEL.registerMessage(msgId.getAndIncrement(), clazz, IPacket::serializeToBuf,
+        CHANNEL.registerMessage(MSG_ID.getAndIncrement(), clazz, IPacket::serializeToBuf,
                 (buf) -> {
                     var p = constructor.get();
                     p.deserializeFromBuf(buf);

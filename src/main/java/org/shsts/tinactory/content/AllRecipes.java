@@ -44,10 +44,12 @@ public final class AllRecipes {
         ORE_ANALYZER = REGISTRATE.simpleProcessingRecipeType("ore_analyzer");
         ORE_WASHER = REGISTRATE.simpleProcessingRecipeType("ore_washer", $ -> $
                 .inputFluid(1, Fluids.WATER, 1000)
-                .outputItem(3, AllMaterials.STONE.getItemEntry("dust"), 1));
+                .outputItem(3, AllMaterials.STONE.entry("dust"), 1));
     }
 
     public static void initRecipes() {
+        AllMaterials.initRecipes();
+
         // disable wooden and iron tools
         REGISTRATE.nullRecipe(Items.WOODEN_AXE);
         REGISTRATE.nullRecipe(Items.WOODEN_HOE);
@@ -134,15 +136,15 @@ public final class AllRecipes {
 
         // smelt wrought iron nugget
         REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
-                        .smelting(Ingredient.of(AllMaterials.IRON.getTag("nugget")),
-                                AllMaterials.WROUGHT_IRON.getItem("nugget"),
+                        .smelting(Ingredient.of(AllMaterials.IRON.tag("nugget")),
+                                AllMaterials.WROUGHT_IRON.item("nugget"),
                                 0, 200)
-                        .unlockedBy("has_material", has(AllMaterials.IRON.getTag("nugget"))),
+                        .unlockedBy("has_material", has(AllMaterials.IRON.tag("nugget"))),
                 ModelGen.modLoc("material/nugget/wrought_iron_from_iron"));
 
         ORE_ANALYZER.modRecipe(AllMaterials.MAGNETITE.loc("raw"))
-                .outputItem(1, AllMaterials.MAGNETITE.getItemEntry("raw"), 1, 0.25f)
-                .inputItem(0, AllMaterials.STONE.getItemEntry("dust"), 1)
+                .outputItem(1, AllMaterials.MAGNETITE.entry("raw"), 1, 0.25f)
+                .inputItem(0, AllMaterials.STONE.entry("dust"), 1)
                 .workTicks(200)
                 .build();
     }
