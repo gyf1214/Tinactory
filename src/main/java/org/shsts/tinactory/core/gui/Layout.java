@@ -51,8 +51,8 @@ public class Layout {
         var maxX = 0;
         var maxY = 0;
         for (var slot : slots) {
-            maxX = Math.max(maxX, slot.x() + ContainerMenu.SLOT_SIZE);
-            maxY = Math.max(maxY, slot.y() + ContainerMenu.SLOT_SIZE);
+            maxX = Math.max(maxX, slot.x() + Menu.SLOT_SIZE);
+            maxY = Math.max(maxY, slot.y() + Menu.SLOT_SIZE);
         }
 
         for (var image : images) {
@@ -67,10 +67,10 @@ public class Layout {
     }
 
     public int getXOffset() {
-        return (ContainerMenu.CONTENT_WIDTH - rect.width()) / 2;
+        return (Menu.CONTENT_WIDTH - rect.width()) / 2;
     }
 
-    public <T extends SmartBlockEntity, M extends ContainerMenu<T>, P extends BlockEntityBuilder<T, ?>>
+    public <T extends SmartBlockEntity, M extends Menu<T>, P extends BlockEntityBuilder<T, ?>>
     Transformer<MenuBuilder<T, M, P>> applyMenu() {
         return builder -> {
             var xOffset = getXOffset();

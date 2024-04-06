@@ -8,7 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ContainerEventPacket implements IPacket {
+public class MenuEventPacket implements IPacket {
     protected int containerId;
     protected int eventId;
 
@@ -20,9 +20,9 @@ public class ContainerEventPacket implements IPacket {
         return eventId;
     }
 
-    public ContainerEventPacket() {}
+    public MenuEventPacket() {}
 
-    public ContainerEventPacket(int containerId, int eventId) {
+    public MenuEventPacket(int containerId, int eventId) {
         this.containerId = containerId;
         this.eventId = eventId;
     }
@@ -40,7 +40,7 @@ public class ContainerEventPacket implements IPacket {
     }
 
     @FunctionalInterface
-    public interface Factory<P extends ContainerEventPacket> {
+    public interface Factory<P extends MenuEventPacket> {
         P create(int containerId, int eventId);
     }
 }

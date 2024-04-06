@@ -11,7 +11,7 @@ import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.network.NetworkController;
@@ -73,7 +73,7 @@ public final class AllBlockEntities {
                 .voltage(Voltage.PRIMITIVE, Voltage.LV)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(ContainerMenu.SLOT_SIZE * 2, 1)
+                .slot(Menu.SLOT_SIZE * 2, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8, 0)
                 .build()
                 .build();
@@ -85,8 +85,8 @@ public final class AllBlockEntities {
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(ContainerMenu.SLOT_SIZE * 3, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + ContainerMenu.SLOT_SIZE, 0)
+                .slot(Menu.SLOT_SIZE * 3, 1)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + Menu.SLOT_SIZE, 0)
                 .build()
                 .build();
     }

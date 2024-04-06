@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui.sync;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.gui.sync.ContainerEventPacket;
+import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SetMachineEventPacket extends ContainerEventPacket {
+public class SetMachineEventPacket extends MenuEventPacket {
     @Nullable
     private Boolean autoDumpItem = null;
     @Nullable
@@ -67,7 +67,7 @@ public class SetMachineEventPacket extends ContainerEventPacket {
         targetRecipeLoc = buf.readOptional(FriendlyByteBuf::readResourceLocation).orElse(null);
     }
 
-    public static class Builder implements ContainerEventPacket.Factory<SetMachineEventPacket> {
+    public static class Builder implements MenuEventPacket.Factory<SetMachineEventPacket> {
         @Nullable
         private Boolean autoDumpItem = null;
         @Nullable

@@ -7,7 +7,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FluidEventPacket extends ContainerEventPacket {
+public class FluidEventPacket extends MenuEventPacket {
     private int tankIndex;
     private int button;
 

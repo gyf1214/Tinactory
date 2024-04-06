@@ -7,8 +7,8 @@ import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.gui.ContainerMenu;
-import org.shsts.tinactory.core.gui.ContainerMenuType;
+import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.sync.CraftingSlot;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
@@ -16,8 +16,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WorkbenchMenu extends ContainerMenu<SmartBlockEntity> {
-    public WorkbenchMenu(ContainerMenuType<SmartBlockEntity, ?> type, int id,
+public class WorkbenchMenu extends Menu<SmartBlockEntity> {
+    public WorkbenchMenu(SmartMenuType<SmartBlockEntity, ?> type, int id,
                          Inventory inventory, SmartBlockEntity blockEntity) {
         super(type, id, inventory, blockEntity);
     }

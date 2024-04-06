@@ -9,11 +9,11 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
 import org.shsts.tinactory.core.gui.sync.FluidEventPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -23,13 +23,13 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FluidSlot extends ContainerWidget {
+public class FluidSlot extends MenuWidget {
     private static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
 
     private final int tank;
     private final int syncSlot;
 
-    public FluidSlot(ContainerMenu<?> menu, Rect rect, int tank, int syncSlot) {
+    public FluidSlot(Menu<?> menu, Rect rect, int tank, int syncSlot) {
         super(menu, rect);
         this.tank = tank;
         this.syncSlot = syncSlot;
@@ -68,7 +68,7 @@ public class FluidSlot extends ContainerWidget {
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        menu.triggerEvent(ContainerEventHandler.FLUID_CLICK, (containerId, eventId) ->
+        menu.triggerEvent(MenuEventHandler.FLUID_CLICK, (containerId, eventId) ->
                 new FluidEventPacket(containerId, eventId, tank, button));
     }
 

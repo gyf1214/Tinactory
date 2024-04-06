@@ -4,7 +4,7 @@ import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
@@ -14,12 +14,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class StretchImage extends ContainerWidget {
+public class StretchImage extends MenuWidget {
     private final Texture texture;
     private final Rect texRect;
     private final int border;
 
-    public StretchImage(ContainerMenu<?> menu, RectD anchor, Rect offset,
+    public StretchImage(Menu<?> menu, RectD anchor, Rect offset,
                         Texture texture, Rect texRect, int border) {
         super(menu, anchor, offset);
         this.texture = texture;

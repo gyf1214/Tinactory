@@ -5,10 +5,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
+import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,11 +21,11 @@ public class SwitchButton extends Button {
     private final Texture texture;
     private final int syncSlot;
     private boolean value;
-    private final BiConsumer<? extends ContainerMenu<?>, Boolean> onSwitch;
+    private final BiConsumer<? extends Menu<?>, Boolean> onSwitch;
 
-    public SwitchButton(ContainerMenu<?> menu, Rect rect, Texture texture,
+    public SwitchButton(Menu<?> menu, Rect rect, Texture texture,
                         @Nullable Component tooltip, int syncSlot,
-                        BiConsumer<? extends ContainerMenu<?>, Boolean> onSwitch) {
+                        BiConsumer<? extends Menu<?>, Boolean> onSwitch) {
         super(menu, rect, tooltip);
         this.texture = texture;
         this.onSwitch = onSwitch;
@@ -37,13 +37,13 @@ public class SwitchButton extends Button {
     public void onMouseClicked(double mouseX, double mouseY, int button) {
         super.onMouseClicked(mouseX, mouseY, button);
         value = !value;
-        ((BiConsumer<ContainerMenu<?>, Boolean>) onSwitch).accept(menu, value);
+        ((BiConsumer<Menu<?>, Boolean>) onSwitch).accept(menu, value);
     }
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         if (syncSlot >= 0) {
-            menu.getSyncPacket(syncSlot, ContainerSyncPacket.Boolean.class)
+            menu.getSyncPacket(syncSlot, MenuSyncPacket.Boolean.class)
                     .ifPresent(packet -> value = packet.getValue());
         }
         if (value) {

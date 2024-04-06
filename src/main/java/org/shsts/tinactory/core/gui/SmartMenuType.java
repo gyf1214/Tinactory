@@ -19,17 +19,17 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ContainerMenuType<T extends BlockEntity, M extends ContainerMenu<T>>
+public class SmartMenuType<T extends BlockEntity, M extends Menu<T>>
         extends MenuType<M> {
 
-    private final ContainerMenu.Factory<T, M> factory;
+    private final Menu.Factory<T, M> factory;
     private final Function<T, Component> title;
     public final Supplier<SmartBlockEntityType<T>> blockEntityType;
 
     @SuppressWarnings("ConstantConditions")
-    public ContainerMenuType(ContainerMenu.Factory<T, M> factory,
-                             Supplier<SmartBlockEntityType<T>> blockEntityType,
-                             Function<T, Component> title) {
+    public SmartMenuType(Menu.Factory<T, M> factory,
+                         Supplier<SmartBlockEntityType<T>> blockEntityType,
+                         Function<T, Component> title) {
         super(null);
         this.factory = factory;
         this.title = title;

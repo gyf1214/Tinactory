@@ -29,8 +29,8 @@ import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllWorldGens;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.IPacket;
-import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
-import org.shsts.tinactory.core.gui.sync.ContainerSyncHandler;
+import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
+import org.shsts.tinactory.core.gui.sync.MenuSyncHandler;
 import org.shsts.tinactory.registrate.AllRegistries;
 import org.shsts.tinactory.registrate.Registrate;
 import org.slf4j.Logger;
@@ -101,8 +101,8 @@ public class Tinactory {
         AllItems.init();
 
         AllWorldGens.init();
-        ContainerSyncHandler.init();
-        ContainerEventHandler.init();
+        MenuSyncHandler.init();
+        MenuEventHandler.init();
         AllRecipes.initRecipes();
 
         REGISTRATE.register(modEventBus);

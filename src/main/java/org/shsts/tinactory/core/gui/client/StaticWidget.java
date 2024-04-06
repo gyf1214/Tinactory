@@ -4,7 +4,7 @@ import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 
@@ -13,15 +13,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class StaticWidget extends ContainerWidget {
+public class StaticWidget extends MenuWidget {
     private final Texture texture;
 
-    public StaticWidget(ContainerMenu<?> menu, Rect rect, Texture texture) {
+    public StaticWidget(Menu<?> menu, Rect rect, Texture texture) {
         super(menu, rect);
         this.texture = texture;
     }
 
-    public StaticWidget(ContainerMenu<?> menu, Texture texture, int x, int y) {
+    public StaticWidget(Menu<?> menu, Texture texture, int x, int y) {
         this(menu, new Rect(x, y, texture.width(), texture.height()), texture);
     }
 

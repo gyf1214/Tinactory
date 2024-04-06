@@ -4,15 +4,15 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Item;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SimpleFluid;
-import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static org.shsts.tinactory.core.gui.ContainerMenu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.test.TinactoryTest.REGISTRATE;
 
 @ParametersAreNonnullByDefault
@@ -28,7 +28,7 @@ public final class AllBlocks {
                 .port(SlotType.FLUID_INPUT)
                 .slot(0, 1)
                 .port(SlotType.FLUID_OUTPUT)
-                .slot(ContainerMenu.SLOT_SIZE * 3, 1)
+                .slot(Menu.SLOT_SIZE * 3, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .buildLayout();
 

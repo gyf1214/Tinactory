@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FluidSyncPacket extends ContainerSyncPacket {
+public class FluidSyncPacket extends MenuSyncPacket {
     private FluidStack fluidStack = FluidStack.EMPTY;
 
     public FluidSyncPacket() {}

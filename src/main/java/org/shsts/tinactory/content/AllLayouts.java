@@ -7,8 +7,8 @@ import org.shsts.tinactory.core.logistics.SlotType;
 
 import java.util.Map;
 
-import static org.shsts.tinactory.core.gui.ContainerMenu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.ContainerMenu.SPACING_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING_VERTICAL;
 
 public final class AllLayouts {
     public static final Layout WORKBENCH;

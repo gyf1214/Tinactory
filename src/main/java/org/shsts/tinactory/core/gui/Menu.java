@@ -19,10 +19,10 @@ import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import net.minecraftforge.network.PacketDistributor;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
-import org.shsts.tinactory.core.gui.sync.ContainerEventPacket;
-import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
+import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
+import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu {
+public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
     public static final int WIDTH = 176;
     public static final int SLOT_SIZE = 18;
     public static final int CONTENT_WIDTH = 9 * SLOT_SIZE;
@@ -59,8 +59,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     protected boolean hasInventory;
     protected int height;
 
-    protected record EventHandler<P extends ContainerEventPacket>(Class<P> clazz, Consumer<P> handler) {
-        public void handle(ContainerEventPacket packet) {
+    protected record EventHandler<P extends MenuEventPacket>(Class<P> clazz, Consumer<P> handler) {
+        public void handle(MenuEventPacket packet) {
             if (clazz.isInstance(packet)) {
                 handler.accept(clazz.cast(packet));
             }
@@ -70,11 +70,11 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     protected final Map<Integer, EventHandler<?>> eventHandlers = new HashMap<>();
 
     @FunctionalInterface
-    public interface SyncPacketFactory<T extends BlockEntity, P extends ContainerSyncPacket> {
-        P create(int containerId, int index, ContainerMenu<T> menu, T be);
+    public interface SyncPacketFactory<T extends BlockEntity, P extends MenuSyncPacket> {
+        P create(int containerId, int index, Menu<T> menu, T be);
     }
 
-    protected static abstract class SyncSlot<T extends BlockEntity, P extends ContainerSyncPacket> {
+    protected static abstract class SyncSlot<T extends BlockEntity, P extends MenuSyncPacket> {
         private final Class<P> clazz;
         @Nullable
         private P packet = null;
@@ -83,9 +83,9 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             this.clazz = clazz;
         }
 
-        protected abstract P getPacket(ContainerMenu<T> menu, T be);
+        protected abstract P getPacket(Menu<T> menu, T be);
 
-        public void syncPacket(ContainerMenu<T> menu, T be) {
+        public void syncPacket(Menu<T> menu, T be) {
             if (menu.player instanceof ServerPlayer player) {
                 var packet1 = getPacket(menu, be);
                 if (!packet1.equals(packet)) {
@@ -95,14 +95,14 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
             }
         }
 
-        public void setPacket(ContainerSyncPacket packet) {
+        public void setPacket(MenuSyncPacket packet) {
             this.packet = clazz.cast(packet);
         }
     }
 
     protected final List<SyncSlot<T, ?>> syncSlots = new ArrayList<>();
 
-    public ContainerMenu(ContainerMenuType<T, ?> type, int id, Inventory inventory, T blockEntity) {
+    public Menu(SmartMenuType<T, ?> type, int id, Inventory inventory, T blockEntity) {
         super(type, id);
         this.player = inventory.player;
         this.inventory = inventory;
@@ -145,7 +145,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
      * This is called before any menu callbacks
      */
     public void initLayout() {
-        registerEvent(ContainerEventHandler.FLUID_CLICK, p ->
+        registerEvent(MenuEventHandler.FLUID_CLICK, p ->
                 clickFluidSlot(p.getTankIndex(), p.getButton()));
     }
 
@@ -238,12 +238,12 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
                 posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 
-    public <P extends ContainerSyncPacket>
+    public <P extends MenuSyncPacket>
     int addSyncSlot(Class<P> clazz, SyncPacketFactory<T, P> factory) {
         int index = syncSlots.size();
         syncSlots.add(new SyncSlot<>(clazz) {
             @Override
-            protected P getPacket(ContainerMenu<T> menu, T be) {
+            protected P getPacket(Menu<T> menu, T be) {
                 return factory.create(menu.containerId, index, menu, be);
             }
         });
@@ -337,8 +337,8 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         }
     }
 
-    public <P extends ContainerEventPacket>
-    void registerEvent(ContainerEventHandler.Event<P> event, Consumer<P> handler) {
+    public <P extends MenuEventPacket>
+    void registerEvent(MenuEventHandler.Event<P> event, Consumer<P> handler) {
         assert !eventHandlers.containsKey(event.id());
         eventHandlers.put(event.id(), new EventHandler<>(event.clazz(), handler));
     }
@@ -346,7 +346,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     /**
      * Called by client bound handler.
      */
-    public void onSyncPacket(int index, ContainerSyncPacket packet) {
+    public void onSyncPacket(int index, MenuSyncPacket packet) {
         var slot = syncSlots.get(index);
         if (slot == null || !slot.clazz.isInstance(packet)) {
             return;
@@ -357,7 +357,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
     /**
      * Called by Screen.
      */
-    public <P extends ContainerSyncPacket> Optional<P> getSyncPacket(int index, Class<P> clazz) {
+    public <P extends MenuSyncPacket> Optional<P> getSyncPacket(int index, Class<P> clazz) {
         var slot = syncSlots.get(index);
         if (slot == null || !clazz.isInstance(slot.packet)) {
             return Optional.empty();
@@ -365,12 +365,12 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         return Optional.of(clazz.cast(slot.packet));
     }
 
-    public <P extends ContainerEventPacket>
-    void triggerEvent(ContainerEventHandler.Event<P> event, ContainerEventPacket.Factory<P> factory) {
+    public <P extends MenuEventPacket>
+    void triggerEvent(MenuEventHandler.Event<P> event, MenuEventPacket.Factory<P> factory) {
         Tinactory.CHANNEL.sendToServer(factory.create(containerId, event.id()));
     }
 
-    public void onEventPacket(ContainerEventPacket packet) {
+    public void onEventPacket(MenuEventPacket packet) {
         var handler = eventHandlers.get(packet.getEventId());
         if (handler != null) {
             handler.handle(packet);
@@ -385,7 +385,7 @@ public class ContainerMenu<T extends BlockEntity> extends AbstractContainerMenu 
         }
     }
 
-    public interface Factory<T1 extends BlockEntity, M1 extends ContainerMenu<T1>> {
-        M1 create(ContainerMenuType<T1, M1> type, int id, Inventory inventory, T1 blockEntity);
+    public interface Factory<T1 extends BlockEntity, M1 extends Menu<T1>> {
+        M1 create(SmartMenuType<T1, M1> type, int id, Inventory inventory, T1 blockEntity);
     }
 }

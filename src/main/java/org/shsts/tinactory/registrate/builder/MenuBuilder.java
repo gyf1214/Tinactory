@@ -13,20 +13,20 @@ import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
-import org.shsts.tinactory.core.gui.ContainerMenu;
-import org.shsts.tinactory.core.gui.ContainerMenuType;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.ContainerMenuScreen;
-import org.shsts.tinactory.core.gui.client.ContainerWidget;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.client.SwitchButton;
-import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
-import org.shsts.tinactory.core.gui.sync.ContainerEventPacket;
-import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
+import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
+import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
+import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 
@@ -45,16 +45,16 @@ import java.util.function.ToDoubleFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
+public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         P extends BlockEntityBuilder<T, ?>>
-        extends RegistryEntryBuilder<MenuType<?>, ContainerMenuType<T, M>, P, MenuBuilder<T, M, P>> {
+        extends RegistryEntryBuilder<MenuType<?>, SmartMenuType<T, M>, P, MenuBuilder<T, M, P>> {
     private final Supplier<SmartBlockEntityType<T>> blockEntityType;
-    private final ContainerMenu.Factory<T, M> factory;
+    private final Menu.Factory<T, M> factory;
     private Function<T, Component> title = $ -> TextComponent.EMPTY;
     private final List<Rect> widgetsRect = new ArrayList<>();
     private boolean showInventory = true;
 
-    private static class MenuCallback<M1 extends ContainerMenu<?>, X> implements Supplier<X> {
+    private static class MenuCallback<M1 extends Menu<?>, X> implements Supplier<X> {
         @Nullable
         private X result;
         private final Function<M1, X> func;
@@ -73,7 +73,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
             return result;
         }
 
-        public static <M2 extends ContainerMenu<?>> MenuCallback<M2, Unit> dummy(Consumer<M2> cons) {
+        public static <M2 extends Menu<?>> MenuCallback<M2, Unit> dummy(Consumer<M2> cons) {
             return new MenuCallback<>(menu -> {
                 cons.accept(menu);
                 return Unit.INSTANCE;
@@ -82,11 +82,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     private final List<MenuCallback<M, ?>> menuCallbacks = new ArrayList<>();
-    private DistLazy<MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>>>
-            screenFactory = () -> () -> ContainerMenuScreen::new;
-    private final List<Supplier<Function<M, ISelf<ContainerWidget>>>> widgets = new ArrayList<>();
+    private DistLazy<MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>>>
+            screenFactory = () -> () -> MenuScreen::new;
+    private final List<Supplier<Function<M, ISelf<MenuWidget>>>> widgets = new ArrayList<>();
 
-    public MenuBuilder(Registrate registrate, String id, P parent, ContainerMenu.Factory<T, M> factory) {
+    public MenuBuilder(Registrate registrate, String id, P parent, Menu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
         this.blockEntityType = () -> {
             assert parent.entry != null;
@@ -105,32 +105,32 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     public MenuBuilder<T, M, P>
-    screen(DistLazy<MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>>> screen) {
+    screen(DistLazy<MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>>> screen) {
         screenFactory = screen;
         return self();
     }
 
-    public MenuBuilder<T, M, P> widget(Supplier<Function<M, ISelf<ContainerWidget>>> factory) {
+    public MenuBuilder<T, M, P> widget(Supplier<Function<M, ISelf<MenuWidget>>> factory) {
         widgets.add(factory);
         return self();
     }
 
-    public MenuBuilder<T, M, P> widget(Rect rect, Supplier<Function<M, ISelf<ContainerWidget>>> factory) {
+    public MenuBuilder<T, M, P> widget(Rect rect, Supplier<Function<M, ISelf<MenuWidget>>> factory) {
         widgetsRect.add(rect);
         widgets.add(factory);
         return self();
     }
 
-    public <P1 extends ContainerSyncPacket> MenuBuilder<T, M, P>
-    syncWidget(Class<P1> packetClazz, ContainerMenu.SyncPacketFactory<T, P1> packetFactory,
-               Supplier<BiFunction<M, Integer, ISelf<ContainerWidget>>> widgetFactory) {
+    public <P1 extends MenuSyncPacket> MenuBuilder<T, M, P>
+    syncWidget(Class<P1> packetClazz, Menu.SyncPacketFactory<T, P1> packetFactory,
+               Supplier<BiFunction<M, Integer, ISelf<MenuWidget>>> widgetFactory) {
         var syncSlot = addSyncSlot(packetClazz, packetFactory);
         return widget(() -> menu -> widgetFactory.get().apply(menu, syncSlot.getAsInt()));
     }
 
-    public <P1 extends ContainerSyncPacket> MenuBuilder<T, M, P>
-    syncWidget(Rect rect, Class<P1> packetClazz, ContainerMenu.SyncPacketFactory<T, P1> packetFactory,
-               Supplier<BiFunction<M, Integer, ISelf<ContainerWidget>>> widgetFactory) {
+    public <P1 extends MenuSyncPacket> MenuBuilder<T, M, P>
+    syncWidget(Rect rect, Class<P1> packetClazz, Menu.SyncPacketFactory<T, P1> packetFactory,
+               Supplier<BiFunction<M, Integer, ISelf<MenuWidget>>> widgetFactory) {
         widgetsRect.add(rect);
         return syncWidget(packetClazz, packetFactory, widgetFactory);
     }
@@ -148,14 +148,14 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     public MenuBuilder<T, M, P>
-    slot(ContainerMenu.SlotFactory<?> factory, int slotIndex, int posX, int posY) {
+    slot(Menu.SlotFactory<?> factory, int slotIndex, int posX, int posY) {
         menuCallbacks.add(MenuCallback.dummy(menu -> menu.addSlot(factory, slotIndex, posX, posY)));
-        widgetsRect.add(new Rect(posX, posY, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE));
+        widgetsRect.add(new Rect(posX, posY, Menu.SLOT_SIZE, Menu.SLOT_SIZE));
         return self();
     }
 
-    public <P1 extends ContainerSyncPacket>
-    IntSupplier addSyncSlot(Class<P1> clazz, ContainerMenu.SyncPacketFactory<T, P1> factory) {
+    public <P1 extends MenuSyncPacket>
+    IntSupplier addSyncSlot(Class<P1> clazz, Menu.SyncPacketFactory<T, P1> factory) {
         var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(clazz, factory));
         menuCallbacks.add(callback);
         return callback::get;
@@ -163,8 +163,8 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
 
     public MenuBuilder<T, M, P>
     progressBar(Texture tex, Rect rect, ToDoubleFunction<T> progressReader) {
-        return syncWidget(rect, ContainerSyncPacket.Double.class, (containerId, index, $, be) ->
-                        new ContainerSyncPacket.Double(containerId, index, progressReader.applyAsDouble(be)),
+        return syncWidget(rect, MenuSyncPacket.Double.class, (containerId, index, $, be) ->
+                        new MenuSyncPacket.Double(containerId, index, progressReader.applyAsDouble(be)),
                 () -> (menu, slot) -> new ProgressBar(menu, rect, tex, slot));
     }
 
@@ -178,13 +178,13 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     public MenuBuilder<T, M, P>
     switchButton(Texture tex, Rect rect, Component tooltip,
                  Predicate<T> valueReader, BiConsumer<M, Boolean> onSwitch) {
-        return syncWidget(rect, ContainerSyncPacket.Boolean.class, (containerId, index, $, be) ->
-                        new ContainerSyncPacket.Boolean(containerId, index, valueReader.test(be)),
+        return syncWidget(rect, MenuSyncPacket.Boolean.class, (containerId, index, $, be) ->
+                        new MenuSyncPacket.Boolean(containerId, index, valueReader.test(be)),
                 () -> (menu, slot) -> new SwitchButton(menu, rect, tex, tooltip, slot, onSwitch));
     }
 
-    public <P1 extends ContainerEventPacket> MenuBuilder<T, M, P>
-    event(ContainerEventHandler.Event<P1> event, BiConsumer<M, P1> handler) {
+    public <P1 extends MenuEventPacket> MenuBuilder<T, M, P>
+    event(MenuEventHandler.Event<P1> event, BiConsumer<M, P1> handler) {
         menuCallbacks.add(MenuCallback.dummy(menu ->
                 menu.registerEvent(event, p -> handler.accept(menu, p))));
         return self();
@@ -193,7 +193,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     public MenuBuilder<T, M, P> fluidSlot(int tank, int x, int y) {
         var syncSlot = new MenuCallback<M, Integer>(menu -> menu.addFluidSlot(tank));
         menuCallbacks.add(syncSlot);
-        var rect = new Rect(x, y, ContainerMenu.SLOT_SIZE, ContainerMenu.SLOT_SIZE);
+        var rect = new Rect(x, y, Menu.SLOT_SIZE, Menu.SLOT_SIZE);
         var rect1 = rect.offset(1, 1).enlarge(-2, -2);
         return staticWidget(rect, Texture.SLOT_BACKGROUND)
                 .widget(rect1, () -> menu -> new FluidSlot(menu, rect1, tank, syncSlot.get()));
@@ -208,7 +208,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         return self();
     }
 
-    private ContainerMenu.Factory<T, M> getFactory() {
+    private Menu.Factory<T, M> getFactory() {
         var showInventory = this.showInventory;
         var menuCallbacks = this.menuCallbacks;
         var widgetsRect = this.widgetsRect;
@@ -224,7 +224,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
         };
     }
 
-    private MenuScreens.ScreenConstructor<M, ? extends ContainerMenuScreen<M>> getScreenFactory() {
+    private MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>> getScreenFactory() {
         assert this.screenFactory != null;
         var screenFactory = this.screenFactory.getValue();
         var widgets = this.widgets;
@@ -238,8 +238,8 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends ContainerMenu<T>,
     }
 
     @Override
-    public ContainerMenuType<T, M> createObject() {
-        var menuType = new ContainerMenuType<>(getFactory(), blockEntityType, title);
+    public SmartMenuType<T, M> createObject() {
+        var menuType = new SmartMenuType<>(getFactory(), blockEntityType, title);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
                 registrate.menuScreenHandler.setMenuScreen(menuType, getScreenFactory()));
         return menuType;

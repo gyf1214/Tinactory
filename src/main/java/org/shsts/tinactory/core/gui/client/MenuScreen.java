@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.common.ISelf;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
@@ -17,21 +17,21 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_HORIZONTAL;
-import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_TOP;
-import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_VERTICAL;
-import static org.shsts.tinactory.core.gui.ContainerMenu.WIDTH;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.WIDTH;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractContainerScreen<M> {
+public class MenuScreen<M extends Menu<?>> extends AbstractContainerScreen<M> {
     public static final int TEXT_COLOR = 0xFF404040;
 
     private final Panel rootPanel;
     private boolean isHovering = false;
 
-    public ContainerMenuScreen(M menu, Inventory inventory, Component title) {
+    public MenuScreen(M menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.titleLabelX = MARGIN_HORIZONTAL;
         this.titleLabelY = MARGIN_VERTICAL;
@@ -47,11 +47,11 @@ public class ContainerMenuScreen<M extends ContainerMenu<?>> extends AbstractCon
         }
     }
 
-    protected void addWidget(ContainerWidget widget) {
+    protected void addWidget(MenuWidget widget) {
         rootPanel.addWidget(widget);
     }
 
-    public void addWidget(Function<M, ISelf<ContainerWidget>> factory) {
+    public void addWidget(Function<M, ISelf<MenuWidget>> factory) {
         var widget = factory.apply(menu);
         rootPanel.addWidget(widget.self());
     }

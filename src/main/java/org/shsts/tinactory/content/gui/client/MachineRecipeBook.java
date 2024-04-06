@@ -12,7 +12,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
@@ -21,8 +21,8 @@ import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinactory.core.gui.sync.ContainerEventHandler;
-import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
+import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
+import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -33,9 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_HORIZONTAL;
-import static org.shsts.tinactory.core.gui.ContainerMenu.MARGIN_TOP;
-import static org.shsts.tinactory.core.gui.ContainerMenu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -64,7 +64,7 @@ public class MachineRecipeBook extends Panel {
         @Nullable
         private ProcessingRecipe<?> recipe = null;
 
-        public RecipeButton(ContainerMenu<?> menu, int index) {
+        public RecipeButton(Menu<?> menu, int index) {
             super(menu, new Rect((index % BUTTON_PER_LINE) * BUTTON_SIZE,
                     (index / BUTTON_PER_LINE) * BUTTON_SIZE,
                     BUTTON_SIZE, BUTTON_SIZE), null);
@@ -129,7 +129,7 @@ public class MachineRecipeBook extends Panel {
     private class ButtonPanel extends Panel {
         private int buttons;
 
-        public ButtonPanel(ContainerMenu<?> menu) {
+        public ButtonPanel(Menu<?> menu) {
             super(menu, RectD.FULL, Rect.corners(0, BUTTON_SIZE, 0, -BUTTON_SIZE));
         }
 
@@ -168,7 +168,7 @@ public class MachineRecipeBook extends Panel {
         private final int pageChange;
         private boolean visible = true;
 
-        public PageButton(ContainerMenu<?> menu, int xOffset, int texX, int pageChange) {
+        public PageButton(Menu<?> menu, int xOffset, int texX, int pageChange) {
             super(menu, RectD.corners(0.5, 1, 0.5, 1),
                     new Rect(xOffset, -PAGE_HEIGHT, PAGE_WIDTH, PAGE_HEIGHT),
                     RECIPE_BOOK_BG, null, texX, TEX_Y, texX, TEX_Y + PAGE_HEIGHT);
@@ -213,7 +213,7 @@ public class MachineRecipeBook extends Panel {
 
     private int page;
 
-    public MachineRecipeBook(ContainerMenu<? extends Machine> menu, int syncSlot,
+    public MachineRecipeBook(Menu<? extends Machine> menu, int syncSlot,
                              RecipeType<? extends ProcessingRecipe<?>> recipeType,
                              int buttonX, int buttonY) {
         super(menu);
@@ -255,19 +255,19 @@ public class MachineRecipeBook extends Panel {
     }
 
     private boolean isCurrentRecipe(@Nullable ProcessingRecipe<?> recipe) {
-        var loc = menu.getSyncPacket(syncSlot, ContainerSyncPacket.LocHolder.class)
-                .flatMap(ContainerSyncPacket.Holder::getData)
+        var loc = menu.getSyncPacket(syncSlot, MenuSyncPacket.LocHolder.class)
+                .flatMap(MenuSyncPacket.Holder::getData)
                 .orElse(null);
         return recipe == null ? loc == null : recipe.getId().equals(loc);
     }
 
     private void unselectRecipe() {
-        menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
+        menu.triggerEvent(MenuEventHandler.SET_MACHINE,
                 SetMachineEventPacket.builder().resetTargetRecipe());
     }
 
     private void selectRecipe(ProcessingRecipe<?> recipe) {
-        menu.triggerEvent(ContainerEventHandler.SET_MACHINE,
+        menu.triggerEvent(MenuEventHandler.SET_MACHINE,
                 SetMachineEventPacket.builder().targetRecipeLoc(recipe.getId()));
     }
 

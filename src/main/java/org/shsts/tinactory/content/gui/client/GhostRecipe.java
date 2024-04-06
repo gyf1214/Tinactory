@@ -7,12 +7,12 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.core.gui.ContainerMenu;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.ContainerWidget;
+import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.sync.ContainerSyncPacket;
+import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -28,7 +28,7 @@ import static org.shsts.tinactory.core.util.GeneralUtil.optionalCastor;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class GhostRecipe extends ContainerWidget {
+public class GhostRecipe extends MenuWidget {
     private final int syncSlot;
     private final Layout layout;
 
@@ -37,15 +37,15 @@ public class GhostRecipe extends ContainerWidget {
     private final List<Layout.SlotWith<?>> ingredients = new ArrayList<>();
     private final ItemRenderer itemRenderer = ClientUtil.getItemRenderer();
 
-    public GhostRecipe(ContainerMenu<?> menu, int syncSlot, Layout layout) {
+    public GhostRecipe(Menu<?> menu, int syncSlot, Layout layout) {
         super(menu, Rect.ZERO.offset(layout.getXOffset(), 0));
         this.syncSlot = syncSlot;
         this.layout = layout;
     }
 
     private void updateRecipe() {
-        var loc = menu.getSyncPacket(syncSlot, ContainerSyncPacket.LocHolder.class)
-                .flatMap(ContainerSyncPacket.Holder::getData)
+        var loc = menu.getSyncPacket(syncSlot, MenuSyncPacket.LocHolder.class)
+                .flatMap(MenuSyncPacket.Holder::getData)
                 .orElse(null);
 
         if (Objects.equals(loc, currentRecipeLoc)) {

@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.common.ISelf;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 
@@ -20,17 +20,17 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class ContainerWidget extends GuiComponent implements ISelf<ContainerWidget>, Widget {
+public abstract class MenuWidget extends GuiComponent implements ISelf<MenuWidget>, Widget {
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 
     private final RectD anchor;
     private final Rect offset;
 
-    protected final ContainerMenu<?> menu;
+    protected final Menu<?> menu;
     protected final int zIndex;
     protected Rect rect;
 
-    public ContainerWidget(ContainerMenu<?> menu, RectD anchor, Rect rect, int zIndex) {
+    public MenuWidget(Menu<?> menu, RectD anchor, Rect rect, int zIndex) {
         this.menu = menu;
         this.offset = rect;
         this.anchor = anchor;
@@ -38,11 +38,11 @@ public abstract class ContainerWidget extends GuiComponent implements ISelf<Cont
         this.zIndex = zIndex;
     }
 
-    public ContainerWidget(ContainerMenu<?> menu, RectD anchor, Rect offset) {
-        this(menu, anchor, offset, ContainerMenu.DEFAULT_Z_INDEX);
+    public MenuWidget(Menu<?> menu, RectD anchor, Rect offset) {
+        this(menu, anchor, offset, Menu.DEFAULT_Z_INDEX);
     }
 
-    public ContainerWidget(ContainerMenu<?> menu, Rect rect) {
+    public MenuWidget(Menu<?> menu, Rect rect) {
         this(menu, RectD.ZERO, rect);
     }
 

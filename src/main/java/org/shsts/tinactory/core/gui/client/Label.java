@@ -4,7 +4,7 @@ import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -13,7 +13,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Label extends ContainerWidget {
+public class Label extends MenuWidget {
     public enum Alignment {
         BEGIN(0d), MIDDLE(0.5d), END(1d);
 
@@ -31,11 +31,11 @@ public class Label extends ContainerWidget {
     public Alignment horizontalAlign = Alignment.BEGIN;
     public Alignment verticalAlign = Alignment.BEGIN;
 
-    public Label(ContainerMenu<?> menu, RectD anchor, Rect offset) {
+    public Label(Menu<?> menu, RectD anchor, Rect offset) {
         super(menu, anchor, offset);
     }
 
-    public Label(ContainerMenu<?> menu, Rect rect) {
+    public Label(Menu<?> menu, Rect rect) {
         super(menu, rect);
     }
 

@@ -9,8 +9,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
-import org.shsts.tinactory.core.gui.ContainerMenu;
-import org.shsts.tinactory.core.gui.ContainerMenuType;
+import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.Nullable;
@@ -43,7 +43,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
     private final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>>
             capabilities = new HashMap<>();
     @Nullable
-    private Supplier<ContainerMenuType<U, ?>> menu = null;
+    private Supplier<SmartMenuType<U, ?>> menu = null;
 
     public BlockEntityBuilder(Registrate registrate, String id, P parent, Factory<U> factory) {
         super(registrate, registrate.blockEntityHandler, id, parent);
@@ -79,17 +79,17 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
         return hasEvent(true);
     }
 
-    public void setMenu(Supplier<ContainerMenuType<U, ?>> value) {
+    public void setMenu(Supplier<SmartMenuType<U, ?>> value) {
         menu = value;
     }
 
-    public <M extends ContainerMenu<U>> MenuBuilder<U, M, BlockEntityBuilder<U, P>>
-    menu(ContainerMenu.Factory<U, M> factory) {
+    public <M extends Menu<U>> MenuBuilder<U, M, BlockEntityBuilder<U, P>>
+    menu(Menu.Factory<U, M> factory) {
         return new MenuBuilder<>(registrate, id, this, factory);
     }
 
-    public MenuBuilder<U, ContainerMenu<U>, BlockEntityBuilder<U, P>> menu() {
-        return menu(ContainerMenu::new);
+    public MenuBuilder<U, Menu<U>, BlockEntityBuilder<U, P>> menu() {
+        return menu(Menu::new);
     }
 
     public <C extends CapabilityProviderBuilder<? super U, BlockEntityBuilder<U, P>>>

@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -18,15 +18,15 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class Button extends ContainerWidget {
+public abstract class Button extends MenuWidget {
     private final @Nullable Component tooltip;
 
-    public Button(ContainerMenu<?> menu, RectD anchor, Rect offset, @Nullable Component tooltip) {
+    public Button(Menu<?> menu, RectD anchor, Rect offset, @Nullable Component tooltip) {
         super(menu, anchor, offset);
         this.tooltip = tooltip;
     }
 
-    public Button(ContainerMenu<?> menu, Rect rect, @Nullable Component tooltip) {
+    public Button(Menu<?> menu, Rect rect, @Nullable Component tooltip) {
         super(menu, rect);
         this.tooltip = tooltip;
     }

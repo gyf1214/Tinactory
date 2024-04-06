@@ -5,8 +5,8 @@ import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static org.shsts.tinactory.core.gui.ContainerMenu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.ContainerMenu.WIDTH;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.WIDTH;
 
 @ParametersAreNonnullByDefault
 public record Texture(ResourceLocation loc, int width, int height) {

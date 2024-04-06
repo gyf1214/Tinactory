@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.ContainerMenu;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 
@@ -18,24 +18,24 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Panel extends ContainerWidget {
-    protected final List<ContainerWidget> children = new ArrayList<>();
+public class Panel extends MenuWidget {
+    protected final List<MenuWidget> children = new ArrayList<>();
     @Nullable
-    private ContainerWidget hoveringChild = null;
+    private MenuWidget hoveringChild = null;
     @Nullable
-    private ContainerWidget clickingChild = null;
+    private MenuWidget clickingChild = null;
 
     public boolean visible = true;
 
-    public Panel(ContainerMenu<?> menu) {
+    public Panel(Menu<?> menu) {
         super(menu, RectD.FULL, Rect.ZERO);
     }
 
-    public Panel(ContainerMenu<?> menu, RectD anchor, Rect offset) {
+    public Panel(Menu<?> menu, RectD anchor, Rect offset) {
         super(menu, anchor, offset);
     }
 
-    public void addWidget(ContainerWidget widget) {
+    public void addWidget(MenuWidget widget) {
         children.add(widget);
     }
 
@@ -78,7 +78,7 @@ public class Panel extends ContainerWidget {
 
     @Override
     public Optional<List<Component>> getTooltip() {
-        return Optional.ofNullable(hoveringChild).flatMap(ContainerWidget::getTooltip);
+        return Optional.ofNullable(hoveringChild).flatMap(MenuWidget::getTooltip);
     }
 
     @Override

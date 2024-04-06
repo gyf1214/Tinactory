@@ -12,13 +12,13 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class ContainerSyncPacket implements IPacket {
+public abstract class MenuSyncPacket implements IPacket {
     protected int containerId;
     protected int index;
 
-    protected ContainerSyncPacket() {}
+    protected MenuSyncPacket() {}
 
-    protected ContainerSyncPacket(int containerId, int index) {
+    protected MenuSyncPacket(int containerId, int index) {
         this.containerId = containerId;
         this.index = index;
     }
@@ -39,7 +39,7 @@ public abstract class ContainerSyncPacket implements IPacket {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ContainerSyncPacket that = (ContainerSyncPacket) o;
+        MenuSyncPacket that = (MenuSyncPacket) o;
         return containerId == that.containerId && index == that.index;
     }
 
@@ -56,7 +56,7 @@ public abstract class ContainerSyncPacket implements IPacket {
         return index;
     }
 
-    public static class Boolean extends ContainerSyncPacket {
+    public static class Boolean extends MenuSyncPacket {
         private boolean value;
 
         public Boolean() {}
@@ -96,7 +96,7 @@ public abstract class ContainerSyncPacket implements IPacket {
         }
     }
 
-    public static class Double extends ContainerSyncPacket {
+    public static class Double extends MenuSyncPacket {
         private double data;
 
         public Double() {}
@@ -136,7 +136,7 @@ public abstract class ContainerSyncPacket implements IPacket {
         }
     }
 
-    public static class Long extends ContainerSyncPacket {
+    public static class Long extends MenuSyncPacket {
         private long data;
 
         public Long() {}
@@ -176,7 +176,7 @@ public abstract class ContainerSyncPacket implements IPacket {
         }
     }
 
-    public static abstract class Holder<T> extends ContainerSyncPacket {
+    public static abstract class Holder<T> extends MenuSyncPacket {
         @Nullable
         private T data;
 
