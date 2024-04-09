@@ -7,10 +7,14 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.core.logistics.ItemHelper;
@@ -138,6 +142,23 @@ public class SmartBlockEntity extends BlockEntity {
      * Client tick callback, need the block to have ticking = true
      */
     protected void onClientTick(Level world, BlockPos pos, BlockState state) {}
+
+    public InteractionResult onUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
+        assert level != null;
+        if (level.isClientSide) {
+            return onClientUse(player, hand, hitResult);
+        } else {
+            return onServerUse(player, hand, hitResult);
+        }
+    }
+
+    protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return InteractionResult.PASS;
+    }
+
+    protected InteractionResult onClientUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return InteractionResult.PASS;
+    }
 
     protected void serializeOnSave(CompoundTag tag) {}
 

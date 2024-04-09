@@ -41,7 +41,7 @@ public final class AllCommands {
 
     private static int invalidatePlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        TechManager.invalidatePlayer(player);
+        TechManager.leaveTeam(player);
         player.sendMessage(new TextComponent("invalidate player success"), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }

@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.util.BiKeyHashMap;
 import org.slf4j.Logger;
 
@@ -26,14 +27,16 @@ import java.util.function.Supplier;
 public class Network extends NetworkBase {
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    public final TeamProfile team;
     private final Map<ComponentType<?>, Component> components = new HashMap<>();
     private final List<Machine> machines = new ArrayList<>();
     private final BiKeyHashMap<IScheduling, ComponentType<?>, Component.Ticker> componentSchedulings =
             new BiKeyHashMap<>();
     private final Multimap<IScheduling, Component.Ticker> machineSchedulings = ArrayListMultimap.create();
 
-    public Network(Level world, BlockPos center) {
+    public Network(Level world, BlockPos center, TeamProfile team) {
         super(world, center);
+        this.team = team;
         attachComponents();
     }
 

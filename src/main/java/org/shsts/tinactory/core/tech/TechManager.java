@@ -7,13 +7,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,6 +30,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+/**
+ * Must be called on server
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class TechManager {
@@ -94,42 +99,35 @@ public final class TechManager {
         return TECHNOLOGIES.values();
     }
 
-    public static Optional<TeamProfile> teamByPlayer(ServerPlayer player) {
-        var uuid = player.getGameProfile().getId();
-        return Optional.ofNullable(TinactorySavedData.get().playerTeams.get(uuid));
-    }
-
-    public static void addPlayerToTeam(ServerPlayer player, TeamProfile team) {
-        var data = TinactorySavedData.get();
-        var uuid = player.getGameProfile().getId();
-        LOGGER.debug("add player {} to team {}", player, team);
-        data.playerTeams.put(uuid, team);
-        data.setDirty();
-    }
-
-    public static TeamProfile newTeam(ServerPlayer player, String name) {
-        var data = TinactorySavedData.get();
-        var team = TeamProfile.create(name);
-        LOGGER.debug("create new team {}", team);
-        data.teams.put(team.uuid, team);
-        addPlayerToTeam(player, team);
-        return team;
-    }
-
-    public static void invalidatePlayer(ServerPlayer player) {
-        var data = TinactorySavedData.get();
-        var uuid = player.getGameProfile().getId();
-        var team = data.playerTeams.get(uuid);
-        LOGGER.debug("invalidate player {}", player);
-        if (team != null) {
-            LOGGER.debug("remove player {} from team {}", player, team);
-            team.players.remove(uuid);
-            if (team.players.isEmpty()) {
-                LOGGER.debug("invalidate empty team {}", team);
-                data.teams.remove(team.uuid);
-            }
+    public static Optional<TeamProfile> teamByPlayer(Player player) {
+        var playerTeam = (PlayerTeam) player.getTeam();
+        if (playerTeam == null) {
+            return Optional.empty();
         }
-        data.playerTeams.remove(uuid);
-        data.setDirty();
+        return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
+    }
+
+    public static Optional<TeamProfile> teamByName(String name) {
+        var playerTeam = ServerUtil.getScoreboard().getPlayerTeam(name);
+        if (playerTeam == null) {
+            return Optional.empty();
+        }
+        return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
+    }
+
+    public static void addPlayerToTeam(Player player, TeamProfile team) {
+        ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), team.getPlayerTeam());
+    }
+
+    public static TeamProfile newTeam(Player player, String name) {
+        var scoreboard = ServerUtil.getScoreboard();
+        var playerTeam = scoreboard.addPlayerTeam(name);
+        scoreboard.addPlayerToTeam(player.getScoreboardName(), playerTeam);
+        return TinactorySavedData.get().getTeamProfile(playerTeam);
+    }
+
+    public static void leaveTeam(Player player) {
+        var scoreboard = ServerUtil.getScoreboard();
+        scoreboard.removePlayerFromTeam(player.getScoreboardName());
     }
 }

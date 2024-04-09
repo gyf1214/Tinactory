@@ -70,12 +70,18 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
                                  InteractionHand hand, BlockHitResult hitResult) {
-        var menu = entityType.get().menu;
-        if (menu == null) {
-            return InteractionResult.PASS;
-        }
         var be = getBlockEntity(world, pos);
         if (be.isEmpty()) {
+            return InteractionResult.PASS;
+        }
+        if (be.get() instanceof SmartBlockEntity sbe) {
+            var result = sbe.onUse(player, hand, hitResult);
+            if (result != InteractionResult.PASS) {
+                return result;
+            }
+        }
+        var menu = entityType.get().menu;
+        if (menu == null) {
             return InteractionResult.PASS;
         }
         if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {

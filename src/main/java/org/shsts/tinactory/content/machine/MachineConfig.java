@@ -40,8 +40,7 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
 
     @Nullable
     public ResourceLocation getTargetRecipeLoc() {
-        return targetRecipeLoc != null ? targetRecipeLoc :
-                (targetRecipe != null ? targetRecipe.getId() : null);
+        return targetRecipe != null ? targetRecipe.getId() : null;
     }
 
     @Nullable
@@ -76,9 +75,8 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
         var tag = new CompoundTag();
         tag.putBoolean("autoDumpItem", autoDumpItem);
         tag.putBoolean("autoDumpFluid", autoDumpFluid);
-        var loc = getTargetRecipeLoc();
-        if (loc != null) {
-            tag.putString("targetRecipe", loc.toString());
+        if (targetRecipe != null) {
+            tag.putString("targetRecipe", targetRecipe.getId().toString());
         }
         return tag;
     }

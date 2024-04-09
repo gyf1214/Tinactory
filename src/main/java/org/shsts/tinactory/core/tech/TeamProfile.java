@@ -5,30 +5,31 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.shsts.tinactory.core.util.ServerUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TeamProfile implements INBTSerializable<CompoundTag> {
-    public final UUID uuid;
-    public final String name;
-    /**
-     * Player team association is managed by SavedData directly.
-     */
-    public final Set<UUID> players = new HashSet<>();
+    private final PlayerTeam playerTeam;
     private final Map<Technology, Long> technologies = new HashMap<>();
 
+    private TeamProfile(PlayerTeam playerTeam) {
+        this.playerTeam = playerTeam;
+    }
 
-    private TeamProfile(UUID uuid, String name) {
-        this.uuid = uuid;
-        this.name = name;
+    public PlayerTeam getPlayerTeam() {
+        return playerTeam;
+    }
+
+    public String getName() {
+        return playerTeam.getName();
     }
 
     public void advanceTechProgress(Technology tech, long progress) {
@@ -51,8 +52,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag> {
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.putUUID("id", uuid);
-        tag.putString("name", name);
+        tag.putString("name", playerTeam.getName());
         var listTag = new ListTag();
         for (var tech : technologies.entrySet()) {
             var loc = tech.getKey().getRegistryName();
@@ -78,21 +78,25 @@ public class TeamProfile implements INBTSerializable<CompoundTag> {
         }
     }
 
-    public static TeamProfile create(String name) {
-        return new TeamProfile(UUID.randomUUID(), name);
+    public static TeamProfile create(PlayerTeam team) {
+        return new TeamProfile(team);
     }
 
-    public static TeamProfile fromTag(Tag tag) {
+    public static Optional<TeamProfile> fromTag(Tag tag) {
         var compoundTag = (CompoundTag) tag;
-        var uuid = compoundTag.getUUID("id");
+
         var name = compoundTag.getString("name");
-        var profile = new TeamProfile(uuid, name);
-        profile.deserializeNBT(compoundTag);
-        return profile;
+        var playerTeam = ServerUtil.getScoreboard().getPlayerTeam(name);
+        if (playerTeam == null) {
+            return Optional.empty();
+        }
+        var ret = new TeamProfile(playerTeam);
+        ret.deserializeNBT(compoundTag);
+        return Optional.of(ret);
     }
 
     @Override
     public String toString() {
-        return "TeamProfile{%s, uuid=%s}".formatted(name, uuid);
+        return "TeamProfile{%s}".formatted(playerTeam.getName());
     }
 }

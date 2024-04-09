@@ -20,7 +20,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NetworkControllerScreen extends MenuScreen<Menu<NetworkController>> {
-    private static final int HEIGHT = 200;
+    private static final int HEIGHT = 120;
 
     private final Panel welcomePanel;
 

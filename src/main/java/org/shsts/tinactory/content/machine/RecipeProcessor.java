@@ -202,10 +202,8 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        var recipeLoc = currentRecipeLoc != null ? currentRecipeLoc :
-                (currentRecipe != null ? currentRecipe.getId() : null);
-        if (recipeLoc != null) {
-            tag.putString("currentRecipe", recipeLoc.toString());
+        if (currentRecipe != null) {
+            tag.putString("currentRecipe", currentRecipe.getId().toString());
             tag.putLong("workProgress", workProgress);
         }
         return tag;
