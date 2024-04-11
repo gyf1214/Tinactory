@@ -14,6 +14,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.SlotItemHandler;
+import org.shsts.tinactory.core.common.I;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.gui.Layout;
@@ -88,32 +89,47 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget);
 
         default <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-        void addWidget(RectD anchor, Rect offset, T widget) {
-            addGuiComponent(anchor, offset, widget);
+        void addWidget(RectD anchor, Rect offset, I<T> widget) {
+            addGuiComponent(anchor, offset, widget.self());
         }
 
         default <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-        void addWidget(Rect offset, T widget) {
-            addWidget(RectD.ZERO, offset, widget);
+        void addWidget(Rect offset, I<T> widget) {
+            addGuiComponent(RectD.ZERO, offset, widget.self());
         }
 
-        default void addPanel(RectD anchor, Rect offset, Panel panel) {
-            addGuiComponent(anchor, offset, panel);
+        default void addPanel(RectD anchor, Rect offset, I<Panel> panel) {
+            addGuiComponent(anchor, offset, panel.self());
         }
 
-        default void addPanel(Rect offset, Panel panel) {
-            addPanel(RectD.FULL, offset, panel);
+        default void addPanel(Rect offset, I<Panel> panel) {
+            addGuiComponent(RectD.FULL, offset, panel.self());
         }
 
-        default void addPanel(Panel panel) {
-            addPanel(RectD.FULL, Rect.ZERO, panel);
+        default void addPanel(I<Panel> panel) {
+            addGuiComponent(RectD.FULL, Rect.ZERO, panel.self());
+        }
+    }
+
+    @FunctionalInterface
+    public interface WidgetFactory<M extends Menu<?>> {
+        void accept(MenuScreen<M> screen, WidgetConsumer cons);
+    }
+
+    @FunctionalInterface
+    public interface MenuWidgetFactory<M extends Menu<?>> extends WidgetFactory<M> {
+        void accept(M menu, WidgetConsumer cons);
+
+        @Override
+        default void accept(MenuScreen<M> screen, WidgetConsumer cons) {
+            accept(screen.getMenu(), cons);
         }
     }
 
     private final List<MenuCallback<M, ?>> menuCallbacks = new ArrayList<>();
     private DistLazy<MenuScreens.ScreenConstructor<M, MenuScreen<M>>>
             screenFactory = () -> () -> MenuScreen::new;
-    private final List<Supplier<BiConsumer<MenuScreen<M>, WidgetConsumer>>> widgets = new ArrayList<>();
+    private final List<Supplier<WidgetFactory<M>>> widgets = new ArrayList<>();
 
     public MenuBuilder(Registrate registrate, String id, P parent, Menu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
@@ -139,20 +155,17 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         return self();
     }
 
-    public MenuBuilder<T, M, P> screenWidget(Supplier<BiConsumer<MenuScreen<M>, WidgetConsumer>> factory) {
+    public MenuBuilder<T, M, P> screenWidget(Supplier<WidgetFactory<M>> factory) {
         widgets.add(factory);
         return self();
     }
 
-    public MenuBuilder<T, M, P> menuWidget(Supplier<BiConsumer<M, WidgetConsumer>> factory) {
-        widgets.add(() -> {
-            var factory1 = factory.get();
-            return (screen, cons) -> factory1.accept(screen.getMenu(), cons);
-        });
+    public MenuBuilder<T, M, P> menuWidget(Supplier<MenuWidgetFactory<M>> factory) {
+        widgets.add(factory::get);
         return self();
     }
 
-    public MenuBuilder<T, M, P> menuWidget(Rect rect, Supplier<BiConsumer<M, WidgetConsumer>> factory) {
+    public MenuBuilder<T, M, P> menuWidget(Rect rect, Supplier<MenuWidgetFactory<M>> factory) {
         widgetsRect.add(rect);
         return menuWidget(factory);
     }
@@ -273,11 +286,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     private MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>> getScreenFactory() {
         assert this.screenFactory != null;
         var screenFactory = this.screenFactory.getValue();
-        var widgets = this.widgets;
+        var widgets = this.widgets.stream().map(Supplier::get).toList();
         return (menu, inventory, title) -> {
             var screen = screenFactory.create(menu, inventory, title);
             for (var widget : widgets) {
-                screen.initWidget(widget.get());
+                screen.initWidget(widget);
             }
             return screen;
         };

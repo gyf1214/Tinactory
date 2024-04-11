@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -17,7 +18,7 @@ import java.util.List;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Panel extends GuiComponent implements MenuBuilder.WidgetConsumer {
+public class Panel extends GuiComponent implements MenuBuilder.WidgetConsumer, ISelf<Panel> {
     protected record Child(RectD anchor, Rect offset, GuiComponent child) {
         public void setRect(Rect parent) {
             var sx = parent.inX(anchor.x()) + offset.x();

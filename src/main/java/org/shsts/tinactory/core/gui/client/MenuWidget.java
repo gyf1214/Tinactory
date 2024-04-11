@@ -10,6 +10,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 
@@ -21,7 +22,8 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class MenuWidget extends GuiComponent implements Widget, GuiEventListener, NarratableEntry {
+public abstract class MenuWidget extends GuiComponent implements
+        Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 
     protected final Menu<?> menu;

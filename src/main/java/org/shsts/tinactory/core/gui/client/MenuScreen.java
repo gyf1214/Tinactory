@@ -21,7 +21,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
@@ -60,7 +59,7 @@ public class MenuScreen<M extends Menu<?>> extends AbstractContainerScreen<M> {
         hoverables.add(widget);
     }
 
-    public void initWidget(BiConsumer<MenuScreen<M>, MenuBuilder.WidgetConsumer> widget) {
+    public void initWidget(MenuBuilder.WidgetFactory<M> widget) {
         widget.accept(this, rootPanel);
     }
 
