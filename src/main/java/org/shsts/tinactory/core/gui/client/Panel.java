@@ -1,105 +1,104 @@
 package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.registrate.builder.MenuBuilder;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Panel extends MenuWidget {
-    protected final List<MenuWidget> children = new ArrayList<>();
-    @Nullable
-    private MenuWidget hoveringChild = null;
-    @Nullable
-    private MenuWidget clickingChild = null;
+public class Panel extends GuiComponent implements MenuBuilder.WidgetConsumer {
+    protected record Child(RectD anchor, Rect offset, GuiComponent child) {
+        public void setRect(Rect parent) {
+            var sx = parent.inX(anchor.x()) + offset.x();
+            var tx = parent.inX(anchor.endX()) + offset.endX();
+            var sy = parent.inY(anchor.y()) + offset.y();
+            var ty = parent.inY(anchor.endY()) + offset.endY();
 
-    public boolean visible = true;
-
-    public Panel(Menu<?> menu) {
-        super(menu, RectD.FULL, Rect.ZERO);
-    }
-
-    public Panel(Menu<?> menu, RectD anchor, Rect offset) {
-        super(menu, anchor, offset);
-    }
-
-    public void addWidget(MenuWidget widget) {
-        children.add(widget);
-    }
-
-    protected void initChildren() {
-        for (var child : children) {
-            child.init(rect);
-        }
-    }
-
-    @Override
-    public void init(Rect parent) {
-        super.init(parent);
-        initChildren();
-    }
-
-    @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        if (!visible) {
-            return;
-        }
-        for (var child : children) {
-            child.render(poseStack, mouseX, mouseY, partialTick);
-        }
-    }
-
-    @Override
-    public boolean isHovering(double mouseX, double mouseY) {
-        hoveringChild = null;
-        if (!visible) {
-            return false;
-        }
-        for (var child : children) {
-            if (child.isHovering(mouseX, mouseY)) {
-                hoveringChild = child;
-                return true;
+            if (child instanceof MenuWidget menuWidget) {
+                menuWidget.setRect(Rect.corners(sx, sy, tx, ty));
+            } else if (child instanceof AbstractWidget widget) {
+                widget.x = sx;
+                widget.y = sy;
+                widget.setWidth(tx - sx);
+                widget.setWidth(ty - sy);
+            } else if (child instanceof Panel panel) {
+                panel.setRect(Rect.corners(sx, sy, tx, ty));
             }
         }
-        return false;
-    }
 
-    @Override
-    public Optional<List<Component>> getTooltip() {
-        return Optional.ofNullable(hoveringChild).flatMap(MenuWidget::getTooltip);
-    }
-
-    @Override
-    public boolean isClicking(double mouseX, double mouseY, int button) {
-        clickingChild = null;
-        if (!visible) {
-            return false;
-        }
-        for (var child : children) {
-            if (child.isClicking(mouseX, mouseY, button)) {
-                clickingChild = child;
-                return true;
+        public void setActive(boolean active) {
+            if (child instanceof MenuWidget menuWidget) {
+                menuWidget.setActive(active);
+            } else if (child instanceof AbstractWidget widget) {
+                widget.active = active;
+                widget.visible = active;
+            } else if (child instanceof Panel panel) {
+                panel.setActive(false);
             }
         }
-        return false;
+
+        public void addToScreen(MenuScreen<?> screen) {
+            if (child instanceof MenuWidget widget) {
+                screen.addWidgetToScreen(widget);
+            } else if (child instanceof AbstractWidget widget) {
+                screen.addWidgetToScreen(widget);
+            } else if (child instanceof Panel panel) {
+                panel.addToScreen();
+            }
+        }
+    }
+
+    protected final Menu<?> menu;
+    protected final MenuScreen<?> screen;
+    protected final List<Child> children = new ArrayList<>();
+    protected boolean active = true;
+
+    public Panel(MenuScreen<?> screen) {
+        this.screen = screen;
+        this.menu = screen.getMenu();
     }
 
     @Override
-    public void onMouseClicked(double mouseX, double mouseY, int button) {
-        if (clickingChild != null) {
-            clickingChild.onMouseClicked(mouseX, mouseY, button);
+    public void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget) {
+        children.add(new Child(anchor, offset, widget));
+    }
+
+    public void init(Rect rect) {
+        setRect(rect);
+        addToScreen();
+    }
+
+    protected void addToScreen() {
+        for (var child : children) {
+            child.addToScreen(screen);
+        }
+    }
+
+    protected void setRect(Rect rect) {
+        for (var child : children) {
+            child.setRect(rect);
+        }
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean value) {
+        active = value;
+        for (var child : children) {
+            child.setActive(value);
         }
     }
 }

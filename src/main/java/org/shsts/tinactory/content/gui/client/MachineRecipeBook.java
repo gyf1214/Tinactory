@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.Button;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
@@ -35,6 +36,7 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @OnlyIn(Dist.CLIENT)
@@ -52,75 +54,62 @@ public class MachineRecipeBook extends Panel {
 
     private static final int BUTTON_PER_LINE = 4;
     private static final int BUTTON_SIZE = SLOT_SIZE + 3;
-    private static final int PAGE_WIDTH = 12;
-    private static final int PAGE_HEIGHT = 18;
     private static final int PANEL_BORDER = 8;
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
+    private static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
+    private static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_HORIZONTAL - PANEL_WIDTH,
+            -MARGIN_TOP, -MARGIN_HORIZONTAL, MARGIN_VERTICAL);
     private static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
+    private static final Rect INNER_PANEL_OFFSET = Rect.corners(PANEL_BORDER, PANEL_BORDER,
+            -PANEL_BORDER, -PANEL_BORDER);
+    private static final RectD PAGE_ANCHOR = new RectD(0.5d, 1d, 0d, 0d);
+    private static final Rect PAGE_OFFSET = new Rect(0, -18, 12, 18);
 
 
     private class RecipeButton extends Button {
-        private boolean isDisable = false;
         @Nullable
         private ProcessingRecipe<?> recipe = null;
 
-        public RecipeButton(Menu<?> menu, int index) {
-            super(menu, new Rect((index % BUTTON_PER_LINE) * BUTTON_SIZE,
-                    (index / BUTTON_PER_LINE) * BUTTON_SIZE,
-                    BUTTON_SIZE, BUTTON_SIZE), null);
-        }
-
-        @Override
-        protected boolean canHover() {
-            return isDisable || recipe != null;
+        public RecipeButton(Menu<?> menu) {
+            super(menu);
         }
 
         @Override
         public Optional<List<Component>> getTooltip() {
-            if (isDisable) {
+            if (recipe == null) {
                 return Optional.of(List.of(new TranslatableComponent("tinactory.tooltip.unselectRecipe")));
-            } else if (recipe == null) {
-                return Optional.empty();
+            } else {
+                // TODO
+                return Optional.of(List.of(new TextComponent(recipe.getId().toString())));
             }
-            // TODO
-            return Optional.of(List.of(new TextComponent(recipe.getId().toString())));
         }
 
         @Override
-        public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            if (isDisable || recipe != null) {
-                if (isCurrentRecipe(recipe)) {
-                    RenderUtil.blit(poseStack, RECIPE_BUTTON, zIndex, rect, 21, 0);
-                } else {
-                    RenderUtil.blit(poseStack, RECIPE_BUTTON, zIndex, rect);
-                }
-
+        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+            var z = getBlitOffset();
+            if (isCurrentRecipe(recipe)) {
+                RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect, 21, 0);
+            } else {
+                RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect);
             }
-            if (isDisable) {
-                RenderUtil.blit(poseStack, DISABLE_BUTTON, zIndex,
-                        rect.offset(2, 2).enlarge(-5, -5));
-            } else if (recipe != null) {
+            if (recipe == null) {
+                RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect.offset(2, 2).enlarge(-5, -5));
+            } else {
                 var x = rect.x() + 2;
                 var y = rect.y() + 2;
                 var output = recipe.getResult();
                 RenderUtil.renderIngredient(output,
                         stack -> RenderUtil.renderItem(stack, x, y),
-                        stack -> RenderUtil.renderFluid(poseStack, stack,
-                                new Rect(x, y, 16, 16), zIndex));
+                        stack -> RenderUtil.renderFluid(poseStack, stack, x, y, z));
             }
-        }
-
-        @Override
-        protected boolean canClick(int button) {
-            return button == 0 && (isDisable || recipe != null);
         }
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             super.onMouseClicked(mouseX, mouseY, button);
-            if (isDisable) {
+            if (recipe == null) {
                 unselectRecipe();
-            } else if (recipe != null) {
+            } else {
                 selectRecipe(recipe);
             }
         }
@@ -129,34 +118,40 @@ public class MachineRecipeBook extends Panel {
     private class ButtonPanel extends Panel {
         private int buttons;
 
-        public ButtonPanel(Menu<?> menu) {
-            super(menu, RectD.FULL, Rect.corners(0, BUTTON_SIZE, 0, -BUTTON_SIZE));
+        public ButtonPanel() {
+            super(MachineRecipeBook.this.screen);
         }
 
         @Override
-        protected void initChildren() {
+        protected void setRect(Rect rect) {
             var buttons = BUTTON_PER_LINE * Math.max(1, rect.height() / BUTTON_SIZE);
             var size = children.size();
             if (size <= buttons) {
                 for (var i = size; i < buttons; i++) {
-                    children.add(new RecipeButton(menu, i));
+                    var x = (i % BUTTON_PER_LINE) * BUTTON_SIZE;
+                    var y = (i / BUTTON_PER_LINE) * BUTTON_SIZE;
+                    var offset = new Rect(x, y, BUTTON_SIZE, BUTTON_SIZE);
+                    var button = new RecipeButton(menu);
+                    button.setActive(active);
+                    addWidget(offset, button);
                 }
             } else {
                 children.subList(buttons, children.size()).clear();
             }
             this.buttons = buttons;
-            super.initChildren();
+            super.setRect(rect);
         }
 
         public void setDisableButton(int index) {
-            if (children.get(index) instanceof RecipeButton button) {
-                button.isDisable = true;
+            if (children.get(index).child() instanceof RecipeButton button) {
+                button.setActive(true);
                 button.recipe = null;
             }
         }
 
         public void setRecipe(int index, @Nullable ProcessingRecipe<?> recipe) {
-            if (children.get(index) instanceof RecipeButton button) {
+            if (children.get(index).child() instanceof RecipeButton button) {
+                button.setActive(recipe != null);
                 button.recipe = recipe;
             }
         }
@@ -166,30 +161,10 @@ public class MachineRecipeBook extends Panel {
         private static final int TEX_Y = 208;
 
         private final int pageChange;
-        private boolean visible = true;
 
-        public PageButton(Menu<?> menu, int xOffset, int texX, int pageChange) {
-            super(menu, RectD.corners(0.5, 1, 0.5, 1),
-                    new Rect(xOffset, -PAGE_HEIGHT, PAGE_WIDTH, PAGE_HEIGHT),
-                    RECIPE_BOOK_BG, null, texX, TEX_Y, texX, TEX_Y + PAGE_HEIGHT);
+        public PageButton(Menu<?> menu, int texX, int pageChange) {
+            super(menu, RECIPE_BOOK_BG, null, texX, TEX_Y, texX, TEX_Y + PAGE_OFFSET.height());
             this.pageChange = pageChange;
-        }
-
-        @Override
-        protected boolean canHover() {
-            return visible && super.canHover();
-        }
-
-        @Override
-        protected boolean canClick(int button) {
-            return visible && super.canClick(button);
-        }
-
-        @Override
-        public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            if (visible) {
-                super.render(poseStack, mouseX, mouseY, partialTick);
-            }
         }
 
         @Override
@@ -211,47 +186,51 @@ public class MachineRecipeBook extends Panel {
     private final PageButton leftPageButton;
     private final PageButton rightPageButton;
 
-    private int page;
+    private int page = 0;
 
-    public MachineRecipeBook(Menu<? extends Machine> menu, int syncSlot,
+    public MachineRecipeBook(MenuScreen<? extends Menu<? extends Machine>> screen, int syncSlot,
                              RecipeType<? extends ProcessingRecipe<?>> recipeType,
                              int buttonX, int buttonY) {
-        super(menu);
+        super(screen);
         this.syncSlot = syncSlot;
         this.recipes = new ArrayList<>(ClientUtil.getRecipeManager().getAllRecipesFor(recipeType));
 
-        this.bookPanel = new Panel(menu, RectD.corners(0d, 0d, 0d, 1d),
-                Rect.corners(-MARGIN_HORIZONTAL - PANEL_WIDTH, -MARGIN_TOP, -MARGIN_HORIZONTAL, 0));
-        this.bookPanel.addWidget(new StretchImage(menu, RectD.FULL, Rect.ZERO,
-                RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER));
-        this.bookPanel.visible = false;
+        this.bookPanel = new Panel(screen);
+        bookPanel.addWidget(RectD.FULL, Rect.ZERO,
+                new StretchImage(menu, RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER));
 
-        this.buttonPanel = new ButtonPanel(menu);
-        this.leftPageButton = new PageButton(menu, -BUTTON_SIZE - PAGE_WIDTH, 15, -1);
-        this.rightPageButton = new PageButton(menu, BUTTON_SIZE, 1, 1);
+        this.buttonPanel = new ButtonPanel();
+        this.leftPageButton = new PageButton(menu, 15, -1);
+        this.rightPageButton = new PageButton(menu, 1, 1);
 
-        var innerPanel = new Panel(menu, RectD.FULL,
-                Rect.corners(PANEL_BORDER, PANEL_BORDER, -PANEL_BORDER, -PANEL_BORDER));
+        var innerPanel = new Panel(screen);
+        innerPanel.addPanel(Rect.corners(0, BUTTON_SIZE, 0, -BUTTON_SIZE), buttonPanel);
+        innerPanel.addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(-BUTTON_SIZE - PAGE_OFFSET.width(), 0), leftPageButton);
+        innerPanel.addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(BUTTON_SIZE, 0), rightPageButton);
 
-        innerPanel.addWidget(buttonPanel);
-        innerPanel.addWidget(leftPageButton);
-        innerPanel.addWidget(rightPageButton);
-        bookPanel.addWidget(innerPanel);
-        addWidget(bookPanel);
-        addWidget(new SimpleButton(menu, new Rect(buttonX, buttonY, 20, 18), RECIPE_BOOK_BUTTON,
+        bookPanel.addPanel(INNER_PANEL_OFFSET, innerPanel);
+        bookPanel.setActive(false);
+
+        addPanel(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
+        addWidget(new Rect(buttonX, buttonY, 20, 18), new SimpleButton(menu, RECIPE_BOOK_BUTTON,
                 new TranslatableComponent("tinactory.tooltip.openRecipeBook"), 0, 19) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
                 super.onMouseClicked(mouseX, mouseY, button);
-                bookPanel.visible = !bookPanel.visible;
+                bookPanel.setActive(!bookPanel.isActive());
+                if (bookPanel.isActive()) {
+                    setPage(page);
+                }
             }
         });
     }
 
     @Override
-    public void init(Rect parent) {
-        super.init(parent);
-        setPage(0);
+    protected void setRect(Rect rect) {
+        super.setRect(rect);
+        if (bookPanel.isActive()) {
+            setPage(page);
+        }
     }
 
     private boolean isCurrentRecipe(@Nullable ProcessingRecipe<?> recipe) {
@@ -275,8 +254,8 @@ public class MachineRecipeBook extends Panel {
         var buttons = buttonPanel.buttons;
         var maxPage = Math.max(1, (recipes.size() + buttons - 1) / buttons);
         var newPage = MathUtil.clamp(index, 0, maxPage - 1);
-        leftPageButton.visible = newPage != 0;
-        rightPageButton.visible = newPage != maxPage - 1;
+        leftPageButton.setActive(newPage != 0);
+        rightPageButton.setActive(newPage != maxPage - 1);
         var offset = newPage * buttons - 1;
         for (var i = 0; i < buttons; i++) {
             var j = i + offset;

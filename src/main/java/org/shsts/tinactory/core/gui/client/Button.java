@@ -6,8 +6,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.Nullable;
@@ -21,14 +19,14 @@ import java.util.Optional;
 public abstract class Button extends MenuWidget {
     private final @Nullable Component tooltip;
 
-    public Button(Menu<?> menu, RectD anchor, Rect offset, @Nullable Component tooltip) {
-        super(menu, anchor, offset);
+    public Button(Menu<?> menu, @Nullable Component tooltip) {
+        super(menu);
         this.tooltip = tooltip;
     }
 
-    public Button(Menu<?> menu, Rect rect, @Nullable Component tooltip) {
-        super(menu, rect);
-        this.tooltip = tooltip;
+    public Button(Menu<?> menu) {
+        super(menu);
+        this.tooltip = null;
     }
 
     protected void playDownSound() {

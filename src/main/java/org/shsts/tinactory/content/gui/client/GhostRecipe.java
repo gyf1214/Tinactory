@@ -38,7 +38,7 @@ public class GhostRecipe extends MenuWidget {
     private final ItemRenderer itemRenderer = ClientUtil.getItemRenderer();
 
     public GhostRecipe(Menu<?> menu, int syncSlot, Layout layout) {
-        super(menu, Rect.ZERO.offset(layout.getXOffset(), 0));
+        super(menu);
         this.syncSlot = syncSlot;
         this.layout = layout;
     }
@@ -71,7 +71,7 @@ public class GhostRecipe extends MenuWidget {
 
     private void renderFluid(PoseStack poseStack, FluidStack stack, int x, int y) {
         var rect = new Rect(x, y, 16, 16);
-        RenderUtil.renderFluid(poseStack, stack, rect, 0x80FFFFFF, zIndex);
+        RenderUtil.renderFluid(poseStack, stack, rect, 0x80FFFFFF, getBlitOffset());
     }
 
     private <I> void renderIngredient(PoseStack poseStack, I ingredient, int x, int y) {
@@ -81,7 +81,7 @@ public class GhostRecipe extends MenuWidget {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         updateRecipe();
 
         for (var ingredient : ingredients) {

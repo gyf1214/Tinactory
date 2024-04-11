@@ -10,7 +10,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.sync.FluidEventPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
@@ -29,8 +28,8 @@ public class FluidSlot extends MenuWidget {
     private final int tank;
     private final int syncSlot;
 
-    public FluidSlot(Menu<?> menu, Rect rect, int tank, int syncSlot) {
-        super(menu, rect);
+    public FluidSlot(Menu<?> menu, int tank, int syncSlot) {
+        super(menu);
         this.tank = tank;
         this.syncSlot = syncSlot;
     }
@@ -73,8 +72,8 @@ public class FluidSlot extends MenuWidget {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        RenderUtil.renderFluid(poseStack, getFluidStack(), rect, zIndex);
+    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        RenderUtil.renderFluid(poseStack, getFluidStack(), rect, getBlitOffset());
 
         if (isHovering(mouseX, mouseY)) {
             RenderSystem.colorMask(true, true, true, false);

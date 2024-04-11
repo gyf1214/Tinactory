@@ -5,8 +5,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -31,12 +29,8 @@ public class Label extends MenuWidget {
     public Alignment horizontalAlign = Alignment.BEGIN;
     public Alignment verticalAlign = Alignment.BEGIN;
 
-    public Label(Menu<?> menu, RectD anchor, Rect offset) {
-        super(menu, anchor, offset);
-    }
-
-    public Label(Menu<?> menu, Rect rect) {
-        super(menu, rect);
+    public Label(Menu<?> menu) {
+        super(menu);
     }
 
     public void setText(Component value) {
@@ -45,7 +39,7 @@ public class Label extends MenuWidget {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         var font = ClientUtil.getFont();
         int x = rect.inX(horizontalAlign.value) - (int) (cacheWidth * horizontalAlign.value);
         int y = rect.inY(verticalAlign.value) - (int) (font.lineHeight * verticalAlign.value);

@@ -18,20 +18,21 @@ public class ProgressBar extends MenuWidget {
     private final Texture texture;
     private final int syncIndex;
 
-    public ProgressBar(Menu<?> menu, Rect rect, Texture texture, int syncIndex) {
-        super(menu, rect);
+    public ProgressBar(Menu<?> menu, Texture texture, int syncIndex) {
+        super(menu);
         this.texture = texture;
         this.syncIndex = syncIndex;
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         var progress = Math.max(menu.getSyncPacket(syncIndex, MenuSyncPacket.Double.class)
                 .map(MenuSyncPacket.Double::getData).orElse(0d), 0d);
         int w1 = (int) (progress * (double) rect.width());
         int w2 = rect.width() - w1;
         int h = rect.height();
-        RenderUtil.blit(poseStack, texture, zIndex, rect.resize(w1, h), new Rect(0, h, w1, h));
-        RenderUtil.blit(poseStack, texture, zIndex, rect.resize(w2, h).offset(w1, 0), new Rect(w1, 0, w2, h));
+        var z = getBlitOffset();
+        RenderUtil.blit(poseStack, texture, z, rect.resize(w1, h), new Rect(0, h, w1, h));
+        RenderUtil.blit(poseStack, texture, z, rect.resize(w2, h).offset(w1, 0), new Rect(w1, 0, w2, h));
     }
 }

@@ -28,13 +28,13 @@ public class NetworkControllerScreen extends MenuScreen<Menu<NetworkController>>
         super(menu, inventory, title);
         this.imageHeight = HEIGHT;
 
-        this.welcomePanel = new Panel(menu);
-        var welcomeLabel = new Label(menu, RectD.corners(0.5, 0.5, 0.5, 0.5), Rect.ZERO);
+        this.welcomePanel = new Panel(this);
+        var welcomeLabel = new Label(menu);
         welcomeLabel.verticalAlign = Label.Alignment.MIDDLE;
         welcomeLabel.horizontalAlign = Label.Alignment.END;
         welcomeLabel.setText(new TranslatableComponent("tinactory.gui.networkController.welcome"));
-        welcomePanel.addWidget(welcomeLabel);
+        welcomePanel.addWidget(RectD.corners(0.5, 0.5, 0.5, 0.5), Rect.ZERO, welcomeLabel);
 
-        addWidget(welcomePanel);
+        rootPanel.addPanel(welcomePanel);
     }
 }

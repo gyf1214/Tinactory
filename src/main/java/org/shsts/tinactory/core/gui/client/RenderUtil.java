@@ -146,6 +146,10 @@ public final class RenderUtil {
         renderFluid(poseStack, stack, rect, 0xFFFFFFFF, zIndex);
     }
 
+    public static void renderFluid(PoseStack poseStack, FluidStack stack, int x, int y, int zIndex) {
+        renderFluid(poseStack, stack, new Rect(x, y, 16, 16), 0xFFFFFFFF, zIndex);
+    }
+
     public static void renderItem(ItemStack stack, int x, int y) {
         ClientUtil.getItemRenderer().renderAndDecorateFakeItem(stack, x, y);
         RenderSystem.disableDepthTest();

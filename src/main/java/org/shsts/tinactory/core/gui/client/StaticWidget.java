@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -16,17 +15,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class StaticWidget extends MenuWidget {
     private final Texture texture;
 
-    public StaticWidget(Menu<?> menu, Rect rect, Texture texture) {
-        super(menu, rect);
+    public StaticWidget(Menu<?> menu, Texture texture) {
+        super(menu);
         this.texture = texture;
     }
 
-    public StaticWidget(Menu<?> menu, Texture texture, int x, int y) {
-        this(menu, new Rect(x, y, texture.width(), texture.height()), texture);
-    }
-
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        RenderUtil.blit(poseStack, texture, zIndex, rect);
+    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        RenderUtil.blit(poseStack, texture, getBlitOffset(), rect);
     }
 }

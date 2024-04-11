@@ -9,6 +9,7 @@ import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
@@ -54,8 +55,10 @@ public final class MenuGen {
             var slot = $.addSyncSlot(MenuSyncPacket.LocHolder.class, (containerId, index, $1, be) ->
                     new MenuSyncPacket.LocHolder(containerId, index,
                             be.machineConfig.getTargetRecipeLoc()));
-            return $.widget(() -> menu -> new MachineRecipeBook(menu, slot.getAsInt(), recipeType.get(), 0, 0))
-                    .widget(() -> menu -> new GhostRecipe(menu, slot.getAsInt(), layout));
+            return $.screenWidget(() -> (menu, cons) -> cons.addPanel(
+                            new MachineRecipeBook(menu, slot.getAsInt(), recipeType.get(), 0, 0)))
+                    .menuWidget(() -> (menu, cons) -> cons.addWidget(Rect.ZERO.offset(layout.getXOffset(), 0),
+                            new GhostRecipe(menu, slot.getAsInt(), layout)));
         };
     }
 }

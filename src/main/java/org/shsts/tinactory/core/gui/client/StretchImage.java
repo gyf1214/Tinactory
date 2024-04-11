@@ -6,7 +6,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,17 +18,16 @@ public class StretchImage extends MenuWidget {
     private final Rect texRect;
     private final int border;
 
-    public StretchImage(Menu<?> menu, RectD anchor, Rect offset,
-                        Texture texture, Rect texRect, int border) {
-        super(menu, anchor, offset);
+    public StretchImage(Menu<?> menu, Texture texture, Rect texRect, int border) {
+        super(menu);
         this.texture = texture;
         this.texRect = texRect;
         this.border = border;
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        render(poseStack, texture, zIndex, rect, texRect, border);
+    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        render(poseStack, texture, getBlitOffset(), rect, texRect, border);
     }
 
     public static void render(PoseStack poseStack, Texture texture, int zIndex,

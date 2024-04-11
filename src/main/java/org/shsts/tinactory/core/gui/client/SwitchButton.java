@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 
@@ -23,10 +22,10 @@ public class SwitchButton extends Button {
     private boolean value;
     private final BiConsumer<? extends Menu<?>, Boolean> onSwitch;
 
-    public SwitchButton(Menu<?> menu, Rect rect, Texture texture,
+    public SwitchButton(Menu<?> menu, Texture texture,
                         @Nullable Component tooltip, int syncSlot,
                         BiConsumer<? extends Menu<?>, Boolean> onSwitch) {
-        super(menu, rect, tooltip);
+        super(menu, tooltip);
         this.texture = texture;
         this.onSwitch = onSwitch;
         this.syncSlot = syncSlot;
@@ -41,15 +40,15 @@ public class SwitchButton extends Button {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         if (syncSlot >= 0) {
             menu.getSyncPacket(syncSlot, MenuSyncPacket.Boolean.class)
                     .ifPresent(packet -> value = packet.getValue());
         }
         if (value) {
-            RenderUtil.blit(poseStack, texture, zIndex, rect, 0, rect.height());
+            RenderUtil.blit(poseStack, texture, getBlitOffset(), rect, 0, rect.height());
         } else {
-            RenderUtil.blit(poseStack, texture, zIndex, rect);
+            RenderUtil.blit(poseStack, texture, getBlitOffset(), rect);
         }
     }
 }
