@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
@@ -49,5 +50,10 @@ public final class AllEvents {
     @SubscribeEvent
     public static void onUnloadWorld(WorldEvent.Unload event) {
         NetworkManager.onUnload((Level) event.getWorld());
+    }
+
+    @SubscribeEvent
+    public static void onRegisterCommand(RegisterCommandsEvent event) {
+        AllCommands.register(event.getDispatcher());
     }
 }

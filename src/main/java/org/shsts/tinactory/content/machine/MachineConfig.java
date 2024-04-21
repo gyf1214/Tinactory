@@ -6,7 +6,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
-import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
+import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.Nullable;
@@ -56,7 +56,7 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
         targetRecipeLoc = null;
     }
 
-    public void apply(Level world, SetMachineEventPacket packet) {
+    public void apply(Level world, SetMachinePacket packet) {
         if (packet.getAutoDumpItem() != null) {
             autoDumpItem = packet.getAutoDumpItem();
         }

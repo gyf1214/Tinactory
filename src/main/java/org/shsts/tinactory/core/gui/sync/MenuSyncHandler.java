@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.network.NetworkEvent;
 import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Menu;
 import org.slf4j.Logger;
 
@@ -21,7 +22,7 @@ public final class MenuSyncHandler {
         var player = Minecraft.getInstance().player;
         if (player != null && player.containerMenu instanceof Menu<?> menu &&
                 menu.containerId == packet.getContainerId()) {
-            menu.onSyncPacket(packet.getIndex(), packet);
+            menu.handleSyncPacket(packet.getIndex(), packet);
         }
     }
 
@@ -37,5 +38,6 @@ public final class MenuSyncHandler {
         register(MenuSyncPacket.Double.class, MenuSyncPacket.Double::new);
         register(MenuSyncPacket.LocHolder.class, MenuSyncPacket.LocHolder::new);
         register(FluidSyncPacket.class, FluidSyncPacket::new);
+        register(NetworkControllerSyncPacket.class, NetworkControllerSyncPacket::new);
     }
 }

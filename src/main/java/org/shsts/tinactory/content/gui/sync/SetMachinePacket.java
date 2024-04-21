@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SetMachineEventPacket extends MenuEventPacket {
+public class SetMachinePacket extends MenuEventPacket {
     @Nullable
     private Boolean autoDumpItem = null;
     @Nullable
@@ -20,9 +20,9 @@ public class SetMachineEventPacket extends MenuEventPacket {
     @Nullable
     private ResourceLocation targetRecipeLoc = null;
 
-    public SetMachineEventPacket() {}
+    public SetMachinePacket() {}
 
-    private SetMachineEventPacket(int containerId, int eventId, Builder builder) {
+    private SetMachinePacket(int containerId, int eventId, Builder builder) {
         super(containerId, eventId);
         this.autoDumpItem = builder.autoDumpItem;
         this.autoDumpFluid = builder.autoDumpFluid;
@@ -67,7 +67,7 @@ public class SetMachineEventPacket extends MenuEventPacket {
         targetRecipeLoc = buf.readOptional(FriendlyByteBuf::readResourceLocation).orElse(null);
     }
 
-    public static class Builder implements MenuEventPacket.Factory<SetMachineEventPacket> {
+    public static class Builder implements MenuEventPacket.Factory<SetMachinePacket> {
         @Nullable
         private Boolean autoDumpItem = null;
         @Nullable
@@ -97,8 +97,8 @@ public class SetMachineEventPacket extends MenuEventPacket {
         }
 
         @Override
-        public SetMachineEventPacket create(int containerId, int eventId) {
-            return new SetMachineEventPacket(containerId, eventId, this);
+        public SetMachinePacket create(int containerId, int eventId) {
+            return new SetMachinePacket(containerId, eventId, this);
         }
     }
 

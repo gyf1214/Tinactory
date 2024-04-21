@@ -3,6 +3,9 @@ package org.shsts.tinactory.core.gui.client;
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.common.ISelf;
@@ -32,7 +35,7 @@ public class Panel extends GuiComponent implements MenuBuilder.WidgetConsumer, I
                 widget.x = sx;
                 widget.y = sy;
                 widget.setWidth(tx - sx);
-                widget.setWidth(ty - sy);
+                widget.setHeight(ty - sy);
             } else if (child instanceof Panel panel) {
                 panel.setRect(Rect.corners(sx, sy, tx, ty));
             }
@@ -73,6 +76,11 @@ public class Panel extends GuiComponent implements MenuBuilder.WidgetConsumer, I
     @Override
     public void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget) {
         children.add(new Child(anchor, offset, widget));
+    }
+
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
+    void addVanillaWidget(Rect offset, T widget) {
+        addGuiComponent(RectD.ZERO, offset, widget);
     }
 
     public void init(Rect rect) {

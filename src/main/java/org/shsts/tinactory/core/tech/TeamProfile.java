@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.core.util.ServerUtil;
@@ -47,6 +48,10 @@ public class TeamProfile implements INBTSerializable<CompoundTag> {
 
     public boolean isTechAvailable(Technology tech) {
         return getTechProgress(tech) > 0 || tech.depends.stream().allMatch(this::isTechFinished);
+    }
+
+    public boolean hasPlayer(Player player) {
+        return player.getTeam() == playerTeam;
     }
 
     @Override

@@ -40,12 +40,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -85,6 +87,18 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         }
     }
 
+    private static class SyncSlotMenuCallback<M1 extends Menu<?>> extends MenuCallback<M1, Integer>
+            implements IntSupplier {
+        public SyncSlotMenuCallback(ToIntFunction<M1> value) {
+            super(value::applyAsInt);
+        }
+
+        @Override
+        public int getAsInt() {
+            return get();
+        }
+    }
+
     public interface WidgetConsumer {
         void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget);
 
@@ -96,6 +110,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         default <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
         void addWidget(Rect offset, I<T> widget) {
             addGuiComponent(RectD.ZERO, offset, widget.self());
+        }
+
+        default <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
+        void addWidget(I<T> widget) {
+            addGuiComponent(RectD.ZERO, Rect.ZERO, widget.self());
         }
 
         default void addPanel(RectD anchor, Rect offset, I<Panel> panel) {
@@ -127,7 +146,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     }
 
     private final List<MenuCallback<M, ?>> menuCallbacks = new ArrayList<>();
-    private DistLazy<MenuScreens.ScreenConstructor<M, MenuScreen<M>>>
+    private DistLazy<MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>>>
             screenFactory = () -> () -> MenuScreen::new;
     private final List<Supplier<WidgetFactory<M>>> widgets = new ArrayList<>();
 
@@ -150,7 +169,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     }
 
     public MenuBuilder<T, M, P>
-    screen(DistLazy<MenuScreens.ScreenConstructor<M, MenuScreen<M>>> screen) {
+    screen(DistLazy<MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>>> screen) {
         screenFactory = screen;
         return self();
     }
@@ -213,14 +232,22 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
 
     public <P1 extends MenuSyncPacket>
     IntSupplier addSyncSlot(Class<P1> clazz, Menu.SyncPacketFactory<T, P1> factory) {
-        var callback = new MenuCallback<M, Integer>(menu -> menu.addSyncSlot(clazz, factory));
+        var callback = new SyncSlotMenuCallback<M>(menu -> menu.addSyncSlot(clazz, factory));
         menuCallbacks.add(callback);
-        return callback::get;
+        return callback;
+    }
+
+    public <P1 extends MenuSyncPacket> MenuBuilder<T, M, P>
+    addSyncSlot(Class<P1> clazz, Menu.SyncPacketFactory<T, P1> factory,
+                BiFunction<MenuBuilder<T, M, P>, IntSupplier, MenuBuilder<T, M, P>> thenTransform) {
+        var callback = new SyncSlotMenuCallback<M>(menu -> menu.addSyncSlot(clazz, factory));
+        menuCallbacks.add(callback);
+        return thenTransform.apply(this, callback);
     }
 
     public MenuBuilder<T, M, P>
     progressBar(Texture tex, Rect rect, ToDoubleFunction<T> progressReader) {
-        return syncWidget(rect, MenuSyncPacket.Double.class, (containerId, index, $, be) ->
+        return syncWidget(rect, MenuSyncPacket.Double.class, (containerId, index, be) ->
                         new MenuSyncPacket.Double(containerId, index, progressReader.applyAsDouble(be)),
                 () -> (menu, slot, cons) -> cons.addWidget(rect, new ProgressBar(menu, tex, slot)));
     }
@@ -235,21 +262,21 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     public MenuBuilder<T, M, P>
     switchButton(Texture tex, Rect rect, Component tooltip,
                  Predicate<T> valueReader, BiConsumer<M, Boolean> onSwitch) {
-        return syncWidget(rect, MenuSyncPacket.Boolean.class, (containerId, index, $, be) ->
+        return syncWidget(rect, MenuSyncPacket.Boolean.class, (containerId, index, be) ->
                         new MenuSyncPacket.Boolean(containerId, index, valueReader.test(be)),
                 () -> (menu, slot, cons) -> cons.addWidget(rect,
                         new SwitchButton(menu, tex, tooltip, slot, onSwitch)));
     }
 
     public <P1 extends MenuEventPacket> MenuBuilder<T, M, P>
-    event(MenuEventHandler.Event<P1> event, BiConsumer<M, P1> handler) {
+    event(MenuEventHandler.Event<P1> event, BiConsumer<T, P1> handler) {
         menuCallbacks.add(MenuCallback.dummy(menu ->
-                menu.registerEvent(event, p -> handler.accept(menu, p))));
+                menu.onEventPacket(event, p -> handler.accept(menu.blockEntity, p))));
         return self();
     }
 
     public MenuBuilder<T, M, P> fluidSlot(int tank, int x, int y) {
-        var syncSlot = new MenuCallback<M, Integer>(menu -> menu.addFluidSlot(tank));
+        var syncSlot = new SyncSlotMenuCallback<M>(menu -> menu.addFluidSlot(tank));
         menuCallbacks.add(syncSlot);
         var rect = new Rect(x, y, Menu.SLOT_SIZE, Menu.SLOT_SIZE);
         var rect1 = rect.offset(1, 1).enlarge(-2, -2);

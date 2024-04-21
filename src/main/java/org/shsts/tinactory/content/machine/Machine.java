@@ -4,15 +4,19 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
-import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
+import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.network.Component;
@@ -46,7 +50,7 @@ public class Machine extends SmartBlockEntity {
         return voltage == Voltage.PRIMITIVE ? Machine::primitive : Machine::new;
     }
 
-    public void setMachineConfig(SetMachineEventPacket packet) {
+    public void setMachineConfig(SetMachinePacket packet) {
         assert level != null && !level.isClientSide;
         machineConfig.apply(level, packet);
         EventManager.invoke(this, AllBlockEntityEvents.SET_MACHINE_CONFIG, packet);
@@ -74,6 +78,14 @@ public class Machine extends SmartBlockEntity {
             network.invalidate();
         }
         LOGGER.debug("machine {}: removed by chunk unload", this);
+    }
+
+    @Override
+    protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (network == null || !network.team.hasPlayer(player)) {
+            return InteractionResult.FAIL;
+        }
+        return super.onServerUse(player, hand, hitResult);
     }
 
     /**

@@ -22,6 +22,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
             ModelGen.gregtech("gui/widget/button_item_output_overlay"), 18, 18);
     public static final Texture FLUID_OUT_BUTTON = new Texture(
             ModelGen.gregtech("gui/widget/button_fluid_output_overlay"), 18, 18);
+    public static final Texture VANILLA_WIDGETS = new Texture(
+            ModelGen.mcLoc("gui/widgets"), 256, 256);
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = new ResourceLocation(loc.getNamespace(), "textures/" + loc.getPath() + ".png");

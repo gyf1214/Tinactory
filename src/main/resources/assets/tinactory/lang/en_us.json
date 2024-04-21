@@ -5,5 +5,12 @@
   "tinactory.tooltip.openRecipeBook": "Open recipe book",
   "tinactory.tooltip.unselectRecipe": "Clear recipe",
   "tinactory.gui.networkController.title": "Network Controller",
-  "tinactory.gui.networkController.welcome": "Team Name: "
+  "tinactory.gui.networkController.welcome": "New Team Name: ",
+  "tinactory.gui.networkController.welcome.button": "Create Team",
+  "tinactory.gui.networkController.teamNameLabel": "Team: %s",
+  "tinactory.chat.createTeam.success": "Create team %s for %s successfully.",
+  "tinactory.chat.leaveTeam.success": "%s leaves team %s successfully.",
+  "tinactory.chat.exception.hasTeam": "Player already has a team.",
+  "tinactory.chat.exception.noTeam": "Player has no team.",
+  "tinactory.chat.exception.teamExists": "Team %s already exists."
 }

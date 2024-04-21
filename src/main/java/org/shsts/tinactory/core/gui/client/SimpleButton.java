@@ -12,9 +12,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class SimpleButton extends Button {
-    private final Texture texture;
-    private final int normalX, normalY;
-    private final int hoverX, hoverY;
+    protected final Texture texture;
+    protected final int normalX, normalY;
+    protected final int hoverX, hoverY;
 
     public SimpleButton(Menu<?> menu, Texture texture,
                         @Nullable Component tooltip, int normalX, int normalY,

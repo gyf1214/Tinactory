@@ -12,12 +12,13 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidEventPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
-import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.FLUID_CLICK;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -67,7 +68,7 @@ public class FluidSlot extends MenuWidget {
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        menu.triggerEvent(MenuEventHandler.FLUID_CLICK, (containerId, eventId) ->
+        menu.triggerEvent(FLUID_CLICK, (containerId, eventId) ->
                 new FluidEventPacket(containerId, eventId, tank, button));
     }
 

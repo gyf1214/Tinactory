@@ -2,8 +2,10 @@ package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
+import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
+import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -38,8 +40,9 @@ public final class AllBlockEntities {
                 .entityClass(NetworkController.class)
                 .blockEntity()
                 .ticking()
-                .menu()
-                .screen(() -> () -> NetworkControllerScreen::new)
+                .menu(NetworkControllerMenu::new)
+                .addSyncSlot(NetworkControllerSyncPacket.class, NetworkControllerSyncPacket::new,
+                        ($, slot) -> $.screen(() -> () -> NetworkControllerScreen.factory(slot)))
                 .noInventory()
                 .title("networkController")
                 .build()

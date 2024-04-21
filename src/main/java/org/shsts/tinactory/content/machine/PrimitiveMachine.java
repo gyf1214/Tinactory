@@ -2,9 +2,13 @@ package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.core.network.Network;
 
@@ -32,12 +36,20 @@ public class PrimitiveMachine extends Machine {
 
     @Override
     protected void onServerTick(Level world, BlockPos pos, BlockState state) {
-        if (this.network == null) {
+        if (network == null) {
             var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
             getProcessor().ifPresent(processor -> {
                 processor.onPreWork();
                 processor.onWorkTick(workSpeed);
             });
         }
+    }
+
+    @Override
+    protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (network == null) {
+            return InteractionResult.PASS;
+        }
+        return super.onServerUse(player, hand, hitResult);
     }
 }

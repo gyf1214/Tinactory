@@ -2,7 +2,6 @@ package org.shsts.tinactory.test;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -32,28 +31,10 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        var player = ctx.getSource().getPlayerOrException();
-        TechManager.newTeam(player, ctx.getArgument("name", String.class));
-        player.sendMessage(new TextComponent("create team success"), Util.NIL_UUID);
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int invalidatePlayer(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        var player = ctx.getSource().getPlayerOrException();
-        TechManager.leaveTeam(player);
-        player.sendMessage(new TextComponent("invalidate player success"), Util.NIL_UUID);
-        return Command.SINGLE_SUCCESS;
-    }
-
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var builder = Commands.literal(TinactoryTest.ID)
                 .then(Commands.literal("test").executes(AllCommands::testCommand))
-                .then(Commands.literal("getTeam").executes(AllCommands::getTeam))
-                .then(Commands.literal("createTeam")
-                        .then(Commands.argument("name", StringArgumentType.string())
-                                .executes(AllCommands::createTeam)))
-                .then(Commands.literal("invalidatePlayer").executes(AllCommands::invalidatePlayer));
+                .then(Commands.literal("getTeam").executes(AllCommands::getTeam));
         dispatcher.register(builder);
     }
 }

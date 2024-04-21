@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.gui.sync.SetMachineEventPacket;
+import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Menu;
@@ -22,7 +22,6 @@ import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -38,6 +37,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -241,13 +241,11 @@ public class MachineRecipeBook extends Panel {
     }
 
     private void unselectRecipe() {
-        menu.triggerEvent(MenuEventHandler.SET_MACHINE,
-                SetMachineEventPacket.builder().resetTargetRecipe());
+        menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().resetTargetRecipe());
     }
 
     private void selectRecipe(ProcessingRecipe<?> recipe) {
-        menu.triggerEvent(MenuEventHandler.SET_MACHINE,
-                SetMachineEventPacket.builder().targetRecipeLoc(recipe.getId()));
+        menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().targetRecipeLoc(recipe.getId()));
     }
 
     private void setPage(int index) {
