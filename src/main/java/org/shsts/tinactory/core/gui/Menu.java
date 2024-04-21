@@ -411,6 +411,6 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
     }
 
     public interface Factory<T1 extends BlockEntity, M1 extends Menu<T1>> {
-        M1 create(SmartMenuType<T1, M1> type, int id, Inventory inventory, T1 blockEntity);
+        M1 create(SmartMenuType<T1, ?> type, int id, Inventory inventory, T1 blockEntity);
     }
 }

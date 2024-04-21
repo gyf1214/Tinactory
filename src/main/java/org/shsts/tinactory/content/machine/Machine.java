@@ -80,9 +80,13 @@ public class Machine extends SmartBlockEntity {
         LOGGER.debug("machine {}: removed by chunk unload", this);
     }
 
+    public boolean canPlayerInteract(Player player) {
+        return network != null && network.team.hasPlayer(player);
+    }
+
     @Override
     protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (network == null || !network.team.hasPlayer(player)) {
+        if (!canPlayerInteract(player)) {
             return InteractionResult.FAIL;
         }
         return super.onServerUse(player, hand, hitResult);

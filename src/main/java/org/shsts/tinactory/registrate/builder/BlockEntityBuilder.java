@@ -88,10 +88,6 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
         return new MenuBuilder<>(registrate, id, this, factory);
     }
 
-    public MenuBuilder<U, Menu<U>, BlockEntityBuilder<U, P>> menu() {
-        return menu(Menu::new);
-    }
-
     public <C extends CapabilityProviderBuilder<? super U, BlockEntityBuilder<U, P>>>
     C capability(Function<BlockEntityBuilder<U, P>, C> builderFactory) {
         var ret = builderFactory.apply(this);

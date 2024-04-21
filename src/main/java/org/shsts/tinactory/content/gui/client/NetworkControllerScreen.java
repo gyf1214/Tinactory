@@ -11,27 +11,26 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
-import org.shsts.tinactory.content.gui.sync.SetNetworkControllerPacket;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.Widgets;
+import org.shsts.tinactory.core.network.NetworkController;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.IntSupplier;
 
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
-import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_NETWORK_CONTROLLER;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
+public class NetworkControllerScreen extends MenuScreen<ProcessingMenu<NetworkController>> {
     private static final int HEIGHT = 120;
     private static final int BUTTON_WIDTH = 72;
 
@@ -40,7 +39,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private final EditBox welcomeEdit;
     private final Label teamNameLabel;
 
-    private NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
+    private NetworkControllerScreen(ProcessingMenu<NetworkController> menu, Inventory inventory,
                                     Component title, int syncSlot) {
         super(menu, inventory, title);
         this.imageHeight = HEIGHT;
@@ -70,7 +69,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         welcomePanel.setActive(false);
     }
 
-    public static MenuScreens.ScreenConstructor<NetworkControllerMenu, NetworkControllerScreen>
+    public static MenuScreens.ScreenConstructor<ProcessingMenu<NetworkController>, NetworkControllerScreen>
     factory(IntSupplier slot) {
         return (menu, inventory, title) -> new NetworkControllerScreen(menu, inventory, title, slot.getAsInt());
     }
@@ -93,7 +92,6 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             var name = welcomeEdit.getValue();
             var command = "/" + Tinactory.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
             player.chat(command);
-            menu.triggerEvent(SET_NETWORK_CONTROLLER, SetNetworkControllerPacket::new);
         }
     }
 }

@@ -8,6 +8,7 @@ import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.RecipeProcessor;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 
 import static org.shsts.tinactory.test.TinactoryTest.REGISTRATE;
@@ -28,7 +29,7 @@ public final class AllBlockEntities {
                 .recipeType(AllRecipes.TEST_RECIPE_TYPE)
                 .voltage(Voltage.ULV)
                 .build()
-                .menu()
+                .menu(ProcessingMenu::new)
                 .transform(MenuGen.machineMenu(AllBlocks.TEST_FLUID_LAYOUT))
                 .transform(MenuGen.machineRecipeBook(AllRecipes.TEST_RECIPE_TYPE, AllBlocks.TEST_FLUID_LAYOUT))
                 .build() // menu

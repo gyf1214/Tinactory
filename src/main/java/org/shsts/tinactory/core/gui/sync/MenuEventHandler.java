@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.network.NetworkEvent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
-import org.shsts.tinactory.content.gui.sync.SetNetworkControllerPacket;
 import org.shsts.tinactory.core.gui.Menu;
 import org.slf4j.Logger;
 
@@ -24,7 +23,6 @@ public final class MenuEventHandler {
 
     public static final Event<FluidEventPacket> FLUID_CLICK;
     public static final Event<SetMachinePacket> SET_MACHINE;
-    public static final Event<SetNetworkControllerPacket> SET_NETWORK_CONTROLLER;
 
     private static <P extends MenuEventPacket> void handle(P packet, NetworkEvent.Context ctx) {
         var player = ctx.getSender();
@@ -51,7 +49,6 @@ public final class MenuEventHandler {
     static {
         FLUID_CLICK = register(FluidEventPacket.class, FluidEventPacket::new);
         SET_MACHINE = register(SetMachinePacket.class, SetMachinePacket::new);
-        SET_NETWORK_CONTROLLER = register(SetNetworkControllerPacket.class, SetNetworkControllerPacket::new);
     }
 
     public static void init() {}

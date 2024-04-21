@@ -10,6 +10,7 @@ import org.shsts.tinactory.content.logistics.StackContainer;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -54,7 +55,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                 .capability(StackContainer::builder)
                 .layout(layout)
                 .build()
-                .menu()
+                .menu(ProcessingMenu::new)
                 .transform(MenuGen.machineMenu(layout))
                 .transform(MenuGen.machineRecipeBook(recipeType, layout))
                 .build() // menu

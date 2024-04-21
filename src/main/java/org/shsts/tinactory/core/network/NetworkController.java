@@ -4,13 +4,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -22,8 +19,6 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NetworkController extends Machine {
-    @Nullable
-    private Network network = null;
     @Nullable
     private String teamName = null;
 
@@ -77,6 +72,16 @@ public class NetworkController extends Machine {
         super.onRemovedByChunk(world);
     }
 
+    // Override machine callbacks
+    @Override
+    public void onConnectToNetwork(Network network) {}
+
+    @Override
+    public void buildSchedulings(Component.SchedulingBuilder builder) {}
+
+    @Override
+    public void onDisconnectFromNetwork() {}
+
     public void initByPlayer(Player player) {
         if (network != null) {
             return;
@@ -85,9 +90,9 @@ public class NetworkController extends Machine {
     }
 
     @Override
-    protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public boolean canPlayerInteract(Player player) {
         initByPlayer(player);
-        return InteractionResult.PASS;
+        return network == null || super.canPlayerInteract(player);
     }
 
     @Override
