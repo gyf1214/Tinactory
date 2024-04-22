@@ -15,6 +15,7 @@ import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllNetworks;
@@ -39,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
@@ -145,8 +147,8 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     @Override
-    public int getMaxPort() {
-        return ports.size();
+    public Optional<ITeamProfile> getOwnerTeam() {
+        return blockEntity.getOwnerTeam().map($ -> $);
     }
 
     @Override

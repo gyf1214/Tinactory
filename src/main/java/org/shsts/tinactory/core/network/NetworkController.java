@@ -14,7 +14,6 @@ import org.shsts.tinactory.core.tech.TechManager;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -24,14 +23,6 @@ public class NetworkController extends Machine {
 
     public NetworkController(BlockEntityType<NetworkController> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-    }
-
-    public Optional<TeamProfile> getOwnerTeam() {
-        if (network == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(network.team);
-        }
     }
 
     private void createNetwork(TeamProfile team) {

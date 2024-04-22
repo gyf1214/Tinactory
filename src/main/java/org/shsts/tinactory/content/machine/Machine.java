@@ -21,6 +21,7 @@ import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.slf4j.Logger;
 
@@ -127,6 +128,14 @@ public class Machine extends SmartBlockEntity {
 
     public Optional<Network> getNetwork() {
         return Optional.ofNullable(network);
+    }
+
+    public Optional<TeamProfile> getOwnerTeam() {
+        if (network == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(network.team);
+        }
     }
 
     public Optional<IProcessor> getProcessor() {
