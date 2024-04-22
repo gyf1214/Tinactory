@@ -142,9 +142,10 @@ public final class AllRecipes {
                         .unlockedBy("has_material", has(AllMaterials.IRON.tag("nugget"))),
                 ModelGen.modLoc("material/nugget/wrought_iron_from_iron"));
 
+        // magnetite ore
         ORE_ANALYZER.modRecipe(AllMaterials.MAGNETITE.loc("raw"))
                 .outputItem(1, AllMaterials.MAGNETITE.entry("raw"), 1, 0.25f)
-                .inputItem(0, AllMaterials.STONE.entry("dust"), 1)
+                .inputItem(0, AllMaterials.STONE.entry("block"), 1)
                 .workTicks(200)
                 .build();
     }

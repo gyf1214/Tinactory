@@ -1,8 +1,8 @@
 package org.shsts.tinactory.test;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
+import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
@@ -32,7 +32,7 @@ public final class AllRecipes {
                 .build();
 
         ORE_ANALYZER.recipe(REGISTRATE, new ResourceLocation(TinactoryTest.ID, "test_ore"))
-                .inputItem(0, Items.COBBLESTONE, 1)
+                .inputItem(0, AllMaterials.STONE.entry("block"), 1)
                 .outputItem(1, AllBlocks.TEST_ORE, 1, 0.75f)
                 .workTicks(20)
                 .build();
