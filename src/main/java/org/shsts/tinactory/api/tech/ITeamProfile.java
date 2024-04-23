@@ -18,4 +18,16 @@ public interface ITeamProfile {
     default boolean hasPlayer(Player player) {
         return player.getTeam() == getPlayerTeam();
     }
+
+    long getTechProgress(ITechnology tech);
+
+    default boolean isTechFinished(ITechnology tech) {
+        return getTechProgress(tech) >= tech.getMaxProgress();
+    }
+
+    default boolean isTechAvailable(ITechnology tech) {
+        return getTechProgress(tech) > 0 || tech.getDepends().stream().allMatch(this::isTechFinished);
+    }
+
+    void advanceTechProgress(ITechnology tech, long progress);
 }

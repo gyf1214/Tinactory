@@ -45,9 +45,9 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     public final long voltage;
     public final long power;
 
-    public ProcessingRecipe(RecipeTypeEntry<S, ?> type, ResourceLocation loc,
-                            List<Input> inputs, List<Output> outputs,
-                            long workTicks, long voltage, long power) {
+    protected ProcessingRecipe(RecipeTypeEntry<S, ?> type, ResourceLocation loc,
+                               List<Input> inputs, List<Output> outputs,
+                               long workTicks, long voltage, long power) {
         super(type, loc);
         this.inputs = inputs;
         this.outputs = outputs;
@@ -65,9 +65,17 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         return output.result.insertPort(container.getPort(output.port, true), random, simulate);
     }
 
+    /**
+     * Return whether this recipe is available in this container.
+     */
+    public boolean canCraftIn(IContainer container) {
+        return true;
+    }
+
     @Override
     public boolean matches(IContainer container, Level world) {
-        return inputs.stream().allMatch(input -> consumeInput(container, input, true)) &&
+        return canCraftIn(container) &&
+                inputs.stream().allMatch(input -> consumeInput(container, input, true)) &&
                 outputs.stream().allMatch(output -> insertOutput(container, output, world.random, true));
     }
 
@@ -90,7 +98,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     @Override
     public boolean canCraftInDimensions(int width, int height) {
-        return false;
+        return true;
     }
 
     @Override
@@ -110,9 +118,9 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     }
 
     public static class Simple extends ProcessingRecipe<Simple> {
-        public Simple(RecipeTypeEntry<Simple, ?> type, ResourceLocation loc,
-                      List<Input> inputs, List<Output> outputs,
-                      long workTicks, long voltage, long power) {
+        private Simple(RecipeTypeEntry<Simple, ?> type, ResourceLocation loc,
+                       List<Input> inputs, List<Output> outputs,
+                       long workTicks, long voltage, long power) {
             super(type, loc, inputs, outputs, workTicks, voltage, power);
         }
     }

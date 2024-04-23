@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.tech;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.Decoder;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +14,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
@@ -48,8 +48,8 @@ public final class TechManager {
             return manager.listResources(prefix, f -> f.endsWith(SUFFIX));
         }
 
-        private <T extends ForgeRegistryEntry<T>> Optional<T>
-        loadResource(ResourceManager manager, ResourceLocation loc, Codec<T> codec) {
+        private <T extends IForgeRegistryEntry<T>, U extends T> Optional<U>
+        loadResource(ResourceManager manager, ResourceLocation loc, Decoder<U> codec) {
             var path = loc.getPath();
             var path1 = path.substring(PREFIX.length() + 1, path.length() - SUFFIX.length());
             var loc1 = new ResourceLocation(loc.getNamespace(), path1);
@@ -57,10 +57,9 @@ public final class TechManager {
                 var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
                 var reader = new BufferedReader(is);
                 var jo = GsonHelper.fromJson(gson, reader, JsonObject.class);
-                return Optional.of(codec
-                        .parse(JsonOps.INSTANCE, jo)
-                        .getOrThrow(false, $ -> {})
-                        .setRegistryName(loc1));
+                var ret = codec.parse(JsonOps.INSTANCE, jo).getOrThrow(false, $ -> {});
+                ret.setRegistryName(loc1);
+                return Optional.of(ret);
             } catch (IOException | RuntimeException ex) {
                 LOGGER.warn("Decode resource {} failed: {}", loc, ex);
             }

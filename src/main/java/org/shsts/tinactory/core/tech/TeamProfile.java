@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.ServerUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,7 +20,7 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class TeamProfile implements INBTSerializable<CompoundTag>, ITeamProfile {
     private final PlayerTeam playerTeam;
-    private final Map<Technology, Long> technologies = new HashMap<>();
+    private final Map<ITechnology, Long> technologies = new HashMap<>();
 
     private TeamProfile(PlayerTeam playerTeam) {
         this.playerTeam = playerTeam;
@@ -30,21 +31,15 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, ITeamProfile 
         return playerTeam;
     }
 
-    public void advanceTechProgress(Technology tech, long progress) {
+    @Override
+    public void advanceTechProgress(ITechnology tech, long progress) {
         technologies.merge(tech, progress, ($, v) -> v + progress);
         TinactorySavedData.get().setDirty();
     }
 
-    public long getTechProgress(Technology tech) {
+    @Override
+    public long getTechProgress(ITechnology tech) {
         return technologies.getOrDefault(tech, 0L);
-    }
-
-    public boolean isTechFinished(Technology tech) {
-        return getTechProgress(tech) >= tech.maxProgress;
-    }
-
-    public boolean isTechAvailable(Technology tech) {
-        return getTechProgress(tech) > 0 || tech.depends.stream().allMatch(this::isTechFinished);
     }
 
     @Override
