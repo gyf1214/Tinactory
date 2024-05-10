@@ -3,7 +3,6 @@ package org.shsts.tinactory.core.tech;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Decoder;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +13,9 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
@@ -30,26 +31,25 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-/**
- * Must be called on server
- */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class TechManager {
+public class TechManager implements ITechManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static class ReloadListener implements PreparableReloadListener {
+    private final Map<ResourceLocation, Technology> technologies = new HashMap<>();
+
+    private class ReloadListener implements PreparableReloadListener {
         private static final String PREFIX = "technologies";
         private static final String SUFFIX = ".json";
 
         private final Gson gson = new Gson();
 
-        private static Collection<ResourceLocation> listResources(ResourceManager manager, String prefix) {
-            return manager.listResources(prefix, f -> f.endsWith(SUFFIX));
+        private static Collection<ResourceLocation> listResources(ResourceManager manager) {
+            return manager.listResources(PREFIX, f -> f.endsWith(SUFFIX));
         }
 
-        private <T extends IForgeRegistryEntry<T>, U extends T> Optional<U>
-        loadResource(ResourceManager manager, ResourceLocation loc, Decoder<U> codec) {
+        private Optional<Technology> loadResource(ResourceManager manager, ResourceLocation loc) {
+            var codec = Technology.CODEC;
             var path = loc.getPath();
             var path1 = path.substring(PREFIX.length() + 1, path.length() - SUFFIX.length());
             var loc1 = new ResourceLocation(loc.getNamespace(), path1);
@@ -72,33 +72,38 @@ public final class TechManager {
                                               Executor backgroundExecutor, Executor gameExecutor) {
 
             return stage.wait(Unit.INSTANCE)
-                    .thenApplyAsync($ -> listResources(manager, PREFIX).stream()
-                            .flatMap(loc -> loadResource(manager, loc, Technology.CODEC).stream())
+                    .thenApplyAsync($ -> listResources(manager).stream()
+                            .flatMap(loc -> loadResource(manager, loc).stream())
                             .toList(), backgroundExecutor)
                     .thenAcceptAsync(techs -> {
-                        TECHNOLOGIES.clear();
+                        technologies.clear();
                         techs.forEach(tech -> {
                             assert tech.getRegistryName() != null;
-                            TECHNOLOGIES.put(tech.getRegistryName(), tech);
+                            technologies.put(tech.getRegistryName(), tech);
                         });
                         techs.forEach(Technology::resolve);
                     }, backgroundExecutor);
         }
     }
 
-    public static final PreparableReloadListener RELOAD_LISTENER = new ReloadListener();
+    private final PreparableReloadListener reloadListener = new ReloadListener();
 
-    private static final Map<ResourceLocation, Technology> TECHNOLOGIES = new HashMap<>();
-
-    public static Optional<Technology> techByKey(ResourceLocation loc) {
-        return Optional.of(TECHNOLOGIES.get(loc));
+    public void addReloadListener(AddReloadListenerEvent event) {
+        event.addListener(reloadListener);
     }
 
-    public static Collection<Technology> allTechs() {
-        return TECHNOLOGIES.values();
+    @Override
+    public Optional<Technology> techByKey(ResourceLocation loc) {
+        return Optional.of(technologies.get(loc));
     }
 
-    public static Optional<TeamProfile> teamByPlayer(Player player) {
+    @Override
+    public Collection<Technology> allTechs() {
+        return technologies.values();
+    }
+
+    @Override
+    public Optional<TeamProfile> teamByPlayer(Player player) {
         var playerTeam = (PlayerTeam) player.getTeam();
         if (playerTeam == null) {
             return Optional.empty();
@@ -106,7 +111,8 @@ public final class TechManager {
         return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
     }
 
-    public static Optional<TeamProfile> teamByName(String name) {
+    @Override
+    public Optional<TeamProfile> teamByName(String name) {
         var playerTeam = ServerUtil.getScoreboard().getPlayerTeam(name);
         if (playerTeam == null) {
             return Optional.empty();
@@ -114,19 +120,28 @@ public final class TechManager {
         return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
     }
 
-    public static void addPlayerToTeam(Player player, TeamProfile team) {
+    @Override
+    public void addPlayerToTeam(Player player, ITeamProfile team) {
         ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), team.getPlayerTeam());
     }
 
-    public static TeamProfile newTeam(Player player, String name) {
+    @Override
+    public void newTeam(Player player, String name) {
         var scoreboard = ServerUtil.getScoreboard();
         var playerTeam = scoreboard.addPlayerTeam(name);
         scoreboard.addPlayerToTeam(player.getScoreboardName(), playerTeam);
-        return TinactorySavedData.get().getTeamProfile(playerTeam);
+        TinactorySavedData.get().getTeamProfile(playerTeam);
     }
 
-    public static void leaveTeam(Player player) {
+    @Override
+    public void leaveTeam(Player player) {
         var scoreboard = ServerUtil.getScoreboard();
         scoreboard.removePlayerFromTeam(player.getScoreboardName());
+    }
+
+    public static final TechManager INSTANCE;
+
+    static {
+        INSTANCE = new TechManager();
     }
 }

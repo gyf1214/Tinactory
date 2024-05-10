@@ -35,7 +35,7 @@ public class NetworkController extends Machine {
     protected void onServerLoad(Level world) {
         super.onServerLoad(world);
         if (teamName != null) {
-            TechManager.teamByName(teamName).ifPresent(this::createNetwork);
+            TechManager.INSTANCE.teamByName(teamName).ifPresent(this::createNetwork);
             teamName = null;
         }
     }
@@ -77,7 +77,7 @@ public class NetworkController extends Machine {
         if (network != null) {
             return;
         }
-        TechManager.teamByPlayer(player).ifPresent(this::createNetwork);
+        TechManager.INSTANCE.teamByPlayer(player).ifPresent(this::createNetwork);
     }
 
     @Override

@@ -30,13 +30,13 @@ public final class AllCommands {
     private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
         var name = ctx.getArgument("name", String.class);
-        if (TechManager.teamByPlayer(player).isPresent()) {
+        if (TechManager.INSTANCE.teamByPlayer(player).isPresent()) {
             throw PLAYER_HAS_TEAM.create();
         }
-        if (TechManager.teamByName(name).isPresent()) {
+        if (TechManager.INSTANCE.teamByName(name).isPresent()) {
             throw TEAM_ALREADY_EXISTS.create(name);
         }
-        TechManager.newTeam(player, name);
+        TechManager.INSTANCE.newTeam(player, name);
         player.sendMessage(new TranslatableComponent("tinactory.chat.createTeam.success",
                 name, player.getDisplayName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
@@ -44,12 +44,12 @@ public final class AllCommands {
 
     private static int leaveTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        var team = TechManager.teamByPlayer(player);
+        var team = TechManager.INSTANCE.teamByPlayer(player);
         if (team.isEmpty()) {
             throw PLAYER_NO_TEAM.create();
         }
         var teamName = team.get().getName();
-        TechManager.leaveTeam(player);
+        TechManager.INSTANCE.leaveTeam(player);
         player.sendMessage(new TranslatableComponent("tinactory.chat.leaveTeam.success",
                 player.getDisplayName(), teamName), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;

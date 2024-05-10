@@ -30,7 +30,7 @@ public final class AllEvents {
 
     @SubscribeEvent
     public static void onAddReloadListener(AddReloadListenerEvent event) {
-        event.addListener(TechManager.RELOAD_LISTENER);
+        TechManager.INSTANCE.addReloadListener(event);
     }
 
     @SubscribeEvent

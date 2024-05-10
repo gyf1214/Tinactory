@@ -66,7 +66,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, ITeamProfile 
             var tag2 = (CompoundTag) tag1;
             var loc = tag2.getString("id");
             var progress = tag2.getLong("progress");
-            TechManager.techByKey(new ResourceLocation(loc))
+            TechManager.INSTANCE.techByKey(new ResourceLocation(loc))
                     .ifPresent(tech -> technologies.put(tech, progress));
         }
     }
