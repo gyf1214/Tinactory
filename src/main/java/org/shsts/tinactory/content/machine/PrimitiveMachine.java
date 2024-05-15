@@ -1,12 +1,12 @@
 package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.TinactoryConfig;
+import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.network.Network;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -17,8 +17,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class PrimitiveMachine extends Machine {
-    public PrimitiveMachine(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state);
+    protected PrimitiveMachine(BlockEntity be) {
+        super(be);
     }
 
     /**
@@ -32,7 +32,12 @@ public class PrimitiveMachine extends Machine {
     }
 
     @Override
-    protected void onServerTick(Level world, BlockPos pos, BlockState state) {
+    public void subscribeEvents(EventManager eventManager) {
+        super.subscribeEvents(eventManager);
+        eventManager.subscribe(AllEvents.SERVER_TICK, this::onServerTick);
+    }
+
+    protected void onServerTick(Level world) {
         if (network == null) {
             var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
             getProcessor().ifPresent(processor -> {

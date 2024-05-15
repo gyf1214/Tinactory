@@ -49,7 +49,7 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
         return Optional.empty();
     }
 
-    public <T1 extends BlockEntity> Optional<T1> getBlockEntity(Level world, BlockPos pos, Class<T1> clazz) {
+    public <T1> Optional<T1> getBlockEntity(Level world, BlockPos pos, Class<T1> clazz) {
         return clazz.isAssignableFrom(getEntityClass()) ?
                 getBlockEntity(world, pos).map(clazz::cast) : Optional.empty();
     }

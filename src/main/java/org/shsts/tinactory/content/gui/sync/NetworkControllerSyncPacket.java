@@ -2,9 +2,9 @@ package org.shsts.tinactory.content.gui.sync;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.network.NetworkController;
-import org.shsts.tinactory.core.tech.TeamProfile;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,7 +21,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
 
     public NetworkControllerSyncPacket(int containerId, int index, NetworkController be) {
         super(containerId, index);
-        this.teamName = be.getOwnerTeam().map(TeamProfile::getName).orElse(null);
+        this.teamName = be.getOwnerTeam().map(ITeamProfile::getName).orElse(null);
     }
 
     @Nullable

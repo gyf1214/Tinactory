@@ -7,6 +7,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -14,8 +15,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -35,7 +36,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final long PROGRESS_PER_TICK = 256;
 
-    private final Machine blockEntity;
+    private final BlockEntity blockEntity;
     private final RecipeType<? extends T> recipeType;
     private final Voltage voltage;
     private long workProgress = 0;
@@ -51,7 +52,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     private IContainer container = null;
     private boolean needUpdate = true;
 
-    private RecipeProcessor(Machine blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
+    private RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
         this.blockEntity = blockEntity;
         this.recipeType = recipeType;
         this.voltage = voltage;
@@ -73,7 +74,8 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     @SuppressWarnings("unchecked")
     @Nullable
     private T getTargetRecipe() {
-        var recipe = blockEntity.machineConfig.getTargetRecipe();
+        var machine = Machine.get(blockEntity);
+        var recipe = machine.machineConfig.getTargetRecipe();
         if (recipe != null && recipe.getType() == recipeType) {
             return (T) recipe;
         }
@@ -185,9 +187,9 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllBlockEntityEvents.SERVER_LOAD, this::onLoad);
-        eventManager.subscribe(AllBlockEntityEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
-        eventManager.subscribe(AllBlockEntityEvents.SET_MACHINE_CONFIG, $ -> setUpdateRecipe());
+        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onLoad);
+        eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
+        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, $ -> setUpdateRecipe());
     }
 
     @Nonnull
@@ -220,7 +222,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         }
     }
 
-    public static class Builder<P> extends CapabilityProviderBuilder<Machine, P> {
+    public static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
         @Nullable
         private Supplier<? extends RecipeType<? extends ProcessingRecipe<?>>> recipeType = null;
         @Nullable
@@ -241,7 +243,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
         }
 
         @Override
-        public Function<Machine, ICapabilityProvider> createObject() {
+        public Function<BlockEntity, ICapabilityProvider> createObject() {
             var recipeType = this.recipeType;
             var voltage = this.voltage;
             assert recipeType != null;

@@ -37,7 +37,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
     private final Factory<U> factory;
     private final Set<Supplier<? extends Block>> validBlocks = new HashSet<>();
     private boolean ticking = false;
-    private boolean hasEvent = false;
+    private boolean eventManager = false;
     @Nullable
     private Class<U> entityClass = null;
     private final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>>
@@ -70,13 +70,13 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
         return ticking(true);
     }
 
-    public BlockEntityBuilder<U, P> hasEvent(boolean value) {
-        hasEvent = value;
+    public BlockEntityBuilder<U, P> eventManager(boolean value) {
+        eventManager = value;
         return self();
     }
 
-    public BlockEntityBuilder<U, P> hasEvent() {
-        return hasEvent(true);
+    public BlockEntityBuilder<U, P> eventManager() {
+        return eventManager(true);
     }
 
     public void setMenu(Supplier<SmartMenuType<U, ?>> value) {
@@ -108,6 +108,6 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
         assert entityClass != null;
         return new SmartBlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state),
                 validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()),
-                entityClass, ticking, hasEvent, this.capabilities, menu);
+                entityClass, ticking, eventManager, this.capabilities, menu);
     }
 }

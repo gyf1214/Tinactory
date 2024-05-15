@@ -9,6 +9,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.tool.IWrenchable;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.network.IConnector;
@@ -27,7 +29,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class MachineBlock<T extends Machine> extends SmartEntityBlock<T>
+public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
         implements IWrenchable, IConnector, IElectricBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final DirectionProperty IO_FACING = DirectionProperty.create("io_facing");
@@ -41,7 +43,7 @@ public class MachineBlock<T extends Machine> extends SmartEntityBlock<T>
         this.resistance = Math.sqrt((double) voltage.value / 2d);
     }
 
-    public static <T extends Machine>
+    public static <T extends SmartBlockEntity>
     EntityBlockBuilder.Factory<T, MachineBlock<T>> factory(Voltage voltage) {
         return (properties, entityType) -> new MachineBlock<>(properties, entityType, voltage);
     }

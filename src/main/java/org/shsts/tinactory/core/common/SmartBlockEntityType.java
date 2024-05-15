@@ -23,18 +23,18 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
     @Nullable
     public final Supplier<SmartMenuType<T, ?>> menu;
 
-    private final boolean hasEvent;
+    private final boolean eventManager;
     private final Map<ResourceLocation, Function<? super T, ? extends ICapabilityProvider>> capabilities;
 
     @SuppressWarnings("ConstantConditions")
     public SmartBlockEntityType(BlockEntitySupplier<? extends T> factory, Set<Block> validBlocks,
-                                Class<T> entityClass, boolean ticking, boolean hasEvent,
+                                Class<T> entityClass, boolean ticking, boolean eventManager,
                                 Map<ResourceLocation, Function<? super T, ? extends ICapabilityProvider>> capabilities,
                                 @Nullable Supplier<SmartMenuType<T, ?>> menu) {
         super(factory, validBlocks, null);
         this.entityClass = entityClass;
         this.ticking = ticking;
-        this.hasEvent = hasEvent;
+        this.eventManager = eventManager;
         this.capabilities = capabilities;
         this.menu = menu;
     }
@@ -46,14 +46,14 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
     public void attachCapabilities(AttachCapabilitiesEvent<BlockEntity> e) {
         var be = cast(e.getObject());
         EventManager eventManager = null;
-        if (hasEvent) {
+        if (this.eventManager) {
             eventManager = new EventManager();
             e.addCapability(new ResourceLocation(Tinactory.ID, "event_manager"), eventManager);
         }
         for (var capEntry : capabilities.entrySet()) {
             var cap = capEntry.getValue().apply(be);
             e.addCapability(capEntry.getKey(), cap);
-            if (hasEvent && cap instanceof IEventSubscriber subscriber) {
+            if (this.eventManager && cap instanceof IEventSubscriber subscriber) {
                 subscriber.subscribeEvents(eventManager);
             }
         }

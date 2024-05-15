@@ -2,95 +2,94 @@ package org.shsts.tinactory.content.machine;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.IEventSubscriber;
+import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.tech.TeamProfile;
-import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
+import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
+import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Machine extends SmartBlockEntity {
+public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    protected final BlockEntity blockEntity;
 
     @Nullable
     protected Network network;
 
     public final MachineConfig machineConfig = new MachineConfig();
 
-    public Machine(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state);
+    protected Machine(BlockEntity be) {
+        this.blockEntity = be;
     }
 
-    public static Machine primitive(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        return new PrimitiveMachine(type, pos, state);
-    }
-
-    public static BlockEntityBuilder.Factory<Machine> factory(Voltage voltage) {
-        return voltage == Voltage.PRIMITIVE ? Machine::primitive : Machine::new;
+    private static Machine primitive(BlockEntity be) {
+        return new PrimitiveMachine(be);
     }
 
     public void setMachineConfig(SetMachinePacket packet) {
+        var level = blockEntity.getLevel();
         assert level != null && !level.isClientSide;
         machineConfig.apply(level, packet);
-        EventManager.invoke(this, AllBlockEntityEvents.SET_MACHINE_CONFIG, packet);
+        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG, packet);
     }
 
     @Override
+    public void subscribeEvents(EventManager eventManager) {
+        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
+        eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
+        eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
+        eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);
+    }
+
     protected void onServerLoad(Level world) {
         machineConfig.onLoad(world);
-        super.onServerLoad(world);
         LOGGER.debug("machine {}: loaded", this);
     }
 
-    @Override
-    protected void onRemovedInWorld(Level world) {
+    protected void onRemoved(Level world) {
         if (network != null) {
             network.invalidate();
         }
-        super.onRemovedInWorld(world);
         LOGGER.debug("machine {}: removed in world", this);
-    }
-
-    @Override
-    protected void onRemovedByChunk(Level world) {
-        if (network != null) {
-            network.invalidate();
-        }
-        LOGGER.debug("machine {}: removed by chunk unload", this);
     }
 
     public boolean canPlayerInteract(Player player) {
         return network != null && network.team.hasPlayer(player);
     }
 
-    @Override
-    protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (!canPlayerInteract(player)) {
-            return InteractionResult.FAIL;
+    protected void onServerUse(AllEvents.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
+        if (!canPlayerInteract(arg.player())) {
+            token.setReturn(InteractionResult.FAIL);
+        } else {
+            token.setReturn(InteractionResult.PASS);
         }
-        return super.onServerUse(player, hand, hitResult);
     }
 
     /**
@@ -99,7 +98,7 @@ public class Machine extends SmartBlockEntity {
     public void onConnectToNetwork(Network network) {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
-        EventManager.invoke(this, AllBlockEntityEvents.CONNECT, network);
+        EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 
     protected void onPreWork(Level world, Network network) {
@@ -107,10 +106,10 @@ public class Machine extends SmartBlockEntity {
         getProcessor().ifPresent(IProcessor::onPreWork);
         var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
         if (machineConfig.isAutoDumpItem()) {
-            EventManager.invoke(this, AllBlockEntityEvents.DUMP_ITEM_OUTPUT, logistics);
+            EventManager.invoke(blockEntity, AllEvents.DUMP_ITEM_OUTPUT, logistics);
         }
         if (machineConfig.isAutoDumpFluid()) {
-            EventManager.invoke(this, AllBlockEntityEvents.DUMP_FLUID_OUTPUT, logistics);
+            EventManager.invoke(blockEntity, AllEvents.DUMP_FLUID_OUTPUT, logistics);
         }
     }
 
@@ -123,7 +122,7 @@ public class Machine extends SmartBlockEntity {
     public void buildSchedulings(Component.SchedulingBuilder builder) {
         builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
         builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
-        EventManager.invoke(this, AllBlockEntityEvents.BUILD_SCHEDULING, builder);
+        EventManager.invoke(blockEntity, AllEvents.BUILD_SCHEDULING, builder);
     }
 
     public Optional<Network> getNetwork() {
@@ -139,11 +138,11 @@ public class Machine extends SmartBlockEntity {
     }
 
     public Optional<IProcessor> getProcessor() {
-        return getCapability(AllCapabilities.PROCESSOR.get()).resolve();
+        return blockEntity.getCapability(AllCapabilities.PROCESSOR.get()).resolve();
     }
 
     public Optional<IElectricMachine> getElectric() {
-        return getCapability(AllCapabilities.ELECTRIC_MACHINE.get()).resolve();
+        return blockEntity.getCapability(AllCapabilities.ELECTRIC_MACHINE.get()).resolve();
     }
 
     /**
@@ -154,13 +153,46 @@ public class Machine extends SmartBlockEntity {
         LOGGER.debug("machine {}: disconnect from network", this);
     }
 
+    @Nonnull
     @Override
-    protected void serializeOnSave(CompoundTag tag) {
-        tag.put("config", machineConfig.serializeNBT());
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == AllCapabilities.MACHINE.get()) {
+            return LazyOptional.of(() -> this).cast();
+        }
+        return LazyOptional.empty();
     }
 
     @Override
-    protected void deserializeOnSave(CompoundTag tag) {
+    public CompoundTag serializeNBT() {
+        var tag = new CompoundTag();
+        tag.put("config", machineConfig.serializeNBT());
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
         machineConfig.deserializeNBT(tag.getCompound("config"));
+    }
+
+    public static Machine get(BlockEntity be) {
+        return be.getCapability(AllCapabilities.MACHINE.get()).resolve().orElseThrow();
+    }
+
+    private static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
+        private final boolean primitive;
+
+        public Builder(P parent, boolean primitive) {
+            super(parent, "network/machine");
+            this.primitive = primitive;
+        }
+
+        @Override
+        public Function<BlockEntity, ICapabilityProvider> createObject() {
+            return primitive ? Machine::primitive : Machine::new;
+        }
+    }
+
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Voltage voltage) {
+        return p -> new Builder<>(p, voltage == Voltage.PRIMITIVE);
     }
 }

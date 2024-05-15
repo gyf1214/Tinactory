@@ -8,23 +8,26 @@ import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.RecipeProcessor;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 
 import static org.shsts.tinactory.test.TinactoryTest.REGISTRATE;
 
 public final class AllBlockEntities {
-    public static final BlockEntitySet<Machine, MachineBlock<Machine>> TEST_MACHINE;
+    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> TEST_MACHINE;
     public static final BlockEntitySet<TestGenerator, MachineBlock<TestGenerator>> TEST_GENERATOR;
 
     static {
-        TEST_MACHINE = REGISTRATE.blockEntitySet("machine/test", Machine::new, MachineBlock.factory(Voltage.ULV))
-                .entityClass(Machine.class)
+        TEST_MACHINE = REGISTRATE.blockEntitySet("machine/test", SmartBlockEntity::new,
+                        MachineBlock.factory(Voltage.ULV))
+                .entityClass(SmartBlockEntity.class)
                 .blockEntity()
-                .ticking().hasEvent()
+                .ticking().eventManager()
                 .capability(StackContainer::builder)
                 .layout(AllBlocks.TEST_FLUID_LAYOUT)
                 .build()
+                .simpleCapability(Machine.builder(Voltage.ULV))
                 .capability(RecipeProcessor::builder)
                 .recipeType(AllRecipes.TEST_RECIPE_TYPE)
                 .voltage(Voltage.ULV)

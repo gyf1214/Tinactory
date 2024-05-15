@@ -8,6 +8,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.MenuGen;
 import org.shsts.tinactory.content.logistics.StackContainer;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
@@ -31,7 +32,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public class ProcessingSet<T extends ProcessingRecipe<T>> {
     public final RecipeTypeEntry<T, ?> recipeType;
     public final Map<Voltage, Layout> layoutSet;
-    protected final Map<Voltage, BlockEntitySet<Machine, MachineBlock<Machine>>> machines;
+    protected final Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines;
 
     public ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Map<Voltage, Layout> layoutSet,
                          ResourceLocation frontOverlay, Collection<Voltage> voltages) {
@@ -41,14 +42,15 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                 .collect(Collectors.toMap($ -> $, voltage -> createMachine(voltage, frontOverlay)));
     }
 
-    protected BlockEntitySet<Machine, MachineBlock<Machine>>
+    protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
     createMachine(Voltage voltage, ResourceLocation frontOverlay) {
         var id = "machine/" + voltage.id + "/" + recipeType.id;
         var layout = layoutSet.get(voltage);
-        var builder = REGISTRATE.blockEntitySet(id, Machine.factory(voltage), MachineBlock.factory(voltage))
-                .entityClass(Machine.class)
+        var builder = REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
+                .entityClass(SmartBlockEntity.class)
                 .blockEntity()
-                .hasEvent()
+                .eventManager()
+                .simpleCapability(Machine.builder(voltage))
                 .capability(RecipeProcessor::builder)
                 .recipeType(recipeType).voltage(voltage)
                 .build()

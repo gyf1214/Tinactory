@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -16,8 +17,8 @@ import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
@@ -50,14 +51,14 @@ public class StackContainer implements ICapabilityProvider,
     private record PortInfo(int startSlot, int endSlot, SlotType type,
                             IPort port, IPort internalPort) {}
 
-    private final Machine blockEntity;
+    private final BlockEntity blockEntity;
     private final IItemHandlerModifiable combinedItems;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports;
     private final Map<Integer, WrapperItemHandler> itemInputs = new HashMap<>();
     private final Multimap<Integer, WrapperFluidTank> fluidInputs = ArrayListMultimap.create();
 
-    private StackContainer(Machine blockEntity, List<Builder.PortInfo> portInfo) {
+    private StackContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
         this.ports = new ArrayList<>(portInfo.size());
 
@@ -137,18 +138,18 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     private void onInputUpdate() {
-        EventManager.invoke(blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, true);
+        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE, true);
         blockEntity.setChanged();
     }
 
     private void onOutputUpdate() {
-        EventManager.invoke(blockEntity, AllBlockEntityEvents.CONTAINER_CHANGE, false);
+        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE, false);
         blockEntity.setChanged();
     }
 
     @Override
     public Optional<ITeamProfile> getOwnerTeam() {
-        return blockEntity.getOwnerTeam().map($ -> $);
+        return Machine.get(blockEntity).getOwnerTeam().map($ -> $);
     }
 
     @Override
@@ -167,8 +168,9 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     private void updateTargetRecipe(boolean updateFilter) {
-        var targetRecipe = blockEntity.machineConfig.getTargetRecipe();
-        var logistics = blockEntity.getNetwork()
+        var machine = Machine.get(blockEntity);
+        var targetRecipe = machine.machineConfig.getTargetRecipe();
+        var logistics = machine.getNetwork()
                 .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
                 .orElse(null);
         if (targetRecipe == null) {
@@ -250,11 +252,11 @@ public class StackContainer implements ICapabilityProvider,
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllBlockEntityEvents.SERVER_LOAD, $ -> updateTargetRecipe(true));
-        eventManager.subscribe(AllBlockEntityEvents.CONNECT, $ -> updateTargetRecipe(false));
-        eventManager.subscribe(AllBlockEntityEvents.DUMP_ITEM_OUTPUT, this::dumpItemOutput);
-        eventManager.subscribe(AllBlockEntityEvents.DUMP_FLUID_OUTPUT, this::dumpFluidOutput);
-        eventManager.subscribe(AllBlockEntityEvents.SET_MACHINE_CONFIG, $ -> updateTargetRecipe(true));
+        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> updateTargetRecipe(true));
+        eventManager.subscribe(AllEvents.CONNECT, $ -> updateTargetRecipe(false));
+        eventManager.subscribe(AllEvents.DUMP_ITEM_OUTPUT, this::dumpItemOutput);
+        eventManager.subscribe(AllEvents.DUMP_FLUID_OUTPUT, this::dumpFluidOutput);
+        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, $ -> updateTargetRecipe(true));
     }
 
     @Nonnull
@@ -284,7 +286,7 @@ public class StackContainer implements ICapabilityProvider,
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 
-    public static class Builder<P> extends CapabilityProviderBuilder<Machine, P> {
+    public static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
         private record PortInfo(int slots, SlotType type) {}
 
         private final List<PortInfo> ports = new ArrayList<>();
@@ -310,7 +312,7 @@ public class StackContainer implements ICapabilityProvider,
         }
 
         @Override
-        public Function<Machine, ICapabilityProvider> createObject() {
+        public Function<BlockEntity, ICapabilityProvider> createObject() {
             var ports = this.ports;
             return be -> new StackContainer(be, ports);
         }

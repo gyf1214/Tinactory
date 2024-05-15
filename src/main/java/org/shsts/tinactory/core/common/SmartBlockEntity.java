@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.items.CapabilityItemHandler;
-import org.shsts.tinactory.content.AllBlockEntityEvents;
+import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
 import javax.annotation.Nullable;
@@ -115,7 +115,7 @@ public class SmartBlockEntity extends BlockEntity {
      * callback when this blockEntity is loaded
      */
     protected void onServerLoad(Level world) {
-        EventManager.invoke(this, AllBlockEntityEvents.SERVER_LOAD, world);
+        EventManager.invoke(this, AllEvents.SERVER_LOAD, world);
     }
 
     protected void onClientLoad(Level world) {}
@@ -124,6 +124,7 @@ public class SmartBlockEntity extends BlockEntity {
      * callback when this blockEntity is truly removed in world
      */
     protected void onRemovedInWorld(Level world) {
+        EventManager.invoke(this, AllEvents.REMOVED_IN_WORLD, world);
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .ifPresent(itemHandler -> ItemHelper.dropItemHandler(world, worldPosition, itemHandler));
     }
@@ -131,12 +132,16 @@ public class SmartBlockEntity extends BlockEntity {
     /**
      * callback when this blockEntity is removed because of chunk unload
      */
-    protected void onRemovedByChunk(Level world) {}
+    protected void onRemovedByChunk(Level world) {
+        EventManager.invoke(this, AllEvents.REMOVED_BY_CHUNK, world);
+    }
 
     /**
      * Sever tick callback, need the block to have ticking = true
      */
-    protected void onServerTick(Level world, BlockPos pos, BlockState state) {}
+    protected void onServerTick(Level world, BlockPos pos, BlockState state) {
+        EventManager.invoke(this, AllEvents.SERVER_TICK, world);
+    }
 
     /**
      * Client tick callback, need the block to have ticking = true
@@ -153,7 +158,8 @@ public class SmartBlockEntity extends BlockEntity {
     }
 
     protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
-        return InteractionResult.PASS;
+        var arg = new AllEvents.OnUseArg(player, hand, hitResult);
+        return EventManager.invokeReturn(this, AllEvents.SERVER_USE, arg);
     }
 
     protected InteractionResult onClientUse(Player player, InteractionHand hand, BlockHitResult hitResult) {

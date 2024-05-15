@@ -4,17 +4,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Event<A> extends ForgeRegistryEntry<Event<?>> {
-    private final Class<A> argClass;
-
-    public A cast(Object sth) {
-        return argClass.cast(sth);
-    }
-
-    public Event(Class<A> argClass) {
-        this.argClass = argClass;
+    @SuppressWarnings("unchecked")
+    public void invoke(Consumer<?> handler, A arg) {
+        ((Consumer<A>) handler).accept(arg);
     }
 }

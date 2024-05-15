@@ -20,23 +20,41 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 public class EventManager implements ICapabilityProvider {
     private final Multimap<Event<?>, Consumer<?>> handlers = HashMultimap.create();
+    private final Multimap<ReturnEvent<?, ?>, ReturnEvent.Handler<?, ?>> returnHandlers = HashMultimap.create();
 
     public EventManager() {}
 
-    @SuppressWarnings("unchecked")
     public <A> void invoke(Event<A> event, A arg) {
         for (var handler : handlers.get(event)) {
-            ((Consumer<A>) handler).accept(arg);
+            event.invoke(handler, arg);
         }
+    }
+
+    public <A, R> R invoke(ReturnEvent<A, R> event, A arg) {
+        var token = event.newToken();
+        for (var handler : returnHandlers.get(event)) {
+            event.invoke(handler, arg, token);
+        }
+        return token.getReturn();
     }
 
     public <A> void subscribe(Supplier<Event<A>> event, Consumer<A> handler) {
         handlers.put(event.get(), handler);
     }
 
+    public <A, R> void subscribe(Supplier<ReturnEvent<A, R>> event, ReturnEvent.Handler<A, R> handler) {
+        returnHandlers.put(event.get(), handler);
+    }
+
     public static <A> void invoke(BlockEntity be, Supplier<Event<A>> event, A arg) {
         be.getCapability(AllCapabilities.EVENT_MANAGER.get())
                 .ifPresent(eventManager -> eventManager.invoke(event.get(), arg));
+    }
+
+    public static <A, R> R invokeReturn(BlockEntity be, Supplier<ReturnEvent<A, R>> event, A arg) {
+        return be.getCapability(AllCapabilities.EVENT_MANAGER.get())
+                .map(eventManager -> eventManager.invoke(event.get(), arg))
+                .orElseThrow();
     }
 
     @Nonnull

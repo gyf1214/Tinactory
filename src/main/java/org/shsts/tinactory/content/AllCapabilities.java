@@ -5,6 +5,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.IWorkbench;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.registrate.common.CapabilityEntry;
@@ -19,6 +20,8 @@ public final class AllCapabilities {
     public static final CapabilityEntry<IWorkbench> WORKBENCH;
     public static final CapabilityEntry<IFluidStackHandler> FLUID_STACK_HANDLER;
 
+    public static final CapabilityEntry<Machine> MACHINE;
+
     static {
         EVENT_MANAGER = REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
         PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
@@ -26,6 +29,8 @@ public final class AllCapabilities {
         ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
         WORKBENCH = REGISTRATE.capability(IWorkbench.class, new CapabilityToken<>() {});
         FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
+
+        MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
     }
 
     public static void init() {}

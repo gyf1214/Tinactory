@@ -17,11 +17,11 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.shsts.tinactory.content.AllBlockEntities;
-import org.shsts.tinactory.content.AllBlockEntityEvents;
 import org.shsts.tinactory.content.AllBlocks;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllClientEvents;
 import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllForgeEvents;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.AllNetworks;
@@ -91,7 +91,7 @@ public class Tinactory {
 
         AllRecipes.init();
         AllCapabilities.init();
-        AllBlockEntityEvents.init();
+        AllEvents.init();
         AllNetworks.init();
 
         ModelGen.init();
@@ -107,7 +107,7 @@ public class Tinactory {
 
         REGISTRATE.register(modEventBus);
         modEventBus.addListener(Tinactory::init);
-        MinecraftForge.EVENT_BUS.register(AllEvents.class);
+        MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);
     }
 
     private static void onCreateClient(IEventBus modEventBus) {

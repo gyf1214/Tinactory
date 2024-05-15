@@ -9,8 +9,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 
 import javax.annotation.Nonnull;
@@ -19,7 +19,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TestGenerator extends Machine implements IElectricMachine {
+public class TestGenerator extends SmartBlockEntity implements IElectricMachine {
     private final long voltage;
     private final double power;
 

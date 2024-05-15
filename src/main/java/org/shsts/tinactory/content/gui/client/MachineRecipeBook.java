@@ -10,8 +10,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -188,7 +188,7 @@ public class MachineRecipeBook extends Panel {
 
     private int page = 0;
 
-    public MachineRecipeBook(MenuScreen<? extends Menu<? extends Machine>> screen, int syncSlot,
+    public MachineRecipeBook(MenuScreen<? extends Menu<? extends SmartBlockEntity>> screen, int syncSlot,
                              RecipeType<? extends ProcessingRecipe<?>> recipeType,
                              int buttonX, int buttonY) {
         super(screen);

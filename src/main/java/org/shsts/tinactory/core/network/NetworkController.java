@@ -4,20 +4,27 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.shsts.tinactory.content.machine.Machine;
+import net.minecraft.world.phys.BlockHitResult;
+import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkController extends Machine {
+public class NetworkController extends SmartBlockEntity {
+    @Nullable
+    private Network network;
     @Nullable
     private String teamName = null;
 
@@ -29,6 +36,14 @@ public class NetworkController extends Machine {
         assert level != null && !level.isClientSide;
         assert network == null;
         network = new Network(level, worldPosition, team);
+    }
+
+    public Optional<ITeamProfile> getOwnerTeam() {
+        if (network == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(network.team);
+        }
     }
 
     @Override
@@ -47,31 +62,23 @@ public class NetworkController extends Machine {
         }
     }
 
-    @Override
-    protected void onRemovedInWorld(Level world) {
+    private void onRemoved() {
         if (network != null) {
             network.destroy();
         }
+    }
+
+    @Override
+    protected void onRemovedInWorld(Level world) {
+        onRemoved();
         super.onRemovedInWorld(world);
     }
 
     @Override
     protected void onRemovedByChunk(Level world) {
-        if (network != null) {
-            network.destroy();
-        }
+        onRemoved();
         super.onRemovedByChunk(world);
     }
-
-    // Override machine callbacks
-    @Override
-    public void onConnectToNetwork(Network network) {}
-
-    @Override
-    public void buildSchedulings(Component.SchedulingBuilder builder) {}
-
-    @Override
-    public void onDisconnectFromNetwork() {}
 
     public void initByPlayer(Player player) {
         if (network != null) {
@@ -80,10 +87,17 @@ public class NetworkController extends Machine {
         TechManager.INSTANCE.teamByPlayer(player).ifPresent(this::createNetwork);
     }
 
-    @Override
-    public boolean canPlayerInteract(Player player) {
+    private boolean canPlayerInteract(Player player) {
         initByPlayer(player);
-        return network == null || super.canPlayerInteract(player);
+        return network == null || network.team.hasPlayer(player);
+    }
+
+    @Override
+    protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!canPlayerInteract(player)) {
+            return InteractionResult.FAIL;
+        }
+        return super.onServerUse(player, hand, hitResult);
     }
 
     @Override
