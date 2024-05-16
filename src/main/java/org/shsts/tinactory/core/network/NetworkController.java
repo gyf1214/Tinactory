@@ -87,7 +87,7 @@ public class NetworkController extends SmartBlockEntity {
         TechManager.INSTANCE.teamByPlayer(player).ifPresent(this::createNetwork);
     }
 
-    private boolean canPlayerInteract(Player player) {
+    public boolean canPlayerInteract(Player player) {
         initByPlayer(player);
         return network == null || network.team.hasPlayer(player);
     }

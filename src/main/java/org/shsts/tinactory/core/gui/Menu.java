@@ -120,7 +120,6 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
                 .resolve().orElse(null);
         this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
                 .resolve().orElse(null);
-        this.height = 0;
     }
 
     @Override
@@ -152,6 +151,7 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
      * This is called before any menu callbacks
      */
     public void initLayout() {
+        height = 0;
         onEventPacket(MenuEventHandler.FLUID_CLICK, p ->
                 clickFluidSlot(p.getTankIndex(), p.getButton()));
     }

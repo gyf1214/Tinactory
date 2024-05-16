@@ -50,6 +50,9 @@ public final class AllBlockEntities {
                         TestGenerator.factory(Voltage.ULV, 1),
                         MachineBlock.factory(Voltage.ULV))
                 .entityClass(TestGenerator.class)
+                .blockEntity()
+                .simpleCapability(Machine.builder(Voltage.ULV))
+                .build()
                 .block()
                 .transform(ModelGen.machine(
                         ModelGen.gregtech("blocks/casings/voltage/ulv"),

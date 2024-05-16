@@ -2,6 +2,7 @@ package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
+import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
@@ -13,7 +14,6 @@ import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.network.NetworkController;
@@ -39,8 +39,8 @@ public final class AllBlockEntities {
                         MachineBlock.factory(Voltage.PRIMITIVE))
                 .entityClass(NetworkController.class)
                 .blockEntity()
-                .ticking()
-                .menu(ProcessingMenu::new)
+                .eventManager().ticking()
+                .menu(NetworkControllerMenu::new)
                 .addSyncSlot(NetworkControllerSyncPacket.class, NetworkControllerSyncPacket::new,
                         ($, slot) -> $.screen(() -> () -> NetworkControllerScreen.factory(slot)))
                 .noInventory()
