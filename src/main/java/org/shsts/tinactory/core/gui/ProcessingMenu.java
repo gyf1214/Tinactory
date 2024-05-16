@@ -92,6 +92,7 @@ public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public MenuScreen<S> createScreen(Inventory inventory, Component title) {
         return new Screen(inventory, title);
