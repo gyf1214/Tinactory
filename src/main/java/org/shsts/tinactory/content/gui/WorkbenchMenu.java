@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.sync.CraftingSlot;
 import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.SlotType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -20,18 +21,20 @@ public class WorkbenchMenu extends Menu<SmartBlockEntity> {
     public WorkbenchMenu(SmartMenuType<SmartBlockEntity, ?> type, int id,
                          Inventory inventory, SmartBlockEntity blockEntity) {
         super(type, id, inventory, blockEntity);
-    }
-
-    @Override
-    public void initLayout() {
-        super.initLayout();
-        var workbench = AllCapabilities.WORKBENCH.getCapability(blockEntity);
 
         var layout = AllLayouts.WORKBENCH;
-        var slotInfo = layout.slots.get(0);
-        var dx = (CONTENT_WIDTH - layout.rect.width()) / 2;
-
-        addSlot((x, y) -> new CraftingSlot(workbench, x, y), dx + slotInfo.x(), slotInfo.y());
+        var workbench = AllCapabilities.WORKBENCH.getCapability(blockEntity);
+        var xOffset = layout.getXOffset();
+        for (var slot : layout.slots) {
+            var x = xOffset + slot.x();
+            var y = slot.y();
+            if (slot.type() == SlotType.NONE) {
+                addSlot(new CraftingSlot(workbench, x + MARGIN_HORIZONTAL + 1, y + MARGIN_TOP + 1));
+            } else {
+                addSlot(slot.index(), x, y);
+            }
+        }
+        this.height = layout.rect.endY();
     }
 
     @Override

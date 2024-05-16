@@ -32,8 +32,7 @@ public final class MenuGen {
     Transformer<MenuBuilder<T, M, P>> machineMenu(Layout layout) {
         var y = layout.rect.endY() + SPACING_VERTICAL;
         var x = CONTENT_WIDTH - SLOT_SIZE * 2;
-        return $ -> $.layout(layout)
-                .switchButton(Texture.SWITCH_BUTTON, x, y,
+        return $ -> $.switchButton(Texture.SWITCH_BUTTON, x, y,
                         new TranslatableComponent("tinactory.tooltip.autoDumpItem"),
                         be -> Machine.get(be).machineConfig.isAutoDumpItem(),
                         (menu, value) -> menu.triggerEvent(SET_MACHINE,

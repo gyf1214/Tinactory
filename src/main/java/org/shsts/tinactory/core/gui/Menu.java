@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -8,6 +9,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidTank;
@@ -15,10 +18,12 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import net.minecraftforge.network.PacketDistributor;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
@@ -120,6 +125,8 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
                 .resolve().orElse(null);
         this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
                 .resolve().orElse(null);
+        height = 0;
+        onEventPacket(MenuEventHandler.FLUID_CLICK, p -> clickFluidSlot(p.getTankIndex(), p.getButton()));
     }
 
     @Override
@@ -145,15 +152,6 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
             }
         }
         return barY + SLOT_SIZE + MARGIN_VERTICAL;
-    }
-
-    /**
-     * This is called before any menu callbacks
-     */
-    public void initLayout() {
-        height = 0;
-        onEventPacket(MenuEventHandler.FLUID_CLICK, p ->
-                clickFluidSlot(p.getTankIndex(), p.getButton()));
     }
 
     /**
@@ -225,24 +223,9 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
         return height;
     }
 
-    @FunctionalInterface
-    public interface BasicSlotFactory<T extends Slot> {
-        T create(int posX, int posY);
-    }
-
-    @FunctionalInterface
-    public interface SlotFactory<T extends Slot> {
-        T create(IItemHandler itemHandler, int index, int posX, int posY);
-    }
-
-    public void addSlot(BasicSlotFactory<?> factory, int posX, int posY) {
-        addSlot(factory.create(posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
-    }
-
-    public void addSlot(SlotFactory<?> factory, int slotIndex, int posX, int posY) {
+    public void addSlot(int index, int posX, int posY) {
         assert container != null;
-        addSlot(factory.create(container, slotIndex,
-                posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
+        addSlot(new SlotItemHandler(container, index, posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 
     public <P extends MenuSyncPacket>
@@ -412,5 +395,12 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
 
     public interface Factory<T1 extends BlockEntity, M1 extends Menu<T1>> {
         M1 create(SmartMenuType<T1, ?> type, int id, Inventory inventory, T1 blockEntity);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SuppressWarnings("unchecked")
+    public <M1 extends Menu<?>> MenuScreen<M1> createScreen(Inventory inventory, Component title) {
+        var screen = new MenuScreen<>(this, inventory, title);
+        return (MenuScreen<M1>) screen;
     }
 }

@@ -12,41 +12,35 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Unit;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.core.common.I;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
-import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.client.SwitchButton;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.common.DistLazy;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 
 @ParametersAreNonnullByDefault
@@ -146,8 +140,6 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     }
 
     private final List<MenuCallback<M, ?>> menuCallbacks = new ArrayList<>();
-    private DistLazy<MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>>>
-            screenFactory = () -> () -> MenuScreen::new;
     private final List<Supplier<WidgetFactory<M>>> widgets = new ArrayList<>();
 
     public MenuBuilder(Registrate registrate, String id, P parent, Menu.Factory<T, M> factory) {
@@ -165,12 +157,6 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
 
     public MenuBuilder<T, M, P> title(String key) {
         title = $ -> new TranslatableComponent("tinactory.gui." + key + ".title");
-        return self();
-    }
-
-    public MenuBuilder<T, M, P>
-    screen(DistLazy<MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>>> screen) {
-        screenFactory = screen;
         return self();
     }
 
@@ -219,37 +205,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         return menuWidget(rect, () -> (menu, cons) -> cons.addWidget(rect, new StaticWidget(menu, tex)));
     }
 
-    public MenuBuilder<T, M, P> slot(int slotIndex, int posX, int posY) {
-        return slot(SlotItemHandler::new, slotIndex, posX, posY);
-    }
-
-    public MenuBuilder<T, M, P>
-    slot(Menu.SlotFactory<?> factory, int slotIndex, int posX, int posY) {
-        menuCallbacks.add(MenuCallback.dummy(menu -> menu.addSlot(factory, slotIndex, posX, posY)));
-        widgetsRect.add(new Rect(posX, posY, Menu.SLOT_SIZE, Menu.SLOT_SIZE));
-        return self();
-    }
-
     public <P1 extends MenuSyncPacket>
     IntSupplier addSyncSlot(Class<P1> clazz, Menu.SyncPacketFactory<T, P1> factory) {
         var callback = new SyncSlotMenuCallback<M>(menu -> menu.addSyncSlot(clazz, factory));
         menuCallbacks.add(callback);
         return callback;
-    }
-
-    public <P1 extends MenuSyncPacket> MenuBuilder<T, M, P>
-    addSyncSlot(Class<P1> clazz, Menu.SyncPacketFactory<T, P1> factory,
-                BiFunction<MenuBuilder<T, M, P>, IntSupplier, MenuBuilder<T, M, P>> thenTransform) {
-        var callback = new SyncSlotMenuCallback<M>(menu -> menu.addSyncSlot(clazz, factory));
-        menuCallbacks.add(callback);
-        return thenTransform.apply(this, callback);
-    }
-
-    public MenuBuilder<T, M, P>
-    progressBar(Texture tex, Rect rect, ToDoubleFunction<T> progressReader) {
-        return syncWidget(rect, MenuSyncPacket.Double.class, (containerId, index, be) ->
-                        new MenuSyncPacket.Double(containerId, index, progressReader.applyAsDouble(be)),
-                () -> (menu, slot, cons) -> cons.addWidget(rect, new ProgressBar(menu, tex, slot)));
     }
 
     public MenuBuilder<T, M, P>
@@ -275,20 +235,6 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         return self();
     }
 
-    public MenuBuilder<T, M, P> fluidSlot(int tank, int x, int y) {
-        var syncSlot = new SyncSlotMenuCallback<M>(menu -> menu.addFluidSlot(tank));
-        menuCallbacks.add(syncSlot);
-        var rect = new Rect(x, y, Menu.SLOT_SIZE, Menu.SLOT_SIZE);
-        var rect1 = rect.offset(1, 1).enlarge(-2, -2);
-        return staticWidget(rect, Texture.SLOT_BACKGROUND)
-                .menuWidget(rect1, () -> (menu, cons) -> cons.addWidget(rect1,
-                        new FluidSlot(menu, tank, syncSlot.get())));
-    }
-
-    public MenuBuilder<T, M, P> layout(Layout layout) {
-        return transform(layout.applyMenu());
-    }
-
     public MenuBuilder<T, M, P> noInventory() {
         showInventory = false;
         return self();
@@ -301,7 +247,6 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         var factory = this.factory;
         return (type, id, inventory, blockEntity) -> {
             var menu = factory.create(type, id, inventory, blockEntity);
-            menu.initLayout();
             for (var callback : menuCallbacks) {
                 callback.resolve(menu);
             }
@@ -310,12 +255,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         };
     }
 
+    @OnlyIn(Dist.CLIENT)
     private MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>> getScreenFactory() {
-        assert this.screenFactory != null;
-        var screenFactory = this.screenFactory.getValue();
         var widgets = this.widgets.stream().map(Supplier::get).toList();
         return (menu, inventory, title) -> {
-            var screen = screenFactory.create(menu, inventory, title);
+            var screen = menu.<M>createScreen(inventory, title);
             for (var widget : widgets) {
                 screen.initWidget(widget);
             }

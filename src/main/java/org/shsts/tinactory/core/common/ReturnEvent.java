@@ -17,6 +17,10 @@ public class ReturnEvent<A, R> extends Event<A> {
         return new Token<>(defaultRet);
     }
 
+    public R getDefaultReturn() {
+        return defaultRet;
+    }
+
     @SuppressWarnings("unchecked")
     public void invoke(Handler<?, ?> handler, A arg, Token<R> token) {
         ((Handler<A, R>) handler).handle(arg, token);

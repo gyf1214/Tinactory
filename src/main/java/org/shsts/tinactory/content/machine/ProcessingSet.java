@@ -57,7 +57,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                 .capability(StackContainer::builder)
                 .layout(layout)
                 .build()
-                .menu(ProcessingMenu::new)
+                .menu(ProcessingMenu.factory(layout))
                 .transform(MenuGen.machineMenu(layout))
                 .transform(MenuGen.machineRecipeBook(recipeType, layout))
                 .build() // menu

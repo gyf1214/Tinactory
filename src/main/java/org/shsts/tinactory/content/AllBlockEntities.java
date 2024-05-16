@@ -4,8 +4,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
-import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
-import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -41,8 +39,6 @@ public final class AllBlockEntities {
                 .blockEntity()
                 .eventManager().ticking()
                 .menu(NetworkControllerMenu::new)
-                .addSyncSlot(NetworkControllerSyncPacket.class, NetworkControllerSyncPacket::new,
-                        ($, slot) -> $.screen(() -> () -> NetworkControllerScreen.factory(slot)))
                 .noInventory()
                 .title("networkController")
                 .build()
@@ -62,7 +58,7 @@ public final class AllBlockEntities {
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
                 .simpleCapability(Workbench::builder)
-                .menu(WorkbenchMenu::new).layout(AllLayouts.WORKBENCH).build()
+                .menu(WorkbenchMenu::new).build()
                 .build()
                 .block()
                 .transform(ModelGen.primitive(gregtech("blocks/casings/crafting_table")))

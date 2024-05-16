@@ -1,7 +1,6 @@
 package org.shsts.tinactory.test;
 
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.gui.MenuGen;
 import org.shsts.tinactory.content.logistics.StackContainer;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
@@ -24,17 +23,15 @@ public final class AllBlockEntities {
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
                 .ticking().eventManager()
+                .simpleCapability(Machine.builder(Voltage.ULV))
                 .capability(StackContainer::builder)
                 .layout(AllBlocks.TEST_FLUID_LAYOUT)
                 .build()
-                .simpleCapability(Machine.builder(Voltage.ULV))
                 .capability(RecipeProcessor::builder)
                 .recipeType(AllRecipes.TEST_RECIPE_TYPE)
                 .voltage(Voltage.ULV)
                 .build()
-                .menu(ProcessingMenu::new)
-                .transform(MenuGen.machineMenu(AllBlocks.TEST_FLUID_LAYOUT))
-                .transform(MenuGen.machineRecipeBook(AllRecipes.TEST_RECIPE_TYPE, AllBlocks.TEST_FLUID_LAYOUT))
+                .menu(ProcessingMenu.factory(AllBlocks.TEST_FLUID_LAYOUT))
                 .build() // menu
                 .build() // blockEntity
                 .block()

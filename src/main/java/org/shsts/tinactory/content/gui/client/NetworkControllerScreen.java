@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui.client;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -21,7 +20,6 @@ import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.Widgets;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.function.IntSupplier;
 
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
@@ -38,8 +36,8 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private final EditBox welcomeEdit;
     private final Label teamNameLabel;
 
-    private NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
-                                    Component title, int syncSlot) {
+    public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
+                                   Component title, int syncSlot) {
         super(menu, inventory, title);
         this.imageHeight = HEIGHT;
 
@@ -66,11 +64,6 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         menu.onSyncPacket(syncSlot, this::refresh);
         configPanel.setActive(false);
         welcomePanel.setActive(false);
-    }
-
-    public static MenuScreens.ScreenConstructor<NetworkControllerMenu, NetworkControllerScreen>
-    factory(IntSupplier slot) {
-        return (menu, inventory, title) -> new NetworkControllerScreen(menu, inventory, title, slot.getAsInt());
     }
 
     private void refresh(NetworkControllerSyncPacket packet) {

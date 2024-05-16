@@ -52,9 +52,10 @@ public class EventManager implements ICapabilityProvider {
     }
 
     public static <A, R> R invokeReturn(BlockEntity be, Supplier<ReturnEvent<A, R>> event, A arg) {
+        var e = event.get();
         return be.getCapability(AllCapabilities.EVENT_MANAGER.get())
-                .map(eventManager -> eventManager.invoke(event.get(), arg))
-                .orElseThrow();
+                .map(eventManager -> eventManager.invoke(e, arg))
+                .orElse(e.getDefaultReturn());
     }
 
     @Nonnull

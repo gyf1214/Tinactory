@@ -3,16 +3,10 @@ package org.shsts.tinactory.core.gui;
 import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
-import org.shsts.tinactory.registrate.builder.MenuBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -68,31 +62,6 @@ public class Layout {
 
     public int getXOffset() {
         return (Menu.CONTENT_WIDTH - rect.width()) / 2;
-    }
-
-    public <T extends SmartBlockEntity, M extends Menu<T>, P extends BlockEntityBuilder<T, ?>>
-    Transformer<MenuBuilder<T, M, P>> applyMenu() {
-        return builder -> {
-            var xOffset = getXOffset();
-            for (var slot : slots) {
-                var x = xOffset + slot.x;
-                var y = slot.y;
-                switch (slot.type.portType) {
-                    case ITEM -> builder.slot(slot.index, x, y);
-                    case FLUID -> builder.fluidSlot(slot.index, x, y);
-                }
-            }
-            for (var image : images) {
-                builder.staticWidget(image.rect.offset(xOffset, 0), image.texture);
-            }
-            if (progressBar != null) {
-                builder.progressBar(progressBar.texture, progressBar.rect.offset(xOffset, 0),
-                        be -> be.getCapability(AllCapabilities.PROCESSOR.get())
-                                .map(IProcessor::getProgress)
-                                .orElse(0.0d));
-            }
-            return builder;
-        };
     }
 
     public record SlotWith<X>(SlotInfo slot, X val) {}

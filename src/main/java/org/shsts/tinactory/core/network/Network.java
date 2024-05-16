@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.tech.TeamProfile;
@@ -73,7 +74,9 @@ public class Network extends NetworkBase {
             component.putBlock(pos, state);
         }
         if (state.getBlock() instanceof SmartEntityBlock<?> entityBlock) {
-            entityBlock.getBlockEntity(world, pos, Machine.class).ifPresent(this::putMachine);
+            entityBlock.getBlockEntity(world, pos)
+                    .flatMap(be -> be.getCapability(AllCapabilities.MACHINE.get()).resolve())
+                    .ifPresent(this::putMachine);
         }
     }
 
