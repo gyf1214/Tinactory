@@ -70,7 +70,7 @@ public class MachineRecipeBook extends Panel {
         @Nullable
         private ProcessingRecipe<?> recipe = null;
 
-        public RecipeButton(Menu<?> menu) {
+        public RecipeButton(Menu<?, ?> menu) {
             super(menu);
         }
 
@@ -162,7 +162,7 @@ public class MachineRecipeBook extends Panel {
 
         private final int pageChange;
 
-        public PageButton(Menu<?> menu, int texX, int pageChange) {
+        public PageButton(Menu<?, ?> menu, int texX, int pageChange) {
             super(menu, RECIPE_BOOK_BG, null, texX, TEX_Y, texX, TEX_Y + PAGE_OFFSET.height());
             this.pageChange = pageChange;
         }
@@ -188,7 +188,7 @@ public class MachineRecipeBook extends Panel {
 
     private int page = 0;
 
-    public MachineRecipeBook(MenuScreen<? extends Menu<? extends SmartBlockEntity>> screen, int syncSlot,
+    public MachineRecipeBook(MenuScreen<? extends Menu<? extends SmartBlockEntity, ?>> screen, int syncSlot,
                              RecipeType<? extends ProcessingRecipe<?>> recipeType,
                              int buttonX, int buttonY) {
         super(screen);

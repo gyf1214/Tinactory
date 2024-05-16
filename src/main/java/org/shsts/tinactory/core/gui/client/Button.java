@@ -19,12 +19,12 @@ import java.util.Optional;
 public abstract class Button extends MenuWidget {
     private final @Nullable Component tooltip;
 
-    public Button(Menu<?> menu, @Nullable Component tooltip) {
+    public Button(Menu<?, ?> menu, @Nullable Component tooltip) {
         super(menu);
         this.tooltip = tooltip;
     }
 
-    public Button(Menu<?> menu) {
+    public Button(Menu<?, ?> menu) {
         super(menu);
         this.tooltip = null;
     }

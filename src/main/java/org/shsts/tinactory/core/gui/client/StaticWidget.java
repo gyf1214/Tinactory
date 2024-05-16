@@ -15,7 +15,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class StaticWidget extends MenuWidget {
     private final Texture texture;
 
-    public StaticWidget(Menu<?> menu, Texture texture) {
+    public StaticWidget(Menu<?, ?> menu, Texture texture) {
         super(menu);
         this.texture = texture;
     }

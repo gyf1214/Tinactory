@@ -20,7 +20,7 @@ public final class MenuSyncHandler {
     private static <P extends MenuSyncPacket>
     void handle(P packet, NetworkEvent.Context ctx) {
         var player = Minecraft.getInstance().player;
-        if (player != null && player.containerMenu instanceof Menu<?> menu &&
+        if (player != null && player.containerMenu instanceof Menu<?, ?> menu &&
                 menu.containerId == packet.getContainerId()) {
             menu.handleSyncPacket(packet.getIndex(), packet);
         }

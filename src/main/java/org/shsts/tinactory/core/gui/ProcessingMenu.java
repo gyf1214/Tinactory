@@ -24,7 +24,7 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingMenu<T extends BlockEntity> extends Menu<T> {
+public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S>> extends Menu<T, S> {
     private final Layout layout;
     private final Map<Layout.SlotInfo, Integer> fluidSyncIndex = new HashMap<>();
     private final int progressBarIndex;
@@ -62,9 +62,9 @@ public class ProcessingMenu<T extends BlockEntity> extends Menu<T> {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private class Screen extends MenuScreen<ProcessingMenu<T>> {
+    private class Screen extends MenuScreen<S> {
         public Screen(Inventory inventory, Component title) {
-            super(ProcessingMenu.this, inventory, title);
+            super(self(), inventory, title);
 
             var layoutPanel = new Panel(this);
 
@@ -92,15 +92,19 @@ public class ProcessingMenu<T extends BlockEntity> extends Menu<T> {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @SuppressWarnings("unchecked")
     @Override
-    public <M1 extends Menu<?>> MenuScreen<M1> createScreen(Inventory inventory, Component title) {
-        return (MenuScreen<M1>) new Screen(inventory, title);
+    public MenuScreen<S> createScreen(Inventory inventory, Component title) {
+        return new Screen(inventory, title);
     }
 
-    public static <T extends BlockEntity> Menu.Factory<T, ProcessingMenu<T>>
-    factory(Layout layout) {
-        return (type, id, inventory, be) -> new ProcessingMenu<>(type, id, inventory, be, layout);
+    public static class Simple<T extends BlockEntity> extends ProcessingMenu<T, Simple<T>> {
+        public Simple(SmartMenuType<T, ?> type, int id, Inventory inventory, T blockEntity,
+                      Layout layout) {
+            super(type, id, inventory, blockEntity, layout);
+        }
+    }
+
+    public static <T extends BlockEntity> Menu.Factory<T, Simple<T>> factory(Layout layout) {
+        return (type, id, inventory1, be) -> new Simple<>(type, id, inventory1, be, layout);
     }
 }

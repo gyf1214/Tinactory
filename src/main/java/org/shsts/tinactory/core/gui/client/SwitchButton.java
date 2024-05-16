@@ -20,11 +20,11 @@ public class SwitchButton extends Button {
     private final Texture texture;
     private final int syncSlot;
     private boolean value;
-    private final BiConsumer<? extends Menu<?>, Boolean> onSwitch;
+    private final BiConsumer<? extends Menu<?, ?>, Boolean> onSwitch;
 
-    public SwitchButton(Menu<?> menu, Texture texture,
+    public SwitchButton(Menu<?, ?> menu, Texture texture,
                         @Nullable Component tooltip, int syncSlot,
-                        BiConsumer<? extends Menu<?>, Boolean> onSwitch) {
+                        BiConsumer<? extends Menu<?, ?>, Boolean> onSwitch) {
         super(menu, tooltip);
         this.texture = texture;
         this.onSwitch = onSwitch;
@@ -36,7 +36,7 @@ public class SwitchButton extends Button {
     public void onMouseClicked(double mouseX, double mouseY, int button) {
         super.onMouseClicked(mouseX, mouseY, button);
         value = !value;
-        ((BiConsumer<Menu<?>, Boolean>) onSwitch).accept(menu, value);
+        ((BiConsumer<Menu<?, ?>, Boolean>) onSwitch).accept(menu, value);
     }
 
     @Override

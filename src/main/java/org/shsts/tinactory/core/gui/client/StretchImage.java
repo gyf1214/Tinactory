@@ -18,7 +18,7 @@ public class StretchImage extends MenuWidget {
     private final Rect texRect;
     private final int border;
 
-    public StretchImage(Menu<?> menu, Texture texture, Rect texRect, int border) {
+    public StretchImage(Menu<?, ?> menu, Texture texture, Rect texRect, int border) {
         super(menu);
         this.texture = texture;
         this.texRect = texRect;

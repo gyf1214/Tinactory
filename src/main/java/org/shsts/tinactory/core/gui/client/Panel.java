@@ -63,7 +63,7 @@ public class Panel extends GuiComponent implements MenuBuilder.WidgetConsumer, I
         }
     }
 
-    protected final Menu<?> menu;
+    protected final Menu<?, ?> menu;
     protected final MenuScreen<?> screen;
     protected final List<Child> children = new ArrayList<>();
     protected boolean active = true;

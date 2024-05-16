@@ -28,7 +28,7 @@ import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MenuGen {
-    public static <T extends SmartBlockEntity, M extends Menu<T>, P extends BlockEntityBuilder<T, ?>>
+    public static <T extends SmartBlockEntity, M extends Menu<T, M>, P extends BlockEntityBuilder<T, ?>>
     Transformer<MenuBuilder<T, M, P>> machineMenu(Layout layout) {
         var y = layout.rect.endY() + SPACING_VERTICAL;
         var x = CONTENT_WIDTH - SLOT_SIZE * 2;
@@ -48,7 +48,7 @@ public final class MenuGen {
     }
 
     public static <R extends ProcessingRecipe<R>, T extends SmartBlockEntity,
-            M extends Menu<T>, P extends BlockEntityBuilder<T, ?>>
+            M extends Menu<T, M>, P extends BlockEntityBuilder<T, ?>>
     Transformer<MenuBuilder<T, M, P>>
     machineRecipeBook(RecipeTypeEntry<R, ?> recipeType, Layout layout) {
         return $ -> {

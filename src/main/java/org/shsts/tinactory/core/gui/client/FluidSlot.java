@@ -29,7 +29,7 @@ public class FluidSlot extends MenuWidget {
     private final int tank;
     private final int syncSlot;
 
-    public FluidSlot(Menu<?> menu, int tank, int syncSlot) {
+    public FluidSlot(Menu<?, ?> menu, int tank, int syncSlot) {
         super(menu);
         this.tank = tank;
         this.syncSlot = syncSlot;

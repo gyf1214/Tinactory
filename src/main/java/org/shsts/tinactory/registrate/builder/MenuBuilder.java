@@ -45,7 +45,7 @@ import java.util.function.ToIntFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
+public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T, M>,
         P extends BlockEntityBuilder<T, ?>>
         extends RegistryEntryBuilder<MenuType<?>, SmartMenuType<T, M>, P, MenuBuilder<T, M, P>> {
     private final Supplier<SmartBlockEntityType<T>> blockEntityType;
@@ -54,7 +54,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     private final List<Rect> widgetsRect = new ArrayList<>();
     private boolean showInventory = true;
 
-    private static class MenuCallback<M1 extends Menu<?>, X> implements Supplier<X> {
+    private static class MenuCallback<M1 extends Menu<?, ?>, X> implements Supplier<X> {
         @Nullable
         private X result;
         private final Function<M1, X> func;
@@ -73,7 +73,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
             return result;
         }
 
-        public static <M2 extends Menu<?>> MenuCallback<M2, Unit> dummy(Consumer<M2> cons) {
+        public static <M2 extends Menu<?, ?>> MenuCallback<M2, Unit> dummy(Consumer<M2> cons) {
             return new MenuCallback<>(menu -> {
                 cons.accept(menu);
                 return Unit.INSTANCE;
@@ -81,7 +81,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
         }
     }
 
-    private static class SyncSlotMenuCallback<M1 extends Menu<?>> extends MenuCallback<M1, Integer>
+    private static class SyncSlotMenuCallback<M1 extends Menu<?, ?>> extends MenuCallback<M1, Integer>
             implements IntSupplier {
         public SyncSlotMenuCallback(ToIntFunction<M1> value) {
             super(value::applyAsInt);
@@ -125,12 +125,12 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     }
 
     @FunctionalInterface
-    public interface WidgetFactory<M extends Menu<?>> {
+    public interface WidgetFactory<M extends Menu<?, M>> {
         void accept(MenuScreen<M> screen, WidgetConsumer cons);
     }
 
     @FunctionalInterface
-    public interface MenuWidgetFactory<M extends Menu<?>> extends WidgetFactory<M> {
+    public interface MenuWidgetFactory<M extends Menu<?, M>> extends WidgetFactory<M> {
         void accept(M menu, WidgetConsumer cons);
 
         @Override
@@ -176,7 +176,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     }
 
     @FunctionalInterface
-    public interface SyncWidgetFactory<M extends Menu<?>> {
+    public interface SyncWidgetFactory<M extends Menu<?, ?>> {
         void accept(M menu, int syncSlot, WidgetConsumer widgetCons);
     }
 
@@ -256,10 +256,10 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T>,
     }
 
     @OnlyIn(Dist.CLIENT)
-    private MenuScreens.ScreenConstructor<M, ? extends MenuScreen<M>> getScreenFactory() {
+    private MenuScreens.ScreenConstructor<M, MenuScreen<M>> getScreenFactory() {
         var widgets = this.widgets.stream().map(Supplier::get).toList();
         return (menu, inventory, title) -> {
-            var screen = menu.<M>createScreen(inventory, title);
+            var screen = menu.createScreen(inventory, title);
             for (var widget : widgets) {
                 screen.initWidget(widget);
             }

@@ -83,7 +83,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
         menu = value;
     }
 
-    public <M extends Menu<U>> MenuBuilder<U, M, BlockEntityBuilder<U, P>>
+    public <M extends Menu<U, M>> MenuBuilder<U, M, BlockEntityBuilder<U, P>>
     menu(Menu.Factory<U, M> factory) {
         return new MenuBuilder<>(registrate, id, this, factory);
     }

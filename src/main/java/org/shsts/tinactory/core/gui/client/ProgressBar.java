@@ -18,7 +18,7 @@ public class ProgressBar extends MenuWidget {
     private final Texture texture;
     private final int syncIndex;
 
-    public ProgressBar(Menu<?> menu, Texture texture, int syncIndex) {
+    public ProgressBar(Menu<?, ?> menu, Texture texture, int syncIndex) {
         super(menu);
         this.texture = texture;
         this.syncIndex = syncIndex;

@@ -31,7 +31,7 @@ import static org.shsts.tinactory.core.gui.Menu.WIDTH;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuScreen<M extends Menu<?>> extends AbstractContainerScreen<M> {
+public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M> {
     public static final int TEXT_COLOR = 0xFF404040;
 
     protected final Panel rootPanel;

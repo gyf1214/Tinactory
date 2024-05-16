@@ -17,7 +17,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WorkbenchMenu extends Menu<SmartBlockEntity> {
+public class WorkbenchMenu extends Menu<SmartBlockEntity, WorkbenchMenu> {
     public WorkbenchMenu(SmartMenuType<SmartBlockEntity, ?> type, int id,
                          Inventory inventory, SmartBlockEntity blockEntity) {
         super(type, id, inventory, blockEntity);

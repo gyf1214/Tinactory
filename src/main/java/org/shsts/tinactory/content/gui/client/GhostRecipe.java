@@ -37,7 +37,7 @@ public class GhostRecipe extends MenuWidget {
     private final List<Layout.SlotWith<?>> ingredients = new ArrayList<>();
     private final ItemRenderer itemRenderer = ClientUtil.getItemRenderer();
 
-    public GhostRecipe(Menu<?> menu, int syncSlot, Layout layout) {
+    public GhostRecipe(Menu<?, ?> menu, int syncSlot, Layout layout) {
         super(menu);
         this.syncSlot = syncSlot;
         this.layout = layout;

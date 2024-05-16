@@ -31,11 +31,11 @@ public class Label extends MenuWidget {
     public Alignment horizontalAlign = Alignment.BEGIN;
     public Alignment verticalAlign = Alignment.BEGIN;
 
-    public Label(Menu<?> menu) {
+    public Label(Menu<?, ?> menu) {
         super(menu);
     }
 
-    public Label(Menu<?> menu, Alignment horizontalAlign, Component text) {
+    public Label(Menu<?, ?> menu, Alignment horizontalAlign, Component text) {
         super(menu);
         this.horizontalAlign = horizontalAlign;
         setText(text);

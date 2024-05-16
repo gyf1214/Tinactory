@@ -26,11 +26,11 @@ public abstract class MenuWidget extends GuiComponent implements
         Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 
-    protected final Menu<?> menu;
+    protected final Menu<?, ?> menu;
     protected Rect rect;
     protected boolean active = true;
 
-    public MenuWidget(Menu<?> menu) {
+    public MenuWidget(Menu<?, ?> menu) {
         this.menu = menu;
     }
 

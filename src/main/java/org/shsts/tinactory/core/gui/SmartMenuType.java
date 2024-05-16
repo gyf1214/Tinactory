@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SmartMenuType<T extends BlockEntity, M extends Menu<T>>
+public class SmartMenuType<T extends BlockEntity, M extends Menu<T, M>>
         extends MenuType<M> {
 
     private final Menu.Factory<T, M> factory;

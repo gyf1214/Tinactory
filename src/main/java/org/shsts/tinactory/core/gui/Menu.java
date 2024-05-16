@@ -23,6 +23,7 @@ import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import net.minecraftforge.network.PacketDistributor;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
@@ -42,7 +43,7 @@ import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
+public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractContainerMenu implements ISelf<S> {
     public static final int WIDTH = 176;
     public static final int SLOT_SIZE = 18;
     public static final int CONTENT_WIDTH = 9 * SLOT_SIZE;
@@ -78,7 +79,7 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
         P create(int containerId, int index, T be);
     }
 
-    protected static abstract class SyncSlot<T extends BlockEntity, P extends MenuSyncPacket> {
+    protected abstract class SyncSlot<P extends MenuSyncPacket> {
         private final Class<P> clazz;
         @Nullable
         private P packet = null;
@@ -88,14 +89,14 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
             this.clazz = clazz;
         }
 
-        protected abstract P getPacket(Menu<T> menu, T be);
+        protected abstract P getPacket(T be);
 
-        public void syncPacket(Menu<T> menu, T be) {
-            if (menu.player instanceof ServerPlayer player) {
-                var packet1 = getPacket(menu, be);
+        public void syncPacket(T be) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                var packet1 = getPacket(be);
                 if (!packet1.equals(packet)) {
                     packet = packet1;
-                    Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet1);
+                    Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), packet1);
                 }
             }
         }
@@ -112,7 +113,7 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
         }
     }
 
-    protected final List<SyncSlot<T, ?>> syncSlots = new ArrayList<>();
+    protected final List<SyncSlot<?>> syncSlots = new ArrayList<>();
 
     public Menu(SmartMenuType<T, ?> type, int id, Inventory inventory, T blockEntity) {
         super(type, id);
@@ -231,10 +232,10 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
     public <P extends MenuSyncPacket>
     int addSyncSlot(Class<P> clazz, SyncPacketFactory<T, P> factory) {
         int index = syncSlots.size();
-        syncSlots.add(new SyncSlot<>(clazz) {
+        syncSlots.add(new SyncSlot<P>(clazz) {
             @Override
-            protected P getPacket(Menu<T> menu, T be) {
-                return factory.create(menu.containerId, index, be);
+            protected P getPacket(T be) {
+                return factory.create(containerId, index, be);
             }
         });
         return index;
@@ -343,7 +344,7 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
      */
     @SuppressWarnings("unchecked")
     public <P extends MenuSyncPacket> void onSyncPacket(int index, Consumer<P> handler) {
-        var slot = (SyncSlot<T, P>) syncSlots.get(index);
+        var slot = (SyncSlot<P>) syncSlots.get(index);
         slot.addCallback(handler);
     }
 
@@ -389,18 +390,16 @@ public class Menu<T extends BlockEntity> extends AbstractContainerMenu {
     public void broadcastChanges() {
         super.broadcastChanges();
         for (var slot : syncSlots) {
-            slot.syncPacket(this, blockEntity);
+            slot.syncPacket(blockEntity);
         }
     }
 
-    public interface Factory<T1 extends BlockEntity, M1 extends Menu<T1>> {
-        M1 create(SmartMenuType<T1, ?> type, int id, Inventory inventory, T1 blockEntity);
+    public interface Factory<T1 extends BlockEntity, M1 extends Menu<T1, M1>> {
+        M1 create(SmartMenuType<T1, M1> type, int id, Inventory inventory, T1 blockEntity);
     }
 
     @OnlyIn(Dist.CLIENT)
-    @SuppressWarnings("unchecked")
-    public <M1 extends Menu<?>> MenuScreen<M1> createScreen(Inventory inventory, Component title) {
-        var screen = new MenuScreen<>(this, inventory, title);
-        return (MenuScreen<M1>) screen;
+    public MenuScreen<S> createScreen(Inventory inventory, Component title) {
+        return new MenuScreen<>(self(), inventory, title);
     }
 }

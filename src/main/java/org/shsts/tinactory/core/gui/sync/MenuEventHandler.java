@@ -26,7 +26,7 @@ public final class MenuEventHandler {
 
     private static <P extends MenuEventPacket> void handle(P packet, NetworkEvent.Context ctx) {
         var player = ctx.getSender();
-        if (player != null && player.containerMenu instanceof Menu<?> menu &&
+        if (player != null && player.containerMenu instanceof Menu<?, ?> menu &&
                 menu.containerId == packet.getContainerId()) {
             menu.handleEventPacket(packet);
         }
