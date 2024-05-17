@@ -1,9 +1,9 @@
 package org.shsts.tinactory.core.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.BuilderBase;
-import org.shsts.tinactory.core.logistics.SlotType;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

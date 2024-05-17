@@ -1,9 +1,9 @@
 package org.shsts.tinactory.content;
 
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.logistics.SlotType;
 
 import java.util.Map;
 

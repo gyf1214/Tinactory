@@ -3,9 +3,9 @@ package org.shsts.tinactory.core.gui;
 import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.Nullable;

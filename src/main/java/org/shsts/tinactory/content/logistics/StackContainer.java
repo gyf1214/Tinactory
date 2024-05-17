@@ -16,6 +16,8 @@ import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
@@ -27,7 +29,6 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
-import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
@@ -187,8 +188,8 @@ public class StackContainer implements ICapabilityProvider,
             }
             if (logistics != null) {
                 for (var portInfo : ports) {
-                    if (portInfo.type != SlotType.NONE && !portInfo.type.output) {
-                        logistics.removePassiveStorage(LogisticsDirection.PULL, portInfo.port);
+                    if (portInfo.type != SlotType.NONE && portInfo.type.direction == PortDirection.INPUT) {
+                        logistics.removePassiveStorage(PortDirection.INPUT, portInfo.port);
                     }
                 }
             }
@@ -220,7 +221,7 @@ public class StackContainer implements ICapabilityProvider,
                 }
             }
             if (logistics != null) {
-                logistics.addPassiveStorage(LogisticsDirection.PULL, getPort(port, false));
+                logistics.addPassiveStorage(PortDirection.INPUT, getPort(port, false));
             }
         }
     }
@@ -232,7 +233,7 @@ public class StackContainer implements ICapabilityProvider,
                 for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
                     var item = combinedItems.getStackInSlot(slot);
                     if (!item.isEmpty()) {
-                        logistics.addActiveRequest(LogisticsDirection.PUSH, itemPort, item);
+                        logistics.addActiveRequest(PortDirection.OUTPUT, itemPort, item);
                     }
                 }
             }
@@ -246,7 +247,7 @@ public class StackContainer implements ICapabilityProvider,
                 for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
                     var fluid = combinedFluids.getFluidInTank(slot);
                     if (!fluid.isEmpty()) {
-                        logistics.addActiveRequest(LogisticsDirection.PUSH, fluidPort, fluid);
+                        logistics.addActiveRequest(PortDirection.OUTPUT, fluidPort, fluid);
                     }
                 }
             }

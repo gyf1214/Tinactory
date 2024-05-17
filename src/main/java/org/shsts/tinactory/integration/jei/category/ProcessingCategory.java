@@ -26,7 +26,11 @@ public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCat
     }
 
     private <I> void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot, I ingredient) {
-        var role = slot.type().output ? RecipeIngredientRole.OUTPUT : RecipeIngredientRole.INPUT;
+        var role = switch (slot.type().direction) {
+            case NONE -> RecipeIngredientRole.RENDER_ONLY;
+            case INPUT -> RecipeIngredientRole.INPUT;
+            case OUTPUT -> RecipeIngredientRole.OUTPUT;
+        };
         var slotBuilder = builder.addSlot(role, slot.x() + 1, slot.y() + 1);
         if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient simpleItemIngredient) {
             slotBuilder.addItemStack(simpleItemIngredient.stack());

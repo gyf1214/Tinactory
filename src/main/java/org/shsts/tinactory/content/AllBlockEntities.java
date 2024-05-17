@@ -2,6 +2,7 @@ package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.machine.MachineBlock;
@@ -13,7 +14,6 @@ import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;

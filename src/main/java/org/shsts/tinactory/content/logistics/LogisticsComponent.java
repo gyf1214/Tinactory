@@ -12,6 +12,7 @@ import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.logistics.FluidContentWrapper;
@@ -34,10 +35,10 @@ import java.util.function.Supplier;
 public class LogisticsComponent extends Component {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private record Request(LogisticsDirection dir, IPort port, ILogisticsContentWrapper content) {}
+    private record Request(PortDirection dir, IPort port, ILogisticsContentWrapper content) {}
 
     private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
-    private final Multimap<LogisticsDirection, IPort> passiveStorages = HashMultimap.create();
+    private final Multimap<PortDirection, IPort> passiveStorages = HashMultimap.create();
 
     public static class WorkerProperty {
         public int workerSize;
@@ -130,12 +131,17 @@ public class LogisticsComponent extends Component {
 
     private ILogisticsContentWrapper transmitItem(Request req, IPort otherPort,
                                                   ILogisticsContentWrapper item, int limit) {
-        return req.dir == LogisticsDirection.PULL ?
-                transmitItem(otherPort, req.port, item, limit) :
-                transmitItem(req.port, otherPort, item, limit);
+        return switch (req.dir) {
+            case NONE -> throw new IllegalArgumentException();
+            case INPUT -> transmitItem(otherPort, req.port, item, limit);
+            case OUTPUT -> transmitItem(req.port, otherPort, item, limit);
+        };
     }
 
     private void handleItemActiveRequest(ILogisticsTypeWrapper type, Request req) {
+        if (req.dir == PortDirection.NONE) {
+            return;
+        }
         var remaining = req.content;
         for (var otherReq : activeRequests.get(type)) {
             if (remaining.isEmpty()) {
@@ -177,23 +183,23 @@ public class LogisticsComponent extends Component {
         ticks++;
     }
 
-    public void addPassiveStorage(LogisticsDirection dir, IPort port) {
+    public void addPassiveStorage(PortDirection dir, IPort port) {
         LOGGER.debug("add PassiveStorage {} {}", dir, port);
         passiveStorages.put(dir, port);
     }
 
-    public void removePassiveStorage(LogisticsDirection dir, IPort port) {
+    public void removePassiveStorage(PortDirection dir, IPort port) {
         LOGGER.debug("remove PassiveStorage {} {}", dir, port);
         passiveStorages.remove(dir, port);
     }
 
-    public void addActiveRequest(LogisticsDirection type, IItemCollection port, ItemStack item) {
+    public void addActiveRequest(PortDirection type, IItemCollection port, ItemStack item) {
         var item1 = item.copy();
         var req = new Request(type, port, new ItemContentWrapper(item1));
         activeRequests.put(new ItemTypeWrapper(item1), req);
     }
 
-    public void addActiveRequest(LogisticsDirection type, IFluidCollection port, FluidStack fluid) {
+    public void addActiveRequest(PortDirection type, IFluidCollection port, FluidStack fluid) {
         var fluid1 = fluid.copy();
         var req = new Request(type, port, new FluidContentWrapper(fluid1));
         activeRequests.put(new FluidTypeWrapper(fluid1), req);

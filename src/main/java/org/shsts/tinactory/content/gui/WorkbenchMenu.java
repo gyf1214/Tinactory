@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -11,7 +12,6 @@ import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.sync.CraftingSlot;
 import org.shsts.tinactory.core.logistics.ItemHelper;
-import org.shsts.tinactory.core.logistics.SlotType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
