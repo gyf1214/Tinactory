@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public interface IContainer {
-    Optional<ITeamProfile> getOwnerTeam();
+    Optional<? extends ITeamProfile> getOwnerTeam();
 
     int portSize();
 

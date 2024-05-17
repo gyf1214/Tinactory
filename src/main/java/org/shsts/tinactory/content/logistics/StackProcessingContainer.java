@@ -20,7 +20,6 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
-import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.machine.Machine;
@@ -31,6 +30,7 @@ import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import javax.annotation.Nonnull;
@@ -148,8 +148,8 @@ public class StackProcessingContainer implements ICapabilityProvider, IContainer
     }
 
     @Override
-    public Optional<ITeamProfile> getOwnerTeam() {
-        return Machine.get(blockEntity).getOwnerTeam().map($ -> $);
+    public Optional<TeamProfile> getOwnerTeam() {
+        return Machine.get(blockEntity).getOwnerTeam();
     }
 
     @Override

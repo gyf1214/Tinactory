@@ -26,17 +26,15 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
 
     @Override
     public boolean canCraftIn(IContainer container) {
-        var ownerTeam = container.getOwnerTeam();
-        if (ownerTeam.isEmpty()) {
-            return false;
-        }
-        var team = ownerTeam.get();
-        for (var tech : requiredTech) {
-            if (!team.isTechFinished(tech)) {
-                return false;
-            }
-        }
-        return true;
+        return container.getOwnerTeam()
+                .map(team -> {
+                    for (var tech : requiredTech) {
+                        if (!team.isTechFinished(tech)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }).orElse(false);
     }
 
     public static class Builder extends ProcessingRecipe.Builder<AssemblyRecipe, Builder> {
