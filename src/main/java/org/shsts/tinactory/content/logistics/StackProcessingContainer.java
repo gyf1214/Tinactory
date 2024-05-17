@@ -25,7 +25,6 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
@@ -48,8 +47,7 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class StackProcessingContainer implements ICapabilityProvider,
-        IContainer, IEventSubscriber, INBTSerializable<CompoundTag> {
+public class StackProcessingContainer implements ICapabilityProvider, IContainer, INBTSerializable<CompoundTag> {
     private record PortInfo(int startSlot, int endSlot, SlotType type,
                             IPort port, IPort internalPort) {}
 
@@ -200,40 +198,6 @@ public class StackProcessingContainer implements ICapabilityProvider,
                 tank.resetFilter();
             }
         }
-    }
-
-    private void dumpItemOutput(LogisticsComponent logistics) {
-        for (var portInfo : ports) {
-            if (portInfo.type == SlotType.ITEM_OUTPUT) {
-                var itemPort = portInfo.port.asItem();
-                for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
-                    var item = combinedItems.getStackInSlot(slot);
-                    if (!item.isEmpty()) {
-                        logistics.addActiveRequest(PortDirection.OUTPUT, itemPort, item);
-                    }
-                }
-            }
-        }
-    }
-
-    private void dumpFluidOutput(LogisticsComponent logistics) {
-        for (var portInfo : ports) {
-            if (portInfo.type == SlotType.FLUID_OUTPUT) {
-                var fluidPort = portInfo.port.asFluid();
-                for (var slot = portInfo.startSlot; slot < portInfo.endSlot; slot++) {
-                    var fluid = combinedFluids.getFluidInTank(slot);
-                    if (!fluid.isEmpty()) {
-                        logistics.addActiveRequest(PortDirection.OUTPUT, fluidPort, fluid);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.DUMP_ITEM_OUTPUT, this::dumpItemOutput);
-        eventManager.subscribe(AllEvents.DUMP_FLUID_OUTPUT, this::dumpFluidOutput);
     }
 
     @Nonnull

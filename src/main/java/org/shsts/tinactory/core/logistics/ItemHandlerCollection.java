@@ -8,9 +8,8 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Item Collection backed by ItemHandler.
@@ -98,24 +97,14 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public Collection<ItemStack> getAllItems() {
-        Map<ItemTypeWrapper, ItemStack> allItems = new HashMap<>();
-
+        var allItems = new ArrayList<ItemStack>();
         var slots = itemHandler.getSlots();
         for (var i = 0; i < slots; i++) {
             var slotItem = itemHandler.getStackInSlot(i);
-            if (slotItem.isEmpty()) {
-                continue;
-            }
-            var wrapper = new ItemTypeWrapper(slotItem);
-            var existingItem = allItems.get(wrapper);
-            if (existingItem != null) {
-                existingItem.grow(slotItem.getCount());
-            } else {
-                allItems.put(wrapper, slotItem.copy());
+            if (!slotItem.isEmpty()) {
+                allItems.add(slotItem);
             }
         }
-
-        // clean reference to the original itemStack
-        return allItems.values().stream().toList();
+        return allItems;
     }
 }

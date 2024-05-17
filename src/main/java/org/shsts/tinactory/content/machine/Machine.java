@@ -15,6 +15,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
@@ -98,14 +99,16 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
     }
 
     protected void resetTargetRecipe(IContainer container, boolean updateFilter) {
-        for (var i = 0; i < container.portSize(); i++) {
-            if (container.hasPort(i) && container.portDirection(i) == PortDirection.INPUT) {
-                if (updateFilter) {
-                    container.resetFilter(i);
-                }
-                var port = container.getPort(i, false);
-                getLogistics().ifPresent(component -> component.removePassiveStorage(PortDirection.INPUT, port));
+        var portSize = container.portSize();
+        for (var i = 0; i < portSize; i++) {
+            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
+                continue;
             }
+            if (updateFilter) {
+                container.resetFilter(i);
+            }
+            var port = container.getPort(i, false);
+            getLogistics().ifPresent(component -> component.removePassiveStorage(PortDirection.INPUT, port));
         }
     }
 
@@ -147,6 +150,38 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
         }
     }
 
+    protected void dumpItemOutput(IContainer container, LogisticsComponent logistics) {
+        var size = container.portSize();
+        for (var i = 0; i < size; i++) {
+            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.OUTPUT) {
+                continue;
+            }
+            var port = container.getPort(i, false);
+            if (port.type() != PortType.ITEM) {
+                continue;
+            }
+            for (var stack : port.asItem().getAllItems()) {
+                logistics.addActiveRequest(PortDirection.OUTPUT, port.asItem(), stack);
+            }
+        }
+    }
+
+    protected void dumpFluidOutput(IContainer container, LogisticsComponent logistics) {
+        var size = container.portSize();
+        for (var i = 0; i < size; i++) {
+            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.OUTPUT) {
+                continue;
+            }
+            var port = container.getPort(i, false);
+            if (port.type() != PortType.FLUID) {
+                continue;
+            }
+            for (var stack : port.asFluid().getAllFluids()) {
+                logistics.addActiveRequest(PortDirection.OUTPUT, port.asFluid(), stack);
+            }
+        }
+    }
+
     /**
      * Called when connect to the network
      */
@@ -162,10 +197,10 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
         getProcessor().ifPresent(IProcessor::onPreWork);
         var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
         if (config.getBoolean("autoDumpItem", false)) {
-            EventManager.invoke(blockEntity, AllEvents.DUMP_ITEM_OUTPUT, logistics);
+            getContainer().ifPresent(container -> dumpItemOutput(container, logistics));
         }
         if (config.getBoolean("autoDumpFluid", false)) {
-            EventManager.invoke(blockEntity, AllEvents.DUMP_FLUID_OUTPUT, logistics);
+            getContainer().ifPresent(container -> dumpFluidOutput(container, logistics));
         }
     }
 

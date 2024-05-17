@@ -12,8 +12,6 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -151,23 +149,9 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
 
     @Override
     public Collection<FluidStack> getAllFluids() {
-        Map<FluidTypeWrapper, FluidStack> allFluids = new HashMap<>();
-
-        for (var tank : tanks) {
-            var stack = tank.getFluid();
-            if (stack.isEmpty()) {
-                continue;
-            }
-            var wrapper = new FluidTypeWrapper(stack);
-            var existingStack = allFluids.get(wrapper);
-            if (existingStack != null) {
-                existingStack.grow(stack.getAmount());
-            } else {
-                allFluids.put(wrapper, stack.copy());
-            }
-        }
-
-        // clean reference to the original itemStack
-        return allFluids.values().stream().toList();
+        return Arrays.stream(tanks)
+                .map(WrapperFluidTank::getFluid)
+                .filter(f -> !f.isEmpty())
+                .toList();
     }
 }
