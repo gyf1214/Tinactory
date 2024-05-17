@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public abstract class BuilderBase<U, P, S extends BuilderBase<U, P, S>> implements ISelf<S> {
     protected final P parent;
     protected final List<Consumer<U>> onCreateObject = new ArrayList<>();
-    protected final List<Consumer<S>> onBuild = new ArrayList<>();
+    protected final List<Runnable> onBuild = new ArrayList<>();
 
     protected BuilderBase(P parent) {
         this.parent = parent;
@@ -31,7 +31,7 @@ public abstract class BuilderBase<U, P, S extends BuilderBase<U, P, S>> implemen
 
     public P build() {
         for (var cb : onBuild) {
-            cb.accept(self());
+            cb.run();
         }
         onBuild.clear();
         return parent;

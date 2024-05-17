@@ -21,7 +21,7 @@ public abstract class SmartRecipeBuilder<U extends SmartRecipe<?, U>, S extends 
 
     protected SmartRecipeBuilder(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
         super(registrate, parent, loc);
-        onBuild.add($ -> $.registrate.recipeDataHandler
-                .addCallback(prov -> prov.addRecipe($.buildObject().toFinished())));
+        onBuild.add(() -> registrate.recipeDataHandler
+                .addCallback(prov -> prov.addRecipe(buildObject().toFinished())));
     }
 }

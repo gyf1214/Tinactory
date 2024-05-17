@@ -10,7 +10,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.SmartMenuType;
@@ -21,14 +20,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T, M>,
-        P extends BlockEntityBuilder<T, ?>>
+public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T, M>, P>
         extends RegistryEntryBuilder<MenuType<?>, SmartMenuType<T, M>, P, MenuBuilder<T, M, P>> {
-    private final Supplier<SmartBlockEntityType<T>> blockEntityType;
     private final Menu.Factory<T, M> factory;
     private Function<T, Component> title = $ -> TextComponent.EMPTY;
     private boolean showInventory = true;
@@ -36,15 +32,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T, M>,
 
     public MenuBuilder(Registrate registrate, String id, P parent, Menu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
-        this.blockEntityType = () -> {
-            assert parent.entry != null;
-            return parent.entry.get();
-        };
         this.factory = factory;
-        this.onBuild.add($ -> {
-            $.parent.onCreateEntry.add($p -> $.register());
-            $.onCreateEntry.add(entry -> $.parent.setMenu(entry::get));
-        });
     }
 
     public MenuBuilder<T, M, P> title(String key) {
@@ -87,7 +75,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T, M>,
 
     @Override
     public SmartMenuType<T, M> createObject() {
-        var menuType = new SmartMenuType<>(getFactory(), blockEntityType, title);
+        var menuType = new SmartMenuType<>(getFactory(), title);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
                 registrate.menuScreenHandler.setMenuScreen(menuType, getScreenFactory()));
         return menuType;

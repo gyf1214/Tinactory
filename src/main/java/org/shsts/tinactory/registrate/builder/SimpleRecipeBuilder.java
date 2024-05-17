@@ -14,7 +14,7 @@ public abstract class SimpleRecipeBuilder<P, S extends SimpleRecipeBuilder<P, S>
 
     public SimpleRecipeBuilder(Registrate registrate, P parent, ResourceLocation loc) {
         super(registrate, parent, loc);
-        onBuild.add($ -> $.registrate.recipeDataHandler
-                .addCallback(prov -> prov.addRecipe($.buildObject())));
+        onBuild.add(() -> registrate.recipeDataHandler
+                .addCallback(prov -> prov.addRecipe(buildObject())));
     }
 }

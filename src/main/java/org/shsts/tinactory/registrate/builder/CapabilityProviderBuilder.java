@@ -18,7 +18,7 @@ public abstract class CapabilityProviderBuilder<T, P> extends
     public CapabilityProviderBuilder(P parent, ResourceLocation loc) {
         super(parent);
         this.loc = loc;
-        onBuild.add(CapabilityProviderBuilder::buildObject);
+        onBuild.add(this::buildObject);
     }
 
     public CapabilityProviderBuilder(P parent, String id) {

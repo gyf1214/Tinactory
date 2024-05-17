@@ -10,30 +10,22 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SmartMenuType<T extends BlockEntity, M extends Menu<T, M>>
-        extends MenuType<M> {
-
+public class SmartMenuType<T extends BlockEntity, M extends Menu<T, M>> extends MenuType<M> {
     private final Menu.Factory<T, M> factory;
     private final Function<T, Component> title;
-    public final Supplier<SmartBlockEntityType<T>> blockEntityType;
 
     @SuppressWarnings("ConstantConditions")
-    public SmartMenuType(Menu.Factory<T, M> factory,
-                         Supplier<SmartBlockEntityType<T>> blockEntityType,
-                         Function<T, Component> title) {
+    public SmartMenuType(Menu.Factory<T, M> factory, Function<T, Component> title) {
         super(null);
         this.factory = factory;
         this.title = title;
-        this.blockEntityType = blockEntityType;
     }
 
     @Override
@@ -41,6 +33,7 @@ public class SmartMenuType<T extends BlockEntity, M extends Menu<T, M>>
         return create(containerId, inventory, null);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public M create(int containerId, Inventory inventory, @Nullable FriendlyByteBuf data) {
         assert data != null;
@@ -48,9 +41,8 @@ public class SmartMenuType<T extends BlockEntity, M extends Menu<T, M>>
         var level = Minecraft.getInstance().level;
         assert level != null;
         var be = level.getBlockEntity(pos);
-        var type = blockEntityType.get();
-        assert be != null && be.getType() == type;
-        return factory.create(this, containerId, inventory, type.cast(be));
+        assert be != null;
+        return factory.create(this, containerId, inventory, (T) be);
     }
 
     public M createFromBlockEntity(int containerId, Inventory inventory, T blockEntity) {

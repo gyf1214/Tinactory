@@ -24,7 +24,7 @@ public class BlockItemBuilder<U extends BlockItem, P extends BlockBuilder<?, ?, 
             assert parent.entry != null;
             return factory.create(parent.entry.get(), properties);
         });
-        onBuild.add($ -> parent.onCreateEntry.add($p -> $.register()));
+        onBuild.add(() -> parent.onCreateEntry.add($ -> register()));
     }
 
     @Override

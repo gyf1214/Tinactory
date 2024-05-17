@@ -26,7 +26,7 @@ public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, La
 
     public LayoutSetBuilder(P parent) {
         super(parent);
-        onBuild.add(LayoutSetBuilder::buildObject);
+        onBuild.add(this::buildObject);
     }
 
     public LayoutSetBuilder<P> dummySlot(int x, int y) {
