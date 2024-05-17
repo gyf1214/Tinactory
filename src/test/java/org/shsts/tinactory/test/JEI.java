@@ -34,33 +34,33 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        registration.useNbtForSubtypes(AllBlocks.TEST_FLUID_CELL.get());
+        registration.useNbtForSubtypes(All.TEST_FLUID_CELL.get());
     }
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new ProcessingCategory<>(
-                testType, registration.getJeiHelpers(), AllBlocks.TEST_FLUID_LAYOUT,
-                AllBlockEntities.TEST_MACHINE.getBlock()));
+                testType, registration.getJeiHelpers(), All.TEST_FLUID_LAYOUT,
+                All.TEST_MACHINE.getBlock()));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         var recipeManager = ClientUtil.getRecipeManager();
-        var recipes = recipeManager.getAllRecipesFor(AllRecipes.TEST_RECIPE_TYPE.get());
+        var recipes = recipeManager.getAllRecipesFor(All.TEST_RECIPE_TYPE.get());
         registration.addRecipes(testType, recipes);
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(AllBlockEntities.TEST_MACHINE.getBlock()), testType);
+        registration.addRecipeCatalyst(new ItemStack(All.TEST_MACHINE.getBlock()), testType);
     }
 
     @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
         var ingredientManager = jeiRuntime.getIngredientManager();
         var ingredients = ingredientManager.getAllIngredients(ForgeTypes.FLUID_STACK).stream()
-                .map(fluid -> AllBlocks.TEST_FLUID_CELL.get().getFluidCell(new FluidStack(fluid, 16000)))
+                .map(fluid -> All.TEST_FLUID_CELL.get().getFluidCell(new FluidStack(fluid, 16000)))
                 .toList();
         ingredientManager.addIngredientsAtRuntime(VanillaTypes.ITEM_STACK, ingredients);
     }

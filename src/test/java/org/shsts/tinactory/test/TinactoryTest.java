@@ -24,10 +24,8 @@ public class TinactoryTest {
     public static final Registrate REGISTRATE = new Registrate(ID);
 
     public TinactoryTest() {
-        AllRecipes.init();
-        AllBlockEntities.init();
-        AllBlocks.init();
-        AllRecipes.initRecipes();
+        All.init();
+        All.initRecipes();
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(TinactoryTest::init);
