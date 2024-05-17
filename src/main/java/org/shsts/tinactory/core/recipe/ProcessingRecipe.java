@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -28,6 +29,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -115,6 +117,11 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         return outputs.stream().min(Comparator.comparingInt(a -> a.port))
                 .map(Output::result)
                 .orElse(new ProcessingResults.ItemResult(true, 0f, ItemStack.EMPTY));
+    }
+
+    public static Optional<ProcessingRecipe<?>> byKey(RecipeManager manager, ResourceLocation loc) {
+        return manager.byKey(loc)
+                .flatMap(r -> r instanceof ProcessingRecipe<?> recipe ? Optional.of(recipe) : Optional.empty());
     }
 
     public static class Simple extends ProcessingRecipe<Simple> {
@@ -345,5 +352,4 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
 
     public static final SmartRecipeSerializer.SimpleFactory<Simple, SimpleBuilder>
             SIMPLE_SERIALIZER = Serializer::new;
-
 }

@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.shsts.tinactory.core.util.GeneralUtil.optionalCastor;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class GhostRecipe extends MenuWidget {
@@ -53,8 +51,7 @@ public class GhostRecipe extends MenuWidget {
         }
         currentRecipeLoc = loc;
         var recipe = Optional.ofNullable(loc)
-                .flatMap(ClientUtil.getRecipeManager()::byKey)
-                .flatMap(optionalCastor(ProcessingRecipe.class));
+                .flatMap($ -> ProcessingRecipe.byKey(ClientUtil.getRecipeManager(), $));
 
         ingredients.clear();
         recipe.map(layout::getProcessingInputs).ifPresent(ingredients::addAll);

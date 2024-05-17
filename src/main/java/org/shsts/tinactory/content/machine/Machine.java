@@ -43,7 +43,7 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
     @Nullable
     protected Network network;
 
-    public final MachineConfig machineConfig = new MachineConfig();
+    public final MachineConfig config = new MachineConfig();
 
     protected Machine(BlockEntity be) {
         this.blockEntity = be;
@@ -53,10 +53,8 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
         return new PrimitiveMachine(be);
     }
 
-    public void setMachineConfig(SetMachinePacket packet) {
-        var level = blockEntity.getLevel();
-        assert level != null && !level.isClientSide;
-        machineConfig.apply(level, packet);
+    public void setConfig(SetMachinePacket packet) {
+        config.apply(packet);
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG, packet);
     }
 
@@ -69,7 +67,6 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
     }
 
     protected void onServerLoad(Level world) {
-        machineConfig.onLoad(world);
         LOGGER.debug("machine {}: loaded", this);
     }
 
@@ -105,10 +102,10 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
         assert this.network == network;
         getProcessor().ifPresent(IProcessor::onPreWork);
         var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-        if (machineConfig.isAutoDumpItem()) {
+        if (config.getBoolean("autoDumpItem", false)) {
             EventManager.invoke(blockEntity, AllEvents.DUMP_ITEM_OUTPUT, logistics);
         }
-        if (machineConfig.isAutoDumpFluid()) {
+        if (config.getBoolean("autoDumpFluid", false)) {
             EventManager.invoke(blockEntity, AllEvents.DUMP_FLUID_OUTPUT, logistics);
         }
     }
@@ -165,13 +162,13 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.put("config", machineConfig.serializeNBT());
+        tag.put("config", config.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        machineConfig.deserializeNBT(tag.getCompound("config"));
+        config.deserializeNBT(tag.getCompound("config"));
     }
 
     public static Machine get(BlockEntity be) {

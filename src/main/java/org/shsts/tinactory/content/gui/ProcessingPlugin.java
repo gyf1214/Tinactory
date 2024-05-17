@@ -40,9 +40,9 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     }
 
     public ProcessingPlugin(M menu) {
-        this.autoDumpItemSlot = syncSlot(menu, m -> m.machineConfig.isAutoDumpItem());
-        this.autoDumpFluidSlot = syncSlot(menu, m -> m.machineConfig.isAutoDumpFluid());
-        menu.onEventPacket(SET_MACHINE, p -> Machine.get(menu.blockEntity).setMachineConfig(p));
+        this.autoDumpItemSlot = syncSlot(menu, m -> m.config.getBoolean("autoDumpItem", false));
+        this.autoDumpFluidSlot = syncSlot(menu, m -> m.config.getBoolean("autoDumpFluid", false));
+        menu.onEventPacket(SET_MACHINE, p -> Machine.get(menu.blockEntity).setConfig(p));
 
         this.startY = menu.getHeight() + SPACING_VERTICAL;
         menu.setHeight(startY + Texture.SWITCH_BUTTON.height() / 2);
@@ -66,13 +66,13 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     @Override
     public void applyMenuScreen(MenuScreen<M> screen) {
         var autoDumpItemTip = new TranslatableComponent("tinactory.tooltip.autoDumpItem");
-        addSwitchButton(screen, START_X, autoDumpItemTip, autoDumpItemSlot, (menu, value) ->
-                menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().autoDumpItem(value)));
+        addSwitchButton(screen, START_X, autoDumpItemTip, autoDumpItemSlot, (menu, val) ->
+                menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("autoDumpItem", val)));
         addStaticWidget(screen, START_X, Texture.ITEM_OUT_BUTTON);
 
         var autoDumpFluidTip = new TranslatableComponent("tinactory.tooltip.autoDumpFluid");
-        addSwitchButton(screen, START_X + SLOT_SIZE, autoDumpFluidTip, autoDumpFluidSlot, (menu, value) ->
-                menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().autoDumpFluid(value)));
+        addSwitchButton(screen, START_X + SLOT_SIZE, autoDumpFluidTip, autoDumpFluidSlot, (menu, val) ->
+                menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("autoDumpFluid", val)));
         addStaticWidget(screen, START_X + SLOT_SIZE, Texture.FLUID_OUT_BUTTON);
     }
 }

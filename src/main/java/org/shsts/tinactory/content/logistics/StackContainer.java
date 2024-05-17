@@ -31,6 +31,7 @@ import org.shsts.tinactory.core.logistics.SlotType;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import javax.annotation.Nonnull;
@@ -168,8 +169,10 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     private void updateTargetRecipe(boolean updateFilter) {
+        var world = blockEntity.getLevel();
+        assert world != null && !world.isClientSide;
         var machine = Machine.get(blockEntity);
-        var targetRecipe = machine.machineConfig.getTargetRecipe();
+        var targetRecipe = machine.config.getRecipe("targetRecipe", world).orElse(null);
         var logistics = machine.getNetwork()
                 .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
                 .orElse(null);
@@ -191,7 +194,7 @@ public class StackContainer implements ICapabilityProvider,
             }
             return;
         }
-        for (var input : targetRecipe.inputs) {
+        for (ProcessingRecipe.Input input : targetRecipe.inputs) {
             var port = input.port();
             var ingredient = input.ingredient();
             if (!hasPort(port)) {

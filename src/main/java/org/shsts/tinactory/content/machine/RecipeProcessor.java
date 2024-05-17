@@ -74,12 +74,12 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
     @SuppressWarnings("unchecked")
     @Nullable
     private T getTargetRecipe() {
-        var machine = Machine.get(blockEntity);
-        var recipe = machine.machineConfig.getTargetRecipe();
-        if (recipe != null && recipe.getType() == recipeType) {
-            return (T) recipe;
-        }
-        return null;
+        var world = blockEntity.getLevel();
+        assert world != null && !world.isClientSide;
+        return (T) Machine.get(blockEntity).config
+                .getRecipe("targetRecipe", world)
+                .filter(r -> r.getType() == recipeType)
+                .orElse(null);
     }
 
     private void updateRecipe() {

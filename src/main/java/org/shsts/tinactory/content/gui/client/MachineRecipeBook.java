@@ -240,11 +240,11 @@ public class MachineRecipeBook extends Panel {
     }
 
     private void unselectRecipe() {
-        menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().resetTargetRecipe());
+        menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().reset("targetRecipe"));
     }
 
     private void selectRecipe(ProcessingRecipe<?> recipe) {
-        menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().targetRecipeLoc(recipe.getId()));
+        menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("targetRecipe", recipe.getId()));
     }
 
     private void setPage(int index) {

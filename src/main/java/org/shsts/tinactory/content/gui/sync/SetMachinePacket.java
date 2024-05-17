@@ -1,98 +1,67 @@
 package org.shsts.tinactory.content.gui.sync;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SetMachinePacket extends MenuEventPacket {
-    @Nullable
-    private Boolean autoDumpItem = null;
-    @Nullable
-    private Boolean autoDumpFluid = null;
-    private boolean resetTargetRecipe = false;
-    @Nullable
-    private ResourceLocation targetRecipeLoc = null;
+    private CompoundTag sets;
+    private List<String> resets;
 
     public SetMachinePacket() {}
 
     private SetMachinePacket(int containerId, int eventId, Builder builder) {
         super(containerId, eventId);
-        this.autoDumpItem = builder.autoDumpItem;
-        this.autoDumpFluid = builder.autoDumpFluid;
-        this.resetTargetRecipe = builder.resetTargetRecipeLoc;
-        this.targetRecipeLoc = builder.targetRecipeLoc;
+        this.sets = builder.sets;
+        this.resets = builder.resets;
     }
 
-    @Nullable
-    public Boolean getAutoDumpItem() {
-        return autoDumpItem;
+    public CompoundTag getSets() {
+        return sets;
     }
 
-    @Nullable
-    public Boolean getAutoDumpFluid() {
-        return autoDumpFluid;
-    }
-
-    public boolean isResetTargetRecipe() {
-        return resetTargetRecipe;
-    }
-
-    @Nullable
-    public ResourceLocation getTargetRecipeLoc() {
-        return targetRecipeLoc;
+    public List<String> getResets() {
+        return resets;
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         super.serializeToBuf(buf);
-        buf.writeOptional(Optional.ofNullable(autoDumpItem), FriendlyByteBuf::writeBoolean);
-        buf.writeOptional(Optional.ofNullable(autoDumpFluid), FriendlyByteBuf::writeBoolean);
-        buf.writeBoolean(resetTargetRecipe);
-        buf.writeOptional(Optional.ofNullable(targetRecipeLoc), FriendlyByteBuf::writeResourceLocation);
+        buf.writeNbt(sets);
+        buf.writeCollection(resets, FriendlyByteBuf::writeUtf);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         super.deserializeFromBuf(buf);
-        autoDumpItem = buf.readOptional(FriendlyByteBuf::readBoolean).orElse(null);
-        autoDumpFluid = buf.readOptional(FriendlyByteBuf::readBoolean).orElse(null);
-        resetTargetRecipe = buf.readBoolean();
-        targetRecipeLoc = buf.readOptional(FriendlyByteBuf::readResourceLocation).orElse(null);
+        sets = buf.readNbt();
+        resets = buf.readCollection(ArrayList::new, FriendlyByteBuf::readUtf);
     }
 
     public static class Builder implements MenuEventPacket.Factory<SetMachinePacket> {
-        @Nullable
-        private Boolean autoDumpItem = null;
-        @Nullable
-        private Boolean autoDumpFluid = null;
-        private boolean resetTargetRecipeLoc = false;
-        @Nullable
-        private ResourceLocation targetRecipeLoc = null;
+        private final CompoundTag sets = new CompoundTag();
+        private final List<String> resets = new ArrayList<>();
 
-        public Builder autoDumpItem(boolean value) {
-            autoDumpItem = value;
+        public Builder reset(String key) {
+            resets.add(key);
             return this;
         }
 
-        public Builder autoDumpFluid(boolean value) {
-            autoDumpFluid = value;
+        public Builder set(String key, boolean val) {
+            sets.putBoolean(key, val);
             return this;
         }
 
-        public Builder targetRecipeLoc(ResourceLocation value) {
-            targetRecipeLoc = value;
-            return this;
-        }
-
-        public Builder resetTargetRecipe() {
-            resetTargetRecipeLoc = true;
+        public Builder set(String key, ResourceLocation val) {
+            sets.putString(key, val.toString());
             return this;
         }
 

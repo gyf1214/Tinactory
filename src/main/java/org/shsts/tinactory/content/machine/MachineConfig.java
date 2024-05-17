@@ -9,86 +9,48 @@ import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
-
-import static org.shsts.tinactory.core.util.GeneralUtil.optionalCastor;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MachineConfig implements INBTSerializable<CompoundTag> {
-    private boolean autoDumpItem = false;
-    private boolean autoDumpFluid = false;
-    @Nullable
-    private ProcessingRecipe<?> targetRecipe = null;
-    @Nullable
-    private ResourceLocation targetRecipeLoc = null;
+    private CompoundTag tag = new CompoundTag();
 
-    public boolean isAutoDumpItem() {
-        return autoDumpItem;
+    public Optional<Boolean> getBoolean(String key) {
+        return tag.contains(key, Tag.TAG_BYTE) ? Optional.of(tag.getBoolean(key)) : Optional.empty();
     }
 
-    public boolean isAutoDumpFluid() {
-        return autoDumpFluid;
+    public boolean getBoolean(String key, boolean def) {
+        return getBoolean(key).orElse(def);
     }
 
-    @Nullable
-    public ProcessingRecipe<?> getTargetRecipe() {
-        return targetRecipe;
+    public Optional<String> getString(String key) {
+        return tag.contains(key, Tag.TAG_STRING) ? Optional.of(tag.getString(key)) : Optional.empty();
     }
 
-    @Nullable
-    public ResourceLocation getTargetRecipeLoc() {
-        return targetRecipe != null ? targetRecipe.getId() : null;
+    public Optional<ResourceLocation> getLoc(String key) {
+        return getString(key).map(ResourceLocation::new);
     }
 
-    @Nullable
-    private ProcessingRecipe<?> recipeByKey(Level world, @Nullable ResourceLocation loc) {
-        return Optional.ofNullable(loc)
-                .flatMap(world.getRecipeManager()::byKey)
-                .flatMap(optionalCastor(ProcessingRecipe.class))
-                .orElse(null);
+    public Optional<ProcessingRecipe<?>> getRecipe(String key, Level world) {
+        return getLoc(key).flatMap(loc -> ProcessingRecipe.byKey(world.getRecipeManager(), loc));
     }
 
-    public void onLoad(Level world) {
-        targetRecipe = recipeByKey(world, targetRecipeLoc);
-        targetRecipeLoc = null;
-    }
-
-    public void apply(Level world, SetMachinePacket packet) {
-        if (packet.getAutoDumpItem() != null) {
-            autoDumpItem = packet.getAutoDumpItem();
-        }
-        if (packet.getAutoDumpFluid() != null) {
-            autoDumpFluid = packet.getAutoDumpFluid();
-        }
-        if (packet.isResetTargetRecipe()) {
-            targetRecipe = null;
-        } else if (packet.getTargetRecipeLoc() != null) {
-            targetRecipe = recipeByKey(world, packet.getTargetRecipeLoc());
+    public void apply(SetMachinePacket packet) {
+        tag.merge(packet.getSets());
+        for (var key : packet.getResets()) {
+            tag.remove(key);
         }
     }
 
     @Override
     public CompoundTag serializeNBT() {
-        var tag = new CompoundTag();
-        tag.putBoolean("autoDumpItem", autoDumpItem);
-        tag.putBoolean("autoDumpFluid", autoDumpFluid);
-        if (targetRecipe != null) {
-            tag.putString("targetRecipe", targetRecipe.getId().toString());
-        }
-        return tag;
+        return tag.copy();
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        autoDumpItem = tag.getBoolean("autoDumpItem");
-        autoDumpFluid = tag.getBoolean("autoDumpFluid");
-        if (tag.contains("targetRecipe", Tag.TAG_STRING)) {
-            targetRecipeLoc = new ResourceLocation(tag.getString("targetRecipe"));
-        } else {
-            targetRecipeLoc = null;
-        }
+        this.tag = tag.copy();
     }
 }
