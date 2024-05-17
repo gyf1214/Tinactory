@@ -10,7 +10,7 @@ import java.util.Collection;
 @MethodsReturnNonnullByDefault
 public interface IFluidCollection extends IPort {
     @Override
-    default PortType getPortType() {
+    default PortType type() {
         return PortType.FLUID;
     }
 

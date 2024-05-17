@@ -159,7 +159,7 @@ public class LogisticsComponent extends Component {
             if (remaining.isEmpty()) {
                 return;
             }
-            if (storage.getPortType() != remaining.getPortType()) {
+            if (storage.type() != remaining.getPortType()) {
                 continue;
             }
             remaining = transmitItem(req, storage, remaining, remaining.getCount());

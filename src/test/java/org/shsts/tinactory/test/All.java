@@ -8,7 +8,7 @@ import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.ProcessingPlugin;
 import org.shsts.tinactory.content.gui.RecipeBookPlugin;
-import org.shsts.tinactory.content.logistics.StackContainer;
+import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.RecipeProcessor;
@@ -66,7 +66,7 @@ public final class All {
                 .blockEntity()
                 .ticking().eventManager()
                 .simpleCapability(Machine.builder(Voltage.ULV))
-                .capability(StackContainer::builder)
+                .capability(StackProcessingContainer::builder)
                 .layout(TEST_FLUID_LAYOUT)
                 .build()
                 .capability(RecipeProcessor::builder)

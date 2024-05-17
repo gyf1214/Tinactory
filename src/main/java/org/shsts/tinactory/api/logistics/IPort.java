@@ -7,15 +7,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IPort {
-    PortType getPortType();
+    PortType type();
 
     default IItemCollection asItem() {
-        assert getPortType() == PortType.ITEM;
+        assert type() == PortType.ITEM;
         return (IItemCollection) this;
     }
 
     default IFluidCollection asFluid() {
-        assert getPortType() == PortType.FLUID;
+        assert type() == PortType.FLUID;
         return (IFluidCollection) this;
     }
 

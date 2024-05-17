@@ -8,7 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AllEvents {
+public class AllForgeEvents {
     @SubscribeEvent
     public static void onRegisterCommand(RegisterCommandsEvent event) {
         AllCommands.register(event.getDispatcher());

@@ -10,6 +10,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -19,12 +20,20 @@ public class CapabilityEntry<T> extends RegistryEntry<Capability<T>> {
         super(modid, "", () -> CapabilityManager.get(token));
     }
 
-    public T getCapability(BlockEntity blockEntity) {
-        return getCapability(blockEntity, null);
+    public T get(BlockEntity be) {
+        return get(be, null);
     }
 
-    public T getCapability(BlockEntity blockEntity, @Nullable Direction dir) {
-        return blockEntity.getCapability(get(), dir)
+    public T get(BlockEntity be, @Nullable Direction dir) {
+        return be.getCapability(get(), dir)
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    public Optional<T> tryGet(BlockEntity be) {
+        return tryGet(be, null);
+    }
+
+    public Optional<T> tryGet(BlockEntity be, @Nullable Direction dir) {
+        return be.getCapability(get(), dir).resolve();
     }
 }

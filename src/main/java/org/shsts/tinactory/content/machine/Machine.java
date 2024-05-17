@@ -13,16 +13,22 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
+import org.shsts.tinactory.content.logistics.LogisticsComponent;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
+import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
@@ -55,6 +61,7 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
 
     public void setConfig(SetMachinePacket packet) {
         config.apply(packet);
+        updateTargetRecipe(true);
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG, packet);
     }
 
@@ -68,6 +75,7 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
 
     protected void onServerLoad(Level world) {
         LOGGER.debug("machine {}: loaded", this);
+        updateTargetRecipe(true);
     }
 
     protected void onRemoved(Level world) {
@@ -89,12 +97,63 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
         }
     }
 
+    protected void resetTargetRecipe(IContainer container, boolean updateFilter) {
+        for (var i = 0; i < container.portSize(); i++) {
+            if (container.hasPort(i) && container.portDirection(i) == PortDirection.INPUT) {
+                if (updateFilter) {
+                    container.resetFilter(i);
+                }
+                var port = container.getPort(i, false);
+                getLogistics().ifPresent(component -> component.removePassiveStorage(PortDirection.INPUT, port));
+            }
+        }
+    }
+
+    protected void setTargetRecipe(IContainer container, ProcessingRecipe<?> recipe, boolean updateFilter) {
+        for (var input : recipe.inputs) {
+            var idx = input.port();
+            var port = container.getPort(idx, false);
+            var ingredient = input.ingredient();
+            if (!container.hasPort(idx)) {
+                continue;
+            }
+            if (updateFilter) {
+                if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
+                    container.setItemFilter(idx, item.ingredient());
+                } else if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
+                    var stack1 = item.stack();
+                    container.setItemFilter(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
+                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
+                    var stack1 = fluid.fluid();
+                    container.setFluidFilter(idx, stack -> stack.isFluidEqual(stack1));
+                }
+            }
+            getLogistics().ifPresent(component -> component.addPassiveStorage(PortDirection.INPUT, port));
+        }
+    }
+
+    protected void updateTargetRecipe(boolean updateFilter) {
+        var world = blockEntity.getLevel();
+        assert world != null && !world.isClientSide;
+        var recipe = config.getRecipe("targetRecipe", world).orElse(null);
+        var container = getContainer().orElse(null);
+        if (container == null) {
+            return;
+        }
+        if (recipe == null) {
+            resetTargetRecipe(container, updateFilter);
+        } else {
+            setTargetRecipe(container, recipe, updateFilter);
+        }
+    }
+
     /**
      * Called when connect to the network
      */
     public void onConnectToNetwork(Network network) {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
+        updateTargetRecipe(false);
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 
@@ -135,11 +194,19 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
     }
 
     public Optional<IProcessor> getProcessor() {
-        return blockEntity.getCapability(AllCapabilities.PROCESSOR.get()).resolve();
+        return AllCapabilities.PROCESSOR.tryGet(blockEntity);
+    }
+
+    public Optional<IContainer> getContainer() {
+        return AllCapabilities.CONTAINER.tryGet(blockEntity);
     }
 
     public Optional<IElectricMachine> getElectric() {
-        return blockEntity.getCapability(AllCapabilities.ELECTRIC_MACHINE.get()).resolve();
+        return AllCapabilities.ELECTRIC_MACHINE.tryGet(blockEntity);
+    }
+
+    public Optional<LogisticsComponent> getLogistics() {
+        return getNetwork().map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT));
     }
 
     /**

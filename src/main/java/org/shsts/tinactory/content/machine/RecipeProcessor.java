@@ -60,7 +60,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
     private IContainer getContainer() {
         if (container == null) {
-            container = AllCapabilities.CONTAINER.getCapability(blockEntity);
+            container = AllCapabilities.CONTAINER.get(blockEntity);
         }
         return container;
     }

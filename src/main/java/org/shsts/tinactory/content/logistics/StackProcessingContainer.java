@@ -5,11 +5,13 @@ import com.google.common.collect.Multimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -21,7 +23,6 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
@@ -31,8 +32,6 @@ import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import javax.annotation.Nonnull;
@@ -45,10 +44,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class StackContainer implements ICapabilityProvider,
+public class StackProcessingContainer implements ICapabilityProvider,
         IContainer, IEventSubscriber, INBTSerializable<CompoundTag> {
     private record PortInfo(int startSlot, int endSlot, SlotType type,
                             IPort port, IPort internalPort) {}
@@ -60,7 +60,7 @@ public class StackContainer implements ICapabilityProvider,
     private final Map<Integer, WrapperItemHandler> itemInputs = new HashMap<>();
     private final Multimap<Integer, WrapperFluidTank> fluidInputs = ArrayListMultimap.create();
 
-    private StackContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
+    private StackProcessingContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
         this.ports = new ArrayList<>(portInfo.size());
 
@@ -155,9 +155,19 @@ public class StackContainer implements ICapabilityProvider,
     }
 
     @Override
+    public int portSize() {
+        return ports.size();
+    }
+
+    @Override
     public boolean hasPort(int port) {
         return port >= 0 && port < ports.size() &&
                 ports.get(port).type != SlotType.NONE;
+    }
+
+    @Override
+    public PortDirection portDirection(int port) {
+        return ports.get(port).type.direction;
     }
 
     @Override
@@ -169,59 +179,25 @@ public class StackContainer implements ICapabilityProvider,
         return internal ? portInfo.internalPort : portInfo.port;
     }
 
-    private void updateTargetRecipe(boolean updateFilter) {
-        var world = blockEntity.getLevel();
-        assert world != null && !world.isClientSide;
-        var machine = Machine.get(blockEntity);
-        var targetRecipe = machine.config.getRecipe("targetRecipe", world).orElse(null);
-        var logistics = machine.getNetwork()
-                .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
-                .orElse(null);
-        if (targetRecipe == null) {
-            if (updateFilter) {
-                for (var itemHandler : itemInputs.values()) {
-                    itemHandler.resetFilter();
-                }
-                for (var tank : fluidInputs.values()) {
-                    tank.resetFilter();
-                }
-            }
-            if (logistics != null) {
-                for (var portInfo : ports) {
-                    if (portInfo.type != SlotType.NONE && portInfo.type.direction == PortDirection.INPUT) {
-                        logistics.removePassiveStorage(PortDirection.INPUT, portInfo.port);
-                    }
-                }
-            }
-            return;
+    @Override
+    public void setItemFilter(int port, Predicate<ItemStack> filter) {
+        itemInputs.get(port).filter = filter;
+    }
+
+    @Override
+    public void setFluidFilter(int port, Predicate<FluidStack> filter) {
+        for (var tank : fluidInputs.get(port)) {
+            tank.filter = filter;
         }
-        for (ProcessingRecipe.Input input : targetRecipe.inputs) {
-            var port = input.port();
-            var ingredient = input.ingredient();
-            if (!hasPort(port)) {
-                continue;
-            }
-            if (updateFilter) {
-                if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                    var handler = itemInputs.get(port);
-                    if (handler != null) {
-                        handler.filter = item.ingredient();
-                    }
-                } else if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
-                    var handler = itemInputs.get(port);
-                    if (handler != null) {
-                        var stack1 = item.stack();
-                        handler.filter = stack -> ItemHelper.canItemsStack(stack, stack1);
-                    }
-                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                    for (var tank : fluidInputs.get(port)) {
-                        var stack1 = fluid.fluid();
-                        tank.filter = stack -> stack.isFluidEqual(stack1);
-                    }
-                }
-            }
-            if (logistics != null) {
-                logistics.addPassiveStorage(PortDirection.INPUT, getPort(port, false));
+    }
+
+    @Override
+    public void resetFilter(int port) {
+        if (itemInputs.containsKey(port)) {
+            itemInputs.get(port).resetFilter();
+        } else if (fluidInputs.containsKey(port)) {
+            for (var tank : fluidInputs.get(port)) {
+                tank.resetFilter();
             }
         }
     }
@@ -256,11 +232,8 @@ public class StackContainer implements ICapabilityProvider,
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> updateTargetRecipe(true));
-        eventManager.subscribe(AllEvents.CONNECT, $ -> updateTargetRecipe(false));
         eventManager.subscribe(AllEvents.DUMP_ITEM_OUTPUT, this::dumpItemOutput);
         eventManager.subscribe(AllEvents.DUMP_FLUID_OUTPUT, this::dumpFluidOutput);
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, $ -> updateTargetRecipe(true));
     }
 
     @Nonnull
@@ -318,7 +291,7 @@ public class StackContainer implements ICapabilityProvider,
         @Override
         public Function<BlockEntity, ICapabilityProvider> createObject() {
             var ports = this.ports;
-            return be -> new StackContainer(be, ports);
+            return be -> new StackProcessingContainer(be, ports);
         }
     }
 

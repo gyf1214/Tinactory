@@ -23,7 +23,7 @@ public class WorkbenchMenu extends Menu<SmartBlockEntity, WorkbenchMenu> {
         super(type, id, inventory, blockEntity);
 
         var layout = AllLayouts.WORKBENCH;
-        var workbench = AllCapabilities.WORKBENCH.getCapability(blockEntity);
+        var workbench = AllCapabilities.WORKBENCH.get(blockEntity);
         var xOffset = layout.getXOffset();
         for (var slot : layout.slots) {
             var x = xOffset + slot.x();

@@ -75,7 +75,7 @@ public class Network extends NetworkBase {
         }
         if (state.getBlock() instanceof SmartEntityBlock<?> entityBlock) {
             entityBlock.getBlockEntity(world, pos)
-                    .flatMap(be -> be.getCapability(AllCapabilities.MACHINE.get()).resolve())
+                    .flatMap(AllCapabilities.MACHINE::tryGet)
                     .ifPresent(this::putMachine);
         }
     }

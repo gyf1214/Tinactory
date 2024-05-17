@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.ProcessingPlugin;
 import org.shsts.tinactory.content.gui.RecipeBookPlugin;
-import org.shsts.tinactory.content.logistics.StackContainer;
+import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
@@ -55,7 +55,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                 .capability(RecipeProcessor::builder)
                 .recipeType(recipeType).voltage(voltage)
                 .build()
-                .capability(StackContainer::builder)
+                .capability(StackProcessingContainer::builder)
                 .layout(layout)
                 .build()
                 .menu(ProcessingMenu.factory(layout))

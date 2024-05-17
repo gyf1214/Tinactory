@@ -14,7 +14,7 @@ import java.util.Collection;
 @MethodsReturnNonnullByDefault
 public interface IItemCollection extends IPort {
     @Override
-    default PortType getPortType() {
+    default PortType type() {
         return PortType.ITEM;
     }
 

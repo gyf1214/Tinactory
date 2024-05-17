@@ -31,7 +31,7 @@ public class TinactoryTest {
         modEventBus.addListener(TinactoryTest::init);
         REGISTRATE.register(modEventBus);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> REGISTRATE.registerClient(modEventBus));
-        MinecraftForge.EVENT_BUS.register(AllEvents.class);
+        MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);
     }
 
     private static void init(FMLCommonSetupEvent event) {
