@@ -44,12 +44,10 @@ public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S
             }
         }
         if (layout.progressBar != null) {
-            this.progressBarIndex = addSyncSlot(MenuSyncPacket.Double.class, (containerId, index, be) -> {
-                var progress = be.getCapability(AllCapabilities.PROCESSOR.get())
-                        .map(IProcessor::getProgress)
-                        .orElse(0.0d);
-                return new MenuSyncPacket.Double(containerId, index, progress);
-            });
+            this.progressBarIndex = addSyncSlot(MenuSyncPacket.Double::new,
+                    be -> be.getCapability(AllCapabilities.PROCESSOR.get())
+                            .map(IProcessor::getProgress)
+                            .orElse(0.0d));
         } else {
             this.progressBarIndex = -1;
         }

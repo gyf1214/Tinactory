@@ -36,8 +36,7 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     private final int startY;
 
     private int syncSlot(M menu, Predicate<Machine> getter) {
-        return menu.addSyncSlot(MenuSyncPacket.Boolean.class, (containerId, index, be) ->
-                new MenuSyncPacket.Boolean(containerId, index, getter.test(Machine.get(be))));
+        return menu.addSyncSlot(MenuSyncPacket.Boolean::new, be -> getter.test(Machine.get(be)));
     }
 
     public ProcessingPlugin(M menu) {

@@ -28,9 +28,8 @@ public class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
 
     public RecipeBookPlugin(M menu, RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType,
                             Layout layout) {
-        this.syncSlot = menu.addSyncSlot(MenuSyncPacket.LocHolder.class, (containerId, index, be) ->
-                new MenuSyncPacket.LocHolder(containerId, index,
-                        Machine.get(be).machineConfig.getTargetRecipeLoc()));
+        this.syncSlot = menu.addSyncSlot(MenuSyncPacket.LocHolder::new,
+                be -> Machine.get(be).machineConfig.getTargetRecipeLoc());
         this.recipeType = recipeType.get();
         this.layout = layout;
     }

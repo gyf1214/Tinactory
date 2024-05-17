@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -75,19 +76,14 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     protected final Map<Integer, EventHandler<?>> eventHandlers = new HashMap<>();
 
     @FunctionalInterface
-    public interface SyncPacketFactory<T extends BlockEntity, P extends MenuSyncPacket> {
+    public interface SyncPacketFactory<T, P extends MenuSyncPacket> {
         P create(int containerId, int index, T be);
     }
 
     protected abstract class SyncSlot<P extends MenuSyncPacket> {
-        private final Class<P> clazz;
         @Nullable
         private P packet = null;
         private final List<Consumer<P>> callbacks = new ArrayList<>();
-
-        protected SyncSlot(Class<P> clazz) {
-            this.clazz = clazz;
-        }
 
         protected abstract P getPacket(T be);
 
@@ -101,8 +97,9 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
             }
         }
 
+        @SuppressWarnings("unchecked")
         public void setPacket(MenuSyncPacket packet) {
-            this.packet = clazz.cast(packet);
+            this.packet = (P) packet;
             for (var cb : callbacks) {
                 cb.accept(this.packet);
             }
@@ -242,10 +239,9 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         addSlot(new SlotItemHandler(container, index, posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));
     }
 
-    public <P extends MenuSyncPacket>
-    int addSyncSlot(Class<P> clazz, SyncPacketFactory<T, P> factory) {
+    public <P extends MenuSyncPacket> int addSyncSlot(SyncPacketFactory<T, P> factory) {
         int index = syncSlots.size();
-        syncSlots.add(new SyncSlot<P>(clazz) {
+        syncSlots.add(new SyncSlot<P>() {
             @Override
             protected P getPacket(T be) {
                 return factory.create(containerId, index, be);
@@ -254,10 +250,14 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         return index;
     }
 
+    public <P extends MenuSyncPacket, R>
+    int addSyncSlot(SyncPacketFactory<R, P> factory, Function<T, R> getter) {
+        return addSyncSlot((containerId, index, be) -> factory.create(containerId, index, getter.apply(be)));
+    }
+
     public int addFluidSlot(int tank) {
         assert fluidContainer != null;
-        return addSyncSlot(FluidSyncPacket.class, (containerId1, index, be) ->
-                new FluidSyncPacket(containerId1, index, fluidContainer.getTank(tank).getFluid()));
+        return addSyncSlot(FluidSyncPacket::new, $ -> fluidContainer.getTank(tank).getFluid());
     }
 
     protected enum FluidClickAction {
@@ -366,7 +366,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
      */
     public void handleSyncPacket(int index, MenuSyncPacket packet) {
         var slot = syncSlots.get(index);
-        if (slot == null || !slot.clazz.isInstance(packet)) {
+        if (slot == null) {
             return;
         }
         slot.setPacket(packet);

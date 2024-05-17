@@ -23,8 +23,7 @@ public class NetworkControllerMenu extends Menu<NetworkController, NetworkContro
     public NetworkControllerMenu(SmartMenuType<NetworkController, ?> type, int id,
                                  Inventory inventory, NetworkController blockEntity) {
         super(type, id, inventory, blockEntity);
-
-        this.syncSlot = addSyncSlot(NetworkControllerSyncPacket.class, NetworkControllerSyncPacket::new);
+        this.syncSlot = addSyncSlot(NetworkControllerSyncPacket::new);
     }
 
     @Override
