@@ -6,7 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface ISelf<S extends ISelf<S>> extends I<S> {
+public interface ISelf<S extends ISelf<S>> {
     @SuppressWarnings("unchecked")
     default S self() {
         return (S) this;
