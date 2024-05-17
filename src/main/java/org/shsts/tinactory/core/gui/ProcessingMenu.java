@@ -88,7 +88,7 @@ public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S
                 layoutPanel.addWidget(progressBar.rect(), widget);
             }
 
-            rootPanel.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
+            addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
         }
     }
 

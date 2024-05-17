@@ -5,7 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.gui.MenuGen;
+import org.shsts.tinactory.content.gui.ProcessingPlugin;
+import org.shsts.tinactory.content.gui.RecipeBookPlugin;
 import org.shsts.tinactory.content.logistics.StackContainer;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -58,8 +59,8 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
                 .layout(layout)
                 .build()
                 .menu(ProcessingMenu.factory(layout))
-                .transform(MenuGen.machineMenu(layout))
-                .transform(MenuGen.machineRecipeBook(recipeType, layout))
+                .plugin(ProcessingPlugin::new)
+                .plugin(RecipeBookPlugin.builder(recipeType, layout))
                 .build() // menu
                 .build() // blockEntity
                 .block()

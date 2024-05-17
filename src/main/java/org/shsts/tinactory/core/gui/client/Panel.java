@@ -8,11 +8,9 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.registrate.builder.MenuBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -21,7 +19,7 @@ import java.util.List;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Panel extends GuiComponent implements MenuBuilder.WidgetConsumer, ISelf<Panel> {
+public class Panel extends GuiComponent implements IWidgetConsumer {
     protected record Child(RectD anchor, Rect offset, GuiComponent child) {
         public void setRect(Rect parent) {
             var sx = parent.inX(anchor.x()) + offset.x();

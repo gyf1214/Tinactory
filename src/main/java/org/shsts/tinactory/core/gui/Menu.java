@@ -115,6 +115,8 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
 
     protected final List<SyncSlot<?>> syncSlots = new ArrayList<>();
 
+    protected final List<IMenuPlugin<S>> plugins = new ArrayList<>();
+
     public Menu(SmartMenuType<T, ?> type, int id, Inventory inventory, T blockEntity) {
         super(type, id);
         this.player = inventory.player;
@@ -126,8 +128,8 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
                 .resolve().orElse(null);
         this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
                 .resolve().orElse(null);
-        height = 0;
         onEventPacket(MenuEventHandler.FLUID_CLICK, p -> clickFluidSlot(p.getTankIndex(), p.getButton()));
+        this.height = 0;
     }
 
     @Override
@@ -155,16 +157,23 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         return barY + SLOT_SIZE + MARGIN_VERTICAL;
     }
 
+    public void addPlugin(IMenuPlugin<S> plugin) {
+        plugins.add(plugin);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void applyPlugin(MenuScreen<S> screen) {
+        for (var plugin : plugins) {
+            plugin.applyMenuScreen(screen);
+        }
+    }
+
     /**
      * This is called after all menu callbacks
      */
-    public void setLayout(List<Rect> widgets, boolean hasInventory) {
+    public void setLayout(boolean hasInventory) {
         // here height does not include top margin and spacing
-        var y = height;
-        for (var widget : widgets) {
-            y = Math.max(y, widget.endY());
-        }
-        y += MARGIN_TOP + SPACING_VERTICAL;
+        var y = height + MARGIN_TOP + SPACING_VERTICAL;
         containerSlotCount = slots.size();
         this.hasInventory = hasInventory;
         if (hasInventory) {
@@ -222,6 +231,10 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
 
     public int getHeight() {
         return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public void addSlot(int index, int posX, int posY) {

@@ -14,8 +14,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.registrate.builder.MenuBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import static org.shsts.tinactory.core.gui.Menu.WIDTH;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M> {
+public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M> implements IWidgetConsumer {
     public static final int TEXT_COLOR = 0xFF404040;
 
     protected final Panel rootPanel;
@@ -53,14 +53,15 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         }
     }
 
+    @Override
+    public void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget) {
+        rootPanel.addGuiComponent(anchor, offset, widget);
+    }
+
     public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
     void addWidgetToScreen(T widget) {
         addRenderableWidget(widget);
         hoverables.add(widget);
-    }
-
-    public void initWidget(MenuBuilder.WidgetFactory<M> widget) {
-        widget.accept(this, rootPanel);
     }
 
     @Override
