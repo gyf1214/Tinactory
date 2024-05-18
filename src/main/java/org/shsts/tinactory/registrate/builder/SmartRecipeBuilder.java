@@ -2,7 +2,6 @@ package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -15,7 +14,7 @@ public abstract class SmartRecipeBuilder<U extends SmartRecipe<?, U>, S extends 
         extends Builder<U, RecipeTypeEntry<U, S>, S> {
 
     @FunctionalInterface
-    public interface Factory<U1 extends Recipe<?>, S1> {
+    public interface Factory<U1 extends SmartRecipe<?, U1>, S1> {
         S1 create(Registrate registrate, RecipeTypeEntry<U1, S1> parent, ResourceLocation loc);
     }
 

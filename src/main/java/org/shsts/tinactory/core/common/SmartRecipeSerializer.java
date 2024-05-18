@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.common;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
@@ -16,16 +17,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
         extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
 
-    @FunctionalInterface
-    public interface Factory<T1 extends SmartRecipe<?, T1>, B1, S extends SmartRecipeSerializer<T1, B1>> {
-        S create(RecipeTypeEntry<T1, B1> type);
-    }
-
-    @FunctionalInterface
-    public interface SimpleFactory<T1 extends SmartRecipe<?, T1>, B1>
-            extends Factory<T1, B1, SmartRecipeSerializer<T1, B1>> {}
+    protected final Gson gson = new Gson();
 
     protected final RecipeTypeEntry<T, B> type;
+
+    @FunctionalInterface
+    public interface Factory<T1 extends SmartRecipe<?, T1>, B1> {
+        SmartRecipeSerializer<T1, B1> create(RecipeTypeEntry<T1, B1> type);
+    }
 
     protected SmartRecipeSerializer(RecipeTypeEntry<T, B> type) {
         this.type = type;
@@ -37,10 +36,17 @@ public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
     public abstract void toJson(JsonObject jo, T recipe);
 
     @Override
-    public abstract T fromNetwork(ResourceLocation loc, FriendlyByteBuf buf);
+    public T fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
+        var jo = gson.fromJson(buf.readUtf(), JsonObject.class);
+        return fromJson(loc, jo);
+    }
 
     @Override
-    public abstract void toNetwork(FriendlyByteBuf buf, T recipe);
+    public void toNetwork(FriendlyByteBuf buf, T recipe) {
+        var jo = new JsonObject();
+        toJson(jo, recipe);
+        buf.writeUtf(gson.toJson(jo));
+    }
 
     @Override
     public T fromJson(ResourceLocation loc, JsonObject jo) {

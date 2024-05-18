@@ -10,12 +10,9 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
-import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
@@ -40,7 +37,7 @@ import java.util.function.Supplier;
 public class JEI implements IModPlugin {
     private static final ResourceLocation LOC = ModelGen.modLoc("jei");
 
-    private record CategoryInfo<C extends Container, T extends Recipe<C>>(
+    private record CategoryInfo<T extends SmartRecipe<?, T>>(
             RecipeType<T> type, RecipeTypeEntry<T, ?> typeEntry,
             RecipeCategory.Factory<T> factory,
             Supplier<Ingredient> catalyst) {
@@ -59,18 +56,18 @@ public class JEI implements IModPlugin {
         }
     }
 
-    private static <C extends Container, T extends Recipe<C>> CategoryInfo<C, T>
+    private static <T extends SmartRecipe<?, T>> CategoryInfo<T>
     category(RecipeTypeEntry<T, ?> recipeType, RecipeCategory.Factory<T> factory, Supplier<Ingredient> catalyst) {
         var type = new RecipeType<>(ModelGen.prepend(recipeType.loc, "jei/category"), recipeType.clazz);
         return new CategoryInfo<>(type, recipeType, factory, catalyst);
     }
 
-    private static <C extends Container, T extends Recipe<C>> CategoryInfo<C, T>
+    private static <T extends SmartRecipe<?, T>> CategoryInfo<T>
     category(RecipeTypeEntry<T, ?> recipeType, RecipeCategory.Factory<T> factory, TagKey<Item> catalyst) {
         return category(recipeType, factory, () -> Ingredient.of(catalyst));
     }
 
-    private static <T extends ProcessingRecipe<T>> CategoryInfo<SmartRecipe.ContainerWrapper<IContainer>, T>
+    private static <T extends ProcessingRecipe<T>> CategoryInfo<T>
     processing(ProcessingSet<T> processingSet) {
         var layout = processingSet.layoutSet.get(Voltage.MAXIMUM);
         return category(processingSet.recipeType, (type, helpers) -> new ProcessingCategory<>(type, helpers,
@@ -78,7 +75,7 @@ public class JEI implements IModPlugin {
                 AllTags.processingMachine(processingSet.recipeType));
     }
 
-    private final List<CategoryInfo<?, ?>> categories = List.of(
+    private final List<CategoryInfo<?>> categories = List.of(
             category(AllRecipes.TOOL, ToolCategory::new, () -> Ingredient.of(AllBlockEntities.WORKBENCH.getBlock())),
             processing(AllBlockEntities.STONE_GENERATOR),
             processing(AllBlockEntities.ORE_ANALYZER));

@@ -3,9 +3,9 @@ package org.shsts.tinactory.registrate.common;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import org.shsts.tinactory.core.common.SmartRecipe;
+import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
@@ -18,11 +18,11 @@ import static org.shsts.tinactory.content.model.ModelGen.prepend;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<RecipeType<T>> {
+public class RecipeTypeEntry<T extends SmartRecipe<?, T>, B> extends RegistryEntry<RecipeType<T>> {
     private final Registrate registrate;
     private final SmartRecipeBuilder.Factory<T, B> builderFactory;
     @Nullable
-    private RecipeSerializer<T> serializer;
+    private SmartRecipeSerializer<T, B> serializer;
     private final String prefix;
     private final Transformer<B> defaultTransformer;
     public final Class<T> clazz;
@@ -38,12 +38,12 @@ public class RecipeTypeEntry<T extends Recipe<?>, B> extends RegistryEntry<Recip
         this.defaultTransformer = defaultTransformer;
     }
 
-    public RecipeSerializer<T> getSerializer() {
+    public SmartRecipeSerializer<T, B> getSerializer() {
         assert serializer != null;
         return serializer;
     }
 
-    public void setSerializer(RecipeSerializer<T> value) {
+    public void setSerializer(SmartRecipeSerializer<T, B> value) {
         serializer = value;
     }
 

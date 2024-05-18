@@ -30,7 +30,7 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
 
     private final ResourceLocation loc;
     private final RecipeType<? super T> type;
-    private final RecipeSerializer<T> serializer;
+    private final SmartRecipeSerializer<T, ?> serializer;
 
     protected SmartRecipe(RecipeTypeEntry<T, ?> type, ResourceLocation loc) {
         this.loc = loc;
@@ -97,11 +97,11 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
         return world.getRecipeManager().getRecipesFor(type, new ContainerWrapper<>(container), world);
     }
 
-    protected abstract static class SimpleFinished<T extends Recipe<?>> implements FinishedRecipe {
+    protected abstract static class SimpleFinished<T extends SmartRecipe<?, T>> implements FinishedRecipe {
         protected final ResourceLocation loc;
-        protected final RecipeSerializer<T> serializer;
+        protected final SmartRecipeSerializer<T, ?> serializer;
 
-        public SimpleFinished(ResourceLocation loc, RecipeSerializer<T> serializer) {
+        public SimpleFinished(ResourceLocation loc, SmartRecipeSerializer<T, ?> serializer) {
             this.loc = loc;
             this.serializer = serializer;
         }
@@ -135,7 +135,7 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
         return new SimpleFinished<>(loc, serializer) {
             @Override
             public void serializeRecipeData(JsonObject jo) {
-                ((SmartRecipeSerializer<T, ?>) serializer).toJson(jo, SmartRecipe.this.self());
+                serializer.toJson(jo, SmartRecipe.this.self());
             }
         };
     }

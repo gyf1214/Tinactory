@@ -7,7 +7,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import org.shsts.tinactory.core.common.SmartRecipe;
-import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -19,7 +18,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class RecipeTypeHandler {
     private final Registrate registrate;
-    private final List<RecipeTypeBuilder<?, ?, ?, ?>> builders = new ArrayList<>();
+    private final List<RecipeTypeBuilder<?, ?, ?>> builders = new ArrayList<>();
     private final DeferredRegister<RecipeType<?>> recipeTypeRegister;
 
     public RecipeTypeHandler(Registrate registrate) {
@@ -27,8 +26,8 @@ public class RecipeTypeHandler {
         this.recipeTypeRegister = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, registrate.modid);
     }
 
-    public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>
-    RecipeTypeEntry<T, B> register(RecipeTypeBuilder<T, B, S, ?> builder) {
+    public <T extends SmartRecipe<?, T>, B>
+    RecipeTypeEntry<T, B> register(RecipeTypeBuilder<T, B, ?> builder) {
         builders.add(builder);
         var recipeType = recipeTypeRegister.register(builder.id, builder::buildObject);
         return new RecipeTypeEntry<>(registrate, builder.id, recipeType,

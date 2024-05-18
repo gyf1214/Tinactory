@@ -17,11 +17,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>, P>
-        extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, S, P>> {
+public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, P>
+        extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final SmartRecipeSerializer.Factory<T, B, S> serializerFactory;
+    private final SmartRecipeSerializer.Factory<T, B> serializerFactory;
     @Nullable
     private SmartRecipeBuilder.Factory<T, B> builderFactory = null;
     @Nullable
@@ -31,27 +31,27 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, S extends SmartRe
     private Transformer<B> defaultTransformer = $ -> $;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
-                             SmartRecipeSerializer.Factory<T, B, S> serializerFactory) {
+                             SmartRecipeSerializer.Factory<T, B> serializerFactory) {
         super(registrate, id, parent);
         this.serializerFactory = serializerFactory;
     }
 
-    public RecipeTypeBuilder<T, B, S, P> builder(SmartRecipeBuilder.Factory<T, B> factory) {
+    public RecipeTypeBuilder<T, B, P> builder(SmartRecipeBuilder.Factory<T, B> factory) {
         builderFactory = factory;
         return self();
     }
 
-    public RecipeTypeBuilder<T, B, S, P> prefix(String value) {
+    public RecipeTypeBuilder<T, B, P> prefix(String value) {
         prefix = value;
         return self();
     }
 
-    public RecipeTypeBuilder<T, B, S, P> clazz(Class<T> value) {
+    public RecipeTypeBuilder<T, B, P> clazz(Class<T> value) {
         clazz = value;
         return self();
     }
 
-    public RecipeTypeBuilder<T, B, S, P> builderTransform(Transformer<B> trans) {
+    public RecipeTypeBuilder<T, B, P> builderTransform(Transformer<B> trans) {
         defaultTransformer = defaultTransformer.chain(trans);
         return this;
     }

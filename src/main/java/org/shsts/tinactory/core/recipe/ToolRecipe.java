@@ -253,6 +253,6 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
         }
     }
 
-    public static final SmartRecipeSerializer.SimpleFactory<ToolRecipe, Builder>
+    public static final SmartRecipeSerializer.Factory<ToolRecipe, Builder>
             SERIALIZER = Serializer::new;
 }

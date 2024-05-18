@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
@@ -314,42 +313,8 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                 jo.addProperty("power", recipe.power);
             }
         }
-
-        public B buildFromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
-            var builder = type.getBuilder(loc);
-            buf.readWithCount(buf1 -> builder.input(
-                    buf1.readVarInt(),
-                    ProcessingIngredients.SERIALIZER.fromNetwork(buf1)));
-            buf.readWithCount(buf1 -> builder.output(
-                    buf1.readVarInt(),
-                    ProcessingResults.SERIALIZER.fromNetwork(buf1)));
-            return builder
-                    .workTicks(buf.readVarLong())
-                    .voltage(buf.readVarLong())
-                    .power(buf.readVarLong());
-        }
-
-        @Override
-        public T fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
-            return buildFromNetwork(loc, buf).buildObject();
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, T recipe) {
-            buf.writeCollection(recipe.inputs, (buf1, input) -> {
-                buf1.writeVarInt(input.port);
-                ProcessingIngredients.SERIALIZER.toNetwork(input.ingredient, buf);
-            });
-            buf.writeCollection(recipe.outputs, (buf1, output) -> {
-                buf1.writeVarInt(output.port);
-                ProcessingResults.SERIALIZER.toNetwork(output.result, buf1);
-            });
-            buf.writeVarLong(recipe.workTicks);
-            buf.writeVarLong(recipe.voltage);
-            buf.writeVarLong(recipe.power);
-        }
     }
 
-    public static final SmartRecipeSerializer.SimpleFactory<Simple, SimpleBuilder>
+    public static final SmartRecipeSerializer.Factory<Simple, SimpleBuilder>
             SIMPLE_SERIALIZER = Serializer::new;
 }

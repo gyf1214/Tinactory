@@ -388,8 +388,8 @@ public class Registrate {
         return registryEntry(id, AllRegistries.EVENT, () -> new ReturnEvent<>(defaultRet));
     }
 
-    public <T extends SmartRecipe<?, T>, B, S extends SmartRecipeSerializer<T, B>>
-    RecipeTypeBuilder<T, B, S, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B, S> serializer) {
+    public <T extends SmartRecipe<?, T>, B>
+    RecipeTypeBuilder<T, B, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
 
