@@ -45,6 +45,7 @@ import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
+import org.shsts.tinactory.registrate.builder.TechBuilder;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import org.shsts.tinactory.registrate.common.CapabilityEntry;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -64,6 +65,7 @@ import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
 import org.shsts.tinactory.registrate.handler.TagsHandler;
+import org.shsts.tinactory.registrate.handler.TechHandler;
 import org.shsts.tinactory.registrate.handler.TintHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -111,6 +113,7 @@ public class Registrate {
     // DataGen
     public final RecipeDataHandler recipeDataHandler = new RecipeDataHandler(this);
     public final LootTableHandler lootTableHandler = new LootTableHandler(this);
+    public final TechHandler techHandler = new TechHandler(this);
 
     // Client
     public final RenderTypeHandler renderTypeHandler = new RenderTypeHandler();
@@ -126,6 +129,7 @@ public class Registrate {
         putDataHandler(itemModelHandler);
         putDataHandler(recipeDataHandler);
         putDataHandler(lootTableHandler);
+        putDataHandler(techHandler);
     }
 
     public <T extends IForgeRegistryEntry<T>>
@@ -407,6 +411,10 @@ public class Registrate {
         for (var id : ids) {
             biomeHandler.addLocation(new ResourceLocation(modid, id));
         }
+    }
+
+    public TechBuilder<Registrate> tech(String id) {
+        return new TechBuilder<>(this, this, id);
     }
 
     public void nullRecipe(ResourceLocation loc) {

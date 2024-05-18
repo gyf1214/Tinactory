@@ -38,6 +38,9 @@ public final class All {
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> TEST_MACHINE;
     public static final BlockEntitySet<TestGenerator, MachineBlock<TestGenerator>> TEST_GENERATOR;
 
+    public static final ResourceLocation TEST_BASE_TECH;
+    public static final ResourceLocation TEST_TECH;
+
     static {
         TEST_RECIPE_TYPE = REGISTRATE.simpleProcessingRecipeType("test");
 
@@ -102,6 +105,15 @@ public final class All {
                 .defaultBlockItem().dropSelf()
                 .build()
                 .register();
+
+        TEST_BASE_TECH = REGISTRATE.tech("test_base")
+                .maxProgress(1000)
+                .createObject();
+
+        TEST_TECH = REGISTRATE.tech("test")
+                .maxProgress(2000)
+                .depends(TEST_BASE_TECH)
+                .createObject();
     }
 
     public static void init() {}

@@ -4,7 +4,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.registrate.Registrate;
@@ -46,13 +45,6 @@ public class TagsHandler<T> extends DataHandler<TagsProvider<T>> {
         @Override
         public String getName() {
             return modId + " item tags";
-        }
-    }
-
-    public void addTags(Supplier<? extends T> object, ResourceLocation... tags) {
-        for (var tag : tags) {
-            callbacks.add(prov -> ((Provider) prov)
-                    .addTag(TagKey.create(registryKey, tag), object.get()));
         }
     }
 

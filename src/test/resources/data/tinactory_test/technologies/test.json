@@ -1,6 +1,0 @@
-{
-  "depends": [
-    "tinactory_test:test_base"
-  ],
-  "max_progress": 1000
-}
