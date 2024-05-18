@@ -40,7 +40,7 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
                         }
                     }
                     return true;
-                }).orElse(false);
+                }).orElse(requiredTech.isEmpty());
     }
 
     public static class Builder extends ProcessingRecipe.Builder<AssemblyRecipe, Builder> {
