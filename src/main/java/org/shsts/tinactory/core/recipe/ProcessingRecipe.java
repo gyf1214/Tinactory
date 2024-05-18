@@ -138,6 +138,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         protected long workTicks = 0;
         protected long voltage = 0;
         protected long power = 0;
+        protected float amperage = 0f;
 
         public Builder(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
             super(registrate, parent, loc);
@@ -237,12 +238,25 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
             return self();
         }
 
+        public S amperage(float value) {
+            amperage = value;
+            return self();
+        }
+
         protected List<Input> getInputs() {
             return inputs.stream().map(Supplier::get).toList();
         }
 
         protected List<Output> getOutputs() {
             return outputs.stream().map(Supplier::get).toList();
+        }
+
+        @Override
+        public U buildObject() {
+            if (power <= 0) {
+                power = (long) (amperage * voltage);
+            }
+            return super.buildObject();
         }
     }
 

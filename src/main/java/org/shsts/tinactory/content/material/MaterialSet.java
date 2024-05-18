@@ -10,12 +10,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
@@ -36,6 +38,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
+import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
+import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
+import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
+import static org.shsts.tinactory.content.AllRecipes.TOOL;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
@@ -121,12 +128,12 @@ public class MaterialSet {
         if (unlock == null) {
             throw new IllegalArgumentException();
         }
-        return builder.unlockedBy("has_material", has(unlock));
+        return builder.unlockedBy("has_material", AllRecipes.has(unlock));
     }
 
     @SuppressWarnings("unchecked")
     private void toolProcess(String result, int count, String[] patterns, int materialCount, Object[] args) {
-        var builder = AllRecipes.TOOL.recipe(loc(result))
+        var builder = TOOL.recipe(loc(result))
                 .result(entry(result), count);
         for (var pat : patterns) {
             builder.pattern(pat);
@@ -347,30 +354,132 @@ public class MaterialSet {
                     .dummies("bolt", "screw", "gear", "rotor", "spring");
         }
 
-        public Builder<P> ore(Tier mineTier, float strength, OreVariant... variants) {
-            var raw = put("raw", () -> REGISTRATE.item(newId("raw"), Item::new)
-                    .model(ModelGen.basicItem(ModelGen.modLoc("items/material/raw")))
-                    .tint(color)
-                    .register());
+        public class OreBuilder extends BuilderBase<Unit, Builder<P>, OreBuilder> {
+            private float destroyTime = 0f;
+            private float explodeResistance = 0f;
+            private boolean primitive = false;
+            @Nullable
+            private Tier mineTier = null;
+            private final OreVariant[] variants;
+            private final Map<String, Supplier<Item>> byproducts = new HashMap<>();
 
-            REGISTRATE.block(newId("ore"), OreBlock::new)
-                    .properties(p -> p.strength(strength, strength * 2))
-                    .transform(ModelGen.oreBlock(Arrays.asList(variants)))
-                    .tint(color)
-                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                    .tag(mineTier.getTag())
-                    .drop(raw::getItem)
-                    .register();
+            private OreBuilder(OreVariant[] variants) {
+                super(Builder.this);
+                this.variants = variants;
+                onBuild.add(this::buildObject);
+            }
 
-            callbacks.add($ -> AllRecipes.ORE_WASHER.recipe($.loc("crushed_purified"))
-                    .inputItem(0, $.entry("crushed"), 1)
-                    .outputItem(2, $.entry("crushed_purified"), 1)
-                    .workTicks(200)
-                    .build());
+            public OreBuilder strength(Tier mineTier, float destroyTime, float explodeResistance) {
+                this.mineTier = mineTier;
+                this.destroyTime = destroyTime;
+                this.explodeResistance = explodeResistance;
+                return this;
+            }
 
-            return dust()
-                    .dummies("crushed", "crushed_centrifuged", "crushed_purified")
-                    .dummies("dust_impure", "dust_pure");
+            public OreBuilder primitive() {
+                this.primitive = true;
+                return this;
+            }
+
+            public OreBuilder byproduct(Supplier<Item> b1, Supplier<Item> b2, Supplier<Item> b3) {
+                byproducts.put("wash", b1);
+                byproducts.put("centrifuge", b2);
+                byproducts.put("thermal_centrifuge", b3);
+                return this;
+            }
+
+            public OreBuilder byproduct(Supplier<Item> b1, Supplier<Item> b2) {
+                return byproduct(b1, b1, b2);
+            }
+
+            public OreBuilder byproduct(Supplier<Item> b1) {
+                return byproduct(b1, b1, b1);
+            }
+
+            private void crush(String output, String input) {
+                callbacks.add($ -> MACERATOR.recipe($.loc(output))
+                        .inputItem(0, $.entry(input), 1)
+                        .outputItem(1, $.entry(output), input.equals("raw") ? 2 : 1)
+                        .voltage(Voltage.LV)
+                        .amperage(0.5f)
+                        .workTicks((long) (destroyTime * 40f))
+                        .build());
+            }
+
+            private void wash(String output, String input) {
+                callbacks.add($ -> {
+                    var builder = ORE_WASHER.recipe($.loc(output))
+                            .inputItem(0, $.entry(input), 1)
+                            .outputItem(2, $.entry(output), 1);
+                    if (input.equals("crushed")) {
+                        var byproduct = byproducts.getOrDefault("wash", $.entry("dust"));
+                        builder.outputItem(4, byproduct, 1, 0.1f);
+                    }
+                    builder.voltage(primitive ? Voltage.PRIMITIVE : Voltage.LV)
+                            .build();
+                });
+            }
+
+            @Override
+            public Unit createObject() {
+                assert mineTier != null && destroyTime > 0 && explodeResistance > 0;
+
+                var raw = put("raw", () -> REGISTRATE.item(newId("raw"), Item::new)
+                        .model(ModelGen.basicItem(ModelGen.modLoc("items/material/raw")))
+                        .tint(color)
+                        .register());
+
+                dust().dummies("crushed", "crushed_centrifuged", "crushed_purified")
+                        .dummies("dust_impure", "dust_pure");
+
+                REGISTRATE.block(newId("ore"), OreBlock::new)
+                        .properties(p -> p.strength(destroyTime, explodeResistance))
+                        .transform(ModelGen.oreBlock(Arrays.asList(variants)))
+                        .tint(color)
+                        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                        .tag(mineTier.getTag())
+                        .drop(raw::getItem)
+                        .register();
+
+                if (primitive) {
+                    Builder.this.process("crushed", 1, "raw", TOOL_HAMMER);
+                    Builder.this.process("dust_pure", 1, "crushed_purified", TOOL_HAMMER);
+                    Builder.this.process("dust_impure", 1, "crushed", TOOL_HAMMER);
+                    Builder.this.process("dust", 1, "crushed_centrifuged", TOOL_HAMMER);
+                }
+
+                crush("crushed", "raw");
+                crush("dust_impure", "crushed");
+                crush("dust_pure", "crushed_purified");
+                crush("dust", "crushed_centrifuged");
+                wash("crushed_purified", "crushed");
+                wash("dust", "dust_impure");
+                callbacks.add($ -> {
+                    var byproduct = byproducts.getOrDefault("centrifuge", $.entry("dust"));
+                    CENTRIFUGE.recipe($.loc("dust"))
+                            .inputItem(0, $.entry("dust_pure"), 1)
+                            .outputItem(1, $.entry("dust"), 1)
+                            .outputItem(1, byproduct, 1, 0.1f)
+                            .voltage(Voltage.LV)
+                            .amperage(1f)
+                            .workTicks(640)
+                            .build();
+                });
+                callbacks.add($ -> {
+                    var byproduct = byproducts.getOrDefault("thermal_centrifuge", $.entry("dust"));
+                    THERMAL_CENTRIFUGE.recipe($.loc("crushed_centrifuged"))
+                            .inputItem(0, $.entry("crushed_purified"), 1)
+                            .outputItem(1, $.entry("crushed_centrifuged"), 1)
+                            .outputItem(1, byproduct, 1, 0.1f)
+                            .build();
+                });
+
+                return Unit.INSTANCE;
+            }
+        }
+
+        public OreBuilder ore(OreVariant... variants) {
+            return new OreBuilder(variants);
         }
 
         private void process(String result, int count, String pattern, Object... args) {

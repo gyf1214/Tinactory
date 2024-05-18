@@ -95,8 +95,10 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
             recipeType = value;
         }
 
-        public Builder<T> voltage(Voltage... values) {
-            voltages.addAll(Arrays.asList(values));
+        public Builder<T> voltage(Voltage from) {
+            Arrays.stream(Voltage.values())
+                    .filter(v -> v.rank >= from.rank && v.rank <= Voltage.IV.rank)
+                    .forEach(voltages::add);
             return this;
         }
 
@@ -112,6 +114,9 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
         public ProcessingSet<T> build() {
             assert frontOverlay != null;
             assert layoutSet != null;
+            if (voltages.isEmpty()) {
+                voltage(Voltage.LV);
+            }
             return new ProcessingSet<>(recipeType, layoutSet, frontOverlay, voltages);
         }
     }

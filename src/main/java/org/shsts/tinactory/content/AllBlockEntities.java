@@ -31,6 +31,10 @@ public final class AllBlockEntities {
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
     public static final ProcessingSet<ProcessingRecipe.Simple> STONE_GENERATOR;
     public static final ProcessingSet<AssemblyRecipe> ORE_ANALYZER;
+    public static final ProcessingSet<ProcessingRecipe.Simple> MACERATOR;
+    public static final ProcessingSet<ProcessingRecipe.Simple> ORE_WASHER;
+    public static final ProcessingSet<ProcessingRecipe.Simple> CENTRIFUGE;
+    public static final ProcessingSet<ProcessingRecipe.Simple> THERMAL_CENTRIFUGE;
 
     static {
         NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller",
@@ -70,7 +74,7 @@ public final class AllBlockEntities {
 
         STONE_GENERATOR = ProcessingSet.builder(AllRecipes.STONE_GENERATOR)
                 .frontOverlay(gregtech("blocks/machines/rock_crusher/overlay_front"))
-                .voltage(Voltage.PRIMITIVE, Voltage.LV)
+                .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 2, 1)
@@ -80,7 +84,7 @@ public final class AllBlockEntities {
 
         ORE_ANALYZER = ProcessingSet.builder(AllRecipes.ORE_ANALYZER)
                 .frontOverlay(gregtech("blocks/machines/electromagnetic_separator/overlay_front"))
-                .voltage(Voltage.PRIMITIVE, Voltage.LV)
+                .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
@@ -88,6 +92,64 @@ public final class AllBlockEntities {
                 .slot(SLOT_SIZE * 3, 1)
                 .slot(SLOT_SIZE * 4, 1, Voltage.LV)
                 .slot(SLOT_SIZE * 5, 1, Voltage.HV)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .build()
+                .build();
+
+        MACERATOR = ProcessingSet.builder(AllRecipes.MACERATOR)
+                .frontOverlay(gregtech("blocks/machines/macerator/overlay_front"))
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 1)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1)
+                .slot(SLOT_SIZE * 4, 1, Voltage.HV)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .build()
+                .build();
+
+        ORE_WASHER = ProcessingSet.builder(AllRecipes.ORE_WASHER)
+                .frontOverlay(gregtech("blocks/machines/ore_washer/overlay_front"))
+                .voltage(Voltage.PRIMITIVE)
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 1)
+                .port(SlotType.FLUID_INPUT)
+                .slot(SLOT_SIZE, 1)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 4, 1)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 5, 1, Voltage.LV)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 6, 1, Voltage.HV)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, 0)
+                .build()
+                .build();
+
+        CENTRIFUGE = ProcessingSet.builder(AllRecipes.CENTRIFUGE)
+                .frontOverlay(gregtech("blocks/machines/centrifuge/overlay_front"))
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 1)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1)
+                .slot(SLOT_SIZE * 4, 1)
+                .slot(SLOT_SIZE * 5, 1)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE, Voltage.HV)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE, Voltage.HV)
+                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE, Voltage.HV)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .build()
+                .build();
+
+        THERMAL_CENTRIFUGE = ProcessingSet.builder(AllRecipes.THERMAL_CENTRIFUGE)
+                .frontOverlay(gregtech("blocks/machines/thermal_centrifuge/overlay_front"))
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 1)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1)
+                .slot(SLOT_SIZE * 4, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
                 .build();

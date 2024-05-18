@@ -8,6 +8,7 @@ import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -71,7 +72,10 @@ public final class AllMaterials {
 
         MAGNETITE = set("magnetite")
                 .color(0xFF1E1E1E).icon(IconSet.METALLIC)
-                .ore(Tiers.IRON, 3.0f)
+                .ore(OreVariant.STONE)
+                .strength(Tiers.IRON, 3.0f, 6.0f)
+                .primitive()
+                .build()
                 .buildObject();
 
         // tool component tags

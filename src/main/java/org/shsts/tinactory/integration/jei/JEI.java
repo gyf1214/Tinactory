@@ -78,7 +78,10 @@ public class JEI implements IModPlugin {
     private final List<CategoryInfo<?>> categories = List.of(
             category(AllRecipes.TOOL, ToolCategory::new, () -> Ingredient.of(AllBlockEntities.WORKBENCH.getBlock())),
             processing(AllBlockEntities.STONE_GENERATOR),
-            processing(AllBlockEntities.ORE_ANALYZER));
+            processing(AllBlockEntities.ORE_ANALYZER),
+            processing(AllBlockEntities.ORE_WASHER),
+            processing(AllBlockEntities.CENTRIFUGE),
+            processing(AllBlockEntities.THERMAL_CENTRIFUGE));
 
     @Override
     public ResourceLocation getPluginUid() {
