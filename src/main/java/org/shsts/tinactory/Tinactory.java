@@ -31,6 +31,7 @@ import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.IPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuSyncHandler;
+import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.AllRegistries;
 import org.shsts.tinactory.registrate.Registrate;
 import org.slf4j.Logger;
@@ -100,6 +101,7 @@ public class Tinactory {
         AllBlocks.init();
         AllItems.init();
 
+        TechManager.init();
         AllWorldGens.init();
         MenuSyncHandler.init();
         MenuEventHandler.init();

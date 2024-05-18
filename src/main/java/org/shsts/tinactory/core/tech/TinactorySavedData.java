@@ -68,10 +68,12 @@ public class TinactorySavedData extends SavedData {
     public static void load(ServerLevel overworld) {
         data = overworld.getDataStorage()
                 .computeIfAbsent(TinactorySavedData::fromTag, TinactorySavedData::new, NAME);
+        LOGGER.debug("load server saved data {}", data);
     }
 
     public static void unload() {
         data = null;
+        LOGGER.debug("unload server saved data");
     }
 
     /**

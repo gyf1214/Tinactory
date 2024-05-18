@@ -28,6 +28,4 @@ public interface ITeamProfile {
     default boolean isTechAvailable(ITechnology tech) {
         return getTechProgress(tech) > 0 || tech.getDepends().stream().allMatch(this::isTechFinished);
     }
-
-    void advanceTechProgress(ITechnology tech, long progress);
 }

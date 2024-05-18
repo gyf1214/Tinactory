@@ -53,7 +53,7 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
 
         private List<Technology> getRequiredTech() {
             return requiredTech.stream()
-                    .flatMap(loc -> TechManager.SERVER.techByKey(loc).stream())
+                    .flatMap(loc -> TechManager.server().techByKey(loc).stream())
                     .toList();
         }
 

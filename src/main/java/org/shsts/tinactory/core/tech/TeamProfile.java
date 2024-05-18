@@ -7,7 +7,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.common.util.INBTSerializable;
-import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.ServerUtil;
 
@@ -18,11 +18,11 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TeamProfile implements INBTSerializable<CompoundTag>, ITeamProfile {
-    private final PlayerTeam playerTeam;
-    private final Map<ITechnology, Long> technologies = new HashMap<>();
+public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamProfile {
+    protected final PlayerTeam playerTeam;
+    protected final Map<ITechnology, Long> technologies = new HashMap<>();
 
-    private TeamProfile(PlayerTeam playerTeam) {
+    protected TeamProfile(PlayerTeam playerTeam) {
         this.playerTeam = playerTeam;
     }
 
@@ -66,7 +66,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, ITeamProfile 
             var tag2 = (CompoundTag) tag1;
             var loc = tag2.getString("id");
             var progress = tag2.getLong("progress");
-            TechManager.SERVER.techByKey(new ResourceLocation(loc))
+            TechManager.server().techByKey(new ResourceLocation(loc))
                     .ifPresent(tech -> technologies.put(tech, progress));
         }
     }

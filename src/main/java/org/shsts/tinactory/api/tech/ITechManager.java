@@ -14,10 +14,4 @@ public interface ITechManager {
     Optional<? extends ITeamProfile> teamByPlayer(Player player);
 
     Optional<? extends ITeamProfile> teamByName(String name);
-
-    void addPlayerToTeam(Player player, ITeamProfile team);
-
-    void newTeam(Player player, String name);
-
-    void leaveTeam(Player player);
 }

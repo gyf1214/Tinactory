@@ -31,7 +31,7 @@ public final class AllForgeEvents {
 
     @SubscribeEvent
     public static void onAddReloadListener(AddReloadListenerEvent event) {
-        TechManager.SERVER.addReloadListener(event);
+        TechManager.server().addReloadListener(event);
     }
 
     @SubscribeEvent
@@ -62,7 +62,7 @@ public final class AllForgeEvents {
         NetworkManager.onUnload(world);
         if (!world.isClientSide) {
             TinactorySavedData.unload();
-            TechManager.serverUnload();
+            TechManager.server().unload();
         }
     }
 

@@ -28,7 +28,7 @@ public class Technology extends ForgeRegistryEntry<ITechnology> implements ITech
     public void resolve() {
         depends.clear();
         dependIds.stream()
-                .flatMap(loc -> TechManager.SERVER.techByKey(loc).stream())
+                .flatMap(loc -> TechManager.server().techByKey(loc).stream())
                 .forEach(depends::add);
     }
 
