@@ -60,7 +60,7 @@ public final class AllForgeEvents {
     public static void onUnloadWorld(WorldEvent.Unload event) {
         var world = (Level) event.getWorld();
         NetworkManager.onUnload(world);
-        if (!world.isClientSide) {
+        if (!world.isClientSide && world.dimension() == Level.OVERWORLD) {
             TinactorySavedData.unload();
             TechManager.server().unload();
         }
