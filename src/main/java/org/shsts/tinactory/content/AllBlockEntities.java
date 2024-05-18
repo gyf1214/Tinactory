@@ -12,7 +12,6 @@ import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -22,6 +21,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -45,7 +45,7 @@ public final class AllBlockEntities {
                 .build()
                 .block()
                 .transform(ModelGen.machine(
-                        gregtech("blocks/casings/voltage/mv"),
+                        gregtech("blocks/casings/voltage/lv"),
                         gregtech("blocks/overlay/machine/overlay_screen")))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
@@ -72,7 +72,7 @@ public final class AllBlockEntities {
                 .voltage(Voltage.PRIMITIVE, Voltage.LV)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(Menu.SLOT_SIZE * 2, 1)
+                .slot(SLOT_SIZE * 2, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8, 0)
                 .build()
                 .build();
@@ -84,8 +84,10 @@ public final class AllBlockEntities {
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(Menu.SLOT_SIZE * 3, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + Menu.SLOT_SIZE, 0)
+                .slot(SLOT_SIZE * 3, 1)
+                .slot(SLOT_SIZE * 4, 1, Voltage.LV)
+                .slot(SLOT_SIZE * 5, 1, Voltage.HV)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
                 .build();
     }
