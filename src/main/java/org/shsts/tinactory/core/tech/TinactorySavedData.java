@@ -5,12 +5,12 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.scores.PlayerTeam;
-import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,13 +62,23 @@ public class TinactorySavedData extends SavedData {
         return data;
     }
 
+    @Nullable
+    private static TinactorySavedData data = null;
+
+    public static void load(ServerLevel overworld) {
+        data = overworld.getDataStorage()
+                .computeIfAbsent(TinactorySavedData::fromTag, TinactorySavedData::new, NAME);
+    }
+
+    public static void unload() {
+        data = null;
+    }
+
     /**
      * Must be called on Server!!
      */
     public static TinactorySavedData get() {
-        var overworld = ServerUtil.getServer().getLevel(Level.OVERWORLD);
-        assert overworld != null;
-        return overworld.getDataStorage()
-                .computeIfAbsent(TinactorySavedData::fromTag, TinactorySavedData::new, NAME);
+        assert data != null;
+        return data;
     }
 }

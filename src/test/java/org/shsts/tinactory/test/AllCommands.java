@@ -24,7 +24,7 @@ public final class AllCommands {
 
     private static int getTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        var msg = TechManager.INSTANCE.teamByPlayer(player)
+        var msg = TechManager.SERVER.teamByPlayer(player)
                 .map(team -> "%s is team %s".formatted(player, team))
                 .orElse("%s has no team".formatted(player));
         player.sendMessage(new TextComponent(msg), Util.NIL_UUID);

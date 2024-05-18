@@ -45,7 +45,7 @@ public class NetworkController extends SmartBlockEntity {
     protected void onServerLoad(Level world) {
         super.onServerLoad(world);
         if (teamName != null) {
-            TechManager.INSTANCE.teamByName(teamName).ifPresent(this::createNetwork);
+            TechManager.SERVER.teamByName(teamName).ifPresent(this::createNetwork);
             teamName = null;
         }
     }
@@ -79,7 +79,7 @@ public class NetworkController extends SmartBlockEntity {
         if (network != null) {
             return;
         }
-        TechManager.INSTANCE.teamByPlayer(player).ifPresent(this::createNetwork);
+        TechManager.SERVER.teamByPlayer(player).ifPresent(this::createNetwork);
     }
 
     public boolean canPlayerInteract(Player player) {

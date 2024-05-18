@@ -14,6 +14,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinactory.core.tech.TinactorySavedData;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
@@ -30,7 +31,7 @@ public final class AllForgeEvents {
 
     @SubscribeEvent
     public static void onAddReloadListener(AddReloadListenerEvent event) {
-        TechManager.INSTANCE.addReloadListener(event);
+        TechManager.SERVER.addReloadListener(event);
     }
 
     @SubscribeEvent
@@ -48,8 +49,21 @@ public final class AllForgeEvents {
     }
 
     @SubscribeEvent
+    public static void onLoadWorld(WorldEvent.Load event) {
+        var world = (Level) event.getWorld();
+        if (!world.isClientSide && world.dimension() == Level.OVERWORLD) {
+            TinactorySavedData.load((ServerLevel) world);
+        }
+    }
+
+    @SubscribeEvent
     public static void onUnloadWorld(WorldEvent.Unload event) {
-        NetworkManager.onUnload((Level) event.getWorld());
+        var world = (Level) event.getWorld();
+        NetworkManager.onUnload(world);
+        if (!world.isClientSide) {
+            TinactorySavedData.unload();
+            TechManager.serverUnload();
+        }
     }
 
     @SubscribeEvent

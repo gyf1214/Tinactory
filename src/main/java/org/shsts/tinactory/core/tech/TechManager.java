@@ -139,9 +139,13 @@ public class TechManager implements ITechManager {
         scoreboard.removePlayerFromTeam(player.getScoreboardName());
     }
 
-    public static final TechManager INSTANCE;
+    public static final TechManager SERVER;
 
     static {
-        INSTANCE = new TechManager();
+        SERVER = new TechManager();
+    }
+
+    public static void serverUnload() {
+        SERVER.technologies.clear();
     }
 }
