@@ -58,6 +58,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MaterialSet {
+    public final String name;
     public final int color;
     private final List<Consumer<MaterialSet>> callbacks;
 
@@ -75,6 +76,7 @@ public class MaterialSet {
     private final Map<String, Entry> items;
 
     private MaterialSet(Builder<?> builder) {
+        this.name = builder.name;
         this.color = builder.color;
         this.items = builder.items;
         this.callbacks = builder.callbacks;

@@ -3,6 +3,7 @@ package org.shsts.tinactory.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Unit;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.Tags;
@@ -12,8 +13,9 @@ import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
@@ -24,11 +26,12 @@ public final class AllMaterials {
     public static final MaterialSet STONE;
     public static final MaterialSet FLINT;
     public static final MaterialSet IRON;
+    public static final MaterialSet GOLD;
     public static final MaterialSet WROUGHT_IRON;
     public static final MaterialSet MAGNETITE;
 
     static {
-        MATERIALS = new HashSet<>();
+        MATERIALS = new HashMap<>();
 
         TEST = set("test")
                 .durability(12800000).tier(Tiers.NETHERITE)
@@ -64,6 +67,13 @@ public final class AllMaterials {
                 .toolProcess().smelt(200)
                 .buildObject();
 
+        GOLD = set("gold")
+                .color(0xFFFFE650).icon(IconSet.METALLIC)
+                .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
+                .existing("nugget", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
+                .dust()
+                .buildObject();
+
         WROUGHT_IRON = set("wrought_iron")
                 .color(0xFFC8B4B4).icon(IconSet.METALLIC).durability(200).tier(Tiers.IRON)
                 .metalSet().toolSet()
@@ -75,6 +85,7 @@ public final class AllMaterials {
                 .ore(OreVariant.STONE)
                 .strength(Tiers.IRON, 3.0f, 6.0f)
                 .primitive()
+                .byproduct(dust("magnetite"), dust("gold"))
                 .build()
                 .buildObject();
 
@@ -84,17 +95,21 @@ public final class AllMaterials {
         REGISTRATE.tag(IRON.tag("screw"), AllTags.TOOL_SCREW);
     }
 
-    private static final Set<MaterialSet> MATERIALS;
+    private static final Map<String, MaterialSet> MATERIALS;
 
     private static MaterialSet.Builder<?> set(String id) {
         return (new MaterialSet.Builder<>(Unit.INSTANCE, id))
-                .onCreateObject(MATERIALS::add);
+                .onCreateObject(mat -> MATERIALS.put(mat.name, mat));
+    }
+
+    private static Supplier<Item> dust(String name) {
+        return () -> MATERIALS.get(name).item("dust");
     }
 
     public static void init() {}
 
     public static void initRecipes() {
-        for (var material : MATERIALS) {
+        for (var material : MATERIALS.values()) {
             material.freeze();
         }
     }
