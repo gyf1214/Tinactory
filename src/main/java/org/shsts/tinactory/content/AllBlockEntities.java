@@ -14,6 +14,7 @@ import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.network.NetworkController;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 
@@ -29,7 +30,7 @@ public final class AllBlockEntities {
     public static final BlockEntitySet<NetworkController, MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
     public static final ProcessingSet<ProcessingRecipe.Simple> STONE_GENERATOR;
-    public static final ProcessingSet<ProcessingRecipe.Simple> ORE_ANALYZER;
+    public static final ProcessingSet<AssemblyRecipe> ORE_ANALYZER;
 
     static {
         NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller",

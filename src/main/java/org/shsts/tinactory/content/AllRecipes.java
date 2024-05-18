@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -30,21 +31,22 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public final class AllRecipes {
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> STONE_GENERATOR;
-    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> ORE_ANALYZER;
+    public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ORE_ANALYZER;
     public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> ORE_WASHER;
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
                 .clazz(ToolRecipe.class)
-                .prefix("tool_recipe")
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
-        STONE_GENERATOR = REGISTRATE.simpleProcessingRecipeType("stone_generator");
-        ORE_ANALYZER = REGISTRATE.simpleProcessingRecipeType("ore_analyzer");
-        ORE_WASHER = REGISTRATE.simpleProcessingRecipeType("ore_washer", $ -> $
-                .inputFluid(1, Fluids.WATER, 1000)
-                .outputItem(3, AllMaterials.STONE.entry("dust"), 1));
+        STONE_GENERATOR = REGISTRATE.simpleProcessingRecipeType("stone_generator").register();
+        ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer").register();
+        ORE_WASHER = REGISTRATE.simpleProcessingRecipeType("ore_washer")
+                .builderTransform($ -> $
+                        .inputFluid(1, Fluids.WATER, 1000)
+                        .outputItem(3, AllMaterials.STONE.entry("dust"), 1))
+                .register();
     }
 
     public static void initRecipes() {
@@ -78,7 +80,7 @@ public final class AllRecipes {
                 .define('#', ItemTags.PLANKS)
                 .pattern("#").pattern("#")
                 .unlockedBy("has_planks", has(ItemTags.PLANKS)));
-        TOOL.modRecipe(Items.STICK)
+        TOOL.recipe(Items.STICK)
                 .result(Items.STICK, 4)
                 .pattern("#").pattern("#")
                 .define('#', ItemTags.PLANKS)
@@ -96,7 +98,7 @@ public final class AllRecipes {
                 .unlockedBy("has_planks", has(ItemTags.PLANKS)));
 
         // generate cobblestone
-        STONE_GENERATOR.modRecipe(Items.COBBLESTONE)
+        STONE_GENERATOR.recipe(Items.COBBLESTONE)
                 .outputItem(0, Items.COBBLESTONE, 1)
                 .primitive().power(1).workTicks(40)
                 .build();
@@ -113,13 +115,13 @@ public final class AllRecipes {
                 .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS)));
 
         // hammer recipes for stone & gravel
-        TOOL.modRecipe(Items.GRAVEL)
+        TOOL.recipe(Items.GRAVEL)
                 .result(Items.GRAVEL, 1)
                 .pattern("#").pattern("#")
                 .define('#', ItemTags.STONE_CRAFTING_MATERIALS)
                 .toolTag(AllTags.TOOL_HAMMER)
                 .build();
-        TOOL.modRecipe(Items.FLINT)
+        TOOL.recipe(Items.FLINT)
                 .result(Items.FLINT, 1)
                 .pattern("###")
                 .define('#', Items.GRAVEL)
@@ -127,7 +129,7 @@ public final class AllRecipes {
                 .build();
 
         // mortar recipes for gravel
-        TOOL.modRecipe(Items.SAND)
+        TOOL.recipe(Items.SAND)
                 .result(Items.SAND, 1)
                 .pattern("#")
                 .define('#', Items.GRAVEL)
@@ -143,7 +145,7 @@ public final class AllRecipes {
                 ModelGen.modLoc("material/nugget/wrought_iron_from_iron"));
 
         // magnetite ore
-        ORE_ANALYZER.modRecipe(AllMaterials.MAGNETITE.loc("raw"))
+        ORE_ANALYZER.recipe(AllMaterials.MAGNETITE.loc("raw"))
                 .outputItem(1, AllMaterials.MAGNETITE.entry("raw"), 1, 0.25f)
                 .inputItem(0, AllMaterials.STONE.entry("block"), 1)
                 .workTicks(200)
@@ -159,7 +161,7 @@ public final class AllRecipes {
         var woodStripped = "stripped_" + wood;
 
         // saw
-        TOOL.modRecipe(planks.loc)
+        TOOL.recipe(planks.loc)
                 .result(planks, 4)
                 .pattern("X")
                 .define('X', logTag)

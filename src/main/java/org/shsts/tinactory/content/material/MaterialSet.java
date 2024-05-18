@@ -126,7 +126,7 @@ public class MaterialSet {
 
     @SuppressWarnings("unchecked")
     private void toolProcess(String result, int count, String[] patterns, int materialCount, Object[] args) {
-        var builder = AllRecipes.TOOL.modRecipe(loc(result))
+        var builder = AllRecipes.TOOL.recipe(loc(result))
                 .result(entry(result), count);
         for (var pat : patterns) {
             builder.pattern(pat);
@@ -362,7 +362,7 @@ public class MaterialSet {
                     .drop(raw::getItem)
                     .register();
 
-            callbacks.add($ -> AllRecipes.ORE_WASHER.modRecipe($.loc("crushed_purified"))
+            callbacks.add($ -> AllRecipes.ORE_WASHER.recipe($.loc("crushed_purified"))
                     .inputItem(0, $.entry("crushed"), 1)
                     .outputItem(2, $.entry("crushed_purified"), 1)
                     .workTicks(200)

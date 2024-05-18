@@ -31,9 +31,9 @@ import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.NullRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
@@ -48,7 +48,6 @@ import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
 import org.shsts.tinactory.registrate.builder.TechBuilder;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import org.shsts.tinactory.registrate.common.CapabilityEntry;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
 import org.shsts.tinactory.registrate.context.DataContext;
@@ -393,18 +392,18 @@ public class Registrate {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
 
-    public RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder>
+    public RecipeTypeBuilder<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder, Registrate>
     simpleProcessingRecipeType(String id) {
-        return simpleProcessingRecipeType(id, $ -> $);
-    }
-
-    public RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder>
-    simpleProcessingRecipeType(String id, Transformer<ProcessingRecipe.SimpleBuilder> builderTransformer) {
         return recipeType("processing/" + id, ProcessingRecipe.SIMPLE_SERIALIZER)
                 .clazz(ProcessingRecipe.Simple.class)
-                .builder(ProcessingRecipe.SimpleBuilder::new)
-                .builderTransform(builderTransformer)
-                .register();
+                .builder(ProcessingRecipe.SimpleBuilder::new);
+    }
+
+    public RecipeTypeBuilder<AssemblyRecipe, AssemblyRecipe.Builder, Registrate>
+    assemblyRecipeType(String id) {
+        return recipeType("processing/" + id, AssemblyRecipe.SERIALIZER)
+                .clazz(AssemblyRecipe.class)
+                .builder(AssemblyRecipe.Builder::new);
     }
 
     public void biome(String... ids) {

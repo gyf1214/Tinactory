@@ -25,8 +25,6 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, P>
     @Nullable
     private SmartRecipeBuilder.Factory<T, B> builderFactory = null;
     @Nullable
-    private String prefix = null;
-    @Nullable
     private Class<T> clazz;
     private Transformer<B> defaultTransformer = $ -> $;
 
@@ -38,11 +36,6 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, P>
 
     public RecipeTypeBuilder<T, B, P> builder(SmartRecipeBuilder.Factory<T, B> factory) {
         builderFactory = factory;
-        return self();
-    }
-
-    public RecipeTypeBuilder<T, B, P> prefix(String value) {
-        prefix = value;
         return self();
     }
 
@@ -82,7 +75,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, P>
     }
 
     public String getPrefix() {
-        return prefix == null ? id : prefix;
+        return registrate.modid + "/" + id;
     }
 
     public Class<T> getClazz() {

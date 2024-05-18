@@ -42,7 +42,7 @@ public final class All {
     public static final ResourceLocation TEST_TECH;
 
     static {
-        TEST_RECIPE_TYPE = REGISTRATE.simpleProcessingRecipeType("test");
+        TEST_RECIPE_TYPE = REGISTRATE.simpleProcessingRecipeType("test").register();
 
         TEST_FLUID_LAYOUT = Layout.builder()
                 .port(SlotType.FLUID_INPUT)
@@ -119,19 +119,19 @@ public final class All {
     public static void init() {}
 
     public static void initRecipes() {
-        TEST_RECIPE_TYPE.modRecipe(TinactoryTest.modLoc("test_water"))
+        TEST_RECIPE_TYPE.recipe("test_water")
                 .inputFluid(0, Fluids.WATER, 500)
                 .outputFluid(1, Fluids.WATER, 1000)
                 .workTicks(50)
                 .build();
 
-        TEST_RECIPE_TYPE.modRecipe(TinactoryTest.modLoc("test_steam"))
+        TEST_RECIPE_TYPE.recipe("test_steam")
                 .inputFluid(0, All.TEST_STEAM, 500)
                 .outputFluid(1, All.TEST_STEAM, 1000)
                 .workTicks(50)
                 .build();
 
-        ORE_ANALYZER.recipe(REGISTRATE, new ResourceLocation(TinactoryTest.ID, "test_ore"))
+        ORE_ANALYZER.recipe(REGISTRATE, "test_ore")
                 .inputItem(0, AllMaterials.STONE.entry("block"), 1)
                 .outputItem(1, All.TEST_ORE, 1, 0.75f)
                 .workTicks(20)
