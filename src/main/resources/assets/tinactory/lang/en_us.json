@@ -8,6 +8,7 @@
   "tinactory.gui.networkController.welcome": "New Team Name: ",
   "tinactory.gui.networkController.welcome.button": "Create Team",
   "tinactory.gui.networkController.teamNameLabel": "Team: %s",
+  "tinactory.gui.networkController.stateLabel": "State: %s",
   "tinactory.chat.createTeam.success": "Create team %s for %s successfully.",
   "tinactory.chat.leaveTeam.success": "%s leaves team %s successfully.",
   "tinactory.chat.exception.hasTeam": "Player already has a team.",

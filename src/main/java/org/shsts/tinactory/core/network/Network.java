@@ -28,7 +28,6 @@ import java.util.function.Supplier;
 public class Network extends NetworkBase {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public final TeamProfile team;
     private final Map<ComponentType<?>, Component> components = new HashMap<>();
     private final List<Machine> machines = new ArrayList<>();
     private final BiKeyHashMap<IScheduling, ComponentType<?>, Component.Ticker> componentSchedulings =
@@ -36,8 +35,7 @@ public class Network extends NetworkBase {
     private final Multimap<IScheduling, Component.Ticker> machineSchedulings = ArrayListMultimap.create();
 
     public Network(Level world, BlockPos center, TeamProfile team) {
-        super(world, center);
-        this.team = team;
+        super(world, center, team);
         attachComponents();
     }
 

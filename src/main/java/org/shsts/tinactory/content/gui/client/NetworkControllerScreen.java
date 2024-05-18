@@ -35,6 +35,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private final Panel configPanel;
     private final EditBox welcomeEdit;
     private final Label teamNameLabel;
+    private final Label stateLabel;
 
     public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
                                    Component title, int syncSlot) {
@@ -48,6 +49,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
                 new TranslatableComponent("tinactory.gui.networkController.welcome.button"),
                 null, this::onWelcomePressed);
         this.teamNameLabel = new Label(menu);
+        this.stateLabel = new Label(menu);
 
         this.welcomePanel = new Panel(this);
         welcomePanel.addWidget(welcomeLabel);
@@ -56,6 +58,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
 
         this.configPanel = new Panel(this);
         configPanel.addWidget(Rect.ZERO, teamNameLabel);
+        configPanel.addWidget(new Rect(0, Label.LINE_HEIGHT, 0, 0), stateLabel);
 
         var offset = Rect.corners(0, 10, 0, -10);
         rootPanel.addPanel(RectD.corners(0.5d, 0d, 0.5d, 1d), offset, welcomePanel);
@@ -67,13 +70,14 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     }
 
     private void refresh(NetworkControllerSyncPacket packet) {
-        var teamName = packet.getTeamName();
-        if (teamName == null) {
+        if (!packet.isPresent()) {
             welcomePanel.setActive(true);
             configPanel.setActive(false);
         } else {
             teamNameLabel.setText(new TranslatableComponent("tinactory.gui.networkController.teamNameLabel",
-                    teamName));
+                    packet.getTeamName()));
+            stateLabel.setText(new TranslatableComponent("tinactory.gui.networkController.stateLabel",
+                    packet.getState()));
             welcomePanel.setActive(false);
             configPanel.setActive(true);
         }

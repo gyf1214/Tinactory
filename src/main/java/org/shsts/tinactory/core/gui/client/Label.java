@@ -13,6 +13,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Label extends MenuWidget {
+    public static final int LINE_HEIGHT = 9;
+
     public enum Alignment {
         BEGIN(0d), MIDDLE(0.5d), END(1d);
 
@@ -49,7 +51,7 @@ public class Label extends MenuWidget {
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         int x = rect.inX(horizontalAlign.value) - (int) (cacheWidth * horizontalAlign.value);
-        int y = rect.inY(verticalAlign.value) - (int) (font.lineHeight * verticalAlign.value);
+        int y = rect.inY(verticalAlign.value) - (int) (LINE_HEIGHT * verticalAlign.value);
         RenderUtil.renderText(poseStack, text, x, y, color);
     }
 }

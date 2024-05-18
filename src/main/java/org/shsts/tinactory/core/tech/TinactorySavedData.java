@@ -21,7 +21,7 @@ public class TinactorySavedData extends SavedData {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String NAME = "tinactory_saved_data";
 
-    private final Map<PlayerTeam, TeamProfile> teams = new HashMap<>();
+    private final Map<String, TeamProfile> teams = new HashMap<>();
 
     private TinactorySavedData() {}
 
@@ -39,15 +39,15 @@ public class TinactorySavedData extends SavedData {
         teams.clear();
         tag.getList("teams", Tag.TAG_COMPOUND).stream()
                 .flatMap(tag1 -> TeamProfile.fromTag(tag1).stream())
-                .forEach(team -> teams.put(team.getPlayerTeam(), team));
+                .forEach(team -> teams.put(team.getName(), team));
     }
 
     public TeamProfile getTeamProfile(PlayerTeam playerTeam) {
-        if (!teams.containsKey(playerTeam)) {
-            teams.put(playerTeam, TeamProfile.create(playerTeam));
+        if (!teams.containsKey(playerTeam.getName())) {
+            teams.put(playerTeam.getName(), TeamProfile.create(playerTeam));
             setDirty();
         }
-        return teams.get(playerTeam);
+        return teams.get(playerTeam.getName());
     }
 
     @Override

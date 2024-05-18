@@ -21,6 +21,7 @@ public class NetworkManager {
     private final Level world;
     private final Map<BlockPos, NetworkBase> networks = new HashMap<>();
     private final Map<BlockPos, NetworkBase.Ref> networkPosMap = new HashMap<>();
+    private final Map<String, NetworkBase> teamNetworks = new HashMap<>();
 
     public NetworkManager(Level world) {
         LOGGER.debug("create network manager for {}", world.dimension());
@@ -47,6 +48,13 @@ public class NetworkManager {
         if (networks.containsKey(center)) {
             return networks.get(center) == network;
         } else {
+            var teamName = network.team.getName();
+            if (teamNetworks.containsKey(teamName) && teamNetworks.get(teamName) != network) {
+                LOGGER.debug("destroy team network {}: {}", teamName, teamNetworks.get(teamName));
+                teamNetworks.get(teamName).destroy();
+            }
+            teamNetworks.put(teamName, network);
+
             LOGGER.debug("register network {} at center {}:{}", network, world.dimension(), center);
             invalidatePos(center);
             networks.put(center, network);
@@ -55,8 +63,11 @@ public class NetworkManager {
     }
 
     public void unregisterNetwork(NetworkBase network) {
-        var center = network.center;
-        networks.remove(center);
+        networks.remove(network.center);
+        var teamName = network.team.getName();
+        if (teamNetworks.get(teamName) == network) {
+            teamNetworks.remove(teamName);
+        }
     }
 
     public void invalidatePos(BlockPos pos) {

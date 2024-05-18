@@ -16,7 +16,7 @@ public interface ITeamProfile {
     }
 
     default boolean hasPlayer(Player player) {
-        return player.getTeam() == getPlayerTeam();
+        return player.getTeam() != null && player.getTeam().getName().equals(getName());
     }
 
     long getTechProgress(ITechnology tech);

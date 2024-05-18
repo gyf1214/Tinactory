@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.TinactoryConfig;
+import org.shsts.tinactory.core.tech.TeamProfile;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -25,8 +26,9 @@ public class NetworkBase {
     protected final Level world;
     private final NetworkManager manager;
     public final BlockPos center;
+    public final TeamProfile team;
 
-    private enum State {
+    public enum State {
         CONNECTED,
         CONNECTING,
         CONFLICT,
@@ -96,14 +98,19 @@ public class NetworkBase {
 
     private final BFSContext bfsContext;
 
-    public NetworkBase(Level world, BlockPos center) {
+    protected NetworkBase(Level world, BlockPos center, TeamProfile team) {
         this.world = world;
         this.manager = NetworkManager.getInstance(world);
         this.center = center;
+        this.team = team;
         this.bfsContext = new BFSContext();
 
         reset();
         manager.registerNetwork(this);
+    }
+
+    public State getState() {
+        return state;
     }
 
     protected void onDisconnect() {
@@ -130,6 +137,9 @@ public class NetworkBase {
     }
 
     public void destroy() {
+        if (state == State.DESTROYED) {
+            return;
+        }
         onDisconnect();
         if (ref != null) {
             ref.network = null;

@@ -11,7 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -38,12 +37,8 @@ public class NetworkController extends SmartBlockEntity {
         network = new Network(level, worldPosition, team);
     }
 
-    public Optional<ITeamProfile> getOwnerTeam() {
-        if (network == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(network.team);
-        }
+    public Optional<Network> getNetwork() {
+        return Optional.ofNullable(network);
     }
 
     @Override
