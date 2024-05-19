@@ -112,7 +112,7 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
         }
     }
 
-    protected void setTargetRecipe(IContainer container, ProcessingRecipe<?> recipe, boolean updateFilter) {
+    protected void setTargetRecipe(IContainer container, ProcessingRecipe recipe, boolean updateFilter) {
         for (var input : recipe.inputs) {
             var idx = input.port();
             var port = container.getPort(idx, false);

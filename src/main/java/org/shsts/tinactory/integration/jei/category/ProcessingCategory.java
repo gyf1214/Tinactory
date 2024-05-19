@@ -20,7 +20,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingCategory<T extends ProcessingRecipe<T>> extends RecipeCategory<T> {
+public class ProcessingCategory<T extends ProcessingRecipe> extends RecipeCategory<T> {
     public ProcessingCategory(RecipeType<T> type, IJeiHelpers helpers, Layout layout, ItemLike icon) {
         super(type, helpers, layout, new ItemStack(icon));
     }

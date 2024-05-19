@@ -30,7 +30,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingSet<T extends ProcessingRecipe<T>> {
+public class ProcessingSet<T extends ProcessingRecipe> {
     public final RecipeTypeEntry<T, ?> recipeType;
     public final Map<Voltage, Layout> layoutSet;
     protected final Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines;
@@ -83,7 +83,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
     }
 
 
-    public static class Builder<T extends ProcessingRecipe<T>> {
+    public static class Builder<T extends ProcessingRecipe> {
         private final RecipeTypeEntry<T, ?> recipeType;
         private final Set<Voltage> voltages = new HashSet<>();
         @Nullable
@@ -121,7 +121,7 @@ public class ProcessingSet<T extends ProcessingRecipe<T>> {
         }
     }
 
-    public static <T extends ProcessingRecipe<T>> Builder<T>
+    public static <T extends ProcessingRecipe> Builder<T>
     builder(RecipeTypeEntry<T, ?> recipeType) {
         return new Builder<>(recipeType);
     }

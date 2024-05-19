@@ -17,7 +17,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeBuilder<T extends SmartRecipe<?, T>, B, P>
+public class RecipeTypeBuilder<T extends SmartRecipe<?>, B, P>
         extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 

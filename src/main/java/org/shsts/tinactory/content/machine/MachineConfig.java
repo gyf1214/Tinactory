@@ -33,7 +33,7 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
         return getString(key).map(ResourceLocation::new);
     }
 
-    public Optional<ProcessingRecipe<?>> getRecipe(String key, Level world) {
+    public Optional<ProcessingRecipe> getRecipe(String key, Level world) {
         return getLoc(key).flatMap(loc -> ProcessingRecipe.byKey(world.getRecipeManager(), loc));
     }
 

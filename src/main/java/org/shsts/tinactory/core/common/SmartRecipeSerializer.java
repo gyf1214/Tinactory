@@ -14,7 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
+public abstract class SmartRecipeSerializer<T extends SmartRecipe<?>, B>
         extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
 
     protected final Gson gson = new Gson();
@@ -22,7 +22,7 @@ public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
     protected final RecipeTypeEntry<T, B> type;
 
     @FunctionalInterface
-    public interface Factory<T1 extends SmartRecipe<?, T1>, B1> {
+    public interface Factory<T1 extends SmartRecipe<?>, B1> {
         SmartRecipeSerializer<T1, B1> create(RecipeTypeEntry<T1, B1> type);
     }
 
@@ -30,10 +30,18 @@ public abstract class SmartRecipeSerializer<T extends SmartRecipe<?, T>, B>
         this.type = type;
     }
 
+    public RecipeTypeEntry<T, B> getType() {
+        return type;
+    }
+
     @Override
     public abstract T fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context);
 
     public abstract void toJson(JsonObject jo, T recipe);
+
+    public void recipeToJson(JsonObject jo, SmartRecipe<?> recipe) {
+        toJson(jo, type.clazz.cast(recipe));
+    }
 
     @Override
     public T fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {

@@ -33,7 +33,7 @@ public final class AllTags {
     public static final TagKey<Block> MINEABLE_WITH_CUTTER = modBlock("mineable/cutter");
 
     public static TagKey<Item>
-    processingMachine(RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType) {
+    processingMachine(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
         return item(new ResourceLocation(recipeType.modid, "machine/" + recipeType.id));
     }
 

@@ -29,12 +29,12 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 public final class AllBlockEntities {
     public static final BlockEntitySet<NetworkController, MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
-    public static final ProcessingSet<ProcessingRecipe.Simple> STONE_GENERATOR;
+    public static final ProcessingSet<ProcessingRecipe> STONE_GENERATOR;
     public static final ProcessingSet<AssemblyRecipe> ORE_ANALYZER;
-    public static final ProcessingSet<ProcessingRecipe.Simple> MACERATOR;
-    public static final ProcessingSet<ProcessingRecipe.Simple> ORE_WASHER;
-    public static final ProcessingSet<ProcessingRecipe.Simple> CENTRIFUGE;
-    public static final ProcessingSet<ProcessingRecipe.Simple> THERMAL_CENTRIFUGE;
+    public static final ProcessingSet<ProcessingRecipe> MACERATOR;
+    public static final ProcessingSet<ProcessingRecipe> ORE_WASHER;
+    public static final ProcessingSet<ProcessingRecipe> CENTRIFUGE;
+    public static final ProcessingSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
 
     static {
         NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller",

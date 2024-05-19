@@ -30,12 +30,12 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
-    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> STONE_GENERATOR;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ORE_ANALYZER;
-    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> MACERATOR;
-    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> ORE_WASHER;
-    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> CENTRIFUGE;
-    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> THERMAL_CENTRIFUGE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MACERATOR;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ORE_WASHER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CENTRIFUGE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
@@ -43,18 +43,18 @@ public final class AllRecipes {
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
-        STONE_GENERATOR = REGISTRATE.simpleProcessingRecipeType("stone_generator").register();
+        STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator").register();
         ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer").register();
-        MACERATOR = REGISTRATE.simpleProcessingRecipeType("macerator").register();
-        ORE_WASHER = REGISTRATE.simpleProcessingRecipeType("ore_washer")
+        MACERATOR = REGISTRATE.processingRecipeType("macerator").register();
+        ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
                 .builderTransform($ -> $
                         .inputFluid(1, Fluids.WATER, 1000)
                         .outputItem(3, AllMaterials.STONE.entry("dust"), 1)
                         .workTicks(320)
                         .amperage(0.25f))
                 .register();
-        CENTRIFUGE = REGISTRATE.simpleProcessingRecipeType("centrifuge").register();
-        THERMAL_CENTRIFUGE = REGISTRATE.simpleProcessingRecipeType("thermal_centrifuge")
+        CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge").register();
+        THERMAL_CENTRIFUGE = REGISTRATE.processingRecipeType("thermal_centrifuge")
                 .builderTransform($ -> $
                         .voltage(Voltage.LV)
                         .workTicks(640)

@@ -68,7 +68,7 @@ public class MachineRecipeBook extends Panel {
 
     private class RecipeButton extends Button {
         @Nullable
-        private ProcessingRecipe<?> recipe = null;
+        private ProcessingRecipe recipe = null;
 
         public RecipeButton(Menu<?, ?> menu) {
             super(menu);
@@ -149,7 +149,7 @@ public class MachineRecipeBook extends Panel {
             }
         }
 
-        public void setRecipe(int index, @Nullable ProcessingRecipe<?> recipe) {
+        public void setRecipe(int index, @Nullable ProcessingRecipe recipe) {
             if (children.get(index).child() instanceof RecipeButton button) {
                 button.setActive(recipe != null);
                 button.recipe = recipe;
@@ -180,7 +180,7 @@ public class MachineRecipeBook extends Panel {
     }
 
     private final int syncSlot;
-    private final List<ProcessingRecipe<?>> recipes = new ArrayList<>();
+    private final List<ProcessingRecipe> recipes = new ArrayList<>();
     private final Panel bookPanel;
     private final ButtonPanel buttonPanel;
     private final PageButton leftPageButton;
@@ -189,7 +189,7 @@ public class MachineRecipeBook extends Panel {
     private int page = 0;
 
     public MachineRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, int syncSlot,
-                             RecipeType<? extends ProcessingRecipe<?>> recipeType,
+                             RecipeType<? extends ProcessingRecipe> recipeType,
                              int buttonX, int buttonY) {
         super(screen);
         this.syncSlot = syncSlot;
@@ -240,7 +240,7 @@ public class MachineRecipeBook extends Panel {
         }
     }
 
-    private boolean isCurrentRecipe(@Nullable ProcessingRecipe<?> recipe) {
+    private boolean isCurrentRecipe(@Nullable ProcessingRecipe recipe) {
         var loc = menu.getSyncPacket(syncSlot, MenuSyncPacket.LocHolder.class)
                 .flatMap(MenuSyncPacket.Holder::getData)
                 .orElse(null);
@@ -251,7 +251,7 @@ public class MachineRecipeBook extends Panel {
         menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().reset("targetRecipe"));
     }
 
-    private void selectRecipe(ProcessingRecipe<?> recipe) {
+    private void selectRecipe(ProcessingRecipe recipe) {
         menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("targetRecipe", recipe.getId()));
     }
 

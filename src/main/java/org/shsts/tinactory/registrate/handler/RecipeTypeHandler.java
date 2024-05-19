@@ -26,7 +26,7 @@ public class RecipeTypeHandler {
         this.recipeTypeRegister = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, registrate.modid);
     }
 
-    public <T extends SmartRecipe<?, T>, B>
+    public <T extends SmartRecipe<?>, B>
     RecipeTypeEntry<T, B> register(RecipeTypeBuilder<T, B, ?> builder) {
         builders.add(builder);
         var recipeType = recipeTypeRegister.register(builder.id, builder::buildObject);

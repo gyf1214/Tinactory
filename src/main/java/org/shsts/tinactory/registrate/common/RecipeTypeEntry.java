@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeEntry<T extends SmartRecipe<?, T>, B> extends RegistryEntry<RecipeType<T>> {
+public class RecipeTypeEntry<T extends SmartRecipe<?>, B> extends RegistryEntry<RecipeType<T>> {
     private final Registrate registrate;
     private final SmartRecipeBuilder.Factory<T, B> builderFactory;
     @Nullable

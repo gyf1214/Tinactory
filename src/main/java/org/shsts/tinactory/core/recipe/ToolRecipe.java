@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
+public class ToolRecipe extends SmartRecipe<Workbench> {
     public final ShapedRecipe shapedRecipe;
     public final List<Ingredient> toolIngredients;
 
@@ -140,7 +140,7 @@ public class ToolRecipe extends SmartRecipe<Workbench, ToolRecipe> {
         }
     }
 
-    private static class Finished extends SimpleFinished<ToolRecipe> {
+    private static class Finished extends SimpleFinished {
         private final FinishedRecipe shaped;
         private final List<Ingredient> tools;
 

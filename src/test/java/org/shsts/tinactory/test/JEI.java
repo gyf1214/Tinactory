@@ -29,8 +29,8 @@ public class JEI implements IModPlugin {
         return new ResourceLocation(TinactoryTest.ID, "jei");
     }
 
-    private final RecipeType<ProcessingRecipe.Simple> testType =
-            new RecipeType<>(TinactoryTest.modLoc("jei/category/test"), ProcessingRecipe.Simple.class);
+    private final RecipeType<ProcessingRecipe> testType =
+            new RecipeType<>(TinactoryTest.modLoc("jei/category/test"), ProcessingRecipe.class);
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {

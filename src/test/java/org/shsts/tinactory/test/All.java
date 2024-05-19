@@ -30,7 +30,7 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.test.TinactoryTest.REGISTRATE;
 
 public final class All {
-    public static final RecipeTypeEntry<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder> TEST_RECIPE_TYPE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> TEST_RECIPE_TYPE;
     public static final Layout TEST_FLUID_LAYOUT;
     public static final RegistryEntry<SimpleFluid> TEST_STEAM;
     public static final RegistryEntry<FluidCell> TEST_FLUID_CELL;
@@ -42,7 +42,7 @@ public final class All {
     public static final ResourceLocation TEST_TECH;
 
     static {
-        TEST_RECIPE_TYPE = REGISTRATE.simpleProcessingRecipeType("test").register();
+        TEST_RECIPE_TYPE = REGISTRATE.processingRecipeType("test").register();
 
         TEST_FLUID_LAYOUT = Layout.builder()
                 .port(SlotType.FLUID_INPUT)

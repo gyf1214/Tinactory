@@ -37,7 +37,7 @@ import java.util.function.Supplier;
 public class JEI implements IModPlugin {
     private static final ResourceLocation LOC = ModelGen.modLoc("jei");
 
-    private record CategoryInfo<T extends SmartRecipe<?, T>>(
+    private record CategoryInfo<T extends SmartRecipe<?>>(
             RecipeType<T> type, RecipeTypeEntry<T, ?> typeEntry,
             RecipeCategory.Factory<T> factory,
             Supplier<Ingredient> catalyst) {
@@ -56,18 +56,18 @@ public class JEI implements IModPlugin {
         }
     }
 
-    private static <T extends SmartRecipe<?, T>> CategoryInfo<T>
+    private static <T extends SmartRecipe<?>> CategoryInfo<T>
     category(RecipeTypeEntry<T, ?> recipeType, RecipeCategory.Factory<T> factory, Supplier<Ingredient> catalyst) {
         var type = new RecipeType<>(ModelGen.prepend(recipeType.loc, "jei/category"), recipeType.clazz);
         return new CategoryInfo<>(type, recipeType, factory, catalyst);
     }
 
-    private static <T extends SmartRecipe<?, T>> CategoryInfo<T>
+    private static <T extends SmartRecipe<?>> CategoryInfo<T>
     category(RecipeTypeEntry<T, ?> recipeType, RecipeCategory.Factory<T> factory, TagKey<Item> catalyst) {
         return category(recipeType, factory, () -> Ingredient.of(catalyst));
     }
 
-    private static <T extends ProcessingRecipe<T>> CategoryInfo<T>
+    private static <T extends ProcessingRecipe> CategoryInfo<T>
     processing(ProcessingSet<T> processingSet) {
         var layout = processingSet.layoutSet.get(Voltage.MAXIMUM);
         return category(processingSet.recipeType, (type, helpers) -> new ProcessingCategory<>(type, helpers,

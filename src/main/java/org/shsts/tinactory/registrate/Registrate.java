@@ -387,16 +387,16 @@ public class Registrate {
         return registryEntry(id, AllRegistries.EVENT, () -> new ReturnEvent<>(defaultRet));
     }
 
-    public <T extends SmartRecipe<?, T>, B>
+    public <T extends SmartRecipe<?>, B>
     RecipeTypeBuilder<T, B, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
 
-    public RecipeTypeBuilder<ProcessingRecipe.Simple, ProcessingRecipe.SimpleBuilder, Registrate>
-    simpleProcessingRecipeType(String id) {
+    public RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>
+    processingRecipeType(String id) {
         return recipeType("processing/" + id, ProcessingRecipe.SIMPLE_SERIALIZER)
-                .clazz(ProcessingRecipe.Simple.class)
-                .builder(ProcessingRecipe.SimpleBuilder::new);
+                .clazz(ProcessingRecipe.class)
+                .builder(ProcessingRecipe.Builder::new);
     }
 
     public RecipeTypeBuilder<AssemblyRecipe, AssemblyRecipe.Builder, Registrate>

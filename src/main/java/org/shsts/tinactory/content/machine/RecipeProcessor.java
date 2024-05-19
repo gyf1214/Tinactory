@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabilityProvider,
+public class RecipeProcessor<T extends ProcessingRecipe> implements ICapabilityProvider,
         IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final long PROGRESS_PER_TICK = 256;
 
@@ -224,7 +224,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
 
     public static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
         @Nullable
-        private Supplier<? extends RecipeType<? extends ProcessingRecipe<?>>> recipeType = null;
+        private Supplier<? extends RecipeType<? extends ProcessingRecipe>> recipeType = null;
         @Nullable
         private Voltage voltage = null;
 
@@ -232,7 +232,7 @@ public class RecipeProcessor<T extends ProcessingRecipe<?>> implements ICapabili
             super(parent, "machine/recipe_processor");
         }
 
-        public Builder<P> recipeType(Supplier<? extends RecipeType<? extends ProcessingRecipe<?>>> recipeType) {
+        public Builder<P> recipeType(Supplier<? extends RecipeType<? extends ProcessingRecipe>> recipeType) {
             this.recipeType = recipeType;
             return this;
         }

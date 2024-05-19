@@ -84,11 +84,11 @@ public class Layout {
         return ret;
     }
 
-    public List<SlotWith<IProcessingIngredient>> getProcessingInputs(ProcessingRecipe<?> recipe) {
+    public List<SlotWith<IProcessingIngredient>> getProcessingInputs(ProcessingRecipe recipe) {
         return getSlotWithInfo(recipe.inputs, ProcessingRecipe.Input::port, ProcessingRecipe.Input::ingredient);
     }
 
-    public List<SlotWith<IProcessingResult>> getProcessingOutputs(ProcessingRecipe<?> recipe) {
+    public List<SlotWith<IProcessingResult>> getProcessingOutputs(ProcessingRecipe recipe) {
         return getSlotWithInfo(recipe.outputs, ProcessingRecipe.Output::port, ProcessingRecipe.Output::result);
     }
 

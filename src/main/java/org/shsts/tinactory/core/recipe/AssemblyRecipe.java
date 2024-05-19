@@ -18,12 +18,12 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
+public class AssemblyRecipe extends ProcessingRecipe {
     private final List<ResourceLocation> requiredTech;
 
-    public AssemblyRecipe(RecipeTypeEntry<AssemblyRecipe, ?> type, ResourceLocation loc,
-                          List<Input> inputs, List<Output> outputs, long workTicks,
-                          long voltage, long power, List<ResourceLocation> requiredTech) {
+    private AssemblyRecipe(RecipeTypeEntry<AssemblyRecipe, ?> type, ResourceLocation loc,
+                           List<Input> inputs, List<Output> outputs, long workTicks,
+                           long voltage, long power, List<ResourceLocation> requiredTech) {
         super(type, loc, inputs, outputs, workTicks, voltage, power);
         this.requiredTech = requiredTech;
     }
@@ -35,7 +35,7 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
                 .orElse(requiredTech.isEmpty());
     }
 
-    public static class Builder extends ProcessingRecipe.Builder<AssemblyRecipe, Builder> {
+    public static class Builder extends BuilderBase<AssemblyRecipe, Builder> {
         private final List<ResourceLocation> requiredTech = new ArrayList<>();
 
         public Builder(Registrate registrate, RecipeTypeEntry<AssemblyRecipe, Builder> parent,

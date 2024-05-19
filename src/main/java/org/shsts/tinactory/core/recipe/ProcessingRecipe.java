@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe<IContainer, S> {
+public class ProcessingRecipe extends SmartRecipe<IContainer> {
     public record Input(int port, IProcessingIngredient ingredient) {}
 
     public record Output(int port, IProcessingResult result) {}
@@ -46,7 +46,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
     public final long voltage;
     public final long power;
 
-    protected ProcessingRecipe(RecipeTypeEntry<S, ?> type, ResourceLocation loc,
+    protected ProcessingRecipe(RecipeTypeEntry<?, ?> type, ResourceLocation loc,
                                List<Input> inputs, List<Output> outputs,
                                long workTicks, long voltage, long power) {
         super(type, loc);
@@ -118,20 +118,12 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
                 .orElse(new ProcessingResults.ItemResult(true, 0f, ItemStack.EMPTY));
     }
 
-    public static Optional<ProcessingRecipe<?>> byKey(RecipeManager manager, ResourceLocation loc) {
+    public static Optional<ProcessingRecipe> byKey(RecipeManager manager, ResourceLocation loc) {
         return manager.byKey(loc)
-                .flatMap(r -> r instanceof ProcessingRecipe<?> recipe ? Optional.of(recipe) : Optional.empty());
+                .flatMap(r -> r instanceof ProcessingRecipe recipe ? Optional.of(recipe) : Optional.empty());
     }
 
-    public static class Simple extends ProcessingRecipe<Simple> {
-        private Simple(RecipeTypeEntry<Simple, ?> type, ResourceLocation loc,
-                       List<Input> inputs, List<Output> outputs,
-                       long workTicks, long voltage, long power) {
-            super(type, loc, inputs, outputs, workTicks, voltage, power);
-        }
-    }
-
-    public abstract static class Builder<U extends ProcessingRecipe<U>, S extends Builder<U, S>>
+    public abstract static class BuilderBase<U extends ProcessingRecipe, S extends BuilderBase<U, S>>
             extends SmartRecipeBuilder<U, S> {
         protected final List<Supplier<Input>> inputs = new ArrayList<>();
         protected final List<Supplier<Output>> outputs = new ArrayList<>();
@@ -140,7 +132,7 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         protected long power = 0;
         protected float amperage = 0f;
 
-        public Builder(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
+        public BuilderBase(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
             super(registrate, parent, loc);
         }
 
@@ -260,19 +252,19 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
     }
 
-    public static class SimpleBuilder extends Builder<Simple, SimpleBuilder> {
-        public SimpleBuilder(Registrate registrate, RecipeTypeEntry<Simple, SimpleBuilder> parent,
-                             ResourceLocation loc) {
+    public static class Builder extends BuilderBase<ProcessingRecipe, Builder> {
+        public Builder(Registrate registrate, RecipeTypeEntry<ProcessingRecipe, Builder> parent,
+                       ResourceLocation loc) {
             super(registrate, parent, loc);
         }
 
         @Override
-        public Simple createObject() {
-            return new Simple(parent, loc, getInputs(), getOutputs(), workTicks, voltage, power);
+        public ProcessingRecipe createObject() {
+            return new ProcessingRecipe(parent, loc, getInputs(), getOutputs(), workTicks, voltage, power);
         }
     }
 
-    protected static class Serializer<T extends ProcessingRecipe<T>, B extends Builder<T, B>>
+    protected static class Serializer<T extends ProcessingRecipe, B extends BuilderBase<T, B>>
             extends SmartRecipeSerializer<T, B> {
         protected Serializer(RecipeTypeEntry<T, B> type) {
             super(type);
@@ -329,6 +321,6 @@ public class ProcessingRecipe<S extends ProcessingRecipe<S>> extends SmartRecipe
         }
     }
 
-    public static final SmartRecipeSerializer.Factory<Simple, SimpleBuilder>
+    public static final SmartRecipeSerializer.Factory<ProcessingRecipe, Builder>
             SIMPLE_SERIALIZER = Serializer::new;
 }

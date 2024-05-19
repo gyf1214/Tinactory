@@ -20,19 +20,17 @@ import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
-        implements Recipe<SmartRecipe.ContainerWrapper<C>>, ISelf<T> {
-
+public abstract class SmartRecipe<C> implements Recipe<SmartRecipe.ContainerWrapper<C>> {
     @FunctionalInterface
-    public interface Factory<T extends SmartRecipe<?, T>> {
+    public interface Factory<T extends SmartRecipe<?>> {
         T create(RecipeTypeEntry<T, ?> type, ResourceLocation loc);
     }
 
     private final ResourceLocation loc;
-    private final RecipeType<? super T> type;
-    private final SmartRecipeSerializer<T, ?> serializer;
+    private final RecipeType<?> type;
+    private final SmartRecipeSerializer<?, ?> serializer;
 
-    protected SmartRecipe(RecipeTypeEntry<T, ?> type, ResourceLocation loc) {
+    protected SmartRecipe(RecipeTypeEntry<?, ?> type, ResourceLocation loc) {
         this.loc = loc;
         this.type = type.get();
         this.serializer = type.getSerializer();
@@ -87,21 +85,21 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
         return NonNullList.create();
     }
 
-    public static <C1, T1 extends SmartRecipe<C1, ?>> Optional<T1>
+    public static <C1, T1 extends SmartRecipe<C1>> Optional<T1>
     getRecipeFor(RecipeType<T1> type, C1 container, Level world) {
         return world.getRecipeManager().getRecipeFor(type, new ContainerWrapper<>(container), world);
     }
 
-    public static <C1, T1 extends SmartRecipe<C1, ?>> List<T1>
+    public static <C1, T1 extends SmartRecipe<C1>> List<T1>
     getRecipesFor(RecipeType<T1> type, C1 container, Level world) {
         return world.getRecipeManager().getRecipesFor(type, new ContainerWrapper<>(container), world);
     }
 
-    protected abstract static class SimpleFinished<T extends SmartRecipe<?, T>> implements FinishedRecipe {
+    protected abstract static class SimpleFinished implements FinishedRecipe {
         protected final ResourceLocation loc;
-        protected final SmartRecipeSerializer<T, ?> serializer;
+        protected final SmartRecipeSerializer<?, ?> serializer;
 
-        public SimpleFinished(ResourceLocation loc, SmartRecipeSerializer<T, ?> serializer) {
+        public SimpleFinished(ResourceLocation loc, SmartRecipeSerializer<?, ?> serializer) {
             this.loc = loc;
             this.serializer = serializer;
         }
@@ -132,10 +130,10 @@ public abstract class SmartRecipe<C, T extends SmartRecipe<C, T>>
     }
 
     public FinishedRecipe toFinished() {
-        return new SimpleFinished<>(loc, serializer) {
+        return new SimpleFinished(loc, serializer) {
             @Override
             public void serializeRecipeData(JsonObject jo) {
-                serializer.toJson(jo, SmartRecipe.this.self());
+                serializer.recipeToJson(jo, SmartRecipe.this);
             }
         };
     }

@@ -23,10 +23,10 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     private final int syncSlot;
-    private final RecipeType<? extends ProcessingRecipe<?>> recipeType;
+    private final RecipeType<? extends ProcessingRecipe> recipeType;
     private final Layout layout;
 
-    public RecipeBookPlugin(M menu, RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType,
+    public RecipeBookPlugin(M menu, RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
                             Layout layout) {
         this.syncSlot = menu.addSyncSlot(MenuSyncPacket.LocHolder::new,
                 be -> Machine.get(be).config.getLoc("targetRecipe").orElse(null));
@@ -35,7 +35,7 @@ public class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     }
 
     public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>>
-    builder(RecipeTypeEntry<? extends ProcessingRecipe<?>, ?> recipeType, Layout layout) {
+    builder(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType, Layout layout) {
         return menu -> new RecipeBookPlugin<>(menu, recipeType, layout);
     }
 
