@@ -20,7 +20,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
-import net.minecraftforge.network.PacketDistributor;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.ISelf;
@@ -92,7 +91,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
                 var packet1 = getPacket(be);
                 if (!packet1.equals(packet)) {
                     packet = packet1;
-                    Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), packet1);
+                    Tinactory.sendToPlayer(serverPlayer, packet1);
                 }
             }
         }
@@ -386,7 +385,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
      */
     public <P extends MenuEventPacket>
     void triggerEvent(MenuEventHandler.Event<P> event, MenuEventPacket.Factory<P> factory) {
-        Tinactory.CHANNEL.sendToServer(factory.create(containerId, event.id()));
+        Tinactory.sendToServer(factory.create(containerId, event.id()));
     }
 
     /**

@@ -30,14 +30,16 @@ public final class AllCommands {
 
     private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        var name = ctx.getArgument("name", String.class);
-        if (TechManager.server().teamByPlayer(player).isPresent()) {
+        var name = StringArgumentType.getString(ctx, "name");
+        var manager = TechManager.server();
+
+        if (manager.teamByPlayer(player).isPresent()) {
             throw PLAYER_HAS_TEAM.create();
         }
-        if (TechManager.server().teamByName(name).isPresent()) {
+        if (manager.teamByName(name).isPresent()) {
             throw TEAM_ALREADY_EXISTS.create(name);
         }
-        TechManager.server().newTeam(player, name);
+        manager.newTeam(player, name);
         player.sendMessage(new TranslatableComponent("tinactory.chat.createTeam.success",
                 name, player.getDisplayName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
@@ -64,12 +66,14 @@ public final class AllCommands {
 
     private static int leaveTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        var team = TechManager.server().teamByPlayer(player);
+        var manager = TechManager.server();
+        var team = manager.teamByPlayer(player);
+
         if (team.isEmpty()) {
             throw PLAYER_NO_TEAM.create();
         }
         var teamName = team.get().getName();
-        TechManager.server().leaveTeam(player);
+        manager.leaveTeam(player);
         player.sendMessage(new TranslatableComponent("tinactory.chat.leaveTeam.success",
                 player.getDisplayName(), teamName), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;

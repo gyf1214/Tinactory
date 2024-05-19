@@ -134,6 +134,7 @@ public final class All {
         ORE_ANALYZER.recipe(REGISTRATE, "test_ore")
                 .inputItem(0, AllMaterials.STONE.entry("block"), 1)
                 .outputItem(1, All.TEST_ORE, 1, 0.75f)
+                .requireTech(TEST_BASE_TECH)
                 .workTicks(20)
                 .build();
     }

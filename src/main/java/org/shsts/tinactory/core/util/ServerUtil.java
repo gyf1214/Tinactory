@@ -2,6 +2,7 @@ package org.shsts.tinactory.core.util;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -12,6 +13,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public final class ServerUtil {
     public static MinecraftServer getServer() {
         return ServerLifecycleHooks.getCurrentServer();
+    }
+
+    public static PlayerList getPlayerList() {
+        return getServer().getPlayerList();
     }
 
     public static Scoreboard getScoreboard() {

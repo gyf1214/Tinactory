@@ -7,6 +7,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.ServerUtil;
@@ -33,8 +34,23 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public void advanceTechProgress(ITechnology tech, long progress) {
-        technologies.merge(tech.getLoc(), progress, ($, v) -> v + progress);
+        var v = technologies.getOrDefault(tech.getLoc(), 0L) + progress;
+        setTechProgress(tech, v);
+    }
+
+    public void setTechProgress(ITechnology tech, long progress) {
+        technologies.put(tech.getLoc(), progress);
         TinactorySavedData.get().setDirty();
+
+        var playerList = ServerUtil.getPlayerList();
+        var packet = new TechUpdatePacket(Map.of(tech.getLoc(), progress));
+        for (var name : playerTeam.getPlayers()) {
+            var player = playerList.getPlayerByName(name);
+            if (player == null) {
+                continue;
+            }
+            Tinactory.sendToPlayer(player, packet);
+        }
     }
 
     @Override

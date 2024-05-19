@@ -50,7 +50,7 @@ public class TechManager implements ITechManager {
 
     @Override
     public Optional<Technology> techByKey(ResourceLocation loc) {
-        return Optional.of(technologies.get(loc));
+        return Optional.ofNullable(technologies.get(loc));
     }
 
     @Override
