@@ -140,23 +140,36 @@ public class TechManager implements ITechManager {
             return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
         }
 
-        @Override
-        public void addPlayerToTeam(Player player, ITeamProfile team) {
-            ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), team.getPlayerTeam());
+        private void sendUpdatePacket(ServerPlayer player, TeamProfile team) {
+            var p = team.updatePacket();
+            Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
         }
 
         @Override
-        public void newTeam(Player player, String name) {
+        public void addPlayerToTeam(ServerPlayer player, ITeamProfile team) {
+            ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), team.getPlayerTeam());
+            sendUpdatePacket(player, (TeamProfile) team);
+        }
+
+        @Override
+        public void newTeam(ServerPlayer player, String name) {
             var scoreboard = ServerUtil.getScoreboard();
             var playerTeam = scoreboard.addPlayerTeam(name);
             scoreboard.addPlayerToTeam(player.getScoreboardName(), playerTeam);
-            TinactorySavedData.get().getTeamProfile(playerTeam);
+            var team = TinactorySavedData.get().getTeamProfile(playerTeam);
+            sendUpdatePacket(player, team);
         }
 
         @Override
-        public void leaveTeam(Player player) {
+        public void leaveTeam(ServerPlayer player) {
             var scoreboard = ServerUtil.getScoreboard();
             scoreboard.removePlayerFromTeam(player.getScoreboardName());
+        }
+
+        public void removeTeam(PlayerTeam playerTeam) {
+            TinactorySavedData.get().removeTeamProfile(playerTeam.getName());
+            var scoreboard = ServerUtil.getScoreboard();
+            scoreboard.removePlayerTeam(playerTeam);
         }
 
         public void onPlayerJoin(ServerPlayer player) {
@@ -188,7 +201,7 @@ public class TechManager implements ITechManager {
         }
 
         @Override
-        public Optional<? extends ITeamProfile> localPlayerTeam() {
+        public Optional<ClientTeamProfile> localPlayerTeam() {
             var team = (PlayerTeam) ClientUtil.getPlayer().getTeam();
             return Optional.ofNullable(getTeamProfile(team));
         }
@@ -206,6 +219,15 @@ public class TechManager implements ITechManager {
                 technologies.put(tech.getRegistryName(), tech);
             }
             LOGGER.debug("reload {} techs", technologies.size());
+        }
+
+        private void handleTechUpdate(TechUpdatePacket p, NetworkEvent.Context ctx) {
+            var team = localPlayerTeam().orElse(null);
+            if (team == null) {
+                return;
+            }
+            team.technologies.putAll(p.getTechs());
+            LOGGER.debug("update {} techs for team {}", technologies.size(), team.getName());
         }
     }
 
@@ -233,5 +255,6 @@ public class TechManager implements ITechManager {
         client = new Client();
         LOGGER.debug("create client tech manager {}", client);
         Tinactory.registryClientPacket(TechInitPacket.class, TechInitPacket::new, client::handleTechInit);
+        Tinactory.registryClientPacket(TechUpdatePacket.class, TechUpdatePacket::new, client()::handleTechUpdate);
     }
 }

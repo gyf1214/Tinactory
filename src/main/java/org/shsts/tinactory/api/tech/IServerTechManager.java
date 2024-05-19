@@ -1,5 +1,6 @@
 package org.shsts.tinactory.api.tech;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
@@ -9,9 +10,9 @@ public interface IServerTechManager extends ITechManager {
 
     Optional<? extends IServerTeamProfile> teamByName(String name);
 
-    void addPlayerToTeam(Player player, ITeamProfile team);
+    void addPlayerToTeam(ServerPlayer player, ITeamProfile team);
 
-    void newTeam(Player player, String name);
+    void newTeam(ServerPlayer player, String name);
 
-    void leaveTeam(Player player);
+    void leaveTeam(ServerPlayer player);
 }

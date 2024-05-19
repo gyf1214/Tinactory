@@ -50,6 +50,11 @@ public class TinactorySavedData extends SavedData {
         return teams.get(playerTeam.getName());
     }
 
+    public void removeTeamProfile(String name) {
+        teams.remove(name);
+        setDirty();
+    }
+
     @Override
     public void setDirty() {
         LOGGER.debug("{} set dirty", this);

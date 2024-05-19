@@ -20,7 +20,7 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamProfile {
     protected final PlayerTeam playerTeam;
-    protected final Map<ITechnology, Long> technologies = new HashMap<>();
+    protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
 
     protected TeamProfile(PlayerTeam playerTeam) {
         this.playerTeam = playerTeam;
@@ -33,13 +33,19 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public void advanceTechProgress(ITechnology tech, long progress) {
-        technologies.merge(tech, progress, ($, v) -> v + progress);
+        assert tech.getRegistryName() != null;
+        technologies.merge(tech.getRegistryName(), progress, ($, v) -> v + progress);
         TinactorySavedData.get().setDirty();
     }
 
     @Override
     public long getTechProgress(ITechnology tech) {
-        return technologies.getOrDefault(tech, 0L);
+        assert tech.getRegistryName() != null;
+        return technologies.getOrDefault(tech.getRegistryName(), 0L);
+    }
+
+    public TechUpdatePacket updatePacket() {
+        return new TechUpdatePacket(technologies);
     }
 
     @Override
@@ -48,9 +54,9 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         tag.putString("name", playerTeam.getName());
         var listTag = new ListTag();
         for (var tech : technologies.entrySet()) {
-            var loc = tech.getKey().getRegistryName();
-            var tag1 = new CompoundTag();
+            var loc = tech.getKey();
             assert loc != null;
+            var tag1 = new CompoundTag();
             tag1.putString("id", loc.toString());
             tag1.putLong("progress", tech.getValue());
             listTag.add(tag1);
@@ -64,10 +70,11 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         var listTag = tag.getList("tech", Tag.TAG_COMPOUND);
         for (var tag1 : listTag) {
             var tag2 = (CompoundTag) tag1;
-            var loc = tag2.getString("id");
+            var loc = new ResourceLocation(tag2.getString("id"));
             var progress = tag2.getLong("progress");
-            TechManager.server().techByKey(new ResourceLocation(loc))
-                    .ifPresent(tech -> technologies.put(tech, progress));
+            if (TechManager.server().techByKey(loc).isPresent()) {
+                technologies.put(loc, progress);
+            }
         }
     }
 

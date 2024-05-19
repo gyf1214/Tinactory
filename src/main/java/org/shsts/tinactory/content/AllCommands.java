@@ -11,6 +11,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -42,6 +43,25 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
+    private static int addPlayerToTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var player = ctx.getSource().getPlayerOrException();
+        var player2 = EntityArgument.getPlayer(ctx, "player");
+        var manager = TechManager.server();
+        var team = manager.teamByPlayer(player);
+
+        if (team.isEmpty()) {
+            throw PLAYER_NO_TEAM.create();
+        }
+        if (manager.teamByPlayer(player2).isPresent()) {
+            throw PLAYER_HAS_TEAM.create();
+        }
+
+        manager.addPlayerToTeam(player2, team.get());
+        player.sendMessage(new TranslatableComponent("tinactory.chat.addPlayerToTeam.success",
+                player2.getDisplayName(), team.get().getName()), Util.NIL_UUID);
+        return Command.SINGLE_SUCCESS;
+    }
+
     private static int leaveTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
         var team = TechManager.server().teamByPlayer(player);
@@ -60,6 +80,9 @@ public final class AllCommands {
                 .then(Commands.literal("createTeam")
                         .then(Commands.argument("name", StringArgumentType.string())
                                 .executes(AllCommands::createTeam)))
+                .then(Commands.literal("addPlayerToTeam")
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(AllCommands::addPlayerToTeam)))
                 .then(Commands.literal("leaveTeam").executes(AllCommands::leaveTeam));
 
         dispatcher.register(builder);
