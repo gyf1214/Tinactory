@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.util;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
@@ -30,5 +31,11 @@ public final class ClientUtil {
     public static void playSound(SoundEvent sound) {
         var soundManager = Minecraft.getInstance().getSoundManager();
         soundManager.play(SimpleSoundInstance.forUI(sound, 1.0f));
+    }
+
+    public static LocalPlayer getPlayer() {
+        var player = Minecraft.getInstance().player;
+        assert player != null;
+        return player;
     }
 }

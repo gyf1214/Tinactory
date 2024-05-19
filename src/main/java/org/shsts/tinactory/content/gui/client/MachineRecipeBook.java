@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Menu;
@@ -179,7 +180,7 @@ public class MachineRecipeBook extends Panel {
     }
 
     private final int syncSlot;
-    private final List<ProcessingRecipe<?>> recipes;
+    private final List<ProcessingRecipe<?>> recipes = new ArrayList<>();
     private final Panel bookPanel;
     private final ButtonPanel buttonPanel;
     private final PageButton leftPageButton;
@@ -192,7 +193,14 @@ public class MachineRecipeBook extends Panel {
                              int buttonX, int buttonY) {
         super(screen);
         this.syncSlot = syncSlot;
-        this.recipes = new ArrayList<>(ClientUtil.getRecipeManager().getAllRecipesFor(recipeType));
+
+        var container = AllCapabilities.CONTAINER.get(screen.getMenu().blockEntity);
+        for (var recipe : ClientUtil.getRecipeManager().getAllRecipesFor(recipeType)) {
+            if (!recipe.canCraftIn(container)) {
+                continue;
+            }
+            recipes.add(recipe);
+        }
 
         this.bookPanel = new Panel(screen);
         bookPanel.addWidget(RectD.FULL, Rect.ZERO,

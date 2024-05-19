@@ -3,12 +3,14 @@ package org.shsts.tinactory.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
@@ -49,6 +51,13 @@ public final class AllForgeEvents {
     }
 
     @SubscribeEvent
+    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
+            TechManager.server().onPlayerJoin(serverPlayer);
+        }
+    }
+
+    @SubscribeEvent
     public static void onLoadWorld(WorldEvent.Load event) {
         var world = (Level) event.getWorld();
         if (!world.isClientSide && world.dimension() == Level.OVERWORLD) {
@@ -60,9 +69,13 @@ public final class AllForgeEvents {
     public static void onUnloadWorld(WorldEvent.Unload event) {
         var world = (Level) event.getWorld();
         NetworkManager.onUnload(world);
-        if (!world.isClientSide && world.dimension() == Level.OVERWORLD) {
-            TinactorySavedData.unload();
-            TechManager.server().unload();
+        if (world.dimension() == Level.OVERWORLD) {
+            if (!world.isClientSide) {
+                TinactorySavedData.unload();
+                TechManager.server().unload();
+            } else {
+                TechManager.client().unload();
+            }
         }
     }
 

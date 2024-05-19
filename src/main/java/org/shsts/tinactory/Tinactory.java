@@ -101,7 +101,6 @@ public class Tinactory {
         AllBlocks.init();
         AllItems.init();
 
-        TechManager.init();
         AllWorldGens.init();
         MenuSyncHandler.init();
         MenuEventHandler.init();
@@ -119,10 +118,14 @@ public class Tinactory {
     }
 
     private static void init(final FMLCommonSetupEvent event) {
+        TechManager.init();
+
         LOGGER.info("hello Tinactory!");
     }
 
     private static void initClient(FMLClientSetupEvent event) {
+        TechManager.initClient();
+
         LOGGER.info("hello Tinactory client!");
     }
 }
