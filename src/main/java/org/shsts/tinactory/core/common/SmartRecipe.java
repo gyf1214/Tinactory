@@ -71,10 +71,26 @@ public abstract class SmartRecipe<C> implements Recipe<SmartRecipe.ContainerWrap
         return assemble(wrapper.compose);
     }
 
-    public abstract ItemStack assemble(C container);
+    public ItemStack assemble(C container) {
+        return ItemStack.EMPTY;
+    }
 
     @Override
-    public abstract boolean canCraftInDimensions(int width, int height);
+    public ItemStack getResultItem() {
+        return ItemStack.EMPTY;
+    }
+
+    /**
+     * Whether the recipe is available in the container, regardless of the inputs
+     */
+    public boolean canCraftIn(C container) {
+        return true;
+    }
+
+    @Override
+    public boolean canCraftInDimensions(int width, int height) {
+        return true;
+    }
 
     @Override
     public NonNullList<ItemStack> getRemainingItems(ContainerWrapper<C> container) {

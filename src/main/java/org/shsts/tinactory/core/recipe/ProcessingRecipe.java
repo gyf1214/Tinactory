@@ -66,13 +66,6 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         return output.result.insertPort(container.getPort(output.port, true), random, simulate);
     }
 
-    /**
-     * Return whether this recipe is available in this container.
-     */
-    public boolean canCraftIn(IContainer container) {
-        return true;
-    }
-
     @Override
     public boolean matches(IContainer container, Level world) {
         return canCraftIn(container) &&
@@ -90,16 +83,6 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         for (var output : outputs) {
             insertOutput(container, output, random, false);
         }
-    }
-
-    @Override
-    public ItemStack assemble(IContainer container) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return true;
     }
 
     @Override
