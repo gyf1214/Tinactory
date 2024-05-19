@@ -20,10 +20,12 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamProfile {
+    protected final TechManager techManager;
     protected final PlayerTeam playerTeam;
     protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
 
-    protected TeamProfile(PlayerTeam playerTeam) {
+    protected TeamProfile(TechManager techManager, PlayerTeam playerTeam) {
+        this.techManager = techManager;
         this.playerTeam = playerTeam;
     }
 
@@ -54,8 +56,18 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     @Override
-    public long getTechProgress(ITechnology tech) {
-        return technologies.getOrDefault(tech.getLoc(), 0L);
+    public long getTechProgress(ResourceLocation tech) {
+        return technologies.getOrDefault(tech, 0L);
+    }
+
+    @Override
+    public boolean isTechFinished(ResourceLocation tech) {
+        return techManager.techByKey(tech).map(this::isTechFinished).orElse(false);
+    }
+
+    @Override
+    public boolean isTechAvailable(ResourceLocation tech) {
+        return techManager.techByKey(tech).map(this::isTechAvailable).orElse(false);
     }
 
     public TechUpdatePacket updatePacket() {
@@ -86,14 +98,14 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             var tag2 = (CompoundTag) tag1;
             var loc = new ResourceLocation(tag2.getString("id"));
             var progress = tag2.getLong("progress");
-            if (TechManager.server().techByKey(loc).isPresent()) {
+            if (techManager.techByKey(loc).isPresent()) {
                 technologies.put(loc, progress);
             }
         }
     }
 
     public static TeamProfile create(PlayerTeam team) {
-        return new TeamProfile(team);
+        return new TeamProfile(TechManager.server(), team);
     }
 
     public static Optional<TeamProfile> fromTag(Tag tag) {
@@ -104,7 +116,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         if (playerTeam == null) {
             return Optional.empty();
         }
-        var ret = new TeamProfile(playerTeam);
+        var ret = new TeamProfile(TechManager.server(), playerTeam);
         ret.deserializeNBT(compoundTag);
         return Optional.of(ret);
     }

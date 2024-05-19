@@ -9,8 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
@@ -21,11 +19,11 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
-    private final List<Technology> requiredTech;
+    private final List<ResourceLocation> requiredTech;
 
     public AssemblyRecipe(RecipeTypeEntry<AssemblyRecipe, ?> type, ResourceLocation loc,
                           List<Input> inputs, List<Output> outputs, long workTicks,
-                          long voltage, long power, List<Technology> requiredTech) {
+                          long voltage, long power, List<ResourceLocation> requiredTech) {
         super(type, loc, inputs, outputs, workTicks, voltage, power);
         this.requiredTech = requiredTech;
     }
@@ -33,14 +31,8 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
     @Override
     public boolean canCraftIn(IContainer container) {
         return container.getOwnerTeam()
-                .map(team -> {
-                    for (var tech : requiredTech) {
-                        if (!team.isTechFinished(tech)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }).orElse(requiredTech.isEmpty());
+                .map(team -> requiredTech.stream().allMatch(team::isTechFinished))
+                .orElse(requiredTech.isEmpty());
     }
 
     public static class Builder extends ProcessingRecipe.Builder<AssemblyRecipe, Builder> {
@@ -51,12 +43,6 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
             super(registrate, parent, loc);
         }
 
-        private List<Technology> getRequiredTech() {
-            return requiredTech.stream()
-                    .flatMap(loc -> TechManager.server().techByKey(loc).stream())
-                    .toList();
-        }
-
         public Builder requireTech(ResourceLocation loc) {
             requiredTech.add(loc);
             return self();
@@ -64,8 +50,8 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
 
         @Override
         public AssemblyRecipe createObject() {
-            return new AssemblyRecipe(parent, loc, getInputs(), getOutputs(), workTicks, voltage, power,
-                    getRequiredTech());
+            return new AssemblyRecipe(parent, loc, getInputs(), getOutputs(), workTicks,
+                    voltage, power, requiredTech);
         }
     }
 
@@ -88,8 +74,7 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
             super.toJson(jo, recipe);
             var ja = new JsonArray();
             for (var tech : recipe.requiredTech) {
-                var loc = tech.getLoc();
-                ja.add(loc.toString());
+                ja.add(tech.toString());
             }
             jo.add("required_tech", ja);
         }

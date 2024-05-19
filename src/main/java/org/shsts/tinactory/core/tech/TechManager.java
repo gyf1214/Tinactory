@@ -177,9 +177,9 @@ public class TechManager implements ITechManager {
     public static class Client extends TechManager implements IClientTechManager {
         private static final Logger LOGGER = LogUtils.getLogger();
 
-        private static class ClientTeamProfile extends TeamProfile {
+        private class ClientTeamProfile extends TeamProfile {
             public ClientTeamProfile(PlayerTeam playerTeam) {
-                super(playerTeam);
+                super(Client.this, playerTeam);
             }
         }
 
@@ -224,7 +224,7 @@ public class TechManager implements ITechManager {
                 return;
             }
             team.technologies.putAll(p.getTechs());
-            LOGGER.debug("update {} techs for team {}", technologies.size(), team.getName());
+            LOGGER.debug("update {} techs for team {}", p.getTechs().size(), team.getName());
         }
     }
 
