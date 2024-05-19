@@ -88,8 +88,7 @@ public class AssemblyRecipe extends ProcessingRecipe<AssemblyRecipe> {
             super.toJson(jo, recipe);
             var ja = new JsonArray();
             for (var tech : recipe.requiredTech) {
-                var loc = tech.getRegistryName();
-                assert loc != null;
+                var loc = tech.getLoc();
                 ja.add(loc.toString());
             }
             jo.add("required_tech", ja);

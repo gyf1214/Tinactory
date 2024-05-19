@@ -33,15 +33,13 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public void advanceTechProgress(ITechnology tech, long progress) {
-        assert tech.getRegistryName() != null;
-        technologies.merge(tech.getRegistryName(), progress, ($, v) -> v + progress);
+        technologies.merge(tech.getLoc(), progress, ($, v) -> v + progress);
         TinactorySavedData.get().setDirty();
     }
 
     @Override
     public long getTechProgress(ITechnology tech) {
-        assert tech.getRegistryName() != null;
-        return technologies.getOrDefault(tech.getRegistryName(), 0L);
+        return technologies.getOrDefault(tech.getLoc(), 0L);
     }
 
     public TechUpdatePacket updatePacket() {

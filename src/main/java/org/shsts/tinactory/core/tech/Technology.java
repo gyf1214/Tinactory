@@ -4,9 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,9 +16,11 @@ import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Technology extends ForgeRegistryEntry<ITechnology> implements ITechnology {
+public class Technology implements ITechnology {
+    @Nullable
+    private ResourceLocation loc = null;
     private final List<ResourceLocation> dependIds;
-    private final Set<Technology> depends = new HashSet<>();
+    private final Set<ITechnology> depends = new HashSet<>();
     public final long maxProgress;
 
     public Technology(List<ResourceLocation> dependIds, long maxProgress) {
@@ -25,15 +28,25 @@ public class Technology extends ForgeRegistryEntry<ITechnology> implements ITech
         this.maxProgress = maxProgress;
     }
 
-    public void resolve() {
+    @Override
+    public ResourceLocation getLoc() {
+        assert loc != null;
+        return loc;
+    }
+
+    public void setLoc(ResourceLocation loc) {
+        this.loc = loc;
+    }
+
+    public void resolve(ITechManager manager) {
         depends.clear();
         dependIds.stream()
-                .flatMap(loc -> TechManager.server().techByKey(loc).stream())
+                .flatMap(loc -> manager.techByKey(loc).stream())
                 .forEach(depends::add);
     }
 
     @Override
-    public Collection<Technology> getDepends() {
+    public Collection<ITechnology> getDepends() {
         return depends;
     }
 

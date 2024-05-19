@@ -32,13 +32,12 @@ public class TechInitPacket implements IPacket {
         var loc = buf.readResourceLocation();
         var jo = GSON.fromJson(buf.readUtf(), JsonObject.class);
         var tech = Technology.CODEC.parse(JsonOps.INSTANCE, jo).getOrThrow(false, $ -> {});
-        tech.setRegistryName(loc);
+        tech.setLoc(loc);
         return tech;
     }
 
     private static void techToBuf(FriendlyByteBuf buf, Technology tech) {
-        assert tech.getRegistryName() != null;
-        buf.writeResourceLocation(tech.getRegistryName());
+        buf.writeResourceLocation(tech.getLoc());
         var je = Technology.CODEC.encodeStart(JsonOps.INSTANCE, tech).getOrThrow(false, $ -> {});
         buf.writeUtf(GSON.toJson(je));
     }

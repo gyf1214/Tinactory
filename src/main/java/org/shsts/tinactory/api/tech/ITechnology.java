@@ -1,15 +1,17 @@
 package org.shsts.tinactory.api.tech;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface ITechnology extends IForgeRegistryEntry<ITechnology> {
-    Collection<? extends ITechnology> getDepends();
+public interface ITechnology {
+    ResourceLocation getLoc();
+
+    Collection<ITechnology> getDepends();
 
     long getMaxProgress();
 }

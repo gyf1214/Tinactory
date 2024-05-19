@@ -77,7 +77,6 @@ public class TechManager implements ITechManager {
             }
 
             private Optional<Technology> loadResource(ResourceManager manager, ResourceLocation loc) {
-                var codec = Technology.CODEC;
                 var path = loc.getPath();
                 var path1 = path.substring(PREFIX.length() + 1, path.length() - SUFFIX.length());
                 var loc1 = new ResourceLocation(loc.getNamespace(), path1);
@@ -85,8 +84,8 @@ public class TechManager implements ITechManager {
                     var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
                     var reader = new BufferedReader(is);
                     var jo = GsonHelper.fromJson(gson, reader, JsonObject.class);
-                    var ret = codec.parse(JsonOps.INSTANCE, jo).getOrThrow(false, $ -> {});
-                    ret.setRegistryName(loc1);
+                    var ret = Technology.CODEC.parse(JsonOps.INSTANCE, jo).getOrThrow(false, $ -> {});
+                    ret.setLoc(loc1);
                     return Optional.of(ret);
                 } catch (IOException | RuntimeException ex) {
                     LOGGER.warn("Decode resource {} failed: {}", loc, ex);
@@ -106,12 +105,9 @@ public class TechManager implements ITechManager {
                                 .toList(), backgroundExecutor)
                         .thenAcceptAsync(techs -> {
                             technologies.clear();
-                            techs.forEach(tech -> {
-                                assert tech.getRegistryName() != null;
-                                technologies.put(tech.getRegistryName(), tech);
-                            });
+                            techs.forEach(tech -> technologies.put(tech.getLoc(), tech));
                             LOGGER.debug("reload {} techs", technologies.size());
-                            techs.forEach(Technology::resolve);
+                            techs.forEach(tech -> tech.resolve(Server.this));
                         }, backgroundExecutor);
             }
         }
@@ -214,10 +210,11 @@ public class TechManager implements ITechManager {
 
         private void handleTechInit(TechInitPacket p, NetworkEvent.Context ctx) {
             technologies.clear();
-            for (var tech : p.getTechs()) {
-                assert tech.getRegistryName() != null;
-                technologies.put(tech.getRegistryName(), tech);
+            var techs = p.getTechs();
+            for (var tech : techs) {
+                technologies.put(tech.getLoc(), tech);
             }
+            techs.forEach(tech -> tech.resolve(this));
             LOGGER.debug("reload {} techs", technologies.size());
         }
 
@@ -255,6 +252,6 @@ public class TechManager implements ITechManager {
         client = new Client();
         LOGGER.debug("create client tech manager {}", client);
         Tinactory.registryClientPacket(TechInitPacket.class, TechInitPacket::new, client::handleTechInit);
-        Tinactory.registryClientPacket(TechUpdatePacket.class, TechUpdatePacket::new, client()::handleTechUpdate);
+        Tinactory.registryClientPacket(TechUpdatePacket.class, TechUpdatePacket::new, client::handleTechUpdate);
     }
 }
