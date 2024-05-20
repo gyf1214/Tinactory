@@ -56,7 +56,9 @@ public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S
 
     @Override
     public boolean stillValid(Player player) {
-        return Machine.get(blockEntity).canPlayerInteract(player) && super.stillValid(player);
+        return super.stillValid(player) && Machine.tryGet(blockEntity)
+                .map(m -> m.canPlayerInteract(player))
+                .orElse(true);
     }
 
     @OnlyIn(Dist.CLIENT)

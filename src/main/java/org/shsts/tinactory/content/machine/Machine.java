@@ -275,7 +275,11 @@ public class Machine extends CapabilityProvider implements IEventSubscriber, INB
     }
 
     public static Machine get(BlockEntity be) {
-        return be.getCapability(AllCapabilities.MACHINE.get()).resolve().orElseThrow();
+        return AllCapabilities.MACHINE.get(be);
+    }
+
+    public static Optional<Machine> tryGet(BlockEntity be) {
+        return AllCapabilities.MACHINE.tryGet(be);
     }
 
     private static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {

@@ -77,8 +77,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     private T getTargetRecipe() {
         var world = blockEntity.getLevel();
         assert world != null && !world.isClientSide;
-        return (T) Machine.get(blockEntity).config
-                .getRecipe("targetRecipe", world)
+        return (T) Machine.tryGet(blockEntity)
+                .flatMap(m -> m.config.getRecipe("targetRecipe", world))
                 .filter(r -> r.getType() == recipeType)
                 .orElse(null);
     }
