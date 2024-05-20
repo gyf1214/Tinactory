@@ -26,6 +26,7 @@ import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
@@ -41,7 +42,7 @@ import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Workbench implements ICapabilityProvider, INBTSerializable<CompoundTag>, IWorkbench {
+public class Workbench extends CapabilityProvider implements INBTSerializable<CompoundTag>, IWorkbench {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static class CraftingStack extends CraftingContainer {
@@ -88,6 +89,8 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
     @Nullable
     private Recipe<?> currentRecipe = null;
 
+    private final LazyOptional<?> itemHandlerCap;
+
     public Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
 
@@ -101,6 +104,8 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         this.itemView = new WrapperItemHandler(
                 new CombinedInvWrapper(toolStorage, craftingView));
         this.itemView.onUpdate(this::onUpdate);
+
+        this.itemHandlerCap = LazyOptional.of(() -> itemView);
     }
 
     @FunctionalInterface
@@ -120,6 +125,7 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private void onUpdate() {
         var world = blockEntity.getLevel();
         if (world == null || world.isClientSide) {
@@ -127,17 +133,12 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
         }
 
         var recipeManager = world.getRecipeManager();
-        var toolRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL.get(), this, world);
-        if (toolRecipe.isEmpty()) {
-            var shapedRecipe = recipeManager.getRecipeFor(RecipeType.CRAFTING, craftingStack, world);
-            if (shapedRecipe.isEmpty()) {
-                currentRecipe = null;
-            } else {
-                currentRecipe = shapedRecipe.get();
-            }
-        } else {
-            currentRecipe = toolRecipe.get();
-        }
+
+        currentRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL.get(), this, world)
+                .map($ -> (Recipe) $)
+                .or(() -> recipeManager.getRecipeFor(RecipeType.CRAFTING, craftingStack, world))
+                .orElse(null);
+
         if (currentRecipe != null) {
             output = applyRecipeFunc(Recipe::assemble);
         } else {
@@ -216,9 +217,9 @@ public class Workbench implements ICapabilityProvider, INBTSerializable<Compound
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> itemView).cast();
+            return itemHandlerCap.cast();
         } else if (cap == AllCapabilities.WORKBENCH.get()) {
-            return LazyOptional.of(() -> this).cast();
+            return myself();
         }
         return LazyOptional.empty();
     }

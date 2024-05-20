@@ -17,6 +17,7 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -32,8 +33,8 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeProcessor<T extends ProcessingRecipe> implements ICapabilityProvider,
-        IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
+public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvider
+        implements IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final long PROGRESS_PER_TICK = 256;
 
     private final BlockEntity blockEntity;
@@ -195,8 +196,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> implements ICapabilityP
     @Nonnull
     @Override
     public <T1> LazyOptional<T1> getCapability(Capability<T1> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.PROCESSOR.get()) {
-            return LazyOptional.of(() -> this).cast();
+        if (cap == AllCapabilities.PROCESSOR.get() || cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
+            return myself();
         }
         return LazyOptional.empty();
     }

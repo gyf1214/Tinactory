@@ -49,33 +49,26 @@ public final class AllCommands {
         var player = ctx.getSource().getPlayerOrException();
         var player2 = EntityArgument.getPlayer(ctx, "player");
         var manager = TechManager.server();
-        var team = manager.teamByPlayer(player);
+        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
-        if (team.isEmpty()) {
-            throw PLAYER_NO_TEAM.create();
-        }
         if (manager.teamByPlayer(player2).isPresent()) {
             throw PLAYER_HAS_TEAM.create();
         }
 
-        manager.addPlayerToTeam(player2, team.get());
+        manager.addPlayerToTeam(player2, team);
         player.sendMessage(new TranslatableComponent("tinactory.chat.addPlayerToTeam.success",
-                player2.getDisplayName(), team.get().getName()), Util.NIL_UUID);
+                player2.getDisplayName(), team.getName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int leaveTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
         var manager = TechManager.server();
-        var team = manager.teamByPlayer(player);
+        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
-        if (team.isEmpty()) {
-            throw PLAYER_NO_TEAM.create();
-        }
-        var teamName = team.get().getName();
         manager.leaveTeam(player);
         player.sendMessage(new TranslatableComponent("tinactory.chat.leaveTeam.success",
-                player.getDisplayName(), teamName), Util.NIL_UUID);
+                player.getDisplayName(), team.getName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 

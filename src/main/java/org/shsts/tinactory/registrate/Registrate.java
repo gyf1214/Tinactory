@@ -39,6 +39,7 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
+import org.shsts.tinactory.registrate.builder.Builder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.builder.ItemBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
@@ -387,14 +388,14 @@ public class Registrate {
         return registryEntry(id, AllRegistries.EVENT, () -> new ReturnEvent<>(defaultRet));
     }
 
-    public <T extends SmartRecipe<?>, B>
+    public <T extends SmartRecipe<?>, B extends Builder<?, ?, B>>
     RecipeTypeBuilder<T, B, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
 
     public RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>
     processingRecipeType(String id) {
-        return recipeType("processing/" + id, ProcessingRecipe.SIMPLE_SERIALIZER)
+        return recipeType("processing/" + id, ProcessingRecipe.SERIALIZER)
                 .clazz(ProcessingRecipe.class)
                 .builder(ProcessingRecipe.Builder::new);
     }

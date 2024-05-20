@@ -24,6 +24,7 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
@@ -48,7 +49,8 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class StackProcessingContainer implements ICapabilityProvider, IContainer, INBTSerializable<CompoundTag> {
+public class StackProcessingContainer extends CapabilityProvider
+        implements IContainer, INBTSerializable<CompoundTag> {
     private record PortInfo(int startSlot, int endSlot, SlotType type,
                             IPort port, IPort internalPort) {}
 
@@ -58,6 +60,9 @@ public class StackProcessingContainer implements ICapabilityProvider, IContainer
     private final List<PortInfo> ports;
     private final Map<Integer, WrapperItemHandler> itemInputs = new HashMap<>();
     private final Multimap<Integer, WrapperFluidTank> fluidInputs = ArrayListMultimap.create();
+
+    private final LazyOptional<?> itemHandlerCap;
+    private final LazyOptional<?> fluidHandlerCap;
 
     private StackProcessingContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
@@ -136,6 +141,9 @@ public class StackProcessingContainer implements ICapabilityProvider, IContainer
         }
         this.combinedItems = new CombinedInvWrapper(items.toArray(IItemHandlerModifiable[]::new));
         this.combinedFluids = new CombinedFluidTank(fluids.toArray(WrapperFluidTank[]::new));
+
+        this.itemHandlerCap = LazyOptional.of(() -> combinedItems);
+        this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
     private void onInputUpdate() {
@@ -211,11 +219,11 @@ public class StackProcessingContainer implements ICapabilityProvider, IContainer
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> combinedItems).cast();
+            return itemHandlerCap.cast();
         } else if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
-            return LazyOptional.of(() -> combinedFluids).cast();
+            return fluidHandlerCap.cast();
         } else if (cap == AllCapabilities.CONTAINER.get()) {
-            return LazyOptional.of(() -> this).cast();
+            return myself();
         }
         return LazyOptional.empty();
     }

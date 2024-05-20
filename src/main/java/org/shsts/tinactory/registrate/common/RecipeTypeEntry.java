@@ -9,6 +9,7 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.builder.Builder;
 import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.Nullable;
@@ -17,24 +18,25 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeEntry<T extends SmartRecipe<?>, B> extends RegistryEntry<RecipeType<T>> {
+public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends Builder<?, ?, B>>
+        extends RegistryEntry<RecipeType<T>> {
     private final Registrate registrate;
     private final SmartRecipeBuilder.Factory<T, B> builderFactory;
     @Nullable
     private SmartRecipeSerializer<T, B> serializer;
     private final String prefix;
-    private final Transformer<B> defaultTransformer;
+    private final Transformer<B> defaults;
     public final Class<T> clazz;
 
     public RecipeTypeEntry(Registrate registrate, String id, Supplier<RecipeType<T>> supplier,
                            SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix, Class<T> clazz,
-                           Transformer<B> defaultTransformer) {
+                           Transformer<B> defaults) {
         super(registrate.modid, id, supplier);
         this.registrate = registrate;
         this.builderFactory = builderFactory;
         this.prefix = prefix;
         this.clazz = clazz;
-        this.defaultTransformer = defaultTransformer;
+        this.defaults = defaults;
     }
 
     public SmartRecipeSerializer<T, B> getSerializer() {
@@ -55,11 +57,11 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B> extends RegistryEntry<
     }
 
     private B addRecipe(ResourceLocation loc) {
-        return defaultTransformer.apply(getBuilder(loc));
+        return getBuilder(loc).transform(defaults);
     }
 
     private B addRecipe(Registrate registrate, ResourceLocation loc) {
-        return defaultTransformer.apply(getBuilder(registrate, loc));
+        return getBuilder(registrate, loc).transform(defaults);
     }
 
     public B recipe(ResourceLocation loc) {

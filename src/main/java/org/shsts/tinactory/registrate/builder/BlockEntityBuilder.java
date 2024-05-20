@@ -15,9 +15,9 @@ import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -57,7 +57,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
 
     @SafeVarargs
     public final BlockEntityBuilder<U, P> validBlock(Supplier<? extends Block>... blocks) {
-        validBlocks.addAll(Arrays.asList(blocks));
+        validBlocks.addAll(List.of(blocks));
         return self();
     }
 

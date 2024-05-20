@@ -16,6 +16,7 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,6 +30,7 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 public final class AllBlockEntities {
     public static final BlockEntitySet<NetworkController, MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
+    public static final ProcessingSet<ResearchRecipe> RESEARCH_TABLE;
     public static final ProcessingSet<ProcessingRecipe> STONE_GENERATOR;
     public static final ProcessingSet<AssemblyRecipe> ORE_ANALYZER;
     public static final ProcessingSet<ProcessingRecipe> MACERATOR;
@@ -71,6 +73,16 @@ public final class AllBlockEntities {
                 .defaultBlockItem().dropSelf()
                 .build()
                 .register();
+
+        RESEARCH_TABLE = ProcessingSet.builder(AllRecipes.RESEARCH)
+                .frontOverlay(gregtech("blocks/overlay/machine/overlay_screen"))
+                .voltage(Voltage.ULV)
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 1)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .build()
+                .build();
 
         STONE_GENERATOR = ProcessingSet.builder(AllRecipes.STONE_GENERATOR)
                 .frontOverlay(gregtech("blocks/machines/rock_crusher/overlay_front"))

@@ -133,11 +133,6 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
                     new ItemStack(item.get(), amount)));
         }
 
-        public S inputItem(int port, Item item, int amount) {
-            return input(port, new ProcessingIngredients.SimpleItemIngredient(
-                    new ItemStack(item, amount)));
-        }
-
         public S inputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
             return input(port, () -> new ProcessingIngredients.FluidIngredient(
                     new FluidStack(fluid.get(), amount)));
@@ -267,8 +262,8 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
                             ProcessingResults.SERIALIZER.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
             return builder
                     .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
-                    .voltage(GsonHelper.getAsLong(jo, "voltage", 0))
-                    .power(GsonHelper.getAsLong(jo, "power", 0));
+                    .voltage(GsonHelper.getAsLong(jo, "voltage"))
+                    .power(GsonHelper.getAsLong(jo, "power"));
         }
 
         @Override
@@ -297,13 +292,11 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
             jo.add("inputs", inputs);
             jo.add("outputs", outputs);
             jo.addProperty("work_ticks", recipe.workTicks);
-            if (recipe.voltage > 0) {
-                jo.addProperty("voltage", recipe.voltage);
-                jo.addProperty("power", recipe.power);
-            }
+            jo.addProperty("voltage", recipe.voltage);
+            jo.addProperty("power", recipe.power);
         }
     }
 
     public static final SmartRecipeSerializer.Factory<ProcessingRecipe, Builder>
-            SIMPLE_SERIALIZER = Serializer::new;
+            SERIALIZER = Serializer::new;
 }

@@ -26,6 +26,7 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
+import static org.shsts.tinactory.content.AllRecipes.RESEARCH;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.test.TinactoryTest.REGISTRATE;
 
@@ -107,11 +108,11 @@ public final class All {
                 .register();
 
         TEST_BASE_TECH = REGISTRATE.tech("test_base")
-                .maxProgress(1000)
+                .maxProgress(10)
                 .createObject();
 
         TEST_TECH = REGISTRATE.tech("test")
-                .maxProgress(2000)
+                .maxProgress(20)
                 .depends(TEST_BASE_TECH)
                 .createObject();
     }
@@ -136,6 +137,13 @@ public final class All {
                 .outputItem(1, All.TEST_ORE, 1, 0.75f)
                 .requireTech(TEST_BASE_TECH)
                 .workTicks(20)
+                .build();
+
+        RESEARCH.recipe(REGISTRATE, "test_research")
+                .target(TEST_BASE_TECH)
+                .inputItem(TEST_ORE)
+                .workTicks(200)
+                .voltage(Voltage.ULV)
                 .build();
     }
 }

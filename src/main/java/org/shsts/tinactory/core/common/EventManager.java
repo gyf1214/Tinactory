@@ -6,7 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.content.AllCapabilities;
 
@@ -18,7 +17,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class EventManager implements ICapabilityProvider {
+public class EventManager extends CapabilityProvider {
     private final Multimap<Event<?>, Consumer<?>> handlers = HashMultimap.create();
     private final Multimap<ReturnEvent<?, ?>, ReturnEvent.Handler<?, ?>> returnHandlers = HashMultimap.create();
 
@@ -62,7 +61,7 @@ public class EventManager implements ICapabilityProvider {
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.EVENT_MANAGER.get()) {
-            return LazyOptional.of(() -> this).cast();
+            return myself();
         }
         return LazyOptional.empty();
     }

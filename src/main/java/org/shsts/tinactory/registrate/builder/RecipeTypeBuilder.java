@@ -17,7 +17,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeBuilder<T extends SmartRecipe<?>, B, P>
+public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends Builder<?, ?, B>, P>
         extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -26,7 +26,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B, P>
     private SmartRecipeBuilder.Factory<T, B> builderFactory = null;
     @Nullable
     private Class<T> clazz;
-    private Transformer<B> defaultTransformer = $ -> $;
+    private Transformer<B> defaults = $ -> $;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
                              SmartRecipeSerializer.Factory<T, B> serializerFactory) {
@@ -44,8 +44,8 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B, P>
         return self();
     }
 
-    public RecipeTypeBuilder<T, B, P> builderTransform(Transformer<B> trans) {
-        defaultTransformer = defaultTransformer.chain(trans);
+    public RecipeTypeBuilder<T, B, P> defaults(Transformer<B> trans) {
+        defaults = defaults.chain(trans);
         return this;
     }
 
@@ -83,8 +83,8 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B, P>
         return clazz;
     }
 
-    public Transformer<B> getDefaultTransformer() {
-        return defaultTransformer;
+    public Transformer<B> getDefaults() {
+        return defaults;
     }
 
     @Override

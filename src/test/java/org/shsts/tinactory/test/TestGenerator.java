@@ -20,6 +20,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TestGenerator extends SmartBlockEntity implements IElectricMachine {
+    private final LazyOptional<?> myself = LazyOptional.of(() -> this);
     private final long voltage;
     private final double power;
 
@@ -59,7 +60,7 @@ public class TestGenerator extends SmartBlockEntity implements IElectricMachine 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
-            return LazyOptional.of(() -> this).cast();
+            return myself.cast();
         }
         return super.getCapability(cap, side);
     }

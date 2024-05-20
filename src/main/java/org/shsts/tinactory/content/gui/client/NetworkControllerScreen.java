@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.Widgets;
+import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -34,7 +35,6 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private final Panel welcomePanel;
     private final Panel configPanel;
     private final EditBox welcomeEdit;
-    private final Label teamNameLabel;
     private final Label stateLabel;
 
     public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
@@ -48,7 +48,6 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         var welcomeButton = Widgets.simpleButton(menu,
                 new TranslatableComponent("tinactory.gui.networkController.welcome.button"),
                 null, this::onWelcomePressed);
-        this.teamNameLabel = new Label(menu);
         this.stateLabel = new Label(menu);
 
         this.welcomePanel = new Panel(this);
@@ -57,7 +56,6 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         welcomePanel.addWidget(new Rect(-BUTTON_WIDTH / 2, 20, BUTTON_WIDTH, BUTTON_HEIGHT), welcomeButton);
 
         this.configPanel = new Panel(this);
-        configPanel.addWidget(Rect.ZERO, teamNameLabel);
         configPanel.addWidget(new Rect(0, Label.LINE_HEIGHT, 0, 0), stateLabel);
 
         var offset = Rect.corners(0, 10, 0, -10);
@@ -74,10 +72,10 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             welcomePanel.setActive(true);
             configPanel.setActive(false);
         } else {
-            teamNameLabel.setText(new TranslatableComponent("tinactory.gui.networkController.teamNameLabel",
-                    packet.getTeamName()));
-            stateLabel.setText(new TranslatableComponent("tinactory.gui.networkController.stateLabel",
-                    packet.getState()));
+            stateLabel.setLines(
+                    I18n.tr("tinactory.gui.networkController.teamNameLabel", packet.getTeamName()),
+                    I18n.tr("tinactory.gui.networkController.stateLabel", packet.getState()),
+                    I18n.tr("tinactory.gui.networkController.workFactorLabel", packet.getWorkFactor()));
             welcomePanel.setActive(false);
             configPanel.setActive(true);
         }

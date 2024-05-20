@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui.client;
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -25,6 +24,7 @@ import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 
 import javax.annotation.Nullable;
@@ -80,7 +80,7 @@ public class MachineRecipeBook extends Panel {
                 return Optional.of(List.of(new TranslatableComponent("tinactory.tooltip.unselectRecipe")));
             } else {
                 // TODO
-                return Optional.of(List.of(new TextComponent(recipe.getId().toString())));
+                return Optional.of(List.of(I18n.raw(recipe.getId().toString())));
             }
         }
 

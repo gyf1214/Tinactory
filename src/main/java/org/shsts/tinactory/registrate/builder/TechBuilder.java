@@ -6,7 +6,6 @@ import org.shsts.tinactory.registrate.Registrate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
@@ -25,7 +24,7 @@ public class TechBuilder<P> extends Builder<ResourceLocation, P, TechBuilder<P>>
     }
 
     public TechBuilder<P> depends(ResourceLocation... loc) {
-        depends.addAll(Arrays.asList(loc));
+        depends.addAll(List.of(loc));
         return this;
     }
 

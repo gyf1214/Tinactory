@@ -11,6 +11,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
@@ -20,6 +21,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public final class ProcessingIngredients {
     public record SimpleItemIngredient(ItemStack stack) implements IProcessingIngredient {
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IItemCollection itemCollection &&
@@ -54,8 +60,12 @@ public final class ProcessingIngredients {
         };
     }
 
-    public record ItemIngredient(Ingredient ingredient,
-                                 int amount) implements IProcessingIngredient {
+    public record ItemIngredient(Ingredient ingredient, int amount) implements IProcessingIngredient {
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IItemCollection itemCollection &&
@@ -98,6 +108,11 @@ public final class ProcessingIngredients {
     }
 
     public record FluidIngredient(FluidStack fluid) implements IProcessingIngredient {
+        @Override
+        public PortType type() {
+            return PortType.FLUID;
+        }
+
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IFluidCollection fluidCollection &&

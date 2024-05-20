@@ -9,6 +9,7 @@
   "tinactory.gui.networkController.welcome.button": "Create Team",
   "tinactory.gui.networkController.teamNameLabel": "Team: %s",
   "tinactory.gui.networkController.stateLabel": "State: %s",
+  "tinactory.gui.networkController.workFactorLabel": "Work Factor: %.2f",
   "tinactory.chat.createTeam.success": "Create team %s for %s successfully.",
   "tinactory.chat.addPlayerToTeam.success": "Add player %s to team %s successfully.",
   "tinactory.chat.leaveTeam.success": "%s leaves team %s successfully.",

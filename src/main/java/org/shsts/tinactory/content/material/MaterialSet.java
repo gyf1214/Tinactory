@@ -394,10 +394,6 @@ public class MaterialSet {
                 return byproduct(b1, b1, b2);
             }
 
-            public OreBuilder byproduct(Supplier<Item> b1) {
-                return byproduct(b1, b1, b1);
-            }
-
             private void crush(String output, String input) {
                 callbacks.add($ -> MACERATOR.recipe($.loc(output))
                         .inputItem(0, $.entry(input), 1)
@@ -436,7 +432,7 @@ public class MaterialSet {
 
                 REGISTRATE.block(newId("ore"), OreBlock::new)
                         .properties(p -> p.strength(destroyTime, explodeResistance))
-                        .transform(ModelGen.oreBlock(Arrays.asList(variants)))
+                        .transform(ModelGen.oreBlock(List.of(variants)))
                         .tint(color)
                         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                         .tag(mineTier.getTag())

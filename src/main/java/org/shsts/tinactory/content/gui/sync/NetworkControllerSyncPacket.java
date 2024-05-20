@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui.sync;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
+import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.network.NetworkBase;
 import org.shsts.tinactory.core.network.NetworkController;
@@ -15,6 +16,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
     private boolean present;
     private String teamName;
     private NetworkBase.State state;
+    private double workFactor;
 
     public NetworkControllerSyncPacket() {}
 
@@ -25,6 +27,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
             var network = be.getNetwork().get();
             this.teamName = network.team.getName();
             this.state = network.getState();
+            this.workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
         }
     }
 
@@ -33,11 +36,18 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
     }
 
     public String getTeamName() {
+        assert present;
         return teamName;
     }
 
     public NetworkBase.State getState() {
+        assert present;
         return state;
+    }
+
+    public double getWorkFactor() {
+        assert present;
+        return workFactor;
     }
 
     @Override
@@ -47,6 +57,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         if (present) {
             buf.writeUtf(teamName);
             buf.writeEnum(state);
+            buf.writeDouble(workFactor);
         }
     }
 
@@ -57,6 +68,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         if (present) {
             teamName = buf.readUtf();
             state = buf.readEnum(NetworkBase.State.class);
+            workFactor = buf.readDouble();
         }
     }
 

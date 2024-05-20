@@ -22,6 +22,7 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.logistics.LogisticsComponent;
+import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
@@ -42,7 +43,7 @@ import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSerializable<CompoundTag> {
+public class Machine extends CapabilityProvider implements IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final BlockEntity blockEntity;
@@ -256,7 +257,7 @@ public class Machine implements ICapabilityProvider, IEventSubscriber, INBTSeria
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.MACHINE.get()) {
-            return LazyOptional.of(() -> this).cast();
+            return myself();
         }
         return LazyOptional.empty();
     }

@@ -19,6 +19,7 @@ import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
@@ -30,6 +31,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
+    public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ORE_ANALYZER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MACERATOR;
@@ -43,11 +45,17 @@ public final class AllRecipes {
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
+        RESEARCH = REGISTRATE.recipeType("research", ResearchRecipe.SERIALIZER)
+                .clazz(ResearchRecipe.class)
+                .builder(ResearchRecipe.Builder::new)
+                .defaults($ -> $.amperage(1f))
+                .register();
+
         STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator").register();
         ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer").register();
         MACERATOR = REGISTRATE.processingRecipeType("macerator").register();
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
-                .builderTransform($ -> $
+                .defaults($ -> $
                         .inputFluid(1, Fluids.WATER, 1000)
                         .outputItem(3, AllMaterials.STONE.entry("dust"), 1)
                         .workTicks(320)
@@ -55,7 +63,7 @@ public final class AllRecipes {
                 .register();
         CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge").register();
         THERMAL_CENTRIFUGE = REGISTRATE.processingRecipeType("thermal_centrifuge")
-                .builderTransform($ -> $
+                .defaults($ -> $
                         .voltage(Voltage.LV)
                         .workTicks(640)
                         .amperage(3f))
@@ -113,7 +121,7 @@ public final class AllRecipes {
         // generate cobblestone
         STONE_GENERATOR.recipe(Items.COBBLESTONE)
                 .outputItem(0, Items.COBBLESTONE, 1)
-                .primitive().power(1).workTicks(40)
+                .primitive().workTicks(40)
                 .build();
 
         // workbench
