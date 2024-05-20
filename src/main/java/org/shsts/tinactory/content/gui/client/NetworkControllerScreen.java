@@ -21,6 +21,8 @@ import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
@@ -29,6 +31,7 @@ import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
+    private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("#.##");
     private static final int HEIGHT = 120;
     private static final int BUTTON_WIDTH = 72;
 
@@ -72,10 +75,11 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             welcomePanel.setActive(true);
             configPanel.setActive(false);
         } else {
+            var workFactor = NUMBER_FORMAT.format(packet.getWorkFactor());
             stateLabel.setLines(
                     I18n.tr("tinactory.gui.networkController.teamNameLabel", packet.getTeamName()),
                     I18n.tr("tinactory.gui.networkController.stateLabel", packet.getState()),
-                    I18n.tr("tinactory.gui.networkController.workFactorLabel", packet.getWorkFactor()));
+                    I18n.tr("tinactory.gui.networkController.workFactorLabel", workFactor));
             welcomePanel.setActive(false);
             configPanel.setActive(true);
         }

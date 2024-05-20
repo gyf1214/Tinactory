@@ -45,6 +45,10 @@ public final class DrawableHelper {
             builder.add(createStatic(helper, image.texture(), rect.width(), rect.height()),
                     rect.x(), rect.y());
         }
+        if (layout.progressBar != null) {
+            var rect = layout.progressBar.rect();
+            builder.add(helper.createBlankDrawable(rect.width(), rect.height()), rect.x(), rect.y());
+        }
         return builder.build();
     }
 }
