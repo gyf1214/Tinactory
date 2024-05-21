@@ -69,7 +69,7 @@ public final class All {
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
                 .ticking().eventManager()
-                .simpleCapability(Machine.builder(Voltage.ULV))
+                .simpleCapability(Machine::builder)
                 .capability(StackProcessingContainer::builder)
                 .layout(TEST_FLUID_LAYOUT)
                 .build()
@@ -83,8 +83,7 @@ public final class All {
                 .build() // menu
                 .build() // blockEntity
                 .block()
-                .transform(ModelGen.machine(
-                        ModelGen.gregtech("blocks/casings/voltage/ulv"),
+                .transform(ModelGen.machine(Voltage.ULV,
                         ModelGen.gregtech("blocks/machines/alloy_smelter/overlay_front")))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
@@ -96,12 +95,10 @@ public final class All {
                         MachineBlock.factory(Voltage.ULV))
                 .entityClass(TestGenerator.class)
                 .blockEntity()
-                .simpleCapability(Machine.builder(Voltage.ULV))
+                .simpleCapability(Machine::builder)
                 .build()
                 .block()
-                .transform(ModelGen.machine(
-                        ModelGen.gregtech("blocks/casings/voltage/ulv"),
-                        ModelGen.gregtech("blocks/overlay/machine/overlay_screen")))
+                .transform(ModelGen.machine(Voltage.ULV, ModelGen.gregtech("blocks/overlay/machine/overlay_screen")))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .build()

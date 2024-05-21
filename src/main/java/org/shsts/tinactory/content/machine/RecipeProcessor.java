@@ -196,7 +196,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     @Nonnull
     @Override
     public <T1> LazyOptional<T1> getCapability(Capability<T1> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.PROCESSOR.get() || cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
+        if (cap == AllCapabilities.PROCESSOR.get() ||
+                (cap == AllCapabilities.ELECTRIC_MACHINE.get() && voltage != Voltage.PRIMITIVE)) {
             return myself();
         }
         return LazyOptional.empty();

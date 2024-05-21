@@ -9,7 +9,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -39,7 +38,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
-import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -55,10 +53,6 @@ public class Machine extends CapabilityProvider implements IEventSubscriber, INB
 
     protected Machine(BlockEntity be) {
         this.blockEntity = be;
-    }
-
-    private static Machine primitive(BlockEntity be) {
-        return new PrimitiveMachine(be);
     }
 
     public void setConfig(SetMachinePacket packet) {
@@ -282,21 +276,7 @@ public class Machine extends CapabilityProvider implements IEventSubscriber, INB
         return AllCapabilities.MACHINE.tryGet(be);
     }
 
-    private static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
-        private final boolean primitive;
-
-        public Builder(P parent, boolean primitive) {
-            super(parent, "network/machine");
-            this.primitive = primitive;
-        }
-
-        @Override
-        public Function<BlockEntity, ICapabilityProvider> createObject() {
-            return primitive ? Machine::primitive : Machine::new;
-        }
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Voltage voltage) {
-        return p -> new Builder<>(p, voltage == Voltage.PRIMITIVE);
+    public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
+        return CapabilityProviderBuilder.fromFactory(parent, "network/machine", Machine::new);
     }
 }

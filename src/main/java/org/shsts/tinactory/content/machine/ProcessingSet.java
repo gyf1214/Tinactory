@@ -34,13 +34,21 @@ public class ProcessingSet<T extends ProcessingRecipe> {
     public final RecipeTypeEntry<T, ?> recipeType;
     public final Map<Voltage, Layout> layoutSet;
     protected final Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines;
+    @Nullable
+    protected final BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive;
 
     public ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Map<Voltage, Layout> layoutSet,
                          ResourceLocation frontOverlay, Collection<Voltage> voltages) {
         this.recipeType = recipeType;
         this.layoutSet = layoutSet;
         this.machines = voltages.stream()
+                .filter(v -> v != Voltage.PRIMITIVE)
                 .collect(Collectors.toMap($ -> $, voltage -> createMachine(voltage, frontOverlay)));
+        if (voltages.contains(Voltage.PRIMITIVE)) {
+            this.primitive = createPrimitive(frontOverlay);
+        } else {
+            this.primitive = null;
+        }
     }
 
     protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
@@ -51,7 +59,7 @@ public class ProcessingSet<T extends ProcessingRecipe> {
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
                 .eventManager()
-                .simpleCapability(Machine.builder(voltage))
+                .simpleCapability(Machine::builder)
                 .capability(RecipeProcessor::builder)
                 .recipeType(recipeType).voltage(voltage)
                 .build()
@@ -78,7 +86,39 @@ public class ProcessingSet<T extends ProcessingRecipe> {
         return builder.register();
     }
 
+    protected BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
+    createPrimitive(ResourceLocation frontOverlay) {
+        var id = "primitive/" + recipeType.id;
+        var layout = layoutSet.get(Voltage.PRIMITIVE);
+        var builder = REGISTRATE.blockEntitySet(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
+                .entityClass(PrimitiveMachine.class)
+                .blockEntity()
+                .eventManager().ticking()
+                .capability(RecipeProcessor::builder)
+                .recipeType(recipeType).voltage(Voltage.PRIMITIVE)
+                .build()
+                .capability(StackProcessingContainer::builder)
+                .layout(layout)
+                .build()
+                .menu(ProcessingMenu.factory(layout))
+                .build() // menu
+                .build() // blockEntity
+                .block()
+                .transform(ModelGen.primitiveMachine(frontOverlay))
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .tag(BlockTags.MINEABLE_WITH_AXE)
+                .dropSelf()
+                .blockItem().tag(AllTags.processingMachine(recipeType)).build()
+                .build();
+
+        return builder.register();
+    }
+
     public Block getBlock(Voltage voltage) {
+        if (voltage == Voltage.PRIMITIVE) {
+            assert primitive != null;
+            return primitive.getBlock();
+        }
         return machines.get(voltage).getBlock();
     }
 

@@ -1,13 +1,13 @@
 package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -16,39 +16,17 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class PrimitiveMachine extends Machine {
-    protected PrimitiveMachine(BlockEntity be) {
-        super(be);
+public class PrimitiveMachine extends SmartBlockEntity {
+    public PrimitiveMachine(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
-    /**
-     * Ignore global workFactor.
-     */
     @Override
-    protected void onWork(Level world, Network network) {
-        assert this.network == network;
+    protected void onServerTick(Level world, BlockPos pos, BlockState state) {
+        super.onServerTick(world, pos, state);
         var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
-        getProcessor().ifPresent(processor -> processor.onWorkTick(workSpeed));
-    }
-
-    @Override
-    public void subscribeEvents(EventManager eventManager) {
-        super.subscribeEvents(eventManager);
-        eventManager.subscribe(AllEvents.SERVER_TICK, this::onServerTick);
-    }
-
-    protected void onServerTick(Level world) {
-        if (network == null) {
-            var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
-            getProcessor().ifPresent(processor -> {
-                processor.onPreWork();
-                processor.onWorkTick(workSpeed);
-            });
-        }
-    }
-
-    @Override
-    public boolean canPlayerInteract(Player player) {
-        return network == null || super.canPlayerInteract(player);
+        var processor = AllCapabilities.PROCESSOR.get(this);
+        processor.onPreWork();
+        processor.onWorkTick(workSpeed);
     }
 }

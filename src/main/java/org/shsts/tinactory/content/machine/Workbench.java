@@ -15,7 +15,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -38,7 +37,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
-import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -235,11 +233,6 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     }
 
     public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
-        return new CapabilityProviderBuilder<>(parent, "primitive/workbench_container") {
-            @Override
-            public Function<BlockEntity, ICapabilityProvider> createObject() {
-                return Workbench::new;
-            }
-        };
+        return CapabilityProviderBuilder.fromFactory(parent, "primitive/workbench_container", Workbench::new);
     }
 }

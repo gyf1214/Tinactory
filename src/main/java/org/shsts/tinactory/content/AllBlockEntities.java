@@ -51,9 +51,7 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .block()
-                .transform(ModelGen.machine(
-                        gregtech("blocks/casings/voltage/lv"),
-                        gregtech("blocks/overlay/machine/overlay_screen")))
+                .transform(ModelGen.machine(Voltage.LV, gregtech("blocks/overlay/machine/overlay_screen")))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .build()

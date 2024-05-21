@@ -12,6 +12,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
+import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.OreBlock;
@@ -59,6 +60,7 @@ public final class ModelGen {
 
     public static final ResourceLocation VOID_TEX = modLoc("void");
     public static final ResourceLocation WHITE_TEX = modLoc("white");
+    public static final ResourceLocation PRIMITIVE_CASING = gregtech("blocks/casings/wood_wall");
 
     public static ResourceLocation mcLoc(String id) {
         return new ResourceLocation(id);
@@ -108,19 +110,12 @@ public final class ModelGen {
     }
 
     public static ResourceLocation casing(Voltage voltage) {
-        return voltage == Voltage.PRIMITIVE ?
-                gregtech("blocks/casings/wood_wall") :
-                gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
+        return gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
     }
 
     public static <S extends BlockBuilder<? extends MachineBlock<?>, ?, S>>
     Transformer<S> machine(Voltage voltage, ResourceLocation front) {
-        return machine(casing(voltage), front);
-    }
-
-    public static <S extends BlockBuilder<? extends MachineBlock<?>, ?, S>>
-    Transformer<S> machine(ResourceLocation casing, ResourceLocation front) {
-        var model = new MachineModel(casing, front);
+        var model = new MachineModel(casing(voltage), front, false);
         return $ -> $.blockState(model::blockState).translucent();
     }
 
@@ -136,6 +131,12 @@ public final class ModelGen {
             }
             ctx.provider.horizontalBlock(ctx.object, model);
         });
+    }
+
+    public static <S extends BlockBuilder<? extends PrimitiveBlock<?>, ?, S>>
+    Transformer<S> primitiveMachine(ResourceLocation front) {
+        var model = new MachineModel(PRIMITIVE_CASING, front, true);
+        return $ -> $.blockState(model::blockState).translucent();
     }
 
     public static <S extends BlockBuilder<? extends Block, ?, S>>
