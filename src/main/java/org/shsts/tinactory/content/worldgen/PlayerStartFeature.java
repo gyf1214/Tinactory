@@ -31,8 +31,11 @@ public class PlayerStartFeature extends Feature<NoneFeatureConfiguration> {
         world.setBlock(chestPos, Blocks.CHEST.defaultBlockState(), 3);
         world.getBlockEntity(chestPos, BlockEntityType.CHEST).ifPresent(chest -> {
             chest.setItem(0, new ItemStack(Blocks.GRASS_BLOCK, 64));
-            chest.setItem(1, new ItemStack(Items.OAK_SAPLING, 16));
-            chest.setItem(2, new ItemStack(Items.BONE_MEAL, 16));
+            chest.setItem(1, new ItemStack(Blocks.DIRT, 64));
+            chest.setItem(2, new ItemStack(Items.OAK_SAPLING, 16));
+            chest.setItem(3, new ItemStack(Items.BONE_MEAL, 16));
+            chest.setItem(4, new ItemStack(Items.WATER_BUCKET));
+            chest.setItem(5, new ItemStack(Items.WATER_BUCKET));
         });
         return true;
     }

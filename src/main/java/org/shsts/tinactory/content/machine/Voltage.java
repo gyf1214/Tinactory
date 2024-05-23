@@ -10,7 +10,7 @@ public enum Voltage {
 
     Voltage(int rank) {
         this.rank = rank;
-        this.value = 2L << (2L * rank);
+        this.value = rank == 0 ? 0 : 2L << (2L * rank);
         this.id = name().toLowerCase();
     }
 }

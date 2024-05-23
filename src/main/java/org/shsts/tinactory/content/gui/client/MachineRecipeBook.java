@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.model.ModelGen;
@@ -194,13 +195,7 @@ public class MachineRecipeBook extends Panel {
         super(screen);
         this.syncSlot = syncSlot;
 
-        var container = AllCapabilities.CONTAINER.get(screen.getMenu().blockEntity);
-        for (var recipe : ClientUtil.getRecipeManager().getAllRecipesFor(recipeType)) {
-            if (!recipe.canCraftIn(container)) {
-                continue;
-            }
-            recipes.add(recipe);
-        }
+        refreshRecipes(recipeType);
 
         this.bookPanel = new Panel(screen);
         bookPanel.addWidget(RectD.FULL, Rect.ZERO,
@@ -230,6 +225,20 @@ public class MachineRecipeBook extends Panel {
                 }
             }
         });
+    }
+
+    private void refreshRecipes(RecipeType<? extends ProcessingRecipe> recipeType) {
+        var be = screen.getMenu().blockEntity;
+        var container = AllCapabilities.CONTAINER.get(be);
+        var voltage = (long) AllCapabilities.ELECTRIC_MACHINE.tryGet(be)
+                .map(IElectricMachine::getVoltage)
+                .orElse(0L);
+        for (var recipe : ClientUtil.getRecipeManager().getAllRecipesFor(recipeType)) {
+            if (!recipe.canCraftIn(container) || recipe.voltage > voltage) {
+                continue;
+            }
+            recipes.add(recipe);
+        }
     }
 
     @Override

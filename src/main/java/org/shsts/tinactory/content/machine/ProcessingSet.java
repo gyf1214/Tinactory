@@ -114,14 +114,17 @@ public class ProcessingSet<T extends ProcessingRecipe> {
         return builder.register();
     }
 
+    public Block getPrimitive() {
+        assert primitive != null;
+        return primitive.getBlock();
+    }
+
     public Block getBlock(Voltage voltage) {
         if (voltage == Voltage.PRIMITIVE) {
-            assert primitive != null;
-            return primitive.getBlock();
+            return getPrimitive();
         }
         return machines.get(voltage).getBlock();
     }
-
 
     public static class Builder<T extends ProcessingRecipe> {
         private final RecipeTypeEntry<T, ?> recipeType;

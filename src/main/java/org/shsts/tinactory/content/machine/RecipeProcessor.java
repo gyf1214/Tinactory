@@ -41,6 +41,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     private final RecipeType<? extends T> recipeType;
     private final Voltage voltage;
     private long workProgress = 0;
+    private double workFactor = 1d;
+    private double energyFactor = 1d;
 
     /**
      * This is only used during deserializeNBT when world is not available.
@@ -83,6 +85,18 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
                 .orElse(null);
     }
 
+    private void calculateFactors(ProcessingRecipe recipe) {
+        var baseVoltage = recipe.voltage == 0 ? Voltage.ULV.value : recipe.voltage;
+        var voltageFactor = 1L;
+        var overclock = 1L;
+        while (baseVoltage * voltageFactor * 4 <= voltage.value) {
+            overclock *= 2;
+            voltageFactor *= 4;
+        }
+        energyFactor = voltageFactor;
+        workFactor = overclock;
+    }
+
     private void updateRecipe() {
         if (currentRecipe != null || !needUpdate) {
             return;
@@ -93,11 +107,13 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         var targetRecipe = getTargetRecipe();
         var container = getContainer();
         if (targetRecipe != null) {
-            if (targetRecipe.matches(container, world)) {
+            if (targetRecipe.matches(container, world) && targetRecipe.voltage <= voltage.value) {
                 currentRecipe = targetRecipe;
             }
         } else {
-            var matches = SmartRecipe.getRecipesFor(recipeType, container, world);
+            var matches = SmartRecipe.getRecipesFor(recipeType, container, world)
+                    .stream().filter(r -> r.voltage <= voltage.value)
+                    .toList();
             if (matches.size() == 1) {
                 currentRecipe = matches.get(0);
             }
@@ -105,6 +121,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         workProgress = 0;
         if (currentRecipe != null) {
             currentRecipe.consumeInputs(container);
+            calculateFactors(currentRecipe);
         }
         needUpdate = false;
         blockEntity.setChanged();
@@ -125,7 +142,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         if (currentRecipe == null) {
             return;
         }
-        var progress = (long) Math.floor(partial * (double) PROGRESS_PER_TICK);
+        var progress = (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
         workProgress += progress;
         var world = getWorld();
         if (workProgress >= getMaxWorkTicks()) {
@@ -163,7 +180,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     @Override
     public double getPowerCons() {
         return voltage == Voltage.PRIMITIVE || currentRecipe == null ?
-                0 : currentRecipe.power;
+                0 : currentRecipe.power * energyFactor;
     }
 
     @SuppressWarnings("unchecked")
@@ -176,6 +193,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
                 .orElse(null);
         currentRecipeLoc = null;
         if (currentRecipe != null) {
+            calculateFactors(currentRecipe);
             needUpdate = false;
         }
     }

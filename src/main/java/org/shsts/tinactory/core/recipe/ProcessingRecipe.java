@@ -6,9 +6,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -133,6 +135,11 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
                     new ItemStack(item.get(), amount)));
         }
 
+        public S inputItem(int port, TagKey<Item> tag, int amount) {
+            return input(port, () -> new ProcessingIngredients.ItemIngredient(
+                    Ingredient.of(tag), amount));
+        }
+
         public S inputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
             return input(port, () -> new ProcessingIngredients.FluidIngredient(
                     new FluidStack(fluid.get(), amount)));
@@ -224,6 +231,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         @Override
         public U buildObject() {
             if (power <= 0) {
+                var voltage = this.voltage == 0 ? Voltage.ULV.value : this.voltage;
                 power = (long) (amperage * voltage);
             }
             return super.buildObject();

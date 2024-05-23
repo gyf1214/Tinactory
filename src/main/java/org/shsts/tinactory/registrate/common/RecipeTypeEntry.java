@@ -4,7 +4,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeType;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
@@ -52,37 +51,38 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends Builder<?, ?, B
         return builderFactory.create(registrate, this, loc);
     }
 
-    public B getBuilder(Registrate registrate, ResourceLocation loc) {
+    private B getBuilder(Registrate registrate, ResourceLocation loc) {
         return builderFactory.create(registrate, this, loc);
-    }
-
-    private B addRecipe(ResourceLocation loc) {
-        return getBuilder(loc).transform(defaults);
     }
 
     private B addRecipe(Registrate registrate, ResourceLocation loc) {
         return getBuilder(registrate, loc).transform(defaults);
     }
 
+    public B recipe(Registrate registrate, ResourceLocation loc) {
+        var id = loc.getPath();
+        if (!registrate.modid.equals(loc.getNamespace())) {
+            id = loc.getNamespace() + "/" + id;
+        }
+        id = prefix + "/" + id;
+        return addRecipe(registrate, new ResourceLocation(registrate.modid, id));
+    }
+
     public B recipe(ResourceLocation loc) {
-        return addRecipe(ModelGen.prepend(loc, prefix));
+        return recipe(registrate, loc);
     }
 
     public B recipe(String id) {
         return recipe(new ResourceLocation(registrate.modid, id));
     }
 
+    public B recipe(Registrate registrate, String id) {
+        return recipe(registrate, new ResourceLocation(registrate.modid, id));
+    }
+
     public B recipe(Item item) {
         var loc = item.getRegistryName();
         assert loc != null;
         return recipe(loc);
-    }
-
-    public B recipe(Registrate registrate, ResourceLocation loc) {
-        return addRecipe(registrate, ModelGen.prepend(loc, prefix));
-    }
-
-    public B recipe(Registrate registrate, String id) {
-        return recipe(registrate, new ResourceLocation(registrate.modid, id));
     }
 }

@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +16,6 @@ import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.IconSet;
-import org.shsts.tinactory.content.material.OreBlock;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.core.common.Transformer;
@@ -23,7 +23,6 @@ import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -115,7 +114,7 @@ public final class ModelGen {
 
     public static <S extends BlockBuilder<? extends MachineBlock<?>, ?, S>>
     Transformer<S> machine(Voltage voltage, ResourceLocation front) {
-        var model = new MachineModel(casing(voltage), front, false);
+        var model = new MachineModel(casing(voltage), front);
         return $ -> $.blockState(model::blockState).translucent();
     }
 
@@ -135,25 +134,19 @@ public final class ModelGen {
 
     public static <S extends BlockBuilder<? extends PrimitiveBlock<?>, ?, S>>
     Transformer<S> primitiveMachine(ResourceLocation front) {
-        var model = new MachineModel(PRIMITIVE_CASING, front, true);
-        return $ -> $.blockState(model::blockState).translucent();
+        var model = new MachineModel(PRIMITIVE_CASING, front);
+        return $ -> $.blockState(model::primitiveBlockState);
     }
 
     public static <S extends BlockBuilder<? extends Block, ?, S>>
-    Transformer<S> oreBlock(Collection<OreVariant> variants) {
+    Transformer<S> oreBlock(OreVariant variant) {
         return $ -> $.blockState(ctx -> {
             var models = ctx.provider.models();
-            var multipart = ctx.provider.getMultipartBuilder(ctx.object);
-            for (var variant : variants) {
-                multipart.part()
-                        .modelFile(models.getExistingFile(prepend(variant.baseBlock, "block")))
-                        .addModel()
-                        .condition(OreBlock.VARIANT, variant)
-                        .end();
-            }
-            multipart.part()
-                    .modelFile(models.getExistingFile(modLoc("block/material/ore_overlay")))
-                    .addModel().end();
+            var loc = variant.baseBlock.getRegistryName();
+            assert loc != null;
+            var baseModel = new ConfiguredModel(models.getExistingFile(prepend(loc, "block")));
+            var overlay = new ConfiguredModel(models.getExistingFile(modLoc("block/material/ore_overlay")));
+            ctx.provider.simpleBlock(ctx.object, baseModel, overlay);
         }).translucent();
     }
 

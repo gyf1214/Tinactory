@@ -432,10 +432,15 @@ public class Registrate {
     }
 
     public void vanillaRecipe(Supplier<RecipeBuilder> recipe) {
-        recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe));
+        vanillaRecipe(recipe, "");
     }
 
-    public void vanillaRecipe(Supplier<RecipeBuilder> recipe, ResourceLocation loc) {
-        recipeDataHandler.addCallback(prov -> recipe.get().save(prov::addRecipe, loc));
+    public void vanillaRecipe(Supplier<RecipeBuilder> recipe, String suffix) {
+        recipeDataHandler.addCallback(prov -> {
+            var builder = recipe.get();
+            var loc = builder.getResult().getRegistryName();
+            assert loc != null;
+            recipe.get().save(prov::addRecipe, new ResourceLocation(modid, "minecraft/" + loc.getPath() + suffix));
+        });
     }
 }

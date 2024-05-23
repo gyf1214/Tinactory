@@ -14,6 +14,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
@@ -181,14 +182,20 @@ public class MaterialSet {
         }
     }
 
-    private MaterialSet smelt(String output, String input, int time) {
-        if (items.containsKey(output) || items.containsKey(input)) {
+    private MaterialSet smelt(String output, String input) {
+        if (!items.containsKey(output) || !items.containsKey(input)) {
             return this;
         }
         REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
-                .smelting(Ingredient.of(tag(input)), item(output), 0, time)
+                .smelting(Ingredient.of(tag(input)), item(output), 0, 200)
                 .unlockedBy("has_material", has(tag(input))));
         return this;
+    }
+
+    private void smelt(Supplier<Item> item) {
+        REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+                .smelting(Ingredient.of(tag("dust")), item.get(), 0, 200)
+                .unlockedBy("has_material", has(tag("dust"))), "_from_" + name);
     }
 
     public void freeze() {
@@ -357,24 +364,19 @@ public class MaterialSet {
         }
 
         public class OreBuilder extends BuilderBase<Unit, Builder<P>, OreBuilder> {
-            private float destroyTime = 0f;
-            private float explodeResistance = 0f;
+            private int amount = 1;
             private boolean primitive = false;
-            @Nullable
-            private Tier mineTier = null;
-            private final OreVariant[] variants;
+            private final OreVariant variant;
             private final Map<String, Supplier<Item>> byproducts = new HashMap<>();
 
-            private OreBuilder(OreVariant[] variants) {
+            private OreBuilder(OreVariant variant) {
                 super(Builder.this);
-                this.variants = variants;
+                this.variant = variant;
                 onBuild.add(this::buildObject);
             }
 
-            public OreBuilder strength(Tier mineTier, float destroyTime, float explodeResistance) {
-                this.mineTier = mineTier;
-                this.destroyTime = destroyTime;
-                this.explodeResistance = explodeResistance;
+            public OreBuilder amount(int val) {
+                amount = val;
                 return this;
             }
 
@@ -396,32 +398,30 @@ public class MaterialSet {
 
             private void crush(String output, String input) {
                 callbacks.add($ -> MACERATOR.recipe($.loc(output))
-                        .inputItem(0, $.entry(input), 1)
-                        .outputItem(1, $.entry(output), input.equals("raw") ? 2 : 1)
+                        .inputItem(0, $.tag(input), 1)
+                        .outputItem(1, $.entry(output), input.equals("raw") ? 2 * amount : 1)
                         .voltage(Voltage.LV)
                         .amperage(0.5f)
-                        .workTicks((long) (destroyTime * 40f))
+                        .workTicks((long) (variant.destroyTime * 40f))
                         .build());
             }
 
-            private void wash(String output, String input) {
+            private void wash(String output, String input, Voltage voltage) {
                 callbacks.add($ -> {
                     var builder = ORE_WASHER.recipe($.loc(output))
-                            .inputItem(0, $.entry(input), 1)
+                            .inputItem(0, $.tag(input), 1)
                             .outputItem(2, $.entry(output), 1);
                     if (input.equals("crushed")) {
                         var byproduct = byproducts.getOrDefault("wash", $.entry("dust"));
                         builder.outputItem(4, byproduct, 1, 0.1f);
                     }
-                    builder.voltage(primitive ? Voltage.PRIMITIVE : Voltage.LV)
+                    builder.voltage(voltage)
                             .build();
                 });
             }
 
             @Override
             public Unit createObject() {
-                assert mineTier != null && destroyTime > 0 && explodeResistance > 0;
-
                 var raw = put("raw", () -> REGISTRATE.item(newId("raw"), Item::new)
                         .model(ModelGen.basicItem(ModelGen.modLoc("items/material/raw")))
                         .tint(color)
@@ -430,14 +430,17 @@ public class MaterialSet {
                 dust().dummies("crushed", "crushed_centrifuged", "crushed_purified")
                         .dummies("dust_impure", "dust_pure");
 
-                REGISTRATE.block(newId("ore"), OreBlock::new)
-                        .properties(p -> p.strength(destroyTime, explodeResistance))
-                        .transform(ModelGen.oreBlock(List.of(variants)))
-                        .tint(color)
-                        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                        .tag(mineTier.getTag())
-                        .drop(raw::getItem)
-                        .register();
+                if (!items.containsKey("ore")) {
+                    REGISTRATE.block(newId("ore"), Block::new)
+                            .material(variant.baseBlock.defaultBlockState().getMaterial())
+                            .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
+                            .transform(ModelGen.oreBlock(variant))
+                            .tint(color)
+                            .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                            .tag(variant.mineTier.getTag())
+                            .drop(raw::getItem)
+                            .register();
+                }
 
                 if (primitive) {
                     Builder.this.process("crushed", 1, "raw", TOOL_HAMMER);
@@ -450,12 +453,12 @@ public class MaterialSet {
                 crush("dust_impure", "crushed");
                 crush("dust_pure", "crushed_purified");
                 crush("dust", "crushed_centrifuged");
-                wash("crushed_purified", "crushed");
-                wash("dust", "dust_impure");
+                wash("crushed_purified", "crushed", Voltage.LV);
+                wash("dust", "dust_impure", primitive ? Voltage.PRIMITIVE : Voltage.ULV);
                 callbacks.add($ -> {
                     var byproduct = byproducts.getOrDefault("centrifuge", $.entry("dust"));
                     CENTRIFUGE.recipe($.loc("dust"))
-                            .inputItem(0, $.entry("dust_pure"), 1)
+                            .inputItem(0, $.tag("dust_pure"), 1)
                             .outputItem(1, $.entry("dust"), 1)
                             .outputItem(1, byproduct, 1, 0.1f)
                             .voltage(Voltage.LV)
@@ -466,7 +469,7 @@ public class MaterialSet {
                 callbacks.add($ -> {
                     var byproduct = byproducts.getOrDefault("thermal_centrifuge", $.entry("dust"));
                     THERMAL_CENTRIFUGE.recipe($.loc("crushed_centrifuged"))
-                            .inputItem(0, $.entry("crushed_purified"), 1)
+                            .inputItem(0, $.tag("crushed_purified"), 1)
                             .outputItem(1, $.entry("crushed_centrifuged"), 1)
                             .outputItem(1, byproduct, 1, 0.1f)
                             .build();
@@ -476,8 +479,12 @@ public class MaterialSet {
             }
         }
 
-        public OreBuilder ore(OreVariant... variants) {
-            return new OreBuilder(variants);
+        public OreBuilder ore(OreVariant variant) {
+            return new OreBuilder(variant);
+        }
+
+        public OreBuilder stoneOre() {
+            return ore(OreVariant.STONE);
         }
 
         private void process(String result, int count, String pattern, Object... args) {
@@ -510,8 +517,13 @@ public class MaterialSet {
             return this;
         }
 
-        public Builder<P> smelt(int time) {
-            callbacks.add($ -> $.smelt("ingot", "dust", time).smelt("nugget", "dust_tiny", time));
+        public Builder<P> smelt() {
+            callbacks.add($ -> $.smelt("ingot", "dust").smelt("nugget", "dust_tiny"));
+            return this;
+        }
+
+        public Builder<P> smelt(Supplier<Item> to) {
+            callbacks.add($ -> $.smelt(to));
             return this;
         }
 

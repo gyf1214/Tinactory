@@ -75,7 +75,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends Builder<?, ?,
     }
 
     public String getPrefix() {
-        return registrate.modid + "/" + id;
+        return id;
     }
 
     public Class<T> getClazz() {

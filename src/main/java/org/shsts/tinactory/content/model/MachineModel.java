@@ -58,12 +58,10 @@ public final class MachineModel {
 
     private final ResourceLocation casing;
     private final ResourceLocation front;
-    private final boolean primitive;
 
-    public MachineModel(ResourceLocation casing, ResourceLocation front, boolean primitive) {
+    public MachineModel(ResourceLocation casing, ResourceLocation front) {
         this.casing = casing;
         this.front = front;
-        this.primitive = primitive;
     }
 
     public static <B extends ModelBuilder<B>>
@@ -82,6 +80,11 @@ public final class MachineModel {
         return applyTextures(prov.withExistingParent(id, ModelGen.modLoc(CASING_MODEL)));
     }
 
+    public void primitiveBlockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var casing = genModel(ctx.id, ctx.provider.models());
+        ctx.provider.horizontalBlock(ctx.object, casing);
+    }
+
     public void blockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
         var casing = genModel(ctx.id, ctx.provider.models());
         var io = ctx.provider.models().getExistingFile(ModelGen.modLoc(IO_MODEL));
@@ -96,21 +99,19 @@ public final class MachineModel {
             }
         }
 
-        if (!primitive) {
-            for (var dir : Direction.values()) {
-                var builder = multipart.part().modelFile(io);
-                if (dir.getAxis() == Direction.Axis.Y) {
-                    builder.rotationX(ModelGen.xRotation(dir))
-                            .rotationY(ModelGen.yRotation(dir)).addModel()
-                            .condition(MachineBlock.IO_FACING, dir);
-                } else {
-                    var otherDir = Arrays.stream(Direction.values())
-                            .filter(d -> d.getAxis() != Direction.Axis.Y && d != dir)
-                            .toArray(Direction[]::new);
-                    builder.rotationY(ModelGen.yRotation(dir)).addModel()
-                            .condition(MachineBlock.FACING, otherDir)
-                            .condition(MachineBlock.IO_FACING, dir);
-                }
+        for (var dir : Direction.values()) {
+            var builder = multipart.part().modelFile(io);
+            if (dir.getAxis() == Direction.Axis.Y) {
+                builder.rotationX(ModelGen.xRotation(dir))
+                        .rotationY(ModelGen.yRotation(dir)).addModel()
+                        .condition(MachineBlock.IO_FACING, dir);
+            } else {
+                var otherDir = Arrays.stream(Direction.values())
+                        .filter(d -> d.getAxis() != Direction.Axis.Y && d != dir)
+                        .toArray(Direction[]::new);
+                builder.rotationY(ModelGen.yRotation(dir)).addModel()
+                        .condition(MachineBlock.FACING, otherDir)
+                        .condition(MachineBlock.IO_FACING, dir);
             }
         }
     }

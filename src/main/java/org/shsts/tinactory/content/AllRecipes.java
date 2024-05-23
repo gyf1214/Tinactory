@@ -7,16 +7,13 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.Voltage;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
@@ -52,7 +49,9 @@ public final class AllRecipes {
                 .register();
 
         STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator").register();
-        ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer").register();
+        ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer")
+                .defaults($ -> $.amperage(0.25f))
+                .register();
         MACERATOR = REGISTRATE.processingRecipeType("macerator").register();
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
                 .defaults($ -> $
@@ -108,9 +107,20 @@ public final class AllRecipes {
                 .toolTag(AllTags.TOOL_SAW)
                 .build();
 
+        // workbench
+        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(AllBlockEntities.WORKBENCH.getBlock())
+                .pattern("WSW")
+                .pattern("SCS")
+                .pattern("WSW")
+                .define('S', AllMaterials.STONE.tag("block"))
+                .define('W', Items.STICK)
+                .define('C', Blocks.CRAFTING_TABLE)
+                .unlockedBy("has_cobblestone", has(AllMaterials.STONE.tag("block"))));
+
         // primitive stone generator
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.STONE_GENERATOR.getBlock(Voltage.PRIMITIVE))
+                .shaped(AllBlockEntities.STONE_GENERATOR.getPrimitive())
                 .pattern("WLW")
                 .pattern("L L")
                 .pattern("WLW")
@@ -118,57 +128,39 @@ public final class AllRecipes {
                 .define('L', ItemTags.LOGS)
                 .unlockedBy("has_planks", has(ItemTags.PLANKS)));
 
+        // primitive ore analyzer
+        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(AllBlockEntities.ORE_ANALYZER.getPrimitive())
+                .pattern("WLW")
+                .pattern("LFL")
+                .pattern("WLW")
+                .define('W', ItemTags.PLANKS)
+                .define('L', ItemTags.LOGS)
+                .define('F', AllMaterials.FLINT.tag("primary"))
+                .unlockedBy("has_flint", has(AllMaterials.FLINT.tag("primary"))));
+
+        // primitive ore washer
+        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(AllBlockEntities.ORE_WASHER.getPrimitive())
+                .pattern("WLW")
+                .pattern("LFL")
+                .pattern("WLW")
+                .define('W', ItemTags.PLANKS)
+                .define('L', ItemTags.LOGS)
+                .define('F', Items.WATER_BUCKET)
+                .unlockedBy("has_water_bucket", has(Items.WATER_BUCKET)));
+
         // generate cobblestone
         STONE_GENERATOR.recipe(Items.COBBLESTONE)
                 .outputItem(0, Items.COBBLESTONE, 1)
-                .primitive().workTicks(40)
+                .primitive().power(1).workTicks(40)
                 .build();
-
-        // workbench
-        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.WORKBENCH.getBlock())
-                .pattern("WSW")
-                .pattern("SCS")
-                .pattern("WSW")
-                .define('S', ItemTags.STONE_CRAFTING_MATERIALS)
-                .define('W', Items.STICK)
-                .define('C', Blocks.CRAFTING_TABLE)
-                .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS)));
-
-        // hammer recipes for stone & gravel
-        TOOL.recipe(Items.GRAVEL)
-                .result(Items.GRAVEL, 1)
-                .pattern("#").pattern("#")
-                .define('#', ItemTags.STONE_CRAFTING_MATERIALS)
-                .toolTag(AllTags.TOOL_HAMMER)
-                .build();
-        TOOL.recipe(Items.FLINT)
-                .result(Items.FLINT, 1)
-                .pattern("###")
-                .define('#', Items.GRAVEL)
-                .toolTag(AllTags.TOOL_HAMMER)
-                .build();
-
-        // mortar recipes for gravel
-        TOOL.recipe(Items.SAND)
-                .result(Items.SAND, 1)
-                .pattern("#")
-                .define('#', Items.GRAVEL)
-                .toolTag(AllTags.TOOL_MORTAR)
-                .build();
-
-        // smelt wrought iron nugget
-        REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
-                        .smelting(Ingredient.of(AllMaterials.IRON.tag("nugget")),
-                                AllMaterials.WROUGHT_IRON.item("nugget"),
-                                0, 200)
-                        .unlockedBy("has_material", has(AllMaterials.IRON.tag("nugget"))),
-                ModelGen.modLoc("material/nugget/wrought_iron_from_iron"));
 
         // magnetite ore
         ORE_ANALYZER.recipe(AllMaterials.MAGNETITE.loc("raw"))
                 .outputItem(1, AllMaterials.MAGNETITE.entry("raw"), 1, 0.25f)
-                .inputItem(0, AllMaterials.STONE.entry("block"), 1)
+                .inputItem(0, AllMaterials.STONE.tag("block"), 1)
+                .primitive()
                 .workTicks(200)
                 .build();
     }
@@ -202,6 +194,10 @@ public final class AllRecipes {
 
     public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
         return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
+    }
+
+    public static InventoryChangeTrigger.TriggerInstance has(Item item) {
+        return inventoryTrigger(ItemPredicate.Builder.item().of(item).build());
     }
 
     private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {
