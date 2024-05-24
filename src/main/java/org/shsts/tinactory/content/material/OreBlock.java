@@ -2,24 +2,21 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class OreBlock extends Block {
-    public static final EnumProperty<OreVariant> VARIANT =
-            EnumProperty.create("variant", OreVariant.class);
+    public final OreVariant variant;
 
-    public OreBlock(Properties properties) {
+    public OreBlock(Properties properties, OreVariant variant) {
         super(properties.requiresCorrectToolForDrops());
+        this.variant = variant;
     }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(VARIANT);
+    public static Function<Properties, OreBlock> factory(OreVariant variant) {
+        return p -> new OreBlock(p, variant);
     }
 }

@@ -50,7 +50,7 @@ public final class AllRecipes {
 
         STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator").register();
         ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer")
-                .defaults($ -> $.amperage(0.25f))
+                .defaults($ -> $.amperage(0.25f).workTicks(200))
                 .register();
         MACERATOR = REGISTRATE.processingRecipeType("macerator").register();
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
@@ -154,14 +154,6 @@ public final class AllRecipes {
         STONE_GENERATOR.recipe(Items.COBBLESTONE)
                 .outputItem(0, Items.COBBLESTONE, 1)
                 .primitive().power(1).workTicks(40)
-                .build();
-
-        // magnetite ore
-        ORE_ANALYZER.recipe(AllMaterials.MAGNETITE.loc("raw"))
-                .outputItem(1, AllMaterials.MAGNETITE.entry("raw"), 1, 0.25f)
-                .inputItem(0, AllMaterials.STONE.tag("block"), 1)
-                .primitive()
-                .workTicks(200)
                 .build();
     }
 

@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.model.ModelGen;
 
@@ -24,14 +25,14 @@ public final class Elements {
 
         GOLD = set("gold")
                 .color(0xFFFFE650).icon(IconSet.SHINY)
-                .existing("ore", Tags.Items.ORES_GOLD, Items.GOLD_ORE)
+                .existing("ore", Blocks.DEEPSLATE_GOLD_ORE)
                 .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
                 .metalSet()
                 .toolProcess().smelt()
-                .stoneOre()
-                .byproduct(dust("gold"), dust("gold"))
+                .ore(OreVariant.DEEPSLATE)
+                // TODO: byproduct
                 .build()
                 .buildObject();
 
@@ -47,8 +48,8 @@ public final class Elements {
                 .existing("cable", ModelGen.modLoc("network/cable/lv"))
                 .metalSet()
                 .toolProcess().smelt()
-                .stoneOre()
-                // TODO: .byproduct(dust("tin"), dust("zinc"))
+                .ore(OreVariant.STONE)
+                // TODO: byproduct tin, zinc
                 .build()
                 .buildObject();
     }

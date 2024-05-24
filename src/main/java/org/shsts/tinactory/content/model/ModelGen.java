@@ -135,7 +135,7 @@ public final class ModelGen {
     public static <S extends BlockBuilder<? extends PrimitiveBlock<?>, ?, S>>
     Transformer<S> primitiveMachine(ResourceLocation front) {
         var model = new MachineModel(PRIMITIVE_CASING, front);
-        return $ -> $.blockState(model::primitiveBlockState);
+        return $ -> $.blockState(model::primitiveBlockState).translucent();
     }
 
     public static <S extends BlockBuilder<? extends Block, ?, S>>

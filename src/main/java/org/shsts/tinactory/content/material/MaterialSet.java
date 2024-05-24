@@ -22,7 +22,7 @@ import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
-import org.shsts.tinactory.core.common.BuilderBase;
+import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
@@ -75,12 +75,17 @@ public class MaterialSet {
     }
 
     private final Map<String, Entry> items;
+    private final Map<String, Supplier<Block>> blocks;
+    @Nullable
+    private final OreVariant oreVariant;
 
     private MaterialSet(Builder<?> builder) {
         this.name = builder.name;
         this.color = builder.color;
         this.items = builder.items;
         this.callbacks = builder.callbacks;
+        this.blocks = builder.blocks;
+        this.oreVariant = builder.oreVariant;
     }
 
     public TagKey<Item> tag(String sub) {
@@ -101,6 +106,16 @@ public class MaterialSet {
     public Supplier<Item> entry(String sub) {
         assert items.containsKey(sub);
         return items.get(sub).item();
+    }
+
+    public OreVariant oreVariant() {
+        assert oreVariant != null;
+        return oreVariant;
+    }
+
+    public Block block(String sub) {
+        assert blocks.containsKey(sub);
+        return blocks.get(sub).get();
     }
 
     @SuppressWarnings("unchecked")
@@ -205,16 +220,19 @@ public class MaterialSet {
         this.callbacks.clear();
     }
 
-    public static class Builder<P> extends BuilderBase<MaterialSet, P, Builder<P>> {
+    public static class Builder<P> extends SimpleBuilder<MaterialSet, P, Builder<P>> {
         private final String name;
         private final Map<String, Entry> items = new HashMap<>();
+        private final Map<String, Supplier<Block>> blocks = new HashMap<>();
         private final List<Consumer<MaterialSet>> callbacks = new ArrayList<>();
         private int color = 0xFFFFFFFF;
         @Nullable
         private IconSet icon = null;
-        private int durability = 0;
+        private int toolDurability = 0;
         @Nullable
-        private Tier tier = null;
+        private Tier toolTier = null;
+        @Nullable
+        private OreVariant oreVariant = null;
 
         public Builder(P parent, String name) {
             super(parent);
@@ -248,13 +266,13 @@ public class MaterialSet {
             return this;
         }
 
-        public Builder<P> durability(int value) {
-            durability = value;
+        public Builder<P> toolDurability(int value) {
+            toolDurability = value;
             return this;
         }
 
-        public Builder<P> tier(Tier value) {
-            tier = value;
+        public Builder<P> toolTer(Tier value) {
+            toolTier = value;
             return this;
         }
 
@@ -300,6 +318,11 @@ public class MaterialSet {
             var loc = item.getRegistryName();
             assert loc != null;
             items.put(sub, new Entry(loc, tag, () -> item));
+            return this;
+        }
+
+        public Builder<P> existing(String sub, Block block) {
+            blocks.put(sub, () -> block);
             return this;
         }
 
@@ -363,7 +386,7 @@ public class MaterialSet {
                     .dummies("bolt", "screw", "gear", "rotor", "spring");
         }
 
-        public class OreBuilder extends BuilderBase<Unit, Builder<P>, OreBuilder> {
+        public class OreBuilder extends SimpleBuilder<Unit, Builder<P>, OreBuilder> {
             private int amount = 1;
             private boolean primitive = false;
             private final OreVariant variant;
@@ -372,7 +395,6 @@ public class MaterialSet {
             private OreBuilder(OreVariant variant) {
                 super(Builder.this);
                 this.variant = variant;
-                onBuild.add(this::buildObject);
             }
 
             public OreBuilder amount(int val) {
@@ -430,8 +452,9 @@ public class MaterialSet {
                 dust().dummies("crushed", "crushed_centrifuged", "crushed_purified")
                         .dummies("dust_impure", "dust_pure");
 
-                if (!items.containsKey("ore")) {
-                    REGISTRATE.block(newId("ore"), Block::new)
+                oreVariant = variant;
+                if (!blocks.containsKey("ore")) {
+                    var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
                             .material(variant.baseBlock.defaultBlockState().getMaterial())
                             .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
                             .transform(ModelGen.oreBlock(variant))
@@ -440,6 +463,7 @@ public class MaterialSet {
                             .tag(variant.mineTier.getTag())
                             .drop(raw::getItem)
                             .register();
+                    blocks.put("ore", ore::get);
                 }
 
                 if (primitive) {
@@ -481,10 +505,6 @@ public class MaterialSet {
 
         public OreBuilder ore(OreVariant variant) {
             return new OreBuilder(variant);
-        }
-
-        public OreBuilder stoneOre() {
-            return ore(OreVariant.STONE);
         }
 
         private void process(String result, int count, String pattern, Object... args) {
@@ -554,13 +574,13 @@ public class MaterialSet {
         }
 
         private void tool(String category, String pattern, Object... args) {
-            assert durability > 0;
+            assert toolDurability > 0;
             var sub = switch (category) {
-                case "wrench" -> tool(category, p -> new UsableToolItem(p, durability,
-                        Objects.requireNonNull(tier), MINEABLE_WITH_WRENCH));
-                case "wire_cutter" -> tool(category, p -> new UsableToolItem(p, durability,
-                        Objects.requireNonNull(tier), MINEABLE_WITH_CUTTER));
-                default -> tool(category, p -> new ToolItem(p, durability));
+                case "wrench" -> tool(category, p -> new UsableToolItem(p, toolDurability,
+                        Objects.requireNonNull(toolTier), MINEABLE_WITH_WRENCH));
+                case "wire_cutter" -> tool(category, p -> new UsableToolItem(p, toolDurability,
+                        Objects.requireNonNull(toolTier), MINEABLE_WITH_CUTTER));
+                default -> tool(category, p -> new ToolItem(p, toolDurability));
             };
             process(sub, 1, pattern, args);
         }

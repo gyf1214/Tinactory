@@ -80,6 +80,7 @@ public class JEI implements IModPlugin {
             processing(AllBlockEntities.RESEARCH_TABLE),
             processing(AllBlockEntities.STONE_GENERATOR),
             processing(AllBlockEntities.ORE_ANALYZER),
+            processing(AllBlockEntities.MACERATOR),
             processing(AllBlockEntities.ORE_WASHER),
             processing(AllBlockEntities.CENTRIFUGE),
             processing(AllBlockEntities.THERMAL_CENTRIFUGE));

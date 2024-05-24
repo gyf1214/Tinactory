@@ -46,12 +46,11 @@ public final class AllMaterials {
         Ores.init();
 
         TEST = set("test")
-                .durability(12800000).tier(Tiers.NETHERITE)
-                .toolSet()
+                .toolDurability(12800000).toolTer(Tiers.NETHERITE).toolSet()
                 .buildObject();
 
         STONE = set("stone")
-                .color(0xFFCDCDCD).icon(IconSet.ROUGH).durability(16)
+                .color(0xFFCDCDCD).icon(IconSet.ROUGH).toolDurability(16)
                 .existing("block", Items.COBBLESTONE)
                 .existing("tool/pickaxe", Items.STONE_PICKAXE)
                 .existing("tool/shovel", Items.STONE_SHOVEL)
@@ -64,15 +63,17 @@ public final class AllMaterials {
                 .buildObject();
 
         FLINT = set("flint")
-                .color(0xFF002040).icon(IconSet.DULL).durability(16)
+                .color(0xFF002040).icon(IconSet.DULL)
                 .existing("primary", Items.FLINT)
                 .dust()
-                .mortar().toolProcess()
+                .toolDurability(16).mortar()
+                .toolProcess()
                 .buildObject();
 
         WROUGHT_IRON = set("wrought_iron")
-                .color(0xFFC8B4B4).icon(IconSet.METALLIC).durability(200).tier(Tiers.IRON)
-                .metalSet().toolSet()
+                .color(0xFFC8B4B4).icon(IconSet.METALLIC)
+                .metalSet()
+                .toolDurability(200).toolTer(Tiers.IRON).toolSet()
                 .toolProcess().smelt()
                 .buildObject();
 
@@ -118,6 +119,8 @@ public final class AllMaterials {
         for (var material : MATERIALS.values()) {
             material.freeze();
         }
+
+        Ores.initRecipes();
 
         // smelt wrought iron nugget
         REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder

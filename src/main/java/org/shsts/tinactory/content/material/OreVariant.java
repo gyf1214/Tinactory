@@ -2,6 +2,8 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
@@ -19,6 +21,7 @@ public enum OreVariant implements StringRepresentable {
     END_STONE(Blocks.END_STONE, Tiers.NETHERITE, Voltage.EV, 4.5f, 9f);
 
     public final Block baseBlock;
+    public final Item baseItem;
     public final Tier mineTier;
     public final Voltage voltage;
     public final float destroyTime;
@@ -31,6 +34,13 @@ public enum OreVariant implements StringRepresentable {
         this.destroyTime = destroyTime;
         this.explodeResistance = explodeResistance;
         this.baseBlock = baseBlock;
+        if (baseBlock == Blocks.STONE) {
+            this.baseItem = Items.COBBLESTONE;
+        } else if (baseBlock == Blocks.DEEPSLATE) {
+            this.baseItem = Items.COBBLED_DEEPSLATE;
+        } else {
+            this.baseItem = baseBlock.asItem();
+        }
     }
 
     public String getName() {
