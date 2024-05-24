@@ -222,7 +222,7 @@ public class MaterialSet {
         }
 
         @Override
-        public MaterialSet createObject() {
+        protected MaterialSet createObject() {
             return new MaterialSet(this);
         }
 
@@ -421,7 +421,7 @@ public class MaterialSet {
             }
 
             @Override
-            public Unit createObject() {
+            protected Unit createObject() {
                 var raw = put("raw", () -> REGISTRATE.item(newId("raw"), Item::new)
                         .model(ModelGen.basicItem(ModelGen.modLoc("items/material/raw")))
                         .tint(color)

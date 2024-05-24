@@ -268,7 +268,7 @@ public class StackProcessingContainer extends CapabilityProvider
         }
 
         @Override
-        public Function<BlockEntity, ICapabilityProvider> createObject() {
+        protected Function<BlockEntity, ICapabilityProvider> createObject() {
             var ports = this.ports;
             return be -> new StackProcessingContainer(be, ports);
         }

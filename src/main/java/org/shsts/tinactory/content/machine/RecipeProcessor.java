@@ -263,7 +263,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         }
 
         @Override
-        public Function<BlockEntity, ICapabilityProvider> createObject() {
+        protected Function<BlockEntity, ICapabilityProvider> createObject() {
             var recipeType = this.recipeType;
             var voltage = this.voltage;
             assert recipeType != null;

@@ -118,7 +118,7 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
 
         @Override
-        public ResearchRecipe createObject() {
+        protected ResearchRecipe createObject() {
             assert target != null;
             if (power <= 0) {
                 power = (long) (voltage * amperage);

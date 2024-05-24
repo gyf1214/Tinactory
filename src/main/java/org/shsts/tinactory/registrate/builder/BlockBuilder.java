@@ -162,7 +162,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
     }
 
     @Override
-    public U createObject() {
+    protected U createObject() {
         assert factory != null;
         return factory.apply(properties.apply(BlockBehaviour.Properties.of(material)));
     }

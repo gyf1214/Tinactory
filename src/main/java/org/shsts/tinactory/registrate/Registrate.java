@@ -343,7 +343,7 @@ public class Registrate {
         }
 
         @Override
-        public U createObject() {
+        protected U createObject() {
             return factory.get();
         }
     }
@@ -395,14 +395,14 @@ public class Registrate {
 
     public RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>
     processingRecipeType(String id) {
-        return recipeType("processing/" + id, ProcessingRecipe.SERIALIZER)
+        return recipeType(id, ProcessingRecipe.SERIALIZER)
                 .clazz(ProcessingRecipe.class)
                 .builder(ProcessingRecipe.Builder::new);
     }
 
     public RecipeTypeBuilder<AssemblyRecipe, AssemblyRecipe.Builder, Registrate>
     assemblyRecipeType(String id) {
-        return recipeType("processing/" + id, AssemblyRecipe.SERIALIZER)
+        return recipeType(id, AssemblyRecipe.SERIALIZER)
                 .clazz(AssemblyRecipe.class)
                 .builder(AssemblyRecipe.Builder::new);
     }
@@ -440,7 +440,8 @@ public class Registrate {
             var builder = recipe.get();
             var loc = builder.getResult().getRegistryName();
             assert loc != null;
-            recipe.get().save(prov::addRecipe, new ResourceLocation(modid, "minecraft/" + loc.getPath() + suffix));
+            var recipeLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + suffix);
+            recipe.get().save(prov::addRecipe, recipeLoc);
         });
     }
 }

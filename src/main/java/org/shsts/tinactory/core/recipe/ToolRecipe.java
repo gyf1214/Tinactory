@@ -209,7 +209,7 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
         }
 
         @Override
-        public FinishedRecipe createObject() {
+        protected FinishedRecipe createObject() {
             assert result != null;
             var key = keys.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));

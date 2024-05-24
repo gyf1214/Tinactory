@@ -75,7 +75,7 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
     }
 
     @Override
-    public U createObject() {
+    protected U createObject() {
         return factory.apply(properties.apply(new Item.Properties()));
     }
 }

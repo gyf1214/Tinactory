@@ -30,7 +30,7 @@ public abstract class CapabilityProviderBuilder<T, P> extends
     fromFactory(P parent, ResourceLocation loc, Function<T, ICapabilityProvider> factory) {
         return new CapabilityProviderBuilder<>(parent, loc) {
             @Override
-            public Function<T, ICapabilityProvider> createObject() {
+            protected Function<T, ICapabilityProvider> createObject() {
                 return factory;
             }
         };

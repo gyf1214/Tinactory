@@ -245,7 +245,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
 
         @Override
-        public ProcessingRecipe createObject() {
+        protected ProcessingRecipe createObject() {
             return new ProcessingRecipe(parent, loc, getInputs(), getOutputs(), workTicks, voltage, power);
         }
     }

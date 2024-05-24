@@ -76,7 +76,7 @@ public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, La
     }
 
     @Override
-    public Map<Voltage, Layout> createObject() {
+    protected Map<Voltage, Layout> createObject() {
         var ret = new HashMap<Voltage, Layout>();
         for (var voltage : Voltage.values()) {
             var slots = getSlots(voltage);

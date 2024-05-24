@@ -59,7 +59,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends Builder<?, ?,
     }
 
     @Override
-    public RecipeType<T> createObject() {
+    protected RecipeType<T> createObject() {
         var loc1 = loc.toString();
         return new RecipeType<>() {
             @Override

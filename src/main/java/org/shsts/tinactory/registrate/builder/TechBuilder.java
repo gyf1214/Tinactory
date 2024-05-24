@@ -29,7 +29,7 @@ public class TechBuilder<P> extends Builder<ResourceLocation, P, TechBuilder<P>>
     }
 
     @Override
-    public ResourceLocation createObject() {
+    protected ResourceLocation createObject() {
         assert maxProgress > 0;
         registrate.techHandler.addCallback(prov -> prov.addTech(loc, depends, maxProgress));
         return loc;

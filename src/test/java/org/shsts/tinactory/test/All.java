@@ -59,12 +59,12 @@ public final class All {
 
         TEST_BASE_TECH = REGISTRATE.tech("test_base")
                 .maxProgress(10)
-                .createObject();
+                .buildObject();
 
         TEST_TECH = REGISTRATE.tech("test")
                 .maxProgress(20)
                 .depends(TEST_BASE_TECH)
-                .createObject();
+                .buildObject();
     }
 
     public static void init() {}

@@ -38,7 +38,7 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
     }
 
     @Override
-    public RegistryBuilder<T> createObject() {
+    protected RegistryBuilder<T> createObject() {
         assert transformer != null;
         var builder = new RegistryBuilder<T>();
         builder = transformer.apply(builder.setName(loc).setType(entryClass));

@@ -49,7 +49,7 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
 
         @Override
-        public AssemblyRecipe createObject() {
+        protected AssemblyRecipe createObject() {
             return new AssemblyRecipe(parent, loc, getInputs(), getOutputs(), workTicks,
                     voltage, power, requiredTech);
         }

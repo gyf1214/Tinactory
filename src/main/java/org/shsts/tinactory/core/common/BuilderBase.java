@@ -18,7 +18,7 @@ public abstract class BuilderBase<U, P, S extends BuilderBase<U, P, S>> implemen
         this.parent = parent;
     }
 
-    public abstract U createObject();
+    protected abstract U createObject();
 
     public U buildObject() {
         var object = createObject();

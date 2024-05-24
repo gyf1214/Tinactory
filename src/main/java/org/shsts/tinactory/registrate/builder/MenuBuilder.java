@@ -74,7 +74,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T, M>, P>
     }
 
     @Override
-    public SmartMenuType<T, M> createObject() {
+    protected SmartMenuType<T, M> createObject() {
         var menuType = new SmartMenuType<>(getFactory(), title);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
                 registrate.menuScreenHandler.setMenuScreen(menuType, getScreenFactory()));

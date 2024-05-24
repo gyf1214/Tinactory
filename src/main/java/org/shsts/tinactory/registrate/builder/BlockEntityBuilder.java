@@ -112,7 +112,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
     }
 
     @Override
-    public SmartBlockEntityType<U> createObject() {
+    protected SmartBlockEntityType<U> createObject() {
         var entry = this.entry;
         var factory = this.factory;
         assert entry != null;
