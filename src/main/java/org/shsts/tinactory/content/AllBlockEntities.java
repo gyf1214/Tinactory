@@ -2,6 +2,7 @@ package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
@@ -18,8 +19,11 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
@@ -31,14 +35,18 @@ public final class AllBlockEntities {
     public static final BlockEntitySet<NetworkController, MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
     public static final ProcessingSet<ResearchRecipe> RESEARCH_TABLE;
+    public static final ProcessingSet<AssemblyRecipe> ASSEMBLER;
     public static final ProcessingSet<ProcessingRecipe> STONE_GENERATOR;
     public static final ProcessingSet<AssemblyRecipe> ORE_ANALYZER;
     public static final ProcessingSet<ProcessingRecipe> MACERATOR;
     public static final ProcessingSet<ProcessingRecipe> ORE_WASHER;
     public static final ProcessingSet<ProcessingRecipe> CENTRIFUGE;
     public static final ProcessingSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
+    public static final ProcessingSet<ProcessingRecipe> ALLOY_SMELTER;
 
     static {
+        PROCESSING_SETS = new HashSet<>();
+
         NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller",
                         NetworkController::new,
                         MachineBlock.factory(Voltage.PRIMITIVE))
@@ -72,28 +80,46 @@ public final class AllBlockEntities {
                 .build()
                 .register();
 
-        RESEARCH_TABLE = ProcessingSet.builder(AllRecipes.RESEARCH)
-                .frontOverlay(gregtech("blocks/overlay/machine/overlay_screen"))
+        RESEARCH_TABLE = builder(AllRecipes.RESEARCH)
+                .overlay(gregtech("blocks/overlay/machine/overlay_screen"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
-                .build();
+                .buildObject();
 
-        STONE_GENERATOR = ProcessingSet.builder(AllRecipes.STONE_GENERATOR)
-                .frontOverlay(gregtech("blocks/machines/rock_crusher/overlay_front"))
+        var assembler = builder(AllRecipes.ASSEMBLER)
+                .overlay(gregtech("blocks/machines/assembler"))
+                .voltage(Voltage.ULV)
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT);
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                assembler.slot(SLOT_SIZE * j, SLOT_SIZE * i + 1);
+            }
+        }
+        ASSEMBLER = assembler.port(SlotType.FLUID_INPUT)
+                .slot(SLOT_SIZE * 2, SLOT_SIZE * 3 + 1)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 3, SLOT_SIZE)
+                .build()
+                .buildObject();
+
+        STONE_GENERATOR = builder(AllRecipes.STONE_GENERATOR)
+                .overlay(gregtech("blocks/machines/rock_crusher"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 2, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8, 0)
                 .build()
-                .build();
+                .buildObject();
 
-        ORE_ANALYZER = ProcessingSet.builder(AllRecipes.ORE_ANALYZER)
-                .frontOverlay(gregtech("blocks/machines/electromagnetic_separator/overlay_front"))
+        ORE_ANALYZER = builder(AllRecipes.ORE_ANALYZER)
+                .overlay(gregtech("blocks/machines/electromagnetic_separator"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -104,10 +130,10 @@ public final class AllBlockEntities {
                 .slot(SLOT_SIZE * 5, 1, Voltage.HV)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
-                .build();
+                .buildObject();
 
-        MACERATOR = ProcessingSet.builder(AllRecipes.MACERATOR)
-                .frontOverlay(gregtech("blocks/machines/macerator/overlay_front"))
+        MACERATOR = builder(AllRecipes.MACERATOR)
+                .overlay(gregtech("blocks/machines/macerator"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
@@ -116,10 +142,10 @@ public final class AllBlockEntities {
                 .slot(SLOT_SIZE * 4, 1, Voltage.HV)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
-                .build();
+                .buildObject();
 
-        ORE_WASHER = ProcessingSet.builder(AllRecipes.ORE_WASHER)
-                .frontOverlay(gregtech("blocks/machines/ore_washer/overlay_front"))
+        ORE_WASHER = builder(AllRecipes.ORE_WASHER)
+                .overlay(gregtech("blocks/machines/ore_washer"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -134,26 +160,26 @@ public final class AllBlockEntities {
                 .slot(SLOT_SIZE * 6, 1, Voltage.HV)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, 0)
                 .build()
-                .build();
+                .buildObject();
 
-        CENTRIFUGE = ProcessingSet.builder(AllRecipes.CENTRIFUGE)
-                .frontOverlay(gregtech("blocks/machines/centrifuge/overlay_front"))
+        CENTRIFUGE = builder(AllRecipes.CENTRIFUGE)
+                .overlay(gregtech("blocks/machines/centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
+                .port(SlotType.FLUID_INPUT)
+                .slot(SLOT_SIZE, 1)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1)
-                .slot(SLOT_SIZE * 4, 1)
-                .slot(SLOT_SIZE * 5, 1)
+                .slot(SLOT_SIZE * 3, 1).slot(SLOT_SIZE * 4, 1).slot(SLOT_SIZE * 5, 1)
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE, Voltage.HV)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE, Voltage.HV)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE, Voltage.HV)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
-                .build();
+                .buildObject();
 
-        THERMAL_CENTRIFUGE = ProcessingSet.builder(AllRecipes.THERMAL_CENTRIFUGE)
-                .frontOverlay(gregtech("blocks/machines/thermal_centrifuge/overlay_front"))
+        THERMAL_CENTRIFUGE = builder(AllRecipes.THERMAL_CENTRIFUGE)
+                .overlay(gregtech("blocks/machines/thermal_centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1)
@@ -162,7 +188,27 @@ public final class AllBlockEntities {
                 .slot(SLOT_SIZE * 4, 1)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
-                .build();
+                .buildObject();
+
+        ALLOY_SMELTER = builder(AllRecipes.ALLOY_SMELTER)
+                .overlay(gregtech("blocks/machines/alloy_smelter"))
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 1)
+                .slot(SLOT_SIZE, 1)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 4, 1)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, 0)
+                .build()
+                .buildObject();
+    }
+
+    public static final Set<ProcessingSet<?>> PROCESSING_SETS;
+
+    private static <T extends ProcessingRecipe> ProcessingSet.Builder<T, ?>
+    builder(RecipeTypeEntry<T, ?> recipeType) {
+        return (new ProcessingSet.Builder<>(recipeType, Unit.INSTANCE))
+                .onCreateObject(PROCESSING_SETS::add);
     }
 
     public static void init() {}

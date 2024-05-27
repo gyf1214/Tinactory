@@ -39,6 +39,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
@@ -423,7 +424,6 @@ public class MaterialSet {
                         .inputItem(0, $.tag(input), 1)
                         .outputItem(1, $.entry(output), input.equals("raw") ? 2 * amount : 1)
                         .voltage(Voltage.LV)
-                        .amperage(0.5f)
                         .workTicks((long) (variant.destroyTime * 40f))
                         .build());
             }
@@ -435,7 +435,10 @@ public class MaterialSet {
                             .outputItem(2, $.entry(output), 1);
                     if (input.equals("crushed")) {
                         var byproduct = byproducts.getOrDefault("wash", $.entry("dust"));
-                        builder.outputItem(4, byproduct, 1, 0.1f);
+                        builder.outputItem(4, byproduct, 1, 0.1f)
+                                .workTicks(160);
+                    } else {
+                        builder.workTicks(32);
                     }
                     builder.voltage(voltage)
                             .build();
@@ -486,8 +489,7 @@ public class MaterialSet {
                             .outputItem(1, $.entry("dust"), 1)
                             .outputItem(1, byproduct, 1, 0.1f)
                             .voltage(Voltage.LV)
-                            .amperage(1f)
-                            .workTicks(640)
+                            .workTicks(80)
                             .build();
                 });
                 callbacks.add($ -> {
@@ -505,6 +507,32 @@ public class MaterialSet {
 
         public OreBuilder ore(OreVariant variant) {
             return new OreBuilder(variant);
+        }
+
+        public Builder<P> alloy(Object... components) {
+            callbacks.add($ -> {
+                Voltage voltage = Voltage.LV;
+                var i = 0;
+                if (components[0] instanceof Voltage v) {
+                    voltage = v;
+                    i = 1;
+                }
+                var totalCount = 0;
+
+                var builder = ALLOY_SMELTER.recipe($.loc("ingot"))
+                        .workTicks(200)
+                        .voltage(voltage);
+
+                for (; i < components.length; i += 2) {
+                    var component = (MaterialSet) components[i];
+                    var count = (int) components[i + 1];
+                    builder.inputItem(0, component.tag("dust"), count);
+                    totalCount += count;
+                }
+                builder.outputItem(0, $.entry("ingot"), totalCount)
+                        .build();
+            });
+            return this;
         }
 
         private void process(String result, int count, String pattern, Object... args) {

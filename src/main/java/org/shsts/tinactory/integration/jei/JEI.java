@@ -28,6 +28,7 @@ import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -75,15 +76,17 @@ public class JEI implements IModPlugin {
                 AllTags.processingMachine(processingSet.recipeType));
     }
 
-    private final List<CategoryInfo<?>> categories = List.of(
-            category(AllRecipes.TOOL, ToolCategory::new, () -> Ingredient.of(AllBlockEntities.WORKBENCH.getBlock())),
-            processing(AllBlockEntities.RESEARCH_TABLE),
-            processing(AllBlockEntities.STONE_GENERATOR),
-            processing(AllBlockEntities.ORE_ANALYZER),
-            processing(AllBlockEntities.MACERATOR),
-            processing(AllBlockEntities.ORE_WASHER),
-            processing(AllBlockEntities.CENTRIFUGE),
-            processing(AllBlockEntities.THERMAL_CENTRIFUGE));
+    private final List<CategoryInfo<?>> categories;
+
+    public JEI() {
+        this.categories = new ArrayList<>();
+
+        categories.add(category(AllRecipes.TOOL, ToolCategory::new,
+                () -> Ingredient.of(AllBlockEntities.WORKBENCH.getBlock())));
+        for (var set : AllBlockEntities.PROCESSING_SETS) {
+            categories.add(processing(set));
+        }
+    }
 
     @Override
     public ResourceLocation getPluginUid() {

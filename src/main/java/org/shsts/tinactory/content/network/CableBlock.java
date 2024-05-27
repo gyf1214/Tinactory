@@ -33,6 +33,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -68,6 +69,10 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
                 .setValue(UP, false)
                 .setValue(DOWN, false);
         registerDefaultState(defaultState);
+    }
+
+    public static Function<Properties, CableBlock> cable(Voltage voltage, double resistance) {
+        return properties -> new CableBlock(properties, RADIUS, voltage, resistance);
     }
 
     private Map<BlockState, VoxelShape> makeShapes() {

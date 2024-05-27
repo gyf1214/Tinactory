@@ -8,6 +8,7 @@ import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
@@ -57,11 +58,11 @@ public final class MachineModel {
     }
 
     private final ResourceLocation casing;
-    private final ResourceLocation front;
+    private final ResourceLocation overlay;
 
-    public MachineModel(ResourceLocation casing, ResourceLocation front) {
+    public MachineModel(ResourceLocation casing, ResourceLocation overlay) {
         this.casing = casing;
-        this.front = front;
+        this.overlay = overlay;
     }
 
     public static <B extends ModelBuilder<B>>
@@ -71,13 +72,23 @@ public final class MachineModel {
                 .texture("side", ModelGen.extend(tex, "side"));
     }
 
-    private <B extends ModelBuilder<B>> B applyTextures(B model) {
-        return casing(model, casing)
-                .texture("front_overlay", front);
+    private <B extends ModelBuilder<B>> B applyTextures(B model, ExistingFileHelper existingHelper) {
+        model = casing(model, casing);
+        if (existingHelper.exists(overlay, ModelGen.TEXTURE_TYPE)) {
+            return model.texture("front_overlay", overlay);
+        } else {
+            for (var dir : ModelGen.DIR_TEX_KEYS.values()) {
+                var loc = ModelGen.extend(overlay, "overlay_" + dir);
+                if (existingHelper.exists(loc, ModelGen.TEXTURE_TYPE)) {
+                    model = model.texture(dir + "_overlay", loc);
+                }
+            }
+            return model;
+        }
     }
 
     private ModelFile genModel(String id, BlockModelProvider prov) {
-        return applyTextures(prov.withExistingParent(id, ModelGen.modLoc(CASING_MODEL)));
+        return applyTextures(prov.withExistingParent(id, ModelGen.modLoc(CASING_MODEL)), prov.existingFileHelper);
     }
 
     public void primitiveBlockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {

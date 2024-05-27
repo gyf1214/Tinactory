@@ -10,7 +10,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.shsts.tinactory.content.AllMaterials.*;
+import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
+import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
+import static org.shsts.tinactory.content.AllMaterials.GOLD;
+import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
+import static org.shsts.tinactory.content.AllMaterials.PYRITE;
+import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.dust;
+import static org.shsts.tinactory.content.AllMaterials.ingot;
+import static org.shsts.tinactory.content.AllMaterials.set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

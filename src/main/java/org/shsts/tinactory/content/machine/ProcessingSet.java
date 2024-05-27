@@ -3,12 +3,14 @@ package org.shsts.tinactory.content.machine;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.ProcessingPlugin;
 import org.shsts.tinactory.content.gui.RecipeBookPlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
@@ -38,21 +40,21 @@ public class ProcessingSet<T extends ProcessingRecipe> {
     protected final BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive;
 
     public ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Map<Voltage, Layout> layoutSet,
-                         ResourceLocation frontOverlay, Collection<Voltage> voltages) {
+                         ResourceLocation overlay, Collection<Voltage> voltages) {
         this.recipeType = recipeType;
         this.layoutSet = layoutSet;
         this.machines = voltages.stream()
                 .filter(v -> v != Voltage.PRIMITIVE)
-                .collect(Collectors.toMap($ -> $, voltage -> createMachine(voltage, frontOverlay)));
+                .collect(Collectors.toMap($ -> $, voltage -> createMachine(voltage, overlay)));
         if (voltages.contains(Voltage.PRIMITIVE)) {
-            this.primitive = createPrimitive(frontOverlay);
+            this.primitive = createPrimitive(overlay);
         } else {
             this.primitive = null;
         }
     }
 
     protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
-    createMachine(Voltage voltage, ResourceLocation frontOverlay) {
+    createMachine(Voltage voltage, ResourceLocation overlay) {
         var id = "machine/" + voltage.id + "/" + recipeType.id;
         var layout = layoutSet.get(voltage);
         var builder = REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
@@ -72,7 +74,7 @@ public class ProcessingSet<T extends ProcessingRecipe> {
                 .build() // menu
                 .build() // blockEntity
                 .block()
-                .transform(ModelGen.machine(voltage, frontOverlay))
+                .transform(ModelGen.machine(voltage, overlay))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .dropSelf()
                 .blockItem().tag(AllTags.processingMachine(recipeType)).build()
@@ -87,7 +89,7 @@ public class ProcessingSet<T extends ProcessingRecipe> {
     }
 
     protected BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
-    createPrimitive(ResourceLocation frontOverlay) {
+    createPrimitive(ResourceLocation overlay) {
         var id = "primitive/" + recipeType.id;
         var layout = layoutSet.get(Voltage.PRIMITIVE);
         var builder = REGISTRATE.blockEntitySet(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
@@ -104,7 +106,7 @@ public class ProcessingSet<T extends ProcessingRecipe> {
                 .build() // menu
                 .build() // blockEntity
                 .block()
-                .transform(ModelGen.primitiveMachine(frontOverlay))
+                .transform(ModelGen.primitiveMachine(overlay))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .tag(BlockTags.MINEABLE_WITH_AXE)
                 .dropSelf()
@@ -126,46 +128,49 @@ public class ProcessingSet<T extends ProcessingRecipe> {
         return machines.get(voltage).getBlock();
     }
 
-    public static class Builder<T extends ProcessingRecipe> {
+    public static class Builder<T extends ProcessingRecipe, P> extends
+            SimpleBuilder<ProcessingSet<T>, P, Builder<T, P>> {
         private final RecipeTypeEntry<T, ?> recipeType;
         private final Set<Voltage> voltages = new HashSet<>();
         @Nullable
-        private ResourceLocation frontOverlay = null;
+        private ResourceLocation overlay = null;
         @Nullable
         private Map<Voltage, Layout> layoutSet = null;
 
-        private Builder(RecipeTypeEntry<T, ?> value) {
+        public Builder(RecipeTypeEntry<T, ?> value, P parent) {
+            super(parent);
             recipeType = value;
         }
 
-        public Builder<T> voltage(Voltage from) {
+        public Builder<T, P> voltage(Voltage from) {
             Arrays.stream(Voltage.values())
                     .filter(v -> v.rank >= from.rank && v.rank <= Voltage.IV.rank)
                     .forEach(voltages::add);
             return this;
         }
 
-        public Builder<T> frontOverlay(ResourceLocation loc) {
-            frontOverlay = loc;
+        public Builder<T, P> overlay(ResourceLocation loc) {
+            overlay = loc;
             return this;
         }
 
-        public LayoutSetBuilder<Builder<T>> layoutSet() {
+        public LayoutSetBuilder<Builder<T, P>> layoutSet() {
             return Layout.builder(this).onCreateObject(value -> layoutSet = value);
         }
 
-        public ProcessingSet<T> build() {
-            assert frontOverlay != null;
+        @Override
+        public ProcessingSet<T> createObject() {
+            assert overlay != null;
             assert layoutSet != null;
             if (voltages.isEmpty()) {
                 voltage(Voltage.LV);
             }
-            return new ProcessingSet<>(recipeType, layoutSet, frontOverlay, voltages);
+            return new ProcessingSet<>(recipeType, layoutSet, overlay, voltages);
         }
     }
 
-    public static <T extends ProcessingRecipe> Builder<T>
+    public static <T extends ProcessingRecipe> Builder<T, Unit>
     builder(RecipeTypeEntry<T, ?> recipeType) {
-        return new Builder<>(recipeType);
+        return new Builder<>(recipeType, Unit.INSTANCE);
     }
 }

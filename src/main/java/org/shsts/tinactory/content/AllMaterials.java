@@ -9,6 +9,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.material.Elements;
+import org.shsts.tinactory.content.material.FirstDegrees;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.Ores;
@@ -28,6 +29,12 @@ public final class AllMaterials {
     public static MaterialSet GOLD;
     public static MaterialSet COPPER;
     public static MaterialSet TIN;
+    public static MaterialSet NICKEL;
+    public static MaterialSet ALUMINIUM;
+
+    public static MaterialSet BRONZE;
+    public static MaterialSet WROUGHT_IRON;
+    public static MaterialSet INVAR;
 
     // Ore
     public static MaterialSet MAGNETITE;
@@ -38,11 +45,11 @@ public final class AllMaterials {
     public static MaterialSet TEST;
     public static MaterialSet STONE;
     public static MaterialSet FLINT;
-    public static MaterialSet WROUGHT_IRON;
 
     static {
         MATERIALS = new HashMap<>();
         Elements.init();
+        FirstDegrees.init();
         Ores.init();
 
         TEST = set("test")
@@ -68,13 +75,6 @@ public final class AllMaterials {
                 .dust()
                 .toolDurability(16).mortar()
                 .toolProcess()
-                .buildObject();
-
-        WROUGHT_IRON = set("wrought_iron")
-                .color(0xFFC8B4B4).icon(IconSet.METALLIC)
-                .metalSet()
-                .toolDurability(200).toolTer(Tiers.IRON).toolSet()
-                .toolProcess().smelt()
                 .buildObject();
 
         // tool component tags

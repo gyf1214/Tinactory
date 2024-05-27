@@ -8,7 +8,13 @@ import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static org.shsts.tinactory.content.AllMaterials.*;
+import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.COPPER;
+import static org.shsts.tinactory.content.AllMaterials.GOLD;
+import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.NICKEL;
+import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -51,6 +57,18 @@ public final class Elements {
                 .ore(OreVariant.STONE)
                 // TODO: byproduct tin, zinc
                 .build()
+                .buildObject();
+
+        NICKEL = set("nickel")
+                .color(0xFFC8C8FA).icon(IconSet.METALLIC)
+                .metalSet()
+                .toolProcess().smelt()
+                .buildObject();
+
+        ALUMINIUM = set("aluminium")
+                .color(0xFF80C8F0).icon(IconSet.DULL)
+                .mechanicalSet()
+                .toolProcess()
                 .buildObject();
     }
 

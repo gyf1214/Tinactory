@@ -12,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -130,7 +131,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
             return input(port, () -> ingredient);
         }
 
-        public S inputItem(int port, Supplier<? extends Item> item, int amount) {
+        public S inputItem(int port, Supplier<? extends ItemLike> item, int amount) {
             return input(port, () -> new ProcessingIngredients.SimpleItemIngredient(
                     new ItemStack(item.get(), amount)));
         }
@@ -159,12 +160,12 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
             return output(port, () -> result);
         }
 
-        public S outputItem(int port, Supplier<? extends Item> item, int amount, float rate) {
+        public S outputItem(int port, Supplier<? extends ItemLike> item, int amount, float rate) {
             return output(port, () ->
                     new ProcessingResults.ItemResult(true, rate, new ItemStack(item.get(), amount)));
         }
 
-        public S outputItem(int port, Supplier<? extends Item> item, int amount) {
+        public S outputItem(int port, Supplier<? extends ItemLike> item, int amount) {
             return outputItem(port, item, amount, 1.0f);
         }
 

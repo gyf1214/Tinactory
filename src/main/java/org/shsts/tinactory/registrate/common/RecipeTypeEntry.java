@@ -85,4 +85,8 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends Builder<?, ?, B
         assert loc != null;
         return recipe(loc);
     }
+
+    public B recipe(RegistryEntry<?> item) {
+        return recipe(item.loc);
+    }
 }

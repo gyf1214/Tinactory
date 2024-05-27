@@ -29,12 +29,14 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public final class AllRecipes {
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
     public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH;
+    public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ORE_ANALYZER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MACERATOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ORE_WASHER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
@@ -45,33 +47,56 @@ public final class AllRecipes {
         RESEARCH = REGISTRATE.recipeType("research", ResearchRecipe.SERIALIZER)
                 .clazz(ResearchRecipe.class)
                 .builder(ResearchRecipe.Builder::new)
-                .defaults($ -> $.amperage(1f))
+                .defaults($ -> $.amperage(0.25f))
                 .register();
 
-        STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator").register();
-        ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer")
-                .defaults($ -> $.amperage(0.25f).workTicks(200))
+        ASSEMBLER = REGISTRATE.assemblyRecipeType("assembler")
+                .defaults($ -> $.amperage(0.375f))
                 .register();
-        MACERATOR = REGISTRATE.processingRecipeType("macerator").register();
+
+        STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator")
+                .defaults($ -> $.amperage(0.125f).workTicks(40))
+                .register();
+
+        ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer")
+                .defaults($ -> $.amperage(0.125f).workTicks(32))
+                .register();
+
+        MACERATOR = REGISTRATE.processingRecipeType("macerator")
+                .defaults($ -> $.amperage(0.25f))
+                .register();
+
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
                 .defaults($ -> $
                         .inputFluid(1, Fluids.WATER, 1000)
                         .outputItem(3, AllMaterials.STONE.entry("dust"), 1)
-                        .workTicks(320)
-                        .amperage(0.25f))
+                        .amperage(0.125f))
                 .register();
-        CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge").register();
+
+        CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge")
+                .defaults($ -> $.amperage(0.5f))
+                .register();
+
         THERMAL_CENTRIFUGE = REGISTRATE.processingRecipeType("thermal_centrifuge")
                 .defaults($ -> $
                         .voltage(Voltage.LV)
-                        .workTicks(640)
-                        .amperage(3f))
+                        .workTicks(400)
+                        .amperage(1.5f))
+                .register();
+
+        ALLOY_SMELTER = REGISTRATE.processingRecipeType("alloy_smelter")
+                .defaults($ -> $.amperage(0.75f))
                 .register();
     }
 
     public static void initRecipes() {
         AllMaterials.initRecipes();
+        vanillaRecipes();
+        primitiveRecipes();
+        AllItems.initRecipes();
+    }
 
+    private static void vanillaRecipes() {
         // disable wooden and iron tools
         REGISTRATE.nullRecipe(Items.WOODEN_AXE);
         REGISTRATE.nullRecipe(Items.WOODEN_HOE);
@@ -106,7 +131,36 @@ public final class AllRecipes {
                 .define('#', ItemTags.PLANKS)
                 .toolTag(AllTags.TOOL_SAW)
                 .build();
+    }
 
+    private static void woodRecipes(String prefix) {
+        var nether = prefix.equals("crimson") || prefix.equals("warped");
+
+        var planks = REGISTRATE.itemHandler.getEntry(prefix + "_planks");
+        var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
+        var wood = prefix + (nether ? "_hyphae" : "_wood");
+        var woodStripped = "stripped_" + wood;
+
+        // saw
+        TOOL.recipe(planks.loc)
+                .result(planks, 4)
+                .pattern("X")
+                .define('X', logTag)
+                .toolTag(AllTags.TOOL_SAW)
+                .build();
+        // disable wood and woodStripped recipes
+        // TODO: maybe not necessary
+        REGISTRATE.nullRecipe(wood);
+        REGISTRATE.nullRecipe(woodStripped);
+        // reduce vanilla recipe to 2 planks
+        REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
+                .shapeless(planks.get(), 2)
+                .requires(logTag)
+                .group("planks")
+                .unlockedBy("has_logs", has(logTag)));
+    }
+
+    private static void primitiveRecipes() {
         // workbench
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(AllBlockEntities.WORKBENCH.getBlock())
@@ -155,33 +209,6 @@ public final class AllRecipes {
                 .outputItem(0, Items.COBBLESTONE, 1)
                 .primitive().power(1).workTicks(40)
                 .build();
-    }
-
-    private static void woodRecipes(String prefix) {
-        var nether = prefix.equals("crimson") || prefix.equals("warped");
-
-        var planks = REGISTRATE.itemHandler.getEntry(prefix + "_planks");
-        var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
-        var wood = prefix + (nether ? "_hyphae" : "_wood");
-        var woodStripped = "stripped_" + wood;
-
-        // saw
-        TOOL.recipe(planks.loc)
-                .result(planks, 4)
-                .pattern("X")
-                .define('X', logTag)
-                .toolTag(AllTags.TOOL_SAW)
-                .build();
-        // disable wood and woodStripped recipes
-        // TODO: maybe not necessary
-        REGISTRATE.nullRecipe(wood);
-        REGISTRATE.nullRecipe(woodStripped);
-        // reduce vanilla recipe to 2 planks
-        REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
-                .shapeless(planks.get(), 2)
-                .requires(logTag)
-                .group("planks")
-                .unlockedBy("has_logs", has(logTag)));
     }
 
     public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
