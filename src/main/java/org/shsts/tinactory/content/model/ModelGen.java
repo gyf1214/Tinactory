@@ -108,6 +108,11 @@ public final class ModelGen {
                 .translucent();
     }
 
+    public static <U extends Item>
+    Consumer<RegistryDataContext<Item, U, ItemModelProvider>> wire() {
+        return ctx -> CableModel.itemModel(ctx, true);
+    }
+
     public static ResourceLocation casing(Voltage voltage) {
         return gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
     }

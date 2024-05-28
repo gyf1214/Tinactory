@@ -61,6 +61,8 @@ public final class ComponentSet {
         private MaterialSet mainMaterial = null;
         @Nullable
         private MaterialSet cableMaterial = null;
+        @Nullable
+        private MaterialSet heatMaterial = null;
         private double cableResistance;
 
         private final List<Consumer<ComponentSet>> callbacks = new ArrayList<>();
@@ -76,8 +78,9 @@ public final class ComponentSet {
             return this;
         }
 
-        public SetBuilder<P> material(MaterialSet main) {
+        public SetBuilder<P> material(MaterialSet main, MaterialSet heat) {
             mainMaterial = main;
+            heatMaterial = heat;
             return this;
         }
 
@@ -104,10 +107,12 @@ public final class ComponentSet {
         @Override
         protected ComponentSet createObject() {
             assert mainMaterial != null;
+            assert heatMaterial != null;
             callbacks.add(set -> {
                 ASSEMBLER.recipe(set.motor)
                         .outputItem(2, set.motor, 1)
                         .inputItem(0, mainMaterial.tag("stick"), 2)
+                        .inputItem(0, heatMaterial.tag("wire"), 2 * voltage.rank)
                         .inputItem(0, set.cable, 2)
                         .workTicks(100)
                         .build();

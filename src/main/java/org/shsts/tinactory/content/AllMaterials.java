@@ -32,9 +32,12 @@ public final class AllMaterials {
     public static MaterialSet NICKEL;
     public static MaterialSet ALUMINIUM;
 
+    // First Degree
     public static MaterialSet BRONZE;
     public static MaterialSet WROUGHT_IRON;
     public static MaterialSet INVAR;
+    public static MaterialSet CUPRONICKEL;
+    public static MaterialSet STEEL;
 
     // Ore
     public static MaterialSet MAGNETITE;
@@ -53,11 +56,11 @@ public final class AllMaterials {
         Ores.init();
 
         TEST = set("test")
-                .toolDurability(12800000).toolTer(Tiers.NETHERITE).toolSet()
+                .tool(12800000, Tiers.NETHERITE).basic().build()
                 .buildObject();
 
         STONE = set("stone")
-                .color(0xFFCDCDCD).icon(IconSet.ROUGH).toolDurability(16)
+                .color(0xFFCDCDCD).icon(IconSet.ROUGH)
                 .existing("block", Items.COBBLESTONE)
                 .existing("tool/pickaxe", Items.STONE_PICKAXE)
                 .existing("tool/shovel", Items.STONE_SHOVEL)
@@ -66,15 +69,16 @@ public final class AllMaterials {
                 .existing("tool/sword", Items.STONE_SWORD)
                 .alias("primary", "block")
                 .dust()
-                .hammer().toolProcess()
+                .toolProcess()
+                .tool(16).hammer().build()
                 .buildObject();
 
         FLINT = set("flint")
                 .color(0xFF002040).icon(IconSet.DULL)
                 .existing("primary", Items.FLINT)
                 .dust()
-                .toolDurability(16).mortar()
                 .toolProcess()
+                .tool(16).mortar().build()
                 .buildObject();
 
         // tool component tags

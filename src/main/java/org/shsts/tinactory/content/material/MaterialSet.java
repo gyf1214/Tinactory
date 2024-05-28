@@ -229,9 +229,6 @@ public class MaterialSet {
         private int color = 0xFFFFFFFF;
         @Nullable
         private IconSet icon = null;
-        private int toolDurability = 0;
-        @Nullable
-        private Tier toolTier = null;
         @Nullable
         private OreVariant oreVariant = null;
 
@@ -264,16 +261,6 @@ public class MaterialSet {
 
         public Builder<P> color(int value) {
             color = value;
-            return this;
-        }
-
-        public Builder<P> toolDurability(int value) {
-            toolDurability = value;
-            return this;
-        }
-
-        public Builder<P> toolTer(Tier value) {
-            toolTier = value;
             return this;
         }
 
@@ -353,6 +340,14 @@ public class MaterialSet {
             for (var sub : subs) {
                 dummy(sub);
             }
+            return this;
+        }
+
+        public Builder<P> wire() {
+            put("wire", () -> REGISTRATE.item(newId("wire"), Item::new)
+                    .model(ModelGen.wire())
+                    .tint(color)
+                    .register());
             return this;
         }
 
@@ -562,6 +557,8 @@ public class MaterialSet {
                     TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
             // spring
             process("spring", 1, "A\nA", "stick", TOOL_FILE, TOOL_SAW, TOOL_WIRE_CUTTER);
+            // cut wire
+            process("wire", 1, "plate", TOOL_WIRE_CUTTER);
             return this;
         }
 
@@ -575,62 +572,92 @@ public class MaterialSet {
             return this;
         }
 
-        private static ResourceLocation toolTex(String sub) {
-            return ModelGen.gregtech("items/tools/" + sub);
+        public class ToolBuilder extends SimpleBuilder<Unit, Builder<P>, ToolBuilder> {
+            private final int durability;
+            @Nullable
+            private final Tier tier;
+
+            private ToolBuilder(int durability, @Nullable Tier tier) {
+                super(Builder.this);
+                this.tier = tier;
+                this.durability = durability;
+            }
+
+            private static ResourceLocation toolTex(String sub) {
+                return ModelGen.gregtech("items/tools/" + sub);
+            }
+
+            private static final Map<String, String> TOOL_HANDLE_TEX = ImmutableMap.<String, String>builder()
+                    .put("hammer", "handle_hammer")
+                    .put("mortar", "mortar_base")
+                    .put("file", "handle_file")
+                    .put("saw", "handle_saw")
+                    .put("screwdriver", "handle_screwdriver")
+                    .put("wire_cutter", "wire_cutter_base")
+                    .build();
+
+            private String item(String category, Function<Item.Properties, ToolItem> factory) {
+                var handle = Optional.ofNullable(TOOL_HANDLE_TEX.get(category))
+                        .map(MaterialSet.Builder.ToolBuilder::toolTex)
+                        .orElse(ModelGen.VOID_TEX);
+                var head = ModelGen.gregtech("items/tools/" + category);
+                var sub = "tool/" + category;
+                put(sub, () -> REGISTRATE.item(newId(sub), factory)
+                        .model(ModelGen.basicItem(handle, head))
+                        .tint(0xFFFFFFFF, color)
+                        .register());
+                return sub;
+            }
+
+            private String toolItem(String category) {
+                return item(category, p -> new ToolItem(p, durability));
+            }
+
+            private String usableItem(String category, TagKey<Block> blockTag) {
+                assert tier != null;
+                return item(category, p -> new UsableToolItem(p, durability, tier, blockTag));
+            }
+
+            private void tool(String category, String pattern, Object... args) {
+                process(toolItem(category), 1, pattern, args);
+            }
+
+            private void usable(String category, TagKey<Block> blockTag, String pattern, Object... args) {
+                process(usableItem(category, blockTag), 1, pattern, args);
+            }
+
+            public ToolBuilder hammer() {
+                tool("hammer", "AA \nAAB\nAA ", "primary", TOOL_HANDLE);
+                return this;
+            }
+
+            public ToolBuilder mortar() {
+                tool("mortar", " A \nBAB\nBBB", "primary", ItemTags.STONE_TOOL_MATERIALS);
+                return this;
+            }
+
+            public ToolBuilder basic() {
+                tool("file", "A\nA\nB", "plate", TOOL_HANDLE);
+                tool("saw", "AAB\n  B", "plate", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
+                tool("screwdriver", "  A\n A \nB  ", "stick", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
+                usable("wrench", MINEABLE_WITH_WRENCH, "A A\nAAA\n A ", "plate", TOOL_HAMMER);
+                usable("wire_cutter", MINEABLE_WITH_CUTTER, "A A\n A \nBCB", "plate", TOOL_HANDLE, TOOL_SCREW,
+                        TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
+                return hammer().mortar();
+            }
+
+            @Override
+            protected Unit createObject() {
+                return Unit.INSTANCE;
+            }
         }
 
-        private static final Map<String, String> TOOL_HANDLE_TEX = ImmutableMap.<String, String>builder()
-                .put("hammer", "handle_hammer")
-                .put("mortar", "mortar_base")
-                .put("file", "handle_file")
-                .put("saw", "handle_saw")
-                .put("screwdriver", "handle_screwdriver")
-                .put("wire_cutter", "wire_cutter_base")
-                .build();
-
-        private String tool(String category, Function<Item.Properties, ToolItem> factory) {
-            var handle = Optional.ofNullable(TOOL_HANDLE_TEX.get(category))
-                    .map(MaterialSet.Builder::toolTex)
-                    .orElse(ModelGen.VOID_TEX);
-            var head = ModelGen.gregtech("items/tools/" + category);
-            var sub = "tool/" + category;
-            put(sub, () -> REGISTRATE.item(newId(sub), factory)
-                    .model(ModelGen.basicItem(handle, head))
-                    .tint(0xFFFFFFFF, this.color)
-                    .register());
-            return sub;
+        public ToolBuilder tool(int durability, Tier tier) {
+            return new ToolBuilder(durability, tier);
         }
 
-        private void tool(String category, String pattern, Object... args) {
-            assert toolDurability > 0;
-            var sub = switch (category) {
-                case "wrench" -> tool(category, p -> new UsableToolItem(p, toolDurability,
-                        Objects.requireNonNull(toolTier), MINEABLE_WITH_WRENCH));
-                case "wire_cutter" -> tool(category, p -> new UsableToolItem(p, toolDurability,
-                        Objects.requireNonNull(toolTier), MINEABLE_WITH_CUTTER));
-                default -> tool(category, p -> new ToolItem(p, toolDurability));
-            };
-            process(sub, 1, pattern, args);
-        }
-
-        public Builder<P> hammer() {
-            tool("hammer", "AA \nAAB\nAA ", "primary", TOOL_HANDLE);
-            return this;
-        }
-
-        public Builder<P> mortar() {
-            tool("mortar", " A \nBAB\nBBB", "primary", ItemTags.STONE_TOOL_MATERIALS);
-            return this;
-        }
-
-        public Builder<P> toolSet() {
-            tool("file", "A\nA\nB", "plate", TOOL_HANDLE);
-            tool("saw", "AAB\n  B", "plate", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
-            tool("screwdriver", "  A\n A \nB  ", "stick", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
-            tool("wrench", "A A\nAAA\n A ", "plate", TOOL_HAMMER);
-            tool("wire_cutter", "A A\n A \nBCB", "plate", TOOL_HANDLE, TOOL_SCREW,
-                    TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
-            return hammer().mortar();
+        public ToolBuilder tool(int durability) {
+            return new ToolBuilder(durability, null);
         }
     }
 }

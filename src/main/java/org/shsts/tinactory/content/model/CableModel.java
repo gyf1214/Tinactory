@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.model;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
@@ -85,7 +84,7 @@ public final class CableModel {
                 .to(16, 8 + radius, 8 + radius)
                 .allFaces((dir, face) -> {
                     if (dir.getAxis() == Direction.Axis.X) {
-                        face.texture("#wire").cullface(dir).tintindex(1);
+                        face.texture("#wire").cullface(dir).tintindex(insulation ? 1 : 0);
                     } else {
                         face.texture("#base").tintindex(0);
                     }
@@ -151,7 +150,7 @@ public final class CableModel {
         }
     }
 
-    public static void itemModel(RegistryDataContext<Item, BlockItem, ItemModelProvider> ctx,
+    public static void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx,
                                  boolean wire) {
         ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(wire ? ITEM_WIRE_MODEL : ITEM_MODEL));
     }

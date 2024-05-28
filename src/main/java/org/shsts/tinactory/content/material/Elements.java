@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.model.ModelGen;
@@ -25,8 +26,9 @@ public final class Elements {
                 .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
                 .existing("wire", ModelGen.modLoc("network/cable/ulv"))
-                .mechanicalSet()
+                .mechanicalSet().wire()
                 .toolProcess().smelt()
+                .tool(200, Tiers.IRON).basic().build()
                 .buildObject();
 
         GOLD = set("gold")
@@ -45,14 +47,13 @@ public final class Elements {
         COPPER = set("copper")
                 .color(0xFFFF6400).icon(IconSet.SHINY)
                 .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
-                .metalSet()
+                .metalSet().wire()
                 .toolProcess().smelt()
                 .buildObject();
 
         TIN = set("tin")
                 .color(0xFFDCDCDC).icon(IconSet.DULL)
-                .existing("cable", ModelGen.modLoc("network/cable/lv"))
-                .metalSet()
+                .metalSet().wire()
                 .toolProcess().smelt()
                 .ore(OreVariant.STONE)
                 // TODO: byproduct tin, zinc
