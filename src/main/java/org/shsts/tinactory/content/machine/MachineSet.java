@@ -32,15 +32,15 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingSet<T extends ProcessingRecipe> {
+public class MachineSet<T extends ProcessingRecipe> {
     public final RecipeTypeEntry<T, ?> recipeType;
     public final Map<Voltage, Layout> layoutSet;
     protected final Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines;
     @Nullable
     protected final BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive;
 
-    public ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Map<Voltage, Layout> layoutSet,
-                         ResourceLocation overlay, Collection<Voltage> voltages) {
+    public MachineSet(RecipeTypeEntry<T, ?> recipeType, Map<Voltage, Layout> layoutSet,
+                      ResourceLocation overlay, Collection<Voltage> voltages) {
         this.recipeType = recipeType;
         this.layoutSet = layoutSet;
         this.machines = voltages.stream()
@@ -129,7 +129,7 @@ public class ProcessingSet<T extends ProcessingRecipe> {
     }
 
     public static class Builder<T extends ProcessingRecipe, P> extends
-            SimpleBuilder<ProcessingSet<T>, P, Builder<T, P>> {
+            SimpleBuilder<MachineSet<T>, P, Builder<T, P>> {
         private final RecipeTypeEntry<T, ?> recipeType;
         private final Set<Voltage> voltages = new HashSet<>();
         @Nullable
@@ -159,13 +159,13 @@ public class ProcessingSet<T extends ProcessingRecipe> {
         }
 
         @Override
-        public ProcessingSet<T> createObject() {
+        public MachineSet<T> createObject() {
             assert overlay != null;
             assert layoutSet != null;
             if (voltages.isEmpty()) {
                 voltage(Voltage.LV);
             }
-            return new ProcessingSet<>(recipeType, layoutSet, overlay, voltages);
+            return new MachineSet<>(recipeType, layoutSet, overlay, voltages);
         }
     }
 
