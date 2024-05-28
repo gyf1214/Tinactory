@@ -47,7 +47,7 @@ public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S
             this.progressBarIndex = addSyncSlot(MenuSyncPacket.Double::new,
                     be -> AllCapabilities.PROCESSOR.tryGet(be)
                             .map(IProcessor::getProgress)
-                            .orElse(0.0d));
+                            .orElse(0d));
         } else {
             this.progressBarIndex = -1;
         }

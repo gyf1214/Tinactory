@@ -30,7 +30,7 @@ public final class ClientUtil {
 
     public static void playSound(SoundEvent sound) {
         var soundManager = Minecraft.getInstance().getSoundManager();
-        soundManager.play(SimpleSoundInstance.forUI(sound, 1.0f));
+        soundManager.play(SimpleSoundInstance.forUI(sound, 1f));
     }
 
     public static LocalPlayer getPlayer() {

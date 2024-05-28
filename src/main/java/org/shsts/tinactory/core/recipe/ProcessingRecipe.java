@@ -49,15 +49,13 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     public final long voltage;
     public final long power;
 
-    protected ProcessingRecipe(RecipeTypeEntry<?, ?> type, ResourceLocation loc,
-                               List<Input> inputs, List<Output> outputs,
-                               long workTicks, long voltage, long power) {
-        super(type, loc);
-        this.inputs = inputs;
-        this.outputs = outputs;
-        this.workTicks = workTicks;
-        this.voltage = voltage;
-        this.power = power;
+    protected ProcessingRecipe(BuilderBase<?, ?> builder) {
+        super(builder.getType(), builder.loc);
+        this.inputs = builder.getInputs();
+        this.outputs = builder.getOutputs();
+        this.workTicks = builder.workTicks;
+        this.voltage = builder.voltage;
+        this.power = builder.power;
     }
 
     protected boolean consumeInput(IContainer container, Input input, boolean simulate) {
@@ -116,7 +114,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         protected long workTicks = 0;
         protected long voltage = 0;
         protected long power = 0;
-        protected float amperage = 0f;
+        protected double amperage = 0f;
 
         public BuilderBase(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
             super(registrate, parent, loc);
@@ -160,35 +158,35 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
             return output(port, () -> result);
         }
 
-        public S outputItem(int port, Supplier<? extends ItemLike> item, int amount, float rate) {
+        public S outputItem(int port, Supplier<? extends ItemLike> item, int amount, double rate) {
             return output(port, () ->
                     new ProcessingResults.ItemResult(true, rate, new ItemStack(item.get(), amount)));
         }
 
         public S outputItem(int port, Supplier<? extends ItemLike> item, int amount) {
-            return outputItem(port, item, amount, 1.0f);
+            return outputItem(port, item, amount, 1d);
         }
 
         public S outputItem(int port, Item item, int amount) {
             return outputItem(port, () -> item, amount);
         }
 
-        public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount, float rate) {
+        public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount, double rate) {
             return output(port, () -> new ProcessingResults.FluidResult(
                     true, rate, new FluidStack(fluid.get(), amount)));
         }
 
-        public S outputFluid(int port, Fluid fluid, int amount, float rate) {
+        public S outputFluid(int port, Fluid fluid, int amount, double rate) {
             return output(port, new ProcessingResults.FluidResult(
                     true, rate, new FluidStack(fluid, amount)));
         }
 
         public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
-            return outputFluid(port, fluid, amount, 1.0f);
+            return outputFluid(port, fluid, amount, 1d);
         }
 
         public S outputFluid(int port, Fluid fluid, int amount) {
-            return outputFluid(port, fluid, amount, 1.0f);
+            return outputFluid(port, fluid, amount, 1d);
         }
 
         public S workTicks(long value) {
@@ -216,9 +214,13 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
             return self();
         }
 
-        public S amperage(float value) {
+        public S amperage(double value) {
             amperage = value;
             return self();
+        }
+
+        protected RecipeTypeEntry<U, S> getType() {
+            return parent;
         }
 
         protected List<Input> getInputs() {
@@ -247,7 +249,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         @Override
         protected ProcessingRecipe createObject() {
-            return new ProcessingRecipe(parent, loc, getInputs(), getOutputs(), workTicks, voltage, power);
+            return new ProcessingRecipe(this);
         }
     }
 

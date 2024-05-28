@@ -45,7 +45,7 @@ public final class MathUtil {
 
     public static Vec3 blockCenter(BlockPos pos) {
         return (new Vec3(pos.getX(), pos.getY(), pos.getZ()))
-                .add(0.5d, 0.5d, 0.5d);
+                .add(0.5, 0.5, 0.5);
     }
 
     public static Vec3 dirNormal(Direction dir) {

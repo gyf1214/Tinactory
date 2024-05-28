@@ -65,16 +65,15 @@ public final class Ores {
     public static void initRecipes() {
         VEINS.vein("chalcopyrite")
                 .primitive()
-                .ore(CHALCOPYRITE, 0.5f)
-                .ore(PYRITE, 0.5f)
+                .ore(CHALCOPYRITE, 0.5)
+                .ore(PYRITE, 0.5)
                 .build()
                 .vein("cassiterite")
-                .ore(CASSITERITE, 0.5f)
-                .ore(TIN, 0.5f)
+                .ore(CASSITERITE, 0.5)
+                .ore(TIN, 0.5)
                 .build()
                 .vein("magnetite")
-                .ore(MAGNETITE, 0.5f)
-                .ore(GOLD, 0.1f)
+                .ore(GOLD, 0.1)
                 .build();
     }
 
@@ -87,7 +86,7 @@ public final class Ores {
     private static final VeinFactory VEINS = new VeinFactory();
 
     private static class VeinBuilder extends SimpleBuilder<Unit, VeinFactory, VeinBuilder> {
-        private record OreInfo(MaterialSet material, float rate) {}
+        private record OreInfo(MaterialSet material, double rate) {}
 
         private final String id;
         private final List<OreInfo> ores = new ArrayList<>();
@@ -98,7 +97,7 @@ public final class Ores {
             this.id = id;
         }
 
-        public VeinBuilder ore(MaterialSet material, float rate) {
+        public VeinBuilder ore(MaterialSet material, double rate) {
             ores.add(new OreInfo(material, rate));
             return this;
         }

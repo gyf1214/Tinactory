@@ -17,7 +17,7 @@ public class Label extends MenuWidget {
     public static final int LINE_HEIGHT = 9;
 
     public enum Alignment {
-        BEGIN(0d), MIDDLE(0.5d), END(1d);
+        BEGIN(0d), MIDDLE(0.5), END(1d);
 
         Alignment(double value) {
             this.value = value;

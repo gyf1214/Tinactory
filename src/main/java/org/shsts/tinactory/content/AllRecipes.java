@@ -47,45 +47,45 @@ public final class AllRecipes {
         RESEARCH = REGISTRATE.recipeType("research", ResearchRecipe.SERIALIZER)
                 .clazz(ResearchRecipe.class)
                 .builder(ResearchRecipe.Builder::new)
-                .defaults($ -> $.amperage(0.25f))
+                .defaults($ -> $.amperage(0.25d))
                 .register();
 
         ASSEMBLER = REGISTRATE.assemblyRecipeType("assembler")
-                .defaults($ -> $.amperage(0.375f))
+                .defaults($ -> $.amperage(0.375d))
                 .register();
 
         STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator")
-                .defaults($ -> $.amperage(0.125f).workTicks(40))
+                .defaults($ -> $.amperage(0.125d).workTicks(40))
                 .register();
 
         ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer")
-                .defaults($ -> $.amperage(0.125f).workTicks(32))
+                .defaults($ -> $.amperage(0.125d).workTicks(32))
                 .register();
 
         MACERATOR = REGISTRATE.processingRecipeType("macerator")
-                .defaults($ -> $.amperage(0.25f))
+                .defaults($ -> $.amperage(0.25d))
                 .register();
 
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
                 .defaults($ -> $
                         .inputFluid(1, Fluids.WATER, 1000)
                         .outputItem(3, AllMaterials.STONE.entry("dust"), 1)
-                        .amperage(0.125f))
+                        .amperage(0.125d))
                 .register();
 
         CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge")
-                .defaults($ -> $.amperage(0.5f))
+                .defaults($ -> $.amperage(0.5d))
                 .register();
 
         THERMAL_CENTRIFUGE = REGISTRATE.processingRecipeType("thermal_centrifuge")
                 .defaults($ -> $
                         .voltage(Voltage.LV)
                         .workTicks(400)
-                        .amperage(1.5f))
+                        .amperage(1.5d))
                 .register();
 
         ALLOY_SMELTER = REGISTRATE.processingRecipeType("alloy_smelter")
-                .defaults($ -> $.amperage(0.75f))
+                .defaults($ -> $.amperage(0.75d))
                 .register();
     }
 

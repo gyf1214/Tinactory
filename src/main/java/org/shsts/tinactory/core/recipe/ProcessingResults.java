@@ -37,7 +37,7 @@ public final class ProcessingResults {
                 return allowEmpty;
             }
             if (portType.isInstance(port)) {
-                if (rate < 1.0d && (simulate || random.nextDouble() > rate)) {
+                if (rate < 1d && (simulate || random.nextDouble() > rate)) {
                     return true;
                 }
                 return doInsertPort(portType.cast(port), random, simulate);
@@ -52,7 +52,7 @@ public final class ProcessingResults {
 
         protected void toJson(JsonObject jo) {
             jo.addProperty("allow_empty", allowEmpty);
-            if (rate < 1.0d) {
+            if (rate < 1) {
                 jo.addProperty("rate", rate);
             }
         }
@@ -101,7 +101,7 @@ public final class ProcessingResults {
                 var jo = je.getAsJsonObject();
                 return new ItemResult(
                         GsonHelper.getAsBoolean(jo, "allow_empty"),
-                        GsonHelper.getAsDouble(jo, "rate", 1.0d),
+                        GsonHelper.getAsDouble(jo, "rate", 1d),
                         parseJson(ItemStack.CODEC, GsonHelper.getAsJsonObject(jo, "item")));
             }
         };
@@ -150,7 +150,7 @@ public final class ProcessingResults {
                 var jo = je.getAsJsonObject();
                 return new FluidResult(
                         GsonHelper.getAsBoolean(jo, "allow_empty"),
-                        GsonHelper.getAsDouble(jo, "rate", 1.0d),
+                        GsonHelper.getAsDouble(jo, "rate", 1d),
                         parseJson(FluidStack.CODEC, GsonHelper.getAsJsonObject(jo, "fluid")));
             }
         };

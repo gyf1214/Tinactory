@@ -62,7 +62,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         configPanel.addWidget(new Rect(0, Label.LINE_HEIGHT, 0, 0), stateLabel);
 
         var offset = Rect.corners(0, 10, 0, -10);
-        rootPanel.addPanel(RectD.corners(0.5d, 0d, 0.5d, 1d), offset, welcomePanel);
+        rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), offset, welcomePanel);
         rootPanel.addPanel(offset, configPanel);
 
         menu.onSyncPacket(syncSlot, this::refresh);

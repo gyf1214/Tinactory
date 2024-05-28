@@ -38,7 +38,7 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     protected final double resistance;
 
     public MachineBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType, Voltage voltage) {
-        super(properties.strength(2.0f, 6.0f).requiresCorrectToolForDrops(), entityType);
+        super(properties.strength(2f, 6f).requiresCorrectToolForDrops(), entityType);
         this.voltage = voltage;
         this.resistance = Math.sqrt((double) voltage.value / 2d);
     }

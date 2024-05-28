@@ -19,13 +19,11 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AssemblyRecipe extends ProcessingRecipe {
-    private final List<ResourceLocation> requiredTech;
+    protected final List<ResourceLocation> requiredTech;
 
-    private AssemblyRecipe(RecipeTypeEntry<AssemblyRecipe, ?> type, ResourceLocation loc,
-                           List<Input> inputs, List<Output> outputs, long workTicks,
-                           long voltage, long power, List<ResourceLocation> requiredTech) {
-        super(type, loc, inputs, outputs, workTicks, voltage, power);
-        this.requiredTech = requiredTech;
+    protected AssemblyRecipe(BuilderBase<?, ?> builder) {
+        super(builder);
+        this.requiredTech = builder.requiredTech;
     }
 
     @Override
@@ -35,33 +33,41 @@ public class AssemblyRecipe extends ProcessingRecipe {
                 .orElse(requiredTech.isEmpty());
     }
 
-    public static class Builder extends BuilderBase<AssemblyRecipe, Builder> {
-        private final List<ResourceLocation> requiredTech = new ArrayList<>();
+    public abstract static class BuilderBase<U extends AssemblyRecipe, S extends BuilderBase<U, S>> extends
+            ProcessingRecipe.BuilderBase<U, S> {
+        protected final List<ResourceLocation> requiredTech = new ArrayList<>();
 
+        public BuilderBase(Registrate registrate, RecipeTypeEntry<U, S> parent,
+                           ResourceLocation loc) {
+            super(registrate, parent, loc);
+        }
+
+        public S requireTech(ResourceLocation loc) {
+            requiredTech.add(loc);
+            return self();
+        }
+    }
+
+    public static class Builder extends BuilderBase<AssemblyRecipe, Builder> {
         public Builder(Registrate registrate, RecipeTypeEntry<AssemblyRecipe, Builder> parent,
                        ResourceLocation loc) {
             super(registrate, parent, loc);
         }
 
-        public Builder requireTech(ResourceLocation loc) {
-            requiredTech.add(loc);
-            return self();
-        }
-
         @Override
         protected AssemblyRecipe createObject() {
-            return new AssemblyRecipe(parent, loc, getInputs(), getOutputs(), workTicks,
-                    voltage, power, requiredTech);
+            return new AssemblyRecipe(this);
         }
     }
 
-    public static class Serializer extends ProcessingRecipe.Serializer<AssemblyRecipe, Builder> {
-        protected Serializer(RecipeTypeEntry<AssemblyRecipe, Builder> type) {
+    public static class Serializer<T extends AssemblyRecipe, B extends BuilderBase<T, B>> extends
+            ProcessingRecipe.Serializer<T, B> {
+        protected Serializer(RecipeTypeEntry<T, B> type) {
             super(type);
         }
 
         @Override
-        protected Builder buildFromJson(ResourceLocation loc, JsonObject jo) {
+        protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
             var builder = super.buildFromJson(loc, jo);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "required_tech"))
                     .map(JsonElement::getAsString)
@@ -70,7 +76,7 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
 
         @Override
-        public void toJson(JsonObject jo, AssemblyRecipe recipe) {
+        public void toJson(JsonObject jo, T recipe) {
             super.toJson(jo, recipe);
             var ja = new JsonArray();
             for (var tech : recipe.requiredTech) {

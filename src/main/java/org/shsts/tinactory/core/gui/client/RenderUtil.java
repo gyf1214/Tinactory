@@ -48,10 +48,10 @@ public final class RenderUtil {
     }
 
     private static void setGLColor(int color) {
-        float a = (float) (color >> 24 & 255) / 255.0F;
-        float r = (float) (color >> 16 & 255) / 255.0F;
-        float g = (float) (color >> 8 & 255) / 255.0F;
-        float b = (float) (color & 255) / 255.0F;
+        float a = (float) (color >> 24 & 255) / 255f;
+        float r = (float) (color >> 16 & 255) / 255f;
+        float g = (float) (color >> 8 & 255) / 255f;
+        float b = (float) (color & 255) / 255f;
         RenderSystem.setShaderColor(r, g, b, a);
     }
 

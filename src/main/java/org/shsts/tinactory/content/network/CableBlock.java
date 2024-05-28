@@ -55,7 +55,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     private final Map<BlockState, VoxelShape> shapes;
 
     public CableBlock(Properties properties, int radius, Voltage voltage, double resistance) {
-        super(properties.strength(2.0f).requiresCorrectToolForDrops());
+        super(properties.strength(2f).requiresCorrectToolForDrops());
         this.radius = radius;
         this.voltage = voltage;
         this.resistance = resistance;

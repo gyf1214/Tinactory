@@ -45,7 +45,7 @@ public final class AllForgeEvents {
             }
             AllWorldGens.PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
                     world.getChunkSource().getGenerator(), new Random(), spawn);
-            event.getSettings().setSpawn(spawn, 0.0f);
+            event.getSettings().setSpawn(spawn, 0f);
             event.setCanceled(true);
         }
     }

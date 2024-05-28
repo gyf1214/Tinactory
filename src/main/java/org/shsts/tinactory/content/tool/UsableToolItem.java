@@ -35,7 +35,7 @@ public class UsableToolItem extends ToolItem {
 
     private static Direction wrenchedDirection(BlockPos pos, Direction clickFace, Vec3 clickLoc) {
         var faceCenter = MathUtil.blockCenter(pos)
-                .add(MathUtil.dirNormal(clickFace).scale(0.5d));
+                .add(MathUtil.dirNormal(clickFace).scale(0.5));
         var clickRel = clickLoc.subtract(faceCenter);
         var dx = MathUtil.compare(clickRel.x, WRENCH_RADIUS_NORM);
         var dy = MathUtil.compare(clickRel.y, WRENCH_RADIUS_NORM);
@@ -81,7 +81,7 @@ public class UsableToolItem extends ToolItem {
 
     @Override
     public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity entity) {
-        if (!world.isClientSide && state.getDestroySpeed(world, pos) != 0.0F) {
+        if (!world.isClientSide && state.getDestroySpeed(world, pos) != 0f) {
             doDamage(stack, 1, entity, InteractionHand.MAIN_HAND);
         }
         return true;

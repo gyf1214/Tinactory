@@ -56,9 +56,9 @@ public final class WrenchOutlineRenderer {
                                       Camera camera, BlockPos pos, Direction face) {
         ms.pushPose();
         var camPos = camera.getPosition();
-        ms.translate((double) pos.getX() - camPos.x + 0.5d,
-                (double) pos.getY() - camPos.y + 0.5d,
-                (double) pos.getZ() - camPos.z + 0.5d);
+        ms.translate((double) pos.getX() - camPos.x + 0.5,
+                (double) pos.getY() - camPos.y + 0.5,
+                (double) pos.getZ() - camPos.z + 0.5);
         var vb = bs.getBuffer(RenderType.LINES);
         var pose = ms.last();
         switch (face.getAxis()) {

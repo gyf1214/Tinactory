@@ -1,0 +1,83 @@
+package org.shsts.tinactory.content.recipe;
+
+import com.google.gson.JsonObject;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.ItemLike;
+import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.content.material.OreVariant;
+import org.shsts.tinactory.core.common.SmartRecipeSerializer;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Random;
+import java.util.function.Supplier;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class OreAnalyzerRecipe extends AssemblyRecipe {
+    public final double rate;
+
+    private OreAnalyzerRecipe(Builder builder) {
+        super(builder);
+        this.rate = builder.rate;
+    }
+
+    @Override
+    public void insertOutputs(IContainer container, Random random) {
+        if (random.nextDouble() <= rate) {
+            super.insertOutputs(container, random);
+        }
+    }
+
+    public static class Builder extends AssemblyRecipe.BuilderBase<OreAnalyzerRecipe, Builder> {
+        public double rate = 0f;
+
+        public Builder(Registrate registrate, RecipeTypeEntry<OreAnalyzerRecipe, Builder> parent,
+                       ResourceLocation loc) {
+            super(registrate, parent, loc);
+        }
+
+        public Builder rate(double value) {
+            rate = value;
+            return this;
+        }
+
+        public Builder inputOre(OreVariant variant) {
+            return inputItem(0, () -> variant.baseItem, 1);
+        }
+
+        public Builder outputItem(Supplier<? extends ItemLike> item, int amount, double rate) {
+            return outputItem(1, item, amount, rate);
+        }
+
+        @Override
+        protected OreAnalyzerRecipe createObject() {
+            return new OreAnalyzerRecipe(this);
+        }
+    }
+
+    public static class Serializer extends AssemblyRecipe.Serializer<OreAnalyzerRecipe, Builder> {
+        protected Serializer(RecipeTypeEntry<OreAnalyzerRecipe, Builder> type) {
+            super(type);
+        }
+
+        @Override
+        protected Builder buildFromJson(ResourceLocation loc, JsonObject jo) {
+            return super.buildFromJson(loc, jo)
+                    .rate(GsonHelper.getAsDouble(jo, "rate"));
+        }
+
+        @Override
+        public void toJson(JsonObject jo, OreAnalyzerRecipe recipe) {
+            super.toJson(jo, recipe);
+            jo.addProperty("rate", recipe.rate);
+        }
+    }
+
+    public static final SmartRecipeSerializer.Factory<OreAnalyzerRecipe, OreAnalyzerRecipe.Builder>
+            SERIALIZER = Serializer::new;
+}

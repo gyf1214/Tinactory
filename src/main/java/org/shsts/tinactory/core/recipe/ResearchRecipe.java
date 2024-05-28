@@ -7,21 +7,16 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -30,19 +25,10 @@ public class ResearchRecipe extends ProcessingRecipe {
     private final ResourceLocation target;
     private final long progress;
 
-    private static List<Input> getInputs(List<IProcessingIngredient> ingredients) {
-        return ingredients.stream()
-                .map(ingredient -> new Input(ingredient.type() == PortType.ITEM ? 0 : 1, ingredient))
-                .toList();
-    }
-
-    private ResearchRecipe(RecipeTypeEntry<?, ?> type, ResourceLocation loc,
-                           List<IProcessingIngredient> inputs,
-                           ResourceLocation target, long progress,
-                           long workTicks, long voltage, long power) {
-        super(type, loc, getInputs(inputs), List.of(), workTicks, voltage, power);
-        this.target = target;
-        this.progress = progress;
+    private ResearchRecipe(Builder builder) {
+        super(builder);
+        this.target = builder.getTarget();
+        this.progress = builder.progress;
     }
 
     @Override
@@ -52,15 +38,10 @@ public class ResearchRecipe extends ProcessingRecipe {
                 .orElse(false);
     }
 
-    public static class Builder extends SmartRecipeBuilder<ResearchRecipe, Builder> {
-        private final List<Supplier<IProcessingIngredient>> inputs = new ArrayList<>();
+    public static class Builder extends ProcessingRecipe.BuilderBase<ResearchRecipe, Builder> {
         @Nullable
         private ResourceLocation target = null;
         private long progress = 1;
-        private long workTicks = 0;
-        private long voltage = 0;
-        private long power = 0;
-        private float amperage = 0f;
 
         public Builder(Registrate registrate, RecipeTypeEntry<ResearchRecipe, Builder> parent,
                        ResourceLocation loc) {
@@ -68,14 +49,12 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
 
         public Builder input(IProcessingIngredient ingredient) {
-            inputs.add(() -> ingredient);
-            return this;
+            var port = ingredient.type() == PortType.ITEM ? 0 : 1;
+            return input(port, ingredient);
         }
 
         public Builder inputItem(Supplier<? extends Item> item, int amount) {
-            inputs.add(() -> new ProcessingIngredients.SimpleItemIngredient(
-                    new ItemStack(item.get(), amount)));
-            return this;
+            return inputItem(0, item, amount);
         }
 
         public Builder inputItem(Supplier<? extends Item> item) {
@@ -92,39 +71,14 @@ public class ResearchRecipe extends ProcessingRecipe {
             return this;
         }
 
-        public Builder workTicks(long value) {
-            workTicks = value;
-            return this;
-        }
-
-        public Builder voltage(Voltage value) {
-            voltage = value.value;
-            return this;
-        }
-
-        public Builder voltage(long value) {
-            voltage = value;
-            return this;
-        }
-
-        public Builder power(long value) {
-            power = value;
-            return this;
-        }
-
-        public Builder amperage(float value) {
-            amperage = value;
-            return this;
+        private ResourceLocation getTarget() {
+            assert target != null;
+            return target;
         }
 
         @Override
         protected ResearchRecipe createObject() {
-            assert target != null;
-            if (power <= 0) {
-                power = (long) (voltage * amperage);
-            }
-            var inputs = this.inputs.stream().map(Supplier::get).toList();
-            return new ResearchRecipe(parent, loc, inputs, target, progress, workTicks, voltage, power);
+            return new ResearchRecipe(this);
         }
     }
 

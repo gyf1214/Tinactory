@@ -63,7 +63,7 @@ public class MachineRecipeBook extends Panel {
     private static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
     private static final Rect INNER_PANEL_OFFSET = Rect.corners(PANEL_BORDER, PANEL_BORDER,
             -PANEL_BORDER, -PANEL_BORDER);
-    private static final RectD PAGE_ANCHOR = new RectD(0.5d, 1d, 0d, 0d);
+    private static final RectD PAGE_ANCHOR = new RectD(0.5, 1d, 0d, 0d);
     private static final Rect PAGE_OFFSET = new Rect(0, -18, 12, 18);
 
 

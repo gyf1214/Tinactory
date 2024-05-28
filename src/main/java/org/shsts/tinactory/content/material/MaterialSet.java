@@ -424,7 +424,7 @@ public class MaterialSet {
                             .outputItem(2, $.entry(output), 1);
                     if (input.equals("crushed")) {
                         var byproduct = byproducts.getOrDefault("wash", $.entry("dust"));
-                        builder.outputItem(4, byproduct, 1, 0.1f)
+                        builder.outputItem(4, byproduct, 1, 0.1)
                                 .workTicks(160);
                     } else {
                         builder.workTicks(32);
@@ -476,7 +476,7 @@ public class MaterialSet {
                     CENTRIFUGE.recipe($.loc("dust"))
                             .inputItem(0, $.tag("dust_pure"), 1)
                             .outputItem(1, $.entry("dust"), 1)
-                            .outputItem(1, byproduct, 1, 0.1f)
+                            .outputItem(1, byproduct, 1, 0.1)
                             .voltage(Voltage.LV)
                             .workTicks(80)
                             .build();
@@ -486,7 +486,7 @@ public class MaterialSet {
                     THERMAL_CENTRIFUGE.recipe($.loc("crushed_centrifuged"))
                             .inputItem(0, $.tag("crushed_purified"), 1)
                             .outputItem(1, $.entry("crushed_centrifuged"), 1)
-                            .outputItem(1, byproduct, 1, 0.1f)
+                            .outputItem(1, byproduct, 1, 0.1)
                             .build();
                 });
 

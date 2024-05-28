@@ -34,7 +34,7 @@ public final class TinactoryConfig {
 
         builder.push("machine");
         primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
-                .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
+                .defineInRange("primitive_work_speed", 0.25, 0d, 1d);
         builder.pop();
 
         builder.push("network");
