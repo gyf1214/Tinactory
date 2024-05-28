@@ -5,7 +5,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
-import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -25,7 +24,6 @@ public final class Elements {
                 .color(0xFFC8C8C8).icon(IconSet.METALLIC)
                 .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
-                .existing("wire", ModelGen.modLoc("network/cable/ulv"))
                 .mechanicalSet().wire()
                 .toolProcess().smelt()
                 .tool(200, Tiers.IRON).basic().build()

@@ -1,9 +1,11 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
-import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.content.model.CableModel;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
@@ -17,6 +19,7 @@ import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllRecipes.has;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -27,7 +30,8 @@ public final class AllItems {
     static {
         ULV_CABLE = REGISTRATE.block("network/cable/ulv",
                         properties -> new CableBlock(properties, CableBlock.WIRE_RADIUS, Voltage.ULV, 2.0))
-                .transform(ModelGen.cable(true))
+                .blockState(ctx -> CableModel.blockState(ctx, true))
+                .itemModel(CableModel::ulvItemModel)
                 .tint(IRON.color)
                 .tag(AllTags.MINEABLE_WITH_CUTTER)
                 .defaultBlockItem().dropSelf()
@@ -52,5 +56,10 @@ public final class AllItems {
         COMPONENT_SETS.values().forEach(ComponentSet::addRecipes);
     }
 
-    private static void ulvRecipes() {}
+    private static void ulvRecipes() {
+        REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
+                .shapeless(ULV_CABLE.get())
+                .requires(Ingredient.of(IRON.tag("wire")), 4)
+                .unlockedBy("has_wire", has(IRON.tag("wire"))));
+    }
 }

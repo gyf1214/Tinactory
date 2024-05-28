@@ -15,7 +15,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -32,7 +31,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -292,12 +290,6 @@ public class MaterialSet {
             return this;
         }
 
-        public Builder<P> existing(String sub, ResourceLocation loc) {
-            assert !items.containsKey(sub);
-            put(sub, loc, () -> Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(loc)));
-            return this;
-        }
-
         public Builder<P> existing(String sub, TagKey<Item> targetTag, Item item) {
             assert !items.containsKey(sub);
             var tag = newTag(sub);
@@ -383,23 +375,25 @@ public class MaterialSet {
         }
 
         public class OreBuilder extends SimpleBuilder<Unit, Builder<P>, OreBuilder> {
-            private int amount = 1;
+            private final int amount;
             private boolean primitive = false;
+            private boolean hammer = false;
             private final OreVariant variant;
             private final Map<String, Supplier<Item>> byproducts = new HashMap<>();
 
-            private OreBuilder(OreVariant variant) {
+            private OreBuilder(OreVariant variant, int amount) {
                 super(Builder.this);
                 this.variant = variant;
-            }
-
-            public OreBuilder amount(int val) {
-                amount = val;
-                return this;
+                this.amount = amount;
             }
 
             public OreBuilder primitive() {
-                this.primitive = true;
+                primitive = true;
+                return hammer();
+            }
+
+            public OreBuilder hammer() {
+                hammer = true;
                 return this;
             }
 
@@ -464,7 +458,7 @@ public class MaterialSet {
                     blocks.put("ore", ore::get);
                 }
 
-                if (primitive) {
+                if (hammer) {
                     Builder.this.process("crushed", 1, "raw", TOOL_HAMMER);
                     Builder.this.process("dust_pure", 1, "crushed_purified", TOOL_HAMMER);
                     Builder.this.process("dust_impure", 1, "crushed", TOOL_HAMMER);
@@ -500,8 +494,12 @@ public class MaterialSet {
             }
         }
 
+        public OreBuilder ore(OreVariant variant, int amount) {
+            return new OreBuilder(variant, amount);
+        }
+
         public OreBuilder ore(OreVariant variant) {
-            return new OreBuilder(variant);
+            return ore(variant, 1);
         }
 
         public Builder<P> alloy(Object... components) {

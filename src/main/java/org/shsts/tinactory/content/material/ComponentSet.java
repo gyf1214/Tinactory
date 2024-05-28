@@ -97,7 +97,7 @@ public final class ComponentSet {
             assert cableMaterial != null;
             var id = "network/cable/" + voltage.id;
             return REGISTRATE.block(id, CableBlock.cable(voltage, cableResistance))
-                    .transform(ModelGen.cable(false))
+                    .transform(ModelGen.cable())
                     .tint(CableBlock.INSULATION_COLOR, cableMaterial.color)
                     .tag(AllTags.MINEABLE_WITH_CUTTER)
                     .defaultBlockItem().dropSelf()

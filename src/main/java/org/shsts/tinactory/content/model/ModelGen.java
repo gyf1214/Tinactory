@@ -102,9 +102,9 @@ public final class ModelGen {
     }
 
     public static <S extends BlockBuilder<? extends CableBlock, ?, S>>
-    Transformer<S> cable(boolean wire) {
-        return $ -> $.blockState(ctx -> CableModel.blockState(ctx, wire))
-                .itemModel(ctx -> CableModel.itemModel(ctx, wire))
+    Transformer<S> cable() {
+        return $ -> $.blockState(ctx -> CableModel.blockState(ctx, false))
+                .itemModel(ctx -> CableModel.itemModel(ctx, false))
                 .translucent();
     }
 

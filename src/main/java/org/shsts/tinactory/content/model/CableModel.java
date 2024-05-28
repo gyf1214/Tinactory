@@ -35,8 +35,8 @@ public final class CableModel {
     private static final String OPEN_WIRE_MODEL = "block/network/cable/open_wire";
     private static final String CLOSED_MODEL = "block/network/cable/closed";
     private static final String CLOSED_WIRE_MODEL = "block/network/cable/closed_wire";
-    private static final String ITEM_MODEL = "item/network/cable/item";
-    private static final String ITEM_WIRE_MODEL = "item/network/cable/item_wire";
+    private static final String ITEM_MODEL = "item/network/cable";
+    private static final String ITEM_WIRE_MODEL = "item/material/wire";
     private static final String TEX_PREFIX = "blocks/cable/";
     private static final ResourceLocation INSULATION_OPEN_TEX = gregtech(TEX_PREFIX + "insulation_1");
     private static final ResourceLocation INSULATION_TEX = gregtech(TEX_PREFIX + "insulation_5");
@@ -119,8 +119,8 @@ public final class CableModel {
                 .texture("base", INSULATION_TEX)
                 .texture("insulation", INSULATION_OPEN_TEX)
                 .texture("wire", WIRE_TEX);
-        genItem(ctx.provider, ITEM_WIRE_MODEL, WIRE_RADIUS, false)
-                .texture("base", WHITE_TEX)
+        genItem(ctx.provider, ITEM_WIRE_MODEL, 1, false)
+                .texture("base", WIRE_TEX)
                 .texture("wire", WIRE_TEX);
     }
 
@@ -153,5 +153,11 @@ public final class CableModel {
     public static void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx,
                                  boolean wire) {
         ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(wire ? ITEM_WIRE_MODEL : ITEM_MODEL));
+    }
+
+    public static void ulvItemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        genItem(ctx.provider, ctx.id, CableBlock.WIRE_RADIUS, false)
+                .texture("base", WIRE_TEX)
+                .texture("wire", "#base");
     }
 }

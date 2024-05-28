@@ -45,8 +45,8 @@ public final class Ores {
         CASSITERITE = set("cassiterite")
                 .color(0xFFDCDCDC).icon(IconSet.METALLIC)
                 .smelt(ingot("tin"))
-                .ore(OreVariant.STONE)
-                .amount(2)
+                .ore(OreVariant.STONE, 2)
+                .hammer()
                 // TODO: tin, zinc
                 .byproduct(dust("tin"), dust("tin"))
                 .build().createObject();
