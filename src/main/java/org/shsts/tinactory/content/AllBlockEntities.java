@@ -2,7 +2,6 @@ package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
@@ -80,7 +79,7 @@ public final class AllBlockEntities {
                 .build()
                 .register();
 
-        RESEARCH_TABLE = builder(AllRecipes.RESEARCH)
+        RESEARCH_TABLE = processing(AllRecipes.RESEARCH)
                 .overlay(gregtech("blocks/overlay/machine/overlay_screen"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
@@ -90,7 +89,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        var assembler = builder(AllRecipes.ASSEMBLER)
+        var assembler = processing(AllRecipes.ASSEMBLER)
                 .overlay(gregtech("blocks/machines/assembler"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
@@ -108,7 +107,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        STONE_GENERATOR = builder(AllRecipes.STONE_GENERATOR)
+        STONE_GENERATOR = processing(AllRecipes.STONE_GENERATOR)
                 .overlay(gregtech("blocks/machines/rock_crusher"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
@@ -118,7 +117,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_ANALYZER = builder(AllRecipes.ORE_ANALYZER)
+        ORE_ANALYZER = processing(AllRecipes.ORE_ANALYZER)
                 .overlay(gregtech("blocks/machines/electromagnetic_separator"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
@@ -132,7 +131,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        MACERATOR = builder(AllRecipes.MACERATOR)
+        MACERATOR = processing(AllRecipes.MACERATOR)
                 .overlay(gregtech("blocks/machines/macerator"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -144,7 +143,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_WASHER = builder(AllRecipes.ORE_WASHER)
+        ORE_WASHER = processing(AllRecipes.ORE_WASHER)
                 .overlay(gregtech("blocks/machines/ore_washer"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
@@ -162,7 +161,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        CENTRIFUGE = builder(AllRecipes.CENTRIFUGE)
+        CENTRIFUGE = processing(AllRecipes.CENTRIFUGE)
                 .overlay(gregtech("blocks/machines/centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -178,7 +177,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        THERMAL_CENTRIFUGE = builder(AllRecipes.THERMAL_CENTRIFUGE)
+        THERMAL_CENTRIFUGE = processing(AllRecipes.THERMAL_CENTRIFUGE)
                 .overlay(gregtech("blocks/machines/thermal_centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -190,7 +189,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ALLOY_SMELTER = builder(AllRecipes.ALLOY_SMELTER)
+        ALLOY_SMELTER = processing(AllRecipes.ALLOY_SMELTER)
                 .overlay(gregtech("blocks/machines/alloy_smelter"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -205,9 +204,9 @@ public final class AllBlockEntities {
 
     public static final Set<MachineSet<?>> PROCESSING_SETS;
 
-    private static <T extends ProcessingRecipe> MachineSet.Builder<T, ?>
-    builder(RecipeTypeEntry<T, ?> recipeType) {
-        return (new MachineSet.Builder<>(recipeType, Unit.INSTANCE))
+    private static <T extends ProcessingRecipe> MachineSet.ProcessingBuilder<T, ?>
+    processing(RecipeTypeEntry<T, ?> recipeType) {
+        return MachineSet.processing(recipeType)
                 .onCreateObject(PROCESSING_SETS::add);
     }
 
