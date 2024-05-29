@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -59,6 +60,10 @@ public class ResearchRecipe extends ProcessingRecipe {
 
         public Builder inputItem(Supplier<? extends Item> item) {
             return inputItem(item, 1);
+        }
+
+        public Builder inputItem(TagKey<Item> item) {
+            return inputItem(0, item, 1);
         }
 
         public Builder target(ResourceLocation value) {

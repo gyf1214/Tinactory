@@ -371,7 +371,7 @@ public class MaterialSet {
 
         public Builder<P> mechanicalSet() {
             return metalSet()
-                    .dummies("bolt", "screw", "gear", "rotor", "spring");
+                    .dummies("bolt", "screw", "gear", "rotor");
         }
 
         public class OreBuilder extends SimpleBuilder<Unit, Builder<P>, OreBuilder> {
@@ -553,8 +553,6 @@ public class MaterialSet {
             // rotor
             process("rotor", 1, "A A\nBC \nA A", "plate", "stick", "screw",
                     TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
-            // spring
-            process("spring", 1, "A\nA", "stick", TOOL_FILE, TOOL_SAW, TOOL_WIRE_CUTTER);
             // cut wire
             process("wire", 1, "plate", TOOL_WIRE_CUTTER);
             return this;

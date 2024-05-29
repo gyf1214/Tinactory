@@ -3,13 +3,15 @@ package org.shsts.tinactory.content.material;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.content.AllRecipes;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.AllTechs;
+import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
@@ -82,43 +84,72 @@ public final class Ores {
     private static final VeinFactory VEINS = new VeinFactory();
 
     private static class VeinBuilder extends SimpleBuilder<Unit, VeinFactory, VeinBuilder> {
-        private record OreInfo(MaterialSet material, double rate) {}
-
         private final String id;
         private final double rate;
-        private final List<OreInfo> ores = new ArrayList<>();
+        private final OreAnalyzerRecipe.Builder builder;
+        private final List<MaterialSet> ores = new ArrayList<>();
+        private boolean baseOre = false;
         private boolean primitive = false;
+        private OreVariant variant = null;
 
         public VeinBuilder(VeinFactory parent, String id, double rate) {
             super(parent);
             this.id = id;
             this.rate = rate;
+            this.builder = AllRecipes.ORE_ANALYZER.recipe(id).rate(rate);
         }
 
         public VeinBuilder ore(MaterialSet material, double rate) {
-            ores.add(new OreInfo(material, rate));
+            builder.outputItem(material.entry("raw"), rate);
+            ores.add(material);
+            if (variant == null) {
+                variant = material.oreVariant();
+                builder.inputOre(variant);
+            }
+            assert variant == material.oreVariant();
             return this;
         }
 
-        private VeinBuilder primitive() {
+        public VeinBuilder primitive() {
+            builder.primitive();
             primitive = true;
+            baseOre = true;
             return this;
         }
 
         @Override
         protected Unit createObject() {
-            assert !ores.isEmpty();
-            var variant = ores.get(0).material.oreVariant();
-            assert ores.stream().allMatch(x -> x.material.oreVariant() == variant);
-            var builder = AllRecipes.ORE_ANALYZER.recipe(id)
-                    .inputOre(variant)
-                    .rate(rate);
-            for (var ore : ores) {
-                builder.outputItem(ore.material.entry("raw"), 1, ore.rate);
+            assert variant != null;
+            assert rate > 0d;
+            if (!primitive) {
+                builder.voltage(variant.voltage);
             }
-            builder.voltage(primitive ? Voltage.PRIMITIVE : variant.voltage)
-                    .build();
+            var tech = AllTechs.ORE.get(variant);
+            var baseProgress = 10L * (1L << (long) variant.rank);
+            var oreProgress = (long) (2d / rate);
+            if (!baseOre) {
+                tech = REGISTRATE.tech("ore/" + id)
+                        .maxProgress(baseProgress * oreProgress)
+                        .depends(tech).buildObject();
 
+                AllRecipes.RESEARCH.recipe(tech)
+                        .target(tech)
+                        .inputItem(() -> variant.baseItem)
+                        .voltage(variant.voltage)
+                        .workTicks(200)
+                        .build();
+            }
+
+            for (var ore : ores) {
+                AllRecipes.RESEARCH.recipe(tech.getPath() + "_from_" + ore.name)
+                        .target(tech).progress(oreProgress)
+                        .inputItem(ore.tag("raw"))
+                        .voltage(variant.voltage)
+                        .workTicks(200)
+                        .build();
+            }
+
+            builder.requireTech(tech).build();
             return Unit.INSTANCE;
         }
     }

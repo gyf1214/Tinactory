@@ -12,13 +12,13 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class TechBuilder<P> extends Builder<ResourceLocation, P, TechBuilder<P>> {
     private final List<ResourceLocation> depends = new ArrayList<>();
-    private int maxProgress = 0;
+    private long maxProgress = 0;
 
     public TechBuilder(Registrate registrate, P parent, String id) {
         super(registrate, parent, id);
     }
 
-    public TechBuilder<P> maxProgress(int maxProgress) {
+    public TechBuilder<P> maxProgress(long maxProgress) {
         this.maxProgress = maxProgress;
         return this;
     }

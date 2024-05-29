@@ -15,11 +15,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public enum OreVariant implements StringRepresentable {
-    STONE(Blocks.STONE, Tiers.IRON, Voltage.ULV, 3f, 6f),
-    DEEPSLATE(Blocks.DEEPSLATE, Tiers.IRON, Voltage.LV, 4.5f, 6f),
-    NETHERRACK(Blocks.NETHERRACK, Tiers.DIAMOND, Voltage.MV, 6f, 7.5f),
-    END_STONE(Blocks.END_STONE, Tiers.NETHERITE, Voltage.EV, 7.5f, 9f);
+    STONE(0, Blocks.STONE, Tiers.IRON, Voltage.ULV, 3f, 6f),
+    DEEPSLATE(1, Blocks.DEEPSLATE, Tiers.IRON, Voltage.LV, 4.5f, 6f),
+    NETHERRACK(2, Blocks.NETHERRACK, Tiers.DIAMOND, Voltage.MV, 6f, 7.5f),
+    END_STONE(3, Blocks.END_STONE, Tiers.NETHERITE, Voltage.EV, 7.5f, 9f);
 
+    public final int rank;
     public final Block baseBlock;
     public final Item baseItem;
     public final Tier mineTier;
@@ -27,8 +28,9 @@ public enum OreVariant implements StringRepresentable {
     public final float destroyTime;
     public final float explodeResistance;
 
-    OreVariant(Block baseBlock, Tier mineTier, Voltage voltage,
+    OreVariant(int rank, Block baseBlock, Tier mineTier, Voltage voltage,
                float destroyTime, float explodeResistance) {
+        this.rank = rank;
         this.mineTier = mineTier;
         this.voltage = voltage;
         this.destroyTime = destroyTime;

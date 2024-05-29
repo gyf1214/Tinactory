@@ -61,8 +61,8 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
             return inputItem(0, () -> variant.baseItem, 1);
         }
 
-        public Builder outputItem(Supplier<? extends ItemLike> item, int amount, double rate) {
-            return outputItem(1, item, amount, rate);
+        public Builder outputItem(Supplier<? extends ItemLike> item, double rate) {
+            return outputItem(1, item, 1, rate);
         }
 
         @Override
