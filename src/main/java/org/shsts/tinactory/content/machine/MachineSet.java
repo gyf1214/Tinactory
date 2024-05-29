@@ -5,17 +5,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.gui.ProcessingPlugin;
-import org.shsts.tinactory.content.gui.RecipeBookPlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
@@ -65,6 +66,8 @@ public class MachineSet<T extends ProcessingRecipe> {
         protected final Set<Voltage> voltages = new HashSet<>();
         @Nullable
         protected Map<Voltage, Layout> layoutSet = null;
+        @Nullable
+        protected ResourceLocation overlay = null;
 
         public Builder(RecipeTypeEntry<T, ?> recipeType, P parent) {
             super(parent);
@@ -82,11 +85,67 @@ public class MachineSet<T extends ProcessingRecipe> {
             return Layout.builder(self()).onCreateObject(value -> layoutSet = value);
         }
 
+        public S overlay(ResourceLocation loc) {
+            overlay = loc;
+            return self();
+        }
+
+        protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>,
+                BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>, ?>
+        getMachineBuilder(Voltage voltage) {
+            assert overlay != null;
+            assert layoutSet != null;
+            var id = "machine/" + voltage.id + "/" + recipeType.id;
+            var layout = layoutSet.get(voltage);
+            return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
+                    .entityClass(SmartBlockEntity.class)
+                    .blockEntity()
+                    .eventManager()
+                    .simpleCapability(Machine::builder)
+                    .capability(StackProcessingContainer::builder).layout(layout).build()
+                    .menu(ProcessingMenu.factory(layout)).build()
+                    .build()
+                    .block()
+                    .transform(ModelGen.machine(voltage, overlay))
+                    .tag(AllTags.MINEABLE_WITH_WRENCH)
+                    .dropSelf()
+                    .blockItem().tag(AllTags.processingMachine(recipeType)).build()
+                    .build();
+        }
+
+        protected BlockEntitySetBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>,
+                BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>, ?>
+        getPrimitiveBuilder() {
+            assert overlay != null;
+            assert layoutSet != null;
+            var id = "primitive/" + recipeType.id;
+            var layout = layoutSet.get(Voltage.PRIMITIVE);
+            return REGISTRATE.blockEntitySet(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
+                    .entityClass(PrimitiveMachine.class)
+                    .blockEntity()
+                    .eventManager().ticking()
+                    .capability(RecipeProcessor::builder)
+                    .recipeType(recipeType).voltage(Voltage.PRIMITIVE)
+                    .build() // recipeProcessor
+                    .capability(StackProcessingContainer::builder).layout(layout).build()
+                    .menu(ProcessingMenu.factory(layout)).build()
+                    .build()
+                    .block()
+                    .transform(ModelGen.primitiveMachine(overlay))
+                    .tag(AllTags.MINEABLE_WITH_WRENCH)
+                    .tag(BlockTags.MINEABLE_WITH_AXE)
+                    .dropSelf()
+                    .blockItem().tag(AllTags.processingMachine(recipeType)).build()
+                    .build();
+        }
+
         protected abstract BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         createMachine(Voltage voltage);
 
-        protected abstract BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
-        createPrimitive();
+        protected BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
+        createPrimitive() {
+            return getPrimitiveBuilder().register();
+        }
 
         @Override
         protected MachineSet<T> createObject() {
@@ -104,85 +163,50 @@ public class MachineSet<T extends ProcessingRecipe> {
 
     public static class ProcessingBuilder<T extends ProcessingRecipe, P> extends
             Builder<T, P, ProcessingBuilder<T, P>> {
-        @Nullable
-        private ResourceLocation overlay = null;
 
         public ProcessingBuilder(RecipeTypeEntry<T, ?> recipeType, P parent) {
             super(recipeType, parent);
         }
 
-        public ProcessingBuilder<T, P> overlay(ResourceLocation loc) {
-            overlay = loc;
-            return this;
+        @Override
+        protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+        createMachine(Voltage voltage) {
+            return getMachineBuilder(voltage)
+                    .blockEntity()
+                    .capability(RecipeProcessor::builder)
+                    .recipeType(recipeType).voltage(voltage)
+                    .build()
+                    .build()
+                    .register();
+        }
+    }
+
+    public static class OreAnalyzerBuilder<P> extends Builder<OreAnalyzerRecipe, P, OreAnalyzerBuilder<P>> {
+        private static final ResourceLocation OVERLAY =
+                ModelGen.gregtech("blocks/machines/electromagnetic_separator");
+
+        public OreAnalyzerBuilder(P parent) {
+            super(AllRecipes.ORE_ANALYZER, parent);
+            overlay(OVERLAY);
         }
 
         @Override
         protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         createMachine(Voltage voltage) {
-            assert layoutSet != null;
-            assert overlay != null;
-            var id = "machine/" + voltage.id + "/" + recipeType.id;
-            var layout = layoutSet.get(voltage);
-            var builder = REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
-                    .entityClass(SmartBlockEntity.class)
+            return getMachineBuilder(voltage)
                     .blockEntity()
-                    .eventManager()
-                    .simpleCapability(Machine::builder)
-                    .capability(RecipeProcessor::builder)
-                    .recipeType(recipeType).voltage(voltage)
+                    .simpleCapability(OreAnalyzerProcessor.builder(voltage))
                     .build()
-                    .capability(StackProcessingContainer::builder)
-                    .layout(layout)
-                    .build()
-                    .menu(ProcessingMenu.factory(layout))
-                    .plugin(ProcessingPlugin::new)
-                    .plugin(RecipeBookPlugin.builder(recipeType, layout))
-                    .build() // menu
-                    .build() // blockEntity
-                    .block()
-                    .transform(ModelGen.machine(voltage, overlay))
-                    .tag(AllTags.MINEABLE_WITH_WRENCH)
-                    .dropSelf()
-                    .blockItem().tag(AllTags.processingMachine(recipeType)).build()
-                    .build();
-
-            return builder.register();
-        }
-
-        @Override
-        protected BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
-        createPrimitive() {
-            assert layoutSet != null;
-            assert overlay != null;
-            var id = "primitive/" + recipeType.id;
-            var layout = layoutSet.get(Voltage.PRIMITIVE);
-            var builder = REGISTRATE.blockEntitySet(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
-                    .entityClass(PrimitiveMachine.class)
-                    .blockEntity()
-                    .eventManager().ticking()
-                    .capability(RecipeProcessor::builder)
-                    .recipeType(recipeType).voltage(Voltage.PRIMITIVE)
-                    .build()
-                    .capability(StackProcessingContainer::builder)
-                    .layout(layout)
-                    .build()
-                    .menu(ProcessingMenu.factory(layout))
-                    .build() // menu
-                    .build() // blockEntity
-                    .block()
-                    .transform(ModelGen.primitiveMachine(overlay))
-                    .tag(AllTags.MINEABLE_WITH_WRENCH)
-                    .tag(BlockTags.MINEABLE_WITH_AXE)
-                    .dropSelf()
-                    .blockItem().tag(AllTags.processingMachine(recipeType)).build()
-                    .build();
-
-            return builder.register();
+                    .register();
         }
     }
 
     public static <T extends ProcessingRecipe> ProcessingBuilder<T, Unit>
     processing(RecipeTypeEntry<T, ?> recipeType) {
         return new ProcessingBuilder<>(recipeType, Unit.INSTANCE);
+    }
+
+    public static OreAnalyzerBuilder<Unit> oreAnalyzer() {
+        return new OreAnalyzerBuilder<>(Unit.INSTANCE);
     }
 }

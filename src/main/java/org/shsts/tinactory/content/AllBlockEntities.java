@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.network.NetworkController;
@@ -36,7 +37,7 @@ public final class AllBlockEntities {
     public static final MachineSet<ResearchRecipe> RESEARCH_TABLE;
     public static final MachineSet<AssemblyRecipe> ASSEMBLER;
     public static final MachineSet<ProcessingRecipe> STONE_GENERATOR;
-    public static final MachineSet<AssemblyRecipe> ORE_ANALYZER;
+    public static final MachineSet<OreAnalyzerRecipe> ORE_ANALYZER;
     public static final MachineSet<ProcessingRecipe> MACERATOR;
     public static final MachineSet<ProcessingRecipe> ORE_WASHER;
     public static final MachineSet<ProcessingRecipe> CENTRIFUGE;
@@ -117,7 +118,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_ANALYZER = processing(AllRecipes.ORE_ANALYZER)
+        ORE_ANALYZER = oreAnalyzer()
                 .overlay(gregtech("blocks/machines/electromagnetic_separator"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
@@ -125,8 +126,8 @@ public final class AllBlockEntities {
                 .slot(0, 1)
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 3, 1)
-                .slot(SLOT_SIZE * 4, 1, Voltage.LV)
-                .slot(SLOT_SIZE * 5, 1, Voltage.HV)
+                .slot(SLOT_SIZE * 4, 1)
+                .slot(SLOT_SIZE * 5, 1, Voltage.MV)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
                 .buildObject();
@@ -204,10 +205,17 @@ public final class AllBlockEntities {
 
     public static final Set<MachineSet<?>> PROCESSING_SETS;
 
+    private static <S extends MachineSet.Builder<?, ?, S>> S set(S builder) {
+        return builder.onCreateObject(PROCESSING_SETS::add);
+    }
+
     private static <T extends ProcessingRecipe> MachineSet.ProcessingBuilder<T, ?>
     processing(RecipeTypeEntry<T, ?> recipeType) {
-        return MachineSet.processing(recipeType)
-                .onCreateObject(PROCESSING_SETS::add);
+        return MachineSet.processing(recipeType).transform(AllBlockEntities::set);
+    }
+
+    private static MachineSet.OreAnalyzerBuilder<?> oreAnalyzer() {
+        return MachineSet.oreAnalyzer().transform(AllBlockEntities::set);
     }
 
     public static void init() {}

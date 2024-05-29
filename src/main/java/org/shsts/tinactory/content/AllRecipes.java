@@ -14,6 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
@@ -31,7 +32,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
-    public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ORE_ANALYZER;
+    public static final RecipeTypeEntry<OreAnalyzerRecipe, OreAnalyzerRecipe.Builder> ORE_ANALYZER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MACERATOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ORE_WASHER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CENTRIFUGE;
@@ -55,10 +56,12 @@ public final class AllRecipes {
                 .register();
 
         STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator")
-                .defaults($ -> $.amperage(0.125d).workTicks(40))
+                .defaults($ -> $.amperage(0.125d).workTicks(20))
                 .register();
 
-        ORE_ANALYZER = REGISTRATE.assemblyRecipeType("ore_analyzer")
+        ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.SERIALIZER)
+                .clazz(OreAnalyzerRecipe.class)
+                .builder(OreAnalyzerRecipe.Builder::new)
                 .defaults($ -> $.amperage(0.125d).workTicks(32))
                 .register();
 
@@ -207,7 +210,7 @@ public final class AllRecipes {
         // generate cobblestone
         STONE_GENERATOR.recipe(Items.COBBLESTONE)
                 .outputItem(0, Items.COBBLESTONE, 1)
-                .primitive().power(1).workTicks(40)
+                .primitive()
                 .build();
     }
 

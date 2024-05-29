@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -38,8 +39,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     private static final long PROGRESS_PER_TICK = 256;
 
     private final BlockEntity blockEntity;
-    private final RecipeType<? extends T> recipeType;
-    private final Voltage voltage;
+    protected final RecipeType<? extends T> recipeType;
+    protected final Voltage voltage;
     private long workProgress = 0;
     private double workFactor = 1d;
     private double energyFactor = 1d;
@@ -55,13 +56,13 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     private IContainer container = null;
     private boolean needUpdate = true;
 
-    private RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
+    protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
         this.blockEntity = blockEntity;
         this.recipeType = recipeType;
         this.voltage = voltage;
     }
 
-    private IContainer getContainer() {
+    protected IContainer getContainer() {
         if (container == null) {
             container = AllCapabilities.CONTAINER.get(blockEntity);
         }
@@ -97,27 +98,31 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         workFactor = overclock;
     }
 
-    private void updateRecipe() {
-        if (currentRecipe != null || !needUpdate) {
-            return;
-        }
-        var world = getWorld();
-        assert currentRecipeLoc == null;
-        currentRecipe = null;
+    protected Optional<T> getNewRecipe(Level world, IContainer container) {
         var targetRecipe = getTargetRecipe();
-        var container = getContainer();
         if (targetRecipe != null) {
             if (targetRecipe.matches(container, world) && targetRecipe.voltage <= voltage.value) {
-                currentRecipe = targetRecipe;
+                return Optional.of(targetRecipe);
             }
         } else {
             var matches = SmartRecipe.getRecipesFor(recipeType, container, world)
                     .stream().filter(r -> r.voltage <= voltage.value)
                     .toList();
             if (matches.size() == 1) {
-                currentRecipe = matches.get(0);
+                return Optional.of(matches.get(0));
             }
         }
+        return Optional.empty();
+    }
+
+    private void updateRecipe() {
+        if (currentRecipe != null || !needUpdate) {
+            return;
+        }
+        var world = getWorld();
+        assert currentRecipeLoc == null;
+        var container = getContainer();
+        currentRecipe = getNewRecipe(world, container).orElse(null);
         workProgress = 0;
         if (currentRecipe != null) {
             currentRecipe.consumeInputs(container);
@@ -137,6 +142,10 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         updateRecipe();
     }
 
+    protected void onWorkDone(T recipe, Random random) {
+        recipe.insertOutputs(getContainer(), random);
+    }
+
     @Override
     public void onWorkTick(double partial) {
         if (currentRecipe == null) {
@@ -144,10 +153,9 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         }
         var progress = (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
         workProgress += progress;
-        var world = getWorld();
         if (workProgress >= getMaxWorkTicks()) {
             assert currentRecipe != null;
-            currentRecipe.insertOutputs(getContainer(), world.random);
+            onWorkDone(currentRecipe, getWorld().random);
             currentRecipe = null;
             needUpdate = true;
         }

@@ -39,4 +39,9 @@ public abstract class CapabilityProviderBuilder<T, P> extends
     fromFactory(P parent, String id, Function<T, ICapabilityProvider> factory) {
         return fromFactory(parent, ModelGen.modLoc(id), factory);
     }
+
+    public static <T extends BlockEntity, P> Function<P, CapabilityProviderBuilder<T, P>>
+    fromFactory(String id, Function<T, ICapabilityProvider> factory) {
+        return p -> fromFactory(p, id, factory);
+    }
 }

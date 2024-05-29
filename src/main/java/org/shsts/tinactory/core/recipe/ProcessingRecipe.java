@@ -99,7 +99,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     public IProcessingResult getResult() {
         return outputs.stream().min(Comparator.comparingInt(a -> a.port))
                 .map(Output::result)
-                .orElse(new ProcessingResults.ItemResult(true, 0f, ItemStack.EMPTY));
+                .orElse(new ProcessingResults.ItemResult(true, 0d, ItemStack.EMPTY));
     }
 
     public static Optional<ProcessingRecipe> byKey(RecipeManager manager, ResourceLocation loc) {
@@ -114,7 +114,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         protected long workTicks = 0;
         protected long voltage = 0;
         protected long power = 0;
-        protected double amperage = 0f;
+        protected double amperage = 0d;
 
         public BuilderBase(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
             super(registrate, parent, loc);

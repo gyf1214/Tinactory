@@ -12,7 +12,6 @@ import java.util.List;
 
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
-import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
@@ -63,23 +62,20 @@ public final class Ores {
     public static void init() {}
 
     public static void initRecipes() {
-        VEINS.vein("chalcopyrite")
+        VEINS.vein("chalcopyrite", 0.4)
                 .primitive()
                 .ore(CHALCOPYRITE, 0.5)
                 .ore(PYRITE, 0.5)
                 .build()
-                .vein("cassiterite")
+                .vein("cassiterite", 0.2)
                 .ore(CASSITERITE, 0.5)
                 .ore(TIN, 0.5)
-                .build()
-                .vein("magnetite")
-                .ore(GOLD, 0.1)
                 .build();
     }
 
     private static class VeinFactory {
-        public VeinBuilder vein(String id) {
-            return new VeinBuilder(this, id);
+        public VeinBuilder vein(String id, double rate) {
+            return new VeinBuilder(this, id, rate);
         }
     }
 
@@ -89,12 +85,14 @@ public final class Ores {
         private record OreInfo(MaterialSet material, double rate) {}
 
         private final String id;
+        private final double rate;
         private final List<OreInfo> ores = new ArrayList<>();
         private boolean primitive = false;
 
-        public VeinBuilder(VeinFactory parent, String id) {
+        public VeinBuilder(VeinFactory parent, String id, double rate) {
             super(parent);
             this.id = id;
+            this.rate = rate;
         }
 
         public VeinBuilder ore(MaterialSet material, double rate) {
@@ -113,9 +111,10 @@ public final class Ores {
             var variant = ores.get(0).material.oreVariant();
             assert ores.stream().allMatch(x -> x.material.oreVariant() == variant);
             var builder = AllRecipes.ORE_ANALYZER.recipe(id)
-                    .inputItem(0, () -> variant.baseItem, 1);
+                    .inputOre(variant)
+                    .rate(rate);
             for (var ore : ores) {
-                builder.outputItem(1, ore.material.entry("raw"), 1, ore.rate);
+                builder.outputItem(ore.material.entry("raw"), 1, ore.rate);
             }
             builder.voltage(primitive ? Voltage.PRIMITIVE : variant.voltage)
                     .build();

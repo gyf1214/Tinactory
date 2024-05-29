@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
@@ -26,6 +27,9 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         this.rate = builder.rate;
     }
 
+    /**
+     * This is only called in primitive processor.
+     */
     @Override
     public void insertOutputs(IContainer container, Random random) {
         if (random.nextDouble() <= rate) {
@@ -33,8 +37,15 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         }
     }
 
+    /**
+     * This is called in {@link OreAnalyzerProcessor}.
+     */
+    public void doInsertOutputs(IContainer container, Random random) {
+        super.insertOutputs(container, random);
+    }
+
     public static class Builder extends AssemblyRecipe.BuilderBase<OreAnalyzerRecipe, Builder> {
-        public double rate = 0f;
+        public double rate = 0d;
 
         public Builder(Registrate registrate, RecipeTypeEntry<OreAnalyzerRecipe, Builder> parent,
                        ResourceLocation loc) {
@@ -56,6 +67,7 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
 
         @Override
         protected OreAnalyzerRecipe createObject() {
+            assert rate > 0d;
             return new OreAnalyzerRecipe(this);
         }
     }
