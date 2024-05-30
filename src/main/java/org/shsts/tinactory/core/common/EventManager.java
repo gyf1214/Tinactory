@@ -4,10 +4,12 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,6 +20,8 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class EventManager extends CapabilityProvider {
+    public static final ResourceLocation LOC = ModelGen.modLoc("event_manager");
+
     private final Multimap<Event<?>, Consumer<?>> handlers = HashMultimap.create();
     private final Multimap<ReturnEvent<?, ?>, ReturnEvent.Handler<?, ?>> returnHandlers = HashMultimap.create();
 

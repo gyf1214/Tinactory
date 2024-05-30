@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.machine;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -15,6 +16,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.common.CapabilityProvider;
@@ -22,13 +24,16 @@ import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -36,11 +41,15 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvider
         implements IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final long PROGRESS_PER_TICK = 256;
 
     private final BlockEntity blockEntity;
     protected final RecipeType<? extends T> recipeType;
     protected final Voltage voltage;
+
+    private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
+
     private long workProgress = 0;
     private double workFactor = 1d;
     private double energyFactor = 1d;
@@ -132,6 +141,12 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         blockEntity.setChanged();
     }
 
+    private void onTechChange(ITeamProfile team) {
+        if (team == getContainer().getOwnerTeam().orElse(null)) {
+            LOGGER.debug("processor {}: on tech change", this);
+        }
+    }
+
     private long getMaxWorkTicks() {
         assert currentRecipe != null;
         return currentRecipe.workTicks * PROGRESS_PER_TICK;
@@ -192,7 +207,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     }
 
     @SuppressWarnings("unchecked")
-    private void onLoad(Level world) {
+    private void onServerLoad(Level world) {
         var recipeManager = world.getRecipeManager();
 
         currentRecipe = (T) Optional.ofNullable(currentRecipeLoc)
@@ -204,6 +219,14 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
             calculateFactors(currentRecipe);
             needUpdate = false;
         }
+
+        TechManager.server().onProgressChange(onTechChange);
+    }
+
+    private void onRemoved(Level world) {
+        if (!world.isClientSide) {
+            TechManager.server().removeProgressChangeListener(onTechChange);
+        }
     }
 
     private void setUpdateRecipe() {
@@ -214,7 +237,9 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onLoad);
+        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
+        eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
+        eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
         eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, $ -> setUpdateRecipe());
     }

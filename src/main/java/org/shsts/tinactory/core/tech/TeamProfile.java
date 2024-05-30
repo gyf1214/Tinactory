@@ -65,6 +65,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
      * Can only be called on server
      */
     public void setTechProgress(ITechnology tech, long progress) {
+        progress = Math.min(progress, tech.getMaxProgress());
         technologies.put(tech.getLoc(), progress);
         broadcastUpdate(TechUpdatePacket.progress(tech, progress));
     }

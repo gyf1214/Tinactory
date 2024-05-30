@@ -32,6 +32,10 @@ public class SetMachinePacket extends MenuEventPacket {
         return resets;
     }
 
+    public boolean contains(String key) {
+        return sets.contains(key) || resets.contains(key);
+    }
+
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         super.serializeToBuf(buf);

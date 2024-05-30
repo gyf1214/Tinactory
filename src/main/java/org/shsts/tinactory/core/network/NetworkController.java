@@ -35,6 +35,7 @@ public class NetworkController extends SmartBlockEntity {
         assert level != null && !level.isClientSide;
         assert network == null;
         network = new Network(level, worldPosition, team);
+        setChanged();
     }
 
     public Optional<Network> getNetwork() {

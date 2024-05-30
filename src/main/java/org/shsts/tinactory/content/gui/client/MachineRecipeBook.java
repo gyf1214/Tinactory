@@ -23,7 +23,6 @@ import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -183,7 +182,6 @@ public class MachineRecipeBook extends Panel {
         }
     }
 
-    private final int syncSlot;
     private final List<ProcessingRecipe> recipes = new ArrayList<>();
     private final Panel bookPanel;
     private final ButtonPanel buttonPanel;
@@ -194,11 +192,10 @@ public class MachineRecipeBook extends Panel {
 
     private int page = 0;
 
-    public MachineRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, int syncSlot,
+    public MachineRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
                              RecipeType<? extends ProcessingRecipe> recipeType,
                              int buttonX, int buttonY) {
         super(screen);
-        this.syncSlot = syncSlot;
         this.recipeType = recipeType;
         refreshRecipes();
 
@@ -239,6 +236,7 @@ public class MachineRecipeBook extends Panel {
     }
 
     private void refreshRecipes() {
+        recipes.clear();
         var be = screen.getMenu().blockEntity;
         var container = AllCapabilities.CONTAINER.get(be);
         var voltage = (long) AllCapabilities.ELECTRIC_MACHINE.tryGet(be)
@@ -261,10 +259,9 @@ public class MachineRecipeBook extends Panel {
     }
 
     private boolean isCurrentRecipe(@Nullable ProcessingRecipe recipe) {
-        var loc = menu.getSyncPacket(syncSlot, MenuSyncPacket.LocHolder.class)
-                .flatMap(MenuSyncPacket.Holder::getData)
-                .orElse(null);
-        return recipe == null ? loc == null : recipe.getId().equals(loc);
+        var curRecipe = AllCapabilities.MACHINE.get(menu.blockEntity)
+                .getTargetRecipe().orElse(null);
+        return curRecipe == recipe;
     }
 
     private void unselectRecipe() {

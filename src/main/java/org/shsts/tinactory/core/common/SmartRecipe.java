@@ -153,4 +153,9 @@ public abstract class SmartRecipe<C> implements Recipe<SmartRecipe.ContainerWrap
             }
         };
     }
+
+    @Override
+    public String toString() {
+        return "%s{%s}".formatted(getClass().getSimpleName(), loc);
+    }
 }

@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.gui.SmartMenuType;
 
 import javax.annotation.Nullable;
@@ -43,16 +42,24 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
         return entityClass.cast(be);
     }
 
+    private static void attachCapability(AttachCapabilitiesEvent<BlockEntity> e, UpdateHelper helper,
+                                         ResourceLocation loc, ICapabilityProvider provider) {
+        e.addCapability(loc, provider);
+        helper.attachCapability(loc, provider);
+    }
+
     public void attachCapabilities(AttachCapabilitiesEvent<BlockEntity> e) {
         var be = cast(e.getObject());
+        var updateHelper = new UpdateHelper();
+        e.addCapability(UpdateHelper.LOC, updateHelper);
         EventManager eventManager = null;
         if (this.eventManager) {
             eventManager = new EventManager();
-            e.addCapability(new ResourceLocation(Tinactory.ID, "event_manager"), eventManager);
+            attachCapability(e, updateHelper, EventManager.LOC, eventManager);
         }
         for (var capEntry : capabilities.entrySet()) {
             var cap = capEntry.getValue().apply(be);
-            e.addCapability(capEntry.getKey(), cap);
+            attachCapability(e, updateHelper, capEntry.getKey(), cap);
             if (this.eventManager && cap instanceof IEventSubscriber subscriber) {
                 subscriber.subscribeEvents(eventManager);
             }

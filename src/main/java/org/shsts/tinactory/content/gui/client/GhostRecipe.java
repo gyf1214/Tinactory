@@ -4,17 +4,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
+import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 
@@ -22,41 +21,36 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class GhostRecipe extends MenuWidget {
-    private final int syncSlot;
     private final Layout layout;
 
     @Nullable
-    private ResourceLocation currentRecipeLoc = null;
+    private ProcessingRecipe currentRecipe = null;
     private final List<Layout.SlotWith<? extends IProcessingObject>> ingredients = new ArrayList<>();
     private final ItemRenderer itemRenderer = ClientUtil.getItemRenderer();
 
-    public GhostRecipe(Menu<?, ?> menu, int syncSlot, Layout layout) {
+    public GhostRecipe(Menu<?, ?> menu, Layout layout) {
         super(menu);
-        this.syncSlot = syncSlot;
         this.layout = layout;
     }
 
     private void updateRecipe() {
-        var loc = menu.getSyncPacket(syncSlot, MenuSyncPacket.LocHolder.class)
-                .flatMap(MenuSyncPacket.Holder::getData)
-                .orElse(null);
+        var recipe = AllCapabilities.MACHINE.get(menu.blockEntity)
+                .getTargetRecipe().orElse(null);
 
-        if (Objects.equals(loc, currentRecipeLoc)) {
+        if (recipe == currentRecipe) {
             return;
         }
-        currentRecipeLoc = loc;
-        var recipe = Optional.ofNullable(loc)
-                .flatMap($ -> ProcessingRecipe.byKey(ClientUtil.getRecipeManager(), $));
+        currentRecipe = recipe;
 
         ingredients.clear();
-        recipe.map(layout::getProcessingInputs).ifPresent(ingredients::addAll);
-        recipe.map(layout::getProcessingOutputs).ifPresent(ingredients::addAll);
+        if (recipe != null) {
+            ingredients.addAll(layout.getProcessingInputs(recipe));
+            ingredients.addAll(layout.getProcessingOutputs(recipe));
+        }
     }
 
     private void renderItem(PoseStack poseStack, ItemStack stack, int x, int y) {

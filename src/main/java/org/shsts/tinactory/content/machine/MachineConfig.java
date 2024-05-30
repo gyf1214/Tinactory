@@ -37,6 +37,14 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
         return getLoc(key).flatMap(loc -> ProcessingRecipe.byKey(world.getRecipeManager(), loc));
     }
 
+    public void setString(String key, String value) {
+        tag.putString(key, value);
+    }
+
+    public void reset(String key) {
+        tag.remove(key);
+    }
+
     public void apply(SetMachinePacket packet) {
         tag.merge(packet.getSets());
         for (var key : packet.getResets()) {

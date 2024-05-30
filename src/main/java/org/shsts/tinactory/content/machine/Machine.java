@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -21,10 +22,11 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.logistics.LogisticsComponent;
-import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.Network;
@@ -41,23 +43,29 @@ import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Machine extends CapabilityProvider implements IEventSubscriber, INBTSerializable<CompoundTag> {
+public class Machine extends UpdatableCapabilityProvider
+        implements IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final BlockEntity blockEntity;
+    protected final SmartBlockEntity blockEntity;
 
     @Nullable
     protected Network network;
 
     public final MachineConfig config = new MachineConfig();
 
-    protected Machine(BlockEntity be) {
+    protected Machine(SmartBlockEntity be) {
         this.blockEntity = be;
     }
 
     public void setConfig(SetMachinePacket packet) {
         config.apply(packet);
-        updateTargetRecipe(true);
+        if (packet.contains("targetRecipe")) {
+            updateTargetRecipe(true);
+            forceUpdate();
+            blockEntity.setChanged();
+            blockEntity.sendUpdate();
+        }
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG, packet);
     }
 
@@ -132,8 +140,9 @@ public class Machine extends CapabilityProvider implements IEventSubscriber, INB
 
     protected void updateTargetRecipe(boolean updateFilter) {
         var world = blockEntity.getLevel();
-        assert world != null && !world.isClientSide;
+        assert world != null;
         var recipe = config.getRecipe("targetRecipe", world).orElse(null);
+        LOGGER.debug("update target recipe = {}", recipe);
         var container = getContainer().orElse(null);
         if (container == null) {
             return;
@@ -239,6 +248,12 @@ public class Machine extends CapabilityProvider implements IEventSubscriber, INB
         return getNetwork().map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT));
     }
 
+    public Optional<ProcessingRecipe> getTargetRecipe() {
+        var world = blockEntity.getLevel();
+        assert world != null;
+        return config.getRecipe("targetRecipe", world);
+    }
+
     /**
      * Called when disconnect from the network
      */
@@ -268,6 +283,23 @@ public class Machine extends CapabilityProvider implements IEventSubscriber, INB
         config.deserializeNBT(tag.getCompound("config"));
     }
 
+    @Override
+    public CompoundTag serializeOnUpdate() {
+        var tag = new CompoundTag();
+        config.getLoc("targetRecipe").ifPresent(loc -> tag.putString("targetRecipe", loc.toString()));
+        return tag;
+    }
+
+    @Override
+    public void deserializeOnUpdate(CompoundTag tag) {
+        if (tag.contains("targetRecipe", Tag.TAG_STRING)) {
+            config.setString("targetRecipe", tag.getString("targetRecipe"));
+        } else {
+            config.reset("targetRecipe");
+        }
+        updateTargetRecipe(true);
+    }
+
     public static Machine get(BlockEntity be) {
         return AllCapabilities.MACHINE.get(be);
     }
@@ -276,7 +308,7 @@ public class Machine extends CapabilityProvider implements IEventSubscriber, INB
         return AllCapabilities.MACHINE.tryGet(be);
     }
 
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
+    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, "network/machine", Machine::new);
     }
 }
