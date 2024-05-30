@@ -69,11 +69,13 @@ public class TechManager implements ITechManager {
 
     @Override
     public void onProgressChange(Consumer<ITeamProfile> callback) {
+        LOGGER.debug("add progress change listener {}", callback);
         changeCallbacks.add(callback);
     }
 
     @Override
     public void removeProgressChangeListener(Consumer<ITeamProfile> callback) {
+        LOGGER.debug("remove progress change listener {}", callback);
         changeCallbacks.remove(callback);
     }
 

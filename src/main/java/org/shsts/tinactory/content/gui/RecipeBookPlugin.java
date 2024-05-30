@@ -26,6 +26,9 @@ public class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     private final RecipeType<? extends ProcessingRecipe> recipeType;
     private final Layout layout;
 
+    @OnlyIn(Dist.CLIENT)
+    private MachineRecipeBook machineRecipeBook = null;
+
     public RecipeBookPlugin(M menu, RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
                             Layout layout) {
         this.syncSlot = menu.addSyncSlot(MenuSyncPacket.LocHolder::new,
@@ -42,8 +45,17 @@ public class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void applyMenuScreen(MenuScreen<M> screen) {
-        screen.addPanel(new MachineRecipeBook(screen, syncSlot, recipeType, 0, 0));
+        machineRecipeBook = new MachineRecipeBook(screen, syncSlot, recipeType, 0, 0);
+        screen.addPanel(machineRecipeBook);
         var rect = new Rect(layout.getXOffset(), 0, 0, 0);
         screen.addWidget(rect, new GhostRecipe(screen.getMenu(), syncSlot, layout));
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public void onScreenRemoved() {
+        if (machineRecipeBook != null) {
+            machineRecipeBook.remove();
+        }
     }
 }

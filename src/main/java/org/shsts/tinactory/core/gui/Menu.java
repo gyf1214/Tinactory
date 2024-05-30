@@ -139,6 +139,14 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
                 player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64.0;
     }
 
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        for (var plugin : plugins) {
+            plugin.onMenuRemoved(player);
+        }
+    }
+
     private int addInventorySlots(int y) {
         var barY = y + 3 * SLOT_SIZE + SPACING_VERTICAL;
         for (var j = 0; j < 9; j++) {
@@ -161,6 +169,13 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     public void applyPlugin(MenuScreen<S> screen) {
         for (var plugin : plugins) {
             plugin.applyMenuScreen(screen);
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void removeScreenPlugin() {
+        for (var plugin : plugins) {
+            plugin.onScreenRemoved();
         }
     }
 

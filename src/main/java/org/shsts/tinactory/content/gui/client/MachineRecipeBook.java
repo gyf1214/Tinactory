@@ -9,6 +9,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.model.ModelGen;
@@ -24,6 +25,7 @@ import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -33,6 +35,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
@@ -186,6 +189,8 @@ public class MachineRecipeBook extends Panel {
     private final ButtonPanel buttonPanel;
     private final PageButton leftPageButton;
     private final PageButton rightPageButton;
+    private final RecipeType<? extends ProcessingRecipe> recipeType;
+    private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
 
     private int page = 0;
 
@@ -194,8 +199,8 @@ public class MachineRecipeBook extends Panel {
                              int buttonX, int buttonY) {
         super(screen);
         this.syncSlot = syncSlot;
-
-        refreshRecipes(recipeType);
+        this.recipeType = recipeType;
+        refreshRecipes();
 
         this.bookPanel = new Panel(screen);
         bookPanel.addWidget(RectD.FULL, Rect.ZERO,
@@ -225,9 +230,15 @@ public class MachineRecipeBook extends Panel {
                 }
             }
         });
+
+        TechManager.client().onProgressChange(onTechChange);
     }
 
-    private void refreshRecipes(RecipeType<? extends ProcessingRecipe> recipeType) {
+    public void remove() {
+        TechManager.client().removeProgressChangeListener(onTechChange);
+    }
+
+    private void refreshRecipes() {
         var be = screen.getMenu().blockEntity;
         var container = AllCapabilities.CONTAINER.get(be);
         var voltage = (long) AllCapabilities.ELECTRIC_MACHINE.tryGet(be)
@@ -282,5 +293,12 @@ public class MachineRecipeBook extends Panel {
             }
         }
         page = newPage;
+    }
+
+    private void onTechChange() {
+        refreshRecipes();
+        if (bookPanel.isActive()) {
+            setPage(page);
+        }
     }
 }

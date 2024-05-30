@@ -43,7 +43,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private final Panel configPanel;
     private final EditBox welcomeEdit;
     private final Label stateLabel;
-    private final Consumer<ITeamProfile> teamChangeCallback = $ -> refreshTeam();
+    private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
 
     public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
                                    Component title, int syncSlot) {
@@ -71,14 +71,14 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         rootPanel.addPanel(offset, configPanel);
 
         menu.onSyncPacket(syncSlot, this::refresh);
-        TechManager.client().onProgressChange(teamChangeCallback);
+        TechManager.client().onProgressChange(onTechChange);
         configPanel.setActive(false);
         welcomePanel.setActive(false);
     }
 
     @Override
     public void removed() {
-        TechManager.client().removeProgressChangeListener(teamChangeCallback);
+        TechManager.client().removeProgressChangeListener(onTechChange);
         super.removed();
     }
 

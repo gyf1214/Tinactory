@@ -79,6 +79,12 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
     }
 
     @Override
+    public void removed() {
+        super.removed();
+        menu.removeScreenPlugin();
+    }
+
+    @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         renderBackground(poseStack);
         super.render(poseStack, mouseX, mouseY, partialTick);
