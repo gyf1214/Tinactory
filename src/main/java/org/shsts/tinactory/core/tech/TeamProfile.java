@@ -12,6 +12,7 @@ import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.ServerUtil;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +24,8 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     protected final TechManager techManager;
     protected final PlayerTeam playerTeam;
     protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
+    @Nullable
+    protected ITechnology targetTech = null;
 
     protected TeamProfile(TechManager techManager, PlayerTeam playerTeam) {
         this.techManager = techManager;
@@ -40,12 +43,14 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         setTechProgress(tech, v);
     }
 
-    public void setTechProgress(ITechnology tech, long progress) {
-        technologies.put(tech.getLoc(), progress);
-        TinactorySavedData.get().setDirty();
+    @Override
+    public void advanceTechProgress(ResourceLocation loc, long progress) {
+        techManager.techByKey(loc).ifPresent(tech -> advanceTechProgress(tech, progress));
+    }
 
+    private void broadcastUpdate(TechUpdatePacket packet) {
+        TinactorySavedData.get().setDirty();
         var playerList = ServerUtil.getPlayerList();
-        var packet = new TechUpdatePacket(Map.of(tech.getLoc(), progress));
         for (var name : playerTeam.getPlayers()) {
             var player = playerList.getPlayerByName(name);
             if (player == null) {
@@ -53,6 +58,14 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             }
             Tinactory.sendToPlayer(player, packet);
         }
+    }
+
+    /**
+     * Can only be called on server
+     */
+    public void setTechProgress(ITechnology tech, long progress) {
+        technologies.put(tech.getLoc(), progress);
+        broadcastUpdate(TechUpdatePacket.progress(tech, progress));
     }
 
     @Override
@@ -70,8 +83,28 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         return techManager.techByKey(tech).map(this::isTechAvailable).orElse(false);
     }
 
-    public TechUpdatePacket updatePacket() {
-        return new TechUpdatePacket(technologies);
+    @Override
+    public Optional<ITechnology> getTargetTech() {
+        return Optional.ofNullable(targetTech);
+    }
+
+    /**
+     * Can only be called on server.
+     */
+    @Override
+    public void setTargetTech(ITechnology tech) {
+        targetTech = tech;
+        broadcastUpdate(TechUpdatePacket.target(tech));
+    }
+
+    @Override
+    public void resetTargetTech() {
+        targetTech = null;
+        broadcastUpdate(TechUpdatePacket.target(null));
+    }
+
+    public TechUpdatePacket fullUpdatePacket() {
+        return TechUpdatePacket.full(technologies, targetTech);
     }
 
     @Override
@@ -88,6 +121,9 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             listTag.add(tag1);
         }
         tag.put("tech", listTag);
+        if (targetTech != null) {
+            tag.putString("target", targetTech.getLoc().toString());
+        }
         return tag;
     }
 
@@ -101,6 +137,10 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             if (techManager.techByKey(loc).isPresent()) {
                 technologies.put(loc, progress);
             }
+        }
+        if (tag.contains("target", Tag.TAG_STRING)) {
+            var loc = new ResourceLocation(tag.getString("target"));
+            targetTech = techManager.techByKey(loc).orElse(null);
         }
     }
 

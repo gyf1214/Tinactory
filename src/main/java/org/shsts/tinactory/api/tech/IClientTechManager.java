@@ -3,5 +3,5 @@ package org.shsts.tinactory.api.tech;
 import java.util.Optional;
 
 public interface IClientTechManager extends ITechManager {
-    Optional<? extends ITeamProfile> localPlayerTeam();
+    Optional<ITeamProfile> localTeamProfile();
 }

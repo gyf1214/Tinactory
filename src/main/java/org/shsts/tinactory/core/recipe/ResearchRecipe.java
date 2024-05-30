@@ -13,12 +13,15 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
+import org.shsts.tinactory.api.tech.IServerTeamProfile;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Random;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -33,11 +36,23 @@ public class ResearchRecipe extends ProcessingRecipe {
         this.progress = builder.progress;
     }
 
+    private boolean canResearch(ITeamProfile team) {
+        return team.isTechAvailable(target) && !team.isTechFinished(target) && team.getTargetTech()
+                .filter(tech -> tech.getLoc().equals(target))
+                .isPresent();
+    }
+
     @Override
     public boolean canCraftIn(IContainer container) {
         return container.getOwnerTeam()
-                .map(team -> team.isTechAvailable(target) && !team.isTechFinished(target))
+                .map(this::canResearch)
                 .orElse(false);
+    }
+
+    @Override
+    public void insertOutputs(IContainer container, Random random) {
+        container.getOwnerTeam()
+                .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress));
     }
 
     @Override

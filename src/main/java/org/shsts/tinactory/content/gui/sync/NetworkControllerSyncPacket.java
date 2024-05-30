@@ -14,7 +14,6 @@ import java.util.Objects;
 @MethodsReturnNonnullByDefault
 public class NetworkControllerSyncPacket extends MenuSyncPacket {
     private boolean present;
-    private String teamName;
     private NetworkBase.State state;
     private double workFactor;
 
@@ -25,7 +24,6 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         this.present = be.getNetwork().isPresent();
         if (present) {
             var network = be.getNetwork().get();
-            this.teamName = network.team.getName();
             this.state = network.getState();
             this.workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
         }
@@ -33,11 +31,6 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
 
     public boolean isPresent() {
         return present;
-    }
-
-    public String getTeamName() {
-        assert present;
-        return teamName;
     }
 
     public NetworkBase.State getState() {
@@ -55,7 +48,6 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         super.serializeToBuf(buf);
         buf.writeBoolean(present);
         if (present) {
-            buf.writeUtf(teamName);
             buf.writeEnum(state);
             buf.writeDouble(workFactor);
         }
@@ -66,7 +58,6 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         super.deserializeFromBuf(buf);
         present = buf.readBoolean();
         if (present) {
-            teamName = buf.readUtf();
             state = buf.readEnum(NetworkBase.State.class);
             workFactor = buf.readDouble();
         }
@@ -81,8 +72,8 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
             return false;
         }
         if (present) {
-            return Objects.equals(teamName, that.teamName) &&
-                    Objects.equals(state, that.state);
+            return Objects.equals(state, that.state) &&
+                    workFactor == that.workFactor;
         } else {
             return true;
         }
@@ -93,7 +84,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         if (present) {
             return Objects.hash(super.hashCode(), present);
         } else {
-            return Objects.hash(super.hashCode(), present, teamName, state);
+            return Objects.hash(super.hashCode(), present, state, workFactor);
         }
     }
 }

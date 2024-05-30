@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
@@ -18,11 +19,11 @@ import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.Widgets;
+import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.util.Optional;
 
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
@@ -31,7 +32,6 @@ import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
-    private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("#.##");
     private static final int HEIGHT = 120;
     private static final int BUTTON_WIDTH = 72;
 
@@ -70,16 +70,33 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         welcomePanel.setActive(false);
     }
 
+    private static Component tr(String key, Object... args) {
+        return I18n.tr("tinactory.gui.networkController." + key, args);
+    }
+
     private void refresh(NetworkControllerSyncPacket packet) {
         if (!packet.isPresent()) {
             welcomePanel.setActive(true);
             configPanel.setActive(false);
         } else {
-            var workFactor = NUMBER_FORMAT.format(packet.getWorkFactor());
+            var localTeam = TechManager.localTeam();
+            var teamName = localTeam.map(ITeamProfile::getName).orElse("<null>");
+            var targetTech = localTeam
+                    .flatMap(team -> {
+                        var tech = team.getTargetTech().orElse(null);
+                        if (tech == null) {
+                            return Optional.empty();
+                        }
+                        return Optional.of(tr("researchLabel", team.getName(),
+                                "%4d".formatted(team.getTechProgress(tech)),
+                                "%4d".formatted(tech.getMaxProgress())));
+                    }).orElse(tr("noneResearchLabel"));
+
             stateLabel.setLines(
-                    I18n.tr("tinactory.gui.networkController.teamNameLabel", packet.getTeamName()),
-                    I18n.tr("tinactory.gui.networkController.stateLabel", packet.getState()),
-                    I18n.tr("tinactory.gui.networkController.workFactorLabel", workFactor));
+                    tr("teamNameLabel", teamName),
+                    tr("stateLabel", packet.getState()),
+                    tr("workFactorLabel", "%.2f".formatted(packet.getWorkFactor())),
+                    targetTech);
             welcomePanel.setActive(false);
             configPanel.setActive(true);
         }

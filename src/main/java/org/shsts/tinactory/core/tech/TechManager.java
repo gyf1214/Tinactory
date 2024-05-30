@@ -136,15 +136,15 @@ public class TechManager implements ITechManager {
             return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
         }
 
-        private void sendUpdatePacket(ServerPlayer player, TeamProfile team) {
-            var p = team.updatePacket();
+        private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
+            var p = team.fullUpdatePacket();
             Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
         }
 
         @Override
         public void addPlayerToTeam(ServerPlayer player, ITeamProfile team) {
             ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), team.getPlayerTeam());
-            sendUpdatePacket(player, (TeamProfile) team);
+            sendFullUpdatePacket(player, (TeamProfile) team);
         }
 
         @Override
@@ -153,7 +153,7 @@ public class TechManager implements ITechManager {
             var playerTeam = scoreboard.addPlayerTeam(name);
             scoreboard.addPlayerToTeam(player.getScoreboardName(), playerTeam);
             var team = TinactorySavedData.get().getTeamProfile(playerTeam);
-            sendUpdatePacket(player, team);
+            sendFullUpdatePacket(player, team);
         }
 
         @Override
@@ -171,6 +171,7 @@ public class TechManager implements ITechManager {
         public void onPlayerJoin(ServerPlayer player) {
             var p = new TechInitPacket(technologies.values());
             Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
+            teamByPlayer(player).ifPresent(profile -> sendFullUpdatePacket(player, profile));
         }
     }
 
@@ -187,7 +188,8 @@ public class TechManager implements ITechManager {
         private ClientTeamProfile localTeam = null;
 
         @Nullable
-        private ClientTeamProfile getTeamProfile(@Nullable PlayerTeam team) {
+        private ClientTeamProfile getLocalTeam() {
+            var team = (PlayerTeam) ClientUtil.getPlayer().getTeam();
             var curTeam = localTeam == null ? null : localTeam.playerTeam;
             if (team != curTeam) {
                 localTeam = team == null ? null : new ClientTeamProfile(team);
@@ -197,9 +199,8 @@ public class TechManager implements ITechManager {
         }
 
         @Override
-        public Optional<ClientTeamProfile> localPlayerTeam() {
-            var team = (PlayerTeam) ClientUtil.getPlayer().getTeam();
-            return Optional.ofNullable(getTeamProfile(team));
+        public Optional<ITeamProfile> localTeamProfile() {
+            return Optional.ofNullable(getLocalTeam());
         }
 
         @Override
@@ -219,12 +220,16 @@ public class TechManager implements ITechManager {
         }
 
         private void handleTechUpdate(TechUpdatePacket p, NetworkEvent.Context ctx) {
-            var team = localPlayerTeam().orElse(null);
+            var team = getLocalTeam();
             if (team == null) {
                 return;
             }
-            team.technologies.putAll(p.getTechs());
-            LOGGER.debug("update {} techs for team {}", p.getTechs().size(), team.getName());
+            team.technologies.putAll(p.getProgress());
+            LOGGER.debug("update {} techs for team {}", p.getProgress().size(), team.getName());
+            if (p.isUpdateTarget()) {
+                team.targetTech = p.getTargetTech().flatMap(this::techByKey).orElse(null);
+                LOGGER.debug("update targetTech = {} for team {}", team.targetTech, team.getName());
+            }
         }
     }
 
@@ -241,6 +246,10 @@ public class TechManager implements ITechManager {
     public static Client client() {
         assert client != null;
         return client;
+    }
+
+    public static Optional<ITeamProfile> localTeam() {
+        return client().localTeamProfile();
     }
 
     public static void init() {

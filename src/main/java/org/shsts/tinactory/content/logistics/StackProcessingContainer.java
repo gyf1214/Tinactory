@@ -161,7 +161,7 @@ public class StackProcessingContainer extends CapabilityProvider
         var world = blockEntity.getLevel();
         assert world != null;
         if (world.isClientSide) {
-            return TechManager.client().localPlayerTeam();
+            return TechManager.localTeam();
         } else {
             return Machine.tryGet(blockEntity).flatMap(Machine::getOwnerTeam);
         }

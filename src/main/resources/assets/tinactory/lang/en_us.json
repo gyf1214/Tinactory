@@ -10,6 +10,8 @@
   "tinactory.gui.networkController.teamNameLabel": "Team: %s",
   "tinactory.gui.networkController.stateLabel": "State: %s",
   "tinactory.gui.networkController.workFactorLabel": "Work Factor: %s",
+  "tinactory.gui.networkController.researchLabel": "Current Research: %s %s/%s",
+  "tinactory.gui.networkController.noneResearchLabel": "Current Research: <none>",
   "tinactory.chat.createTeam.success": "Create team %s for %s successfully.",
   "tinactory.chat.addPlayerToTeam.success": "Add player %s to team %s successfully.",
   "tinactory.chat.leaveTeam.success": "%s leaves team %s successfully.",

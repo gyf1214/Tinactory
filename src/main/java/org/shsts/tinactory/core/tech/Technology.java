@@ -3,6 +3,8 @@ package org.shsts.tinactory.core.tech;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -14,6 +16,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @ParametersAreNonnullByDefault
@@ -49,6 +52,12 @@ public class Technology implements ITechnology {
                 .forEach(depends::add);
     }
 
+    // TODO
+    @Override
+    public Component getName() {
+        return new TextComponent(getLoc().toString());
+    }
+
     @Override
     public Collection<ITechnology> getDepends() {
         return depends;
@@ -57,6 +66,24 @@ public class Technology implements ITechnology {
     @Override
     public long getMaxProgress() {
         return maxProgress;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Technology that = (Technology) o;
+        return Objects.equals(loc, that.loc);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(loc);
+    }
+
+    @Override
+    public String toString() {
+        return "Technology{%s}".formatted(loc);
     }
 
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(

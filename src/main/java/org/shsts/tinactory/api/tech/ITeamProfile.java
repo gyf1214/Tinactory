@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -37,4 +38,6 @@ public interface ITeamProfile {
     }
 
     boolean isTechAvailable(ResourceLocation tech);
+
+    Optional<ITechnology> getTargetTech();
 }
