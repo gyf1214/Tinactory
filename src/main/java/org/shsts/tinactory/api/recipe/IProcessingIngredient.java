@@ -1,10 +1,7 @@
 package org.shsts.tinactory.api.recipe;
 
 import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.logistics.PortType;
 
-public interface IProcessingIngredient {
-    PortType type();
-
+public interface IProcessingIngredient extends IProcessingObject {
     boolean consumePort(IPort port, boolean simulate);
 }

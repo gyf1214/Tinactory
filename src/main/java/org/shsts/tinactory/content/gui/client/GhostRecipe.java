@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -32,7 +33,7 @@ public class GhostRecipe extends MenuWidget {
 
     @Nullable
     private ResourceLocation currentRecipeLoc = null;
-    private final List<Layout.SlotWith<?>> ingredients = new ArrayList<>();
+    private final List<Layout.SlotWith<? extends IProcessingObject>> ingredients = new ArrayList<>();
     private final ItemRenderer itemRenderer = ClientUtil.getItemRenderer();
 
     public GhostRecipe(Menu<?, ?> menu, int syncSlot, Layout layout) {
@@ -71,7 +72,7 @@ public class GhostRecipe extends MenuWidget {
         RenderUtil.renderFluid(poseStack, stack, rect, 0x80FFFFFF, getBlitOffset());
     }
 
-    private <I> void renderIngredient(PoseStack poseStack, I ingredient, int x, int y) {
+    private void renderIngredient(PoseStack poseStack, IProcessingObject ingredient, int x, int y) {
         RenderUtil.renderIngredient(ingredient,
                 stack -> renderItem(poseStack, stack, x, y),
                 stack -> renderFluid(poseStack, stack, x, y));

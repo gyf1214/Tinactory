@@ -42,6 +42,7 @@ public final class AllTechs {
     private static void ore(OreVariant variant) {
         ORE.put(variant, base("ore/" + variant.name().toLowerCase())
                 .maxProgress(200L * (1L << (long) variant.rank))
+                .displayItem(variant.baseItem)
                 .buildObject());
     }
 

@@ -98,7 +98,7 @@ public class MachineRecipeBook extends Panel {
             } else {
                 var x = rect.x() + 2;
                 var y = rect.y() + 2;
-                var output = recipe.getResult();
+                var output = recipe.getDisplay();
                 RenderUtil.renderIngredient(output,
                         stack -> RenderUtil.renderItem(stack, x, y),
                         stack -> RenderUtil.renderFluid(poseStack, stack, x, y, z));

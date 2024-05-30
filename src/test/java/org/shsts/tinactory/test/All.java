@@ -59,11 +59,13 @@ public final class All {
 
         TEST_BASE_TECH = REGISTRATE.tech("test_base")
                 .maxProgress(10)
+                .displayItem(Items.WOODEN_SWORD)
                 .buildObject();
 
         TEST_TECH = REGISTRATE.tech("test")
                 .maxProgress(20)
                 .depends(TEST_BASE_TECH)
+                .displayItem(Items.IRON_SWORD)
                 .buildObject();
     }
 

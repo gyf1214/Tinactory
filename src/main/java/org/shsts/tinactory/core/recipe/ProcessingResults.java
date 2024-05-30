@@ -10,6 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -18,15 +19,24 @@ import java.util.Random;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class ProcessingResults {
+    public static final IProcessingResult EMPTY = new ItemResult(true, 0, ItemStack.EMPTY);
+
     public static abstract class RatedResult<T extends IPort> implements IProcessingResult {
         public final boolean allowEmpty;
         public final double rate;
-        private final Class<T> portType;
+        private final PortType portType;
+        private final Class<T> portClazz;
 
-        public RatedResult(boolean allowEmpty, double rate, Class<T> portType) {
+        public RatedResult(boolean allowEmpty, double rate, PortType portType, Class<T> portClazz) {
             this.allowEmpty = allowEmpty;
             this.rate = rate;
             this.portType = portType;
+            this.portClazz = portClazz;
+        }
+
+        @Override
+        public PortType type() {
+            return portType;
         }
 
         protected abstract boolean doInsertPort(T port, Random random, boolean simulate);
@@ -36,11 +46,11 @@ public final class ProcessingResults {
             if (port == IPort.EMPTY) {
                 return allowEmpty;
             }
-            if (portType.isInstance(port)) {
+            if (portClazz.isInstance(port)) {
                 if (rate < 1d && (simulate || random.nextDouble() > rate)) {
                     return true;
                 }
-                return doInsertPort(portType.cast(port), random, simulate);
+                return doInsertPort(portClazz.cast(port), random, simulate);
             }
             return false;
         }
@@ -62,7 +72,7 @@ public final class ProcessingResults {
         public final ItemStack stack;
 
         public ItemResult(boolean allowEmpty, double rate, ItemStack stack) {
-            super(allowEmpty, rate, IItemCollection.class);
+            super(allowEmpty, rate, PortType.ITEM, IItemCollection.class);
             this.stack = stack;
         }
 
@@ -111,7 +121,7 @@ public final class ProcessingResults {
         public final FluidStack stack;
 
         public FluidResult(boolean allowEmpty, double rate, FluidStack stack) {
-            super(allowEmpty, rate, IFluidCollection.class);
+            super(allowEmpty, rate, PortType.FLUID, IFluidCollection.class);
             this.stack = stack;
         }
 

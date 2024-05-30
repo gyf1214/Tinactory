@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
 
@@ -22,10 +24,12 @@ public class Technology implements ITechnology {
     private final List<ResourceLocation> dependIds;
     private final Set<ITechnology> depends = new HashSet<>();
     public final long maxProgress;
+    public final Item displayItem;
 
-    public Technology(List<ResourceLocation> dependIds, long maxProgress) {
+    public Technology(List<ResourceLocation> dependIds, long maxProgress, Item displayItem) {
         this.dependIds = dependIds;
         this.maxProgress = maxProgress;
+        this.displayItem = displayItem;
     }
 
     @Override
@@ -57,6 +61,7 @@ public class Technology implements ITechnology {
 
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ResourceLocation.CODEC.listOf().optionalFieldOf("depends", List.of()).forGetter(tech -> tech.dependIds),
-            Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress)
+            Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
+            ForgeRegistries.ITEMS.getCodec().fieldOf("display_item").forGetter(tech -> tech.displayItem)
     ).apply(instance, Technology::new));
 }

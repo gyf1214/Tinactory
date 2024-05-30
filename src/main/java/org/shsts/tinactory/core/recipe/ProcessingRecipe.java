@@ -19,6 +19,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -88,7 +89,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
     @Override
     public ItemStack getResultItem() {
-        var output = getResult();
+        var output = getDisplay();
         if (output instanceof ProcessingResults.ItemResult item) {
             return item.stack;
         } else {
@@ -96,10 +97,10 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
     }
 
-    public IProcessingResult getResult() {
+    public IProcessingObject getDisplay() {
         return outputs.stream().min(Comparator.comparingInt(a -> a.port))
                 .map(Output::result)
-                .orElse(new ProcessingResults.ItemResult(true, 0d, ItemStack.EMPTY));
+                .orElse(ProcessingResults.EMPTY);
     }
 
     public static Optional<ProcessingRecipe> byKey(RecipeManager manager, ResourceLocation loc) {

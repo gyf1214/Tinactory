@@ -121,6 +121,7 @@ public final class Ores {
         protected Unit createObject() {
             assert variant != null;
             assert rate > 0d;
+            assert !ores.isEmpty();
             if (!primitive) {
                 builder.voltage(variant.voltage);
             }
@@ -130,6 +131,7 @@ public final class Ores {
             if (!baseOre) {
                 tech = REGISTRATE.tech("ore/" + id)
                         .maxProgress(baseProgress * oreProgress)
+                        .displayItem(ores.get(0).loc("raw"))
                         .depends(tech).buildObject();
 
                 AllRecipes.RESEARCH.recipe(tech)

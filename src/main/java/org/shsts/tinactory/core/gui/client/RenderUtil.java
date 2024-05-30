@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
@@ -156,9 +157,8 @@ public final class RenderUtil {
         RenderSystem.disableBlend();
     }
 
-    public static <I>
-    void renderIngredient(I ingredient, Consumer<ItemStack> itemRenderer,
-                          Consumer<FluidStack> fluidRenderer) {
+    public static void renderIngredient(IProcessingObject ingredient, Consumer<ItemStack> itemRenderer,
+                                        Consumer<FluidStack> fluidRenderer) {
 
         if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
             itemRenderer.accept(item.stack());
