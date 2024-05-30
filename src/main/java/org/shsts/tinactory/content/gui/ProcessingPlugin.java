@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.core.gui.Menu.CONTENT_WIDTH;
@@ -74,5 +75,9 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
         addSwitchButton(screen, START_X + SLOT_SIZE, autoDumpFluidTip, autoDumpFluidSlot, (menu, val) ->
                 menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("autoDumpFluid", val)));
         addStaticWidget(screen, START_X + SLOT_SIZE, Texture.FLUID_OUT_BUTTON);
+    }
+
+    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>> builder() {
+        return ProcessingPlugin::new;
     }
 }

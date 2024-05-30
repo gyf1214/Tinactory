@@ -104,7 +104,8 @@ public final class ModelGen {
     public static <S extends BlockBuilder<? extends CableBlock, ?, S>>
     Transformer<S> cable() {
         return $ -> $.blockState(ctx -> CableModel.blockState(ctx, false))
-                .itemModel(ctx -> CableModel.itemModel(ctx, false))
+                .defaultBlockItem(ctx -> CableModel.itemModel(ctx, false))
+                .dropSelf()
                 .translucent();
     }
 

@@ -43,6 +43,8 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
     private final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>>
             capabilities = new HashMap<>();
     @Nullable
+    private ChildMenuBuilder<?> menuBuilder = null;
+    @Nullable
     private Supplier<SmartMenuType<U, ?>> menu = null;
 
     public BlockEntityBuilder(Registrate registrate, String id, P parent, Factory<U> factory) {
@@ -84,19 +86,24 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
     }
 
     private class ChildMenuBuilder<M extends Menu<U, M>> extends MenuBuilder<U, M, BlockEntityBuilder<U, P>> {
-        public ChildMenuBuilder(Registrate registrate, String id, BlockEntityBuilder<U, P> parent,
-                                Menu.Factory<U, M> factory) {
-            super(registrate, id, parent, factory);
-            this.onBuild.add(() -> {
-                parent.onCreateEntry.add($ -> register());
-                onCreateEntry.add(entry -> parent.setMenu(entry::get));
-            });
+        public ChildMenuBuilder(Registrate registrate, String id, Menu.Factory<U, M> factory) {
+            super(registrate, id, BlockEntityBuilder.this, factory);
+            onCreateEntry.add(entry -> parent.setMenu(entry::get));
+            parent.onCreateEntry.add($ -> register());
         }
     }
 
     public <M extends Menu<U, M>> MenuBuilder<U, M, BlockEntityBuilder<U, P>>
     menu(Menu.Factory<U, M> factory) {
-        return new ChildMenuBuilder<>(registrate, id, this, factory);
+        assert menuBuilder == null;
+        var builder = new ChildMenuBuilder<>(registrate, id, factory);
+        menuBuilder = builder;
+        return builder;
+    }
+
+    public MenuBuilder<U, ?, BlockEntityBuilder<U, P>> menu() {
+        assert menuBuilder != null;
+        return menuBuilder;
     }
 
     public <C extends CapabilityProviderBuilder<? super U, BlockEntityBuilder<U, P>>>

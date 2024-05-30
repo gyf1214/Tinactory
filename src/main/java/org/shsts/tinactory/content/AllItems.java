@@ -37,10 +37,9 @@ public final class AllItems {
         ULV_CABLE = REGISTRATE.block("network/cable/ulv",
                         properties -> new CableBlock(properties, CableBlock.WIRE_RADIUS, Voltage.ULV, 2.0))
                 .blockState(ctx -> CableModel.blockState(ctx, true))
-                .itemModel(CableModel::ulvItemModel)
                 .tint(IRON.color)
                 .tag(AllTags.MINEABLE_WITH_CUTTER)
-                .defaultBlockItem().dropSelf()
+                .defaultBlockItem(CableModel::ulvItemModel).dropSelf()
                 .register();
 
         COMPONENT_SETS = ComponentSet.builder()

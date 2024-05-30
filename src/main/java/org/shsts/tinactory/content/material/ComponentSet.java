@@ -100,7 +100,6 @@ public final class ComponentSet {
                     .transform(ModelGen.cable())
                     .tint(CableBlock.INSULATION_COLOR, cableMaterial.color)
                     .tag(AllTags.MINEABLE_WITH_CUTTER)
-                    .defaultBlockItem().dropSelf()
                     .register();
         }
 

@@ -23,7 +23,6 @@ import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -38,9 +37,9 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
     protected Transformer<BlockBehaviour.Properties> properties = $ -> $;
 
     @Nullable
-    protected Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockStateCallback = null;
+    protected BlockItemBuilder<?> blockItemBuilder = null;
     @Nullable
-    protected Consumer<RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider>> itemModelCallback = null;
+    protected Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockStateCallback = null;
     @Nullable
     protected DistLazy<BlockColor> tint = null;
 
@@ -89,15 +88,16 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         return self();
     }
 
-    public Optional<DistLazy<ItemColor>> getItemTint() {
+    @Nullable
+    private DistLazy<ItemColor> getItemTint() {
         var tint = this.tint;
-        return tint == null ? Optional.empty() : Optional.of(() -> {
+        return tint == null ? null : () -> {
             var itemColor = tint.getValue();
             return () -> (itemStack, index) -> {
                 var item = (BlockItem) itemStack.getItem();
                 return itemColor.getColor(item.getBlock().defaultBlockState(), null, null, index);
             };
-        });
+        };
     }
 
     public S blockState(Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
@@ -105,30 +105,48 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         return self();
     }
 
-    public <U1 extends BlockItem> S itemModel(Consumer<RegistryDataContext<Item, U1, ItemModelProvider>> cons) {
-        itemModelCallback = ctx -> cons.accept(ctx.cast());
-        return self();
-    }
+    public class BlockItemBuilder<U1 extends BlockItem> extends ItemBuilder<U1, S, BlockItemBuilder<U1>> {
+        @FunctionalInterface
+        public interface Factory<U2 extends BlockItem> {
+            U2 create(Block block, Item.Properties properties);
+        }
 
-    public <U1 extends BlockItem> Consumer<RegistryDataContext<Item, U1, ItemModelProvider>>
-    getItemModel() {
-        if (itemModelCallback != null) {
-            var ret = itemModelCallback;
-            itemModelCallback = null;
-            return ret::accept;
-        } else {
-            return ctx -> ctx.provider.withExistingParent(ctx.id,
-                    new ResourceLocation(ctx.modid, "block/" + ctx.id));
+        public BlockItemBuilder(Factory<U1> factory) {
+            super(BlockBuilder.this.registrate, BlockBuilder.this.id, BlockBuilder.this.self(), properties -> {
+                var entry = BlockBuilder.this.entry;
+                assert entry != null;
+                return factory.create(entry.get(), properties);
+            });
+            parent.onCreateEntry.add($ -> register());
+        }
+
+        @Override
+        protected RegistryEntry<U1> createEntry() {
+            if (modelCallback == null) {
+                modelCallback = ctx -> ctx.provider.withExistingParent(ctx.id,
+                        new ResourceLocation(ctx.modid, "block/" + ctx.id));
+            }
+            if (tint == null) {
+                tint = getItemTint();
+            }
+            return super.createEntry();
         }
     }
 
-    public <U1 extends BlockItem> BlockItemBuilder<U1, S>
+    public <U1 extends BlockItem> BlockItemBuilder<U1>
     blockItem(BlockItemBuilder.Factory<U1> factory) {
-        return new BlockItemBuilder<>(registrate, self(), factory);
+        assert blockItemBuilder == null;
+        var builder = new BlockItemBuilder<>(factory);
+        blockItemBuilder = builder;
+        return builder;
     }
 
-    public BlockItemBuilder<BlockItem, S> blockItem() {
-        return blockItem(BlockItem::new);
+    public BlockItemBuilder<? extends BlockItem> blockItem() {
+        return blockItemBuilder != null ? blockItemBuilder : blockItem(BlockItem::new);
+    }
+
+    public S defaultBlockItem(Consumer<RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider>> cons) {
+        return blockItem().model(cons::accept).build();
     }
 
     public S defaultBlockItem() {

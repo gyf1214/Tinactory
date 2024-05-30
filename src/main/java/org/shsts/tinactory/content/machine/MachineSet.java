@@ -7,6 +7,8 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.gui.ProcessingPlugin;
+import org.shsts.tinactory.content.gui.RecipeBookPlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -171,10 +173,16 @@ public class MachineSet<T extends ProcessingRecipe> {
         @Override
         protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         createMachine(Voltage voltage) {
+            assert layoutSet != null;
+            var layout = layoutSet.get(voltage);
             return getMachineBuilder(voltage)
                     .blockEntity()
                     .capability(RecipeProcessor::builder)
                     .recipeType(recipeType).voltage(voltage)
+                    .build()
+                    .menu()
+                    .plugin(ProcessingPlugin.builder())
+                    .plugin(RecipeBookPlugin.builder(recipeType, layout))
                     .build()
                     .build()
                     .register();
