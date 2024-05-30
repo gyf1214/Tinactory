@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.player.LocalPlayer;
@@ -21,9 +22,11 @@ import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
@@ -32,6 +35,7 @@ import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final int HEIGHT = 120;
     private static final int BUTTON_WIDTH = 72;
 
@@ -39,6 +43,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private final Panel configPanel;
     private final EditBox welcomeEdit;
     private final Label stateLabel;
+    private final Consumer<ITeamProfile> teamChangeCallback = $ -> refreshTeam();
 
     public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
                                    Component title, int syncSlot) {
@@ -66,12 +71,37 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         rootPanel.addPanel(offset, configPanel);
 
         menu.onSyncPacket(syncSlot, this::refresh);
+        TechManager.client().onProgressChange(teamChangeCallback);
         configPanel.setActive(false);
         welcomePanel.setActive(false);
     }
 
+    @Override
+    public void removed() {
+        TechManager.client().removeProgressChangeListener(teamChangeCallback);
+        super.removed();
+    }
+
     private static Component tr(String key, Object... args) {
         return I18n.tr("tinactory.gui.networkController." + key, args);
+    }
+
+    private void refreshTeam() {
+        var localTeam = TechManager.localTeam();
+        LOGGER.debug("refresh team {}", localTeam);
+        var teamName = localTeam.map(ITeamProfile::getName).orElse("<null>");
+        var targetTech = localTeam
+                .flatMap(team -> {
+                    var tech = team.getTargetTech().orElse(null);
+                    if (tech == null) {
+                        return Optional.empty();
+                    }
+                    return Optional.of(tr("researchLabel", team.getName(),
+                            "%4d".formatted(team.getTechProgress(tech)),
+                            "%4d".formatted(tech.getMaxProgress())));
+                }).orElse(tr("noneResearchLabel"));
+        stateLabel.setLine(0, tr("teamNameLabel", teamName));
+        stateLabel.setLine(3, targetTech);
     }
 
     private void refresh(NetworkControllerSyncPacket packet) {
@@ -79,24 +109,9 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             welcomePanel.setActive(true);
             configPanel.setActive(false);
         } else {
-            var localTeam = TechManager.localTeam();
-            var teamName = localTeam.map(ITeamProfile::getName).orElse("<null>");
-            var targetTech = localTeam
-                    .flatMap(team -> {
-                        var tech = team.getTargetTech().orElse(null);
-                        if (tech == null) {
-                            return Optional.empty();
-                        }
-                        return Optional.of(tr("researchLabel", team.getName(),
-                                "%4d".formatted(team.getTechProgress(tech)),
-                                "%4d".formatted(tech.getMaxProgress())));
-                    }).orElse(tr("noneResearchLabel"));
-
-            stateLabel.setLines(
-                    tr("teamNameLabel", teamName),
-                    tr("stateLabel", packet.getState()),
-                    tr("workFactorLabel", "%.2f".formatted(packet.getWorkFactor())),
-                    targetTech);
+            refreshTeam();
+            stateLabel.setLine(1, tr("stateLabel", packet.getState()));
+            stateLabel.setLine(2, tr("workFactorLabel", "%.2f".formatted(packet.getWorkFactor())));
             welcomePanel.setActive(false);
             configPanel.setActive(true);
         }

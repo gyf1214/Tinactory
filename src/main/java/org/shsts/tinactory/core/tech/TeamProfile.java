@@ -50,6 +50,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     private void broadcastUpdate(TechUpdatePacket packet) {
         TinactorySavedData.get().setDirty();
+        techManager.invokeChange(this);
         var playerList = ServerUtil.getPlayerList();
         for (var name : playerTeam.getPlayers()) {
             var player = playerList.getPlayerByName(name);
@@ -163,6 +164,6 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public String toString() {
-        return "TeamProfile{%s}".formatted(playerTeam.getName());
+        return "%s{%s}".formatted(getClass().getSimpleName(), playerTeam.getName());
     }
 }

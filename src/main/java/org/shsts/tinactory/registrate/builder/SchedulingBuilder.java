@@ -8,6 +8,7 @@ import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -23,13 +24,13 @@ public class SchedulingBuilder<P> extends RegistryEntryBuilder<IScheduling, ISch
 
     @SafeVarargs
     public final SchedulingBuilder<P> before(Supplier<Supplier<IScheduling>>... befores) {
-        this.befores.addAll(List.of(befores));
+        this.befores.addAll(Arrays.asList(befores));
         return self();
     }
 
     @SafeVarargs
     public final SchedulingBuilder<P> after(Supplier<Supplier<IScheduling>>... afters) {
-        this.afters.addAll(List.of(afters));
+        this.afters.addAll(Arrays.asList(afters));
         return self();
     }
 

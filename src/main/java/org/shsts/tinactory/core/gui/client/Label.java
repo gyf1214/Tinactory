@@ -4,10 +4,12 @@ import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class Label extends MenuWidget {
         private final double value;
     }
 
-    private List<Component> lines = List.of();
+    private final List<Component> lines = new ArrayList<>();
     private int cacheWidth = 0;
     private int cacheHeight = 0;
     private final Font font = ClientUtil.getFont();
@@ -45,12 +47,25 @@ public class Label extends MenuWidget {
         setLines(lines);
     }
 
-    public void setLines(Component... values) {
-        lines = List.of(values);
-        cacheWidth = Arrays.stream(values)
+    private void updateSize() {
+        cacheWidth = lines.stream()
                 .mapToInt(font::width)
                 .max().orElse(0);
-        cacheHeight = values.length * LINE_HEIGHT;
+        cacheHeight = lines.size() * LINE_HEIGHT;
+    }
+
+    public void setLines(Component... values) {
+        lines.clear();
+        lines.addAll(Arrays.asList(values));
+        updateSize();
+    }
+
+    public void setLine(int index, Component value) {
+        while (lines.size() <= index) {
+            lines.add(TextComponent.EMPTY);
+        }
+        lines.set(index, value);
+        updateSize();
     }
 
     @Override
