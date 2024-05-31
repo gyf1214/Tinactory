@@ -40,10 +40,16 @@ public final class AllMaterials {
     public static MaterialSet STEEL;
 
     // Ore
-    public static MaterialSet MAGNETITE;
     public static MaterialSet CHALCOPYRITE;
     public static MaterialSet PYRITE;
+    public static MaterialSet LIMONITE;
+    public static MaterialSet BANDED_IRON;
+    public static MaterialSet COAL;
     public static MaterialSet CASSITERITE;
+    public static MaterialSet REDSTONE;
+    public static MaterialSet CINNABAR;
+    public static MaterialSet RUBY;
+    public static MaterialSet MAGNETITE;
 
     public static MaterialSet TEST;
     public static MaterialSet STONE;
@@ -99,6 +105,10 @@ public final class AllMaterials {
     public static MaterialSet.Builder<?> set(String id) {
         return (new MaterialSet.Builder<>(Unit.INSTANCE, id))
                 .onCreateObject(mat -> MATERIALS.put(mat.name, mat));
+    }
+
+    public static Supplier<Item> primary(String name) {
+        return item(name, "primary");
     }
 
     public static Supplier<Item> dust(String name) {

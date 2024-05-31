@@ -155,9 +155,9 @@ public final class AllBlockEntities {
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 5, 1, Voltage.LV)
+                .slot(SLOT_SIZE * 5, 1, Voltage.ULV)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 6, 1, Voltage.HV)
+                .slot(SLOT_SIZE * 6, 1, Voltage.ULV)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, 0)
                 .build()
                 .buildObject();

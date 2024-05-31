@@ -38,7 +38,7 @@ public final class Elements {
                 .metalSet()
                 .toolProcess().smelt()
                 .ore(OreVariant.DEEPSLATE)
-                // TODO: byproduct
+                // TODO: byproduct ?
                 .build()
                 .buildObject();
 

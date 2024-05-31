@@ -377,7 +377,6 @@ public class MaterialSet {
         public class OreBuilder extends SimpleBuilder<Unit, Builder<P>, OreBuilder> {
             private final int amount;
             private boolean primitive = false;
-            private boolean hammer = false;
             private final OreVariant variant;
             private final Map<String, Supplier<Item>> byproducts = new HashMap<>();
 
@@ -389,11 +388,11 @@ public class MaterialSet {
 
             public OreBuilder primitive() {
                 primitive = true;
-                return hammer();
+                return this;
             }
 
-            public OreBuilder hammer() {
-                hammer = true;
+            public OreBuilder byproduct(String key, Supplier<Item> b1) {
+                byproducts.put(key, b1);
                 return this;
             }
 
@@ -404,8 +403,8 @@ public class MaterialSet {
                 return this;
             }
 
-            public OreBuilder byproduct(Supplier<Item> b1, Supplier<Item> b2) {
-                return byproduct(b1, b1, b2);
+            public OreBuilder byproduct(Supplier<Item> b1) {
+                return byproduct(b1, b1, b1);
             }
 
             private void crush(String output, String input) {
@@ -419,13 +418,17 @@ public class MaterialSet {
 
             private void wash(String output, String input, Voltage voltage) {
                 callbacks.add($ -> {
-                    var builder = ORE_WASHER.recipe($.loc(output))
+                    var loc = $.loc(output);
+                    if (input.equals("dust_pure")) {
+                        loc = new ResourceLocation(loc.getNamespace(), loc.getPath() + "_from_pure");
+                    }
+                    var builder = ORE_WASHER.recipe(loc)
                             .inputItem(0, $.tag(input), 1)
                             .outputItem(2, $.entry(output), 1);
                     if (input.equals("crushed")) {
                         var byproduct = byproducts.getOrDefault("wash", $.entry("dust"));
                         builder.outputItem(4, byproduct, 1, 0.1)
-                                .workTicks(160);
+                                .workTicks(200);
                     } else {
                         builder.workTicks(32);
                     }
@@ -458,19 +461,19 @@ public class MaterialSet {
                     blocks.put("ore", ore::get);
                 }
 
-                if (hammer) {
-                    Builder.this.process("crushed", 1, "raw", TOOL_HAMMER);
+                if (variant.voltage.rank <= Voltage.ULV.rank) {
+                    Builder.this.process("crushed", amount, "raw", TOOL_HAMMER);
                     Builder.this.process("dust_pure", 1, "crushed_purified", TOOL_HAMMER);
                     Builder.this.process("dust_impure", 1, "crushed", TOOL_HAMMER);
-                    Builder.this.process("dust", 1, "crushed_centrifuged", TOOL_HAMMER);
                 }
 
                 crush("crushed", "raw");
                 crush("dust_impure", "crushed");
                 crush("dust_pure", "crushed_purified");
                 crush("dust", "crushed_centrifuged");
-                wash("crushed_purified", "crushed", Voltage.LV);
+                wash("crushed_purified", "crushed", Voltage.ULV);
                 wash("dust", "dust_impure", primitive ? Voltage.PRIMITIVE : Voltage.ULV);
+                wash("dust", "dust_pure", Voltage.ULV);
                 callbacks.add($ -> {
                     var byproduct = byproducts.getOrDefault("centrifuge", $.entry("dust"));
                     CENTRIFUGE.recipe($.loc("dust"))
