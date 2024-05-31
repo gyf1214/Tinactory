@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.items.IItemHandler;
@@ -186,6 +187,11 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
 
         public Builder pattern(String row) {
             rows.add(row);
+            return self();
+        }
+
+        public Builder define(Character key, Supplier<? extends ItemLike> item) {
+            keys.put(key, () -> Ingredient.of(item.get()));
             return self();
         }
 

@@ -3,9 +3,11 @@ package org.shsts.tinactory.content.model;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -16,6 +18,10 @@ import org.shsts.tinactory.registrate.context.RegistryDataContext;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 
+import static org.shsts.tinactory.content.model.ModelGen.TEXTURE_TYPE;
+import static org.shsts.tinactory.content.model.ModelGen.extend;
+import static org.shsts.tinactory.content.model.ModelGen.modLoc;
+
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class MachineModel {
@@ -23,7 +29,7 @@ public final class MachineModel {
 
     private static final String IO_MODEL = "block/machine/io";
     private static final String IO_TEX_KEY = "io_overlay";
-    private static final String IO_TEX = "blocks/overlay/appeng/me_output_bus";
+    public static final String IO_TEX = "blocks/overlay/machine/overlay_energy_out";
 
     private static void genCasingModel(DataContext<BlockStateProvider> ctx) {
         var model = ctx.provider.models().withExistingParent(CASING_MODEL, ModelGen.mcLoc("block/block"))
@@ -67,28 +73,32 @@ public final class MachineModel {
 
     public static <B extends ModelBuilder<B>>
     B casing(B model, ResourceLocation tex) {
-        return model.texture("top", ModelGen.extend(tex, "top"))
-                .texture("bottom", ModelGen.extend(tex, "bottom"))
-                .texture("side", ModelGen.extend(tex, "side"));
+        return model.texture("top", extend(tex, "top"))
+                .texture("bottom", extend(tex, "bottom"))
+                .texture("side", extend(tex, "side"));
     }
 
     private <B extends ModelBuilder<B>> B applyTextures(B model, ExistingFileHelper existingHelper) {
         model = casing(model, casing);
-        if (existingHelper.exists(overlay, ModelGen.TEXTURE_TYPE)) {
+        if (existingHelper.exists(overlay, TEXTURE_TYPE)) {
             return model.texture("front_overlay", overlay);
         } else {
             for (var dir : ModelGen.DIR_TEX_KEYS.values()) {
-                var loc = ModelGen.extend(overlay, "overlay_" + dir);
-                if (existingHelper.exists(loc, ModelGen.TEXTURE_TYPE)) {
+                var loc = extend(overlay, "overlay_" + dir);
+                if (existingHelper.exists(loc, TEXTURE_TYPE)) {
                     model = model.texture(dir + "_overlay", loc);
                 }
+            }
+            var side = extend(overlay, "overlay_side");
+            if (existingHelper.exists(side, TEXTURE_TYPE)) {
+                model = model.texture("left_overlay", side).texture("right_overlay", side);
             }
             return model;
         }
     }
 
     private ModelFile genModel(String id, BlockModelProvider prov) {
-        return applyTextures(prov.withExistingParent(id, ModelGen.modLoc(CASING_MODEL)), prov.existingFileHelper);
+        return applyTextures(prov.withExistingParent(id, modLoc(CASING_MODEL)), prov.existingFileHelper);
     }
 
     public void primitiveBlockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
@@ -98,7 +108,7 @@ public final class MachineModel {
 
     public void blockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
         var casing = genModel(ctx.id, ctx.provider.models());
-        var io = ctx.provider.models().getExistingFile(ModelGen.modLoc(IO_MODEL));
+        var io = ctx.provider.models().getExistingFile(modLoc(IO_MODEL));
         var multipart = ctx.provider.getMultipartBuilder(ctx.object);
 
         for (var dir : Direction.values()) {
@@ -125,5 +135,10 @@ public final class MachineModel {
                         .condition(MachineBlock.IO_FACING, dir);
             }
         }
+    }
+
+    public void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        var model = ctx.provider.withExistingParent(ctx.id, modLoc(CASING_MODEL));
+        applyTextures(model, ctx.provider.existingFileHelper);
     }
 }

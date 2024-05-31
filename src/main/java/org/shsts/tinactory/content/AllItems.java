@@ -9,6 +9,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
 import org.shsts.tinactory.content.model.CableModel;
+import org.shsts.tinactory.content.model.MachineModel;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -23,6 +24,7 @@ import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllRecipes.TOOL;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 
@@ -30,6 +32,7 @@ import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 @MethodsReturnNonnullByDefault
 public final class AllItems {
     public static final RegistryEntry<CableBlock> ULV_CABLE;
+    public static final RegistryEntry<Item> ULV_MACHINE_HULL;
     public static final Map<Voltage, ComponentSet> COMPONENT_SETS;
     public static final RegistryEntry<Item> VACUUM_TUBE;
 
@@ -40,6 +43,10 @@ public final class AllItems {
                 .tint(IRON.color)
                 .tag(AllTags.MINEABLE_WITH_CUTTER)
                 .defaultBlockItem(CableModel::ulvItemModel).dropSelf()
+                .register();
+
+        ULV_MACHINE_HULL = REGISTRATE.item("component/ulv/machine_hull", Item::new)
+                .model(ModelGen.machineItem(Voltage.ULV, gregtech(MachineModel.IO_TEX)))
                 .register();
 
         COMPONENT_SETS = ComponentSet.builder()
@@ -73,10 +80,18 @@ public final class AllItems {
 
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(VACUUM_TUBE.get())
-                .pattern(" G ").pattern("GWG").pattern("BBB")
+                .pattern("BGB").pattern("WWW")
                 .define('G', Items.GLASS)
                 .define('W', COPPER.tag("wire"))
                 .define('B', IRON.tag("bolt"))
                 .unlockedBy("has_wire", has(COPPER.tag("wire"))));
+
+        TOOL.recipe(ULV_MACHINE_HULL)
+                .result(ULV_MACHINE_HULL, 1)
+                .pattern("###").pattern("#W#").pattern("###")
+                .define('#', IRON.tag("plate"))
+                .define('W', ULV_CABLE)
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
     }
 }

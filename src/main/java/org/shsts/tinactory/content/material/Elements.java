@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 
@@ -26,7 +25,6 @@ public final class Elements {
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
                 .mechanicalSet().wire()
                 .toolProcess().smelt()
-                .tool(200, Tiers.IRON).basic().build()
                 .buildObject();
 
         GOLD = set("gold")

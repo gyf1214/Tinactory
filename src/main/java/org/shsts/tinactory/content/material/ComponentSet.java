@@ -5,6 +5,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.model.MachineModel;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.core.common.SimpleBuilder;
@@ -20,6 +21,7 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
+import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -32,6 +34,7 @@ public final class ComponentSet {
     public final RegistryEntry<Item> sensor;
     public final RegistryEntry<Item> fieldGenerator;
     public final RegistryEntry<CableBlock> cable;
+    public final RegistryEntry<Item> machineHull;
 
     private final List<Consumer<ComponentSet>> callbacks;
 
@@ -44,6 +47,7 @@ public final class ComponentSet {
         this.sensor = builder.dummy("sensor");
         this.fieldGenerator = builder.dummy("field_generator");
         this.cable = builder.cableBlock();
+        this.machineHull = builder.machineHull();
 
         this.callbacks = builder.callbacks;
     }
@@ -87,9 +91,15 @@ public final class ComponentSet {
         private RegistryEntry<Item> dummy(String name) {
             var id = "component/" + voltage.id + "/" + name;
             var texName = name.replace('_', '.') + "." + voltage.id;
-            var texLoc = ModelGen.gregtech("items/metaitems/" + texName);
+            var texLoc = gregtech("items/metaitems/" + texName);
             return REGISTRATE.item(id, Item::new)
                     .model(ModelGen.basicItem(texLoc))
+                    .register();
+        }
+
+        private RegistryEntry<Item> machineHull() {
+            return REGISTRATE.item("component/" + voltage.id + "/machine_hull", Item::new)
+                    .model(ModelGen.machineItem(voltage, gregtech(MachineModel.IO_TEX)))
                     .register();
         }
 
@@ -108,12 +118,23 @@ public final class ComponentSet {
             assert mainMaterial != null;
             assert heatMaterial != null;
             callbacks.add(set -> {
+                var voltage = this.voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
+
                 ASSEMBLER.recipe(set.motor)
                         .outputItem(2, set.motor, 1)
                         .inputItem(0, mainMaterial.tag("stick"), 2)
                         .inputItem(0, heatMaterial.tag("wire"), 2 * voltage.rank)
                         .inputItem(0, set.cable, 2)
                         .workTicks(100)
+                        .voltage(voltage)
+                        .build();
+
+                ASSEMBLER.recipe(set.machineHull)
+                        .outputItem(2, set.machineHull, 1)
+                        .inputItem(0, mainMaterial.tag("plate"), 8)
+                        .inputItem(0, set.cable, 2)
+                        .workTicks(100)
+                        .voltage(voltage)
                         .build();
             });
             return new ComponentSet(this);

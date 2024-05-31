@@ -35,20 +35,18 @@ public final class DrawableHelper {
                 .build();
     }
 
-    public static IDrawable createBackground(IGuiHelper helper, Layout layout) {
-        var builder = ComposeDrawable.builder();
+    public static ComposeDrawable.Builder createBackground(IGuiHelper helper, Layout layout, int width) {
+        var xOffset = (width - layout.rect.width()) / 2;
+        var builder = ComposeDrawable.builder()
+                .add(helper.createBlankDrawable(width, layout.rect.height()));
         for (var slot : layout.slots) {
-            builder.add(helper.getSlotDrawable(), slot.x(), slot.y());
+            builder.add(helper.getSlotDrawable(), xOffset + slot.x(), slot.y());
         }
         for (var image : layout.images) {
             var rect = image.rect();
             builder.add(createStatic(helper, image.texture(), rect.width(), rect.height()),
-                    rect.x(), rect.y());
+                    xOffset + rect.x(), rect.y());
         }
-        if (layout.progressBar != null) {
-            var rect = layout.progressBar.rect();
-            builder.add(helper.createBlankDrawable(rect.width(), rect.height()), rect.x(), rect.y());
-        }
-        return builder.build();
+        return builder;
     }
 }

@@ -21,6 +21,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
 
@@ -30,28 +31,42 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCategory<T> {
+    protected static final int WIDTH = Menu.WIDTH - Menu.SLOT_SIZE;
+
     protected final RecipeType<T> type;
     private final Component title;
-    private final IDrawable background;
+    protected final IDrawable background;
     private final IDrawable icon;
     protected final Layout layout;
+    protected final int xOffset;
 
     @Nullable
     private final LoadingCache<Integer, IDrawable> cachedProgressBar;
     @Nullable
     private final Rect progressBarRect;
 
-    public RecipeCategory(RecipeType<T> type, IJeiHelpers helpers, Layout layout, ItemStack icon) {
+    private static IDrawable createBackground(IJeiHelpers helpers, Layout layout) {
+        return DrawableHelper.createBackground(helpers.getGuiHelper(), layout, WIDTH)
+                .build();
+    }
+
+    protected RecipeCategory(RecipeType<T> type, IJeiHelpers helpers, Layout layout, ItemStack icon) {
+        this(type, helpers, createBackground(helpers, layout), layout, icon);
+    }
+
+    protected RecipeCategory(RecipeType<T> type, IJeiHelpers helpers, IDrawable background,
+                             Layout layout, ItemStack icon) {
         this.type = type;
         this.title = new TranslatableComponent(ModelGen.translate(type.getUid()));
         var guiHelper = helpers.getGuiHelper();
-        this.background = DrawableHelper.createBackground(guiHelper, layout);
+        this.background = background;
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, icon);
         this.layout = layout;
+        this.xOffset = (WIDTH - layout.rect.width()) / 2;
 
         if (layout.progressBar != null) {
             var texture = layout.progressBar.texture();
-            this.progressBarRect = layout.progressBar.rect();
+            this.progressBarRect = layout.progressBar.rect().offset(xOffset, 0);
             this.cachedProgressBar = CacheBuilder.newBuilder()
                     .maximumSize(25)
                     .build(new CacheLoader<>() {
@@ -100,7 +115,7 @@ public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCate
 
     protected void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot,
                                  Ingredient ingredient, RecipeIngredientRole role) {
-        builder.addSlot(role, slot.x() + 1, slot.y() + 1)
+        builder.addSlot(role, slot.x() + 1 + xOffset, slot.y() + 1)
                 .addIngredients(ingredient);
     }
 

@@ -185,4 +185,8 @@ public final class RenderUtil {
     public static void renderText(PoseStack poseStack, Component text, int x, int y, int color) {
         ClientUtil.getFont().draw(poseStack, text, (float) x, (float) y, color);
     }
+
+    public static void renderText(PoseStack poseStack, Component text, int x, int y) {
+        renderText(poseStack, text, x, y, TEXT_COLOR);
+    }
 }

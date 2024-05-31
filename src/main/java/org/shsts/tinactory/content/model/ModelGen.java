@@ -124,6 +124,12 @@ public final class ModelGen {
         return $ -> $.blockState(model::blockState).translucent();
     }
 
+    public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
+    machineItem(Voltage voltage, ResourceLocation front) {
+        var model = new MachineModel(casing(voltage), front);
+        return model::itemModel;
+    }
+
     public static <S extends BlockBuilder<? extends Block, ?, S>>
     Transformer<S> primitive(ResourceLocation tex) {
         return $ -> $.blockState(ctx -> {

@@ -21,6 +21,7 @@ public final class FirstDegrees {
                 .color(0xFFC8B4B4).icon(IconSet.METALLIC)
                 .metalSet()
                 .toolProcess().smelt()
+                .tool(200, Tiers.IRON).basic().build()
                 .buildObject();
 
         BRONZE = set("bronze")
