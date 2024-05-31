@@ -181,7 +181,7 @@ public class MachineSet<T extends ProcessingRecipe> {
                     .recipeType(recipeType).voltage(voltage)
                     .build()
                     .menu()
-                    .plugin(ProcessingPlugin.builder())
+                    .plugin(ProcessingPlugin.builder(layout))
                     .plugin(RecipeBookPlugin.builder(recipeType, layout))
                     .build()
                     .build()
@@ -201,9 +201,14 @@ public class MachineSet<T extends ProcessingRecipe> {
         @Override
         protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         createMachine(Voltage voltage) {
+            assert layoutSet != null;
+            var layout = layoutSet.get(voltage);
             return getMachineBuilder(voltage)
                     .blockEntity()
                     .simpleCapability(OreAnalyzerProcessor.builder(voltage))
+                    .menu()
+                    .plugin(ProcessingPlugin.builder(layout))
+                    .build()
                     .build()
                     .register();
         }

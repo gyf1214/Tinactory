@@ -2,12 +2,13 @@ package org.shsts.tinactory.content.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
@@ -15,6 +16,7 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.client.SwitchButton;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
+import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiConsumer;
@@ -29,7 +31,6 @@ import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
-    private static final int START_X = CONTENT_WIDTH - SLOT_SIZE * 2;
     private static final Texture SWITCH_TEX = Texture.SWITCH_BUTTON;
 
     private final int autoDumpItemSlot;
@@ -40,9 +41,18 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
         return menu.addSyncSlot(MenuSyncPacket.Boolean::new, be -> getter.test(Machine.get(be)));
     }
 
-    public ProcessingPlugin(M menu) {
-        this.autoDumpItemSlot = syncSlot(menu, m -> m.config.getBoolean("autoDumpItem", false));
-        this.autoDumpFluidSlot = syncSlot(menu, m -> m.config.getBoolean("autoDumpFluid", false));
+    public ProcessingPlugin(M menu, boolean autoDumpItem, boolean autoDumpFluid) {
+        if (autoDumpItem) {
+            this.autoDumpItemSlot = syncSlot(menu, m -> m.config.getBoolean("autoDumpItem", false));
+        } else {
+            this.autoDumpItemSlot = -1;
+        }
+
+        if (autoDumpFluid) {
+            this.autoDumpFluidSlot = syncSlot(menu, m -> m.config.getBoolean("autoDumpFluid", false));
+        } else {
+            this.autoDumpFluidSlot = -1;
+        }
         menu.onEventPacket(SET_MACHINE, p -> Machine.get(menu.blockEntity).setConfig(p));
 
         this.startY = menu.getHeight() + SPACING_VERTICAL;
@@ -66,18 +76,35 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void applyMenuScreen(MenuScreen<M> screen) {
-        var autoDumpItemTip = new TranslatableComponent("tinactory.tooltip.autoDumpItem");
-        addSwitchButton(screen, START_X, autoDumpItemTip, autoDumpItemSlot, (menu, val) ->
-                menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("autoDumpItem", val)));
-        addStaticWidget(screen, START_X, Texture.ITEM_OUT_BUTTON);
-
-        var autoDumpFluidTip = new TranslatableComponent("tinactory.tooltip.autoDumpFluid");
-        addSwitchButton(screen, START_X + SLOT_SIZE, autoDumpFluidTip, autoDumpFluidSlot, (menu, val) ->
-                menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("autoDumpFluid", val)));
-        addStaticWidget(screen, START_X + SLOT_SIZE, Texture.FLUID_OUT_BUTTON);
+        var x = CONTENT_WIDTH - SLOT_SIZE;
+        if (autoDumpFluidSlot >= 0) {
+            var autoDumpFluidTip = I18n.tr("tinactory.tooltip.autoDumpFluid");
+            addSwitchButton(screen, x, autoDumpFluidTip, autoDumpFluidSlot, (menu, val) ->
+                    menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("autoDumpFluid", val)));
+            addStaticWidget(screen, x, Texture.FLUID_OUT_BUTTON);
+            x -= SLOT_SIZE;
+        }
+        if (autoDumpItemSlot >= 0) {
+            var autoDumpItemTip = I18n.tr("tinactory.tooltip.autoDumpItem");
+            addSwitchButton(screen, x, autoDumpItemTip, autoDumpItemSlot, (menu, val) ->
+                    menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("autoDumpItem", val)));
+            addStaticWidget(screen, x, Texture.ITEM_OUT_BUTTON);
+        }
     }
 
-    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>> builder() {
-        return ProcessingPlugin::new;
+    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>> builder(Layout layout) {
+        var hasItemOutput = false;
+        var hasFluidOutput = false;
+        for (var slot : layout.slots) {
+            if (slot.type() == SlotType.ITEM_OUTPUT) {
+                hasItemOutput = true;
+            }
+            if (slot.type() == SlotType.FLUID_OUTPUT) {
+                hasFluidOutput = true;
+            }
+        }
+        var hasItem = hasItemOutput;
+        var hasFluid = hasFluidOutput;
+        return menu -> new ProcessingPlugin<>(menu, hasItem, hasFluid);
     }
 }
