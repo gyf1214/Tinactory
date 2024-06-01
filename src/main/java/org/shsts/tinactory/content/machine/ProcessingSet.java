@@ -164,11 +164,13 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
             @Override
             protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
+                var layout = getLayout(voltage);
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
                         .simpleCapability(RecipeProcessor.generator(recipeType, voltage))
                         .menu()
-                        .plugin(ProcessingPlugin.builder(getLayout(voltage)))
+                        .plugin(ProcessingPlugin.builder(layout))
+                        .plugin(RecipeBookPlugin.builder(recipeType, layout))
                         .build()
                         .build();
             }

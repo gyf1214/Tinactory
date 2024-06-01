@@ -52,6 +52,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet<ProcessingRecipe> ALLOY_SMELTER;
     public static final ProcessingSet<GeneratorRecipe> STEAM_TURBINE;
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
+    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -213,7 +214,7 @@ public final class AllBlockEntities {
 
         STEAM_TURBINE = generator(AllRecipes.STEAM_TURBINE)
                 .voltage(Voltage.ULV, Voltage.HV)
-                .overlay(gregtech("blocks/generators/steam_turbine"))
+                .overlay(gregtech("blocks/generators/steam_turbine/overlay_side"))
                 .layoutSet()
                 .port(SlotType.FLUID_INPUT)
                 .slot(0, 1)
@@ -223,26 +224,8 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        LOW_PRESSURE_BOILER = REGISTRATE.blockEntitySet("machine/boiler/low",
-                        SmartBlockEntity::new,
-                        MachineBlock.factory(Voltage.PRIMITIVE))
-                .entityClass(SmartBlockEntity.class)
-                .blockEntity()
-                .eventManager()
-                .simpleCapability(Machine::builder)
-                .simpleCapability(Boiler.builder(1d))
-                .simpleCapability(StackProcessingContainer.builder(AllLayouts.BOILER))
-                .menu(ProcessingMenu.factory(AllLayouts.BOILER))
-                .plugin(ProcessingPlugin.builder(AllLayouts.BOILER))
-                .plugin(BoilerPlugin::new)
-                .build()
-                .build()
-                .block()
-                .transform(ModelGen.machine(Voltage.LV, gregtech("blocks/generators/boiler/coal")))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
-                .defaultBlockItem().dropSelf()
-                .build()
-                .register();
+        LOW_PRESSURE_BOILER = boiler("low", 1d, Voltage.ULV);
+        HIGH_PRESSURE_BOILER = boiler("high", 2.2d, Voltage.MV);
     }
 
     public static final Set<ProcessingSet<?>> PROCESSING_SETS;
@@ -259,6 +242,30 @@ public final class AllBlockEntities {
     private static ProcessingSet.Builder<GeneratorRecipe, ?>
     generator(RecipeTypeEntry<GeneratorRecipe, ?> recipeType) {
         return ProcessingSet.generator(recipeType).onCreateObject(PROCESSING_SETS::add);
+    }
+
+    private static BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+    boiler(String name, double burnSpeed, Voltage casingVoltage) {
+        var id = "machine/boiler/" + name;
+        var layout = AllLayouts.BOILER;
+        return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(Voltage.PRIMITIVE))
+                .entityClass(SmartBlockEntity.class)
+                .blockEntity()
+                .eventManager()
+                .simpleCapability(Machine::builder)
+                .simpleCapability(Boiler.builder(burnSpeed))
+                .simpleCapability(StackProcessingContainer.builder(layout))
+                .menu(ProcessingMenu.factory(layout))
+                .plugin(ProcessingPlugin.builder(layout))
+                .plugin(BoilerPlugin::new)
+                .build()
+                .build()
+                .block()
+                .transform(ModelGen.machine(casingVoltage, gregtech("blocks/generators/boiler/coal")))
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
+                .build()
+                .register();
     }
 
     public static void init() {}

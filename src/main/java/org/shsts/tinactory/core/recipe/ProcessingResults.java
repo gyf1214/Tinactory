@@ -47,10 +47,10 @@ public final class ProcessingResults {
                 return autoVoid;
             }
             if (portClazz.isInstance(port)) {
-                if (autoVoid || (rate < 1d && (simulate || random.nextDouble() > rate))) {
+                if (rate < 1d && (simulate || random.nextDouble() > rate)) {
                     return true;
                 }
-                return doInsertPort(portClazz.cast(port), random, simulate);
+                return doInsertPort(portClazz.cast(port), random, simulate) || autoVoid;
             }
             return false;
         }

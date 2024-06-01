@@ -155,7 +155,7 @@ public class Boiler extends CapabilityProvider implements
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        heat = tag.getDouble("hear");
+        heat = tag.getDouble("heat");
         maxBurn = tag.getLong("maxBurn");
         currentBurn = tag.getLong("currentBurn");
         leftSteam = tag.getDouble("leftSteam");
