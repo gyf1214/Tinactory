@@ -3,6 +3,8 @@ package org.shsts.tinactory.content.machine;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -18,6 +20,12 @@ public enum Voltage {
         this.rank = rank;
         this.value = rank == 0 ? 0 : 2L << (2L * rank);
         this.id = name().toLowerCase();
+    }
+
+    public static List<Voltage> between(Voltage from, Voltage to) {
+        return Arrays.stream(Voltage.values())
+                .filter(x -> x.rank >= from.rank && x.rank <= to.rank)
+                .toList();
     }
 
     public static Voltage fromValue(long value) {

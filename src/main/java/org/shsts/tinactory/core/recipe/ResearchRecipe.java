@@ -12,7 +12,6 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
@@ -53,11 +52,6 @@ public class ResearchRecipe extends ProcessingRecipe {
     public void insertOutputs(IContainer container, Random random) {
         container.getOwnerTeam()
                 .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress));
-    }
-
-    @Override
-    public IProcessingObject getDisplay() {
-        return inputs.isEmpty() ? ProcessingResults.EMPTY : inputs.get(0).ingredient();
     }
 
     public static class Builder extends ProcessingRecipe.BuilderBase<ResearchRecipe, Builder> {

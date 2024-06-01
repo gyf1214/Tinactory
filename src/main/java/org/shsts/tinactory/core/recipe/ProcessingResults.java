@@ -22,13 +22,13 @@ public final class ProcessingResults {
     public static final IProcessingResult EMPTY = new ItemResult(true, 0, ItemStack.EMPTY);
 
     public static abstract class RatedResult<T extends IPort> implements IProcessingResult {
-        public final boolean allowEmpty;
+        public final boolean autoVoid;
         public final double rate;
         private final PortType portType;
         private final Class<T> portClazz;
 
-        public RatedResult(boolean allowEmpty, double rate, PortType portType, Class<T> portClazz) {
-            this.allowEmpty = allowEmpty;
+        public RatedResult(boolean autoVoid, double rate, PortType portType, Class<T> portClazz) {
+            this.autoVoid = autoVoid;
             this.rate = rate;
             this.portType = portType;
             this.portClazz = portClazz;
@@ -44,10 +44,10 @@ public final class ProcessingResults {
         @Override
         public boolean insertPort(IPort port, Random random, boolean simulate) {
             if (port == IPort.EMPTY) {
-                return allowEmpty;
+                return autoVoid;
             }
             if (portClazz.isInstance(port)) {
-                if (rate < 1d && (simulate || random.nextDouble() > rate)) {
+                if (autoVoid || (rate < 1d && (simulate || random.nextDouble() > rate))) {
                     return true;
                 }
                 return doInsertPort(portClazz.cast(port), random, simulate);
@@ -56,12 +56,12 @@ public final class ProcessingResults {
         }
 
         protected void toNetwork(FriendlyByteBuf buf) {
-            buf.writeBoolean(allowEmpty);
+            buf.writeBoolean(autoVoid);
             buf.writeDouble(rate);
         }
 
         protected void toJson(JsonObject jo) {
-            jo.addProperty("allow_empty", allowEmpty);
+            jo.addProperty("auto_void", autoVoid);
             if (rate < 1) {
                 jo.addProperty("rate", rate);
             }
@@ -71,8 +71,8 @@ public final class ProcessingResults {
     public static class ItemResult extends RatedResult<IItemCollection> {
         public final ItemStack stack;
 
-        public ItemResult(boolean allowEmpty, double rate, ItemStack stack) {
-            super(allowEmpty, rate, PortType.ITEM, IItemCollection.class);
+        public ItemResult(boolean autoVoid, double rate, ItemStack stack) {
+            super(autoVoid, rate, PortType.ITEM, IItemCollection.class);
             this.stack = stack;
         }
 
@@ -110,7 +110,7 @@ public final class ProcessingResults {
             public ItemResult fromJson(JsonElement je) {
                 var jo = je.getAsJsonObject();
                 return new ItemResult(
-                        GsonHelper.getAsBoolean(jo, "allow_empty"),
+                        GsonHelper.getAsBoolean(jo, "auto_void"),
                         GsonHelper.getAsDouble(jo, "rate", 1d),
                         parseJson(ItemStack.CODEC, GsonHelper.getAsJsonObject(jo, "item")));
             }
@@ -120,8 +120,8 @@ public final class ProcessingResults {
     public static class FluidResult extends RatedResult<IFluidCollection> {
         public final FluidStack stack;
 
-        public FluidResult(boolean allowEmpty, double rate, FluidStack stack) {
-            super(allowEmpty, rate, PortType.FLUID, IFluidCollection.class);
+        public FluidResult(boolean autoVoid, double rate, FluidStack stack) {
+            super(autoVoid, rate, PortType.FLUID, IFluidCollection.class);
             this.stack = stack;
         }
 
@@ -159,7 +159,7 @@ public final class ProcessingResults {
             public FluidResult fromJson(JsonElement je) {
                 var jo = je.getAsJsonObject();
                 return new FluidResult(
-                        GsonHelper.getAsBoolean(jo, "allow_empty"),
+                        GsonHelper.getAsBoolean(jo, "auto_void"),
                         GsonHelper.getAsDouble(jo, "rate", 1d),
                         parseJson(FluidStack.CODEC, GsonHelper.getAsJsonObject(jo, "fluid")));
             }

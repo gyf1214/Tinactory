@@ -30,7 +30,6 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -98,9 +97,13 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     }
 
     public IProcessingObject getDisplay() {
-        return outputs.stream().min(Comparator.comparingInt(a -> a.port))
-                .map(Output::result)
-                .orElse(ProcessingResults.EMPTY);
+        if (!outputs.isEmpty()) {
+            return outputs.get(0).result;
+        } else if (!inputs.isEmpty()) {
+            return inputs.get(0).ingredient;
+        } else {
+            return ProcessingResults.EMPTY;
+        }
     }
 
     public static Optional<ProcessingRecipe> byKey(RecipeManager manager, ResourceLocation loc) {
@@ -116,9 +119,15 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         protected long voltage = 0;
         protected long power = 0;
         protected double amperage = 0d;
+        protected boolean autoVoid = false;
 
         public BuilderBase(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
             super(registrate, parent, loc);
+        }
+
+        public S autoVoid() {
+            autoVoid = true;
+            return self();
         }
 
         public S input(int port, Supplier<IProcessingIngredient> ingredient) {
@@ -161,7 +170,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         public S outputItem(int port, Supplier<? extends ItemLike> item, int amount, double rate) {
             return output(port, () ->
-                    new ProcessingResults.ItemResult(true, rate, new ItemStack(item.get(), amount)));
+                    new ProcessingResults.ItemResult(autoVoid, rate, new ItemStack(item.get(), amount)));
         }
 
         public S outputItem(int port, Supplier<? extends ItemLike> item, int amount) {
@@ -174,12 +183,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount, double rate) {
             return output(port, () -> new ProcessingResults.FluidResult(
-                    true, rate, new FluidStack(fluid.get(), amount)));
-        }
-
-        public S outputFluid(int port, Fluid fluid, int amount, double rate) {
-            return output(port, new ProcessingResults.FluidResult(
-                    true, rate, new FluidStack(fluid, amount)));
+                    autoVoid, rate, new FluidStack(fluid.get(), amount)));
         }
 
         public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
@@ -187,7 +191,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
 
         public S outputFluid(int port, Fluid fluid, int amount) {
-            return outputFluid(port, fluid, amount, 1d);
+            return outputFluid(port, () -> fluid, amount);
         }
 
         public S workTicks(long value) {

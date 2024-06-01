@@ -7,19 +7,17 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartRecipe;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
-    private OreAnalyzerProcessor(BlockEntity blockEntity, Voltage voltage) {
+    public OreAnalyzerProcessor(BlockEntity blockEntity, Voltage voltage) {
         super(blockEntity, AllRecipes.ORE_ANALYZER.get(), voltage);
     }
 
@@ -65,10 +63,5 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
         if (!emptyRecipe) {
             recipe.doInsertOutputs(getContainer(), random);
         }
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Voltage voltage) {
-        return CapabilityProviderBuilder.fromFactory("machine/ore_analyzer_processor",
-                be -> new OreAnalyzerProcessor(be, voltage));
     }
 }

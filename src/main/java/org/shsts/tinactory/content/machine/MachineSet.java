@@ -24,13 +24,13 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -62,7 +62,7 @@ public class MachineSet<T extends ProcessingRecipe> {
         return machines.get(voltage).getBlock();
     }
 
-    public static abstract class Builder<T extends ProcessingRecipe, P, S extends Builder<T, P, S>> extends
+    public abstract static class Builder<T extends ProcessingRecipe, P, S extends Builder<T, P, S>> extends
             SimpleBuilder<MachineSet<T>, P, S> {
         protected final RecipeTypeEntry<T, ?> recipeType;
         protected final Set<Voltage> voltages = new HashSet<>();
@@ -77,9 +77,12 @@ public class MachineSet<T extends ProcessingRecipe> {
         }
 
         public S voltage(Voltage from) {
-            Arrays.stream(Voltage.values())
-                    .filter(v -> v.rank >= from.rank && v.rank <= Voltage.IV.rank)
-                    .forEach(voltages::add);
+            voltages.addAll(Voltage.between(from, Voltage.IV));
+            return self();
+        }
+
+        public S voltage(Voltage from, Voltage to) {
+            voltages.addAll(Voltage.between(from, to));
             return self();
         }
 
@@ -126,9 +129,7 @@ public class MachineSet<T extends ProcessingRecipe> {
                     .entityClass(PrimitiveMachine.class)
                     .blockEntity()
                     .eventManager().ticking()
-                    .capability(RecipeProcessor::builder)
-                    .recipeType(recipeType).voltage(Voltage.PRIMITIVE)
-                    .build() // recipeProcessor
+                    .simpleCapability(RecipeProcessor.basic(recipeType, Voltage.PRIMITIVE))
                     .capability(StackProcessingContainer::builder).layout(layout).build()
                     .menu(ProcessingMenu.factory(layout)).build()
                     .build()
@@ -161,65 +162,74 @@ public class MachineSet<T extends ProcessingRecipe> {
             var primitive = voltages.contains(Voltage.PRIMITIVE) ? createPrimitive() : null;
             return new MachineSet<>(recipeType, layoutSet, machines, primitive);
         }
-    }
 
-    public static class ProcessingBuilder<T extends ProcessingRecipe, P> extends
-            Builder<T, P, ProcessingBuilder<T, P>> {
-
-        public ProcessingBuilder(RecipeTypeEntry<T, ?> recipeType, P parent) {
-            super(recipeType, parent);
-        }
-
-        @Override
-        protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
-        createMachine(Voltage voltage) {
-            assert layoutSet != null;
-            var layout = layoutSet.get(voltage);
-            return getMachineBuilder(voltage)
-                    .blockEntity()
-                    .capability(RecipeProcessor::builder)
-                    .recipeType(recipeType).voltage(voltage)
-                    .build()
-                    .menu()
-                    .plugin(ProcessingPlugin.builder(layout))
-                    .plugin(RecipeBookPlugin.builder(recipeType, layout))
-                    .build()
-                    .build()
-                    .register();
+        private abstract static class Simple<T1 extends ProcessingRecipe, P1> extends
+                Builder<T1, P1, Simple<T1, P1>> {
+            public Simple(RecipeTypeEntry<T1, ?> recipeType, P1 parent) {
+                super(recipeType, parent);
+            }
         }
     }
 
-    public static class OreAnalyzerBuilder<P> extends Builder<OreAnalyzerRecipe, P, OreAnalyzerBuilder<P>> {
-        private static final ResourceLocation OVERLAY =
-                ModelGen.gregtech("blocks/machines/electromagnetic_separator");
-
-        public OreAnalyzerBuilder(P parent) {
-            super(AllRecipes.ORE_ANALYZER, parent);
-            overlay(OVERLAY);
-        }
-
-        @Override
-        protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
-        createMachine(Voltage voltage) {
-            assert layoutSet != null;
-            var layout = layoutSet.get(voltage);
-            return getMachineBuilder(voltage)
-                    .blockEntity()
-                    .simpleCapability(OreAnalyzerProcessor.builder(voltage))
-                    .menu()
-                    .plugin(ProcessingPlugin.builder(layout))
-                    .build()
-                    .build()
-                    .register();
-        }
-    }
-
-    public static <T extends ProcessingRecipe> ProcessingBuilder<T, Unit>
+    public static <T extends ProcessingRecipe> Builder<T, ?, ?>
     processing(RecipeTypeEntry<T, ?> recipeType) {
-        return new ProcessingBuilder<>(recipeType, Unit.INSTANCE);
+        return new Builder.Simple<>(recipeType, Unit.INSTANCE) {
+            @Override
+            protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            createMachine(Voltage voltage) {
+                assert layoutSet != null;
+                var layout = layoutSet.get(voltage);
+                return getMachineBuilder(voltage)
+                        .blockEntity()
+                        .simpleCapability(RecipeProcessor.basic(recipeType, voltage))
+                        .menu()
+                        .plugin(ProcessingPlugin.builder(layout))
+                        .plugin(RecipeBookPlugin.builder(recipeType, layout))
+                        .build()
+                        .build()
+                        .register();
+            }
+        };
     }
 
-    public static OreAnalyzerBuilder<Unit> oreAnalyzer() {
-        return new OreAnalyzerBuilder<>(Unit.INSTANCE);
+    public static Builder<OreAnalyzerRecipe, ?, ?> oreAnalyzer() {
+        var builder = new Builder.Simple<>(AllRecipes.ORE_ANALYZER, Unit.INSTANCE) {
+            @Override
+            protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            createMachine(Voltage voltage) {
+                assert layoutSet != null;
+                var layout = layoutSet.get(voltage);
+                return getMachineBuilder(voltage)
+                        .blockEntity()
+                        .simpleCapability(RecipeProcessor.oreProcessor(voltage))
+                        .menu()
+                        .plugin(ProcessingPlugin.builder(layout))
+                        .build()
+                        .build()
+                        .register();
+            }
+        };
+        return builder.overlay(gregtech("blocks/machines/electromagnetic_separator"));
+    }
+
+    public static Builder<ProcessingRecipe, ?, ?>
+    generator(RecipeTypeEntry<ProcessingRecipe, ?> recipeType) {
+        return new Builder.Simple<>(recipeType, Unit.INSTANCE) {
+            @Override
+            protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            createMachine(Voltage voltage) {
+                assert layoutSet != null;
+                var layout = layoutSet.get(voltage);
+                return getMachineBuilder(voltage)
+                        .blockEntity()
+                        .simpleCapability(RecipeProcessor.generator(recipeType, voltage))
+                        .menu()
+                        .plugin(ProcessingPlugin.builder(layout))
+                        .plugin(RecipeBookPlugin.builder(recipeType, layout))
+                        .build()
+                        .build()
+                        .register();
+            }
+        };
     }
 }

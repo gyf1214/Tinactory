@@ -38,6 +38,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STEAM_TURBINE;
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
@@ -62,22 +63,22 @@ public final class AllRecipes {
         ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.SERIALIZER)
                 .clazz(OreAnalyzerRecipe.class)
                 .builder(OreAnalyzerRecipe.Builder::new)
-                .defaults($ -> $.amperage(0.125d).workTicks(32))
+                .defaults($ -> $.autoVoid().amperage(0.125d).workTicks(32))
                 .register();
 
         MACERATOR = REGISTRATE.processingRecipeType("macerator")
-                .defaults($ -> $.amperage(0.25d))
+                .defaults($ -> $.autoVoid().amperage(0.25d))
                 .register();
 
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
-                .defaults($ -> $
+                .defaults($ -> $.autoVoid()
                         .inputFluid(1, Fluids.WATER, 1000)
                         .outputItem(3, AllMaterials.STONE.entry("dust"), 1)
                         .amperage(0.125d))
                 .register();
 
         CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge")
-                .defaults($ -> $.amperage(0.5d))
+                .defaults($ -> $.autoVoid().amperage(0.5d))
                 .register();
 
         THERMAL_CENTRIFUGE = REGISTRATE.processingRecipeType("thermal_centrifuge")
@@ -89,6 +90,10 @@ public final class AllRecipes {
 
         ALLOY_SMELTER = REGISTRATE.processingRecipeType("alloy_smelter")
                 .defaults($ -> $.amperage(0.75d))
+                .register();
+
+        STEAM_TURBINE = REGISTRATE.processingRecipeType("steam_turbine")
+                .defaults($ -> $.autoVoid().amperage(1d).workTicks(100))
                 .register();
     }
 

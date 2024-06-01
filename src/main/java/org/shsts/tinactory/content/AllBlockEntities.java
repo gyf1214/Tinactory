@@ -43,6 +43,7 @@ public final class AllBlockEntities {
     public static final MachineSet<ProcessingRecipe> CENTRIFUGE;
     public static final MachineSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
     public static final MachineSet<ProcessingRecipe> ALLOY_SMELTER;
+    public static final MachineSet<ProcessingRecipe> STEAM_TURBINE;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -201,21 +202,34 @@ public final class AllBlockEntities {
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, 0)
                 .build()
                 .buildObject();
+
+        STEAM_TURBINE = generator(AllRecipes.STEAM_TURBINE)
+                .voltage(Voltage.ULV, Voltage.HV)
+                .overlay(gregtech("blocks/generators/steam_turbine"))
+                .layoutSet()
+                .port(SlotType.FLUID_INPUT)
+                .slot(0, 1)
+                .port(SlotType.FLUID_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .build()
+                .buildObject();
     }
 
     public static final Set<MachineSet<?>> PROCESSING_SETS;
 
-    private static <S extends MachineSet.Builder<?, ?, S>> S set(S builder) {
-        return builder.onCreateObject(PROCESSING_SETS::add);
-    }
-
-    private static <T extends ProcessingRecipe> MachineSet.ProcessingBuilder<T, ?>
+    private static <T extends ProcessingRecipe> MachineSet.Builder<T, ?, ?>
     processing(RecipeTypeEntry<T, ?> recipeType) {
-        return MachineSet.processing(recipeType).transform(AllBlockEntities::set);
+        return MachineSet.processing(recipeType).onCreateObject(PROCESSING_SETS::add);
     }
 
-    private static MachineSet.OreAnalyzerBuilder<?> oreAnalyzer() {
-        return MachineSet.oreAnalyzer().transform(AllBlockEntities::set);
+    private static MachineSet.Builder<OreAnalyzerRecipe, ?, ?> oreAnalyzer() {
+        return MachineSet.oreAnalyzer().onCreateObject(PROCESSING_SETS::add);
+    }
+
+    private static MachineSet.Builder<ProcessingRecipe, ?, ?>
+    generator(RecipeTypeEntry<ProcessingRecipe, ?> recipeType) {
+        return MachineSet.generator(recipeType).onCreateObject(PROCESSING_SETS::add);
     }
 
     public static void init() {}

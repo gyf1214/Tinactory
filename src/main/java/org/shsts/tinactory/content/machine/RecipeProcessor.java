@@ -10,7 +10,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -26,6 +25,7 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -35,24 +35,23 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvider
         implements IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final long PROGRESS_PER_TICK = 256;
+    protected static final long PROGRESS_PER_TICK = 256;
 
-    private final BlockEntity blockEntity;
+    protected final BlockEntity blockEntity;
     protected final RecipeType<? extends T> recipeType;
     protected final Voltage voltage;
 
-    private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
+    protected long workProgress = 0;
+    protected double workFactor = 1d;
+    protected double energyFactor = 1d;
 
-    private long workProgress = 0;
-    private double workFactor = 1d;
-    private double energyFactor = 1d;
+    private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
 
     /**
      * This is only used during deserializeNBT when world is not available.
@@ -60,7 +59,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     @Nullable
     private ResourceLocation currentRecipeLoc = null;
     @Nullable
-    private T currentRecipe = null;
+    protected T currentRecipe = null;
     @Nullable
     private IContainer container = null;
     private boolean needUpdate = true;
@@ -95,7 +94,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
                 .orElse(null);
     }
 
-    private void calculateFactors(ProcessingRecipe recipe) {
+    protected void calculateFactors(ProcessingRecipe recipe) {
         var baseVoltage = recipe.voltage == 0 ? Voltage.ULV.value : recipe.voltage;
         var voltageFactor = 1L;
         var overclock = 1L;
@@ -162,15 +161,18 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         recipe.insertOutputs(getContainer(), random);
     }
 
+    protected long getProgressPerTick(double partial) {
+        return (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
+    }
+
     @Override
     public void onWorkTick(double partial) {
         if (currentRecipe == null) {
             return;
         }
-        var progress = (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
+        var progress = getProgressPerTick(partial);
         workProgress += progress;
         if (workProgress >= getMaxWorkTicks()) {
-            assert currentRecipe != null;
             onWorkDone(currentRecipe, getWorld().random);
             currentRecipe = null;
             needUpdate = true;
@@ -276,37 +278,19 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         }
     }
 
-    public static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
-        @Nullable
-        private Supplier<? extends RecipeType<? extends ProcessingRecipe>> recipeType = null;
-        @Nullable
-        private Voltage voltage = null;
+    private static final String ID = "machine/recipe_processor";
 
-        public Builder(P parent) {
-            super(parent, "machine/recipe_processor");
-        }
-
-        public Builder<P> recipeType(Supplier<? extends RecipeType<? extends ProcessingRecipe>> recipeType) {
-            this.recipeType = recipeType;
-            return this;
-        }
-
-        public Builder<P> voltage(Voltage voltage) {
-            this.voltage = voltage;
-            return this;
-        }
-
-        @Override
-        protected Function<BlockEntity, ICapabilityProvider> createObject() {
-            var recipeType = this.recipeType;
-            var voltage = this.voltage;
-            assert recipeType != null;
-            assert voltage != null;
-            return be -> new RecipeProcessor<>(be, recipeType.get(), voltage);
-        }
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
+    basic(RecipeTypeEntry<? extends ProcessingRecipe, ?> type, Voltage voltage) {
+        return CapabilityProviderBuilder.fromFactory(ID, be -> new RecipeProcessor<>(be, type.get(), voltage));
     }
 
-    public static <P> Builder<P> builder(P parent) {
-        return new Builder<>(parent);
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> oreProcessor(Voltage voltage) {
+        return CapabilityProviderBuilder.fromFactory(ID, be -> new OreAnalyzerProcessor(be, voltage));
+    }
+
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
+    generator(RecipeTypeEntry<? extends ProcessingRecipe, ?> type, Voltage voltage) {
+        return CapabilityProviderBuilder.fromFactory(ID, be -> new GeneratorProcessor(be, type.get(), voltage));
     }
 }

@@ -6,12 +6,14 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
 import org.shsts.tinactory.content.model.CableModel;
 import org.shsts.tinactory.content.model.MachineModel;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.network.CableBlock;
+import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -24,6 +26,7 @@ import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
@@ -35,6 +38,7 @@ public final class AllItems {
     public static final RegistryEntry<Item> ULV_MACHINE_HULL;
     public static final Map<Voltage, ComponentSet> COMPONENT_SETS;
     public static final RegistryEntry<Item> VACUUM_TUBE;
+    public static final RegistryEntry<SimpleFluid> STEAM;
 
     static {
         ULV_CABLE = REGISTRATE.block("network/cable/ulv",
@@ -63,6 +67,8 @@ public final class AllItems {
         VACUUM_TUBE = REGISTRATE.item("circuit/vacuum_tube", Item::new)
                 .model(ModelGen.basicItem(gregtech("items/metaitems/circuit.vacuum_tube")))
                 .register();
+
+        STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
     }
 
     public static void init() {}
@@ -70,6 +76,15 @@ public final class AllItems {
     public static void initRecipes() {
         ulvRecipes();
         COMPONENT_SETS.values().forEach(ComponentSet::addRecipes);
+
+        for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
+            var consume = (int) voltage.value / 8 * (14 - voltage.rank);
+            STEAM_TURBINE.recipe(voltage.id)
+                    .voltage(voltage)
+                    .inputFluid(0, STEAM, consume)
+                    .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
+                    .build();
+        }
     }
 
     private static void ulvRecipes() {
