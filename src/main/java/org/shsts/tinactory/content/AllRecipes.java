@@ -90,7 +90,7 @@ public final class AllRecipes {
                 .register();
 
         ALLOY_SMELTER = REGISTRATE.processingRecipeType("alloy_smelter")
-                .defaults($ -> $.amperage(0.75d))
+                .defaults($ -> $.amperage(1.5d))
                 .register();
 
         STEAM_TURBINE = REGISTRATE.recipeType("steam_turbine", GeneratorRecipe.SERIALIZER)
@@ -175,7 +175,7 @@ public final class AllRecipes {
     private static void primitiveRecipes() {
         // workbench
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.WORKBENCH.getBlock())
+                .shaped(AllBlockEntities.WORKBENCH.block())
                 .pattern("WSW")
                 .pattern("SCS")
                 .pattern("WSW")
@@ -186,7 +186,7 @@ public final class AllRecipes {
 
         // primitive stone generator
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.STONE_GENERATOR.getPrimitive())
+                .shaped(AllBlockEntities.STONE_GENERATOR.block(Voltage.PRIMITIVE))
                 .pattern("WLW")
                 .pattern("L L")
                 .pattern("WLW")
@@ -196,7 +196,7 @@ public final class AllRecipes {
 
         // primitive ore analyzer
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.ORE_ANALYZER.getPrimitive())
+                .shaped(AllBlockEntities.ORE_ANALYZER.block(Voltage.PRIMITIVE))
                 .pattern("WLW")
                 .pattern("LFL")
                 .pattern("WLW")
@@ -207,7 +207,7 @@ public final class AllRecipes {
 
         // primitive ore washer
         REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.ORE_WASHER.getPrimitive())
+                .shaped(AllBlockEntities.ORE_WASHER.block(Voltage.PRIMITIVE))
                 .pattern("WLW")
                 .pattern("LFL")
                 .pattern("WLW")

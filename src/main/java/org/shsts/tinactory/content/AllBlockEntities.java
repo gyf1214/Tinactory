@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
+import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -49,6 +50,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet<ProcessingRecipe> ORE_WASHER;
     public static final ProcessingSet<ProcessingRecipe> CENTRIFUGE;
     public static final ProcessingSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
+    public static final MachineSet ELECTRIC_FURNACE;
     public static final ProcessingSet<ProcessingRecipe> ALLOY_SMELTER;
     public static final ProcessingSet<GeneratorRecipe> STEAM_TURBINE;
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
@@ -200,7 +202,19 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
+        ELECTRIC_FURNACE = ProcessingSet.electricFurnace()
+                .voltage(Voltage.ULV)
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 1)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .build()
+                .buildObject();
+
         ALLOY_SMELTER = processing(AllRecipes.ALLOY_SMELTER)
+                .voltage(Voltage.ULV)
                 .overlay(gregtech("blocks/machines/alloy_smelter"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)

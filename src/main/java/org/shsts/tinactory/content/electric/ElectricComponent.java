@@ -72,7 +72,7 @@ public class ElectricComponent extends Component {
             if (powerBufferGen < MathUtil.EPS) {
                 return 0d;
             }
-            return MathUtil.clamp(power / powerBufferGen, 0d, 1d);
+            return MathUtil.clamp(power / powerBufferGen, -1d, 0d);
         }
     }
 

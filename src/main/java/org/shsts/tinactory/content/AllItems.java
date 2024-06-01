@@ -6,7 +6,10 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
 import org.shsts.tinactory.content.model.CableModel;
@@ -18,15 +21,24 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
+import static org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER;
+import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
+import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
+import static org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER;
+import static org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER;
+import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_TABLE;
+import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
+import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
@@ -79,7 +91,7 @@ public final class AllItems {
 
         for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
             var consume = (int) voltage.value / 8 * (14 - voltage.rank);
-            STEAM_TURBINE.recipe(voltage.id)
+            AllRecipes.STEAM_TURBINE.recipe(voltage.id)
                     .voltage(voltage)
                     .inputFluid(0, STEAM, consume)
                     .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
@@ -108,5 +120,40 @@ public final class AllItems {
                 .define('W', ULV_CABLE)
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
+
+        ulvMachine(STONE_GENERATOR);
+        ulvMachine(ORE_ANALYZER);
+        ulvMachine(ORE_WASHER);
+        ulvMachine(NETWORK_CONTROLLER.entry(), VACUUM_TUBE);
+        ulvMachine(RESEARCH_TABLE.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
+        ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH.entry());
+        ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
+
+        TOOL.recipe(ALLOY_SMELTER.entry(Voltage.ULV))
+                .result(ALLOY_SMELTER.entry(Voltage.ULV), 1)
+                .pattern("WVW").pattern("VHV").pattern("WVW")
+                .define('W', ULV_CABLE)
+                .define('H', ELECTRIC_FURNACE.entry(Voltage.ULV))
+                .define('V', VACUUM_TUBE)
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
+    }
+
+    private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
+                                   Supplier<? extends ItemLike> base) {
+        TOOL.recipe(result)
+                .result(result, 1)
+                .pattern("BBB").pattern("VHV").pattern("WVW")
+                .define('B', base)
+                .define('W', ULV_CABLE)
+                .define('H', ULV_MACHINE_HULL)
+                .define('V', VACUUM_TUBE)
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
+    }
+
+    private static void ulvMachine(MachineSet set) {
+        ulvMachine(set.entry(Voltage.ULV), set.entry(Voltage.PRIMITIVE));
     }
 }
+

@@ -1,12 +1,14 @@
 package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -31,13 +33,29 @@ public class MachineSet {
         this.primitive = primitive;
     }
 
-    public static abstract class Builder<T extends MachineSet, P, S extends Builder<T, P, S>>
+    public RegistryEntry<? extends Block> entry(Voltage voltage) {
+        if (voltage == Voltage.PRIMITIVE) {
+            assert primitive != null;
+            return primitive.entry();
+        }
+        return machines.get(voltage).entry();
+    }
+
+    public Block block(Voltage voltage) {
+        if (voltage == Voltage.PRIMITIVE) {
+            assert primitive != null;
+            return primitive.block();
+        }
+        return machines.get(voltage).block();
+    }
+
+    public static abstract class BuilderBase<T extends MachineSet, P, S extends BuilderBase<T, P, S>>
             extends SimpleBuilder<T, P, S> {
         protected final Set<Voltage> voltages = new HashSet<>();
         @Nullable
         protected Map<Voltage, Layout> layoutSet = null;
 
-        protected Builder(P parent) {
+        protected BuilderBase(P parent) {
             super(parent);
         }
 
@@ -63,8 +81,11 @@ public class MachineSet {
         protected abstract BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         getMachineBuilder(Voltage voltage);
 
-        protected abstract BlockEntitySetBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
-        getPrimitiveBuilder();
+        @Nullable
+        protected BlockEntitySetBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
+        getPrimitiveBuilder() {
+            return null;
+        }
 
         protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         createMachine(Voltage voltage) {
@@ -73,7 +94,9 @@ public class MachineSet {
 
         protected BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
         createPrimitive() {
-            return getPrimitiveBuilder().register();
+            var builder = getPrimitiveBuilder();
+            assert builder != null;
+            return builder.register();
         }
 
         protected abstract T
@@ -92,6 +115,20 @@ public class MachineSet {
                     .collect(Collectors.toMap($ -> $, this::createMachine));
             var primitive = voltages.contains(Voltage.PRIMITIVE) ? createPrimitive() : null;
             return createSet(layoutSet, machines, primitive);
+        }
+    }
+
+    public abstract static class Builder<P> extends BuilderBase<MachineSet, P, Builder<P>> {
+        protected Builder(P parent) {
+            super(parent);
+        }
+
+        @Override
+        protected MachineSet
+        createSet(Map<Voltage, Layout> layoutSet,
+                  Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
+                  @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
+            return new MachineSet(layoutSet, machines, primitive);
         }
     }
 }

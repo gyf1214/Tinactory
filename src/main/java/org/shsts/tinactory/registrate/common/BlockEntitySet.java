@@ -18,7 +18,11 @@ public class BlockEntitySet<T extends SmartBlockEntity, U extends SmartEntityBlo
         this.block = block;
     }
 
-    public U getBlock() {
+    public U block() {
         return block.get();
+    }
+
+    public RegistryEntry<U> entry() {
+        return block;
     }
 }

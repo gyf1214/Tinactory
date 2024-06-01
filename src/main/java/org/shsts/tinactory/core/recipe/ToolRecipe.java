@@ -163,7 +163,7 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
 
     public static class Builder extends SimpleRecipeBuilder<RecipeTypeEntry<ToolRecipe, Builder>, Builder> {
         @Nullable
-        private Supplier<Item> result = null;
+        private Supplier<? extends ItemLike> result = null;
         private int count = 0;
         private final List<String> rows = new ArrayList<>();
         private final Map<Character, Supplier<Ingredient>> keys = new HashMap<>();
@@ -173,7 +173,7 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
             super(registrate, parent, loc);
         }
 
-        public Builder result(Supplier<Item> result, int count) {
+        public Builder result(Supplier<? extends ItemLike> result, int count) {
             this.result = result;
             this.count = count;
             return self();
@@ -220,7 +220,7 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
             var key = keys.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
             var tools = this.tools.stream().map(Supplier::get).toList();
-            var shaped = new FinishedShaped(loc, result.get(), count, rows, key);
+            var shaped = new FinishedShaped(loc, result.get().asItem(), count, rows, key);
             return new Finished(loc, parent, shaped, tools);
         }
     }

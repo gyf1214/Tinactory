@@ -28,6 +28,7 @@ public final class AllTags {
 
     public static final TagKey<Item> TOOL_HANDLE = modItem("tool_handle");
     public static final TagKey<Item> TOOL_SCREW = modItem("tool_screw");
+    public static final TagKey<Item> ELECTRIC_FURNACE = modItem("machine/electric_furnace");
 
     public static final TagKey<Block> MINEABLE_WITH_WRENCH = modBlock("mineable/wrench");
     public static final TagKey<Block> MINEABLE_WITH_CUTTER = modBlock("mineable/cutter");

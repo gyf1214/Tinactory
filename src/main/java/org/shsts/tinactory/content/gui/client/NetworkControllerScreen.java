@@ -111,7 +111,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         } else {
             refreshTeam();
             stateLabel.setLine(1, tr("stateLabel", packet.getState()));
-            stateLabel.setLine(2, tr("workFactorLabel", "%.2f".formatted(packet.getWorkFactor())));
+            stateLabel.setLine(2, tr("workFactorLabel", "%.0f%%".formatted(packet.getWorkFactor() * 100d)));
             welcomePanel.setActive(false);
             configPanel.setActive(true);
         }

@@ -298,4 +298,9 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     generator(RecipeTypeEntry<? extends GeneratorRecipe, ?> type, Voltage voltage) {
         return CapabilityProviderBuilder.fromFactory(ID, be -> new GeneratorProcessor(be, type.get(), voltage));
     }
+
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
+    electricFurnace(Voltage voltage) {
+        return CapabilityProviderBuilder.fromFactory(ID, be -> new ElectricFurnace(be, voltage));
+    }
 }

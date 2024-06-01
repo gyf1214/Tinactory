@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.jei;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -72,7 +73,7 @@ public class JEI implements IModPlugin {
     processing(ProcessingSet<T> processingSet) {
         var layout = processingSet.layoutSet.get(Voltage.MAXIMUM);
         return category(processingSet.recipeType, (type, helpers) -> new ProcessingCategory<>(type, helpers,
-                        layout, processingSet.getBlock(Voltage.LV)),
+                        layout, processingSet.block(Voltage.LV)),
                 AllTags.processingMachine(processingSet.recipeType));
     }
 
@@ -82,7 +83,7 @@ public class JEI implements IModPlugin {
         this.categories = new ArrayList<>();
 
         categories.add(category(AllRecipes.TOOL, ToolCategory::new,
-                () -> Ingredient.of(AllBlockEntities.WORKBENCH.getBlock())));
+                () -> Ingredient.of(AllBlockEntities.WORKBENCH.block())));
         for (var set : AllBlockEntities.PROCESSING_SETS) {
             categories.add(processing(set));
         }
@@ -112,6 +113,9 @@ public class JEI implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         for (var category : categories) {
             category.addCatalysts(registration);
+        }
+        for (var itemStack : Ingredient.of(AllTags.ELECTRIC_FURNACE).getItems()) {
+            registration.addRecipeCatalyst(VanillaTypes.ITEM_STACK, itemStack, RecipeTypes.SMELTING);
         }
     }
 }

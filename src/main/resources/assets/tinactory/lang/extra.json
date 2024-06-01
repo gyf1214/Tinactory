@@ -12,7 +12,7 @@
   "tinactory.gui.networkController.welcome.button": "Create Team",
   "tinactory.gui.networkController.teamNameLabel": "Team: %s",
   "tinactory.gui.networkController.stateLabel": "State: %s",
-  "tinactory.gui.networkController.workFactorLabel": "Work Factor: %s",
+  "tinactory.gui.networkController.workFactorLabel": "Power Grid: %s",
   "tinactory.gui.networkController.researchLabel": "Research: %s %s/%s",
   "tinactory.gui.networkController.noneResearchLabel": "Research: <none>",
   "tinactory.jei.processing.total": "Total: %s EU",

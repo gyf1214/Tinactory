@@ -18,7 +18,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class ToolCategory extends RecipeCategory<ToolRecipe> {
     public ToolCategory(RecipeType<ToolRecipe> type, IJeiHelpers helpers) {
-        super(type, helpers, AllLayouts.WORKBENCH, new ItemStack(AllBlockEntities.WORKBENCH.getBlock()));
+        super(type, helpers, AllLayouts.WORKBENCH, new ItemStack(AllBlockEntities.WORKBENCH.block()));
     }
 
     @Override

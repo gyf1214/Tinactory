@@ -78,7 +78,7 @@ public final class ProcessingResults {
 
         @Override
         protected boolean doInsertPort(IItemCollection port, Random random, boolean simulate) {
-            return port.insertItem(stack, simulate).isEmpty();
+            return port.acceptInput(stack) && port.insertItem(stack, simulate).isEmpty();
         }
 
         public static final ICombinedSerializer<ItemResult> SERIALIZER = new ICombinedSerializer<>() {
@@ -127,7 +127,7 @@ public final class ProcessingResults {
 
         @Override
         protected boolean doInsertPort(IFluidCollection port, Random random, boolean simulate) {
-            return port.fill(stack, simulate) == stack.getAmount();
+            return port.acceptInput(stack) && port.fill(stack, simulate) == stack.getAmount();
         }
 
         public static final ICombinedSerializer<FluidResult> SERIALIZER = new ICombinedSerializer<>() {

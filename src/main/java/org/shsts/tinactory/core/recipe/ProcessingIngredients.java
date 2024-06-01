@@ -28,7 +28,7 @@ public final class ProcessingIngredients {
 
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
-            return port instanceof IItemCollection itemCollection &&
+            return port instanceof IItemCollection itemCollection && itemCollection.acceptOutput() &&
                     itemCollection.extractItem(stack, simulate).getCount() >= stack.getCount();
         }
 
@@ -115,7 +115,7 @@ public final class ProcessingIngredients {
 
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
-            return port instanceof IFluidCollection fluidCollection &&
+            return port instanceof IFluidCollection fluidCollection && fluidCollection.acceptOutput() &&
                     fluidCollection.drain(fluid, simulate).getAmount() >= fluid.getAmount();
         }
 

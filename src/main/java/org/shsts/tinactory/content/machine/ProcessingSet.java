@@ -4,7 +4,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Unit;
-import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.ProcessingPlugin;
@@ -40,20 +39,8 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
         this.recipeType = recipeType;
     }
 
-    public Block getPrimitive() {
-        assert primitive != null;
-        return primitive.getBlock();
-    }
-
-    public Block getBlock(Voltage voltage) {
-        if (voltage == Voltage.PRIMITIVE) {
-            return getPrimitive();
-        }
-        return machines.get(voltage).getBlock();
-    }
-
     public abstract static class Builder<T extends ProcessingRecipe, P> extends
-            MachineSet.Builder<ProcessingSet<T>, P, Builder<T, P>> {
+            BuilderBase<ProcessingSet<T>, P, Builder<T, P>> {
         protected final RecipeTypeEntry<T, ?> recipeType;
         @Nullable
         protected ResourceLocation overlay = null;
@@ -172,6 +159,34 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .plugin(ProcessingPlugin.builder(layout))
                         .plugin(RecipeBookPlugin.builder(recipeType, layout))
                         .build()
+                        .build();
+            }
+        };
+    }
+
+    public static MachineSet.Builder<?> electricFurnace() {
+        return new MachineSet.Builder<Object>(Unit.INSTANCE) {
+            private final ResourceLocation overlay = gregtech("blocks/machines/electric_furnace");
+
+            @Override
+            protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            getMachineBuilder(Voltage voltage) {
+                var id = "machine/" + voltage.id + "/electric_furnace";
+                var layout = getLayout(voltage);
+                return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
+                        .entityClass(SmartBlockEntity.class)
+                        .blockEntity()
+                        .eventManager()
+                        .simpleCapability(Machine::builder)
+                        .simpleCapability(StackProcessingContainer.builder(layout))
+                        .simpleCapability(RecipeProcessor.electricFurnace(voltage))
+                        .menu(ProcessingMenu.factory(layout)).build()
+                        .build()
+                        .block()
+                        .transform(ModelGen.machine(voltage, overlay))
+                        .tag(AllTags.MINEABLE_WITH_WRENCH)
+                        .blockItem().tag(AllTags.ELECTRIC_FURNACE).build()
+                        .dropSelf()
                         .build();
             }
         };
