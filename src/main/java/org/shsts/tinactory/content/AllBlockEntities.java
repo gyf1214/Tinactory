@@ -11,8 +11,8 @@ import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
-import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
+import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
@@ -41,16 +41,16 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 public final class AllBlockEntities {
     public static final BlockEntitySet<NetworkController, MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
-    public static final MachineSet<ResearchRecipe> RESEARCH_TABLE;
-    public static final MachineSet<AssemblyRecipe> ASSEMBLER;
-    public static final MachineSet<ProcessingRecipe> STONE_GENERATOR;
-    public static final MachineSet<OreAnalyzerRecipe> ORE_ANALYZER;
-    public static final MachineSet<ProcessingRecipe> MACERATOR;
-    public static final MachineSet<ProcessingRecipe> ORE_WASHER;
-    public static final MachineSet<ProcessingRecipe> CENTRIFUGE;
-    public static final MachineSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
-    public static final MachineSet<ProcessingRecipe> ALLOY_SMELTER;
-    public static final MachineSet<GeneratorRecipe> STEAM_TURBINE;
+    public static final ProcessingSet<ResearchRecipe> RESEARCH_TABLE;
+    public static final ProcessingSet<AssemblyRecipe> ASSEMBLER;
+    public static final ProcessingSet<ProcessingRecipe> STONE_GENERATOR;
+    public static final ProcessingSet<OreAnalyzerRecipe> ORE_ANALYZER;
+    public static final ProcessingSet<ProcessingRecipe> MACERATOR;
+    public static final ProcessingSet<ProcessingRecipe> ORE_WASHER;
+    public static final ProcessingSet<ProcessingRecipe> CENTRIFUGE;
+    public static final ProcessingSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
+    public static final ProcessingSet<ProcessingRecipe> ALLOY_SMELTER;
+    public static final ProcessingSet<GeneratorRecipe> STEAM_TURBINE;
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
 
     static {
@@ -245,20 +245,20 @@ public final class AllBlockEntities {
                 .register();
     }
 
-    public static final Set<MachineSet<?>> PROCESSING_SETS;
+    public static final Set<ProcessingSet<?>> PROCESSING_SETS;
 
-    private static <T extends ProcessingRecipe> MachineSet.Builder<T, ?, ?>
+    private static <T extends ProcessingRecipe> ProcessingSet.Builder<T, ?>
     processing(RecipeTypeEntry<T, ?> recipeType) {
-        return MachineSet.processing(recipeType).onCreateObject(PROCESSING_SETS::add);
+        return ProcessingSet.processing(recipeType).onCreateObject(PROCESSING_SETS::add);
     }
 
-    private static MachineSet.Builder<OreAnalyzerRecipe, ?, ?> oreAnalyzer() {
-        return MachineSet.oreAnalyzer().onCreateObject(PROCESSING_SETS::add);
+    private static ProcessingSet.Builder<OreAnalyzerRecipe, ?> oreAnalyzer() {
+        return ProcessingSet.oreAnalyzer().onCreateObject(PROCESSING_SETS::add);
     }
 
-    private static MachineSet.Builder<GeneratorRecipe, ?, ?>
+    private static ProcessingSet.Builder<GeneratorRecipe, ?>
     generator(RecipeTypeEntry<GeneratorRecipe, ?> recipeType) {
-        return MachineSet.generator(recipeType).onCreateObject(PROCESSING_SETS::add);
+        return ProcessingSet.generator(recipeType).onCreateObject(PROCESSING_SETS::add);
     }
 
     public static void init() {}

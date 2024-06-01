@@ -40,5 +40,5 @@ public class GeneratorRecipe extends ProcessingRecipe {
     }
 
     public static final SmartRecipeSerializer.Factory<GeneratorRecipe, Builder> SERIALIZER =
-            ProcessingRecipe.Serializer::new;
+            Serializer::new;
 }

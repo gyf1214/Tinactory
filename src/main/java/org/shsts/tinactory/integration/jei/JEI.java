@@ -16,7 +16,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.MachineSet;
+import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -69,11 +69,11 @@ public class JEI implements IModPlugin {
     }
 
     private static <T extends ProcessingRecipe> CategoryInfo<T>
-    processing(MachineSet<T> machineSet) {
-        var layout = machineSet.layoutSet.get(Voltage.MAXIMUM);
-        return category(machineSet.recipeType, (type, helpers) -> new ProcessingCategory<>(type, helpers,
-                        layout, machineSet.getBlock(Voltage.LV)),
-                AllTags.processingMachine(machineSet.recipeType));
+    processing(ProcessingSet<T> processingSet) {
+        var layout = processingSet.layoutSet.get(Voltage.MAXIMUM);
+        return category(processingSet.recipeType, (type, helpers) -> new ProcessingCategory<>(type, helpers,
+                        layout, processingSet.getBlock(Voltage.LV)),
+                AllTags.processingMachine(processingSet.recipeType));
     }
 
     private final List<CategoryInfo<?>> categories;
