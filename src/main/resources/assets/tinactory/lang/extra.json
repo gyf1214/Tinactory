@@ -1,4 +1,6 @@
 {
+  "block.tinactory.machine.boiler.high": "High Pressure Steam Boiler",
+  "block.tinactory.machine.boiler.low": "Small Steam Boiler",
   "block.tinactory.network.controller": "Network Controller",
   "block.tinactory.primitive.workbench": "Workbench",
   "item.tinactory.circuit.vacuum_tube": "Vacuum Tube",

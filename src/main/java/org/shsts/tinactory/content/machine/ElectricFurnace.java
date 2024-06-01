@@ -59,7 +59,7 @@ public class ElectricFurnace extends CapabilityProvider
     private void onLoad(Level world) {
         var container = AllCapabilities.CONTAINER.get(blockEntity);
         inputPort = container.getPort(0, false).asItem();
-        outputPort = container.getPort(0, true).asItem();
+        outputPort = container.getPort(1, true).asItem();
         inputWrapper = new RecipeWrapper((IItemHandlerModifiable)
                 ((ItemHandlerCollection) inputPort).itemHandler);
 
@@ -92,12 +92,11 @@ public class ElectricFurnace extends CapabilityProvider
         var world = blockEntity.getLevel();
         assert world != null;
         assert currentRecipeLoc == null;
-        var matches = world.getRecipeManager()
-                .getRecipesFor(RecipeType.SMELTING, inputWrapper, world).stream()
+        currentRecipe = world.getRecipeManager()
+                .getRecipeFor(RecipeType.SMELTING, inputWrapper, world)
                 .filter(this::canSmelt)
-                .toList();
+                .orElse(null);
 
-        currentRecipe = matches.size() == 1 ? matches.get(0) : null;
         workProgress = 0;
         if (currentRecipe != null) {
             var ingredient = currentRecipe.getIngredients().get(0);
@@ -131,7 +130,7 @@ public class ElectricFurnace extends CapabilityProvider
 
     @Override
     public double getPowerCons() {
-        return voltage.value * 1d;
+        return currentRecipe == null ? 0d : voltage.value * 1d;
     }
 
     @Override
