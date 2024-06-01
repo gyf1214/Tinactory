@@ -3,7 +3,6 @@ package org.shsts.tinactory.registrate.builder;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -26,7 +25,8 @@ import java.util.function.Function;
 public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T, M>, P>
         extends RegistryEntryBuilder<MenuType<?>, SmartMenuType<T, M>, P, MenuBuilder<T, M, P>> {
     private final Menu.Factory<T, M> factory;
-    private Function<T, Component> title = $ -> TextComponent.EMPTY;
+    private Function<T, Component> title = be ->
+            new TranslatableComponent(be.getBlockState().getBlock().getDescriptionId());
     private boolean showInventory = true;
     private final List<Function<M, IMenuPlugin<M>>> plugins = new ArrayList<>();
 

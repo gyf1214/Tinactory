@@ -525,7 +525,7 @@ public class MaterialSet {
                     builder.inputItem(0, component.tag("dust"), count);
                     totalCount += count;
                 }
-                builder.outputItem(0, $.entry("ingot"), totalCount)
+                builder.outputItem(1, $.entry("ingot"), totalCount)
                         .build();
             });
             return this;
