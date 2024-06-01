@@ -1,4 +1,6 @@
 {
+  "item.tinactory.circuit.vacuum_tube": "Vacuum Tube",
+  "block.tinactory.network.controller": "Network Controller",
   "tinactory.tooltip.liquid": "%s mB",
   "tinactory.tooltip.autoDumpItem": "Automatically output item to network",
   "tinactory.tooltip.autoDumpFluid": "Automatically output fluid to network",

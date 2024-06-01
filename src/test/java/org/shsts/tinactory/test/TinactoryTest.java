@@ -2,7 +2,6 @@ package org.shsts.tinactory.test;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -24,9 +23,6 @@ public class TinactoryTest {
     public static final Registrate REGISTRATE = new Registrate(ID);
 
     public TinactoryTest() {
-        All.init();
-        All.initRecipes();
-
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(TinactoryTest::init);
         REGISTRATE.register(modEventBus);
@@ -36,9 +32,5 @@ public class TinactoryTest {
 
     private static void init(FMLCommonSetupEvent event) {
         LOGGER.info("hello TinactoryTest!");
-    }
-
-    public static ResourceLocation modLoc(String x) {
-        return new ResourceLocation(ID, x);
     }
 }

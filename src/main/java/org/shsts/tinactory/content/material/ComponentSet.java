@@ -118,7 +118,7 @@ public final class ComponentSet {
             assert mainMaterial != null;
             assert heatMaterial != null;
             callbacks.add(set -> {
-                var voltage = this.voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
+                var recipeVoltage = this.voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
 
                 ASSEMBLER.recipe(set.motor)
                         .outputItem(2, set.motor, 1)
@@ -126,7 +126,7 @@ public final class ComponentSet {
                         .inputItem(0, heatMaterial.tag("wire"), 2 * voltage.rank)
                         .inputItem(0, set.cable, 2)
                         .workTicks(100)
-                        .voltage(voltage)
+                        .voltage(recipeVoltage)
                         .build();
 
                 ASSEMBLER.recipe(set.machineHull)
@@ -134,7 +134,7 @@ public final class ComponentSet {
                         .inputItem(0, mainMaterial.tag("plate"), 8)
                         .inputItem(0, set.cable, 2)
                         .workTicks(100)
-                        .voltage(voltage)
+                        .voltage(recipeVoltage)
                         .build();
             });
             return new ComponentSet(this);

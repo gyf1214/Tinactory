@@ -47,10 +47,12 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
                         Function<BlockBehaviour.Properties, U> factory) {
         super(registrate, registrate.blockHandler, id, parent);
         this.factory = factory;
+        onCreateEntry.add(registrate.languageHandler::block);
     }
 
     protected BlockBuilder(Registrate registrate, String id, P parent) {
         super(registrate, registrate.blockHandler, id, parent);
+        onCreateEntry.add(registrate.languageHandler::block);
     }
 
     public S material(Material value) {

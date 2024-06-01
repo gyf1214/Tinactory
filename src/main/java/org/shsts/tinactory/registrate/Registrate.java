@@ -57,6 +57,7 @@ import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.DynamicHandler;
 import org.shsts.tinactory.registrate.handler.ItemModelHandler;
+import org.shsts.tinactory.registrate.handler.LanguageHandler;
 import org.shsts.tinactory.registrate.handler.LootTableHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RecipeDataHandler;
@@ -114,6 +115,7 @@ public class Registrate {
     public final RecipeDataHandler recipeDataHandler = new RecipeDataHandler(this);
     public final LootTableHandler lootTableHandler = new LootTableHandler(this);
     public final TechHandler techHandler = new TechHandler(this);
+    public final LanguageHandler languageHandler = new LanguageHandler(this);
 
     // Client
     public final RenderTypeHandler renderTypeHandler = new RenderTypeHandler();
@@ -130,6 +132,7 @@ public class Registrate {
         putDataHandler(recipeDataHandler);
         putDataHandler(lootTableHandler);
         putDataHandler(techHandler);
+        putDataHandler(languageHandler);
     }
 
     public <T extends IForgeRegistryEntry<T>>
@@ -224,6 +227,7 @@ public class Registrate {
 
         protected SimpleItemBuilder(String id, Function<Item.Properties, U> factory) {
             super(Registrate.this, id, Registrate.this, factory);
+            onCreateEntry.add(registrate.languageHandler::item);
         }
     }
 
