@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
-import org.shsts.tinactory.core.common.SmartRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
@@ -23,9 +22,7 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
 
     @Override
     protected Optional<OreAnalyzerRecipe> getNewRecipe(Level world, IContainer container) {
-        var matches = SmartRecipe.getRecipesFor(recipeType, container, world)
-                .stream().filter(r -> r.voltage <= voltage.value)
-                .toList();
+        var matches = getMatchedRecipes(world);
         var size = matches.size();
         if (size == 0) {
             return Optional.empty();
@@ -61,7 +58,7 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
     @Override
     protected void onWorkDone(OreAnalyzerRecipe recipe, Random random) {
         if (!emptyRecipe) {
-            recipe.doInsertOutputs(getContainer(), random);
+            recipe.doInsertOutputs(container, random);
         }
     }
 }

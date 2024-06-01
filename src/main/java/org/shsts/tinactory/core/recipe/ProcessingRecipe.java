@@ -74,6 +74,10 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
                 outputs.stream().allMatch(output -> insertOutput(container, output, world.random, true));
     }
 
+    public boolean canCraftInVoltage(long voltage) {
+        return this.voltage <= voltage;
+    }
+
     public void consumeInputs(IContainer container) {
         for (var input : inputs) {
             consumeInput(container, input, false);
@@ -260,7 +264,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
     protected static class Serializer<T extends ProcessingRecipe, B extends BuilderBase<T, B>>
             extends SmartRecipeSerializer<T, B> {
-        protected Serializer(RecipeTypeEntry<T, B> type) {
+        public Serializer(RecipeTypeEntry<T, B> type) {
             super(type);
         }
 

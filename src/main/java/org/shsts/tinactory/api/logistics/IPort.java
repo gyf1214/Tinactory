@@ -19,5 +19,17 @@ public interface IPort {
         return (IFluidCollection) this;
     }
 
-    IPort EMPTY = () -> PortType.NONE;
+    boolean isEmpty();
+
+    IPort EMPTY = new IPort() {
+        @Override
+        public PortType type() {
+            return PortType.NONE;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+    };
 }

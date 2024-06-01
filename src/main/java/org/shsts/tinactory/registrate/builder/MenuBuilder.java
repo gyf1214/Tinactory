@@ -22,7 +22,7 @@ import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<T, M>, P>
+public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<? super T, M>, P>
         extends RegistryEntryBuilder<MenuType<?>, SmartMenuType<T, M>, P, MenuBuilder<T, M, P>> {
     private final Menu.Factory<T, M> factory;
     private Function<T, Component> title = be ->

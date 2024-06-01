@@ -18,6 +18,7 @@ public final class AllEvents {
     public record OnUseArg(Player player, InteractionHand hand, BlockHitResult hitResult) {}
 
     public static final RegistryEntry<Event<Level>> SERVER_LOAD;
+    public static final RegistryEntry<Event<Level>> CLIENT_LOAD;
     public static final RegistryEntry<Event<Level>> REMOVED_IN_WORLD;
     public static final RegistryEntry<Event<Level>> REMOVED_BY_CHUNK;
     public static final RegistryEntry<Event<Level>> SERVER_TICK;
@@ -29,11 +30,12 @@ public final class AllEvents {
     public static final RegistryEntry<Event<SetMachinePacket>> SET_MACHINE_CONFIG;
 
     static {
-        SERVER_LOAD = REGISTRATE.event("on_server_load");
-        REMOVED_IN_WORLD = REGISTRATE.event("on_removed_in_world");
-        REMOVED_BY_CHUNK = REGISTRATE.event("on_removed_by_chunk");
-        SERVER_TICK = REGISTRATE.event("on_server_tick");
-        SERVER_USE = REGISTRATE.returnEvent("on_server_use", InteractionResult.PASS);
+        SERVER_LOAD = REGISTRATE.event("server_load");
+        CLIENT_LOAD = REGISTRATE.event("client_load");
+        REMOVED_IN_WORLD = REGISTRATE.event("removed_in_world");
+        REMOVED_BY_CHUNK = REGISTRATE.event("removed_by_chunk");
+        SERVER_TICK = REGISTRATE.event("server_tick");
+        SERVER_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
 
         CONTAINER_CHANGE = REGISTRATE.event("logistics/container_change");
         CONNECT = REGISTRATE.event("network/connect");

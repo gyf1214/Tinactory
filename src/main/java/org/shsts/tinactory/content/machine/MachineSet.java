@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.gui.ProcessingPlugin;
 import org.shsts.tinactory.content.gui.RecipeBookPlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -37,9 +38,9 @@ import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 public class MachineSet<T extends ProcessingRecipe> {
     public final RecipeTypeEntry<T, ?> recipeType;
     public final Map<Voltage, Layout> layoutSet;
-    protected final Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines;
+    private final Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines;
     @Nullable
-    protected final BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive;
+    private final BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive;
 
     private MachineSet(RecipeTypeEntry<T, ?> recipeType, Map<Voltage, Layout> layoutSet,
                        Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
@@ -107,7 +108,7 @@ public class MachineSet<T extends ProcessingRecipe> {
                     .blockEntity()
                     .eventManager()
                     .simpleCapability(Machine::builder)
-                    .capability(StackProcessingContainer::builder).layout(layout).build()
+                    .simpleCapability(StackProcessingContainer.builder(layout))
                     .menu(ProcessingMenu.factory(layout)).build()
                     .build()
                     .block()
@@ -130,7 +131,7 @@ public class MachineSet<T extends ProcessingRecipe> {
                     .blockEntity()
                     .eventManager().ticking()
                     .simpleCapability(RecipeProcessor.basic(recipeType, Voltage.PRIMITIVE))
-                    .capability(StackProcessingContainer::builder).layout(layout).build()
+                    .simpleCapability(StackProcessingContainer.builder(layout))
                     .menu(ProcessingMenu.factory(layout)).build()
                     .build()
                     .block()
@@ -212,8 +213,8 @@ public class MachineSet<T extends ProcessingRecipe> {
         return builder.overlay(gregtech("blocks/machines/electromagnetic_separator"));
     }
 
-    public static Builder<ProcessingRecipe, ?, ?>
-    generator(RecipeTypeEntry<ProcessingRecipe, ?> recipeType) {
+    public static Builder<GeneratorRecipe, ?, ?>
+    generator(RecipeTypeEntry<GeneratorRecipe, ?> recipeType) {
         return new Builder.Simple<>(recipeType, Unit.INSTANCE) {
             @Override
             protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
@@ -225,7 +226,6 @@ public class MachineSet<T extends ProcessingRecipe> {
                         .simpleCapability(RecipeProcessor.generator(recipeType, voltage))
                         .menu()
                         .plugin(ProcessingPlugin.builder(layout))
-                        .plugin(RecipeBookPlugin.builder(recipeType, layout))
                         .build()
                         .build()
                         .register();

@@ -113,7 +113,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
 
     protected final List<IMenuPlugin<S>> plugins = new ArrayList<>();
 
-    public Menu(SmartMenuType<T, ?> type, int id, Inventory inventory, T blockEntity) {
+    public Menu(SmartMenuType<? extends T, ?> type, int id, Inventory inventory, T blockEntity) {
         super(type, id);
         this.player = inventory.player;
         this.inventory = inventory;
@@ -421,7 +421,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         }
     }
 
-    public interface Factory<T1 extends BlockEntity, M1 extends Menu<T1, M1>> {
+    public interface Factory<T1 extends BlockEntity, M1 extends Menu<? super T1, M1>> {
         M1 create(SmartMenuType<T1, M1> type, int id, Inventory inventory, T1 blockEntity);
     }
 

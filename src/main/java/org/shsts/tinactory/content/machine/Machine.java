@@ -62,9 +62,7 @@ public class Machine extends UpdatableCapabilityProvider
         config.apply(packet);
         if (packet.contains("targetRecipe")) {
             updateTargetRecipe(true);
-            forceUpdate();
-            blockEntity.setChanged();
-            blockEntity.sendUpdate();
+            sendUpdate(blockEntity);
         }
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG, packet);
     }

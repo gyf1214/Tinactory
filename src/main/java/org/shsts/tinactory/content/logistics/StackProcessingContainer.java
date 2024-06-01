@@ -277,4 +277,8 @@ public class StackProcessingContainer extends CapabilityProvider
     public static <P> Builder<P> builder(P parent) {
         return new Builder<>(parent);
     }
+
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Layout layout) {
+        return p -> builder(p).layout(layout);
+    }
 }

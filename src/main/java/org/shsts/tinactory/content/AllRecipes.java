@@ -14,6 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -38,7 +39,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STEAM_TURBINE;
+    public static final RecipeTypeEntry<GeneratorRecipe, GeneratorRecipe.Builder> STEAM_TURBINE;
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
@@ -92,7 +93,9 @@ public final class AllRecipes {
                 .defaults($ -> $.amperage(0.75d))
                 .register();
 
-        STEAM_TURBINE = REGISTRATE.processingRecipeType("steam_turbine")
+        STEAM_TURBINE = REGISTRATE.recipeType("steam_turbine", GeneratorRecipe.SERIALIZER)
+                .clazz(GeneratorRecipe.class)
+                .builder(GeneratorRecipe.Builder::new)
                 .defaults($ -> $.autoVoid().amperage(1d).workTicks(100))
                 .register();
     }

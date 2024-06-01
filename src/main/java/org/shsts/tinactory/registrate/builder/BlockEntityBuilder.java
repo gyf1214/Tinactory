@@ -85,7 +85,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
         menu = value;
     }
 
-    private class ChildMenuBuilder<M extends Menu<U, M>> extends MenuBuilder<U, M, BlockEntityBuilder<U, P>> {
+    private class ChildMenuBuilder<M extends Menu<? super U, M>> extends MenuBuilder<U, M, BlockEntityBuilder<U, P>> {
         public ChildMenuBuilder(Registrate registrate, String id, Menu.Factory<U, M> factory) {
             super(registrate, id, BlockEntityBuilder.this, factory);
             onCreateEntry.add(entry -> parent.setMenu(entry::get));
@@ -93,7 +93,7 @@ public class BlockEntityBuilder<U extends SmartBlockEntity, P> extends RegistryE
         }
     }
 
-    public <M extends Menu<U, M>> MenuBuilder<U, M, BlockEntityBuilder<U, P>>
+    public <M extends Menu<? super U, M>> MenuBuilder<U, M, BlockEntityBuilder<U, P>>
     menu(Menu.Factory<U, M> factory) {
         assert menuBuilder == null;
         var builder = new ChildMenuBuilder<>(registrate, id, factory);

@@ -69,6 +69,16 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
     }
 
     @Override
+    public boolean isEmpty() {
+        for (var tank : tanks) {
+            if (!tank.getFluid().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean acceptInput(FluidStack stack) {
         return Arrays.stream(tanks).anyMatch(tank -> tank.isFluidValid(stack));
     }

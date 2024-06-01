@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SmartMenuType<T extends BlockEntity, M extends Menu<T, M>> extends MenuType<M> {
+public class SmartMenuType<T extends BlockEntity, M extends Menu<? super T, M>> extends MenuType<M> {
     private final Menu.Factory<T, M> factory;
     private final Function<T, Component> title;
 

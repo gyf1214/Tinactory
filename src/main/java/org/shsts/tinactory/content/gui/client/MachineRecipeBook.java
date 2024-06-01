@@ -243,7 +243,7 @@ public class MachineRecipeBook extends Panel {
                 .map(IElectricMachine::getVoltage)
                 .orElse(0L);
         for (var recipe : ClientUtil.getRecipeManager().getAllRecipesFor(recipeType)) {
-            if (!recipe.canCraftIn(container) || recipe.voltage > voltage) {
+            if (!recipe.canCraftIn(container) || !recipe.canCraftInVoltage(voltage)) {
                 continue;
             }
             recipes.add(recipe);

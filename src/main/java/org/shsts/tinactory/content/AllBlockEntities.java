@@ -3,16 +3,23 @@ package org.shsts.tinactory.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.content.gui.BoilerPlugin;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
+import org.shsts.tinactory.content.gui.ProcessingPlugin;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.content.logistics.StackProcessingContainer;
+import org.shsts.tinactory.content.machine.Boiler;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
@@ -43,7 +50,8 @@ public final class AllBlockEntities {
     public static final MachineSet<ProcessingRecipe> CENTRIFUGE;
     public static final MachineSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
     public static final MachineSet<ProcessingRecipe> ALLOY_SMELTER;
-    public static final MachineSet<ProcessingRecipe> STEAM_TURBINE;
+    public static final MachineSet<GeneratorRecipe> STEAM_TURBINE;
+    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -214,6 +222,27 @@ public final class AllBlockEntities {
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
                 .build()
                 .buildObject();
+
+        LOW_PRESSURE_BOILER = REGISTRATE.blockEntitySet("machine/boiler/low",
+                        SmartBlockEntity::new,
+                        MachineBlock.factory(Voltage.PRIMITIVE))
+                .entityClass(SmartBlockEntity.class)
+                .blockEntity()
+                .eventManager()
+                .simpleCapability(Machine::builder)
+                .simpleCapability(Boiler.builder(1d))
+                .simpleCapability(StackProcessingContainer.builder(AllLayouts.BOILER))
+                .menu(ProcessingMenu.factory(AllLayouts.BOILER))
+                .plugin(ProcessingPlugin.builder(AllLayouts.BOILER))
+                .plugin(BoilerPlugin::new)
+                .build()
+                .build()
+                .block()
+                .transform(ModelGen.machine(Voltage.LV, gregtech("blocks/generators/boiler/coal")))
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
+                .build()
+                .register();
     }
 
     public static final Set<MachineSet<?>> PROCESSING_SETS;
@@ -227,8 +256,8 @@ public final class AllBlockEntities {
         return MachineSet.oreAnalyzer().onCreateObject(PROCESSING_SETS::add);
     }
 
-    private static MachineSet.Builder<ProcessingRecipe, ?, ?>
-    generator(RecipeTypeEntry<ProcessingRecipe, ?> recipeType) {
+    private static MachineSet.Builder<GeneratorRecipe, ?, ?>
+    generator(RecipeTypeEntry<GeneratorRecipe, ?> recipeType) {
         return MachineSet.generator(recipeType).onCreateObject(PROCESSING_SETS::add);
     }
 

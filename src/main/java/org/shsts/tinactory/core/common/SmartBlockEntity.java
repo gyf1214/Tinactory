@@ -151,7 +151,9 @@ public class SmartBlockEntity extends BlockEntity {
         EventManager.invoke(this, AllEvents.SERVER_LOAD, world);
     }
 
-    protected void onClientLoad(Level world) {}
+    protected void onClientLoad(Level world) {
+        EventManager.invoke(this, AllEvents.CLIENT_LOAD, world);
+    }
 
     /**
      * callback when this blockEntity is truly removed in world

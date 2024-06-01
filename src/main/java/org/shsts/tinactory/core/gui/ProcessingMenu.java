@@ -24,12 +24,12 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S>> extends Menu<T, S> {
+public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
     private final Layout layout;
     private final Map<Layout.SlotInfo, Integer> fluidSyncIndex = new HashMap<>();
     private final int progressBarIndex;
 
-    public ProcessingMenu(SmartMenuType<T, ?> type, int id, Inventory inventory, T blockEntity,
+    public ProcessingMenu(SmartMenuType<?, ?> type, int id, Inventory inventory, BlockEntity blockEntity,
                           Layout layout) {
         super(type, id, inventory, blockEntity);
 
@@ -62,9 +62,9 @@ public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S
     }
 
     @OnlyIn(Dist.CLIENT)
-    private class Screen extends MenuScreen<S> {
+    private class Screen extends MenuScreen<ProcessingMenu> {
         public Screen(Inventory inventory, Component title) {
-            super(self(), inventory, title);
+            super(ProcessingMenu.this, inventory, title);
 
             var layoutPanel = new Panel(this);
 
@@ -94,18 +94,11 @@ public class ProcessingMenu<T extends BlockEntity, S extends ProcessingMenu<T, S
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public MenuScreen<S> createScreen(Inventory inventory, Component title) {
+    public MenuScreen<ProcessingMenu> createScreen(Inventory inventory, Component title) {
         return new Screen(inventory, title);
     }
 
-    public static class Simple<T extends BlockEntity> extends ProcessingMenu<T, Simple<T>> {
-        public Simple(SmartMenuType<T, ?> type, int id, Inventory inventory, T blockEntity,
-                      Layout layout) {
-            super(type, id, inventory, blockEntity, layout);
-        }
-    }
-
-    public static <T extends BlockEntity> Menu.Factory<T, Simple<T>> factory(Layout layout) {
-        return (type, id, inventory1, be) -> new Simple<>(type, id, inventory1, be, layout);
+    public static <T extends BlockEntity> Menu.Factory<T, ProcessingMenu> factory(Layout layout) {
+        return (type, id, inventory, be) -> new ProcessingMenu(type, id, inventory, be, layout);
     }
 }

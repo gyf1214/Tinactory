@@ -3,14 +3,15 @@ package org.shsts.tinactory.content.machine;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class GeneratorProcessor extends RecipeProcessor<ProcessingRecipe> {
-    protected GeneratorProcessor(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe> recipeType,
+public class GeneratorProcessor extends RecipeProcessor<GeneratorRecipe> {
+    protected GeneratorProcessor(BlockEntity blockEntity, RecipeType<? extends GeneratorRecipe> recipeType,
                                  Voltage voltage) {
         super(blockEntity, recipeType, voltage);
     }
