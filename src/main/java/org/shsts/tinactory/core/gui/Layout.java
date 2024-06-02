@@ -25,6 +25,10 @@ public class Layout {
         public SlotInfo setIndex(int index) {
             return new SlotInfo(index, x, y, port, type);
         }
+
+        public SlotInfo setType(SlotType type) {
+            return new SlotInfo(index, x, y, port, type);
+        }
     }
 
     public final List<SlotInfo> slots;

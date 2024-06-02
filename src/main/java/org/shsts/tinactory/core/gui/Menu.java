@@ -248,6 +248,10 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         this.height = height;
     }
 
+    public int getSlotSize() {
+        return slots.size();
+    }
+
     public void addSlot(int index, int posX, int posY) {
         assert container != null;
         addSlot(new SlotItemHandler(container, index, posX + MARGIN_HORIZONTAL + 1, posY + MARGIN_TOP + 1));

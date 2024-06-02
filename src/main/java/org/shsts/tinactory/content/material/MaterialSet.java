@@ -579,6 +579,7 @@ public class MaterialSet {
                     TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
             // cut wire
             process("wire", 1, "plate", TOOL_WIRE_CUTTER);
+            // pipe
             process("pipe", 1, "AAA", "plate", TOOL_HAMMER, TOOL_WRENCH);
             return this;
         }

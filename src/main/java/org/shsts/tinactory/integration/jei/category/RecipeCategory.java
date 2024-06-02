@@ -5,132 +5,317 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.helpers.IJeiHelpers;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.recipe.transfer.IRecipeTransferInfo;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
+import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.jei.ComposeDrawable;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCategory<T> {
+public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?, M>> {
     protected static final int WIDTH = Menu.CONTENT_WIDTH;
 
+    protected final RecipeTypeEntry<? extends T, ?> recipeType;
     protected final RecipeType<T> type;
-    private final Component title;
-    protected final IDrawable background;
-    private final IDrawable icon;
     protected final Layout layout;
-    protected final int xOffset;
+    protected final Ingredient catalyst;
+    protected final ItemStack iconItem;
+    protected final Class<M> menuClazz;
 
-    @Nullable
-    private final LoadingCache<Integer, IDrawable> cachedProgressBar;
-    @Nullable
-    private final Rect progressBarRect;
-
-    private static IDrawable createBackground(IJeiHelpers helpers, Layout layout) {
-        return DrawableHelper.createBackground(helpers.getGuiHelper(), layout, WIDTH)
-                .build();
-    }
-
-    protected RecipeCategory(RecipeType<T> type, IJeiHelpers helpers, Layout layout, ItemStack icon) {
-        this(type, helpers, createBackground(helpers, layout), layout, icon);
-    }
-
-    protected RecipeCategory(RecipeType<T> type, IJeiHelpers helpers, IDrawable background,
-                             Layout layout, ItemStack icon) {
-        this.type = type;
-        this.title = new TranslatableComponent(ModelGen.translate(type.getUid()));
-        var guiHelper = helpers.getGuiHelper();
-        this.background = background;
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, icon);
+    protected RecipeCategory(RecipeTypeEntry<? extends T, ?> recipeType, Layout layout, Ingredient catalyst,
+                             ItemStack iconItem, Class<M> menuClazz) {
+        this.recipeType = recipeType;
+        this.type = new RecipeType<>(ModelGen.prepend(recipeType.loc, "jei/category"), recipeType.clazz);
         this.layout = layout;
-        this.xOffset = (WIDTH - layout.rect.width()) / 2;
+        this.catalyst = catalyst;
+        this.iconItem = iconItem;
+        this.menuClazz = menuClazz;
+    }
 
-        if (layout.progressBar != null) {
-            var texture = layout.progressBar.texture();
-            this.progressBarRect = layout.progressBar.rect().offset(xOffset, 0);
-            this.cachedProgressBar = CacheBuilder.newBuilder()
-                    .maximumSize(25)
-                    .build(new CacheLoader<>() {
-                        @Override
-                        public IDrawable load(Integer key) {
-                            return DrawableHelper.createProgressBar(guiHelper, texture, key);
-                        }
-                    });
-        } else {
-            this.cachedProgressBar = null;
-            this.progressBarRect = null;
+    protected interface IIngredientBuilder {
+        <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type, List<I> ingredients);
+
+        default <I> void addIngredient(Layout.SlotInfo slot, IIngredientType<I> type, I ingredient) {
+            addIngredients(slot, type, List.of(ingredient));
+        }
+
+        default void item(Layout.SlotInfo slot, ItemStack stack) {
+            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(stack));
+        }
+
+        default void items(Layout.SlotInfo slot, List<ItemStack> stacks) {
+            addIngredients(slot, VanillaTypes.ITEM_STACK, stacks);
+        }
+
+        default void ingredient(Layout.SlotInfo slot, Ingredient ingredient) {
+            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(ingredient.getItems()));
+        }
+
+        default void fluid(Layout.SlotInfo slot, FluidStack stack) {
+            addIngredient(slot, ForgeTypes.FLUID_STACK, stack);
         }
     }
 
-    @Override
-    public Component getTitle() {
-        return title;
+    protected interface IDrawHelper {
+        void drawProgressBar(PoseStack stack, int cycle);
+
+        IDrawable getBackground();
     }
 
-    @Override
-    public IDrawable getBackground() {
-        return background;
+    protected ComposeDrawable.Builder buildBackground(ComposeDrawable.Builder builder,
+                                                      IGuiHelper helper, int xOffset) {
+        builder.add(helper.createBlankDrawable(WIDTH, layout.rect.height()));
+        for (var slot : layout.slots) {
+            builder.add(helper.getSlotDrawable(), xOffset + slot.x(), slot.y());
+        }
+        for (var image : layout.images) {
+            var rect = image.rect();
+            var drawable = DrawableHelper.createStatic(helper, image.texture(), rect.width(), rect.height());
+            builder.add(drawable, xOffset + rect.x(), rect.y());
+        }
+        return builder;
     }
 
-    @Override
-    public IDrawable getIcon() {
-        return icon;
+    protected abstract void addRecipe(T recipe, IIngredientBuilder builder);
+
+    protected void drawExtra(T recipe, IDrawHelper helper, IRecipeSlotsView recipeSlotsView,
+                             PoseStack stack, double mouseX, double mouseY) {}
+
+    protected boolean canTransfer(M menu, T recipe) {
+        return true;
     }
 
-    @SuppressWarnings("removal")
-    @Override
-    public ResourceLocation getUid() {
-        return type.getUid();
-    }
+    private class Category implements IRecipeCategory<T>, IDrawHelper {
 
-    @SuppressWarnings("removal")
-    @Override
-    public Class<? extends T> getRecipeClass() {
-        return type.getRecipeClass();
-    }
+        private final Component title;
+        private final IDrawable icon;
+        private final IDrawable background;
+        private final int xOffset;
 
-    @Override
-    public RecipeType<T> getRecipeType() {
-        return type;
-    }
+        @Nullable
+        private final LoadingCache<Integer, IDrawable> cachedProgressBar;
+        @Nullable
+        private final Rect progressBarRect;
 
-    protected void addIngredient(IRecipeLayoutBuilder builder, Layout.SlotInfo slot,
-                                 Ingredient ingredient, RecipeIngredientRole role) {
-        builder.addSlot(role, slot.x() + 1 + xOffset, slot.y() + 1)
-                .addIngredients(ingredient);
-    }
+        private Category(IGuiHelper guiHelper) {
+            this.title = I18n.tr(type.getUid());
+            this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, iconItem);
+            this.xOffset = (WIDTH - layout.rect.width()) / 2;
+            this.background = createBackground(guiHelper, xOffset);
 
-    @Override
-    public abstract void setRecipe(IRecipeLayoutBuilder builder, T recipe, IFocusGroup focuses);
+            if (layout.progressBar != null) {
+                var texture = layout.progressBar.texture();
+                this.progressBarRect = layout.progressBar.rect().offset(xOffset, 0);
+                this.cachedProgressBar = CacheBuilder.newBuilder()
+                        .maximumSize(25)
+                        .build(new CacheLoader<>() {
+                            @Override
+                            public IDrawable load(Integer key) {
+                                return DrawableHelper.createProgressBar(guiHelper, texture, key);
+                            }
+                        });
+            } else {
+                this.cachedProgressBar = null;
+                this.progressBarRect = null;
+            }
+        }
 
-    protected void drawProgressBar(PoseStack stack, int cycle) {
-        if (cachedProgressBar != null && progressBarRect != null) {
-            var bar = cachedProgressBar.getUnchecked(cycle);
-            bar.draw(stack, progressBarRect.x(), progressBarRect.y());
+        private IDrawable createBackground(IGuiHelper helper, int xOffset) {
+            var builder = ComposeDrawable.builder();
+            return buildBackground(builder, helper, xOffset).build();
+        }
+
+        private class IngredientBuilder implements IIngredientBuilder {
+            private final IRecipeLayoutBuilder builder;
+
+            public IngredientBuilder(IRecipeLayoutBuilder builder) {
+                this.builder = builder;
+            }
+
+            @Override
+            public <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type,
+                                           List<I> ingredients) {
+                var role = switch (slot.type().direction) {
+                    case INPUT -> RecipeIngredientRole.INPUT;
+                    case OUTPUT -> RecipeIngredientRole.OUTPUT;
+                    case NONE -> throw new IllegalArgumentException();
+                };
+                var x = slot.x() + 1 + xOffset;
+                var y = slot.y() + 1;
+                builder.addSlot(role, x, y).addIngredients(type, ingredients);
+            }
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, T recipe, IFocusGroup focuses) {
+            var ingredientBuilder = new IngredientBuilder(builder);
+            addRecipe(recipe, ingredientBuilder);
+            builder.moveRecipeTransferButton(WIDTH - Menu.SLOT_SIZE, 0);
+        }
+
+        @Override
+        public Component getTitle() {
+            return title;
+        }
+
+        @Override
+        public IDrawable getBackground() {
+            return background;
+        }
+
+        @Override
+        public IDrawable getIcon() {
+            return icon;
+        }
+
+        @Override
+        public void drawProgressBar(PoseStack stack, int cycle) {
+            if (cachedProgressBar != null && progressBarRect != null) {
+                var bar = cachedProgressBar.getUnchecked(cycle);
+                bar.draw(stack, progressBarRect.x(), progressBarRect.y());
+            }
+        }
+
+        @Override
+        public void draw(T recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+            drawExtra(recipe, this, recipeSlotsView, stack, mouseX, mouseY);
+        }
+
+        @Override
+        public RecipeType<T> getRecipeType() {
+            return type;
+        }
+
+        @SuppressWarnings("removal")
+        @Override
+        public ResourceLocation getUid() {
+            return type.getUid();
+        }
+
+        @SuppressWarnings("removal")
+        @Override
+        public Class<? extends T> getRecipeClass() {
+            return type.getRecipeClass();
         }
     }
 
-    @FunctionalInterface
-    public interface Factory<T1 extends Recipe<?>> {
-        RecipeCategory<T1> create(RecipeType<T1> type, IJeiHelpers helpers);
+    private class TransferInfo implements IRecipeTransferInfo<M, T> {
+        @Override
+        public Class<M> getContainerClass() {
+            return menuClazz;
+        }
+
+        @Override
+        public boolean canHandle(M container, T recipe) {
+            return canTransfer(container, recipe);
+        }
+
+        private class IngredientBuilder implements IIngredientBuilder {
+            private final M container;
+            private final List<Slot> slots = new ArrayList<>();
+
+            public IngredientBuilder(M container) {
+                this.container = container;
+            }
+
+            @Override
+            public <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type,
+                                           List<I> ingredients) {
+                if (slot.type() == SlotType.ITEM_INPUT) {
+                    slots.add(container.getSlot(slot.index()));
+                }
+            }
+        }
+
+        @Override
+        public List<Slot> getRecipeSlots(M container, T recipe) {
+            var builder = new IngredientBuilder(container);
+            addRecipe(recipe, builder);
+            return builder.slots;
+        }
+
+        @Override
+        public List<Slot> getInventorySlots(M container, T recipe) {
+            var list = new ArrayList<Slot>();
+            var slotSize = container.getSlotSize();
+            for (var k = layout.slots.size(); k < slotSize; k++) {
+                list.add(container.getSlot(k));
+            }
+            return list;
+        }
+
+        @Override
+        public RecipeType<T> getRecipeType() {
+            return type;
+        }
+
+        @SuppressWarnings({"removal", "unchecked"})
+        @Override
+        public Class<T> getRecipeClass() {
+            return (Class<T>) type.getRecipeClass();
+        }
+
+        @SuppressWarnings("removal")
+        @Override
+        public ResourceLocation getRecipeCategoryUid() {
+            return type.getUid();
+        }
+    }
+
+    public void registerCategory(IRecipeCategoryRegistration registration) {
+        var guiHelper = registration.getJeiHelpers().getGuiHelper();
+        registration.addRecipeCategories(new Category(guiHelper));
+    }
+
+    public void registerCatalysts(IRecipeCatalystRegistration registration) {
+        var items = catalyst.getItems();
+        for (var item : items) {
+            registration.addRecipeCatalyst(item, type);
+        }
+    }
+
+    public void registerRecipes(IRecipeRegistration registration, RecipeManager recipeManager) {
+        var list = recipeManager.getAllRecipesFor(recipeType.get()).stream()
+                .map($ -> (T) $)
+                .toList();
+        registration.addRecipes(type, list);
+    }
+
+    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
+        registration.addRecipeTransferHandler(new TransferInfo());
     }
 }

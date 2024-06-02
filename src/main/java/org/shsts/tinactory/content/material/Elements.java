@@ -43,7 +43,7 @@ public final class Elements {
         COPPER = set("copper")
                 .color(0xFFFF6400).icon(IconSet.SHINY)
                 .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
-                .metalSet().wireAndPlate()
+                .metalSet().wireAndPlate().pipe()
                 .toolProcess().smelt()
                 .buildObject();
 

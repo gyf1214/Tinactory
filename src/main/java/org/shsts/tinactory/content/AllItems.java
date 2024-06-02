@@ -27,10 +27,12 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
+import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER;
 import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_TABLE;
+import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
@@ -136,6 +138,27 @@ public final class AllItems {
                 .define('W', ULV_CABLE)
                 .define('H', ELECTRIC_FURNACE.entry(Voltage.ULV))
                 .define('V', VACUUM_TUBE)
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
+
+        TOOL.recipe(STEAM_TURBINE.entry(Voltage.ULV))
+                .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
+                .pattern("PVP").pattern("RHR").pattern("WVW")
+                .define('P', COPPER.tag("pipe"))
+                .define('R', IRON.tag("rotor"))
+                .define('W', ULV_CABLE)
+                .define('H', ULV_MACHINE_HULL)
+                .define('V', VACUUM_TUBE)
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
+
+        TOOL.recipe(LOW_PRESSURE_BOILER.entry())
+                .result(LOW_PRESSURE_BOILER.entry(), 1)
+                .pattern("PPP").pattern("PWP").pattern("VFV")
+                .define('P', IRON.tag("plate"))
+                .define('W', ULV_CABLE)
+                .define('V', VACUUM_TUBE)
+                .define('F', Blocks.FURNACE.asItem())
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
     }

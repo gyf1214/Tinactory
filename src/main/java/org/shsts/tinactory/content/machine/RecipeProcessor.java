@@ -46,7 +46,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     public static final long PROGRESS_PER_TICK = 256;
 
     protected final BlockEntity blockEntity;
-    protected final RecipeType<? extends T> recipeType;
+    public final RecipeType<? extends T> recipeType;
     protected final Voltage voltage;
 
     protected long workProgress = 0;
