@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.model.CableModel;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
@@ -54,6 +55,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_SAW;
 import static org.shsts.tinactory.content.AllTags.TOOL_SCREW;
 import static org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
+import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -335,14 +337,6 @@ public class MaterialSet {
             return this;
         }
 
-        public Builder<P> wire() {
-            put("wire", () -> REGISTRATE.item(newId("wire"), Item::new)
-                    .model(ModelGen.wire())
-                    .tint(color)
-                    .register());
-            return this;
-        }
-
         public Builder<P> dust() {
             return dummies("dust");
         }
@@ -364,14 +358,41 @@ public class MaterialSet {
 
         public Builder<P> metalSet() {
             return dustSet()
-                    .dummies("ingot")
-                    .alias("primary", "ingot")
-                    .dummies("nugget", "plate", "stick");
+                    .dummies("ingot", "nugget")
+                    .alias("primary", "ingot");
+        }
+
+        public Builder<P> metalSetExt() {
+            return metalSet().dummies("plate", "stick");
         }
 
         public Builder<P> mechanicalSet() {
-            return metalSet()
+            return metalSetExt()
                     .dummies("bolt", "screw", "gear", "rotor");
+        }
+
+        public Builder<P> pipe() {
+            put("pipe", () -> REGISTRATE.item(newId("pipe"), Item::new)
+                    .model(CableModel::pipeModel)
+                    .tint(color)
+                    .register());
+            return this;
+        }
+
+        public Builder<P> wire() {
+            put("wire", () -> REGISTRATE.item(newId("wire"), Item::new)
+                    .model(CableModel::wireModel)
+                    .tint(color)
+                    .register());
+            return this;
+        }
+
+        public Builder<P> wireAndPlate() {
+            return wire().dummies("plate");
+        }
+
+        public Builder<P> magnetic() {
+            return dummies("magnetic");
         }
 
         public class OreBuilder extends SimpleBuilder<Unit, Builder<P>, OreBuilder> {
@@ -546,7 +567,7 @@ public class MaterialSet {
             // plate
             process("plate", 1, "A\nA", "ingot", TOOL_HAMMER);
             // stick
-            process("stick", 1, "plate", TOOL_FILE);
+            process("stick", 1, "ingot", TOOL_FILE);
             // bolt
             process("bolt", 2, "stick", TOOL_SAW);
             // screw
@@ -558,6 +579,7 @@ public class MaterialSet {
                     TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
             // cut wire
             process("wire", 1, "plate", TOOL_WIRE_CUTTER);
+            process("pipe", 1, "AAA", "plate", TOOL_HAMMER, TOOL_WRENCH);
             return this;
         }
 

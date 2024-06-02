@@ -27,7 +27,8 @@ public class BoilerPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     @Override
     public void applyMenuScreen(MenuScreen<M> screen) {
         var menu = screen.getMenu();
-        var label = new Label(menu, Label.Alignment.END);
+        var label = new Label(menu);
+        label.verticalAlign = Label.Alignment.END;
         menu.<MenuSyncPacket.Double>onSyncPacket(syncSlot,
                 p -> label.setLine(0, new TextComponent("Heat: %.2f".formatted(p.getData()))));
 

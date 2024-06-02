@@ -60,13 +60,21 @@ public final class ComponentSet {
     }
 
     public static class SetBuilder<P> extends SimpleBuilder<ComponentSet, P, SetBuilder<P>> {
+        private static final int ASSEMBLE_TICKS = 100;
+
         private final Voltage voltage;
         @Nullable
         private MaterialSet mainMaterial = null;
         @Nullable
+        private MaterialSet heatMaterial = null;
+        @Nullable
+        private MaterialSet pipeMaterial = null;
+        @Nullable
+        private MaterialSet rotorMaterial = null;
+        @Nullable
         private MaterialSet cableMaterial = null;
         @Nullable
-        private MaterialSet heatMaterial = null;
+        private MaterialSet magneticMaterial = null;
         private double cableResistance;
 
         private final List<Consumer<ComponentSet>> callbacks = new ArrayList<>();
@@ -82,9 +90,28 @@ public final class ComponentSet {
             return this;
         }
 
-        public SetBuilder<P> material(MaterialSet main, MaterialSet heat) {
-            mainMaterial = main;
-            heatMaterial = heat;
+        public SetBuilder<P> material(MaterialSet val) {
+            mainMaterial = val;
+            return this;
+        }
+
+        public SetBuilder<P> heat(MaterialSet val) {
+            heatMaterial = val;
+            return this;
+        }
+
+        public SetBuilder<P> pipe(MaterialSet val) {
+            pipeMaterial = val;
+            return this;
+        }
+
+        public SetBuilder<P> rotor(MaterialSet val) {
+            rotorMaterial = val;
+            return this;
+        }
+
+        public SetBuilder<P> magnetic(MaterialSet val) {
+            magneticMaterial = val;
             return this;
         }
 
@@ -117,24 +144,51 @@ public final class ComponentSet {
         protected ComponentSet createObject() {
             assert mainMaterial != null;
             assert heatMaterial != null;
+            assert magneticMaterial != null;
+            assert pipeMaterial != null;
+            assert rotorMaterial != null;
             callbacks.add(set -> {
-                var recipeVoltage = this.voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
+                var assembleVoltage = this.voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
 
                 ASSEMBLER.recipe(set.motor)
                         .outputItem(2, set.motor, 1)
+                        .inputItem(0, magneticMaterial.tag("magnetic"), 1)
                         .inputItem(0, mainMaterial.tag("stick"), 2)
                         .inputItem(0, heatMaterial.tag("wire"), 2 * voltage.rank)
                         .inputItem(0, set.cable, 2)
-                        .workTicks(100)
-                        .voltage(recipeVoltage)
+                        .workTicks(ASSEMBLE_TICKS)
+                        .voltage(assembleVoltage)
+                        .build();
+
+                ASSEMBLER.recipe(set.pump)
+                        .outputItem(2, set.pump, 1)
+                        .inputItem(0, set.motor, 1)
+                        .inputItem(0, pipeMaterial.tag("pipe"), 1)
+                        .inputItem(0, rotorMaterial.tag("rotor"), 1)
+                        .inputItem(0, rotorMaterial.tag("screw"), 3)
+                        // TODO rubber seal
+                        .inputItem(0, set.cable, 1)
+                        .workTicks(ASSEMBLE_TICKS)
+                        .voltage(assembleVoltage)
+                        .build();
+
+                ASSEMBLER.recipe(set.piston)
+                        .outputItem(2, set.piston, 1)
+                        .inputItem(0, set.motor, 1)
+                        .inputItem(0, mainMaterial.tag("plate"), 3)
+                        .inputItem(0, mainMaterial.tag("stick"), 2)
+                        .inputItem(0, mainMaterial.tag("gear"), 1)
+                        .inputItem(0, set.cable, 2)
+                        .workTicks(ASSEMBLE_TICKS)
+                        .voltage(assembleVoltage)
                         .build();
 
                 ASSEMBLER.recipe(set.machineHull)
                         .outputItem(2, set.machineHull, 1)
                         .inputItem(0, mainMaterial.tag("plate"), 8)
                         .inputItem(0, set.cable, 2)
-                        .workTicks(100)
-                        .voltage(recipeVoltage)
+                        .workTicks(ASSEMBLE_TICKS)
+                        .voltage(assembleVoltage)
                         .build();
             });
             return new ComponentSet(this);

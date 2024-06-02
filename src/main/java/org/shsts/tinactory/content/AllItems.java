@@ -34,6 +34,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_TABLE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
@@ -58,7 +59,7 @@ public final class AllItems {
                 .blockState(ctx -> CableModel.blockState(ctx, true))
                 .tint(IRON.color)
                 .tag(AllTags.MINEABLE_WITH_CUTTER)
-                .defaultBlockItem(CableModel::ulvItemModel).dropSelf()
+                .defaultBlockItem(CableModel::ulvCableModel).dropSelf()
                 .register();
 
         ULV_MACHINE_HULL = REGISTRATE.item("component/ulv/machine_hull", Item::new)
@@ -67,11 +68,11 @@ public final class AllItems {
 
         COMPONENT_SETS = ComponentSet.builder()
                 .components(Voltage.LV)
-                .material(STEEL, COPPER)
+                .material(STEEL).heat(COPPER).pipe(BRONZE).rotor(TIN).magnetic(STEEL)
                 .cable(TIN, 1.0)
                 .build()
                 .components(Voltage.MV)
-                .material(ALUMINIUM, CUPRONICKEL)
+                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
                 .cable(COPPER, 1.0)
                 .build()
                 .buildObject();

@@ -43,13 +43,13 @@ public final class Elements {
         COPPER = set("copper")
                 .color(0xFFFF6400).icon(IconSet.SHINY)
                 .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
-                .metalSet().wire()
+                .metalSet().wireAndPlate()
                 .toolProcess().smelt()
                 .buildObject();
 
         TIN = set("tin")
                 .color(0xFFDCDCDC).icon(IconSet.DULL)
-                .metalSet().wire()
+                .mechanicalSet().wire()
                 .toolProcess().smelt()
                 .ore(OreVariant.STONE)
                 // TODO: byproduct tin, zinc
@@ -65,7 +65,6 @@ public final class Elements {
         ALUMINIUM = set("aluminium")
                 .color(0xFF80C8F0).icon(IconSet.DULL)
                 .mechanicalSet()
-                .toolProcess()
                 .buildObject();
     }
 

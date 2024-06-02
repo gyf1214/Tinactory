@@ -31,7 +31,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class RecipeCategory<T extends Recipe<?>> implements IRecipeCategory<T> {
-    protected static final int WIDTH = Menu.WIDTH - Menu.SLOT_SIZE;
+    protected static final int WIDTH = Menu.CONTENT_WIDTH;
 
     protected final RecipeType<T> type;
     private final Component title;

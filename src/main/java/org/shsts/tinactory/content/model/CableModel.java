@@ -21,7 +21,9 @@ import java.util.stream.Collectors;
 
 import static org.shsts.tinactory.content.model.ModelGen.WHITE_TEX;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
+import static org.shsts.tinactory.content.network.CableBlock.PIPE_RADIUS;
 import static org.shsts.tinactory.content.network.CableBlock.RADIUS;
+import static org.shsts.tinactory.content.network.CableBlock.SMALL_WIRE_RADIUS;
 import static org.shsts.tinactory.content.network.CableBlock.WIRE_RADIUS;
 
 @MethodsReturnNonnullByDefault
@@ -37,10 +39,13 @@ public final class CableModel {
     private static final String CLOSED_WIRE_MODEL = "block/network/cable/closed_wire";
     private static final String ITEM_MODEL = "item/network/cable";
     private static final String ITEM_WIRE_MODEL = "item/material/wire";
+    private static final String ITEM_PIPE_MODEL = "item/material/pipe";
     private static final String TEX_PREFIX = "blocks/cable/";
     private static final ResourceLocation INSULATION_OPEN_TEX = gregtech(TEX_PREFIX + "insulation_1");
     private static final ResourceLocation INSULATION_TEX = gregtech(TEX_PREFIX + "insulation_5");
     private static final ResourceLocation WIRE_TEX = gregtech(TEX_PREFIX + "wire");
+    private static final ResourceLocation PIPE_SIDE_TEX = gregtech("blocks/pipe/pipe_side");
+    private static final ResourceLocation PIPE_IN_TEX = gregtech("blocks/pipe/pipe_normal_in");
 
     private static BlockModelBuilder genOpenEnd(BlockModelProvider prov, String id, int radius, boolean insulation) {
         var model = prov.withExistingParent(id, prov.mcLoc("block/block"))
@@ -119,9 +124,12 @@ public final class CableModel {
                 .texture("base", INSULATION_TEX)
                 .texture("insulation", INSULATION_OPEN_TEX)
                 .texture("wire", WIRE_TEX);
-        genItem(ctx.provider, ITEM_WIRE_MODEL, 1, false)
+        genItem(ctx.provider, ITEM_WIRE_MODEL, SMALL_WIRE_RADIUS, false)
                 .texture("base", WIRE_TEX)
                 .texture("wire", WIRE_TEX);
+        genItem(ctx.provider, ITEM_PIPE_MODEL, PIPE_RADIUS, false)
+                .texture("base", PIPE_SIDE_TEX)
+                .texture("wire", PIPE_IN_TEX);
     }
 
     public static void blockState(RegistryDataContext<Block, ? extends CableBlock, BlockStateProvider> ctx,
@@ -150,14 +158,21 @@ public final class CableModel {
         }
     }
 
-    public static void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx,
-                                 boolean wire) {
-        ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(wire ? ITEM_WIRE_MODEL : ITEM_MODEL));
+    public static void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(ITEM_MODEL));
     }
 
-    public static void ulvItemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public static void wireModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(ITEM_WIRE_MODEL));
+    }
+
+    public static void ulvCableModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         genItem(ctx.provider, ctx.id, CableBlock.WIRE_RADIUS, false)
                 .texture("base", WIRE_TEX)
                 .texture("wire", "#base");
+    }
+
+    public static void pipeModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(ITEM_PIPE_MODEL));
     }
 }

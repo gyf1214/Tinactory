@@ -46,7 +46,9 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     public static final BooleanProperty UP = PipeBlock.UP;
     public static final BooleanProperty DOWN = PipeBlock.DOWN;
     public static final int RADIUS = 3;
+    public static final int SMALL_WIRE_RADIUS = 1;
     public static final int WIRE_RADIUS = 2;
+    public static final int PIPE_RADIUS = 4;
     public static final int INSULATION_COLOR = 0xFF36302E;
 
     private final int radius;

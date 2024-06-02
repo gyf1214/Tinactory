@@ -15,11 +15,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.content.model.ModelGen.gregtech;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record IconSet(String subfolder, @Nullable IconSet parent) {
-    private static final ResourceLocation ITEM_LOC = ModelGen.gregtech("items/material_sets");
-    private static final ResourceLocation BLOCK_LOC = ModelGen.gregtech("blocks/material_sets");
+    private static final ResourceLocation ITEM_LOC = gregtech("items/material_sets");
+    private static final ResourceLocation BLOCK_LOC = gregtech("blocks/material_sets");
+    private static final ResourceLocation MAGNETIC_LOC = gregtech("items/material_sets/magnetic/magnetic_overlay");
 
     public static final IconSet DULL = new IconSet();
     public static final IconSet ROUGH = new IconSet("rough");
@@ -36,6 +39,9 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     }
 
     private Optional<ResourceLocation> getTex(ResourceLocation baseLoc, ExistingFileHelper helper, String sub) {
+        if (sub.equals("magnetic_overlay")) {
+            return Optional.of(MAGNETIC_LOC);
+        }
         for (var set = this; set != null; set = set.parent) {
             var loc = ModelGen.extend(baseLoc, set.subfolder + "/" + sub);
             if (helper.exists(loc, ModelGen.TEXTURE_TYPE)) {
@@ -49,12 +55,15 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     Consumer<RegistryDataContext<Item, U, P>> itemModel(String sub) {
         return ctx -> {
             var helper = ctx.provider.existingFileHelper;
-            var base = getTex(ITEM_LOC, helper, sub).orElseThrow(() -> new IllegalArgumentException(
-                    "No icon %s for icon set %s".formatted(sub, subfolder)));
+
+            var baseSub = sub.equals("magnetic") ? "stick" : sub;
+            var base = getTex(ITEM_LOC, helper, baseSub).orElseThrow(() -> new IllegalArgumentException(
+                    "No icon %s for icon set %s".formatted(baseSub, subfolder)));
             var overlay = getTex(ITEM_LOC, helper, sub + "_overlay");
+
             var model = ctx.provider.withExistingParent(ctx.id, "item/generated")
                     .texture("layer0", base);
-            overlay.ifPresent(resourceLocation -> model.texture("layer1", resourceLocation));
+            overlay.ifPresent(loc -> model.texture("layer1", loc));
         };
     }
 

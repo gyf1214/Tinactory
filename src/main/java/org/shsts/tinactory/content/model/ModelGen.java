@@ -104,14 +104,9 @@ public final class ModelGen {
     public static <S extends BlockBuilder<? extends CableBlock, ?, S>>
     Transformer<S> cable() {
         return $ -> $.blockState(ctx -> CableModel.blockState(ctx, false))
-                .defaultBlockItem(ctx -> CableModel.itemModel(ctx, false))
+                .defaultBlockItem(CableModel::itemModel)
                 .dropSelf()
                 .translucent();
-    }
-
-    public static <U extends Item>
-    Consumer<RegistryDataContext<Item, U, ItemModelProvider>> wire() {
-        return ctx -> CableModel.itemModel(ctx, true);
     }
 
     public static ResourceLocation casing(Voltage voltage) {
