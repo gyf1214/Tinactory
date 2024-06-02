@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -79,5 +80,6 @@ public class JEI implements IModPlugin {
         for (var category : categories) {
             category.registerRecipeTransferHandlers(registration);
         }
+        registration.addRecipeTransferHandler(WorkbenchMenu.class, RecipeTypes.CRAFTING, 9, 9, 19, 36);
     }
 }

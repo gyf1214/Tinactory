@@ -1,5 +1,7 @@
 package org.shsts.tinactory.integration.jei.category;
 
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -12,6 +14,8 @@ import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -34,15 +38,22 @@ public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchMenu> {
 
         var k = 0;
         for (var toolIngredient : recipe.toolIngredients) {
-            builder.ingredient(slots.get(1 + k), toolIngredient);
+            var items = Arrays.asList(toolIngredient.getItems());
+            builder.addIngredients(slots.get(1 + k), RecipeIngredientRole.CATALYST,
+                    VanillaTypes.ITEM_STACK, items);
             if (++k >= 9) {
                 break;
             }
         }
-        for (var i = 0; i < shaped.getHeight(); i++) {
-            for (var j = 0; j < shaped.getWidth(); j++) {
-                var ingredient = recipe.shapedRecipe.getIngredients().get(i * shaped.getWidth() + j);
-                builder.ingredient(slots.get(10 + i * 3 + j), ingredient);
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                var slot = slots.get(10 + i * 3 + j);
+                if (i < shaped.getHeight() && j < shaped.getWidth()) {
+                    var ingredient = recipe.shapedRecipe.getIngredients().get(i * shaped.getWidth() + j);
+                    builder.ingredient(slot, ingredient);
+                } else {
+                    builder.items(slot, List.of());
+                }
             }
         }
     }

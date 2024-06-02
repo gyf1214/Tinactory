@@ -25,15 +25,21 @@ public class WorkbenchMenu extends Menu<SmartBlockEntity, WorkbenchMenu> {
         var layout = AllLayouts.WORKBENCH;
         var workbench = AllCapabilities.WORKBENCH.get(blockEntity);
         var xOffset = layout.getXOffset();
+        var outputX = 0;
+        var outputY = 0;
         for (var slot : layout.slots) {
             var x = xOffset + slot.x();
             var y = slot.y();
             if (slot.type() == SlotType.NONE) {
-                addSlot(new CraftingSlot(workbench, x + MARGIN_HORIZONTAL + 1, y + MARGIN_TOP + 1));
-            } else {
+                outputX = x;
+                outputY = y;
+            } else if (slot.type() == SlotType.ITEM_INPUT) {
                 addSlot(slot.index(), x, y);
+            } else {
+                throw new IllegalArgumentException();
             }
         }
+        addSlot(new CraftingSlot(workbench, outputX + MARGIN_HORIZONTAL + 1, outputY + MARGIN_TOP + 1));
         this.height = layout.rect.endY();
     }
 

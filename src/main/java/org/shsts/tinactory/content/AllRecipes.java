@@ -86,11 +86,11 @@ public final class AllRecipes {
                 .defaults($ -> $
                         .voltage(Voltage.LV)
                         .workTicks(400)
-                        .amperage(1.5d))
+                        .amperage(1d))
                 .register();
 
         ALLOY_SMELTER = REGISTRATE.processingRecipeType("alloy_smelter")
-                .defaults($ -> $.amperage(1.5d))
+                .defaults($ -> $.amperage(0.75d))
                 .register();
 
         STEAM_TURBINE = REGISTRATE.recipeType("steam_turbine", GeneratorRecipe.SERIALIZER)

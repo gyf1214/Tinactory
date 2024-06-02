@@ -28,6 +28,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -67,7 +69,17 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     }
 
     protected interface IIngredientBuilder {
-        <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type, List<I> ingredients);
+        <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
+                                IIngredientType<I> type, List<I> ingredients);
+
+        default <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type, List<I> ingredients) {
+            var role = switch (slot.type().direction) {
+                case INPUT -> RecipeIngredientRole.INPUT;
+                case OUTPUT -> RecipeIngredientRole.OUTPUT;
+                case NONE -> throw new IllegalArgumentException();
+            };
+            addIngredients(slot, role, type, ingredients);
+        }
 
         default <I> void addIngredient(Layout.SlotInfo slot, IIngredientType<I> type, I ingredient) {
             addIngredients(slot, type, List.of(ingredient));
@@ -119,6 +131,15 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         return true;
     }
 
+    protected List<Slot> getInventorySlots(M container) {
+        var list = new ArrayList<Slot>();
+        var slotSize = container.getSlotSize();
+        for (var k = layout.slots.size(); k < slotSize; k++) {
+            list.add(container.getSlot(k));
+        }
+        return list;
+    }
+
     private class Category implements IRecipeCategory<T>, IDrawHelper {
 
         private final Component title;
@@ -167,13 +188,8 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
             }
 
             @Override
-            public <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type,
-                                           List<I> ingredients) {
-                var role = switch (slot.type().direction) {
-                    case INPUT -> RecipeIngredientRole.INPUT;
-                    case OUTPUT -> RecipeIngredientRole.OUTPUT;
-                    case NONE -> throw new IllegalArgumentException();
-                };
+            public <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
+                                           IIngredientType<I> type, List<I> ingredients) {
                 var x = slot.x() + 1 + xOffset;
                 var y = slot.y() + 1;
                 builder.addSlot(role, x, y).addIngredients(type, ingredients);
@@ -234,6 +250,8 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     }
 
     private class TransferInfo implements IRecipeTransferInfo<M, T> {
+        private static final Slot EMPTY_SLOT = new SlotItemHandler(EmptyHandler.INSTANCE, 0, 0, 0);
+
         @Override
         public Class<M> getContainerClass() {
             return menuClazz;
@@ -253,10 +271,15 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
             }
 
             @Override
-            public <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type,
-                                           List<I> ingredients) {
+            public <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
+                                           IIngredientType<I> type, List<I> ingredients) {
+                if (role != RecipeIngredientRole.INPUT) {
+                    return;
+                }
                 if (slot.type() == SlotType.ITEM_INPUT) {
                     slots.add(container.getSlot(slot.index()));
+                } else if (slot.type() == SlotType.FLUID_INPUT) {
+                    slots.add(EMPTY_SLOT);
                 }
             }
         }
@@ -270,12 +293,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
         @Override
         public List<Slot> getInventorySlots(M container, T recipe) {
-            var list = new ArrayList<Slot>();
-            var slotSize = container.getSlotSize();
-            for (var k = layout.slots.size(); k < slotSize; k++) {
-                list.add(container.getSlot(k));
-            }
-            return list;
+            return RecipeCategory.this.getInventorySlots(container);
         }
 
         @Override
@@ -316,6 +334,9 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     }
 
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-        registration.addRecipeTransferHandler(new TransferInfo());
+        var hasItem = layout.slots.stream().anyMatch(slot -> slot.type() == SlotType.ITEM_INPUT);
+        if (hasItem) {
+            registration.addRecipeTransferHandler(new TransferInfo());
+        }
     }
 }

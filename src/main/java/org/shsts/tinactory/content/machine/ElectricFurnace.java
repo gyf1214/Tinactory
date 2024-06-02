@@ -130,7 +130,7 @@ public class ElectricFurnace extends CapabilityProvider
 
     @Override
     public double getPowerCons() {
-        return currentRecipe == null ? 0d : voltage.value * 1d;
+        return currentRecipe == null ? 0d : voltage.value * 0.625d;
     }
 
     @Override

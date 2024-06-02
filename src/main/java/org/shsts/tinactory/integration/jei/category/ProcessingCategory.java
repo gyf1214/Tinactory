@@ -3,6 +3,7 @@ package org.shsts.tinactory.integration.jei.category;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -107,5 +108,10 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
                 .map(p -> p instanceof RecipeProcessor<?> processor &&
                         processor.recipeType == recipe.getType())
                 .orElse(false);
+    }
+
+    @Override
+    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
+        // TODO: auto transfer of processing recipe is too buggy, disable now
     }
 }
