@@ -3,13 +3,11 @@ package org.shsts.tinactory.core.tech;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.JsonOps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
@@ -23,6 +21,7 @@ import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
@@ -105,8 +104,8 @@ public class TechManager implements ITechManager {
                 try (var resource = manager.getResource(loc)) {
                     var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
                     var reader = new BufferedReader(is);
-                    var jo = GsonHelper.fromJson(gson, reader, JsonObject.class);
-                    var ret = Technology.CODEC.parse(JsonOps.INSTANCE, jo).getOrThrow(false, $ -> {});
+                    var jo = gson.fromJson(reader, JsonObject.class);
+                    var ret = CodecHelper.parseJson(Technology.CODEC, jo);
                     ret.setLoc(loc1);
                     return Optional.of(ret);
                 } catch (IOException | RuntimeException ex) {

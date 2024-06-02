@@ -160,10 +160,10 @@ public final class RenderUtil {
     public static void renderIngredient(IProcessingObject ingredient, Consumer<ItemStack> itemRenderer,
                                         Consumer<FluidStack> fluidRenderer) {
 
-        if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
+        if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
             itemRenderer.accept(item.stack());
-        } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-            var items = item.ingredient().getItems();
+        } else if (ingredient instanceof ProcessingIngredients.TagIngredient tag) {
+            var items = tag.ingredient.getItems();
             if (items.length > 0) {
                 var cycle = System.currentTimeMillis() / CYCLE_TIME;
                 var idx = (int) (cycle % items.length);

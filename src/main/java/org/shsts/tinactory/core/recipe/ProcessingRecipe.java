@@ -10,7 +10,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -144,13 +143,12 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
 
         public S inputItem(int port, Supplier<? extends ItemLike> item, int amount) {
-            return input(port, () -> new ProcessingIngredients.SimpleItemIngredient(
+            return input(port, () -> new ProcessingIngredients.ItemIngredient(
                     new ItemStack(item.get(), amount)));
         }
 
         public S inputItem(int port, TagKey<Item> tag, int amount) {
-            return input(port, () -> new ProcessingIngredients.ItemIngredient(
-                    Ingredient.of(tag), amount));
+            return input(port, () -> new ProcessingIngredients.TagIngredient(tag, amount));
         }
 
         public S inputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
@@ -274,12 +272,12 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
                     .map(JsonElement::getAsJsonObject)
                     .forEach(je -> builder.input(
                             GsonHelper.getAsInt(je, "port"),
-                            ProcessingIngredients.SERIALIZER.fromJson(GsonHelper.getAsJsonObject(je, "ingredient"))));
+                            ProcessingIngredients.fromJson(GsonHelper.getAsJsonObject(je, "ingredient"))));
             Streams.stream(GsonHelper.getAsJsonArray(jo, "outputs"))
                     .map(JsonElement::getAsJsonObject)
                     .forEach(je -> builder.output(
                             GsonHelper.getAsInt(je, "port"),
-                            ProcessingResults.SERIALIZER.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
+                            ProcessingResults.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
             return builder
                     .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
                     .voltage(GsonHelper.getAsLong(jo, "voltage"))
@@ -298,7 +296,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
                     .map(input -> {
                         var je = new JsonObject();
                         je.addProperty("port", input.port);
-                        je.add("ingredient", ProcessingIngredients.SERIALIZER.toJson(input.ingredient));
+                        je.add("ingredient", ProcessingIngredients.toJson(input.ingredient));
                         return je;
                     }).forEach(inputs::add);
             var outputs = new JsonArray();
@@ -306,7 +304,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
                     .map(output -> {
                         var je = new JsonObject();
                         je.addProperty("port", output.port);
-                        je.add("result", ProcessingResults.SERIALIZER.toJson(output.result));
+                        je.add("result", ProcessingResults.toJson(output.result));
                         return je;
                     }).forEach(outputs::add);
             jo.add("inputs", inputs);

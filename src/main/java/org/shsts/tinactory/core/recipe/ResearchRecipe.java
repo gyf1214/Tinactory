@@ -111,7 +111,7 @@ public class ResearchRecipe extends ProcessingRecipe {
         public ResearchRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
             var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
-                    .map(je -> ProcessingIngredients.SERIALIZER.fromJson(je.getAsJsonObject()))
+                    .map(je -> ProcessingIngredients.fromJson(je.getAsJsonObject()))
                     .forEach(builder::input);
             return builder.target(new ResourceLocation(GsonHelper.getAsString(jo, "target")))
                     .progress(GsonHelper.getAsLong(jo, "progress"))
@@ -125,7 +125,7 @@ public class ResearchRecipe extends ProcessingRecipe {
         public void toJson(JsonObject jo, ResearchRecipe recipe) {
             var inputs = new JsonArray();
             recipe.inputs.stream()
-                    .map(input -> ProcessingIngredients.SERIALIZER.toJson(input.ingredient()))
+                    .map(input -> ProcessingIngredients.toJson(input.ingredient()))
                     .forEach(inputs::add);
             jo.add("inputs", inputs);
             jo.addProperty("target", recipe.target.toString());

@@ -2,10 +2,10 @@ package org.shsts.tinactory.core.tech;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.mojang.serialization.JsonOps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.core.common.IPacket;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -31,14 +31,14 @@ public class TechInitPacket implements IPacket {
     private static Technology techFromBuf(FriendlyByteBuf buf) {
         var loc = buf.readResourceLocation();
         var jo = GSON.fromJson(buf.readUtf(), JsonObject.class);
-        var tech = Technology.CODEC.parse(JsonOps.INSTANCE, jo).getOrThrow(false, $ -> {});
+        var tech = CodecHelper.parseJson(Technology.CODEC, jo);
         tech.setLoc(loc);
         return tech;
     }
 
     private static void techToBuf(FriendlyByteBuf buf, Technology tech) {
         buf.writeResourceLocation(tech.getLoc());
-        var je = Technology.CODEC.encodeStart(JsonOps.INSTANCE, tech).getOrThrow(false, $ -> {});
+        var je = CodecHelper.encodeJson(Technology.CODEC, tech);
         buf.writeUtf(GSON.toJson(je));
     }
 

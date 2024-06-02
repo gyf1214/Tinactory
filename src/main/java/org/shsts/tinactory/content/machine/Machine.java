@@ -122,9 +122,9 @@ public class Machine extends UpdatableCapabilityProvider
                 continue;
             }
             if (updateFilter) {
-                if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                    container.setItemFilter(idx, item.ingredient());
-                } else if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient item) {
+                if (ingredient instanceof ProcessingIngredients.TagIngredient tag) {
+                    container.setItemFilter(idx, tag.ingredient);
+                } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
                     var stack1 = item.stack();
                     container.setItemFilter(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
                 } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {

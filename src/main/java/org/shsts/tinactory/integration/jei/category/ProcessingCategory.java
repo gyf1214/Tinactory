@@ -53,19 +53,19 @@ public class ProcessingCategory<T extends ProcessingRecipe> extends RecipeCatego
             case OUTPUT -> RecipeIngredientRole.OUTPUT;
         };
         var slotBuilder = builder.addSlot(role, slot.x() + 1 + xOffset, slot.y() + 1);
-        if (ingredient instanceof ProcessingIngredients.SimpleItemIngredient simpleItemIngredient) {
-            slotBuilder.addItemStack(simpleItemIngredient.stack());
-        } else if (ingredient instanceof ProcessingIngredients.ItemIngredient itemIngredient) {
-            var stacks = Arrays.stream(itemIngredient.ingredient().getItems())
-                    .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, itemIngredient.amount()))
+        if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
+            slotBuilder.addItemStack(item.stack());
+        } else if (ingredient instanceof ProcessingIngredients.TagIngredient tag) {
+            var stacks = Arrays.stream(tag.ingredient.getItems())
+                    .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, tag.amount))
                     .toList();
             slotBuilder.addItemStacks(stacks);
-        } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluidIngredient) {
-            slotBuilder.addIngredient(ForgeTypes.FLUID_STACK, fluidIngredient.fluid());
-        } else if (ingredient instanceof ProcessingResults.ItemResult itemResult) {
-            slotBuilder.addItemStack(itemResult.stack);
-        } else if (ingredient instanceof ProcessingResults.FluidResult fluidResult) {
-            slotBuilder.addIngredient(ForgeTypes.FLUID_STACK, fluidResult.stack);
+        } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
+            slotBuilder.addIngredient(ForgeTypes.FLUID_STACK, fluid.fluid());
+        } else if (ingredient instanceof ProcessingResults.ItemResult item) {
+            slotBuilder.addItemStack(item.stack);
+        } else if (ingredient instanceof ProcessingResults.FluidResult fluid) {
+            slotBuilder.addIngredient(ForgeTypes.FLUID_STACK, fluid.stack);
         } else {
             throw new IllegalArgumentException("Unknown processing ingredient type %s"
                     .formatted(ingredient.getClass()));
