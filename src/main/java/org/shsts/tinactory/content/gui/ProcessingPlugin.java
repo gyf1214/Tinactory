@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
@@ -37,7 +38,8 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     private final int startY;
 
     private int syncSlot(M menu, Predicate<Machine> getter) {
-        return menu.addSyncSlot(MenuSyncPacket.Boolean::new, be -> getter.test(Machine.get(be)));
+        return menu.addSyncSlot(MenuSyncPacket.Boolean::new, be ->
+                getter.test(AllCapabilities.MACHINE.get(be)));
     }
 
     public ProcessingPlugin(M menu, boolean autoDumpItem, boolean autoDumpFluid) {
@@ -52,7 +54,8 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
         } else {
             this.autoDumpFluidSlot = -1;
         }
-        menu.onEventPacket(SET_MACHINE, p -> Machine.get(menu.blockEntity).setConfig(p));
+        menu.onEventPacket(SET_MACHINE, p -> AllCapabilities.MACHINE.get(menu.blockEntity)
+                .setConfig(p));
 
         this.startY = menu.getHeight() - Texture.SWITCH_BUTTON.height() / 2;
     }

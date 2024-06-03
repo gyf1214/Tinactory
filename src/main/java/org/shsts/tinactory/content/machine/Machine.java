@@ -298,10 +298,6 @@ public class Machine extends UpdatableCapabilityProvider
         updateTargetRecipe(true);
     }
 
-    public static Machine get(BlockEntity be) {
-        return AllCapabilities.MACHINE.get(be);
-    }
-
     public static Optional<Machine> tryGet(BlockEntity be) {
         return AllCapabilities.MACHINE.tryGet(be);
     }
