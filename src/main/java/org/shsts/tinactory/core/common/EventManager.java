@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -33,6 +34,10 @@ public class EventManager extends CapabilityProvider {
         }
     }
 
+    public void invoke(Event<Unit> event) {
+        invoke(event, Unit.INSTANCE);
+    }
+
     public <A, R> R invoke(ReturnEvent<A, R> event, A arg) {
         var token = event.newToken();
         for (var handler : returnHandlers.get(event)) {
@@ -45,6 +50,10 @@ public class EventManager extends CapabilityProvider {
         handlers.put(event.get(), handler);
     }
 
+    public void subscribe(Supplier<Event<Unit>> event, Runnable handler) {
+        subscribe(event, $ -> handler.run());
+    }
+
     public <A, R> void subscribe(Supplier<ReturnEvent<A, R>> event, ReturnEvent.Handler<A, R> handler) {
         returnHandlers.put(event.get(), handler);
     }
@@ -52,6 +61,11 @@ public class EventManager extends CapabilityProvider {
     public static <A> void invoke(BlockEntity be, Supplier<Event<A>> event, A arg) {
         AllCapabilities.EVENT_MANAGER.tryGet(be)
                 .ifPresent(eventManager -> eventManager.invoke(event.get(), arg));
+    }
+
+    public static void invoke(BlockEntity be, Supplier<Event<Unit>> event) {
+        AllCapabilities.EVENT_MANAGER.tryGet(be)
+                .ifPresent(eventManager -> eventManager.invoke(event.get()));
     }
 
     public static <A, R> R invokeReturn(BlockEntity be, Supplier<ReturnEvent<A, R>> event, A arg) {

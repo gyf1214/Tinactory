@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -27,10 +26,8 @@ import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
-import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.Network;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
@@ -60,24 +57,15 @@ public class Machine extends UpdatableCapabilityProvider
 
     public void setConfig(SetMachinePacket packet) {
         config.apply(packet);
-        if (packet.contains("targetRecipe")) {
-            updateTargetRecipe(true);
-            sendUpdate(blockEntity);
-        }
-        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG, packet);
+        sendUpdate(blockEntity);
+        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
         eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
         eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);
-    }
-
-    protected void onServerLoad(Level world) {
-        LOGGER.debug("machine {}: loaded", this);
-        updateTargetRecipe(true);
     }
 
     protected void onRemoved(Level world) {
@@ -96,59 +84,6 @@ public class Machine extends UpdatableCapabilityProvider
             token.setReturn(InteractionResult.FAIL);
         } else {
             token.setReturn(InteractionResult.PASS);
-        }
-    }
-
-    protected void resetTargetRecipe(IContainer container, boolean updateFilter) {
-        var portSize = container.portSize();
-        for (var i = 0; i < portSize; i++) {
-            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
-                continue;
-            }
-            if (updateFilter) {
-                container.resetFilter(i);
-            }
-            var port = container.getPort(i, false);
-            getLogistics().ifPresent(component -> component.removePassiveStorage(PortDirection.INPUT, port));
-        }
-    }
-
-    protected void setTargetRecipe(IContainer container, ProcessingRecipe recipe, boolean updateFilter) {
-        for (var input : recipe.inputs) {
-            var idx = input.port();
-            var port = container.getPort(idx, false);
-            var ingredient = input.ingredient();
-            if (!container.hasPort(idx)) {
-                continue;
-            }
-            if (updateFilter) {
-                if (ingredient instanceof ProcessingIngredients.TagIngredient tag) {
-                    container.setItemFilter(idx, tag.ingredient);
-                } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                    var stack1 = item.stack();
-                    container.setItemFilter(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
-                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                    var stack1 = fluid.fluid();
-                    container.setFluidFilter(idx, stack -> stack.isFluidEqual(stack1));
-                }
-            }
-            getLogistics().ifPresent(component -> component.addPassiveStorage(PortDirection.INPUT, port));
-        }
-    }
-
-    protected void updateTargetRecipe(boolean updateFilter) {
-        var world = blockEntity.getLevel();
-        assert world != null;
-        var recipe = config.getRecipe("targetRecipe", world).orElse(null);
-        LOGGER.debug("update target recipe = {}", recipe);
-        var container = getContainer().orElse(null);
-        if (container == null) {
-            return;
-        }
-        if (recipe == null) {
-            resetTargetRecipe(container, updateFilter);
-        } else {
-            setTargetRecipe(container, recipe, updateFilter);
         }
     }
 
@@ -190,7 +125,6 @@ public class Machine extends UpdatableCapabilityProvider
     public void onConnectToNetwork(Network network) {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
-        updateTargetRecipe(false);
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 
@@ -283,19 +217,13 @@ public class Machine extends UpdatableCapabilityProvider
 
     @Override
     public CompoundTag serializeOnUpdate() {
-        var tag = new CompoundTag();
-        config.getLoc("targetRecipe").ifPresent(loc -> tag.putString("targetRecipe", loc.toString()));
-        return tag;
+        return serializeNBT();
     }
 
     @Override
     public void deserializeOnUpdate(CompoundTag tag) {
-        if (tag.contains("targetRecipe", Tag.TAG_STRING)) {
-            config.setString("targetRecipe", tag.getString("targetRecipe"));
-        } else {
-            config.reset("targetRecipe");
-        }
-        updateTargetRecipe(true);
+        deserializeNBT(tag);
+        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
 
     public static Optional<Machine> tryGet(BlockEntity be) {

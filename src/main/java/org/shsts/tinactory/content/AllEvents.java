@@ -1,11 +1,11 @@
 package org.shsts.tinactory.content;
 
+import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.network.Component;
@@ -27,7 +27,7 @@ public final class AllEvents {
     public static final RegistryEntry<Event<Boolean>> CONTAINER_CHANGE;
     public static final RegistryEntry<Event<Network>> CONNECT;
     public static final RegistryEntry<Event<Component.SchedulingBuilder>> BUILD_SCHEDULING;
-    public static final RegistryEntry<Event<SetMachinePacket>> SET_MACHINE_CONFIG;
+    public static final RegistryEntry<Event<Unit>> SET_MACHINE_CONFIG;
 
     static {
         SERVER_LOAD = REGISTRATE.event("server_load");

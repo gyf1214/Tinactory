@@ -2,8 +2,8 @@ package org.shsts.tinactory.registrate.common;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
@@ -80,7 +80,7 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends Builder<?, ?, B
         return recipe(registrate, new ResourceLocation(registrate.modid, id));
     }
 
-    public B recipe(Item item) {
+    public B recipe(IForgeRegistryEntry<?> item) {
         var loc = item.getRegistryName();
         assert loc != null;
         return recipe(loc);

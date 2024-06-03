@@ -110,7 +110,7 @@ public class ElectricFurnace extends CapabilityProvider
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.SERVER_LOAD, this::onLoad);
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, $ -> setUpdateRecipe());
+        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::setUpdateRecipe);
     }
 
     @Override

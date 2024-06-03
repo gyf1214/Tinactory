@@ -73,7 +73,7 @@ public final class AllRecipes {
 
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
                 .defaults($ -> $.autoVoid()
-                        .inputFluid(1, Fluids.WATER, 1000)
+                        .inputFluid(1, Fluids.WATER, 500)
                         .outputItem(3, AllMaterials.STONE.entry("dust"), 1)
                         .amperage(0.125d))
                 .register();
@@ -220,6 +220,12 @@ public final class AllRecipes {
         STONE_GENERATOR.recipe(Items.COBBLESTONE)
                 .outputItem(0, Items.COBBLESTONE, 1)
                 .primitive()
+                .build();
+
+        // generate water
+        STONE_GENERATOR.recipe(Fluids.WATER)
+                .outputFluid(1, Fluids.WATER, 1000)
+                .voltage(Voltage.ULV)
                 .build();
     }
 

@@ -162,7 +162,6 @@ public class NetworkBase {
         LOGGER.debug("network {}: connect finished", this);
         state = State.CONNECTED;
         bfsContext.reset();
-        ticks = 0;
     }
 
     protected void connectConflict(BlockPos pos) {
@@ -212,13 +211,7 @@ public class NetworkBase {
         }
     }
 
-    private int ticks;
-
-    protected void doTick() {
-        if (ticks++ % 40 == 0) {
-            LOGGER.debug("network {}: tick", this);
-        }
-    }
+    protected void doTick() {}
 
     public void tick() {
         switch (state) {
