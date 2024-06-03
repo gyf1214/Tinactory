@@ -16,7 +16,6 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.RecipeProcessor;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
@@ -31,10 +30,14 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
 
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING_VERTICAL;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, ProcessingMenu> {
-    private static final int EXTRA_HEIGHT = (Menu.FONT_HEIGHT + Menu.SPACING_VERTICAL) * 3;
+    private static final int EXTRA_HEIGHT = (FONT_HEIGHT + SPACING_VERTICAL) * 3 + SLOT_SIZE / 2;
     private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("0.00");
 
     public ProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
@@ -52,7 +55,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
 
     protected int drawTextLine(PoseStack stack, Component text, int y) {
         RenderUtil.renderText(stack, text, 0, y);
-        return y - Menu.FONT_HEIGHT - Menu.SPACING_VERTICAL;
+        return y - FONT_HEIGHT - SPACING_VERTICAL;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
                              PoseStack stack, double mouseX, double mouseY) {
 
         helper.drawProgressBar(stack, (int) recipe.workTicks);
-        var y = helper.getBackground().getHeight() - Menu.FONT_HEIGHT;
+        var y = helper.getBackground().getHeight() - FONT_HEIGHT;
         var total = recipe.power * recipe.workTicks;
         var duration = NUMBER_FORMAT.format((double) recipe.workTicks / 20d);
         var voltage = Voltage.fromValue(recipe.voltage).id.toUpperCase();

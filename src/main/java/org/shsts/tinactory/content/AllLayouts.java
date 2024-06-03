@@ -2,7 +2,6 @@ package org.shsts.tinactory.content;
 
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Texture;
 
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING_VERTICAL;
@@ -27,12 +26,11 @@ public final class AllLayouts {
 
         BOILER = Layout.builder()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
+                .slot(0, 1 + SLOT_SIZE * 2)
                 .port(SlotType.FLUID_INPUT)
-                .slot(SLOT_SIZE, 1)
+                .slot(0, 1)
                 .port(SlotType.FLUID_OUTPUT)
-                .slot(4 * SLOT_SIZE, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + 2 * SLOT_SIZE, 0)
+                .slot(3 * SLOT_SIZE, 1 + SLOT_SIZE)
                 .buildLayout();
     }
 }

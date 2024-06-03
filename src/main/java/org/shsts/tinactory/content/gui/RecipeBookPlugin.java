@@ -22,25 +22,27 @@ import java.util.function.Function;
 public class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     private final RecipeType<? extends ProcessingRecipe> recipeType;
     private final Layout layout;
+    private final int startY;
 
     @OnlyIn(Dist.CLIENT)
     private MachineRecipeBook machineRecipeBook = null;
 
-    public RecipeBookPlugin(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
+    public RecipeBookPlugin(M menu, RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
                             Layout layout) {
         this.recipeType = recipeType.get();
         this.layout = layout;
+        this.startY = menu.getHeight() - 18;
     }
 
     public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>>
     builder(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType, Layout layout) {
-        return $ -> new RecipeBookPlugin<>(recipeType, layout);
+        return menu -> new RecipeBookPlugin<>(menu, recipeType, layout);
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
     public void applyMenuScreen(MenuScreen<M> screen) {
-        machineRecipeBook = new MachineRecipeBook(screen, recipeType, 0, 0);
+        machineRecipeBook = new MachineRecipeBook(screen, recipeType, 0, startY);
         screen.addPanel(machineRecipeBook);
         var rect = new Rect(layout.getXOffset(), 0, 0, 0);
         screen.addWidget(rect, new GhostRecipe(screen.getMenu(), layout));

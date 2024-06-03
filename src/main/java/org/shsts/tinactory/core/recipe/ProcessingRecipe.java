@@ -29,6 +29,7 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -101,9 +102,11 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
     public IProcessingObject getDisplay() {
         if (!outputs.isEmpty()) {
-            return outputs.get(0).result;
+            return outputs.stream().min(Comparator.comparingInt(Output::port))
+                    .get().result;
         } else if (!inputs.isEmpty()) {
-            return inputs.get(0).ingredient;
+            return inputs.stream().min(Comparator.comparingInt(Input::port))
+                    .get().ingredient;
         } else {
             return ProcessingResults.EMPTY;
         }

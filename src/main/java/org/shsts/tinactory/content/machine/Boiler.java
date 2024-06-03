@@ -131,7 +131,7 @@ public class Boiler extends CapabilityProvider implements
 
     @Override
     public double getProgress() {
-        return maxBurn <= 0 ? 0d : (double) currentBurn / (double) maxBurn;
+        return maxBurn <= 0 ? 0d : 1d - ((double) currentBurn / (double) maxBurn);
     }
 
     @Nonnull

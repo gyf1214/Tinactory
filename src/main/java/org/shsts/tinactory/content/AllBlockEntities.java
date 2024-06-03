@@ -97,8 +97,8 @@ public final class AllBlockEntities {
                 .voltage(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .slot(0, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_MULTIPLE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -108,15 +108,15 @@ public final class AllBlockEntities {
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT);
         for (var i = 0; i < 3; i++) {
-            for (var j = 0; j < 3; j++) {
-                assembler.slot(SLOT_SIZE * j, SLOT_SIZE * i + 1);
+            for (var j = 0; j < (i == 2 ? 2 : 3); j++) {
+                assembler.slot(SLOT_SIZE * j, 1 + SLOT_SIZE * i);
             }
         }
         ASSEMBLER = assembler.port(SlotType.FLUID_INPUT)
-                .slot(SLOT_SIZE * 2, SLOT_SIZE * 3 + 1)
+                .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 3, SLOT_SIZE)
+                .progressBar(Texture.PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE)
                 .build()
                 .buildObject();
 
@@ -125,8 +125,10 @@ public final class AllBlockEntities {
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 2, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8, 0)
+                .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE / 2)
+                .port(SlotType.FLUID_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, Voltage.ULV)
+                .progressBar(Texture.PROGRESS_MACERATE, 8, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -135,12 +137,11 @@ public final class AllBlockEntities {
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
+                .slot(0, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1)
-                .slot(SLOT_SIZE * 4, 1)
-                .slot(SLOT_SIZE * 5, 1, Voltage.MV)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2).slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, Voltage.LV)
+                .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -148,11 +149,11 @@ public final class AllBlockEntities {
                 .overlay(gregtech("blocks/machines/macerator"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
+                .slot(0, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1)
-                .slot(SLOT_SIZE * 4, 1, Voltage.HV)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2, Voltage.HV)
+                .progressBar(Texture.PROGRESS_MACERATE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -161,16 +162,16 @@ public final class AllBlockEntities {
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
+                .slot(0, 1 + SLOT_SIZE / 2)
                 .port(SlotType.FLUID_INPUT)
-                .slot(SLOT_SIZE, 1)
+                .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 4, 1)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 5, 1, Voltage.ULV)
+                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, Voltage.ULV)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 6, 1, Voltage.ULV)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, 0)
+                .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE / 2, Voltage.ULV)
+                .progressBar(Texture.PROGRESS_BATH, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -178,15 +179,15 @@ public final class AllBlockEntities {
                 .overlay(gregtech("blocks/machines/centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
+                .slot(0, 1 + SLOT_SIZE / 2)
                 .port(SlotType.FLUID_INPUT)
-                .slot(SLOT_SIZE, 1)
+                .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1).slot(SLOT_SIZE * 4, 1).slot(SLOT_SIZE * 5, 1)
-                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE, Voltage.HV)
-                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE, Voltage.HV)
-                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE, Voltage.HV)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .slot(SLOT_SIZE * 4, 1).slot(SLOT_SIZE * 5, 1).slot(SLOT_SIZE * 6, 1, Voltage.HV)
+                .port(SlotType.FLUID_OUTPUT)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE).slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
+                .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE, Voltage.HV)
+                .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -194,11 +195,11 @@ public final class AllBlockEntities {
                 .overlay(gregtech("blocks/machines/thermal_centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
+                .slot(0, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1)
-                .slot(SLOT_SIZE * 4, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -206,10 +207,10 @@ public final class AllBlockEntities {
                 .voltage(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
+                .slot(0, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -218,11 +219,11 @@ public final class AllBlockEntities {
                 .overlay(gregtech("blocks/machines/alloy_smelter"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
-                .slot(0, 1)
-                .slot(SLOT_SIZE, 1)
+                .slot(0, 1 + SLOT_SIZE / 2)
+                .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 4, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, 0)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -231,10 +232,10 @@ public final class AllBlockEntities {
                 .overlay(gregtech("blocks/generators/steam_turbine/overlay_side"))
                 .layoutSet()
                 .port(SlotType.FLUID_INPUT)
-                .slot(0, 1)
+                .slot(0, 1 + SLOT_SIZE / 2)
                 .port(SlotType.FLUID_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, 0)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 

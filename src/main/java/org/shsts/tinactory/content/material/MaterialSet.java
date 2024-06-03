@@ -499,8 +499,8 @@ public class MaterialSet {
                     var byproduct = byproducts.getOrDefault("centrifuge", $.entry("dust"));
                     CENTRIFUGE.recipe($.loc("dust"))
                             .inputItem(0, $.tag("dust_pure"), 1)
-                            .outputItem(1, $.entry("dust"), 1)
-                            .outputItem(1, byproduct, 1, 0.1)
+                            .outputItem(2, $.entry("dust"), 1)
+                            .outputItem(2, byproduct, 1, 0.1)
                             .voltage(Voltage.LV)
                             .workTicks(80)
                             .build();

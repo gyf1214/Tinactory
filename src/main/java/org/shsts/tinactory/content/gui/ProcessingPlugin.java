@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 
 import static org.shsts.tinactory.core.gui.Menu.CONTENT_WIDTH;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.SPACING_VERTICAL;
 import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 
 @ParametersAreNonnullByDefault
@@ -55,8 +54,7 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
         }
         menu.onEventPacket(SET_MACHINE, p -> Machine.get(menu.blockEntity).setConfig(p));
 
-        this.startY = menu.getHeight() + SPACING_VERTICAL;
-        menu.setHeight(startY + Texture.SWITCH_BUTTON.height() / 2);
+        this.startY = menu.getHeight() - Texture.SWITCH_BUTTON.height() / 2;
     }
 
     @OnlyIn(Dist.CLIENT)

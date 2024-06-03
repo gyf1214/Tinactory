@@ -1,37 +1,47 @@
 package org.shsts.tinactory.content.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
-import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.Label;
+import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class BoilerPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
-    private final int syncSlot;
+public class BoilerPlugin implements IMenuPlugin<ProcessingMenu> {
+    private static final double MAX_HEAT = 500d;
 
-    public BoilerPlugin(M menu) {
-        this.syncSlot = menu.addSyncSlot(MenuSyncPacket.Double::new,
-                be -> ((Boiler) AllCapabilities.PROCESSOR.get(be)).getHeat());
+    private final int burnSlot;
+    private final int heatSlot;
+
+    public BoilerPlugin(ProcessingMenu menu) {
+        this.burnSlot = menu.addSyncSlot(MenuSyncPacket.Double::new,
+                be -> AllCapabilities.PROCESSOR.get(be).getProgress());
+        this.heatSlot = menu.addSyncSlot(MenuSyncPacket.Double::new,
+                be -> ((Boiler) AllCapabilities.PROCESSOR.get(be)).getHeat() / MAX_HEAT);
     }
 
     @Override
-    public void applyMenuScreen(MenuScreen<M> screen) {
+    public void applyMenuScreen(MenuScreen<ProcessingMenu> screen) {
         var menu = screen.getMenu();
-        var label = new Label(menu);
-        label.verticalAlign = Label.Alignment.END;
-        menu.<MenuSyncPacket.Double>onSyncPacket(syncSlot,
-                p -> label.setLine(0, new TextComponent("Heat: %.2f".formatted(p.getData()))));
 
-        screen.addWidget(RectD.corners(0d, 1d, 0d, 1d), Rect.ZERO, label);
+        var xOffset = menu.layout.getXOffset();
+        var burnBar = new ProgressBar(menu, Texture.PROGRESS_BURN, burnSlot);
+        burnBar.direction = ProgressBar.Direction.VERTICAL;
+        screen.addWidget(new Rect(xOffset + 1, 1 + SLOT_SIZE, 16, 16), burnBar);
+
+        var heatBar = new ProgressBar(menu, Texture.HEAT_EMPTY, Texture.HEAT_FULL, heatSlot);
+        heatBar.direction = ProgressBar.Direction.VERTICAL;
+        var rect = new Rect(xOffset + SLOT_SIZE * 2, 1, Texture.HEAT_EMPTY.width(), Texture.HEAT_EMPTY.height());
+        screen.addWidget(rect, heatBar);
     }
 }
