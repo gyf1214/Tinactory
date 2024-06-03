@@ -8,16 +8,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,32 +22,11 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class GhostRecipe extends MenuWidget {
-    private final Layout layout;
-
-    @Nullable
-    private ProcessingRecipe currentRecipe = null;
     private final List<Layout.SlotWith<? extends IProcessingObject>> ingredients = new ArrayList<>();
     private final ItemRenderer itemRenderer = ClientUtil.getItemRenderer();
 
-    public GhostRecipe(Menu<?, ?> menu, Layout layout) {
+    public GhostRecipe(Menu<?, ?> menu) {
         super(menu);
-        this.layout = layout;
-    }
-
-    private void updateRecipe() {
-        var recipe = AllCapabilities.MACHINE.get(menu.blockEntity)
-                .getTargetRecipe().orElse(null);
-
-        if (recipe == currentRecipe) {
-            return;
-        }
-        currentRecipe = recipe;
-
-        ingredients.clear();
-        if (recipe != null) {
-            ingredients.addAll(layout.getProcessingInputs(recipe));
-            ingredients.addAll(layout.getProcessingOutputs(recipe));
-        }
     }
 
     private void renderItem(PoseStack poseStack, ItemStack stack, int x, int y) {
@@ -74,8 +50,6 @@ public class GhostRecipe extends MenuWidget {
 
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        updateRecipe();
-
         for (var ingredient : ingredients) {
             var slot = ingredient.slot();
             var slotType = ingredient.slot().type();
@@ -86,5 +60,13 @@ public class GhostRecipe extends MenuWidget {
             var y = slot.y() + rect.y() + 1;
             renderIngredient(poseStack, ingredient.val(), x, y);
         }
+    }
+
+    public void clear() {
+        ingredients.clear();
+    }
+
+    public void addIngredient(Layout.SlotWith<? extends IProcessingObject> ingredient) {
+        ingredients.add(ingredient);
     }
 }

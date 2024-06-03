@@ -3,13 +3,11 @@ package org.shsts.tinactory.content.gui;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.gui.client.GhostRecipe;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBook;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -39,8 +37,6 @@ public abstract class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlu
     public void applyMenuScreen(MenuScreen<M> screen) {
         recipeBook = createRecipeBook(screen);
         screen.addPanel(recipeBook);
-        var rect = new Rect(layout.getXOffset(), 0, 0, 0);
-        screen.addWidget(rect, new GhostRecipe(screen.getMenu(), layout));
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -57,7 +53,7 @@ public abstract class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlu
             @OnlyIn(Dist.CLIENT)
             @Override
             protected MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen) {
-                return new ProcessingRecipeBook(screen, recipeType.get(), 0, buttonY);
+                return new ProcessingRecipeBook(screen, recipeType.get(), 0, buttonY, layout);
             }
         };
     }

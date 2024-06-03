@@ -10,6 +10,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
@@ -33,12 +34,14 @@ import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
     private final RecipeType<? extends ProcessingRecipe> recipeType;
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
+    private final Layout layout;
 
     public ProcessingRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
                                 RecipeType<? extends ProcessingRecipe> recipeType,
-                                int buttonX, int buttonY) {
-        super(screen, buttonX, buttonY);
+                                int buttonX, int buttonY, Layout layout) {
+        super(screen, buttonX, buttonY, layout.getXOffset());
         this.recipeType = recipeType;
+        this.layout = layout;
         TechManager.client().onProgressChange(onTechChange);
     }
 
@@ -71,10 +74,13 @@ public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
 
     @Override
     protected void selectRecipe(@Nullable ProcessingRecipe recipe) {
+        ghostRecipe.clear();
         if (recipe == null) {
             menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().reset("targetRecipe"));
         } else {
             menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("targetRecipe", recipe.getId()));
+            layout.getProcessingInputs(recipe).forEach(ghostRecipe::addIngredient);
+            layout.getProcessingOutputs(recipe).forEach(ghostRecipe::addIngredient);
         }
     }
 

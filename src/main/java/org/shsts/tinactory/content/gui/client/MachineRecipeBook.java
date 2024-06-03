@@ -163,6 +163,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
     }
 
     protected final Panel bookPanel;
+    protected final GhostRecipe ghostRecipe;
     private final ButtonPanel buttonPanel;
     private final PageButton leftPageButton;
     private final PageButton rightPageButton;
@@ -171,9 +172,10 @@ public abstract class MachineRecipeBook<T> extends Panel {
     protected int page = 0;
 
     public MachineRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
-                             int buttonX, int buttonY) {
+                             int buttonX, int buttonY, int xOffset) {
         super(screen);
         this.bookPanel = new Panel(screen);
+        this.ghostRecipe = new GhostRecipe(screen.getMenu());
         this.buttonPanel = new ButtonPanel();
         this.leftPageButton = new PageButton(menu, 15, -1);
         this.rightPageButton = new PageButton(menu, 1, 1);
@@ -201,6 +203,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
                 }
             }
         });
+        addWidget(new Rect(xOffset, 0, 0, 0), ghostRecipe);
     }
 
     @Override
