@@ -1,11 +1,11 @@
 package org.shsts.tinactory.content.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.client.GhostRecipe;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
+import org.shsts.tinactory.content.gui.client.ProcessingRecipeBook;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
@@ -19,31 +19,26 @@ import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
-    private final RecipeType<? extends ProcessingRecipe> recipeType;
-    private final Layout layout;
-    private final int startY;
+public abstract class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
+    protected final Layout layout;
+    protected final int buttonY;
 
     @OnlyIn(Dist.CLIENT)
-    private MachineRecipeBook machineRecipeBook = null;
+    private MachineRecipeBook<?> recipeBook = null;
 
-    public RecipeBookPlugin(M menu, RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
-                            Layout layout) {
-        this.recipeType = recipeType.get();
+    public RecipeBookPlugin(M menu, Layout layout) {
         this.layout = layout;
-        this.startY = menu.getHeight() - 18;
+        this.buttonY = menu.getHeight() - 18;
     }
 
-    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>>
-    builder(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType, Layout layout) {
-        return menu -> new RecipeBookPlugin<>(menu, recipeType, layout);
-    }
+    @OnlyIn(Dist.CLIENT)
+    protected abstract MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen);
 
     @OnlyIn(Dist.CLIENT)
     @Override
     public void applyMenuScreen(MenuScreen<M> screen) {
-        machineRecipeBook = new MachineRecipeBook(screen, recipeType, 0, startY);
-        screen.addPanel(machineRecipeBook);
+        recipeBook = createRecipeBook(screen);
+        screen.addPanel(recipeBook);
         var rect = new Rect(layout.getXOffset(), 0, 0, 0);
         screen.addWidget(rect, new GhostRecipe(screen.getMenu(), layout));
     }
@@ -51,8 +46,19 @@ public class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void onScreenRemoved() {
-        if (machineRecipeBook != null) {
-            machineRecipeBook.remove();
+        if (recipeBook != null) {
+            recipeBook.remove();
         }
+    }
+
+    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>>
+    processing(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType, Layout layout) {
+        return menu -> new RecipeBookPlugin<>(menu, layout) {
+            @OnlyIn(Dist.CLIENT)
+            @Override
+            protected MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen) {
+                return new ProcessingRecipeBook(screen, recipeType.get(), 0, buttonY);
+            }
+        };
     }
 }

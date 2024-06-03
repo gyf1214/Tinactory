@@ -121,7 +121,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .simpleCapability(RecipeProcessor.basic(recipeType, voltage))
                         .menu()
                         .plugin(ProcessingPlugin.builder(layout))
-                        .plugin(RecipeBookPlugin.builder(recipeType, layout))
+                        .plugin(RecipeBookPlugin.processing(recipeType, layout))
                         .build()
                         .build();
             }
@@ -157,7 +157,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .simpleCapability(RecipeProcessor.generator(recipeType, voltage))
                         .menu()
                         .plugin(ProcessingPlugin.builder(layout))
-                        .plugin(RecipeBookPlugin.builder(recipeType, layout))
+                        .plugin(RecipeBookPlugin.processing(recipeType, layout))
                         .build()
                         .build();
             }

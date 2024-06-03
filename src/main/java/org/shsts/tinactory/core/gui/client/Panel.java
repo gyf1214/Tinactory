@@ -59,6 +59,12 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
                 panel.addToScreen();
             }
         }
+
+        public void initPanel() {
+            if (child instanceof Panel panel) {
+                panel.initPanel();
+            }
+        }
     }
 
     protected final Menu<?, ?> menu;
@@ -82,8 +88,18 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
     }
 
     public void init(Rect rect) {
+        initPanel();
         setRect(rect);
         addToScreen();
+    }
+
+    /**
+     * Override this for additional initialization.
+     */
+    protected void initPanel() {
+        for (var child : children) {
+            child.initPanel();
+        }
     }
 
     protected void addToScreen() {
