@@ -51,7 +51,7 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
         } else {
             this.progressBarIndex = -1;
         }
-        this.height = layout.rect.endY() + SLOT_SIZE / 2;
+        this.height = layout.rect.endY() + SLOT_SIZE + MARGIN_VERTICAL;
     }
 
     @Override

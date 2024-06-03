@@ -27,6 +27,8 @@ import org.shsts.tinactory.core.network.Network;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -35,10 +37,15 @@ import java.util.function.Supplier;
 public class LogisticsComponent extends Component {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private record Request(PortDirection dir, IPort port, ILogisticsContentWrapper content) {}
+    private record Request(PortDirection dir, IPort port,
+                           ILogisticsTypeWrapper type,
+                           ILogisticsContentWrapper content) {}
 
+    private final List<Request> activeRequestList = new ArrayList<>();
     private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
     private final Multimap<PortDirection, IPort> passiveStorages = HashMultimap.create();
+
+    private int nextReqIndex = 0;
 
     public static class WorkerProperty {
         public int workerSize;
@@ -85,6 +92,7 @@ public class LogisticsComponent extends Component {
 
     @Override
     public void onDisconnect() {
+        activeRequestList.clear();
         activeRequests.clear();
         passiveStorages.clear();
     }
@@ -138,14 +146,17 @@ public class LogisticsComponent extends Component {
         };
     }
 
-    private void handleItemActiveRequest(ILogisticsTypeWrapper type, Request req) {
+    private boolean handleItemActiveRequest(Request req) {
         if (req.dir == PortDirection.NONE) {
-            return;
+            return false;
         }
         var remaining = req.content;
-        for (var otherReq : activeRequests.get(type)) {
+        if (remaining.isEmpty()) {
+            return false;
+        }
+        for (var otherReq : activeRequests.get(req.type)) {
             if (remaining.isEmpty()) {
-                return;
+                return true;
             }
             if (otherReq.dir == req.dir) {
                 continue;
@@ -157,14 +168,14 @@ public class LogisticsComponent extends Component {
         }
         for (var storage : passiveStorages.get(req.dir.invert())) {
             if (remaining.isEmpty()) {
-                return;
+                return true;
             }
             if (storage.type() != remaining.getPortType()) {
                 continue;
             }
             remaining = transmitItem(req, storage, remaining, remaining.getCount());
         }
-        remaining.isEmpty();
+        return true;
     }
 
     private void onTick(Level world, Network network) {
@@ -172,15 +183,21 @@ public class LogisticsComponent extends Component {
         var workers = workerProperty.workerSize;
         var index = ticks % delay;
         var cycles = Math.min(ticks / delay, (workers + index) / delay);
+        ticks++;
 
-        for (var entry : activeRequests.entries()) {
-            if (cycles-- <= 0) {
+        for (var i = 0; i < activeRequestList.size(); i++) {
+            if (cycles <= 0) {
                 break;
             }
-            handleItemActiveRequest(entry.getKey(), entry.getValue());
+            var k = nextReqIndex % activeRequestList.size();
+            if (handleItemActiveRequest(activeRequestList.get(k))) {
+                cycles--;
+            }
+            nextReqIndex = k + 1;
         }
+
+        activeRequestList.clear();
         activeRequests.clear();
-        ticks++;
     }
 
     public void addPassiveStorage(PortDirection dir, IPort port) {
@@ -195,14 +212,16 @@ public class LogisticsComponent extends Component {
 
     public void addActiveRequest(PortDirection type, IItemCollection port, ItemStack item) {
         var item1 = item.copy();
-        var req = new Request(type, port, new ItemContentWrapper(item1));
-        activeRequests.put(new ItemTypeWrapper(item1), req);
+        var req = new Request(type, port, new ItemTypeWrapper(item1), new ItemContentWrapper(item1));
+        activeRequestList.add(req);
+        activeRequests.put(req.type, req);
     }
 
     public void addActiveRequest(PortDirection type, IFluidCollection port, FluidStack fluid) {
         var fluid1 = fluid.copy();
-        var req = new Request(type, port, new FluidContentWrapper(fluid1));
-        activeRequests.put(new FluidTypeWrapper(fluid1), req);
+        var req = new Request(type, port, new FluidTypeWrapper(fluid1), new FluidContentWrapper(fluid1));
+        activeRequestList.add(req);
+        activeRequests.put(req.type, req);
     }
 
     @Override

@@ -98,16 +98,15 @@ public class Boiler extends CapabilityProvider implements
     @Override
     public void onWorkTick(double partial) {
         var decay = Math.max(0, heat - BASE_HEAT) * BASE_DECAY;
-        if (maxBurn <= 0) {
-            heat = Math.max(BASE_HEAT, heat - decay);
-            return;
+        var heat1 = heat - decay;
+        if (maxBurn > 0) {
+            currentBurn += (long) (burnSpeed * (double) PROGRESS_PER_TICK);
+            if (currentBurn >= maxBurn) {
+                currentBurn = 0;
+                maxBurn = 0;
+            }
+            heat1 += burnSpeed * BASE_BURN;
         }
-        currentBurn += (long) (burnSpeed * (double) PROGRESS_PER_TICK);
-        if (currentBurn >= maxBurn) {
-            currentBurn = 0;
-            maxBurn = 0;
-        }
-        var heat1 = heat - decay + burnSpeed * BASE_BURN;
         if (heat > BURN_HEAT) {
             var absorb = (heat - BURN_HEAT) * BASE_ABSORB;
             var leftSteam1 = leftSteam + absorb * BURN_EFFICIENCY;
