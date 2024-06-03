@@ -4,10 +4,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
@@ -31,18 +29,6 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
 
     public Optional<ResourceLocation> getLoc(String key) {
         return getString(key).map(ResourceLocation::new);
-    }
-
-    public Optional<ProcessingRecipe> getRecipe(String key, Level world) {
-        return getLoc(key).flatMap(loc -> ProcessingRecipe.byKey(world.getRecipeManager(), loc));
-    }
-
-    public void setString(String key, String value) {
-        tag.putString(key, value);
-    }
-
-    public void reset(String key) {
-        tag.remove(key);
     }
 
     public void apply(SetMachinePacket packet) {

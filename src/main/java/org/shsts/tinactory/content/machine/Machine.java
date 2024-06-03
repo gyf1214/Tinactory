@@ -28,7 +28,6 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.Network;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
@@ -178,12 +177,6 @@ public class Machine extends UpdatableCapabilityProvider
 
     public Optional<LogisticsComponent> getLogistics() {
         return getNetwork().map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT));
-    }
-
-    public Optional<ProcessingRecipe> getTargetRecipe() {
-        var world = blockEntity.getLevel();
-        assert world != null;
-        return config.getRecipe("targetRecipe", world);
     }
 
     /**

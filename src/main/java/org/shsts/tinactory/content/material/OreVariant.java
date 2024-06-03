@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -47,6 +48,12 @@ public enum OreVariant implements StringRepresentable {
 
     public String getName() {
         return name().toLowerCase();
+    }
+
+    public ResourceLocation getLoc() {
+        var loc = baseItem.getRegistryName();
+        assert loc != null;
+        return loc;
     }
 
     @Override

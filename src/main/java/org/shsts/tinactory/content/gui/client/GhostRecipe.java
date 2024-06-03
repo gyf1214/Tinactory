@@ -69,4 +69,8 @@ public class GhostRecipe extends MenuWidget {
     public void addIngredient(Layout.SlotWith<? extends IProcessingObject> ingredient) {
         ingredients.add(ingredient);
     }
+
+    public void addIngredient(Layout.SlotInfo slot, IProcessingObject ingredient) {
+        ingredients.add(new Layout.SlotWith<>(slot, ingredient));
+    }
 }

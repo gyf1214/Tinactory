@@ -1,13 +1,17 @@
 package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.content.AllRecipes;
+import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 
@@ -18,6 +22,23 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
 
     public OreAnalyzerProcessor(BlockEntity blockEntity, Voltage voltage) {
         super(blockEntity, AllRecipes.ORE_ANALYZER.get(), voltage);
+    }
+
+    @Override
+    protected void setTargetRecipe(ResourceLocation loc, boolean updateFilter) {
+        var variant = Arrays.stream(OreVariant.values())
+                .filter(v -> loc.equals(v.baseItem.getRegistryName()))
+                .findAny();
+        if (variant.isEmpty()) {
+            resetTargetRecipe(updateFilter);
+            return;
+        }
+        var item = variant.get().baseItem;
+
+        var container = getContainer();
+        var port = container.getPort(0, false);
+        container.setItemFilter(0, stack -> stack.is(item));
+        getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, port));
     }
 
     @Override
@@ -58,7 +79,7 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
     @Override
     protected void onWorkDone(OreAnalyzerRecipe recipe, Random random) {
         if (!emptyRecipe) {
-            recipe.doInsertOutputs(container, random);
+            recipe.doInsertOutputs(getContainer(), random);
         }
     }
 }

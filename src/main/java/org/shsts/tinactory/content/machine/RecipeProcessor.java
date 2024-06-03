@@ -69,7 +69,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     @Nullable
     protected T targetRecipe = null;
     @Nullable
-    protected IContainer container = null;
+    private IContainer container = null;
     private boolean needUpdate = true;
 
     protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {

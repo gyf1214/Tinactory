@@ -17,6 +17,7 @@
   "tinactory.gui.networkController.workFactorLabel": "Power Grid: %s",
   "tinactory.gui.networkController.researchLabel": "Research: %s %s/%s",
   "tinactory.gui.networkController.noneResearchLabel": "Research: <none>",
+  "tinactory.gui.oreAnalyzer.recipeButton": "Analyze %s",
   "tinactory.jei.processing.total": "Total: %s EU",
   "tinactory.jei.processing.usage": "Usage: %s EU/t (%s)",
   "tinactory.jei.processing.duration": "Duration: %s secs",
