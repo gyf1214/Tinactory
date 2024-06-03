@@ -1,6 +1,8 @@
 package org.shsts.tinactory.content.gui;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
@@ -30,6 +32,7 @@ public class BoilerPlugin implements IMenuPlugin<ProcessingMenu> {
                 be -> ((Boiler) AllCapabilities.PROCESSOR.get(be)).getHeat() / MAX_HEAT);
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void applyMenuScreen(MenuScreen<ProcessingMenu> screen) {
         var menu = screen.getMenu();
