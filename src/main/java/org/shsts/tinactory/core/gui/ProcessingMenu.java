@@ -10,7 +10,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
@@ -56,7 +55,7 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
 
     @Override
     public boolean stillValid(Player player) {
-        return super.stillValid(player) && Machine.tryGet(blockEntity)
+        return super.stillValid(player) && AllCapabilities.MACHINE.tryGet(blockEntity)
                 .map(m -> m.canPlayerInteract(player))
                 .orElse(true);
     }

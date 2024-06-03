@@ -75,9 +75,9 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
     private void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
         if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
             builder.item(slot, item.stack());
-        } else if (ingredient instanceof ProcessingIngredients.TagIngredient tag) {
-            var items = Arrays.stream(tag.ingredient.getItems())
-                    .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, tag.amount))
+        } else if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
+            var items = Arrays.stream(item.ingredient.getItems())
+                    .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, item.amount))
                     .toList();
             builder.items(slot, items);
         } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {

@@ -35,7 +35,6 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
         }
         var item = variant.get().baseItem;
 
-        var container = getContainer();
         var port = container.getPort(0, false);
         container.setItemFilter(0, stack -> stack.is(item));
         getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, port));
@@ -79,7 +78,7 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
     @Override
     protected void onWorkDone(OreAnalyzerRecipe recipe, Random random) {
         if (!emptyRecipe) {
-            recipe.doInsertOutputs(getContainer(), random);
+            recipe.doInsertOutputs(container, random);
         }
     }
 }

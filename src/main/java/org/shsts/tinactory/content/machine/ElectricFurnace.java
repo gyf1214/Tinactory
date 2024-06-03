@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.machine;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -17,15 +18,19 @@ import net.minecraftforge.items.wrapper.RecipeWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.logistics.LogisticsComponent;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
@@ -36,8 +41,13 @@ import static org.shsts.tinactory.content.machine.RecipeProcessor.PROGRESS_PER_T
 @MethodsReturnNonnullByDefault
 public class ElectricFurnace extends CapabilityProvider
         implements IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private final BlockEntity blockEntity;
     private final Voltage voltage;
+    private final double workFactor;
+
+    private IContainer container;
     private IItemCollection inputPort;
     private RecipeWrapper inputWrapper;
     private IItemCollection outputPort;
@@ -46,32 +56,15 @@ public class ElectricFurnace extends CapabilityProvider
     private ResourceLocation currentRecipeLoc = null;
     @Nullable
     private SmeltingRecipe currentRecipe = null;
+    @Nullable
+    private SmeltingRecipe targetRecipe = null;
     private long workProgress = 0L;
-    private final double workFactor;
     private boolean needUpdate = true;
 
     public ElectricFurnace(BlockEntity blockEntity, Voltage voltage) {
         this.blockEntity = blockEntity;
         this.voltage = voltage;
         this.workFactor = 1 << (voltage.rank - 1);
-    }
-
-    private void onLoad(Level world) {
-        var container = AllCapabilities.CONTAINER.get(blockEntity);
-        inputPort = container.getPort(0, false).asItem();
-        outputPort = container.getPort(1, true).asItem();
-        inputWrapper = new RecipeWrapper((IItemHandlerModifiable)
-                ((ItemHandlerCollection) inputPort).itemHandler);
-
-        var recipeManager = world.getRecipeManager();
-        currentRecipe = (SmeltingRecipe) Optional.ofNullable(currentRecipeLoc)
-                .flatMap(recipeManager::byKey)
-                .filter(r -> r.getType() == RecipeType.SMELTING)
-                .orElse(null);
-        currentRecipeLoc = null;
-        if (currentRecipe != null) {
-            needUpdate = false;
-        }
     }
 
     private void setUpdateRecipe() {
@@ -106,11 +99,86 @@ public class ElectricFurnace extends CapabilityProvider
         blockEntity.setChanged();
     }
 
+    private Optional<LogisticsComponent> getLogistics() {
+        return AllCapabilities.MACHINE.tryGet(blockEntity)
+                .flatMap(Machine::getLogistics);
+    }
+
+    private void setTargetRecipe(ResourceLocation loc, boolean updateFilter) {
+        var world = blockEntity.getLevel();
+        assert world != null;
+        var recipe = world.getRecipeManager().byKey(loc);
+        if (recipe.isEmpty() || !(recipe.get() instanceof SmeltingRecipe recipe1) ||
+                recipe1.getType() != RecipeType.SMELTING) {
+            resetTargetRecipe(updateFilter);
+            return;
+        }
+
+        targetRecipe = recipe1;
+        if (updateFilter) {
+            container.setItemFilter(0, targetRecipe.getIngredients().get(0));
+        }
+
+        getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, inputPort));
+    }
+
+    protected void resetTargetRecipe(boolean updateFilter) {
+        targetRecipe = null;
+        if (updateFilter) {
+            container.resetFilter(0);
+        }
+
+        getLogistics().ifPresent($ -> $.removePassiveStorage(PortDirection.INPUT, inputPort));
+    }
+
+    private void updateTargetRecipe(boolean updateFilter) {
+        var loc = AllCapabilities.MACHINE.tryGet(blockEntity)
+                .flatMap(m -> m.config.getLoc("targetRecipe"))
+                .orElse(null);
+        LOGGER.debug("update target recipe = {}", loc);
+        if (loc == null) {
+            resetTargetRecipe(updateFilter);
+        } else {
+            setTargetRecipe(loc, updateFilter);
+        }
+    }
+
+    private void onLoad(Level world) {
+        container = AllCapabilities.CONTAINER.get(blockEntity);
+        inputPort = container.getPort(0, false).asItem();
+        outputPort = container.getPort(1, true).asItem();
+        inputWrapper = new RecipeWrapper((IItemHandlerModifiable)
+                ((ItemHandlerCollection) inputPort).itemHandler);
+    }
+
+    private void onServerLoad(Level world) {
+        onLoad(world);
+
+        var recipeManager = world.getRecipeManager();
+        currentRecipe = (SmeltingRecipe) Optional.ofNullable(currentRecipeLoc)
+                .flatMap(recipeManager::byKey)
+                .filter(r -> r.getType() == RecipeType.SMELTING)
+                .orElse(null);
+        currentRecipeLoc = null;
+        if (currentRecipe != null) {
+            needUpdate = false;
+        }
+
+        updateTargetRecipe(true);
+    }
+
+    private void onMachineConfig() {
+        updateTargetRecipe(true);
+        setUpdateRecipe();
+    }
+
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onLoad);
+        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
+        eventManager.subscribe(AllEvents.CLIENT_LOAD, this::onLoad);
+        eventManager.subscribe(AllEvents.CONNECT, $ -> updateTargetRecipe(false));
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::setUpdateRecipe);
+        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
     }
 
     @Override

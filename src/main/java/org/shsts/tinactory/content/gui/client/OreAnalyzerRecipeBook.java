@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
@@ -20,8 +19,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -49,8 +46,6 @@ public class OreAnalyzerRecipeBook extends MachineRecipeBook<OreVariant> {
 
     @Override
     protected void selectRecipe(OreVariant recipe) {
-        menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("targetRecipe", recipe.getLoc()));
-
         var ingredient = new ProcessingIngredients.ItemIngredient(new ItemStack(recipe.baseItem));
         ghostRecipe.addIngredient(inputSlot, ingredient);
     }

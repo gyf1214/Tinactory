@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.gui;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.content.gui.client.ElectricFurnaceRecipeBook;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.OreAnalyzerRecipeBook;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBook;
@@ -64,6 +65,15 @@ public abstract class RecipeBookPlugin<M extends Menu<?, M>> implements IMenuPlu
             @Override
             protected MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen) {
                 return new OreAnalyzerRecipeBook(screen, 0, buttonY, layout);
+            }
+        };
+    }
+
+    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>> electricFurnace(Layout layout) {
+        return menu -> new RecipeBookPlugin<>(menu, layout) {
+            @Override
+            protected MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen) {
+                return new ElectricFurnaceRecipeBook(screen, 0, buttonY, layout);
             }
         };
     }

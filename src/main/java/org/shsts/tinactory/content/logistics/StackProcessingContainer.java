@@ -163,7 +163,8 @@ public class StackProcessingContainer extends CapabilityProvider
         if (world.isClientSide) {
             return TechManager.localTeam();
         } else {
-            return Machine.tryGet(blockEntity).flatMap(Machine::getOwnerTeam);
+            return AllCapabilities.MACHINE.tryGet(blockEntity)
+                    .flatMap(Machine::getOwnerTeam);
         }
     }
 

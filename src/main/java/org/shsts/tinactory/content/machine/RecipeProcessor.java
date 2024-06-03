@@ -68,8 +68,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     protected T currentRecipe = null;
     @Nullable
     protected T targetRecipe = null;
-    @Nullable
-    private IContainer container = null;
+    protected IContainer container;
     private boolean needUpdate = true;
 
     protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
@@ -84,15 +83,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         return world;
     }
 
-    protected IContainer getContainer() {
-        if (container == null) {
-            container = AllCapabilities.CONTAINER.get(blockEntity);
-        }
-        return container;
-    }
-
     protected Optional<LogisticsComponent> getLogistics() {
-        return Machine.tryGet(blockEntity)
+        return AllCapabilities.MACHINE.tryGet(blockEntity)
                 .flatMap(Machine::getLogistics);
     }
 
@@ -108,7 +100,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         }
 
         targetRecipe = (T) recipe;
-        var container = getContainer();
         for (var input : recipe.inputs) {
             var idx = input.port();
             var port = container.getPort(idx, false);
@@ -117,8 +108,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
                 continue;
             }
             if (updateFilter) {
-                if (ingredient instanceof ProcessingIngredients.TagIngredient tag) {
-                    container.setItemFilter(idx, tag.ingredient);
+                if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
+                    container.setItemFilter(idx, item.ingredient);
                 } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
                     var stack1 = item.stack();
                     container.setItemFilter(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
@@ -133,7 +124,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
 
     protected void resetTargetRecipe(boolean updateFilter) {
         targetRecipe = null;
-        var container = getContainer();
         var portSize = container.portSize();
         for (var i = 0; i < portSize; i++) {
             if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
@@ -147,9 +137,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         }
     }
 
-
     private void updateTargetRecipe(boolean updateFilter) {
-        var loc = Machine.tryGet(blockEntity)
+        var loc = AllCapabilities.MACHINE.tryGet(blockEntity)
                 .flatMap(m -> m.config.getLoc("targetRecipe"))
                 .orElse(null);
         LOGGER.debug("update target recipe = {}", loc);
@@ -173,7 +162,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     }
 
     protected List<T> getMatchedRecipes(Level world) {
-        return SmartRecipe.getRecipesFor(recipeType, getContainer(), world)
+        return SmartRecipe.getRecipesFor(recipeType, container, world)
                 .stream().filter(r -> r.canCraftInVoltage(voltage.value))
                 .map($ -> (T) $)
                 .toList();
@@ -198,7 +187,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
             return;
         }
         var world = getWorld();
-        var container = getContainer();
         assert currentRecipeLoc == null;
         currentRecipe = getNewRecipe(world, container).orElse(null);
         workProgress = 0;
@@ -211,7 +199,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     }
 
     private void onTechChange(ITeamProfile team) {
-        if (team == getContainer().getOwnerTeam().orElse(null)) {
+        if (team == container.getOwnerTeam().orElse(null)) {
             LOGGER.debug("processor {}: on tech change", this);
             setUpdateRecipe();
         }
@@ -228,7 +216,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     }
 
     protected void onWorkDone(T recipe, Random random) {
-        recipe.insertOutputs(getContainer(), random);
+        recipe.insertOutputs(container, random);
     }
 
     protected long getProgressPerTick(double partial) {
@@ -279,8 +267,14 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
                 0 : currentRecipe.power * energyFactor;
     }
 
+    private void onLoad(Level world) {
+        container = AllCapabilities.CONTAINER.get(blockEntity);
+    }
+
     @SuppressWarnings("unchecked")
     private void onServerLoad(Level world) {
+        onLoad(world);
+
         var recipeManager = world.getRecipeManager();
         currentRecipe = (T) Optional.ofNullable(currentRecipeLoc)
                 .flatMap(recipeManager::byKey)
@@ -317,6 +311,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     @Override
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
+        eventManager.subscribe(AllEvents.CLIENT_LOAD, this::onLoad);
         eventManager.subscribe(AllEvents.CONNECT, $ -> updateTargetRecipe(false));
         eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);

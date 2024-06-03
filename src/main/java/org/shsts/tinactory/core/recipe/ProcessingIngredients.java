@@ -50,26 +50,14 @@ public final class ProcessingIngredients {
                 ItemStack.CODEC.xmap(ItemIngredient::new, ItemIngredient::stack);
     }
 
-    public static class TagIngredient implements IProcessingIngredient {
-        private static final String CODEC_NAME = "tag_ingredient";
 
-        private final TagKey<Item> tag;
-        public final int amount;
+    public abstract static class ItemsIngredientBase implements IProcessingIngredient {
         public final Ingredient ingredient;
+        public final int amount;
 
-        public TagIngredient(TagKey<Item> tag, int amount) {
-            this.tag = tag;
+        protected ItemsIngredientBase(Ingredient ingredient, int amount) {
             this.amount = amount;
-            this.ingredient = Ingredient.of(tag);
-        }
-
-        public Ingredient ingredient() {
-            return ingredient;
-        }
-
-        @Override
-        public String codecName() {
-            return CODEC_NAME;
+            this.ingredient = ingredient;
         }
 
         @Override
@@ -81,6 +69,34 @@ public final class ProcessingIngredients {
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IItemCollection itemCollection &&
                     ItemHelper.consumeItemCollection(itemCollection, ingredient, amount, simulate);
+        }
+
+        /**
+         * Note that this is not serializable, only for display or JEI purpose.
+         */
+        public static ItemsIngredientBase of(Ingredient ingredient, int amount) {
+            return new ItemsIngredientBase(ingredient, amount) {
+                @Override
+                public String codecName() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+    }
+
+    public static class TagIngredient extends ItemsIngredientBase {
+        private static final String CODEC_NAME = "tag_ingredient";
+
+        private final TagKey<Item> tag;
+
+        public TagIngredient(TagKey<Item> tag, int amount) {
+            super(Ingredient.of(tag), amount);
+            this.tag = tag;
+        }
+
+        @Override
+        public String codecName() {
+            return CODEC_NAME;
         }
 
         private static final Codec<TagIngredient> CODEC = RecordCodecBuilder.create(instance -> instance.group(
