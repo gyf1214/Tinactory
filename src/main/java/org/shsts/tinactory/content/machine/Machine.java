@@ -42,15 +42,22 @@ public class Machine extends UpdatableCapabilityProvider
         implements IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final SmartBlockEntity blockEntity;
+    private final SmartBlockEntity blockEntity;
 
     @Nullable
-    protected Network network;
+    private Network network;
 
     public final MachineConfig config = new MachineConfig();
 
-    protected Machine(SmartBlockEntity be) {
+    private Machine(SmartBlockEntity be) {
         this.blockEntity = be;
+    }
+
+    private void onRemoved(Level world) {
+        if (network != null) {
+            network.invalidate();
+        }
+        LOGGER.debug("machine {}: removed in world", this);
     }
 
     public void setConfig(SetMachinePacket packet) {
@@ -59,25 +66,11 @@ public class Machine extends UpdatableCapabilityProvider
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
 
-    @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
-        eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
-        eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);
-    }
-
-    protected void onRemoved(Level world) {
-        if (network != null) {
-            network.invalidate();
-        }
-        LOGGER.debug("machine {}: removed in world", this);
-    }
-
     public boolean canPlayerInteract(Player player) {
         return network != null && network.team.hasPlayer(player);
     }
 
-    protected void onServerUse(AllEvents.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
+    private void onServerUse(AllEvents.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
         if (!canPlayerInteract(arg.player())) {
             token.setReturn(InteractionResult.FAIL);
         } else {
@@ -85,7 +78,7 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
-    protected void dumpItemOutput(IContainer container, LogisticsComponent logistics) {
+    private void dumpItemOutput(IContainer container, LogisticsComponent logistics) {
         var size = container.portSize();
         for (var i = 0; i < size; i++) {
             if (!container.hasPort(i) || container.portDirection(i) != PortDirection.OUTPUT) {
@@ -101,7 +94,7 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
-    protected void dumpFluidOutput(IContainer container, LogisticsComponent logistics) {
+    private void dumpFluidOutput(IContainer container, LogisticsComponent logistics) {
         var size = container.portSize();
         for (var i = 0; i < size; i++) {
             if (!container.hasPort(i) || container.portDirection(i) != PortDirection.OUTPUT) {
@@ -117,6 +110,13 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
+    @Override
+    public void subscribeEvents(EventManager eventManager) {
+        eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
+        eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
+        eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);
+    }
+
     /**
      * Called when connect to the network
      */
@@ -126,7 +126,15 @@ public class Machine extends UpdatableCapabilityProvider
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 
-    protected void onPreWork(Level world, Network network) {
+    /**
+     * Called when disconnect from the network
+     */
+    public void onDisconnectFromNetwork() {
+        network = null;
+        LOGGER.debug("machine {}: disconnect from network", this);
+    }
+
+    private void onPreWork(Level world, Network network) {
         assert this.network == network;
         getProcessor().ifPresent(IProcessor::onPreWork);
         var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
@@ -138,7 +146,7 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
-    protected void onWork(Level world, Network network) {
+    private void onWork(Level world, Network network) {
         assert this.network == network;
         var workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
         getProcessor().ifPresent(processor -> processor.onWorkTick(workFactor));
@@ -176,14 +184,6 @@ public class Machine extends UpdatableCapabilityProvider
 
     public Optional<LogisticsComponent> getLogistics() {
         return getNetwork().map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT));
-    }
-
-    /**
-     * Called when disconnect from the network
-     */
-    public void onDisconnectFromNetwork() {
-        network = null;
-        LOGGER.debug("machine {}: disconnect from network", this);
     }
 
     @Nonnull
