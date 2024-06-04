@@ -5,7 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -25,20 +24,19 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
     }
 
     @Override
-    protected void setTargetRecipe(ResourceLocation loc, boolean updateFilter) {
+    protected void setTargetRecipe(ResourceLocation loc) {
         var variant = Arrays.stream(OreVariant.values())
                 .filter(v -> loc.equals(v.baseItem.getRegistryName()))
                 .findAny();
         if (variant.isEmpty()) {
-            resetTargetRecipe(updateFilter);
+            resetTargetRecipe();
             return;
         }
         var item = variant.get().baseItem;
 
-        var port = container.getPort(0, false);
         container.setItemFilter(0, stack -> stack.is(item));
-        getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, port));
     }
+
 
     @Override
     protected Optional<OreAnalyzerRecipe> getNewRecipe(Level world, IContainer container) {

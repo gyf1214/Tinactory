@@ -104,46 +104,61 @@ public class ElectricFurnace extends CapabilityProvider
                 .flatMap(Machine::getLogistics);
     }
 
-    private void setTargetRecipe(ResourceLocation loc, boolean updateFilter) {
+    private void setTargetRecipe(ResourceLocation loc) {
         var world = blockEntity.getLevel();
         assert world != null;
         var recipe = world.getRecipeManager().byKey(loc);
         if (recipe.isEmpty() || !(recipe.get() instanceof SmeltingRecipe recipe1) ||
                 recipe1.getType() != RecipeType.SMELTING) {
-            resetTargetRecipe(updateFilter);
+            resetTargetRecipe();
             return;
         }
-
         targetRecipe = recipe1;
-        if (updateFilter) {
-            container.setItemFilter(0, targetRecipe.getIngredients().get(0));
-        }
 
-        getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, inputPort));
+        container.setItemFilter(0, targetRecipe.getIngredients().get(0));
     }
 
-    protected void resetTargetRecipe(boolean updateFilter) {
+    private void resetTargetRecipe() {
         targetRecipe = null;
-        if (updateFilter) {
-            container.resetFilter(0);
-        }
-
-        getLogistics().ifPresent($ -> $.removePassiveStorage(PortDirection.INPUT, inputPort));
+        container.resetFilter(0);
     }
 
-    private void updateTargetRecipe(boolean updateFilter) {
+    private void setAutoInput(boolean val) {
+        var portSize = container.portSize();
+        for (var i = 0; i < portSize; i++) {
+            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
+                continue;
+            }
+            var port = container.getPort(i, false);
+            if (val) {
+                getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, port));
+            } else {
+                getLogistics().ifPresent($ -> $.removePassiveStorage(PortDirection.INPUT, port));
+            }
+        }
+    }
+
+    private void updateTargetRecipe() {
         var loc = AllCapabilities.MACHINE.tryGet(blockEntity)
                 .flatMap(m -> m.config.getLoc("targetRecipe"))
                 .orElse(null);
         LOGGER.debug("update target recipe = {}", loc);
         if (loc == null) {
-            resetTargetRecipe(updateFilter);
+            resetTargetRecipe();
         } else {
-            setTargetRecipe(loc, updateFilter);
+            setTargetRecipe(loc);
         }
     }
 
-    private void onLoad(Level world) {
+    private void updateAutoInput() {
+        var val = AllCapabilities.MACHINE.tryGet(blockEntity)
+                .flatMap(m -> m.config.getBoolean("autoInput"))
+                .orElse(false);
+        LOGGER.debug("update auto input = {}", val);
+        setAutoInput(val);
+    }
+
+    private void onLoad() {
         container = AllCapabilities.CONTAINER.get(blockEntity);
         inputPort = container.getPort(0, false).asItem();
         outputPort = container.getPort(1, true).asItem();
@@ -152,7 +167,7 @@ public class ElectricFurnace extends CapabilityProvider
     }
 
     private void onServerLoad(Level world) {
-        onLoad(world);
+        onLoad();
 
         var recipeManager = world.getRecipeManager();
         currentRecipe = (SmeltingRecipe) Optional.ofNullable(currentRecipeLoc)
@@ -164,19 +179,21 @@ public class ElectricFurnace extends CapabilityProvider
             needUpdate = false;
         }
 
-        updateTargetRecipe(true);
+        updateTargetRecipe();
+        updateAutoInput();
     }
 
     private void onMachineConfig() {
-        updateTargetRecipe(true);
+        updateTargetRecipe();
+        updateAutoInput();
         setUpdateRecipe();
     }
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, this::onLoad);
-        eventManager.subscribe(AllEvents.CONNECT, $ -> updateTargetRecipe(false));
+        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
+        eventManager.subscribe(AllEvents.CONNECT, $ -> updateAutoInput());
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
         eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
     }

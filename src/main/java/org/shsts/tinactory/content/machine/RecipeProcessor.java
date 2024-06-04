@@ -89,64 +89,79 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     }
 
     @SuppressWarnings("unchecked")
-    protected void setTargetRecipe(ResourceLocation loc, boolean updateFilter) {
+    protected void setTargetRecipe(ResourceLocation loc) {
         var world = blockEntity.getLevel();
         assert world != null;
 
         var recipe = ProcessingRecipe.byKey(world.getRecipeManager(), loc).orElse(null);
         if (recipe == null || recipe.getType() != recipeType) {
-            resetTargetRecipe(updateFilter);
+            resetTargetRecipe();
             return;
         }
 
         targetRecipe = (T) recipe;
         for (var input : recipe.inputs) {
             var idx = input.port();
-            var port = container.getPort(idx, false);
             var ingredient = input.ingredient();
             if (!container.hasPort(idx)) {
                 continue;
             }
-            if (updateFilter) {
-                if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
-                    container.setItemFilter(idx, item.ingredient);
-                } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                    var stack1 = item.stack();
-                    container.setItemFilter(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
-                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                    var stack1 = fluid.fluid();
-                    container.setFluidFilter(idx, stack -> stack.isFluidEqual(stack1));
-                }
+            if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
+                container.setItemFilter(idx, item.ingredient);
+            } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
+                var stack1 = item.stack();
+                container.setItemFilter(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
+            } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
+                var stack1 = fluid.fluid();
+                container.setFluidFilter(idx, stack -> stack.isFluidEqual(stack1));
             }
-            getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, port));
         }
     }
 
-    protected void resetTargetRecipe(boolean updateFilter) {
+    protected void resetTargetRecipe() {
         targetRecipe = null;
         var portSize = container.portSize();
         for (var i = 0; i < portSize; i++) {
             if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
                 continue;
             }
-            if (updateFilter) {
-                container.resetFilter(i);
-            }
-            var port = container.getPort(i, false);
-            getLogistics().ifPresent($ -> $.removePassiveStorage(PortDirection.INPUT, port));
+            container.resetFilter(i);
         }
     }
 
-    private void updateTargetRecipe(boolean updateFilter) {
+    protected void setAutoInput(boolean val) {
+        var portSize = container.portSize();
+        for (var i = 0; i < portSize; i++) {
+            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
+                continue;
+            }
+            var port = container.getPort(i, false);
+            if (val) {
+                getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, port));
+            } else {
+                getLogistics().ifPresent($ -> $.removePassiveStorage(PortDirection.INPUT, port));
+            }
+        }
+    }
+
+    private void updateTargetRecipe() {
         var loc = AllCapabilities.MACHINE.tryGet(blockEntity)
                 .flatMap(m -> m.config.getLoc("targetRecipe"))
                 .orElse(null);
         LOGGER.debug("update target recipe = {}", loc);
         if (loc == null) {
-            resetTargetRecipe(updateFilter);
+            resetTargetRecipe();
         } else {
-            setTargetRecipe(loc, updateFilter);
+            setTargetRecipe(loc);
         }
+    }
+
+    private void updateAutoInput() {
+        var val = AllCapabilities.MACHINE.tryGet(blockEntity)
+                .flatMap(m -> m.config.getBoolean("autoInput"))
+                .orElse(false);
+        LOGGER.debug("update auto input = {}", val);
+        setAutoInput(val);
     }
 
     protected void calculateFactors(ProcessingRecipe recipe) {
@@ -267,13 +282,13 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
                 0 : currentRecipe.power * energyFactor;
     }
 
-    private void onLoad(Level world) {
+    private void onLoad() {
         container = AllCapabilities.CONTAINER.get(blockEntity);
     }
 
     @SuppressWarnings("unchecked")
     private void onServerLoad(Level world) {
-        onLoad(world);
+        onLoad();
 
         var recipeManager = world.getRecipeManager();
         currentRecipe = (T) Optional.ofNullable(currentRecipeLoc)
@@ -286,7 +301,8 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
             needUpdate = false;
         }
 
-        updateTargetRecipe(true);
+        updateTargetRecipe();
+        updateAutoInput();
 
         TechManager.server().onProgressChange(onTechChange);
     }
@@ -304,15 +320,16 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     }
 
     private void onMachineConfig() {
-        updateTargetRecipe(true);
+        updateTargetRecipe();
+        updateAutoInput();
         setUpdateRecipe();
     }
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, this::onLoad);
-        eventManager.subscribe(AllEvents.CONNECT, $ -> updateTargetRecipe(false));
+        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
+        eventManager.subscribe(AllEvents.CONNECT, $ -> updateAutoInput());
         eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
