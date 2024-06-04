@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
@@ -222,7 +221,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
 
         addPanel(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
         addWidget(new Rect(buttonX, buttonY, 20, 18), new SimpleButton(menu, RECIPE_BOOK_BUTTON,
-                new TranslatableComponent("tinactory.tooltip.openRecipeBook"), 0, 19) {
+                I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 19) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
                 super.onMouseClicked(mouseX, mouseY, button);

@@ -5,13 +5,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidEventPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class FluidSlot extends MenuWidget {
 
         var tooltip = new ArrayList<Component>();
         tooltip.add(fluidStack.getDisplayName());
-        TranslatableComponent amountString = new TranslatableComponent("tinactory.tooltip.liquid",
+        var amountString = I18n.tr("tinactory.tooltip.liquid",
                 NUMBER_FORMAT.format(fluidStack.getAmount()));
         tooltip.add(amountString.withStyle(ChatFormatting.GRAY));
 

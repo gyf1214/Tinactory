@@ -37,7 +37,6 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
         container.setItemFilter(0, stack -> stack.is(item));
     }
 
-
     @Override
     protected Optional<OreAnalyzerRecipe> getNewRecipe(Level world, IContainer container) {
         var matches = getMatchedRecipes(world);

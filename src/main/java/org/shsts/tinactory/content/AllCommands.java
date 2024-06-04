@@ -12,9 +12,9 @@ import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -22,11 +22,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public final class AllCommands {
     private static final SimpleCommandExceptionType PLAYER_HAS_TEAM = new SimpleCommandExceptionType(
-            new TranslatableComponent("tinactory.chat.exception.hasTeam"));
+            I18n.tr("tinactory.chat.exception.hasTeam"));
     private static final SimpleCommandExceptionType PLAYER_NO_TEAM = new SimpleCommandExceptionType(
-            new TranslatableComponent("tinactory.chat.exception.noTeam"));
+            I18n.tr("tinactory.chat.exception.noTeam"));
     private static final DynamicCommandExceptionType TEAM_ALREADY_EXISTS = new DynamicCommandExceptionType(
-            t -> new TranslatableComponent("tinactory.chat.exception.teamExists", t));
+            t -> I18n.tr("tinactory.chat.exception.teamExists", t));
 
     private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
@@ -40,7 +40,7 @@ public final class AllCommands {
             throw TEAM_ALREADY_EXISTS.create(name);
         }
         manager.newTeam(player, name);
-        player.sendMessage(new TranslatableComponent("tinactory.chat.createTeam.success",
+        player.sendMessage(I18n.tr("tinactory.chat.createTeam.success",
                 name, player.getDisplayName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
@@ -56,7 +56,7 @@ public final class AllCommands {
         }
 
         manager.addPlayerToTeam(player2, team);
-        player.sendMessage(new TranslatableComponent("tinactory.chat.addPlayerToTeam.success",
+        player.sendMessage(I18n.tr("tinactory.chat.addPlayerToTeam.success",
                 player2.getDisplayName(), team.getName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
@@ -67,7 +67,7 @@ public final class AllCommands {
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
         manager.leaveTeam(player);
-        player.sendMessage(new TranslatableComponent("tinactory.chat.leaveTeam.success",
+        player.sendMessage(I18n.tr("tinactory.chat.leaveTeam.success",
                 player.getDisplayName(), team.getName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }

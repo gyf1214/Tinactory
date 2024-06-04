@@ -6,7 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -51,10 +50,10 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         this.imageHeight = HEIGHT;
 
         var welcomeLabel = new Label(menu, Label.Alignment.END,
-                new TranslatableComponent("tinactory.gui.networkController.welcome"));
+                I18n.tr("tinactory.gui.networkController.welcome"));
         this.welcomeEdit = Widgets.editBox();
         var welcomeButton = Widgets.simpleButton(menu,
-                new TranslatableComponent("tinactory.gui.networkController.welcome.button"),
+                I18n.tr("tinactory.gui.networkController.welcome.button"),
                 null, this::onWelcomePressed);
         this.stateLabel = new Label(menu);
 
