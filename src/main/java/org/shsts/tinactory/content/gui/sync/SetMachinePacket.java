@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -30,10 +31,6 @@ public class SetMachinePacket extends MenuEventPacket {
 
     public List<String> getResets() {
         return resets;
-    }
-
-    public boolean contains(String key) {
-        return sets.contains(key) || resets.contains(key);
     }
 
     @Override
@@ -66,6 +63,12 @@ public class SetMachinePacket extends MenuEventPacket {
 
         public Builder set(String key, ResourceLocation val) {
             sets.putString(key, val.toString());
+            return this;
+        }
+
+        public Builder setPort(int port, MachineConfig.PortConfig config) {
+            var key = "portConfig_" + port;
+            sets.putByte(key, (byte) config.index);
             return this;
         }
 

@@ -9,6 +9,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
+import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -46,12 +47,13 @@ import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 public abstract class MachineRecipeBook<T> extends Panel {
     private static final int BUTTON_SIZE = SLOT_SIZE + 3;
     private static final int BUTTON_PER_LINE = 4;
-    private static final int PANEL_BORDER = 8;
+    public static final int BUTTON_TOP_MARGIN = BUTTON_SIZE;
+    public static final int PANEL_BORDER = 8;
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
-    private static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
-    private static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_HORIZONTAL - PANEL_WIDTH,
+    public static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
+    public static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_HORIZONTAL - PANEL_WIDTH,
             -MARGIN_TOP, -MARGIN_HORIZONTAL, MARGIN_VERTICAL);
-    private static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
+    public static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
     private static final Rect INNER_PANEL_OFFSET = Rect.corners(PANEL_BORDER, PANEL_BORDER,
             -PANEL_BORDER, -PANEL_BORDER);
     private static final RectD PAGE_ANCHOR = new RectD(0.5, 1d, 0d, 0d);
@@ -59,7 +61,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
 
     private static final Texture RECIPE_BOOK_BUTTON = new Texture(
             ModelGen.mcLoc("gui/recipe_button"), 256, 256);
-    private static final Texture RECIPE_BOOK_BG = new Texture(
+    public static final Texture RECIPE_BOOK_BG = new Texture(
             ModelGen.mcLoc("gui/recipe_book"), 256, 256);
     private static final Texture DISABLE_BUTTON = new Texture(
             ModelGen.modLoc("gui/disable_recipe"), 16, 16);
@@ -189,6 +191,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
         }
     }
 
+    protected final MachineConfig machineConfig;
     protected final Panel bookPanel;
     protected final GhostRecipe ghostRecipe;
     private final ButtonPanel buttonPanel;
@@ -202,6 +205,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
     public MachineRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
                              int buttonX, int buttonY, int xOffset) {
         super(screen);
+        this.machineConfig = AllCapabilities.MACHINE.get(screen.getMenu().blockEntity).config;
         this.bookPanel = new Panel(screen);
         this.ghostRecipe = new GhostRecipe(screen.getMenu());
         this.buttonPanel = new ButtonPanel();
@@ -212,7 +216,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
                 new StretchImage(menu, RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER));
 
         var innerPanel = new Panel(screen);
-        innerPanel.addPanel(Rect.corners(0, BUTTON_SIZE, 0, -BUTTON_SIZE), buttonPanel);
+        innerPanel.addPanel(Rect.corners(0, BUTTON_TOP_MARGIN, 0, -BUTTON_SIZE), buttonPanel);
         innerPanel.addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(-BUTTON_SIZE - PAGE_OFFSET.width(), 0), leftPageButton);
         innerPanel.addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(BUTTON_SIZE, 0), rightPageButton);
 
@@ -257,8 +261,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
 
     @Nullable
     private ResourceLocation getCurrentRecipeLoc() {
-        return AllCapabilities.MACHINE.get(menu.blockEntity)
-                .config.getLoc("targetRecipe").orElse(null);
+        return machineConfig.getLoc("targetRecipe").orElse(null);
     }
 
     protected abstract void doRefreshRecipes();

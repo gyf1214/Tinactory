@@ -13,6 +13,20 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MachineConfig implements INBTSerializable<CompoundTag> {
+    public enum PortConfig {
+        NONE(0), PASSIVE(1), ACTIVE(2);
+
+        public final int index;
+
+        PortConfig(int index) {
+            this.index = index;
+        }
+
+        public static PortConfig fromIndex(int i) {
+            return values()[i];
+        }
+    }
+
     private CompoundTag tag = new CompoundTag();
 
     public Optional<Boolean> getBoolean(String key) {
@@ -29,6 +43,11 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
 
     public Optional<ResourceLocation> getLoc(String key) {
         return getString(key).map(ResourceLocation::new);
+    }
+
+    public PortConfig getPortConfig(int port) {
+        var key = "portConfig_" + port;
+        return PortConfig.fromIndex(tag.contains(key, Tag.TAG_BYTE) ? tag.getByte(key) : 0);
     }
 
     public void apply(SetMachinePacket packet) {

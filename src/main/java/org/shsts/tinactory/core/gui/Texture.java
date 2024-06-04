@@ -19,12 +19,14 @@ public record Texture(ResourceLocation loc, int width, int height) {
             gregtech("gui/base/slot"), SLOT_SIZE, SLOT_SIZE);
     public static final Texture SWITCH_BUTTON = new Texture(
             gregtech("gui/widget/toggle_button_background"), 18, 36);
-    public static final Texture AUTO_IN_BUTTON = new Texture(
+    public static final Texture GREGTECH = new Texture(
+            gregtech("gui/icon/gregtech_logo"), 17, 17);
+    public static final Texture CLEAR_GRID_BUTTON = new Texture(
+            gregtech("gui/widget/button_clear_grid"), 18, 18);
+    public static final Texture AUTO_OUT_BUTTON = new Texture(
             gregtech("gui/widget/button_output"), 18, 18);
     public static final Texture ITEM_OUT_BUTTON = new Texture(
             gregtech("gui/widget/button_item_output_overlay"), 18, 18);
-    public static final Texture FLUID_OUT_BUTTON = new Texture(
-            gregtech("gui/widget/button_fluid_output_overlay"), 18, 18);
     public static final Texture VANILLA_WIDGETS = new Texture(
             mcLoc("gui/widgets"), 256, 256);
 
