@@ -20,11 +20,9 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
-import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.logistics.LogisticsComponent;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
@@ -99,11 +97,6 @@ public class ElectricFurnace extends CapabilityProvider
         blockEntity.setChanged();
     }
 
-    private Optional<LogisticsComponent> getLogistics() {
-        return AllCapabilities.MACHINE.tryGet(blockEntity)
-                .flatMap(Machine::getLogistics);
-    }
-
     private void setTargetRecipe(ResourceLocation loc) {
         var world = blockEntity.getLevel();
         assert world != null;
@@ -123,21 +116,6 @@ public class ElectricFurnace extends CapabilityProvider
         container.resetFilter(0);
     }
 
-    private void setAutoInput(boolean val) {
-        var portSize = container.portSize();
-        for (var i = 0; i < portSize; i++) {
-            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
-                continue;
-            }
-            var port = container.getPort(i, false);
-            if (val) {
-                getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, port));
-            } else {
-                getLogistics().ifPresent($ -> $.removePassiveStorage(PortDirection.INPUT, port));
-            }
-        }
-    }
-
     private void updateTargetRecipe() {
         var loc = AllCapabilities.MACHINE.tryGet(blockEntity)
                 .flatMap(m -> m.config.getLoc("targetRecipe"))
@@ -148,14 +126,6 @@ public class ElectricFurnace extends CapabilityProvider
         } else {
             setTargetRecipe(loc);
         }
-    }
-
-    private void updateAutoInput() {
-        var val = AllCapabilities.MACHINE.tryGet(blockEntity)
-                .flatMap(m -> m.config.getBoolean("autoInput"))
-                .orElse(false);
-        LOGGER.debug("update auto input = {}", val);
-        setAutoInput(val);
     }
 
     private void onLoad() {
@@ -180,12 +150,10 @@ public class ElectricFurnace extends CapabilityProvider
         }
 
         updateTargetRecipe();
-        updateAutoInput();
     }
 
     private void onMachineConfig() {
         updateTargetRecipe();
-        updateAutoInput();
         setUpdateRecipe();
     }
 
@@ -193,7 +161,6 @@ public class ElectricFurnace extends CapabilityProvider
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
         eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CONNECT, $ -> updateAutoInput());
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
         eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
     }

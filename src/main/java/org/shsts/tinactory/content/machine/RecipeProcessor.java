@@ -19,7 +19,6 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.logistics.LogisticsComponent;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
@@ -83,11 +82,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         return world;
     }
 
-    protected Optional<LogisticsComponent> getLogistics() {
-        return AllCapabilities.MACHINE.tryGet(blockEntity)
-                .flatMap(Machine::getLogistics);
-    }
-
     @SuppressWarnings("unchecked")
     protected void setTargetRecipe(ResourceLocation loc) {
         var world = blockEntity.getLevel();
@@ -129,21 +123,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         }
     }
 
-    protected void setAutoInput(boolean val) {
-        var portSize = container.portSize();
-        for (var i = 0; i < portSize; i++) {
-            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
-                continue;
-            }
-            var port = container.getPort(i, false);
-            if (val) {
-                getLogistics().ifPresent($ -> $.addPassiveStorage(PortDirection.INPUT, port));
-            } else {
-                getLogistics().ifPresent($ -> $.removePassiveStorage(PortDirection.INPUT, port));
-            }
-        }
-    }
-
     private void updateTargetRecipe() {
         var loc = AllCapabilities.MACHINE.tryGet(blockEntity)
                 .flatMap(m -> m.config.getLoc("targetRecipe"))
@@ -154,14 +133,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         } else {
             setTargetRecipe(loc);
         }
-    }
-
-    private void updateAutoInput() {
-        var val = AllCapabilities.MACHINE.tryGet(blockEntity)
-                .flatMap(m -> m.config.getBoolean("autoInput"))
-                .orElse(false);
-        LOGGER.debug("update auto input = {}", val);
-        setAutoInput(val);
     }
 
     protected void calculateFactors(ProcessingRecipe recipe) {
@@ -302,7 +273,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         }
 
         updateTargetRecipe();
-        updateAutoInput();
 
         TechManager.server().onProgressChange(onTechChange);
     }
@@ -321,7 +291,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
 
     private void onMachineConfig() {
         updateTargetRecipe();
-        updateAutoInput();
         setUpdateRecipe();
     }
 
@@ -329,7 +298,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
         eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CONNECT, $ -> updateAutoInput());
         eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());

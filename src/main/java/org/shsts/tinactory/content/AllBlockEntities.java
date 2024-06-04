@@ -4,8 +4,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.BlockTags;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.gui.BoilerPlugin;
+import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
-import org.shsts.tinactory.content.gui.ProcessingPlugin;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
@@ -271,7 +271,7 @@ public final class AllBlockEntities {
                 .simpleCapability(Boiler.builder(burnSpeed))
                 .simpleCapability(StackProcessingContainer.builder(layout))
                 .menu(ProcessingMenu.factory(layout))
-                .plugin(ProcessingPlugin.builder(layout))
+                .plugin(MachinePlugin.builder(layout))
                 .plugin(BoilerPlugin::new)
                 .build()
                 .build()

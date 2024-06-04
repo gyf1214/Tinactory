@@ -25,11 +25,11 @@ import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
+public class MachinePlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     private final Layout layout;
     private final int buttonY;
 
-    public ProcessingPlugin(M menu, Layout layout) {
+    public MachinePlugin(M menu, Layout layout) {
         this.layout = layout;
         menu.onEventPacket(SET_MACHINE, p -> AllCapabilities.MACHINE.get(menu.blockEntity).setConfig(p));
         this.buttonY = menu.getHeight() - SLOT_SIZE;
@@ -58,6 +58,6 @@ public class ProcessingPlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
     }
 
     public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>> builder(Layout layout) {
-        return menu -> new ProcessingPlugin<>(menu, layout);
+        return menu -> new MachinePlugin<>(menu, layout);
     }
 }

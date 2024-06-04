@@ -6,7 +6,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.gui.ProcessingPlugin;
+import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.RecipeBookPlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.model.ModelGen;
@@ -120,7 +120,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .blockEntity()
                         .simpleCapability(RecipeProcessor.basic(recipeType, voltage))
                         .menu()
-                        .plugin(ProcessingPlugin.builder(layout))
+                        .plugin(MachinePlugin.builder(layout))
                         .plugin(RecipeBookPlugin.processing(recipeType, layout))
                         .build()
                         .build();
@@ -139,7 +139,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .blockEntity()
                         .simpleCapability(RecipeProcessor.oreProcessor(voltage))
                         .menu()
-                        .plugin(ProcessingPlugin.builder(getLayout(voltage)))
+                        .plugin(MachinePlugin.builder(getLayout(voltage)))
                         .plugin(RecipeBookPlugin.oreAnalyzer(layout))
                         .build()
                         .build();
@@ -159,7 +159,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .blockEntity()
                         .simpleCapability(RecipeProcessor.generator(recipeType, voltage))
                         .menu()
-                        .plugin(ProcessingPlugin.builder(layout))
+                        .plugin(MachinePlugin.builder(layout))
                         .plugin(RecipeBookPlugin.processing(recipeType, layout))
                         .build()
                         .build();
@@ -184,7 +184,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .simpleCapability(StackProcessingContainer.builder(layout))
                         .simpleCapability(RecipeProcessor.electricFurnace(voltage))
                         .menu(ProcessingMenu.factory(layout))
-                        .plugin(ProcessingPlugin.builder(layout))
+                        .plugin(MachinePlugin.builder(layout))
                         .plugin(RecipeBookPlugin.electricFurnace(layout))
                         .build()
                         .build()
