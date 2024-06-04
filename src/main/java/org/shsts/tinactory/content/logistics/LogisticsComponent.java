@@ -210,14 +210,14 @@ public class LogisticsComponent extends Component {
         passiveStorages.remove(dir, port);
     }
 
-    public void addActiveRequest(PortDirection type, IItemCollection port, ItemStack item) {
+    public void addActiveItem(PortDirection type, IItemCollection port, ItemStack item) {
         var item1 = item.copy();
         var req = new Request(type, port, new ItemTypeWrapper(item1), new ItemContentWrapper(item1));
         activeRequestList.add(req);
         activeRequests.put(req.type, req);
     }
 
-    public void addActiveRequest(PortDirection type, IFluidCollection port, FluidStack fluid) {
+    public void addActiveFluid(PortDirection type, IFluidCollection port, FluidStack fluid) {
         var fluid1 = fluid.copy();
         var req = new Request(type, port, new FluidTypeWrapper(fluid1), new FluidContentWrapper(fluid1));
         activeRequestList.add(req);

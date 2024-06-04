@@ -60,8 +60,12 @@ public class Machine extends UpdatableCapabilityProvider
         LOGGER.debug("machine {}: removed in world", this);
     }
 
+    /**
+     * Called only on server
+     */
     public void setConfig(SetMachinePacket packet) {
         config.apply(packet);
+        updatePassiveRequests();
         sendUpdate(blockEntity);
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
@@ -78,40 +82,57 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
-    private void dumpItemOutput(IContainer container, LogisticsComponent logistics) {
+    private void addActiveRequests(IContainer container, LogisticsComponent logistics) {
         var size = container.portSize();
         for (var i = 0; i < size; i++) {
-            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.OUTPUT) {
+            if (!container.hasPort(i) || config.getPortConfig(i) != MachineConfig.PortConfig.ACTIVE ||
+                    container.portDirection(i) != PortDirection.OUTPUT) {
                 continue;
             }
             var port = container.getPort(i, false);
-            if (port.type() != PortType.ITEM) {
-                continue;
-            }
-            for (var stack : port.asItem().getAllItems()) {
-                logistics.addActiveRequest(PortDirection.OUTPUT, port.asItem(), stack);
+            if (port.type() == PortType.ITEM) {
+                for (var stack : port.asItem().getAllItems()) {
+                    logistics.addActiveItem(PortDirection.OUTPUT, port.asItem(), stack);
+                }
+            } else if (port.type() == PortType.FLUID) {
+                for (var stack : port.asFluid().getAllFluids()) {
+                    logistics.addActiveFluid(PortDirection.OUTPUT, port.asFluid(), stack);
+                }
             }
         }
     }
 
-    private void dumpFluidOutput(IContainer container, LogisticsComponent logistics) {
+    private void updatePassiveRequests() {
+        if (network == null) {
+            return;
+        }
+        var container1 = getContainer();
+        if (container1.isEmpty()) {
+            return;
+        }
+        var container = container1.get();
+        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
+
         var size = container.portSize();
         for (var i = 0; i < size; i++) {
-            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.OUTPUT) {
+            if (!container.hasPort(i)) {
                 continue;
             }
+
+            var direction = container.portDirection(i);
             var port = container.getPort(i, false);
-            if (port.type() != PortType.FLUID) {
-                continue;
-            }
-            for (var stack : port.asFluid().getAllFluids()) {
-                logistics.addActiveRequest(PortDirection.OUTPUT, port.asFluid(), stack);
+
+            if (config.getPortConfig(i) == MachineConfig.PortConfig.PASSIVE) {
+                logistics.addPassiveStorage(direction, port);
+            } else {
+                logistics.removePassiveStorage(direction, port);
             }
         }
     }
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
+        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> updatePassiveRequests());
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
         eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
         eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);
@@ -123,6 +144,7 @@ public class Machine extends UpdatableCapabilityProvider
     public void onConnectToNetwork(Network network) {
         LOGGER.debug("machine {}: connect to network {}", this, network);
         this.network = network;
+        updatePassiveRequests();
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 
@@ -138,12 +160,7 @@ public class Machine extends UpdatableCapabilityProvider
         assert this.network == network;
         getProcessor().ifPresent(IProcessor::onPreWork);
         var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-        if (config.getBoolean("autoDumpItem", false)) {
-            getContainer().ifPresent(container -> dumpItemOutput(container, logistics));
-        }
-        if (config.getBoolean("autoDumpFluid", false)) {
-            getContainer().ifPresent(container -> dumpFluidOutput(container, logistics));
-        }
+        getContainer().ifPresent(container -> addActiveRequests(container, logistics));
     }
 
     private void onWork(Level world, Network network) {

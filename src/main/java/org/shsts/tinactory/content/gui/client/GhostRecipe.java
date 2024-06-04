@@ -32,14 +32,14 @@ public class GhostRecipe extends MenuWidget {
     private void renderItem(PoseStack poseStack, ItemStack stack, int x, int y) {
         itemRenderer.renderAndDecorateFakeItem(stack, x, y);
         RenderSystem.depthFunc(516);
-        RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), 0x808B8B8B);
+        RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), 0xAA8B8B8B);
         RenderSystem.depthFunc(515);
         RenderSystem.disableDepthTest();
     }
 
     private void renderFluid(PoseStack poseStack, FluidStack stack, int x, int y) {
         var rect = new Rect(x, y, 16, 16);
-        RenderUtil.renderFluid(poseStack, stack, rect, 0x80FFFFFF, getBlitOffset());
+        RenderUtil.renderFluid(poseStack, stack, rect, 0x55FFFFFF, getBlitOffset());
     }
 
     private void renderIngredient(PoseStack poseStack, IProcessingObject ingredient, int x, int y) {

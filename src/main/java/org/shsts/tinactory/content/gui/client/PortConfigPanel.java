@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
@@ -44,11 +45,14 @@ public class PortConfigPanel extends Panel {
         public static final int COLOR = 0x80FFAA00;
 
         private final int port;
+        private final PortDirection direction;
         private final List<Layout.SlotInfo> slots;
 
-        public ConfigButton(Menu<?, ?> menu, int port, List<Layout.SlotInfo> slots) {
+        public ConfigButton(Menu<?, ?> menu, int port, PortDirection direction,
+                            List<Layout.SlotInfo> slots) {
             super(menu);
             this.port = port;
+            this.direction = direction;
             this.slots = slots;
         }
 
@@ -79,7 +83,13 @@ public class PortConfigPanel extends Panel {
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             super.onMouseClicked(mouseX, mouseY, button);
             var config = machineConfig.getPortConfig(port);
+
             var nextConfig = MachineConfig.PortConfig.fromIndex((config.index + 1) % 3);
+            // Disallow active input request
+            if (nextConfig == MachineConfig.PortConfig.ACTIVE && direction != PortDirection.OUTPUT) {
+                nextConfig = MachineConfig.PortConfig.NONE;
+            }
+
             var packet = SetMachinePacket.builder().setPort(port, nextConfig);
             menu.triggerEvent(MenuEventHandler.SET_MACHINE, packet);
         }
@@ -108,7 +118,7 @@ public class PortConfigPanel extends Panel {
             var label = new Label(menu, Label.Alignment.BEGIN, I18n.raw("%s", type));
             label.verticalAlign = Label.Alignment.MIDDLE;
             label.color = 0xFFFFAA00;
-            var button = new ConfigButton(menu, port, slots);
+            var button = new ConfigButton(menu, port, type.direction, slots);
 
             var y = SLOT_SIZE * i;
             addWidget(RectD.ZERO, LABEL_RECT.offset(0, y), label);
