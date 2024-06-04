@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllCapabilities;
@@ -23,6 +24,7 @@ import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.Optional;
 
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BUTTON_TOP_MARGIN;
@@ -31,6 +33,7 @@ import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.RECIPE_BO
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING_VERTICAL;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -93,6 +96,16 @@ public class PortConfigPanel extends Panel {
             var packet = SetMachinePacket.builder().setPort(port, nextConfig);
             menu.triggerEvent(MenuEventHandler.SET_MACHINE, packet);
         }
+
+        @Override
+        public Optional<List<Component>> getTooltip() {
+            var tooltip = switch (machineConfig.getPortConfig(port)) {
+                case NONE -> I18n.tr("tinactory.gui.portConfig.none");
+                case PASSIVE -> I18n.tr("tinactory.gui.portConfig.passive");
+                case ACTIVE -> I18n.tr("tinactory.gui.portConfig.active");
+            };
+            return Optional.of(List.of(tooltip));
+        }
     }
 
     private final MachineConfig machineConfig;
@@ -115,12 +128,13 @@ public class PortConfigPanel extends Panel {
                 continue;
             }
 
-            var label = new Label(menu, Label.Alignment.BEGIN, I18n.raw("%s", type));
+            var key = "tinactory.gui.portConfig." + type.portType.name().toLowerCase() + "Label";
+            var label = new Label(menu, Label.Alignment.BEGIN, I18n.tr(key));
             label.verticalAlign = Label.Alignment.MIDDLE;
             label.color = 0xFFFFAA00;
             var button = new ConfigButton(menu, port, type.direction, slots);
 
-            var y = SLOT_SIZE * i;
+            var y = (SLOT_SIZE + SPACING_VERTICAL) * i;
             addWidget(RectD.ZERO, LABEL_RECT.offset(0, y), label);
             addWidget(RectD.corners(1d, 0d, 1d, 0d), BUTTON_RECT.offset(0, y), button);
             i++;
