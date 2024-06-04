@@ -271,7 +271,7 @@ public final class AllBlockEntities {
                 .simpleCapability(Boiler.builder(burnSpeed))
                 .simpleCapability(StackProcessingContainer.builder(layout))
                 .menu(ProcessingMenu.factory(layout))
-                .plugin(MachinePlugin.builder(layout))
+                .plugin(MachinePlugin.noBook(layout))
                 .plugin(BoilerPlugin::new)
                 .build()
                 .build()

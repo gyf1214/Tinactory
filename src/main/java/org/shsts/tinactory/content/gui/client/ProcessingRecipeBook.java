@@ -34,8 +34,8 @@ public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
 
     public ProcessingRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
                                 RecipeType<? extends ProcessingRecipe> recipeType,
-                                int buttonX, int buttonY, Layout layout) {
-        super(screen, buttonX, buttonY, layout.getXOffset());
+                                Layout layout) {
+        super(screen, layout.getXOffset());
         this.recipeType = recipeType;
         this.layout = layout;
         TechManager.client().onProgressChange(onTechChange);

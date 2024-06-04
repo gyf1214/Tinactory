@@ -132,7 +132,6 @@ public class Machine extends UpdatableCapabilityProvider
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> updatePassiveRequests());
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
         eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
         eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);

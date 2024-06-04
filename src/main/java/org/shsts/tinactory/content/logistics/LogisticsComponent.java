@@ -122,8 +122,7 @@ public class LogisticsComponent extends Component {
     private ILogisticsContentWrapper transmitItem(IPort from, IPort to,
                                                   ILogisticsContentWrapper content, int limit) {
 
-        var size = Math.min(workerProperty.getContentLimit(content), limit);
-        var contentCopy = content.copyWithAmount(size);
+        var contentCopy = content.copyWithAmount(limit);
         var remaining = transmitItem(from, to, contentCopy, true);
         if (!remaining.isEmpty()) {
             contentCopy.shrink(remaining.getCount());
@@ -132,8 +131,13 @@ public class LogisticsComponent extends Component {
             return content;
         } else {
             var remaining1 = transmitItem(from, to, contentCopy, false);
-            remaining1.grow(content.getCount() - contentCopy.getCount());
-            return remaining1;
+            var size = content.getCount() - contentCopy.getCount();
+            if (remaining1.isEmpty()) {
+                return content.copyWithAmount(size);
+            } else {
+                remaining1.grow(size);
+                return remaining1;
+            }
         }
     }
 
@@ -151,6 +155,10 @@ public class LogisticsComponent extends Component {
             return false;
         }
         var remaining = req.content;
+        var limit = workerProperty.getContentLimit(remaining);
+        if (remaining.getCount() > limit) {
+            remaining = remaining.copyWithAmount(limit);
+        }
         if (remaining.isEmpty()) {
             return false;
         }
@@ -161,9 +169,9 @@ public class LogisticsComponent extends Component {
             if (otherReq.dir == req.dir) {
                 continue;
             }
-            var limit = Math.min(remaining.getCount(), otherReq.content.getCount());
+            var limit1 = Math.min(remaining.getCount(), otherReq.content.getCount());
             var originalCount = remaining.getCount();
-            remaining = transmitItem(req, otherReq.port, remaining, limit);
+            remaining = transmitItem(req, otherReq.port, remaining, limit1);
             otherReq.content.shrink(originalCount - remaining.getCount());
         }
         for (var storage : passiveStorages.get(req.dir.invert())) {

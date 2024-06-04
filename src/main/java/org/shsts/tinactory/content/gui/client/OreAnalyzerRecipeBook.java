@@ -25,9 +25,8 @@ import java.util.Optional;
 public class OreAnalyzerRecipeBook extends MachineRecipeBook<OreVariant> {
     private final Layout.SlotInfo inputSlot;
 
-    public OreAnalyzerRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
-                                 int buttonX, int buttonY, Layout layout) {
-        super(screen, buttonX, buttonY, layout.getXOffset());
+    public OreAnalyzerRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, Layout layout) {
+        super(screen, layout.getXOffset());
         this.inputSlot = layout.slots.stream()
                 .filter(slot -> slot.port() == 0)
                 .findFirst().orElseThrow();

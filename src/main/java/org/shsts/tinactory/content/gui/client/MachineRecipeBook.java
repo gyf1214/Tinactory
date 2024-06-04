@@ -47,7 +47,7 @@ import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
 public abstract class MachineRecipeBook<T> extends Panel {
     private static final int BUTTON_SIZE = SLOT_SIZE + 3;
     private static final int BUTTON_PER_LINE = 4;
-    public static final int BUTTON_TOP_MARGIN = BUTTON_SIZE;
+    public static final int BUTTON_TOP_MARGIN = BUTTON_SIZE / 2;
     public static final int PANEL_BORDER = 8;
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
     public static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
@@ -59,7 +59,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
     private static final RectD PAGE_ANCHOR = new RectD(0.5, 1d, 0d, 0d);
     private static final Rect PAGE_OFFSET = new Rect(0, -18, 12, 18);
 
-    private static final Texture RECIPE_BOOK_BUTTON = new Texture(
+    public static final Texture RECIPE_BOOK_BUTTON = new Texture(
             ModelGen.mcLoc("gui/recipe_button"), 256, 256);
     public static final Texture RECIPE_BOOK_BG = new Texture(
             ModelGen.mcLoc("gui/recipe_book"), 256, 256);
@@ -202,8 +202,7 @@ public abstract class MachineRecipeBook<T> extends Panel {
     private final List<ResourceLocation> recipeList = new ArrayList<>();
     protected int page = 0;
 
-    public MachineRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
-                             int buttonX, int buttonY, int xOffset) {
+    public MachineRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, int xOffset) {
         super(screen);
         this.machineConfig = AllCapabilities.MACHINE.get(screen.getMenu().blockEntity).config;
         this.bookPanel = new Panel(screen);
@@ -224,17 +223,6 @@ public abstract class MachineRecipeBook<T> extends Panel {
         bookPanel.setActive(false);
 
         addPanel(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
-        addWidget(new Rect(buttonX, buttonY, 20, 18), new SimpleButton(menu, RECIPE_BOOK_BUTTON,
-                I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 19) {
-            @Override
-            public void onMouseClicked(double mouseX, double mouseY, int button) {
-                super.onMouseClicked(mouseX, mouseY, button);
-                bookPanel.setActive(!bookPanel.isActive());
-                if (bookPanel.isActive()) {
-                    setPage(page);
-                }
-            }
-        });
         addWidget(new Rect(xOffset, 0, 0, 0), ghostRecipe);
     }
 
@@ -302,5 +290,16 @@ public abstract class MachineRecipeBook<T> extends Panel {
             }
         }
         page = newPage;
+    }
+
+    public void setBookActive(boolean value) {
+        bookPanel.setActive(value);
+        if (value) {
+            setPage(page);
+        }
+    }
+
+    public boolean isBookActive() {
+        return bookPanel.isActive();
     }
 }

@@ -25,9 +25,8 @@ public class ElectricFurnaceRecipeBook extends MachineRecipeBook<SmeltingRecipe>
     private final Layout.SlotInfo inputSlot;
     private final Layout.SlotInfo outputSlot;
 
-    public ElectricFurnaceRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
-                                     int buttonX, int buttonY, Layout layout) {
-        super(screen, buttonX, buttonY, layout.getXOffset());
+    public ElectricFurnaceRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, Layout layout) {
+        super(screen, layout.getXOffset());
         this.inputSlot = layout.slots.stream()
                 .filter(slot -> slot.port() == 0)
                 .findFirst().orElseThrow();
