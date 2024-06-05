@@ -86,6 +86,10 @@ public final class AllItems {
         STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
     }
 
+    public static ComponentSet componentSet(Voltage voltage) {
+        return COMPONENT_SETS.get(voltage);
+    }
+
     public static void init() {}
 
     public static void initRecipes() {

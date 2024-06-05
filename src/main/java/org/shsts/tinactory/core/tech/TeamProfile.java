@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.tech;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -11,6 +12,7 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.ServerUtil;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,9 +23,12 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamProfile {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     protected final TechManager techManager;
     protected final PlayerTeam playerTeam;
     protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
+    protected final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     protected ITechnology targetTech = null;
 
@@ -61,12 +66,28 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         }
     }
 
+    public void onTechComplete(ITechnology tech) {
+        for (var modifier : tech.getModifiers().entrySet()) {
+            var key = modifier.getKey();
+            var val = modifier.getValue();
+            modifiers.merge(key, val, Integer::sum);
+            LOGGER.debug("{} set modifier {} = {}", this, key, val);
+        }
+    }
+
     /**
      * Can only be called on server
      */
     public void setTechProgress(ITechnology tech, long progress) {
-        progress = Math.min(progress, tech.getMaxProgress());
+        var oldProgress = technologies.getOrDefault(tech.getLoc(), 0L);
+        var maxProgress = tech.getMaxProgress();
+        progress = Math.min(progress, maxProgress);
+
         technologies.put(tech.getLoc(), progress);
+        if (oldProgress < maxProgress && progress >= maxProgress) {
+            onTechComplete(tech);
+        }
+
         broadcastUpdate(TechUpdatePacket.progress(tech, progress));
     }
 
@@ -105,6 +126,11 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         broadcastUpdate(TechUpdatePacket.target(null));
     }
 
+    @Override
+    public int getModifier(String key) {
+        return modifiers.getOrDefault(key, 0);
+    }
+
     public TechUpdatePacket fullUpdatePacket() {
         return TechUpdatePacket.full(technologies, targetTech);
     }
@@ -136,9 +162,12 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             var tag2 = (CompoundTag) tag1;
             var loc = new ResourceLocation(tag2.getString("id"));
             var progress = tag2.getLong("progress");
-            if (techManager.techByKey(loc).isPresent()) {
+            techManager.techByKey(loc).ifPresent(tech -> {
                 technologies.put(loc, progress);
-            }
+                if (progress >= tech.maxProgress) {
+                    onTechComplete(tech);
+                }
+            });
         }
         if (tag.contains("target", Tag.TAG_STRING)) {
             var loc = new ResourceLocation(tag.getString("target"));

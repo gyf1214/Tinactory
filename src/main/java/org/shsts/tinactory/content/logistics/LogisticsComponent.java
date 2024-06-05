@@ -47,38 +47,38 @@ public class LogisticsComponent extends Component {
 
     private int nextReqIndex = 0;
 
-    public static class WorkerProperty {
-        public int workerSize;
-        public int workerDelay;
-        public int stackSize;
-        public int fluidStackSize;
-
-        public WorkerProperty(int workerSize, int workerDelay, int stackSize, int fluidStackSize) {
-            this.workerSize = workerSize;
-            this.workerDelay = workerDelay;
-            this.stackSize = stackSize;
-            this.fluidStackSize = fluidStackSize;
-        }
-
-        public int getContentLimit(ILogisticsContentWrapper content) {
-            return switch (content.getPortType()) {
-                case ITEM -> stackSize;
-                case FLUID -> fluidStackSize;
-                default -> throw new IllegalArgumentException();
-            };
-        }
-    }
-
-    public final WorkerProperty workerProperty;
     private int ticks;
 
     public LogisticsComponent(ComponentType<LogisticsComponent> type, Network network) {
         super(type, network);
-        workerProperty = new WorkerProperty(
-                TinactoryConfig.INSTANCE.initialWorkerSize.get(),
-                TinactoryConfig.INSTANCE.initialWorkerDelay.get(),
-                TinactoryConfig.INSTANCE.initialWorkerStack.get(),
-                TinactoryConfig.INSTANCE.initialWorkerFluidStack.get());
+    }
+
+    private int getTechLevel() {
+        return network.team.getModifier("logistics_level");
+    }
+
+    private int getWorkerSize() {
+        return TinactoryConfig.INSTANCE.workerSize.get().get(getTechLevel());
+    }
+
+    private int getWorkerDelay() {
+        return TinactoryConfig.INSTANCE.workerDelay.get().get(getTechLevel());
+    }
+
+    private int getWorkerStack() {
+        return TinactoryConfig.INSTANCE.workerStack.get().get(getTechLevel());
+    }
+
+    private int getWorkerFluidStack() {
+        return TinactoryConfig.INSTANCE.workerFluidStack.get().get(getTechLevel());
+    }
+
+    private int getContentLimit(ILogisticsContentWrapper content) {
+        return switch (content.getPortType()) {
+            case ITEM -> getWorkerStack();
+            case FLUID -> getWorkerFluidStack();
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     public void resetWorkers() {
@@ -155,7 +155,7 @@ public class LogisticsComponent extends Component {
             return false;
         }
         var remaining = req.content;
-        var limit = workerProperty.getContentLimit(remaining);
+        var limit = getContentLimit(remaining);
         if (remaining.getCount() > limit) {
             remaining = remaining.copyWithAmount(limit);
         }
@@ -187,8 +187,8 @@ public class LogisticsComponent extends Component {
     }
 
     private void onTick(Level world, Network network) {
-        var delay = workerProperty.workerDelay;
-        var workers = workerProperty.workerSize;
+        var delay = getWorkerDelay();
+        var workers = getWorkerSize();
         var index = ticks % delay;
         var cycles = Math.min(ticks / delay, (workers + index) / delay);
         ticks++;

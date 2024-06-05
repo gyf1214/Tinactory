@@ -40,4 +40,6 @@ public interface ITeamProfile {
     boolean isTechAvailable(ResourceLocation tech);
 
     Optional<ITechnology> getTargetTech();
+
+    int getModifier(String key);
 }

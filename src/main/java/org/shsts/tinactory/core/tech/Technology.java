@@ -16,6 +16,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -26,11 +27,14 @@ public class Technology implements ITechnology {
     private ResourceLocation loc = null;
     private final List<ResourceLocation> dependIds;
     private final Set<ITechnology> depends = new HashSet<>();
+    public final Map<String, Integer> modifiers;
     public final long maxProgress;
     public final Item displayItem;
 
-    public Technology(List<ResourceLocation> dependIds, long maxProgress, Item displayItem) {
+    public Technology(List<ResourceLocation> dependIds, long maxProgress, Map<String, Integer> modifiers,
+                      Item displayItem) {
         this.dependIds = dependIds;
+        this.modifiers = modifiers;
         this.maxProgress = maxProgress;
         this.displayItem = displayItem;
     }
@@ -64,6 +68,11 @@ public class Technology implements ITechnology {
     }
 
     @Override
+    public Map<String, Integer> getModifiers() {
+        return modifiers;
+    }
+
+    @Override
     public long getMaxProgress() {
         return maxProgress;
     }
@@ -89,6 +98,7 @@ public class Technology implements ITechnology {
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ResourceLocation.CODEC.listOf().optionalFieldOf("depends", List.of()).forGetter(tech -> tech.dependIds),
             Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
+            Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("modifiers").forGetter(tech -> tech.modifiers),
             ForgeRegistries.ITEMS.getCodec().fieldOf("display_item").forGetter(tech -> tech.displayItem)
     ).apply(instance, Technology::new));
 }

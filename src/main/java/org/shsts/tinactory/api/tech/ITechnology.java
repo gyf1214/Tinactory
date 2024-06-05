@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
+import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -15,6 +16,8 @@ public interface ITechnology {
     Component getName();
 
     Collection<ITechnology> getDepends();
+
+    Map<String, Integer> getModifiers();
 
     long getMaxProgress();
 }

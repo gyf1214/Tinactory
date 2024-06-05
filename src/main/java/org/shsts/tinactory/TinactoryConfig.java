@@ -5,6 +5,8 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
+import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -13,23 +15,25 @@ public final class TinactoryConfig {
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
-    public final ConfigValue<Integer> initialWorkerSize;
-    public final ConfigValue<Integer> initialWorkerDelay;
-    public final ConfigValue<Integer> initialWorkerStack;
-    public final ConfigValue<Integer> initialWorkerFluidStack;
+    public final ConfigValue<List<? extends Integer>> workerSize;
+    public final ConfigValue<List<? extends Integer>> workerDelay;
+    public final ConfigValue<List<? extends Integer>> workerStack;
+    public final ConfigValue<List<? extends Integer>> workerFluidStack;
 
     public TinactoryConfig(ForgeConfigSpec.Builder builder) {
         builder.push("logistics");
         fluidSlotSize = builder.comment("Default size of a fluid slot.")
                 .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
-        initialWorkerSize = builder.comment("Initial worker size for logistics component")
-                .defineInRange("initial_worker_size", 1, 0, Integer.MAX_VALUE);
-        initialWorkerDelay = builder.comment("Initial worker delay for logistics component")
-                .defineInRange("initial_worker_delay", 40, 1, Integer.MAX_VALUE);
-        initialWorkerStack = builder.comment("Initial worker stack for logistics component")
-                .defineInRange("initial_worker_stack", 4, 1, Integer.MAX_VALUE);
-        initialWorkerFluidStack = builder.comment("Initial worker fluid stack for logistics component")
-                .defineInRange("initial_worker_fluid_stack", 1000, 1, Integer.MAX_VALUE);
+
+        Predicate<Object> validator = i -> (int) i > 0;
+        workerSize = builder.comment("Worker sizes for logistics component")
+                .defineList("worker_size", List.of(1, 4, 8, 16, 16), validator);
+        workerDelay = builder.comment("Worker delays for logistics component")
+                .defineList("worker_delay", List.of(40, 40, 40, 20, 20), validator);
+        workerStack = builder.comment("Worker item stacks for logistics component")
+                .defineList("worker_stack", List.of(4, 16, 64, 64, 128), validator);
+        workerFluidStack = builder.comment("Worker fluid stacks for logistics component")
+                .defineList("worker_fluid_stack", List.of(1000, 4000, 16000, 16000, 32000), validator);
         builder.pop();
 
         builder.push("machine");

@@ -243,7 +243,15 @@ public class TechManager implements ITechManager {
             if (team == null) {
                 return;
             }
-            team.technologies.putAll(p.getProgress());
+            for (var progress : p.getProgress().entrySet()) {
+                var oldProgress = team.technologies.getOrDefault(progress.getKey(), 0L);
+                team.technologies.put(progress.getKey(), progress.getValue());
+                techByKey(progress.getKey())
+                        .filter(tech -> oldProgress < tech.maxProgress &&
+                                progress.getValue() >= tech.maxProgress)
+                        .ifPresent(team::onTechComplete);
+            }
+
             LOGGER.debug("update {} techs for team {}", p.getProgress().size(), team.getName());
             if (p.isUpdateTarget()) {
                 team.targetTech = p.getTargetTech().flatMap(this::techByKey).orElse(null);
