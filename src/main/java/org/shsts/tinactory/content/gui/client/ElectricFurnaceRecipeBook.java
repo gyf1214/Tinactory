@@ -45,7 +45,7 @@ public class ElectricFurnaceRecipeBook extends MachineRecipeBook<SmeltingRecipe>
     @Override
     protected void selectRecipe(SmeltingRecipe recipe) {
         var ingredient = ProcessingIngredients.ItemsIngredientBase.of(recipe.getIngredients().get(0), 1);
-        var result = new ProcessingResults.ItemResult(false, 1d, recipe.getResultItem());
+        var result = new ProcessingResults.ItemResult(1d, recipe.getResultItem());
         ghostRecipe.addIngredient(inputSlot, ingredient);
         ghostRecipe.addIngredient(outputSlot, result);
     }

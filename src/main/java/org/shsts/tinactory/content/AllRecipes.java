@@ -68,22 +68,21 @@ public final class AllRecipes {
         ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.SERIALIZER)
                 .clazz(OreAnalyzerRecipe.class)
                 .builder(OreAnalyzerRecipe.Builder::new)
-                .defaults($ -> $.autoVoid().amperage(0.125d).workTicks(32))
+                .defaults($ -> $.amperage(0.125d).workTicks(32))
                 .register();
 
         MACERATOR = REGISTRATE.processingRecipeType("macerator")
-                .defaults($ -> $.autoVoid().amperage(0.25d))
+                .defaults($ -> $.amperage(0.25d))
                 .register();
 
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
-                .defaults($ -> $.autoVoid()
-                        .inputFluid(1, Fluids.WATER, 500)
+                .defaults($ -> $.inputFluid(1, Fluids.WATER, 500)
                         .outputItem(3, AllMaterials.STONE.entry("dust"), 1)
                         .amperage(0.125d))
                 .register();
 
         CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge")
-                .defaults($ -> $.autoVoid().amperage(0.5d))
+                .defaults($ -> $.amperage(0.5d))
                 .register();
 
         THERMAL_CENTRIFUGE = REGISTRATE.processingRecipeType("thermal_centrifuge")

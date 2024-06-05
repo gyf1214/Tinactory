@@ -131,14 +131,12 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         protected long voltage = 0;
         protected long power = 0;
         protected double amperage = 0d;
-        protected boolean autoVoid = false;
 
         public BuilderBase(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
             super(registrate, parent, loc);
         }
 
         public S autoVoid() {
-            autoVoid = true;
             return self();
         }
 
@@ -181,7 +179,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         public S outputItem(int port, Supplier<? extends ItemLike> item, int amount, double rate) {
             return output(port, () ->
-                    new ProcessingResults.ItemResult(autoVoid, rate, new ItemStack(item.get(), amount)));
+                    new ProcessingResults.ItemResult(rate, new ItemStack(item.get(), amount)));
         }
 
         public S outputItem(int port, Supplier<? extends ItemLike> item, int amount) {
@@ -194,7 +192,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount, double rate) {
             return output(port, () -> new ProcessingResults.FluidResult(
-                    autoVoid, rate, new FluidStack(fluid.get(), amount)));
+                    rate, new FluidStack(fluid.get(), amount)));
         }
 
         public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {

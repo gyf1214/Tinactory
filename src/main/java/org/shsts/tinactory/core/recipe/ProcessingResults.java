@@ -23,17 +23,15 @@ import java.util.Random;
 @ParametersAreNonnullByDefault
 public final class ProcessingResults {
 
-    public static final IProcessingResult EMPTY = new ItemResult(true, 0, ItemStack.EMPTY);
+    public static final IProcessingResult EMPTY = new ItemResult(0d, ItemStack.EMPTY);
 
     public static abstract class RatedResult<T extends IPort> implements IProcessingResult {
-        public final boolean autoVoid;
         public final double rate;
         private final PortType portType;
         private final Class<T> portClazz;
         private final String codecName;
 
-        public RatedResult(boolean autoVoid, double rate, PortType portType, Class<T> portClazz, String codecName) {
-            this.autoVoid = autoVoid;
+        public RatedResult(double rate, PortType portType, Class<T> portClazz, String codecName) {
             this.rate = rate;
             this.portType = portType;
             this.portClazz = portClazz;
@@ -55,13 +53,13 @@ public final class ProcessingResults {
         @Override
         public boolean insertPort(IPort port, Random random, boolean simulate) {
             if (port == IPort.EMPTY) {
-                return autoVoid;
+                return true;
             }
             if (portClazz.isInstance(port)) {
                 if (rate < 1d && (simulate || random.nextDouble() > rate)) {
                     return true;
                 }
-                return doInsertPort(portClazz.cast(port), random, simulate) || autoVoid;
+                return doInsertPort(portClazz.cast(port), random, simulate);
             }
             return false;
         }
@@ -72,8 +70,8 @@ public final class ProcessingResults {
 
         public final ItemStack stack;
 
-        public ItemResult(boolean autoVoid, double rate, ItemStack stack) {
-            super(autoVoid, rate, PortType.ITEM, IItemCollection.class, CODEC_NAME);
+        public ItemResult(double rate, ItemStack stack) {
+            super(rate, PortType.ITEM, IItemCollection.class, CODEC_NAME);
             this.stack = stack;
         }
 
@@ -83,7 +81,6 @@ public final class ProcessingResults {
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.BOOL.fieldOf("auto_void").forGetter($ -> $.autoVoid),
                 Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
                 ItemStack.CODEC.fieldOf("item").forGetter($ -> $.stack)
         ).apply(instance, ItemResult::new));
@@ -94,8 +91,8 @@ public final class ProcessingResults {
 
         public final FluidStack stack;
 
-        public FluidResult(boolean autoVoid, double rate, FluidStack stack) {
-            super(autoVoid, rate, PortType.FLUID, IFluidCollection.class, CODEC_NAME);
+        public FluidResult(double rate, FluidStack stack) {
+            super(rate, PortType.FLUID, IFluidCollection.class, CODEC_NAME);
             this.stack = stack;
         }
 
@@ -105,7 +102,6 @@ public final class ProcessingResults {
         }
 
         private static final Codec<FluidResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.BOOL.fieldOf("auto_void").forGetter($ -> $.autoVoid),
                 Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
                 FluidStack.CODEC.fieldOf("fluid").forGetter($ -> $.stack)
         ).apply(instance, FluidResult::new));
