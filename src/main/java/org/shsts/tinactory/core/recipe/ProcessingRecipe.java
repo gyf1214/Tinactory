@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -23,6 +24,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -110,6 +112,10 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         } else {
             return ProcessingResults.EMPTY;
         }
+    }
+
+    public Component getDescription() {
+        return I18n.tr(getDescriptionId(getId()));
     }
 
     public static Optional<ProcessingRecipe> byKey(RecipeManager manager, ResourceLocation loc) {

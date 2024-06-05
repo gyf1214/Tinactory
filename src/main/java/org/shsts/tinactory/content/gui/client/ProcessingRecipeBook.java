@@ -17,7 +17,6 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -28,7 +27,7 @@ import java.util.function.Consumer;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
-    private final RecipeType<? extends ProcessingRecipe> recipeType;
+    protected final RecipeType<? extends ProcessingRecipe> recipeType;
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
     private final Layout layout;
 
@@ -69,7 +68,7 @@ public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
     @Override
     protected Optional<List<Component>> buttonToolTip(ProcessingRecipe recipe) {
         // TODO
-        return Optional.of(List.of(I18n.raw(recipe.getId().toString())));
+        return Optional.of(List.of(recipe.getDescription()));
     }
 
     @Override

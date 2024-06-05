@@ -111,6 +111,10 @@ public abstract class SmartRecipe<C> implements Recipe<SmartRecipe.ContainerWrap
         return world.getRecipeManager().getRecipesFor(type, new ContainerWrapper<>(container), world);
     }
 
+    public static String getDescriptionId(ResourceLocation loc) {
+        return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
+    }
+
     protected abstract static class SimpleFinished implements FinishedRecipe {
         protected final ResourceLocation loc;
         protected final SmartRecipeSerializer<?, ?> serializer;

@@ -27,13 +27,15 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.registrate.common.BlockEntitySet;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.machine.ProcessingSet.generator;
+import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
+import static org.shsts.tinactory.content.machine.ProcessingSet.processing;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
@@ -92,7 +94,7 @@ public final class AllBlockEntities {
                 .build()
                 .register();
 
-        RESEARCH_TABLE = processing(AllRecipes.RESEARCH)
+        RESEARCH_TABLE = set(processing(AllRecipes.RESEARCH))
                 .overlay(gregtech("blocks/overlay/machine/overlay_screen"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
@@ -102,7 +104,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        var assembler = processing(AllRecipes.ASSEMBLER)
+        var assembler = set(processing(AllRecipes.ASSEMBLER))
                 .overlay(gregtech("blocks/machines/assembler"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
@@ -120,7 +122,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        STONE_GENERATOR = processing(AllRecipes.STONE_GENERATOR)
+        STONE_GENERATOR = set(processing(AllRecipes.STONE_GENERATOR))
                 .overlay(gregtech("blocks/machines/rock_crusher"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
@@ -132,7 +134,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_ANALYZER = oreAnalyzer()
+        ORE_ANALYZER = set(ProcessingSet.oreAnalyzer())
                 .overlay(gregtech("blocks/machines/electromagnetic_separator"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
@@ -145,7 +147,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        MACERATOR = processing(AllRecipes.MACERATOR)
+        MACERATOR = set(marker(AllRecipes.MACERATOR))
                 .overlay(gregtech("blocks/machines/macerator"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -157,7 +159,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_WASHER = processing(AllRecipes.ORE_WASHER)
+        ORE_WASHER = set(marker(AllRecipes.ORE_WASHER))
                 .overlay(gregtech("blocks/machines/ore_washer"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
@@ -175,7 +177,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        CENTRIFUGE = processing(AllRecipes.CENTRIFUGE)
+        CENTRIFUGE = set(marker(AllRecipes.CENTRIFUGE))
                 .overlay(gregtech("blocks/machines/centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -191,7 +193,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        THERMAL_CENTRIFUGE = processing(AllRecipes.THERMAL_CENTRIFUGE)
+        THERMAL_CENTRIFUGE = set(marker(AllRecipes.THERMAL_CENTRIFUGE))
                 .overlay(gregtech("blocks/machines/thermal_centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -214,7 +216,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ALLOY_SMELTER = processing(AllRecipes.ALLOY_SMELTER)
+        ALLOY_SMELTER = set(processing(AllRecipes.ALLOY_SMELTER))
                 .voltage(Voltage.ULV)
                 .overlay(gregtech("blocks/machines/alloy_smelter"))
                 .layoutSet()
@@ -227,7 +229,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        STEAM_TURBINE = generator(AllRecipes.STEAM_TURBINE)
+        STEAM_TURBINE = set(generator(AllRecipes.STEAM_TURBINE))
                 .voltage(Voltage.ULV, Voltage.HV)
                 .overlay(gregtech("blocks/generators/steam_turbine/overlay_side"))
                 .layoutSet()
@@ -246,17 +248,8 @@ public final class AllBlockEntities {
     public static final Set<ProcessingSet<?>> PROCESSING_SETS;
 
     private static <T extends ProcessingRecipe> ProcessingSet.Builder<T, ?>
-    processing(RecipeTypeEntry<T, ?> recipeType) {
-        return ProcessingSet.processing(recipeType).onCreateObject(PROCESSING_SETS::add);
-    }
-
-    private static ProcessingSet.Builder<OreAnalyzerRecipe, ?> oreAnalyzer() {
-        return ProcessingSet.oreAnalyzer().onCreateObject(PROCESSING_SETS::add);
-    }
-
-    private static ProcessingSet.Builder<GeneratorRecipe, ?>
-    generator(RecipeTypeEntry<GeneratorRecipe, ?> recipeType) {
-        return ProcessingSet.generator(recipeType).onCreateObject(PROCESSING_SETS::add);
+    set(ProcessingSet.Builder<T, ?> builder) {
+        return builder.onCreateObject(PROCESSING_SETS::add);
     }
 
     private static BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>

@@ -20,6 +20,7 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
+import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
@@ -40,6 +41,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static org.shsts.tinactory.content.AllRecipes.MARKER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -88,12 +91,18 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
         assert world != null;
 
         var recipe = ProcessingRecipe.byKey(world.getRecipeManager(), loc).orElse(null);
-        if (recipe == null || recipe.getType() != recipeType) {
+        if (recipe == null || (recipe.getType() != recipeType && (recipe.getType() != MARKER.get() ||
+                ((MarkerRecipe) recipe).baseType != recipeType))) {
             resetTargetRecipe();
             return;
         }
 
-        targetRecipe = (T) recipe;
+        if (recipe.getType() == MARKER.get()) {
+            targetRecipe = null;
+        } else {
+            targetRecipe = (T) recipe;
+        }
+
         for (var input : recipe.inputs) {
             var idx = input.port();
             var ingredient = input.ingredient();

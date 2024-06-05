@@ -14,6 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -256,6 +257,14 @@ public final class AllRecipes {
                 .baseType(THERMAL_CENTRIFUGE)
                 .inputItem(0, AllMaterials.tag("crushed_purified"))
                 .build();
+
+        for (var variant : OreVariant.values()) {
+            MARKER.recipe("analyze_" + variant.getName())
+                    .baseType(ORE_ANALYZER)
+                    .inputItem(0, variant.baseItem)
+                    .voltage(variant.voltage)
+                    .build();
+        }
     }
 
     private static void markerCrush(String sub) {

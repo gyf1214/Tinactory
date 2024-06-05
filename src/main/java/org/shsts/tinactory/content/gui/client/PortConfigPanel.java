@@ -44,17 +44,22 @@ public class PortConfigPanel extends Panel {
     private static final Rect BUTTON_RECT =
             new Rect(-PANEL_BORDER - SLOT_SIZE - SPACING_VERTICAL, BUTTON_TOP_MARGIN + PANEL_BORDER,
                     SLOT_SIZE, SLOT_SIZE);
+    private static final int TEXT_COLOR = 0xFFFFAA00;
+    private static final int OVERLAY_COLOR = 0x80FFAA00;
 
 
     private class ConfigButton extends Button {
 
         private final int port;
         private final PortDirection direction;
+        private final List<Layout.SlotInfo> slots;
 
-        public ConfigButton(Menu<?, ?> menu, int port, PortDirection direction) {
+        public ConfigButton(Menu<?, ?> menu, int port, PortDirection direction,
+                            List<Layout.SlotInfo> slots) {
             super(menu);
             this.port = port;
             this.direction = direction;
+            this.slots = slots;
         }
 
         @Override
@@ -68,6 +73,9 @@ public class PortConfigPanel extends Panel {
                 case NONE -> RenderUtil.blit(poseStack, Texture.CLEAR_GRID_BUTTON, z, rect);
                 case PASSIVE -> RenderUtil.blit(poseStack, Texture.AUTO_OUT_BUTTON, z, rect);
                 case ACTIVE -> RenderUtil.blit(poseStack, Texture.ITEM_OUT_BUTTON, z, rect);
+            }
+            if (isHovering(mouseX, mouseY)) {
+                renderHoverOverlay(poseStack, slots);
             }
         }
 
@@ -88,19 +96,17 @@ public class PortConfigPanel extends Panel {
 
         @Override
         public Optional<List<Component>> getTooltip() {
-            var subKey = I18n.tr("tinactory.gui.portConfig." + direction.name().toLowerCase());
+            var subKey = I18n.tr("tinactory.tooltip.portConfig." + direction.name().toLowerCase());
             var tooltip = switch (machineConfig.getPortConfig(port)) {
-                case NONE -> I18n.tr("tinactory.gui.portConfig.none", subKey);
-                case PASSIVE -> I18n.tr("tinactory.gui.portConfig.passive", subKey);
-                case ACTIVE -> I18n.tr("tinactory.gui.portConfig.active", subKey);
+                case NONE -> I18n.tr("tinactory.tooltip.portConfig.none", subKey);
+                case PASSIVE -> I18n.tr("tinactory.tooltip.portConfig.passive", subKey);
+                case ACTIVE -> I18n.tr("tinactory.tooltip.portConfig.active", subKey);
             };
             return Optional.of(List.of(tooltip));
         }
     }
 
     private class ConfigLabel extends Label {
-        private static final int TEXT_COLOR = 0xFFFFAA00;
-        private static final int OVERLAY_COLOR = 0x80FFAA00;
 
         private final List<Layout.SlotInfo> slots;
 
@@ -120,13 +126,7 @@ public class PortConfigPanel extends Panel {
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
             super.doRender(poseStack, mouseX, mouseY, partialTick);
             if (isHovering(mouseX, mouseY)) {
-                var bx = screen.getGuiLeft() + MARGIN_HORIZONTAL + xOffset;
-                var by = screen.getGuiTop() + MARGIN_TOP;
-                for (var slot : slots) {
-                    var x = slot.x() + 1 + bx;
-                    var y = slot.y() + 1 + by;
-                    RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), OVERLAY_COLOR);
-                }
+                renderHoverOverlay(poseStack, slots);
             }
         }
     }
@@ -155,12 +155,22 @@ public class PortConfigPanel extends Panel {
             var label = new ConfigLabel(menu, I18n.tr(key, port), slots);
             label.verticalAlign = Label.Alignment.MIDDLE;
             label.color = 0xFFFFAA00;
-            var button = new ConfigButton(menu, port, type.direction);
+            var button = new ConfigButton(menu, port, type.direction, slots);
 
             var y = (SLOT_SIZE + SPACING_VERTICAL) * i;
             addWidget(RectD.corners(0d, 0d, 1d, 0d), LABEL_RECT.offset(0, y), label);
             addWidget(RectD.corners(1d, 0d, 1d, 0d), BUTTON_RECT.offset(0, y), button);
             i++;
+        }
+    }
+
+    private void renderHoverOverlay(PoseStack poseStack, List<Layout.SlotInfo> slots) {
+        var bx = screen.getGuiLeft() + MARGIN_HORIZONTAL + xOffset;
+        var by = screen.getGuiTop() + MARGIN_TOP;
+        for (var slot : slots) {
+            var x = slot.x() + 1 + bx;
+            var y = slot.y() + 1 + by;
+            RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), OVERLAY_COLOR);
         }
     }
 }

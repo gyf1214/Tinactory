@@ -50,7 +50,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends Builder<?, ?,
     }
 
     public void registerSerializer(IForgeRegistry<RecipeSerializer<?>> registry) {
-        LOGGER.debug("register object {} {}", registry.getRegistryName(), loc);
+        LOGGER.trace("register object {} {}", registry.getRegistryName(), loc);
         assert entry != null;
         var serializer = serializerFactory.create(entry);
         serializer.setRegistryName(loc);

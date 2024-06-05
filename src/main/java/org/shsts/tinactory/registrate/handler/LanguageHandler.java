@@ -75,6 +75,10 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
         }
     }
 
+    public void track(String key) {
+        addCallback(prov -> ((Provider) prov).trackedKeys.add(key));
+    }
+
     public void item(RegistryEntry<? extends Item> entry) {
         addCallback(prov -> ((Provider) prov).track(entry.get()));
     }

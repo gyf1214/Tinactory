@@ -6,7 +6,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.client.ElectricFurnaceRecipeBook;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
-import org.shsts.tinactory.content.gui.client.OreAnalyzerRecipeBook;
+import org.shsts.tinactory.content.gui.client.MarkerRecipeBook;
 import org.shsts.tinactory.content.gui.client.PortConfigPanel;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBook;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
@@ -57,7 +57,8 @@ public abstract class MachinePlugin<M extends Menu<?, M>> implements IMenuPlugin
     public void applyMenuScreen(MenuScreen<M> screen) {
         var menu = screen.getMenu();
         var portConfigPanel = new PortConfigPanel(screen, layout);
-        var button = new SimpleButton(menu, Texture.SWITCH_BUTTON, null, 0, 0, 0, 0) {
+        var button = new SimpleButton(menu, Texture.SWITCH_BUTTON,
+                I18n.tr("tinactory.tooltip.openPortConfig"), 0, 0, 0, 0) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
                 super.onMouseClicked(mouseX, mouseY, button);
@@ -113,22 +114,13 @@ public abstract class MachinePlugin<M extends Menu<?, M>> implements IMenuPlugin
         };
     }
 
-    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>> oreAnalyzer(Layout layout) {
+    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>>
+    marker(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType, Layout layout) {
         return menu -> new MachinePlugin<>(menu, layout) {
             @OnlyIn(Dist.CLIENT)
             @Override
             protected MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen) {
-                return new OreAnalyzerRecipeBook(screen, layout);
-            }
-        };
-    }
-
-    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>> electricFurnace(Layout layout) {
-        return menu -> new MachinePlugin<>(menu, layout) {
-            @OnlyIn(Dist.CLIENT)
-            @Override
-            protected MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen) {
-                return new ElectricFurnaceRecipeBook(screen, layout);
+                return new MarkerRecipeBook(screen, recipeType.get(), layout);
             }
         };
     }
@@ -140,6 +132,16 @@ public abstract class MachinePlugin<M extends Menu<?, M>> implements IMenuPlugin
             @Override
             protected MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen) {
                 return null;
+            }
+        };
+    }
+
+    public static <M extends Menu<?, M>> Function<M, IMenuPlugin<M>> electricFurnace(Layout layout) {
+        return menu -> new MachinePlugin<>(menu, layout) {
+            @OnlyIn(Dist.CLIENT)
+            @Override
+            protected MachineRecipeBook<?> createRecipeBook(MenuScreen<M> screen) {
+                return new ElectricFurnaceRecipeBook(screen, layout);
             }
         };
     }

@@ -114,12 +114,28 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
             @Override
             protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
-                var layout = getLayout(voltage);
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
                         .simpleCapability(RecipeProcessor.basic(recipeType, voltage))
                         .menu()
-                        .plugin(MachinePlugin.processing(recipeType, layout))
+                        .plugin(MachinePlugin.processing(recipeType, getLayout(voltage)))
+                        .build()
+                        .build();
+            }
+        };
+    }
+
+    public static <T extends ProcessingRecipe> Builder<T, ?>
+    marker(RecipeTypeEntry<T, ?> recipeType) {
+        return new Builder<>(recipeType, Unit.INSTANCE) {
+            @Override
+            protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            getMachineBuilder(Voltage voltage) {
+                return super.getMachineBuilder(voltage)
+                        .blockEntity()
+                        .simpleCapability(RecipeProcessor.basic(recipeType, voltage))
+                        .menu()
+                        .plugin(MachinePlugin.marker(recipeType, getLayout(voltage)))
                         .build()
                         .build();
             }
@@ -131,13 +147,11 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
             @Override
             protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
-                assert layoutSet != null;
-                var layout = layoutSet.get(voltage);
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
                         .simpleCapability(RecipeProcessor.oreProcessor(voltage))
                         .menu()
-                        .plugin(MachinePlugin.oreAnalyzer(getLayout(voltage)))
+                        .plugin(MachinePlugin.marker(recipeType, getLayout(voltage)))
                         .build()
                         .build();
             }
