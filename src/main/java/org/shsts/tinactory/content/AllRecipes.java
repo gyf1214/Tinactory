@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
+import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -40,6 +41,8 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
     public static final RecipeTypeEntry<GeneratorRecipe, GeneratorRecipe.Builder> STEAM_TURBINE;
+    // Recipes only used to mark input for recipe book purpose
+    public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
 
     static {
         TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
@@ -98,6 +101,11 @@ public final class AllRecipes {
                 .builder(GeneratorRecipe.Builder::new)
                 .defaults($ -> $.autoVoid().amperage(1d).workTicks(100))
                 .register();
+
+        MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.SERIALIZER)
+                .clazz(MarkerRecipe.class)
+                .builder(MarkerRecipe.Builder::new)
+                .register();
     }
 
     public static void initRecipes() {
@@ -106,6 +114,7 @@ public final class AllRecipes {
         vanillaRecipes();
         primitiveRecipes();
         AllItems.initRecipes();
+        markerRecipes();
     }
 
     private static void vanillaRecipes() {
@@ -226,6 +235,41 @@ public final class AllRecipes {
         STONE_GENERATOR.recipe(Fluids.WATER)
                 .outputFluid(1, Fluids.WATER, 1000)
                 .voltage(Voltage.ULV)
+                .build();
+    }
+
+    public static void markerRecipes() {
+        markerCrush("raw");
+        markerCrush("crushed");
+        markerCrush("crushed_purified");
+        markerCrush("crushed_centrifuged");
+        markerWash("crushed");
+        markerWash("dust_impure");
+        markerWash("dust_pure");
+
+        MARKER.recipe("centrifuge_dust_pure")
+                .baseType(CENTRIFUGE)
+                .inputItem(0, AllMaterials.tag("dust_pure"))
+                .build();
+
+        MARKER.recipe("thermal_centrifuge_crushed_purified")
+                .baseType(THERMAL_CENTRIFUGE)
+                .inputItem(0, AllMaterials.tag("crushed_purified"))
+                .build();
+    }
+
+    private static void markerCrush(String sub) {
+        MARKER.recipe("crush_" + sub)
+                .baseType(MACERATOR)
+                .inputItem(0, AllMaterials.tag(sub))
+                .build();
+    }
+
+    private static void markerWash(String sub) {
+        MARKER.recipe("wash_" + sub)
+                .baseType(ORE_WASHER)
+                .inputItem(0, AllMaterials.tag(sub))
+                .inputFluid(1, Fluids.WATER)
                 .build();
     }
 

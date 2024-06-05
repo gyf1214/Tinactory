@@ -123,8 +123,8 @@ public final class AllMaterials {
         return () -> get(name).item(sub);
     }
 
-    public static Supplier<TagKey<Item>> tag(String name, String sub) {
-        return () -> get(name).tag(sub);
+    public static TagKey<Item> tag(String sub) {
+        return MaterialSet.Builder.prefixTag(sub);
     }
 
     public static void init() {}

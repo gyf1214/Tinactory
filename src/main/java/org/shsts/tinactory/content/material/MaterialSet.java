@@ -246,7 +246,7 @@ public class MaterialSet {
             return sub.startsWith("tool/") ? sub : "materials/" + sub;
         }
 
-        private static TagKey<Item> prefixTag(String sub) {
+        public static TagKey<Item> prefixTag(String sub) {
             return AllTags.modItem(prefix(sub));
         }
 

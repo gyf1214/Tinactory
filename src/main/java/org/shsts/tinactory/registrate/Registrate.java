@@ -86,43 +86,62 @@ public class Registrate {
     private final Map<ResourceKey<? extends Registry<?>>, TagsHandler<?>> tagsHandlers = new HashMap<>();
 
     // Registry
-    public final RegistryHandler registryHandler = new RegistryHandler(this);
+    public final RegistryHandler registryHandler;
 
     // Registry Entries
-    public final RegistryEntryHandler<Block> blockHandler = forgeHandler(ForgeRegistries.BLOCKS);
-    public final RegistryEntryHandler<Item> itemHandler = forgeHandler(ForgeRegistries.ITEMS);
-    public final RegistryEntryHandler<BlockEntityType<?>> blockEntityHandler =
-            forgeHandler(ForgeRegistries.BLOCK_ENTITIES);
-    public final RegistryEntryHandler<MenuType<?>> menuTypeHandler =
-            forgeHandler(ForgeRegistries.CONTAINERS);
-    public final RegistryEntryHandler<Fluid> fluidHandler = forgeHandler(ForgeRegistries.FLUIDS);
+    public final RegistryEntryHandler<Block> blockHandler;
+    public final RegistryEntryHandler<Item> itemHandler;
+    public final RegistryEntryHandler<BlockEntityType<?>> blockEntityHandler;
+    public final RegistryEntryHandler<MenuType<?>> menuTypeHandler;
+    public final RegistryEntryHandler<Fluid> fluidHandler;
 
     // Dynamic
-    public final DynamicHandler<Biome> biomeHandler =
-            new DynamicHandler<>(Biome.class, OverworldBiomes::theVoid);
+    public final DynamicHandler<Biome> biomeHandler;
 
     // Others
-    public final CapabilityHandler capabilityHandler = new CapabilityHandler(this);
-    public final RecipeTypeHandler recipeTypeHandler = new RecipeTypeHandler(this);
+    public final CapabilityHandler capabilityHandler;
+    public final RecipeTypeHandler recipeTypeHandler;
 
     // ModelGen
-    public final BlockStateHandler blockStateHandler = new BlockStateHandler(this);
-    public final ItemModelHandler itemModelHandler = new ItemModelHandler(this);
+    public final BlockStateHandler blockStateHandler;
+    public final ItemModelHandler itemModelHandler;
 
     // DataGen
-    public final RecipeDataHandler recipeDataHandler = new RecipeDataHandler(this);
-    public final LootTableHandler lootTableHandler = new LootTableHandler(this);
-    public final TechHandler techHandler = new TechHandler(this);
-    public final LanguageHandler languageHandler = new LanguageHandler(this);
+    public final RecipeDataHandler recipeDataHandler;
+    public final LootTableHandler lootTableHandler;
+    public final TechHandler techHandler;
+    public final LanguageHandler languageHandler;
 
     // Client
-    public final RenderTypeHandler renderTypeHandler = new RenderTypeHandler();
-    public final MenuScreenHandler menuScreenHandler = new MenuScreenHandler();
-    public final TintHandler tintHandler = new TintHandler();
+    public final RenderTypeHandler renderTypeHandler;
+    public final MenuScreenHandler menuScreenHandler;
+    public final TintHandler tintHandler;
 
     @SuppressWarnings("deprecation")
     public Registrate(String modid) {
         this.modid = modid;
+
+        this.registryHandler = new RegistryHandler(this);
+        this.blockHandler = forgeHandler(ForgeRegistries.BLOCKS);
+        this.itemHandler = forgeHandler(ForgeRegistries.ITEMS);
+        this.blockEntityHandler = forgeHandler(ForgeRegistries.BLOCK_ENTITIES);
+        this.menuTypeHandler = forgeHandler(ForgeRegistries.CONTAINERS);
+        this.fluidHandler = forgeHandler(ForgeRegistries.FLUIDS);
+        this.biomeHandler = new DynamicHandler<>(Biome.class, OverworldBiomes::theVoid);
+        this.capabilityHandler = new CapabilityHandler(this);
+
+        this.recipeTypeHandler = new RecipeTypeHandler(this);
+        this.blockStateHandler = new BlockStateHandler(this);
+        this.itemModelHandler = new ItemModelHandler(this);
+        this.recipeDataHandler = new RecipeDataHandler(this);
+        this.lootTableHandler = new LootTableHandler(this);
+        this.techHandler = new TechHandler(this);
+        this.languageHandler = new LanguageHandler(this);
+
+        this.renderTypeHandler = new RenderTypeHandler();
+        this.menuScreenHandler = new MenuScreenHandler();
+        this.tintHandler = new TintHandler();
+
         tagsHandler(Registry.ITEM);
         tagsHandler(Registry.BLOCK);
         putDataHandler(blockStateHandler);
