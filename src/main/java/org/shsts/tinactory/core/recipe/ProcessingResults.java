@@ -56,7 +56,7 @@ public final class ProcessingResults {
                 return true;
             }
             if (portClazz.isInstance(port)) {
-                if (rate < 1d && (simulate || random.nextDouble() > rate)) {
+                if (!simulate && random.nextDouble() > rate) {
                     return true;
                 }
                 return doInsertPort(portClazz.cast(port), random, simulate);

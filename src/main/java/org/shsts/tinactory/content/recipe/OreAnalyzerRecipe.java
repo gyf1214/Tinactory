@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.material.OreVariant;
@@ -15,7 +14,6 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -59,10 +57,6 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
 
         public Builder inputOre(OreVariant variant) {
             return inputItem(0, () -> variant.baseItem, 1);
-        }
-
-        public Builder outputItem(Supplier<? extends ItemLike> item, double rate) {
-            return outputItem(1, item, 1, rate);
         }
 
         @Override

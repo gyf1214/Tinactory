@@ -169,7 +169,7 @@ public final class Ores {
         }
 
         public VeinBuilder ore(MaterialSet material, double rate) {
-            builder.outputItem(material.entry("raw"), rate);
+            builder.outputItem(ores.size() + 1, material.entry("raw"), 1, rate);
             ores.add(material);
             if (variant == null) {
                 variant = material.oreVariant();

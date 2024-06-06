@@ -8,6 +8,8 @@ import org.shsts.tinactory.core.common.SimpleBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +17,9 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
-    private record SlotAndVoltage(Layout.SlotInfo slot, Voltage voltage) {}
+    private record SlotAndVoltages(Layout.SlotInfo slot, Collection<Voltage> voltages) {}
 
-    private final List<SlotAndVoltage> slots = new ArrayList<>();
+    private final List<SlotAndVoltages> slots = new ArrayList<>();
     private SlotType curSlotType = SlotType.NONE;
     private int curPort = -1;
     private int curSlot = 0;
@@ -30,7 +32,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
 
     public LayoutSetBuilder<P> dummySlot(int x, int y) {
         var slot = new Layout.SlotInfo(0, x, y, 0, SlotType.NONE);
-        slots.add(new SlotAndVoltage(slot, Voltage.PRIMITIVE));
+        slots.add(new SlotAndVoltages(slot, List.of(Voltage.PRIMITIVE)));
         return this;
     }
 
@@ -40,15 +42,23 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return this;
     }
 
-    public LayoutSetBuilder<P> slot(int x, int y, Voltage requiredVoltage) {
+    public LayoutSetBuilder<P> slot(int x, int y, Collection<Voltage> voltages) {
         assert curPort >= 0;
         var slot = new Layout.SlotInfo(curSlot++, x, y, curPort, curSlotType);
-        slots.add(new SlotAndVoltage(slot, requiredVoltage));
+        slots.add(new SlotAndVoltages(slot, voltages));
         return this;
     }
 
+    public LayoutSetBuilder<P> slot(int x, int y, Voltage fromVoltage) {
+        return slot(x, y, Voltage.between(fromVoltage, Voltage.MAXIMUM));
+    }
+
+    public LayoutSetBuilder<P> slot(int x, int y, Voltage fromVoltage, Voltage toVoltage) {
+        return slot(x, y, Voltage.between(fromVoltage, toVoltage));
+    }
+
     public LayoutSetBuilder<P> slot(int x, int y) {
-        return slot(x, y, Voltage.PRIMITIVE);
+        return slot(x, y, Arrays.asList(Voltage.values()));
     }
 
     public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {
@@ -61,7 +71,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         var fluidSlots = 0;
         var itemSlots = 0;
         for (var slot : slots) {
-            if (voltage.compareTo(slot.voltage) < 0) {
+            if (!slot.voltages.contains(voltage)) {
                 continue;
             }
             var index = 0;

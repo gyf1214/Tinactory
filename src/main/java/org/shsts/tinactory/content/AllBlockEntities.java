@@ -30,6 +30,7 @@ import org.shsts.tinactory.registrate.common.BlockEntitySet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -134,18 +135,21 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_ANALYZER = set(ProcessingSet.oreAnalyzer())
+        var oreAnalyzer = set(ProcessingSet.oreAnalyzer())
                 .overlay(gregtech("blocks/machines/electromagnetic_separator"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
-                .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2).slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, Voltage.LV)
-                .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-                .build()
-                .buildObject();
+                .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2);
+        for (var i = 3; i < 6; i++) {
+            var startVoltage = i == 5 ? Voltage.PRIMITIVE : Voltage.LV;
+            oreAnalyzer.port(SlotType.ITEM_OUTPUT)
+                    .slot(SLOT_SIZE * i, 1 + SLOT_SIZE / 2, startVoltage, Voltage.MV)
+                    .slot(SLOT_SIZE * i, 1, Voltage.HV)
+                    .slot(SLOT_SIZE * i, 1 + SLOT_SIZE, Voltage.HV);
+        }
+        ORE_ANALYZER = oreAnalyzer.build().buildObject();
 
         MACERATOR = set(marker(AllRecipes.MACERATOR))
                 .overlay(gregtech("blocks/machines/macerator"))
@@ -153,8 +157,16 @@ public final class AllBlockEntities {
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2, Voltage.HV)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, Voltage.LV, Voltage.HV)
+                .slot(SLOT_SIZE * 3, 1, Voltage.EV)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2, Voltage.MV, Voltage.HV)
+                .slot(SLOT_SIZE * 4, 1, Voltage.EV)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, List.of(Voltage.HV))
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE, Voltage.EV)
+                .port(SlotType.ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE, Voltage.EV)
                 .progressBar(Texture.PROGRESS_MACERATE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
@@ -185,10 +197,10 @@ public final class AllBlockEntities {
                 .port(SlotType.FLUID_INPUT)
                 .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
                 .port(SlotType.ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 4, 1).slot(SLOT_SIZE * 5, 1).slot(SLOT_SIZE * 6, 1, Voltage.HV)
+                .slot(SLOT_SIZE * 4, 1).slot(SLOT_SIZE * 5, 1).slot(SLOT_SIZE * 6, 1)
                 .port(SlotType.FLUID_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE).slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
-                .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE, Voltage.HV)
+                .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE)
                 .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();

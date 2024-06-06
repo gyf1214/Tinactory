@@ -2,6 +2,8 @@ package org.shsts.tinactory.content.recipe;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -15,6 +17,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class GeneratorRecipe extends ProcessingRecipe {
     protected GeneratorRecipe(BuilderBase<?, ?> builder) {
         super(builder);
+    }
+
+    @Override
+    public boolean matches(IContainer container, Level world) {
+        // no check output
+        return canCraftIn(container) &&
+                inputs.stream().allMatch(input -> consumeInput(container, input, true));
     }
 
     @Override
