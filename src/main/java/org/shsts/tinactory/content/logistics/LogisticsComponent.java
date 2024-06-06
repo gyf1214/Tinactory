@@ -24,11 +24,12 @@ import org.shsts.tinactory.core.logistics.ItemTypeWrapper;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.util.RoundRobinList;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -41,16 +42,17 @@ public class LogisticsComponent extends Component {
                            ILogisticsTypeWrapper type,
                            ILogisticsContentWrapper content) {}
 
-    private final List<Request> activeRequestList = new ArrayList<>();
     private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
+    private final RoundRobinList<Request> activeRequestList = new RoundRobinList<>();
     private final Multimap<PortDirection, IPort> passiveStorages = HashMultimap.create();
-
-    private int nextReqIndex = 0;
+    private final Map<PortDirection, RoundRobinList<IPort>> passiveStorageList = new HashMap<>();
 
     private int ticks;
 
     public LogisticsComponent(ComponentType<LogisticsComponent> type, Network network) {
         super(type, network);
+        this.passiveStorageList.put(PortDirection.INPUT, new RoundRobinList<>());
+        this.passiveStorageList.put(PortDirection.OUTPUT, new RoundRobinList<>());
     }
 
     private int getTechLevel() {
@@ -92,9 +94,12 @@ public class LogisticsComponent extends Component {
 
     @Override
     public void onDisconnect() {
-        activeRequestList.clear();
         activeRequests.clear();
+        activeRequestList.clear();
         passiveStorages.clear();
+        for (var list : passiveStorageList.values()) {
+            list.clear();
+        }
     }
 
     /**
@@ -174,7 +179,7 @@ public class LogisticsComponent extends Component {
             remaining = transmitItem(req, otherReq.port, remaining, limit1);
             otherReq.content.shrink(originalCount - remaining.getCount());
         }
-        for (var storage : passiveStorages.get(req.dir.invert())) {
+        for (var storage : passiveStorageList.get(req.dir.invert())) {
             if (remaining.isEmpty()) {
                 return true;
             }
@@ -197,11 +202,9 @@ public class LogisticsComponent extends Component {
             if (cycles <= 0) {
                 break;
             }
-            var k = nextReqIndex % activeRequestList.size();
-            if (handleItemActiveRequest(activeRequestList.get(k))) {
+            if (handleItemActiveRequest(activeRequestList.getNext())) {
                 cycles--;
             }
-            nextReqIndex = k + 1;
         }
 
         activeRequestList.clear();
@@ -209,13 +212,19 @@ public class LogisticsComponent extends Component {
     }
 
     public void addPassiveStorage(PortDirection dir, IPort port) {
-        LOGGER.debug("add PassiveStorage {} {}", dir, port);
-        passiveStorages.put(dir, port);
+        if (!passiveStorages.containsEntry(dir, port)) {
+            LOGGER.debug("add PassiveStorage {} {}", dir, port);
+            passiveStorages.put(dir, port);
+            passiveStorageList.get(dir).add(port);
+        }
     }
 
     public void removePassiveStorage(PortDirection dir, IPort port) {
-        LOGGER.debug("remove PassiveStorage {} {}", dir, port);
-        passiveStorages.remove(dir, port);
+        if (passiveStorages.containsEntry(dir, port)) {
+            LOGGER.debug("remove PassiveStorage {} {}", dir, port);
+            passiveStorages.remove(dir, port);
+            passiveStorageList.get(dir).remove(port);
+        }
     }
 
     public void addActiveItem(PortDirection type, IItemCollection port, ItemStack item) {
