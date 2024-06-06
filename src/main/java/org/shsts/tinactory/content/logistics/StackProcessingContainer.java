@@ -1,17 +1,13 @@
 package org.shsts.tinactory.content.logistics;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -40,12 +36,9 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -58,8 +51,6 @@ public class StackProcessingContainer extends CapabilityProvider
     private final IItemHandlerModifiable combinedItems;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports;
-    private final Map<Integer, WrapperItemHandler> itemInputs = new HashMap<>();
-    private final Multimap<Integer, WrapperFluidTank> fluidInputs = ArrayListMultimap.create();
 
     private final LazyOptional<?> itemHandlerCap;
     private final LazyOptional<?> fluidHandlerCap;
@@ -71,13 +62,11 @@ public class StackProcessingContainer extends CapabilityProvider
         var items = new ArrayList<WrapperItemHandler>(portInfo.size());
         var fluids = new ArrayList<WrapperFluidTank>();
         var slotIdx = 0;
-        var portIdx = 0;
         for (var port : portInfo) {
             var type = port.type;
             if (port.slots <= 0 || type == SlotType.NONE) {
                 ports.add(new PortInfo(slotIdx, slotIdx, SlotType.NONE,
                         IPort.EMPTY, IPort.EMPTY));
-                portIdx++;
                 continue;
             }
             switch (type) {
@@ -87,7 +76,6 @@ public class StackProcessingContainer extends CapabilityProvider
                     items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
-                    itemInputs.put(portIdx, view);
                     ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
                             collection, collection));
                 }
@@ -109,7 +97,6 @@ public class StackProcessingContainer extends CapabilityProvider
                         view.onUpdate(this::onInputUpdate);
 
                         views[i] = view;
-                        fluidInputs.put(portIdx, view);
                         fluids.add(view);
                     }
 
@@ -136,7 +123,6 @@ public class StackProcessingContainer extends CapabilityProvider
                             new CombinedFluidTank(views), new CombinedFluidTank(inners)));
                 }
             }
-            portIdx++;
             slotIdx += port.slots;
         }
         this.combinedItems = new CombinedInvWrapper(items.toArray(IItemHandlerModifiable[]::new));
@@ -191,29 +177,6 @@ public class StackProcessingContainer extends CapabilityProvider
         }
         var portInfo = ports.get(port);
         return internal ? portInfo.internalPort : portInfo.port;
-    }
-
-    @Override
-    public void setItemFilter(int port, Predicate<ItemStack> filter) {
-        itemInputs.get(port).filter = filter;
-    }
-
-    @Override
-    public void setFluidFilter(int port, Predicate<FluidStack> filter) {
-        for (var tank : fluidInputs.get(port)) {
-            tank.filter = filter;
-        }
-    }
-
-    @Override
-    public void resetFilter(int port) {
-        if (itemInputs.containsKey(port)) {
-            itemInputs.get(port).resetFilter();
-        } else if (fluidInputs.containsKey(port)) {
-            for (var tank : fluidInputs.get(port)) {
-                tank.resetFilter();
-            }
-        }
     }
 
     @Nonnull

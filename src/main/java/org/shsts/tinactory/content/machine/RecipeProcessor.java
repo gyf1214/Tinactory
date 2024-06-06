@@ -1,17 +1,20 @@
 package org.shsts.tinactory.content.machine;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -41,6 +44,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
 
@@ -103,6 +107,9 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
             targetRecipe = (T) recipe;
         }
 
+        var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
+        var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
+
         for (var input : recipe.inputs) {
             var idx = input.port();
             var ingredient = input.ingredient();
@@ -110,14 +117,24 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
                 continue;
             }
             if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
-                container.setItemFilter(idx, item.ingredient);
+                itemFilters.put(idx, item.ingredient);
             } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
                 var stack1 = item.stack();
-                container.setItemFilter(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
+                itemFilters.put(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
             } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
                 var stack1 = fluid.fluid();
-                container.setFluidFilter(idx, stack -> stack.isFluidEqual(stack1));
+                fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
             }
+        }
+
+        for (var idx : itemFilters.keys().elementSet()) {
+            var port = container.getPort(idx, false);
+            port.asItem().setItemFilter(itemFilters.get(idx));
+        }
+
+        for (var idx : fluidFilters.keys().elementSet()) {
+            var port = container.getPort(idx, false);
+            port.asFluid().setFluidFilter(fluidFilters.get(idx));
         }
     }
 
@@ -128,7 +145,11 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
             if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
                 continue;
             }
-            container.resetFilter(i);
+            var port = container.getPort(i, false);
+            switch (port.type()) {
+                case ITEM -> port.asItem().resetItemFilter();
+                case FLUID -> port.asFluid().resetFluidFilter();
+            }
         }
     }
 

@@ -18,7 +18,6 @@ import net.minecraftforge.items.wrapper.RecipeWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
@@ -45,7 +44,6 @@ public class ElectricFurnace extends CapabilityProvider
     private final Voltage voltage;
     private final double workFactor;
 
-    private IContainer container;
     private IItemCollection inputPort;
     private RecipeWrapper inputWrapper;
     private IItemCollection outputPort;
@@ -107,13 +105,12 @@ public class ElectricFurnace extends CapabilityProvider
             return;
         }
         targetRecipe = recipe1;
-
-        container.setItemFilter(0, targetRecipe.getIngredients().get(0));
+        inputPort.setItemFilter(targetRecipe.getIngredients());
     }
 
     private void resetTargetRecipe() {
         targetRecipe = null;
-        container.resetFilter(0);
+        inputPort.resetItemFilter();
     }
 
     private void updateTargetRecipe() {
@@ -129,7 +126,7 @@ public class ElectricFurnace extends CapabilityProvider
     }
 
     private void onLoad() {
-        container = AllCapabilities.CONTAINER.get(blockEntity);
+        var container = AllCapabilities.CONTAINER.get(blockEntity);
         inputPort = container.getPort(0, false).asItem();
         outputPort = container.getPort(1, true).asItem();
         inputWrapper = new RecipeWrapper((IItemHandlerModifiable)

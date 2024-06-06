@@ -12,6 +12,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -163,5 +165,23 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
                 .map(WrapperFluidTank::getFluid)
                 .filter(f -> !f.isEmpty())
                 .toList();
+    }
+
+    @Override
+    public void setFluidFilter(List<? extends Predicate<FluidStack>> filters) {
+        for (var i = 0; i < tanks.length; i++) {
+            if (i < filters.size()) {
+                tanks[i].filter = filters.get(i);
+            } else {
+                tanks[i].filter = $ -> false;
+            }
+        }
+    }
+
+    @Override
+    public void resetFluidFilter() {
+        for (var tank : tanks) {
+            tank.resetFilter();
+        }
     }
 }

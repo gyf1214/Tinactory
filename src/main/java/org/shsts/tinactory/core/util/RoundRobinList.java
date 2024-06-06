@@ -18,6 +18,7 @@ public class RoundRobinList<T> extends ArrayList<T> {
     public Iterator<T> iterator() {
         return new Iterator<>() {
             private int count = size();
+            private int first = nextIndex.getAndAdd(1);
 
             @Override
             public boolean hasNext() {
@@ -26,9 +27,8 @@ public class RoundRobinList<T> extends ArrayList<T> {
 
             @Override
             public T next() {
-                var ret = getNext();
                 count--;
-                return ret;
+                return get(first++ % size());
             }
         };
     }

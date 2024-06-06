@@ -4,12 +4,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Item Collection backed by ItemHandler.
@@ -17,8 +18,6 @@ import java.util.Collection;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemHandlerCollection implements IItemCollection {
-    public static final ItemHandlerCollection EMPTY = new ItemHandlerCollection(EmptyHandler.INSTANCE);
-
     public final IItemHandler itemHandler;
 
     public ItemHandlerCollection(IItemHandler itemHandler) {
@@ -116,5 +115,29 @@ public class ItemHandlerCollection implements IItemCollection {
             }
         }
         return allItems;
+    }
+
+    @Override
+    public void setItemFilter(List<? extends Predicate<ItemStack>> filters) {
+        if (!(itemHandler instanceof WrapperItemHandler wrapper)) {
+            return;
+        }
+        for (var i = 0; i < wrapper.getSlots(); i++) {
+            if (i < filters.size()) {
+                wrapper.setFilter(i, filters.get(i));
+            } else {
+                wrapper.setFilter(i, $ -> false);
+            }
+        }
+    }
+
+    @Override
+    public void resetItemFilter() {
+        if (!(itemHandler instanceof WrapperItemHandler wrapper)) {
+            return;
+        }
+        for (var i = 0; i < wrapper.getSlots(); i++) {
+            wrapper.resetFilter(i);
+        }
     }
 }

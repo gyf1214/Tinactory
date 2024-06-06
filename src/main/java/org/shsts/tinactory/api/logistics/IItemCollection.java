@@ -5,6 +5,8 @@ import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Represent a collection of items without specific slots.
@@ -38,4 +40,8 @@ public interface IItemCollection extends IPort {
      * DO NOT change the returned ItemStack.
      */
     Collection<ItemStack> getAllItems();
+
+    void setItemFilter(List<? extends Predicate<ItemStack>> filters);
+
+    void resetItemFilter();
 }

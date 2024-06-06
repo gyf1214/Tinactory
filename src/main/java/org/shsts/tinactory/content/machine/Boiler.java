@@ -26,6 +26,7 @@ import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.content.machine.RecipeProcessor.PROGRESS_PER_TICK;
@@ -67,8 +68,8 @@ public class Boiler extends CapabilityProvider implements
         waterPort = container.getPort(1, false).asFluid();
         outputPort = container.getPort(2, true).asFluid();
 
-        container.setItemFilter(0, item -> ForgeHooks.getBurnTime(item, null) > 0);
-        container.setFluidFilter(1, fluid -> fluid.getFluid() == Fluids.WATER);
+        fuelPort.setItemFilter(List.of(item -> ForgeHooks.getBurnTime(item, null) > 0));
+        waterPort.setFluidFilter(List.of(fluid -> fluid.getFluid() == Fluids.WATER));
     }
 
     @Override

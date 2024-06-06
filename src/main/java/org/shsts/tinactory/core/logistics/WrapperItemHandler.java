@@ -10,17 +10,20 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WrapperItemHandler implements IItemHandlerModifiable {
+    private static final Predicate<ItemStack> TRUE = $ -> true;
+
     private final IItemHandlerModifiable compose;
     private final List<Runnable> updateListener = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
-    public Predicate<ItemStack> filter = $ -> true;
+    private final List<Predicate<ItemStack>> filters;
 
     public WrapperItemHandler(int size) {
         this(new ItemStackHandler(size));
@@ -28,14 +31,19 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
 
     public WrapperItemHandler(IItemHandlerModifiable compose) {
         this.compose = compose;
+        this.filters = new ArrayList<>(Collections.nCopies(compose.getSlots(), TRUE));
     }
 
     public WrapperItemHandler(Container inv) {
         this(new InvWrapper(inv));
     }
 
-    public void resetFilter() {
-        filter = $ -> true;
+    public void setFilter(int idx, Predicate<ItemStack> sth) {
+        filters.set(idx, sth);
+    }
+
+    public void resetFilter(int idx) {
+        filters.set(idx, TRUE);
     }
 
     public void onUpdate(Runnable cons) {
@@ -98,6 +106,6 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
 
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
-        return allowInput && filter.test(stack) && compose.isItemValid(slot, stack);
+        return allowInput && filters.get(slot).test(stack) && compose.isItemValid(slot, stack);
     }
 }

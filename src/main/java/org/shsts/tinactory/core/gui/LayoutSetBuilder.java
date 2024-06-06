@@ -32,7 +32,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
 
     public LayoutSetBuilder<P> dummySlot(int x, int y) {
         var slot = new Layout.SlotInfo(0, x, y, 0, SlotType.NONE);
-        slots.add(new SlotAndVoltages(slot, List.of(Voltage.PRIMITIVE)));
+        slots.add(new SlotAndVoltages(slot, Arrays.asList(Voltage.values())));
         return this;
     }
 
