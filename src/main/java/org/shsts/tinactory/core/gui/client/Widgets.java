@@ -6,6 +6,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
@@ -16,6 +18,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.core.gui.Texture.VANILLA_WIDGETS;
 
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Widgets {
@@ -39,7 +42,7 @@ public final class Widgets {
 
                 font.drawShadow(poseStack, label, rect.x() + w - (float) textWidth / 2,
                         rect.y() + (float) (rect.height() - font.lineHeight) / 2,
-                        0xFFFFFFFF);
+                        RenderUtil.WHITE);
             }
 
             @Override

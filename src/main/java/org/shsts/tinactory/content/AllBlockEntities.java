@@ -143,7 +143,7 @@ public final class AllBlockEntities {
                 .slot(0, 1 + SLOT_SIZE / 2)
                 .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2);
         for (var i = 3; i < 6; i++) {
-            var startVoltage = i == 5 ? Voltage.PRIMITIVE : Voltage.LV;
+            var startVoltage = i == 5 ? Voltage.LV : Voltage.PRIMITIVE;
             oreAnalyzer.port(SlotType.ITEM_OUTPUT)
                     .slot(SLOT_SIZE * i, 1 + SLOT_SIZE / 2, startVoltage, Voltage.MV)
                     .slot(SLOT_SIZE * i, 1, Voltage.HV)

@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
@@ -75,6 +76,11 @@ public class Technology implements ITechnology {
     @Override
     public long getMaxProgress() {
         return maxProgress;
+    }
+
+    @Override
+    public ItemStack getDisplayItem() {
+        return new ItemStack(displayItem);
     }
 
     @Override

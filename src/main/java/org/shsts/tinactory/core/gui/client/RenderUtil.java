@@ -35,6 +35,7 @@ import java.util.function.Consumer;
 public final class RenderUtil {
     private static final int CYCLE_TIME = 1000;
     public static final int TEXT_COLOR = 0xFF404040;
+    public static final int WHITE = 0xFFFFFFFF;
 
     public static void blit(PoseStack poseStack, Texture tex, int zIndex, Rect dstRect) {
         blit(poseStack, tex, zIndex, dstRect, new Rect(0, 0, dstRect.width(), dstRect.height()));
@@ -45,7 +46,7 @@ public final class RenderUtil {
     }
 
     public static void blit(PoseStack poseStack, Texture tex, int zIndex, Rect dstRect, Rect srcRect) {
-        blit(poseStack, tex, zIndex, 0xFFFFFFFF, dstRect, srcRect);
+        blit(poseStack, tex, zIndex, WHITE, dstRect, srcRect);
     }
 
     private static void setGLColor(int color) {
@@ -144,11 +145,11 @@ public final class RenderUtil {
     }
 
     public static void renderFluid(PoseStack poseStack, FluidStack stack, Rect rect, int zIndex) {
-        renderFluid(poseStack, stack, rect, 0xFFFFFFFF, zIndex);
+        renderFluid(poseStack, stack, rect, WHITE, zIndex);
     }
 
     public static void renderFluid(PoseStack poseStack, FluidStack stack, int x, int y, int zIndex) {
-        renderFluid(poseStack, stack, new Rect(x, y, 16, 16), 0xFFFFFFFF, zIndex);
+        renderFluid(poseStack, stack, new Rect(x, y, 16, 16), WHITE, zIndex);
     }
 
     public static void renderItem(ItemStack stack, int x, int y) {

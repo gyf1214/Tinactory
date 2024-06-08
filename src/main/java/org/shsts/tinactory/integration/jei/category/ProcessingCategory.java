@@ -32,12 +32,12 @@ import java.util.Arrays;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.SPACING_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, ProcessingMenu> {
-    private static final int EXTRA_HEIGHT = (FONT_HEIGHT + SPACING_VERTICAL) * 3 + SLOT_SIZE / 2;
+    private static final int EXTRA_HEIGHT = (FONT_HEIGHT + SPACING) * 3 + SLOT_SIZE / 2;
     private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("0.00");
 
     public ProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
@@ -55,7 +55,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
 
     protected int drawTextLine(PoseStack stack, Component text, int y) {
         RenderUtil.renderText(stack, text, 0, y);
-        return y - FONT_HEIGHT - SPACING_VERTICAL;
+        return y - FONT_HEIGHT - SPACING;
     }
 
     @Override

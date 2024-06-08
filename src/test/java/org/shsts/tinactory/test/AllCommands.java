@@ -85,29 +85,6 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int setTargetTech(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        var player = ctx.getSource().getPlayerOrException();
-        var techName = ResourceLocationArgument.getId(ctx, "tech");
-        var manager = TechManager.server();
-        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
-        var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
-
-        team.setTargetTech(tech);
-        player.sendMessage(I18n.raw("team %s: set targetTech=%s", team.getName(), tech.getLoc()),
-                Util.NIL_UUID);
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int resetTargetTech(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        var player = ctx.getSource().getPlayerOrException();
-        var manager = TechManager.server();
-        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
-
-        team.resetTargetTech();
-        player.sendMessage(I18n.raw("team %s: set targetTech=<null>", team.getName()), Util.NIL_UUID);
-        return Command.SINGLE_SUCCESS;
-    }
-
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var builder = Commands.literal(TinactoryTest.ID)
                 .then(Commands.literal("test").executes(AllCommands::testCommand))
@@ -121,11 +98,7 @@ public final class AllCommands {
                                         .executes(AllCommands::setTechProgress))))
                 .then(Commands.literal("getTechProgress")
                         .then(Commands.argument("tech", ResourceLocationArgument.id())
-                                .executes(AllCommands::getTechProgress)))
-                .then(Commands.literal("setTargetTech")
-                        .then(Commands.argument("tech", ResourceLocationArgument.id())
-                                .executes(AllCommands::setTargetTech))
-                        .executes(AllCommands::resetTargetTech));
+                                .executes(AllCommands::getTechProgress)));
         dispatcher.register(builder);
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
@@ -27,6 +28,8 @@ public final class AllCommands {
             I18n.tr("tinactory.chat.exception.noTeam"));
     private static final DynamicCommandExceptionType TEAM_ALREADY_EXISTS = new DynamicCommandExceptionType(
             t -> I18n.tr("tinactory.chat.exception.teamExists", t));
+    private static final DynamicCommandExceptionType TECH_NOT_FOUND = new DynamicCommandExceptionType(
+            t -> I18n.tr("tinactory.chat.exception.noTech", t));
 
     private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
@@ -72,6 +75,30 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
+    private static int setTargetTech(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var player = ctx.getSource().getPlayerOrException();
+        var techName = ResourceLocationArgument.getId(ctx, "tech");
+        var manager = TechManager.server();
+        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
+        var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
+
+        team.setTargetTech(tech);
+        player.sendMessage(I18n.tr("tinactory.chat.setTargetTech.success", team.getName(),
+                I18n.tr(tech.getDescriptionId())), Util.NIL_UUID);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int resetTargetTech(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var player = ctx.getSource().getPlayerOrException();
+        var manager = TechManager.server();
+        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
+
+        team.resetTargetTech();
+        player.sendMessage(I18n.tr("tinactory.chat.resetTargetTech.success", team.getName()),
+                Util.NIL_UUID);
+        return Command.SINGLE_SUCCESS;
+    }
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var builder = Commands.literal(Tinactory.ID)
                 .then(Commands.literal("createTeam")
@@ -80,7 +107,11 @@ public final class AllCommands {
                 .then(Commands.literal("addPlayerToTeam")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(AllCommands::addPlayerToTeam)))
-                .then(Commands.literal("leaveTeam").executes(AllCommands::leaveTeam));
+                .then(Commands.literal("leaveTeam").executes(AllCommands::leaveTeam))
+                .then(Commands.literal("setTargetTech")
+                        .then(Commands.argument("tech", ResourceLocationArgument.id())
+                                .executes(AllCommands::setTargetTech))
+                        .executes(AllCommands::resetTargetTech));
 
         dispatcher.register(builder);
     }

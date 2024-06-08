@@ -36,7 +36,7 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     private boolean canResearch(ITeamProfile team) {
-        return team.isTechAvailable(target) && !team.isTechFinished(target) && team.getTargetTech()
+        return team.canResearch(target) && team.getTargetTech()
                 .filter(tech -> tech.getLoc().equals(target))
                 .isPresent();
     }

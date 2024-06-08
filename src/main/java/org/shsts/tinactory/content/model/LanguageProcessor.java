@@ -88,8 +88,10 @@ public class LanguageProcessor {
             if (extra.has(key)) {
                 continue;
             }
-            process(key).ifPresentOrElse(val -> prov.add(key, val),
-                    () -> LOGGER.warn("key not processed: {}", key));
+            process(key).ifPresentOrElse(val -> prov.add(key, val), () -> {
+                LOGGER.warn("key not processed: {}", key);
+                prov.add(key, "MISSING TR");
+            });
         }
         for (var entry : extra.entrySet()) {
             prov.add(entry.getKey(), entry.getValue().getAsString());

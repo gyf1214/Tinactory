@@ -25,7 +25,6 @@ import org.shsts.tinactory.core.util.I18n;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
@@ -47,10 +46,10 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private final EditBox welcomeEdit;
     private final Tab tabs;
     private final Label stateLabel;
-    private final Label techLabel;
+    private final TechPanel techPanel;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
 
-    private static Component tr(String key, Object... args) {
+    public static Component tr(String key, Object... args) {
         return I18n.tr("tinactory.gui.networkController." + key, args);
     }
 
@@ -61,7 +60,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         this.welcomePanel = new Panel(this);
         var welcomeLabel = new Label(menu, Label.Alignment.END, tr("welcome"));
         this.welcomeEdit = Widgets.editBox();
-        var welcomeButton = Widgets.simpleButton(menu, tr("welcome.button"), null, this::onWelcomePressed);
+        var welcomeButton = Widgets.simpleButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
         welcomePanel.addWidget(welcomeLabel);
         welcomePanel.addVanillaWidget(new Rect(0, -1, 64, EDIT_BOX_LINE_HEIGHT), welcomeEdit);
         welcomePanel.addWidget(new Rect(-BUTTON_WIDTH / 2, 20, BUTTON_WIDTH, BUTTON_HEIGHT), welcomeButton);
@@ -70,9 +69,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         this.stateLabel = new Label(menu);
         statePanel.addWidget(stateLabel);
 
-        var techPanel = new Panel(this);
-        this.techLabel = new Label(menu);
-        techPanel.addWidget(techLabel);
+        this.techPanel = new TechPanel(this);
 
         this.tabs = new Tab(this, statePanel, techPanel);
 
@@ -106,18 +103,8 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         var localTeam = TechManager.localTeam();
         LOGGER.debug("refresh team {}", localTeam);
         var teamName = localTeam.map(ITeamProfile::getName).orElse("<null>");
-        var targetTech = localTeam
-                .flatMap(team -> {
-                    var tech = team.getTargetTech().orElse(null);
-                    if (tech == null) {
-                        return Optional.empty();
-                    }
-                    return Optional.of(tr("researchLabel", team.getName(),
-                            "%4d".formatted(team.getTechProgress(tech)),
-                            "%4d".formatted(tech.getMaxProgress())));
-                }).orElse(tr("noneResearchLabel"));
         stateLabel.setLine(0, tr("teamNameLabel", teamName));
-        techLabel.setLine(0, targetTech);
+        localTeam.ifPresent(techPanel::refreshTech);
     }
 
     private void refresh(NetworkControllerSyncPacket packet) {

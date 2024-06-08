@@ -32,6 +32,11 @@ public class StretchImage extends MenuWidget {
 
     public static void render(PoseStack poseStack, Texture texture, int zIndex,
                               Rect rect, Rect texRect, int border) {
+        render(poseStack, texture, zIndex, RenderUtil.WHITE, rect, texRect, border);
+    }
+
+    public static void render(PoseStack poseStack, Texture texture, int zIndex,
+                              int color, Rect rect, Rect texRect, int border) {
         var w = rect.width() - border;
         var h = rect.height() - border;
         var tw = texRect.width() - border;
@@ -43,16 +48,16 @@ public class StretchImage extends MenuWidget {
         var mR = rect.offset(border, border).resize(w - border, h - border);
         var tR = texRect.resize(border, border);
 
-        RenderUtil.blit(poseStack, texture, zIndex, cR, tR);
-        RenderUtil.blit(poseStack, texture, zIndex, cR.offset(w, 0), tR.offset(tw, 0));
-        RenderUtil.blit(poseStack, texture, zIndex, cR.offset(0, h), tR.offset(0, th));
-        RenderUtil.blit(poseStack, texture, zIndex, cR.offset(w, h), tR.offset(tw, th));
+        RenderUtil.blit(poseStack, texture, zIndex, color, cR, tR);
+        RenderUtil.blit(poseStack, texture, zIndex, color, cR.offset(w, 0), tR.offset(tw, 0));
+        RenderUtil.blit(poseStack, texture, zIndex, color, cR.offset(0, h), tR.offset(0, th));
+        RenderUtil.blit(poseStack, texture, zIndex, color, cR.offset(w, h), tR.offset(tw, th));
 
-        RenderUtil.blit(poseStack, texture, zIndex, wR, tR.offset(border, 0));
-        RenderUtil.blit(poseStack, texture, zIndex, wR.offset(0, h), tR.offset(border, th));
-        RenderUtil.blit(poseStack, texture, zIndex, hR, tR.offset(0, border));
-        RenderUtil.blit(poseStack, texture, zIndex, hR.offset(w, 0), tR.offset(tw, border));
+        RenderUtil.blit(poseStack, texture, zIndex, color, wR, tR.offset(border, 0));
+        RenderUtil.blit(poseStack, texture, zIndex, color, wR.offset(0, h), tR.offset(border, th));
+        RenderUtil.blit(poseStack, texture, zIndex, color, hR, tR.offset(0, border));
+        RenderUtil.blit(poseStack, texture, zIndex, color, hR.offset(w, 0), tR.offset(tw, border));
 
-        RenderUtil.blit(poseStack, texture, zIndex, mR, tR.offset(tw - border, th - border));
+        RenderUtil.blit(poseStack, texture, zIndex, color, mR, tR.offset(tw - border, th - border));
     }
 }

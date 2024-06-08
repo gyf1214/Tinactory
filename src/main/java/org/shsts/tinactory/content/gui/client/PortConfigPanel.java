@@ -33,7 +33,7 @@ import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.SPACING_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 
 @ParametersAreNonnullByDefault
@@ -46,10 +46,10 @@ public class PortConfigPanel extends Panel {
     private static final Texture CLEAR_GRID_BUTTON = new Texture(
             gregtech("gui/widget/button_clear_grid"), 18, 18);
     private static final Rect LABEL_RECT =
-            new Rect(PANEL_BORDER + SPACING_VERTICAL, BUTTON_TOP_MARGIN + PANEL_BORDER,
-                    -(PANEL_BORDER + SPACING_VERTICAL) * 2 - SLOT_SIZE, SLOT_SIZE);
+            new Rect(PANEL_BORDER + SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
+                    -(PANEL_BORDER + SPACING) * 2 - SLOT_SIZE, SLOT_SIZE);
     private static final Rect BUTTON_RECT =
-            new Rect(-PANEL_BORDER - SLOT_SIZE - SPACING_VERTICAL, BUTTON_TOP_MARGIN + PANEL_BORDER,
+            new Rect(-PANEL_BORDER - SLOT_SIZE - SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
                     SLOT_SIZE, SLOT_SIZE);
     private static final int TEXT_COLOR = 0xFFFFAA00;
     private static final int OVERLAY_COLOR = 0x80FFAA00;
@@ -164,7 +164,7 @@ public class PortConfigPanel extends Panel {
             label.color = 0xFFFFAA00;
             var button = new ConfigButton(menu, port, type.direction, slots);
 
-            var y = (SLOT_SIZE + SPACING_VERTICAL) * i;
+            var y = (SLOT_SIZE + SPACING) * i;
             addWidget(RectD.corners(0d, 0d, 1d, 0d), LABEL_RECT.offset(0, y), label);
             addWidget(RectD.corners(1d, 0d, 1d, 0d), BUTTON_RECT.offset(0, y), button);
             i++;

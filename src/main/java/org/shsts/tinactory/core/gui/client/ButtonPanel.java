@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class ButtonPanel extends Panel {
@@ -122,17 +125,7 @@ public abstract class ButtonPanel extends Panel {
             buttons.subList(buttonCount, curSize).clear();
         }
         super.setRect(rect);
-        if (isActive()) {
-            setPage(page);
-        }
-    }
-
-    @Override
-    public void setActive(boolean value) {
-        super.setActive(value);
-        if (value) {
-            setPage(page);
-        }
+        refresh();
     }
 
     protected abstract int getItemCount();
@@ -166,7 +159,8 @@ public abstract class ButtonPanel extends Panel {
         page = newPage;
     }
 
-    public void refresh() {
+    @Override
+    protected void doRefresh() {
         setPage(page);
     }
 }

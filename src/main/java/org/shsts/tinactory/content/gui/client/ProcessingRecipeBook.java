@@ -84,8 +84,6 @@ public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
 
     private void onTechChange() {
         refreshRecipes();
-        if (bookPanel.isActive()) {
-            buttonPanel.refresh();
-        }
+        buttonPanel.refresh();
     }
 }

@@ -39,6 +39,14 @@ public interface ITeamProfile {
 
     boolean isTechAvailable(ResourceLocation tech);
 
+    default boolean canResearch(ResourceLocation tech) {
+        return isTechAvailable(tech) && !isTechFinished(tech);
+    }
+
+    default boolean canResearch(ITechnology tech) {
+        return isTechAvailable(tech) && !isTechFinished(tech);
+    }
+
     Optional<ITechnology> getTargetTech();
 
     int getModifier(String key);

@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.handler.TechProvider;
 
@@ -60,6 +61,8 @@ public class TechBuilder<P> extends Builder<ResourceLocation, P, TechBuilder<P>>
     protected ResourceLocation createObject() {
         assert maxProgress > 0;
         registrate.techHandler.addCallback(prov -> prov.addTech(this));
+        registrate.languageHandler.track(ITechnology.getDescriptionId(loc));
+        registrate.languageHandler.track(ITechnology.getDetailsId(loc));
         return loc;
     }
 

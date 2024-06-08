@@ -102,6 +102,14 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
         }
     }
 
+    public void refresh() {
+        if (isActive()) {
+            doRefresh();
+        }
+    }
+
+    protected void doRefresh() {}
+
     protected void addToScreen() {
         for (var child : children) {
             child.addToScreen(screen);
@@ -123,5 +131,6 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
         for (var child : children) {
             child.setActive(value);
         }
+        refresh();
     }
 }

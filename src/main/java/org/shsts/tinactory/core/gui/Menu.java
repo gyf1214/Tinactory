@@ -49,9 +49,9 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     public static final int CONTENT_WIDTH = 9 * SLOT_SIZE;
     public static final int MARGIN_HORIZONTAL = (WIDTH - CONTENT_WIDTH) / 2;
     public static final int FONT_HEIGHT = 9;
-    public static final int SPACING_VERTICAL = 3;
-    public static final int MARGIN_VERTICAL = 3 + SPACING_VERTICAL;
-    public static final int MARGIN_TOP = MARGIN_VERTICAL + FONT_HEIGHT + SPACING_VERTICAL;
+    public static final int SPACING = 3;
+    public static final int MARGIN_VERTICAL = 3 + SPACING;
+    public static final int MARGIN_TOP = MARGIN_VERTICAL + FONT_HEIGHT + SPACING;
 
     public final boolean isClientSide;
     public final T blockEntity;
@@ -148,7 +148,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     }
 
     private int addInventorySlots(int y) {
-        var barY = y + 3 * SLOT_SIZE + SPACING_VERTICAL;
+        var barY = y + 3 * SLOT_SIZE + SPACING;
         for (var j = 0; j < 9; j++) {
             addSlot(new Slot(inventory, j, MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, barY + 1));
         }
@@ -184,7 +184,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
      */
     public void setLayout(boolean hasInventory) {
         // here height does not include top margin and spacing
-        var y = height + MARGIN_TOP + SPACING_VERTICAL;
+        var y = height + MARGIN_TOP + SPACING;
         containerSlotCount = slots.size();
         this.hasInventory = hasInventory;
         if (hasInventory) {
