@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
+import org.shsts.tinactory.core.gui.client.Tab;
 import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
@@ -27,6 +28,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 
@@ -35,54 +38,68 @@ import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 @ParametersAreNonnullByDefault
 public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final int HEIGHT = 120;
+    private static final int LEFT_MARGIN = 28;
+    private static final int TOP_MARGIN = 48;
+    private static final int BOTTOM_MARGIN = 28;
     private static final int BUTTON_WIDTH = 72;
 
     private final Panel welcomePanel;
-    private final Panel configPanel;
     private final EditBox welcomeEdit;
+    private final Tab tabs;
     private final Label stateLabel;
+    private final Label techLabel;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
+
+    private static Component tr(String key, Object... args) {
+        return I18n.tr("tinactory.gui.networkController." + key, args);
+    }
 
     public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
                                    Component title, int syncSlot) {
         super(menu, inventory, title);
-        this.imageHeight = HEIGHT;
-
-        var welcomeLabel = new Label(menu, Label.Alignment.END,
-                I18n.tr("tinactory.gui.networkController.welcome"));
-        this.welcomeEdit = Widgets.editBox();
-        var welcomeButton = Widgets.simpleButton(menu,
-                I18n.tr("tinactory.gui.networkController.welcome.button"),
-                null, this::onWelcomePressed);
-        this.stateLabel = new Label(menu);
 
         this.welcomePanel = new Panel(this);
+        var welcomeLabel = new Label(menu, Label.Alignment.END, tr("welcome"));
+        this.welcomeEdit = Widgets.editBox();
+        var welcomeButton = Widgets.simpleButton(menu, tr("welcome.button"), null, this::onWelcomePressed);
         welcomePanel.addWidget(welcomeLabel);
         welcomePanel.addVanillaWidget(new Rect(0, -1, 64, EDIT_BOX_LINE_HEIGHT), welcomeEdit);
         welcomePanel.addWidget(new Rect(-BUTTON_WIDTH / 2, 20, BUTTON_WIDTH, BUTTON_HEIGHT), welcomeButton);
 
-        this.configPanel = new Panel(this);
-        configPanel.addWidget(new Rect(0, Label.LINE_HEIGHT, 0, 0), stateLabel);
+        var statePanel = new Panel(this);
+        this.stateLabel = new Label(menu);
+        statePanel.addWidget(stateLabel);
 
-        var offset = Rect.corners(0, 10, 0, -10);
-        rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), offset, welcomePanel);
-        rootPanel.addPanel(offset, configPanel);
+        var techPanel = new Panel(this);
+        this.techLabel = new Label(menu);
+        techPanel.addWidget(techLabel);
+
+        this.tabs = new Tab(this, statePanel, techPanel);
+
+        rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
+        rootPanel.addPanel(statePanel);
+        rootPanel.addPanel(techPanel);
+        rootPanel.addPanel(new Rect(-MARGIN_HORIZONTAL, -MARGIN_TOP, 0, 0), tabs);
 
         menu.onSyncPacket(syncSlot, this::refresh);
         TechManager.client().onProgressChange(onTechChange);
-        configPanel.setActive(false);
+        statePanel.setActive(false);
         welcomePanel.setActive(false);
+    }
+
+    @Override
+    protected void init() {
+        imageWidth = width - 2 * LEFT_MARGIN;
+        leftPos = LEFT_MARGIN;
+        imageHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
+        topPos = TOP_MARGIN;
+        initRect();
     }
 
     @Override
     public void removed() {
         TechManager.client().removeProgressChangeListener(onTechChange);
         super.removed();
-    }
-
-    private static Component tr(String key, Object... args) {
-        return I18n.tr("tinactory.gui.networkController." + key, args);
     }
 
     private void refreshTeam() {
@@ -100,19 +117,19 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
                             "%4d".formatted(tech.getMaxProgress())));
                 }).orElse(tr("noneResearchLabel"));
         stateLabel.setLine(0, tr("teamNameLabel", teamName));
-        stateLabel.setLine(3, targetTech);
+        techLabel.setLine(0, targetTech);
     }
 
     private void refresh(NetworkControllerSyncPacket packet) {
         if (!packet.isPresent()) {
             welcomePanel.setActive(true);
-            configPanel.setActive(false);
+            tabs.setActive(false);
         } else {
             refreshTeam();
             stateLabel.setLine(1, tr("stateLabel", packet.getState()));
             stateLabel.setLine(2, tr("workFactorLabel", "%.0f%%".formatted(packet.getWorkFactor() * 100d)));
             welcomePanel.setActive(false);
-            configPanel.setActive(true);
+            tabs.setActive(true);
         }
     }
 

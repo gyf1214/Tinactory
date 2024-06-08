@@ -68,7 +68,7 @@ public abstract class MachinePlugin<M extends Menu<?, M>> implements IMenuPlugin
                 }
             }
         };
-        var buttonOverlay = new StaticWidget(menu, Texture.GREGTECH);
+        var buttonOverlay = new StaticWidget(menu, Texture.GREGTECH_LOGO);
 
         screen.addPanel(PANEL_ANCHOR, PANEL_OFFSET, portConfigPanel);
         portConfigPanel.setActive(false);

@@ -1,7 +1,7 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
@@ -29,15 +29,22 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BUTTON_TOP_MARGIN;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_BORDER;
-import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.RECIPE_BOOK_BG;
+import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING_VERTICAL;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class PortConfigPanel extends Panel {
+    private static final Texture ITEM_OUT_BUTTON = new Texture(
+            gregtech("gui/widget/button_item_output_overlay"), 18, 18);
+    private static final Texture AUTO_OUT_BUTTON = new Texture(
+            gregtech("gui/widget/button_output"), 18, 18);
+    private static final Texture CLEAR_GRID_BUTTON = new Texture(
+            gregtech("gui/widget/button_clear_grid"), 18, 18);
     private static final Rect LABEL_RECT =
             new Rect(PANEL_BORDER + SPACING_VERTICAL, BUTTON_TOP_MARGIN + PANEL_BORDER,
                     -(PANEL_BORDER + SPACING_VERTICAL) * 2 - SLOT_SIZE, SLOT_SIZE);
@@ -70,9 +77,9 @@ public class PortConfigPanel extends Panel {
                 RenderUtil.blit(poseStack, Texture.SWITCH_BUTTON, z, rect);
             }
             switch (config) {
-                case NONE -> RenderUtil.blit(poseStack, Texture.CLEAR_GRID_BUTTON, z, rect);
-                case PASSIVE -> RenderUtil.blit(poseStack, Texture.AUTO_OUT_BUTTON, z, rect);
-                case ACTIVE -> RenderUtil.blit(poseStack, Texture.ITEM_OUT_BUTTON, z, rect);
+                case NONE -> RenderUtil.blit(poseStack, CLEAR_GRID_BUTTON, z, rect);
+                case PASSIVE -> RenderUtil.blit(poseStack, AUTO_OUT_BUTTON, z, rect);
+                case ACTIVE -> RenderUtil.blit(poseStack, ITEM_OUT_BUTTON, z, rect);
             }
             if (isHovering(mouseX, mouseY)) {
                 renderHoverOverlay(poseStack, slots);

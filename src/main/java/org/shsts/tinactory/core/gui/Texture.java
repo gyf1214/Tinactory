@@ -8,36 +8,27 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 import static org.shsts.tinactory.content.model.ModelGen.mcLoc;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.WIDTH;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record Texture(ResourceLocation loc, int width, int height) {
-    public static final Texture BACKGROUND = new Texture(
-            gregtech("gui/base/background"), WIDTH, 166);
     public static final Texture SLOT_BACKGROUND = new Texture(
             gregtech("gui/base/slot"), SLOT_SIZE, SLOT_SIZE);
     public static final Texture SWITCH_BUTTON = new Texture(
             gregtech("gui/widget/toggle_button_background"), 18, 36);
-    public static final Texture GREGTECH = new Texture(
+    public static final Texture GREGTECH_LOGO = new Texture(
             gregtech("gui/icon/gregtech_logo"), 17, 17);
-    public static final Texture CLEAR_GRID_BUTTON = new Texture(
-            gregtech("gui/widget/button_clear_grid"), 18, 18);
-    public static final Texture AUTO_OUT_BUTTON = new Texture(
-            gregtech("gui/widget/button_output"), 18, 18);
-    public static final Texture ITEM_OUT_BUTTON = new Texture(
-            gregtech("gui/widget/button_item_output_overlay"), 18, 18);
     public static final Texture VANILLA_WIDGETS = new Texture(
             mcLoc("gui/widgets"), 256, 256);
 
-    public static final Texture PROGRESS_ARROW = progress("arrow");
-    public static final Texture PROGRESS_MACERATE = progress("macerate");
-    public static final Texture PROGRESS_BATH = progress("bath");
-    public static final Texture PROGRESS_SIFT = progress("sift");
-    public static final Texture PROGRESS_EXTRACT = progress("extract");
-    public static final Texture PROGRESS_CIRCUIT = progress("circuit");
-    public static final Texture PROGRESS_GAS = progress("gas_collector");
-    public static final Texture PROGRESS_MULTIPLE = progress("arrow_multiple");
+    public static final Texture PROGRESS_ARROW = progressBar("arrow");
+    public static final Texture PROGRESS_MACERATE = progressBar("macerate");
+    public static final Texture PROGRESS_BATH = progressBar("bath");
+    public static final Texture PROGRESS_SIFT = progressBar("sift");
+    public static final Texture PROGRESS_EXTRACT = progressBar("extract");
+    public static final Texture PROGRESS_CIRCUIT = progressBar("circuit");
+    public static final Texture PROGRESS_GAS = progressBar("gas_collector");
+    public static final Texture PROGRESS_MULTIPLE = progressBar("arrow_multiple");
     public static final Texture PROGRESS_BURN = new Texture(
             gregtech("gui/progress_bar/progress_bar_boiler_fuel_steel"), 18, 36);
 
@@ -45,6 +36,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
             gregtech("gui/progress_bar/progress_bar_boiler_empty_steel"), 10, 54);
     public static final Texture HEAT_FULL = new Texture(
             gregtech("gui/progress_bar/progress_bar_boiler_heat"), 10, 54);
+    public static final Texture RECIPE_BOOK_BG = new Texture(
+            mcLoc("gui/recipe_book"), 256, 256);
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = new ResourceLocation(loc.getNamespace(), "textures/" + loc.getPath() + ".png");
@@ -52,7 +45,7 @@ public record Texture(ResourceLocation loc, int width, int height) {
         this.height = height;
     }
 
-    public static Texture progress(String name) {
+    private static Texture progressBar(String name) {
         return new Texture(gregtech("gui/progress_bar/progress_bar_" + name), 20, 40);
     }
 }

@@ -1,7 +1,7 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -85,7 +85,7 @@ public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
     private void onTechChange() {
         refreshRecipes();
         if (bookPanel.isActive()) {
-            setPage(page);
+            buttonPanel.refresh();
         }
     }
 }

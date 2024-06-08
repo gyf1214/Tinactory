@@ -1,6 +1,6 @@
 package org.shsts.tinactory.core.gui;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

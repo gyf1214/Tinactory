@@ -1,6 +1,6 @@
 package org.shsts.tinactory.core.gui.client;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;

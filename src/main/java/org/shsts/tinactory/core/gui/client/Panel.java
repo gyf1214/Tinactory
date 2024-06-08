@@ -1,6 +1,6 @@
 package org.shsts.tinactory.core.gui.client;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Widget;
@@ -46,7 +46,7 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
                 widget.active = active;
                 widget.visible = active;
             } else if (child instanceof Panel panel) {
-                panel.setActive(false);
+                panel.setActive(active);
             }
         }
 
