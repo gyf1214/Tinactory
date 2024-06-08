@@ -17,6 +17,7 @@ import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
+import org.shsts.tinactory.content.multiblock.MultiBlock;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -58,6 +59,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet<GeneratorRecipe> STEAM_TURBINE;
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
+    public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -255,6 +257,22 @@ public final class AllBlockEntities {
 
         LOW_PRESSURE_BOILER = boiler("low", 1d, Voltage.ULV);
         HIGH_PRESSURE_BOILER = boiler("high", 2.2d, Voltage.MV);
+
+        BLAST_FURNACE = REGISTRATE.blockEntitySet("multi_block/blast_furnace",
+                        SmartBlockEntity::new, PrimitiveBlock<SmartBlockEntity>::new)
+                .entityClass(SmartBlockEntity.class)
+                .blockEntity()
+                .eventManager().ticking()
+                .simpleCapability(MultiBlock.blastFurnace())
+                .build()
+                .block()
+                .transform(ModelGen.primitiveMachine(
+                        gregtech("blocks/casings/solid/machine_casing_heatproof"),
+                        gregtech("blocks/multiblock/blast_furnace")))
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
+                .build()
+                .register();
     }
 
     public static final Set<ProcessingSet<?>> PROCESSING_SETS;

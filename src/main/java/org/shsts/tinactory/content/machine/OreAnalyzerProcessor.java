@@ -27,9 +27,6 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
         if (size == 0) {
             return Optional.empty();
         }
-        if (size == 1) {
-            return Optional.of(matches.get(0));
-        }
 
         var random = world.random;
 
@@ -38,6 +35,10 @@ public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
             emptyRate *= 1 - match.rate;
         }
         emptyRecipe = random.nextDouble() <= emptyRate;
+
+        if (size == 1) {
+            return Optional.of(matches.get(0));
+        }
 
         var rates = matches.stream().mapToDouble(r -> r.rate).toArray();
         for (var i = 1; i < size; i++) {

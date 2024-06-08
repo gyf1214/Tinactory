@@ -11,9 +11,11 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinactory.core.multiblock.MultiBlockManager;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TinactorySavedData;
@@ -68,7 +70,10 @@ public final class AllForgeEvents {
     @SubscribeEvent
     public static void onUnloadWorld(WorldEvent.Unload event) {
         var world = (Level) event.getWorld();
-        NetworkManager.onUnload(world);
+        if (!world.isClientSide) {
+            NetworkManager.onUnload(world);
+            MultiBlockManager.onUnload(world);
+        }
         if (world.dimension() == Level.OVERWORLD) {
             if (!world.isClientSide) {
                 TinactorySavedData.unload();
@@ -82,5 +87,14 @@ public final class AllForgeEvents {
     @SubscribeEvent
     public static void onRegisterCommand(RegisterCommandsEvent event) {
         AllCommands.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void onBlockChanged(BlockEvent.NeighborNotifyEvent event) {
+        var world = (Level) event.getWorld();
+        if (world.isClientSide) {
+            return;
+        }
+        MultiBlockManager.get(world).invalidate(event.getPos());
     }
 }

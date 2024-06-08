@@ -70,7 +70,7 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
         var oldDir = state.getValue(IO_FACING);
         world.setBlockAndUpdate(pos, state.setValue(IO_FACING, dir));
 
-        NetworkManager.tryGetInstance(world).ifPresent(manager -> {
+        NetworkManager.tryGet(world).ifPresent(manager -> {
             manager.invalidatePosDir(pos, dir);
             manager.invalidatePosDir(pos, oldDir);
         });
@@ -106,7 +106,7 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     }
 
     protected void onDestroy(Level world, BlockPos pos, BlockState state) {
-        NetworkManager.tryGetInstance(world).ifPresent(manager ->
+        NetworkManager.tryGet(world).ifPresent(manager ->
                 manager.invalidatePosDir(pos, state.getValue(IO_FACING)));
     }
 

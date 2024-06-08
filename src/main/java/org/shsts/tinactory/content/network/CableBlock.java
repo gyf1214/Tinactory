@@ -159,7 +159,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         var newState = state.setValue(property, connected);
         world.setBlockAndUpdate(pos, newState);
 
-        NetworkManager.tryGetInstance(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
+        NetworkManager.tryGet(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
         return newState;
     }
 
@@ -209,7 +209,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state,
                             @Nullable LivingEntity placer, ItemStack stack) {
-        NetworkManager.tryGetInstance(world).ifPresent(manager -> {
+        NetworkManager.tryGet(world).ifPresent(manager -> {
             for (var dir : Direction.values()) {
                 if (isConnected(world, pos, state, dir)) {
                     manager.invalidatePosDir(pos, dir);
@@ -228,7 +228,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     }
 
     private void onDestroy(Level world, BlockPos pos, BlockState state) {
-        NetworkManager.tryGetInstance(world).ifPresent(manager -> {
+        NetworkManager.tryGet(world).ifPresent(manager -> {
             manager.invalidatePos(pos);
             for (var entry : PROPERTY_BY_DIRECTION.entrySet()) {
                 if (state.getValue(entry.getValue())) {

@@ -91,7 +91,8 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                     .menu(ProcessingMenu.factory(layout)).build()
                     .build()
                     .block()
-                    .transform(ModelGen.primitiveMachine(overlay))
+                    .transform(ModelGen.primitiveMachine(gregtech("blocks/casings/wood_wall"),
+                            overlay))
                     .tag(AllTags.MINEABLE_WITH_WRENCH)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .dropSelf()

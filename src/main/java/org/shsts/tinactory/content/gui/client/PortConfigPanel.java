@@ -151,9 +151,9 @@ public class PortConfigPanel extends Panel {
         addWidget(RectD.FULL, Rect.ZERO, background);
 
         var i = 0;
-        for (var port : layout.portSlots.keys().elementSet()) {
+        for (var port = 0; port < layout.portSlots.size(); port++) {
             var slots = layout.portSlots.get(port);
-            var type = slots.get(0).type();
+            var type = layout.ports.get(port).type();
             if (type == SlotType.NONE) {
                 continue;
             }

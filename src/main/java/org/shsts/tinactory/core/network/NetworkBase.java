@@ -88,7 +88,7 @@ public class NetworkBase {
 
     protected NetworkBase(Level world, BlockPos center, TeamProfile team) {
         this.world = world;
-        this.manager = NetworkManager.getInstance(world);
+        this.manager = NetworkManager.get(world);
         this.center = center;
         this.team = team;
         this.bfsContext = new BFSContext();

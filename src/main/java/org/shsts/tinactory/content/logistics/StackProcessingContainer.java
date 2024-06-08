@@ -35,7 +35,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -55,7 +54,7 @@ public class StackProcessingContainer extends CapabilityProvider
     private final LazyOptional<?> itemHandlerCap;
     private final LazyOptional<?> fluidHandlerCap;
 
-    private StackProcessingContainer(BlockEntity blockEntity, List<Builder.PortInfo> portInfo) {
+    private StackProcessingContainer(BlockEntity blockEntity, List<Layout.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
         this.ports = new ArrayList<>(portInfo.size());
 
@@ -63,36 +62,36 @@ public class StackProcessingContainer extends CapabilityProvider
         var fluids = new ArrayList<WrapperFluidTank>();
         var slotIdx = 0;
         for (var port : portInfo) {
-            var type = port.type;
-            if (port.slots <= 0 || type == SlotType.NONE) {
+            var type = port.type();
+            if (port.slots() <= 0 || type == SlotType.NONE) {
                 ports.add(new PortInfo(slotIdx, slotIdx, SlotType.NONE,
                         IPort.EMPTY, IPort.EMPTY));
                 continue;
             }
             switch (type) {
                 case ITEM_INPUT -> {
-                    var view = new WrapperItemHandler(port.slots);
+                    var view = new WrapperItemHandler(port.slots());
                     view.onUpdate(this::onInputUpdate);
                     items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
-                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
                             collection, collection));
                 }
                 case ITEM_OUTPUT -> {
-                    var inner = new WrapperItemHandler(port.slots);
+                    var inner = new WrapperItemHandler(port.slots());
                     inner.onUpdate(this::onOutputUpdate);
 
                     var view = new WrapperItemHandler(inner);
                     view.allowInput = false;
                     items.add(view);
 
-                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
                             new ItemHandlerCollection(view), new ItemHandlerCollection(inner)));
                 }
                 case FLUID_INPUT -> {
-                    var views = new WrapperFluidTank[port.slots];
-                    for (var i = 0; i < port.slots; i++) {
+                    var views = new WrapperFluidTank[port.slots()];
+                    for (var i = 0; i < port.slots(); i++) {
                         var view = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
                         view.onUpdate(this::onInputUpdate);
 
@@ -101,14 +100,14 @@ public class StackProcessingContainer extends CapabilityProvider
                     }
 
                     var collection = new CombinedFluidTank(views);
-                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
                             collection, collection));
                 }
                 case FLUID_OUTPUT -> {
-                    var inners = new WrapperFluidTank[port.slots];
-                    var views = new WrapperFluidTank[port.slots];
+                    var inners = new WrapperFluidTank[port.slots()];
+                    var views = new WrapperFluidTank[port.slots()];
 
-                    for (var i = 0; i < port.slots; i++) {
+                    for (var i = 0; i < port.slots(); i++) {
                         var inner = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
                         inner.onUpdate(this::onOutputUpdate);
                         inners[i] = inner;
@@ -119,11 +118,11 @@ public class StackProcessingContainer extends CapabilityProvider
                         fluids.add(view);
                     }
 
-                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots, type,
+                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
                             new CombinedFluidTank(views), new CombinedFluidTank(inners)));
                 }
             }
-            slotIdx += port.slots;
+            slotIdx += port.slots();
         }
         this.combinedItems = new CombinedInvWrapper(items.toArray(IItemHandlerModifiable[]::new));
         this.combinedFluids = new CombinedFluidTank(fluids.toArray(WrapperFluidTank[]::new));
@@ -207,9 +206,7 @@ public class StackProcessingContainer extends CapabilityProvider
     }
 
     public static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
-        private record PortInfo(int slots, SlotType type) {}
-
-        private final List<PortInfo> ports = new ArrayList<>();
+        private final List<Layout.PortInfo> ports = new ArrayList<>();
 
         public Builder(P parent) {
             super(parent, "logistics/stack_container");
@@ -217,17 +214,7 @@ public class StackProcessingContainer extends CapabilityProvider
 
         public Builder<P> layout(Layout layout) {
             ports.clear();
-            var slots = layout.slots.stream().filter(s -> s.type() != SlotType.NONE).toList();
-            if (slots.isEmpty()) {
-                return this;
-            }
-            var portCount = 1 + slots.stream().mapToInt(Layout.SlotInfo::port).max().getAsInt();
-            var newPorts = new ArrayList<>(Collections.nCopies(portCount, new PortInfo(0, SlotType.NONE)));
-            for (var slot : slots) {
-                var info = newPorts.get(slot.port());
-                newPorts.set(slot.port(), new PortInfo(info.slots + 1, slot.type()));
-            }
-            ports.addAll(newPorts);
+            ports.addAll(layout.ports);
             return this;
         }
 

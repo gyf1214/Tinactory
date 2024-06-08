@@ -59,7 +59,6 @@ public final class ModelGen {
 
     public static final ResourceLocation VOID_TEX = modLoc("void");
     public static final ResourceLocation WHITE_TEX = modLoc("white");
-    public static final ResourceLocation PRIMITIVE_CASING = gregtech("blocks/casings/wood_wall");
 
     public static ResourceLocation mcLoc(String id) {
         return new ResourceLocation(id);
@@ -136,8 +135,8 @@ public final class ModelGen {
     }
 
     public static <S extends BlockBuilder<? extends PrimitiveBlock<?>, ?, S>>
-    Transformer<S> primitiveMachine(ResourceLocation front) {
-        var model = new MachineModel(PRIMITIVE_CASING, front);
+    Transformer<S> primitiveMachine(ResourceLocation casing, ResourceLocation front) {
+        var model = new MachineModel(casing, front);
         return $ -> $.blockState(model::primitiveBlockState).translucent();
     }
 

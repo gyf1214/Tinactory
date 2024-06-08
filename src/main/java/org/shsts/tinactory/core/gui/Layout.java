@@ -1,6 +1,5 @@
 package org.shsts.tinactory.core.gui;
 
-import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.logistics.SlotType;
@@ -31,17 +30,29 @@ public class Layout {
         }
     }
 
+    public record PortInfo(int slots, SlotType type) {}
+
     public final List<SlotInfo> slots;
     public final List<WidgetInfo> images;
     @Nullable
     public final WidgetInfo progressBar;
     public final Rect rect;
-    public final ArrayListMultimap<Integer, SlotInfo> portSlots = ArrayListMultimap.create();
+    public final List<PortInfo> ports = new ArrayList<>();
+    public final List<List<SlotInfo>> portSlots = new ArrayList<>();
 
     public Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable WidgetInfo progressBar) {
         this.slots = slots;
         for (var slot : slots) {
-            portSlots.put(slot.port(), slot);
+            if (slot.port >= portSlots.size()) {
+                var list = new ArrayList<SlotInfo>();
+                portSlots.add(list);
+                list.add(slot);
+            } else {
+                portSlots.get(slot.port).add(slot);
+            }
+        }
+        for (var portSlot : portSlots) {
+            ports.add(new PortInfo(portSlot.size(), portSlot.get(0).type));
         }
         this.images = images;
         this.progressBar = progressBar;

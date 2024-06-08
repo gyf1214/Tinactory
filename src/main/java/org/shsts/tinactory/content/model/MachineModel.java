@@ -72,14 +72,20 @@ public final class MachineModel {
     }
 
     public static <B extends ModelBuilder<B>>
-    B casing(B model, ResourceLocation tex) {
-        return model.texture("top", extend(tex, "top"))
-                .texture("bottom", extend(tex, "bottom"))
-                .texture("side", extend(tex, "side"));
+    B casing(B model, ResourceLocation tex, ExistingFileHelper existingHelper) {
+        if (existingHelper.exists(tex, TEXTURE_TYPE)) {
+            return model.texture("top", tex)
+                    .texture("bottom", tex)
+                    .texture("side", tex);
+        } else {
+            return model.texture("top", extend(tex, "top"))
+                    .texture("bottom", extend(tex, "bottom"))
+                    .texture("side", extend(tex, "side"));
+        }
     }
 
     private <B extends ModelBuilder<B>> B applyTextures(B model, ExistingFileHelper existingHelper) {
-        model = casing(model, casing);
+        model = casing(model, casing, existingHelper);
         if (existingHelper.exists(overlay, TEXTURE_TYPE)) {
             return model.texture("front_overlay", overlay);
         } else {

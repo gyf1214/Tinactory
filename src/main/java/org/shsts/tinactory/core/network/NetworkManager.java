@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkManager {
+public final class NetworkManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Level world;
@@ -85,24 +85,24 @@ public class NetworkManager {
         networks.clear();
     }
 
-    private static final Map<ResourceKey<Level>, NetworkManager> MANAGERS = new HashMap<>();
+    private static final Map<ResourceKey<Level>, NetworkManager> INSTANCES = new HashMap<>();
 
-    public static NetworkManager getInstance(Level world) {
+    public static NetworkManager get(Level world) {
         assert !world.isClientSide;
         var dimension = world.dimension();
-        return MANAGERS.computeIfAbsent(dimension, $ -> new NetworkManager(world));
+        return INSTANCES.computeIfAbsent(dimension, $ -> new NetworkManager(world));
     }
 
-    public static Optional<NetworkManager> tryGetInstance(Level world) {
-        return world.isClientSide ? Optional.empty() : Optional.of(getInstance(world));
+    public static Optional<NetworkManager> tryGet(Level world) {
+        return world.isClientSide ? Optional.empty() : Optional.of(get(world));
     }
 
     public static void onUnload(Level world) {
         LOGGER.debug("remove network manager for {}", world.dimension());
-        var manager = MANAGERS.get(world.dimension());
+        var manager = INSTANCES.get(world.dimension());
         if (manager != null) {
             manager.destroy();
-            MANAGERS.remove(world.dimension());
+            INSTANCES.remove(world.dimension());
         }
     }
 }
