@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.machine.RecipeProcessor.PROGRESS_PER_TICK;
+import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

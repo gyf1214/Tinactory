@@ -10,7 +10,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class GeneratorProcessor extends RecipeProcessor<GeneratorRecipe> {
+public class GeneratorProcessor extends MachineProcessor<GeneratorRecipe> {
     protected GeneratorProcessor(BlockEntity blockEntity, RecipeType<? extends GeneratorRecipe> recipeType,
                                  Voltage voltage) {
         super(blockEntity, recipeType, voltage);

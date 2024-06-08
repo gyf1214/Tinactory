@@ -29,7 +29,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.content.machine.RecipeProcessor.PROGRESS_PER_TICK;
+import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

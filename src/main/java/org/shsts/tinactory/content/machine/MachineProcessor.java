@@ -50,7 +50,7 @@ import static org.shsts.tinactory.content.AllRecipes.MARKER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvider
+public class MachineProcessor<T extends ProcessingRecipe> extends CapabilityProvider
         implements IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final long PROGRESS_PER_TICK = 256;
@@ -77,7 +77,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
     protected IContainer container;
     private boolean needUpdate = true;
 
-    protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
+    protected MachineProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
         this.blockEntity = blockEntity;
         this.recipeType = recipeType;
         this.voltage = voltage;
@@ -368,7 +368,7 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
 
     public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
     basic(RecipeTypeEntry<? extends ProcessingRecipe, ?> type, Voltage voltage) {
-        return CapabilityProviderBuilder.fromFactory(ID, be -> new RecipeProcessor<>(be, type.get(), voltage));
+        return CapabilityProviderBuilder.fromFactory(ID, be -> new MachineProcessor<>(be, type.get(), voltage));
     }
 
     public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> oreProcessor(Voltage voltage) {

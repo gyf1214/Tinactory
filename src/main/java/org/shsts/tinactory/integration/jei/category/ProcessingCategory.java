@@ -13,7 +13,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.RecipeProcessor;
+import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
@@ -108,7 +108,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
     @Override
     protected boolean canTransfer(ProcessingMenu menu, ProcessingRecipe recipe) {
         return AllCapabilities.PROCESSOR.tryGet(menu.blockEntity)
-                .map(p -> p instanceof RecipeProcessor<?> processor &&
+                .map(p -> p instanceof MachineProcessor<?> processor &&
                         processor.recipeType == recipe.getType())
                 .orElse(false);
     }

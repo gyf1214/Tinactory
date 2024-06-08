@@ -13,7 +13,7 @@ import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class OreAnalyzerProcessor extends RecipeProcessor<OreAnalyzerRecipe> {
+public class OreAnalyzerProcessor extends MachineProcessor<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
     public OreAnalyzerProcessor(BlockEntity blockEntity, Voltage voltage) {

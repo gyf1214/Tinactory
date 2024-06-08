@@ -86,7 +86,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                     .entityClass(PrimitiveMachine.class)
                     .blockEntity()
                     .eventManager().ticking()
-                    .simpleCapability(RecipeProcessor.basic(recipeType, Voltage.PRIMITIVE))
+                    .simpleCapability(MachineProcessor.basic(recipeType, Voltage.PRIMITIVE))
                     .simpleCapability(StackProcessingContainer.builder(layout))
                     .menu(ProcessingMenu.factory(layout)).build()
                     .build()
@@ -117,7 +117,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
             getMachineBuilder(Voltage voltage) {
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
-                        .simpleCapability(RecipeProcessor.basic(recipeType, voltage))
+                        .simpleCapability(MachineProcessor.basic(recipeType, voltage))
                         .menu()
                         .plugin(MachinePlugin.processing(recipeType, getLayout(voltage)))
                         .build()
@@ -134,7 +134,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
             getMachineBuilder(Voltage voltage) {
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
-                        .simpleCapability(RecipeProcessor.basic(recipeType, voltage))
+                        .simpleCapability(MachineProcessor.basic(recipeType, voltage))
                         .menu()
                         .plugin(MachinePlugin.marker(recipeType, getLayout(voltage)))
                         .build()
@@ -150,7 +150,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
             getMachineBuilder(Voltage voltage) {
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
-                        .simpleCapability(RecipeProcessor.oreProcessor(voltage))
+                        .simpleCapability(MachineProcessor.oreProcessor(voltage))
                         .menu()
                         .plugin(MachinePlugin.marker(recipeType, getLayout(voltage)))
                         .build()
@@ -169,7 +169,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                 var layout = getLayout(voltage);
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
-                        .simpleCapability(RecipeProcessor.generator(recipeType, voltage))
+                        .simpleCapability(MachineProcessor.generator(recipeType, voltage))
                         .menu()
                         .plugin(MachinePlugin.processing(recipeType, layout))
                         .build()
@@ -193,7 +193,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .eventManager()
                         .simpleCapability(Machine::builder)
                         .simpleCapability(StackProcessingContainer.builder(layout))
-                        .simpleCapability(RecipeProcessor.electricFurnace(voltage))
+                        .simpleCapability(MachineProcessor.electricFurnace(voltage))
                         .menu(ProcessingMenu.factory(layout))
                         .plugin(MachinePlugin.electricFurnace(layout))
                         .build()
