@@ -216,7 +216,6 @@ public class RecipeProcessor<T extends ProcessingRecipe> extends CapabilityProvi
 
     private void onTechChange(ITeamProfile team) {
         if (team == container.getOwnerTeam().orElse(null)) {
-            LOGGER.debug("processor {}: on tech change", this);
             setUpdateRecipe();
         }
     }

@@ -6,6 +6,7 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.IWorkbench;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.content.multiblock.MultiBlock;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.UpdateHelper;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
@@ -23,6 +24,7 @@ public final class AllCapabilities {
     public static final CapabilityEntry<IFluidStackHandler> FLUID_STACK_HANDLER;
 
     public static final CapabilityEntry<Machine> MACHINE;
+    public static final CapabilityEntry<MultiBlock> MULTI_BLOCK;
 
     static {
         UPDATE_HELPER = REGISTRATE.capability(UpdateHelper.class, new CapabilityToken<>() {});
@@ -34,6 +36,7 @@ public final class AllCapabilities {
         FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
 
         MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
+        MULTI_BLOCK = REGISTRATE.capability(MultiBlock.class, new CapabilityToken<>() {});
     }
 
     public static void init() {}

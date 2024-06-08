@@ -6,6 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.WeakMap;
@@ -18,13 +19,13 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class MultiBlockBase implements IEventSubscriber {
+public abstract class MultiBlockBase extends CapabilityProvider implements IEventSubscriber {
     private static final int CHECK_CYCLE = 40;
 
     protected final BlockEntity blockEntity;
     protected MultiBlockManager manager;
     @Nullable
-    private WeakMap.Ref<MultiBlockBase> ref = null;
+    protected WeakMap.Ref<MultiBlockBase> ref = null;
     private int checkTick = 0;
 
     public MultiBlockBase(BlockEntity blockEntity) {
@@ -69,13 +70,18 @@ public abstract class MultiBlockBase implements IEventSubscriber {
 
     protected abstract Optional<Collection<BlockPos>> checkMultiBlock();
 
+    protected void onInvalidate() {}
+
     public void invalidate() {
         if (ref != null) {
             ref.invalidate();
             ref = null;
             checkTick = 0;
+            onInvalidate();
         }
     }
+
+    protected void onRegister() {}
 
     private void onServerLoad(Level world) {
         manager = MultiBlockManager.get(world);
@@ -92,7 +98,10 @@ public abstract class MultiBlockBase implements IEventSubscriber {
             return;
         }
         if (++checkTick > CHECK_CYCLE) {
-            checkMultiBlock().ifPresent(blocks -> manager.register(this, blocks));
+            checkMultiBlock().ifPresent(blocks -> {
+                manager.register(this, blocks);
+                onRegister();
+            });
             checkTick = 0;
         }
     }
