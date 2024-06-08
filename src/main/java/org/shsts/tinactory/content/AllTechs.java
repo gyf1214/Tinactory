@@ -32,7 +32,7 @@ public final class AllTechs {
         LOGISTICS = new ArrayList<>();
         for (var i = 0; i < 3; i++) {
             LOGISTICS.add(base("logistics/" + i)
-                    .maxProgress(100L * (1L << (long) (2 * i)))
+                    .maxProgress(30L * (1L << (long) (2 * i)))
                     .modifier("logistics_level", 1)
                     .buildObject());
         }
@@ -72,17 +72,13 @@ public final class AllTechs {
             var tech = entry.getValue();
             AllRecipes.RESEARCH.recipe(tech)
                     .target(tech)
-                    .inputItem(() -> variant.baseItem)
-                    .voltage(variant.voltage)
-                    .workTicks(200)
+                    .defaultInput(variant.voltage)
                     .build();
         }
 
         AllRecipes.RESEARCH.recipe(LOGISTICS.get(0))
                 .target(LOGISTICS.get(0))
-                .inputItem(AllItems.componentSet(Voltage.LV).conveyor)
-                .voltage(Voltage.LV)
-                .workTicks(200)
+                .defaultInput(Voltage.LV)
                 .build();
     }
 }

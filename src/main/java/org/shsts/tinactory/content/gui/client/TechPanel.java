@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
@@ -46,14 +47,15 @@ public class TechPanel extends Panel {
     private static final int FINISHED_COLOR = 0xFFAAFFAA;
     private static final int AVAILABLE_COLOR = 0xFFFFFFAA;
     private static final int INVALID_COLOR = 0xFFFFAAAA;
-
+    private static final int PROGRESS_COLOR = 0xFF00AA00;
 
     public static final int BUTTON_SIZE = 24;
     private static final int PANEL_BORDER = 2;
+    private static final Rect BUTTON_PANEL_BG = BACKGROUND_TEX_RECT.offset(6, 6).enlarge(-12, -12);
     private static final int LEFT_WIDTH = PANEL_BORDER * 2 + BUTTON_SIZE * 5;
     public static final int LEFT_OFFSET = LEFT_WIDTH + MARGIN_HORIZONTAL * 2;
     public static final int RIGHT_WIDTH = LEFT_WIDTH + BUTTON_SIZE * 2;
-    private static final Rect BUTTON_PANEL_BG = BACKGROUND_TEX_RECT.offset(6, 6).enlarge(-12, -12);
+    private static final int PROGRESS_HEIGHT = 5;
 
     private final ITechManager techManager;
     private final TechButton currentTechButton;
@@ -169,6 +171,36 @@ public class TechPanel extends Panel {
         }
     }
 
+    private class ProgressBar extends MenuWidget {
+        public ProgressBar() {
+            super(TechPanel.this.menu);
+        }
+
+        @Override
+        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+            if (selectedTech == null || team == null) {
+                return;
+            }
+
+            var progress = team.getTechProgress(selectedTech) * rect.width() / selectedTech.getMaxProgress();
+            RenderUtil.fill(poseStack, rect.resize((int) progress, rect.height()), PROGRESS_COLOR);
+        }
+
+        @Override
+        protected boolean canHover() {
+            return true;
+        }
+
+        @Override
+        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
+            if (selectedTech == null || team == null) {
+                return Optional.empty();
+            }
+            return Optional.of(List.of(tr("researchProgress",
+                    team.getTechProgress(selectedTech), selectedTech.getMaxProgress())));
+        }
+    }
+
     public TechPanel(MenuScreen<?> screen) {
         super(screen);
         this.techManager = TechManager.client();
@@ -195,20 +227,21 @@ public class TechPanel extends Panel {
         this.selectedTechLabel = new Label(menu);
         var label3 = new Label(menu, tr("techRequirementsLabel"));
         label3.verticalAlign = Label.Alignment.MIDDLE;
-        var requirementButtons = new RequiredTechButtons();
         this.startResearchButton = Widgets.simpleButton(menu, tr("startResearchButton"),
                 null, this::startResearch);
         var y = 0;
         var offset7 = Rect.corners(0, y - Widgets.BUTTON_HEIGHT, 0, y);
         y -= Widgets.BUTTON_HEIGHT + MARGIN_VERTICAL;
-        var offset6 = Rect.corners(0, y - BUTTON_SIZE, 0, y);
+        var offset6 = Rect.corners(0, y - PROGRESS_HEIGHT, 0, y);
+        y -= PROGRESS_HEIGHT + MARGIN_VERTICAL;
+        var offset5 = Rect.corners(0, y - BUTTON_SIZE, 0, y);
         y -= BUTTON_SIZE + MARGIN_VERTICAL;
         var offset4 = Rect.corners(0, 0, 0, y);
         selectedTechPanel.addWidget(RectD.FULL, offset4, selectedTechLabel);
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset6, requirementButtons);
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 0d, 1d), offset6, label3);
+        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 0d, 1d), offset5, label3);
+        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset5, new RequiredTechButtons());
+        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset6, new ProgressBar());
         selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset7, startResearchButton);
-
         addPanel(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
     }
 

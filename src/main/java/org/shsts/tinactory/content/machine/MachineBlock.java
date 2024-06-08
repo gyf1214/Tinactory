@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.tool.IWrenchable;
@@ -40,7 +41,8 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     public MachineBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType, Voltage voltage) {
         super(properties.strength(2f, 6f).requiresCorrectToolForDrops(), entityType);
         this.voltage = voltage;
-        this.resistance = Math.sqrt((double) voltage.value / 2d);
+        this.resistance = Math.sqrt((double) voltage.value / 2d) *
+                TinactoryConfig.INSTANCE.machineResistanceFactor.get();
     }
 
     public static <T extends SmartBlockEntity>

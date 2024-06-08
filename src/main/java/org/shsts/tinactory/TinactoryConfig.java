@@ -12,13 +12,15 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 public final class TinactoryConfig {
     public final ConfigValue<Integer> fluidSlotSize;
-    public final ConfigValue<Double> primitiveWorkSpeed;
-    public final ConfigValue<Integer> networkConnectDelay;
-    public final ConfigValue<Integer> networkMaxConnectsPerTick;
     public final ConfigValue<List<? extends Integer>> workerSize;
     public final ConfigValue<List<? extends Integer>> workerDelay;
     public final ConfigValue<List<? extends Integer>> workerStack;
     public final ConfigValue<List<? extends Integer>> workerFluidStack;
+    public final ConfigValue<Double> primitiveWorkSpeed;
+    public final ConfigValue<Double> machineResistanceFactor;
+    public final ConfigValue<Double> cableResistanceFactor;
+    public final ConfigValue<Integer> networkConnectDelay;
+    public final ConfigValue<Integer> networkMaxConnectsPerTick;
 
     public TinactoryConfig(ForgeConfigSpec.Builder builder) {
         builder.push("logistics");
@@ -39,6 +41,10 @@ public final class TinactoryConfig {
         builder.push("machine");
         primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
                 .defineInRange("primitive_work_speed", 0.25, 0d, 1d);
+        machineResistanceFactor = builder.comment("Machine resistance factor")
+                .defineInRange("machine_resistance_factor", 0.1d, 0d, Double.MAX_VALUE);
+        cableResistanceFactor = builder.comment("Cable resistance factor")
+                .defineInRange("cable_resistance_factor", 0.01d, 0d, Double.MAX_VALUE);
         builder.pop();
 
         builder.push("network");

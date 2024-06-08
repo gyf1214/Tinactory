@@ -51,6 +51,7 @@ import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 public final class AllItems {
     public static final RegistryEntry<CableBlock> ULV_CABLE;
     public static final RegistryEntry<Item> ULV_MACHINE_HULL;
+    public static final RegistryEntry<Item> ULV_RESEARCH_EQUIPMENT;
     public static final Map<Voltage, ComponentSet> COMPONENT_SETS;
     public static final RegistryEntry<Item> VACUUM_TUBE;
     public static final RegistryEntry<SimpleFluid> STEAM;
@@ -68,14 +69,35 @@ public final class AllItems {
                 .model(ModelGen.machineItem(Voltage.ULV, gregtech(MachineModel.IO_TEX)))
                 .register();
 
+        ULV_RESEARCH_EQUIPMENT = REGISTRATE.item("component/ulv/research_equipment", Item::new)
+                .model(ModelGen.basicItem(gregtech("items/metaitems/glass_vial/base"),
+                        gregtech("items/metaitems/glass_vial/overlay")))
+                .tint(0xFFFFFFFF, IRON.color)
+                .register();
+
         COMPONENT_SETS = ComponentSet.builder()
                 .components(Voltage.LV)
                 .material(STEEL).heat(COPPER).pipe(BRONZE).rotor(TIN).magnetic(STEEL)
-                .cable(TIN, 1.0)
+                .cable(TIN)
                 .build()
                 .components(Voltage.MV)
                 .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-                .cable(COPPER, 1.0)
+                .cable(COPPER)
+                .build()
+                // TODO
+                .components(Voltage.HV)
+                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
+                .cable(COPPER)
+                .build()
+                .components(Voltage.EV)
+                // TODO
+                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
+                .cable(COPPER)
+                .build()
+                .components(Voltage.IV)
+                // TODO
+                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
+                .cable(COPPER)
                 .build()
                 .buildObject();
 
@@ -90,11 +112,17 @@ public final class AllItems {
         return COMPONENT_SETS.get(voltage);
     }
 
+    public static RegistryEntry<Item> researchEquipment(Voltage voltage) {
+        return voltage == Voltage.ULV ? ULV_RESEARCH_EQUIPMENT :
+                componentSet(voltage).researchEquipment;
+    }
+
     public static void init() {}
 
     public static void initRecipes() {
         ulvRecipes();
         COMPONENT_SETS.values().forEach(ComponentSet::addRecipes);
+        researchEquipments();
 
         for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
             var consume = (int) voltage.value / 8 * (14 - voltage.rank);
@@ -182,6 +210,19 @@ public final class AllItems {
 
     private static void ulvMachine(MachineSet set) {
         ulvMachine(set.entry(Voltage.ULV), set.entry(Voltage.PRIMITIVE));
+    }
+
+    private static void researchEquipments() {
+        var workTicks = 200;
+
+        var item = ULV_RESEARCH_EQUIPMENT;
+        AllRecipes.ASSEMBLER.recipe(item)
+                .outputItem(2, item, 1)
+                .inputItem(0, IRON.tag("plate"), 1)
+                .inputItem(0, COPPER.tag("wire"), 1)
+                .workTicks(workTicks)
+                .voltage(Voltage.ULV)
+                .build();
     }
 }
 

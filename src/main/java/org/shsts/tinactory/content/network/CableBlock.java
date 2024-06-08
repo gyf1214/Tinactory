@@ -21,6 +21,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -60,7 +61,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         super(properties.strength(2f).requiresCorrectToolForDrops());
         this.radius = radius;
         this.voltage = voltage;
-        this.resistance = resistance;
+        this.resistance = resistance * TinactoryConfig.INSTANCE.cableResistanceFactor.get();
         this.shapes = makeShapes();
 
         var defaultState = stateDefinition.any()

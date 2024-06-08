@@ -200,28 +200,24 @@ public final class Ores {
                 builder.voltage(variant.voltage);
             }
             var tech = AllTechs.ORE.get(variant);
-            var baseProgress = 10L * (1L << (long) variant.rank);
-            var oreProgress = (long) (2d / rate);
+            var baseProgress = 50L * (1L << (long) variant.rank);
             if (!baseOre) {
                 tech = REGISTRATE.tech("ore/" + id)
-                        .maxProgress(baseProgress * oreProgress)
+                        .maxProgress(baseProgress)
                         .displayItem(ores.get(0).loc("raw"))
                         .depends(tech).buildObject();
 
                 AllRecipes.RESEARCH.recipe(tech)
                         .target(tech)
-                        .inputItem(() -> variant.baseItem)
-                        .voltage(variant.voltage)
-                        .workTicks(200)
+                        .defaultInput(variant.voltage)
                         .build();
             }
 
             for (var ore : new HashSet<>(ores)) {
                 AllRecipes.RESEARCH.recipe(tech.getPath() + "_from_" + ore.name)
-                        .target(tech).progress(oreProgress)
+                        .target(tech)
                         .inputItem(ore.tag("raw"))
                         .voltage(variant.voltage)
-                        .workTicks(200)
                         .build();
             }
 

@@ -54,7 +54,7 @@ public final class AllRecipes {
         RESEARCH = REGISTRATE.recipeType("research", ResearchRecipe.SERIALIZER)
                 .clazz(ResearchRecipe.class)
                 .builder(ResearchRecipe.Builder::new)
-                .defaults($ -> $.amperage(0.25d))
+                .defaults($ -> $.amperage(0.25d).workTicks(200))
                 .register();
 
         ASSEMBLER = REGISTRATE.assemblyRecipeType("assembler")

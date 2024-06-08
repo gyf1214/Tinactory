@@ -23,6 +23,7 @@
   "tinactory.gui.networkController.currentTechLabel": "Current Research",
   "tinactory.gui.networkController.availableTechLabel": "Available Technologies",
   "tinactory.gui.networkController.techRequirementsLabel": "Requirements",
+  "tinactory.gui.networkController.researchProgress": "Progress %s / %s",
   "tinactory.gui.networkController.startResearchButton": "Start Research",
   "tinactory.gui.portConfig.itemLabel": "Item %s",
   "tinactory.gui.portConfig.fluidLabel": "Fluid %s",

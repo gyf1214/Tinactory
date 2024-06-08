@@ -35,6 +35,7 @@ public final class ComponentSet {
     public final RegistryEntry<Item> fieldGenerator;
     public final RegistryEntry<CableBlock> cable;
     public final RegistryEntry<Item> machineHull;
+    public final RegistryEntry<Item> researchEquipment;
 
     private final List<Consumer<ComponentSet>> callbacks;
 
@@ -48,6 +49,7 @@ public final class ComponentSet {
         this.fieldGenerator = builder.dummy("field_generator");
         this.cable = builder.cableBlock();
         this.machineHull = builder.machineHull();
+        this.researchEquipment = builder.researchEquipment();
 
         this.callbacks = builder.callbacks;
     }
@@ -75,7 +77,6 @@ public final class ComponentSet {
         private MaterialSet cableMaterial = null;
         @Nullable
         private MaterialSet magneticMaterial = null;
-        private double cableResistance;
 
         private final List<Consumer<ComponentSet>> callbacks = new ArrayList<>();
 
@@ -84,9 +85,8 @@ public final class ComponentSet {
             this.voltage = voltage;
         }
 
-        public SetBuilder<P> cable(MaterialSet material, double resistance) {
+        public SetBuilder<P> cable(MaterialSet material) {
             cableMaterial = material;
-            cableResistance = resistance;
             return this;
         }
 
@@ -133,10 +133,19 @@ public final class ComponentSet {
         private RegistryEntry<CableBlock> cableBlock() {
             assert cableMaterial != null;
             var id = "network/cable/" + voltage.id;
-            return REGISTRATE.block(id, CableBlock.cable(voltage, cableResistance))
+            return REGISTRATE.block(id, CableBlock.cable(voltage, 1d))
                     .transform(ModelGen.cable())
                     .tint(CableBlock.INSULATION_COLOR, cableMaterial.color)
                     .tag(AllTags.MINEABLE_WITH_CUTTER)
+                    .register();
+        }
+
+        private RegistryEntry<Item> researchEquipment() {
+            assert mainMaterial != null;
+            return REGISTRATE.item("component/" + voltage.id + "/research_equipment", Item::new)
+                    .model(ModelGen.basicItem(gregtech("items/metaitems/glass_vial/base"),
+                            gregtech("items/metaitems/glass_vial/overlay")))
+                    .tint(0xFFFFFFFF, mainMaterial.color)
                     .register();
         }
 
