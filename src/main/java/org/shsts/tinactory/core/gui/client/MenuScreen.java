@@ -117,7 +117,7 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         }
         for (var hoverable : hoverables) {
             if (hoverable instanceof MenuWidget widget && widget.isHovering(mouseX, mouseY)) {
-                widget.getTooltip().ifPresent(tooltip ->
+                widget.getTooltip(mouseX, mouseY).ifPresent(tooltip ->
                         renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
                 return;
             } else if (hoverable instanceof AbstractWidget widget && widget.isHoveredOrFocused()) {

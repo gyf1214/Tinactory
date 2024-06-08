@@ -102,7 +102,7 @@ public class PortConfigPanel extends Panel {
         }
 
         @Override
-        public Optional<List<Component>> getTooltip() {
+        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
             var subKey = I18n.tr("tinactory.tooltip.portConfig." + direction.name().toLowerCase());
             var tooltip = switch (machineConfig.getPortConfig(port)) {
                 case NONE -> I18n.tr("tinactory.tooltip.portConfig.none", subKey);
@@ -118,7 +118,7 @@ public class PortConfigPanel extends Panel {
         private final List<Layout.SlotInfo> slots;
 
         public ConfigLabel(Menu<?, ?> menu, Component line, List<Layout.SlotInfo> slots) {
-            super(menu, Label.Alignment.BEGIN, line);
+            super(menu, line);
             this.slots = slots;
             this.verticalAlign = Label.Alignment.MIDDLE;
             this.color = TEXT_COLOR;

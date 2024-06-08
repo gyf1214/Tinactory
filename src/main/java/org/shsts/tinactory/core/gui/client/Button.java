@@ -39,7 +39,7 @@ public abstract class Button extends MenuWidget {
     }
 
     @Override
-    public Optional<List<Component>> getTooltip() {
+    public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
         return Optional.ofNullable(tooltip).map(List::of);
     }
 

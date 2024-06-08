@@ -46,7 +46,7 @@ public class FluidSlot extends MenuWidget {
     }
 
     @Override
-    public Optional<List<Component>> getTooltip() {
+    public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
         var fluidStack = getFluidStack();
         if (fluidStack.isEmpty() || fluidStack.getFluid() == null) {
             return Optional.empty();

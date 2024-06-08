@@ -36,14 +36,14 @@ public class Label extends MenuWidget {
     public int color = RenderUtil.TEXT_COLOR;
     public Alignment horizontalAlign = Alignment.BEGIN;
     public Alignment verticalAlign = Alignment.BEGIN;
+    public int spacing = Menu.SPACING;
 
     public Label(Menu<?, ?> menu) {
         super(menu);
     }
 
-    public Label(Menu<?, ?> menu, Alignment horizontalAlign, Component... lines) {
+    public Label(Menu<?, ?> menu, Component... lines) {
         super(menu);
-        this.horizontalAlign = horizontalAlign;
         setLines(lines);
     }
 
@@ -51,7 +51,7 @@ public class Label extends MenuWidget {
         cacheWidth = lines.stream()
                 .mapToInt(font::width)
                 .max().orElse(0);
-        cacheHeight = lines.size() * LINE_HEIGHT;
+        cacheHeight = lines.size() * (LINE_HEIGHT + spacing) - spacing;
     }
 
     public void setLines(Component... values) {
@@ -74,7 +74,7 @@ public class Label extends MenuWidget {
         int y = rect.inY(verticalAlign.value) - (int) (cacheHeight * verticalAlign.value);
         for (var line : lines) {
             RenderUtil.renderText(poseStack, line, x, y, color);
-            y += LINE_HEIGHT;
+            y += LINE_HEIGHT + spacing;
         }
     }
 }

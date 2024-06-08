@@ -43,7 +43,7 @@ public abstract class ButtonPanel extends Panel {
         }
 
         @Override
-        public Optional<List<Component>> getTooltip() {
+        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
             return buttonTooltip(index);
         }
 

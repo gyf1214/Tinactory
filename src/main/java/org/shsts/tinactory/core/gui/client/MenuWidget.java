@@ -59,7 +59,7 @@ public abstract class MenuWidget extends GuiComponent implements
         return active && canHover() && rect.in(mouseX, mouseY);
     }
 
-    public Optional<List<Component>> getTooltip() {
+    public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
         return Optional.empty();
     }
 

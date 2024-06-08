@@ -29,6 +29,8 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.client.Label.LINE_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 
@@ -37,10 +39,10 @@ import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 @ParametersAreNonnullByDefault
 public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final int LEFT_MARGIN = 28;
-    private static final int TOP_MARGIN = 48;
-    private static final int BOTTOM_MARGIN = 28;
-    private static final int BUTTON_WIDTH = 72;
+    private static final int WELCOME_BUTTON_WIDTH = 72;
+    private static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
+    private static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + LINE_HEIGHT +
+            MARGIN_VERTICAL * 3 + MARGIN_TOP;
 
     private final Panel welcomePanel;
     private final EditBox welcomeEdit;
@@ -58,12 +60,13 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         super(menu, inventory, title);
 
         this.welcomePanel = new Panel(this);
-        var welcomeLabel = new Label(menu, Label.Alignment.END, tr("welcome"));
+        var welcomeLabel = new Label(menu, tr("welcome"));
+        welcomeLabel.horizontalAlign = Label.Alignment.END;
         this.welcomeEdit = Widgets.editBox();
         var welcomeButton = Widgets.simpleButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
         welcomePanel.addWidget(welcomeLabel);
         welcomePanel.addVanillaWidget(new Rect(0, -1, 64, EDIT_BOX_LINE_HEIGHT), welcomeEdit);
-        welcomePanel.addWidget(new Rect(-BUTTON_WIDTH / 2, 20, BUTTON_WIDTH, BUTTON_HEIGHT), welcomeButton);
+        welcomePanel.addWidget(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT), welcomeButton);
 
         var statePanel = new Panel(this);
         this.stateLabel = new Label(menu);
@@ -82,14 +85,15 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         TechManager.client().onProgressChange(onTechChange);
         statePanel.setActive(false);
         welcomePanel.setActive(false);
+
+        this.imageWidth = WIDTH;
+        this.imageHeight = HEIGHT;
     }
 
     @Override
     protected void init() {
-        imageWidth = width - 2 * LEFT_MARGIN;
-        leftPos = LEFT_MARGIN;
-        imageHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
-        topPos = TOP_MARGIN;
+        leftPos = (width - WIDTH) / 2;
+        topPos = (height - HEIGHT - Tab.BUTTON_OFFSET) / 2 + Tab.BUTTON_OFFSET;
         initRect();
     }
 

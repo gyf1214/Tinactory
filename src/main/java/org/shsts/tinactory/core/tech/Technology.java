@@ -14,12 +14,10 @@ import org.shsts.tinactory.api.tech.ITechnology;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -27,7 +25,7 @@ public class Technology implements ITechnology {
     @Nullable
     private ResourceLocation loc = null;
     private final List<ResourceLocation> dependIds;
-    private final Set<ITechnology> depends = new HashSet<>();
+    private final List<ITechnology> depends = new ArrayList<>();
     public final Map<String, Integer> modifiers;
     public final long maxProgress;
     public final Item displayItem;
@@ -64,7 +62,7 @@ public class Technology implements ITechnology {
     }
 
     @Override
-    public Collection<ITechnology> getDepends() {
+    public List<ITechnology> getDepends() {
         return depends;
     }
 

@@ -28,12 +28,14 @@ import org.shsts.tinactory.core.util.I18n;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
-import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_BORDER;
 import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.client.Label.LINE_HEIGHT;
 
@@ -45,14 +47,20 @@ public class TechPanel extends Panel {
     private static final int AVAILABLE_COLOR = 0xFFFFFFAA;
     private static final int INVALID_COLOR = 0xFFFFAAAA;
 
-    private static final int BUTTON_SIZE = 24;
-    private static final int LEFT_WIDTH = PANEL_BORDER * 2 + BUTTON_SIZE * 6;
 
-    private final Label techLabel;
-    private final TechButton currentTechButton;
-    private final Button startResearchButton;
+    public static final int BUTTON_SIZE = 24;
+    private static final int PANEL_BORDER = 2;
+    private static final int LEFT_WIDTH = PANEL_BORDER * 2 + BUTTON_SIZE * 5;
+    public static final int LEFT_OFFSET = LEFT_WIDTH + MARGIN_HORIZONTAL * 2;
+    public static final int RIGHT_WIDTH = LEFT_WIDTH + BUTTON_SIZE * 2;
+    private static final Rect BUTTON_PANEL_BG = BACKGROUND_TEX_RECT.offset(6, 6).enlarge(-12, -12);
+
     private final ITechManager techManager;
+    private final TechButton currentTechButton;
     private final List<ITechnology> availableTechs = new ArrayList<>();
+    private final Panel selectedTechPanel;
+    private final Label selectedTechLabel;
+    private final Button startResearchButton;
     @Nullable
     private ITeamProfile team = null;
     @Nullable
@@ -78,7 +86,7 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        public Optional<List<Component>> getTooltip() {
+        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
             return technology == null ? Optional.empty() : techTooltip(technology);
         }
 
@@ -118,35 +126,90 @@ public class TechPanel extends Panel {
         }
     }
 
+    private class RequiredTechButtons extends Button {
+        public RequiredTechButtons() {
+            super(TechPanel.this.menu);
+        }
+
+        @Override
+        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+            var depends = selectedTech == null ? List.<ITechnology>of() : selectedTech.getDepends();
+            var z = getBlitOffset();
+
+            var i = 0;
+            for (var depend : depends) {
+                var x = rect.endX() - (i + 1) * BUTTON_SIZE;
+                var y = rect.y();
+                renderTechButton(poseStack, z, new Rect(x, y, BUTTON_SIZE, BUTTON_SIZE), depend, true);
+                i++;
+            }
+        }
+
+        private Optional<ITechnology> getSelectedTech(double mouseX) {
+            if (selectedTech == null) {
+                return Optional.empty();
+            }
+            var depends = selectedTech.getDepends();
+            var index = (int) Math.floor((rect.endX() - mouseX) / BUTTON_SIZE);
+
+            return index >= 0 && index < depends.size() ? Optional.of(depends.get(index)) : Optional.empty();
+        }
+
+        @Override
+        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
+            return getSelectedTech(mouseX).flatMap(TechPanel.this::techTooltip);
+        }
+
+        @Override
+        public void onMouseClicked(double mouseX, double mouseY, int button) {
+            getSelectedTech(mouseX).ifPresent(tech -> {
+                super.onMouseClicked(mouseX, mouseY, button);
+                onSelect(tech);
+            });
+        }
+    }
+
     public TechPanel(MenuScreen<?> screen) {
         super(screen);
         this.techManager = TechManager.client();
 
-        var label1 = new Label(menu, Label.Alignment.BEGIN, tr("currentTechLabel"));
+        var label1 = new Label(menu, tr("currentTechLabel"));
         label1.verticalAlign = Label.Alignment.MIDDLE;
         this.currentTechButton = new TechButton(true);
-        addWidget(new Rect(LEFT_WIDTH - BUTTON_SIZE, 0, BUTTON_SIZE, BUTTON_SIZE), currentTechButton);
-        addWidget(new Rect(0, 0, LEFT_WIDTH - BUTTON_SIZE, BUTTON_SIZE), label1);
-
-        this.techLabel = new Label(menu, Label.Alignment.BEGIN, tr("techDetails"));
-        this.startResearchButton = Widgets.simpleButton(menu, tr("startResearchButton"), null,
-                this::startResearch);
-        var offset1 = Rect.corners(0, BUTTON_SIZE + SPACING, LEFT_WIDTH, -SPACING * 2 - Widgets.BUTTON_HEIGHT);
-        var offset2 = Rect.corners(0, -SPACING - Widgets.BUTTON_HEIGHT, LEFT_WIDTH, -SPACING);
-        addWidget(RectD.corners(0d, 0d, 0d, 0.5), offset1, techLabel);
-        addWidget(RectD.corners(0d, 0.5, 0d, 0.5), offset2, startResearchButton);
+        addWidget(new Rect(0, 0, LEFT_WIDTH - BUTTON_SIZE - 2, BUTTON_SIZE), label1);
+        addWidget(new Rect(LEFT_WIDTH - BUTTON_SIZE - 2, 0, BUTTON_SIZE, BUTTON_SIZE), currentTechButton);
 
         this.availableTechPanel = new TechButtonPanel();
-        var label2 = new Label(menu, Label.Alignment.BEGIN, tr("availableTechLabel"));
-        var anchor1 = RectD.corners(0d, 0.5, 0d, 1d);
-        var offset3 = Rect.corners(0, LINE_HEIGHT + SPACING, LEFT_WIDTH, 0);
-        var offset4 = offset3.offset(PANEL_BORDER, PANEL_BORDER).enlarge(-PANEL_BORDER * 2, -PANEL_BORDER * 2);
-        var bg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);
-        addWidget(RectD.corners(0d, 0.5, 0d, 0.5d), new Rect(0, 0, LEFT_WIDTH, LINE_HEIGHT), label2);
-        addWidget(anchor1, offset3, bg);
-        addPanel(anchor1, offset4, availableTechPanel);
+        var label2 = new Label(menu, tr("availableTechLabel"));
+        var anchor1 = RectD.corners(0d, 0d, 0d, 1d);
+        var top = BUTTON_SIZE + MARGIN_VERTICAL * 2;
+        var offset1 = Rect.corners(-1, top + LINE_HEIGHT + SPACING, LEFT_WIDTH - 1, 0);
+        var offset2 = offset1.offset(PANEL_BORDER, PANEL_BORDER).enlarge(-PANEL_BORDER * 2, -PANEL_BORDER * 2);
+        var bg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
+        addWidget(new Rect(0, top, LEFT_WIDTH, LINE_HEIGHT), label2);
+        addWidget(anchor1, offset1, bg);
+        addPanel(anchor1, offset2, availableTechPanel);
 
+        this.selectedTechPanel = new Panel(screen);
 
+        this.selectedTechLabel = new Label(menu);
+        var label3 = new Label(menu, tr("techRequirementsLabel"));
+        label3.verticalAlign = Label.Alignment.MIDDLE;
+        var requirementButtons = new RequiredTechButtons();
+        this.startResearchButton = Widgets.simpleButton(menu, tr("startResearchButton"),
+                null, this::startResearch);
+        var y = 0;
+        var offset7 = Rect.corners(0, y - Widgets.BUTTON_HEIGHT, 0, y);
+        y -= Widgets.BUTTON_HEIGHT + MARGIN_VERTICAL;
+        var offset6 = Rect.corners(0, y - BUTTON_SIZE, 0, y);
+        y -= BUTTON_SIZE + MARGIN_VERTICAL;
+        var offset4 = Rect.corners(0, 0, 0, y);
+        selectedTechPanel.addWidget(RectD.FULL, offset4, selectedTechLabel);
+        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset6, requirementButtons);
+        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 0d, 1d), offset6, label3);
+        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset7, startResearchButton);
+
+        addPanel(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
     }
 
     private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,
@@ -199,14 +262,13 @@ public class TechPanel extends Panel {
             return;
         }
 
-        if (selectedTech == null) {
-            techLabel.setLines();
-        } else {
-            techLabel.setLine(0, I18n.tr(selectedTech.getDescriptionId()));
-            techLabel.setLine(1, I18n.tr(selectedTech.getDetailsId()));
-        }
+        selectedTechPanel.setActive(selectedTech != null);
 
-        startResearchButton.setActive(selectedTech != null && team.canResearch(selectedTech));
+        if (selectedTech != null) {
+            selectedTechLabel.setLine(0, I18n.tr(selectedTech.getDescriptionId()));
+            selectedTechLabel.setLine(1, I18n.tr(selectedTech.getDetailsId()));
+            startResearchButton.setActive(team.canResearch(selectedTech));
+        }
     }
 
     @Override
@@ -219,11 +281,15 @@ public class TechPanel extends Panel {
         currentTechButton.technology = targetTech;
         currentTechButton.setActive(targetTech != null);
 
+        if (selectedTech == null) {
+            selectedTech = targetTech;
+        }
         refreshSelected();
 
         availableTechs.clear();
         availableTechs.addAll(techManager.allTechs().stream()
-                .filter(team::canResearch)
+                .sorted(Comparator.comparing(tech -> team.canResearch(tech) ? 0 :
+                        (team.isTechFinished(tech) ? 2 : 1)))
                 .toList());
         availableTechPanel.refresh();
     }

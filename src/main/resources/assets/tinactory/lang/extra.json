@@ -22,7 +22,7 @@
   "tinactory.gui.networkController.workFactorLabel": "Power Grid: %s",
   "tinactory.gui.networkController.currentTechLabel": "Current Research",
   "tinactory.gui.networkController.availableTechLabel": "Available Technologies",
-  "tinactory.gui.networkController.techDetails": "Details",
+  "tinactory.gui.networkController.techRequirementsLabel": "Requirements",
   "tinactory.gui.networkController.startResearchButton": "Start Research",
   "tinactory.gui.portConfig.itemLabel": "Item %s",
   "tinactory.gui.portConfig.fluidLabel": "Fluid %s",
