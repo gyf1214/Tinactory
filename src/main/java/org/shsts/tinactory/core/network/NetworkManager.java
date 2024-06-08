@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.shsts.tinactory.core.common.WeakMap;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -20,7 +21,7 @@ public class NetworkManager {
 
     private final Level world;
     private final Map<BlockPos, NetworkBase> networks = new HashMap<>();
-    private final Map<BlockPos, NetworkBase.Ref> networkPosMap = new HashMap<>();
+    private final WeakMap<BlockPos, NetworkBase> networkPosMap = new WeakMap<>();
     private final Map<String, NetworkBase> teamNetworks = new HashMap<>();
 
     public NetworkManager(Level world) {
@@ -33,14 +34,13 @@ public class NetworkManager {
     }
 
     public Optional<NetworkBase> getNetworkAtPos(BlockPos pos) {
-        return Optional.ofNullable(networks.get(pos)).or(() ->
-                Optional.ofNullable(networkPosMap.get(pos)).flatMap(NetworkBase.Ref::get));
+        return Optional.ofNullable(networks.get(pos)).or(() -> networkPosMap.get(pos));
     }
 
     public void putNetworkAtPos(BlockPos pos, NetworkBase network) {
         assert !hasNetworkAtPos(pos);
         LOGGER.debug("track block at {}:{} to network {}", world.dimension(), pos, network);
-        networkPosMap.put(pos, network.ref());
+        network.addToMap(networkPosMap, pos);
     }
 
     public boolean registerNetwork(NetworkBase network) {

@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.TinactoryConfig;
+import org.shsts.tinactory.core.common.WeakMap;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.slf4j.Logger;
 
@@ -38,21 +39,8 @@ public class NetworkBase {
     private State state;
     private int delayTicks;
 
-    public static class Ref {
-        @Nullable
-        private NetworkBase network;
-
-        public Ref(NetworkBase network) {
-            this.network = network;
-        }
-
-        public Optional<NetworkBase> get() {
-            return Optional.ofNullable(network);
-        }
-    }
-
     @Nullable
-    private Ref ref;
+    private WeakMap.Ref<NetworkBase> ref = null;
 
     private class BFSContext {
         private final Queue<BlockPos> queue = new ArrayDeque<>();
@@ -130,7 +118,7 @@ public class NetworkBase {
         }
         onDisconnect();
         if (ref != null) {
-            ref.network = null;
+            ref.invalidate();
         }
         reset();
         LOGGER.debug("network {}: invalidated", this);
@@ -142,7 +130,7 @@ public class NetworkBase {
         }
         onDisconnect();
         if (ref != null) {
-            ref.network = null;
+            ref.invalidate();
         }
         ref = null;
         state = State.DESTROYED;
@@ -151,11 +139,12 @@ public class NetworkBase {
         LOGGER.debug("network {}: destroyed", this);
     }
 
-    public Ref ref() {
+    public <K> void addToMap(WeakMap<K, NetworkBase> map, K key) {
         if (ref == null) {
-            ref = new Ref(this);
+            ref = map.put(key, this);
+        } else {
+            map.put(key, ref);
         }
-        return ref;
     }
 
     protected void connectFinish() {
