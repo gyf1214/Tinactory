@@ -3,44 +3,35 @@ package org.shsts.tinactory.content.machine;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
-import org.jetbrains.annotations.NotNull;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.slf4j.Logger;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
-
-import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_TICK;
+import java.util.List;
+import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricFurnace extends CapabilityProvider
-        implements IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
+public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements IElectricMachine {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final BlockEntity blockEntity;
     private final Voltage voltage;
     private final double workFactor;
 
@@ -48,118 +39,62 @@ public class ElectricFurnace extends CapabilityProvider
     private RecipeWrapper inputWrapper;
     private IItemCollection outputPort;
 
-    @Nullable
-    private ResourceLocation currentRecipeLoc = null;
-    @Nullable
-    private SmeltingRecipe currentRecipe = null;
-    @Nullable
-    private SmeltingRecipe targetRecipe = null;
-    private long workProgress = 0L;
-    private boolean needUpdate = true;
-
     public ElectricFurnace(BlockEntity blockEntity, Voltage voltage) {
-        this.blockEntity = blockEntity;
+        super(blockEntity, RecipeType.SMELTING);
         this.voltage = voltage;
         this.workFactor = 1 << (voltage.rank - 1);
     }
 
-    private void setUpdateRecipe() {
-        if (currentRecipe == null) {
-            needUpdate = true;
-        }
-    }
-
-    private boolean canSmelt(SmeltingRecipe recipe) {
+    @Override
+    protected boolean matches(Level world, SmeltingRecipe recipe, IContainer container) {
         var result = recipe.assemble(inputWrapper);
         return outputPort.acceptInput(result) && outputPort.insertItem(result, true).isEmpty();
     }
 
-    private void updateRecipe() {
-        if (currentRecipe != null || !needUpdate) {
-            return;
-        }
-        var world = blockEntity.getLevel();
-        assert world != null;
-        assert currentRecipeLoc == null;
-        currentRecipe = world.getRecipeManager()
-                .getRecipeFor(RecipeType.SMELTING, inputWrapper, world)
-                .filter(this::canSmelt)
-                .orElse(null);
-
-        workProgress = 0;
-        if (currentRecipe != null) {
-            var ingredient = currentRecipe.getIngredients().get(0);
-            ItemHelper.consumeItemCollection(inputPort, ingredient, 1, false);
-        }
-        needUpdate = false;
-        blockEntity.setChanged();
+    @Override
+    protected List<? extends SmeltingRecipe> getMatchedRecipes(Level world, IContainer container) {
+        return world.getRecipeManager().getRecipeFor(recipeType, inputWrapper, world)
+                .filter($ -> matches(world, $, container))
+                .map(List::of).orElse(List.of());
     }
 
-    private void setTargetRecipe(ResourceLocation loc) {
-        var world = blockEntity.getLevel();
-        assert world != null;
-        var recipe = world.getRecipeManager().byKey(loc);
-        if (recipe.isEmpty() || !(recipe.get() instanceof SmeltingRecipe recipe1) ||
-                recipe1.getType() != RecipeType.SMELTING) {
-            resetTargetRecipe();
-            return;
-        }
-        targetRecipe = recipe1;
+    @Override
+    protected boolean allowTargetRecipe(Recipe<?> recipe) {
+        return recipe.getType() == RecipeType.SMELTING;
+    }
+
+    @Override
+    protected void doSetTargetRecipe(Recipe<?> recipe) {
+        targetRecipe = (SmeltingRecipe) recipe;
         inputPort.setItemFilter(targetRecipe.getIngredients());
     }
 
-    private void resetTargetRecipe() {
+    @Override
+    public void resetTargetRecipe() {
+        LOGGER.debug("update target recipe = <null>");
         targetRecipe = null;
         inputPort.resetItemFilter();
     }
 
-    private void updateTargetRecipe() {
-        var loc = AllCapabilities.MACHINE.tryGet(blockEntity)
-                .flatMap(m -> m.config.getLoc("targetRecipe"))
-                .orElse(null);
-        LOGGER.debug("update target recipe = {}", loc);
-        if (loc == null) {
-            resetTargetRecipe();
-        } else {
-            setTargetRecipe(loc);
-        }
-    }
-
-    private void onLoad() {
-        var container = AllCapabilities.CONTAINER.get(blockEntity);
-        inputPort = container.getPort(0, false).asItem();
-        outputPort = container.getPort(1, true).asItem();
-        inputWrapper = new RecipeWrapper((IItemHandlerModifiable)
-                ((ItemHandlerCollection) inputPort).itemHandler);
-    }
-
-    private void onServerLoad(Level world) {
-        onLoad();
-
-        var recipeManager = world.getRecipeManager();
-        currentRecipe = (SmeltingRecipe) Optional.ofNullable(currentRecipeLoc)
-                .flatMap(recipeManager::byKey)
-                .filter(r -> r.getType() == RecipeType.SMELTING)
-                .orElse(null);
-        currentRecipeLoc = null;
-        if (currentRecipe != null) {
-            needUpdate = false;
-        }
-
-        updateTargetRecipe();
-    }
-
-    private void onMachineConfig() {
-        updateTargetRecipe();
-        setUpdateRecipe();
+    @Override
+    protected void onWorkBegin(SmeltingRecipe recipe, IContainer container) {
+        var ingredient = recipe.getIngredients().get(0);
+        ItemHelper.consumeItemCollection(inputPort, ingredient, 1, false);
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
+    protected long onWorkProgress(SmeltingRecipe recipe, double partial) {
+        return (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
+    }
+
+    @Override
+    protected void onWorkDone(SmeltingRecipe recipe, IContainer container, Random random) {
+        outputPort.insertItem(recipe.assemble(inputWrapper), false);
+    }
+
+    @Override
+    protected long getMaxWorkProgress(SmeltingRecipe recipe) {
+        return recipe.getCookingTime() * PROGRESS_PER_TICK;
     }
 
     @Override
@@ -183,62 +118,20 @@ public class ElectricFurnace extends CapabilityProvider
     }
 
     @Override
-    public void onPreWork() {
-        updateRecipe();
+    public void onLoad() {
+        container = AllCapabilities.CONTAINER.get(blockEntity);
+        inputPort = container.getPort(0, false).asItem();
+        outputPort = container.getPort(1, true).asItem();
+        inputWrapper = new RecipeWrapper((IItemHandlerModifiable)
+                ((ItemHandlerCollection) inputPort).itemHandler);
     }
 
-    private long getMaxProgress() {
-        assert currentRecipe != null;
-        return currentRecipe.getCookingTime() * PROGRESS_PER_TICK;
-    }
-
+    @Nonnull
     @Override
-    public void onWorkTick(double partial) {
-        if (currentRecipe == null) {
-            return;
-        }
-        var progress = (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
-        workProgress += progress;
-        if (workProgress >= getMaxProgress()) {
-            outputPort.insertItem(currentRecipe.assemble(inputWrapper), false);
-            currentRecipe = null;
-            needUpdate = true;
-        }
-        blockEntity.setChanged();
-    }
-
-    @Override
-    public double getProgress() {
-        return currentRecipe == null ? 0d : (double) workProgress / (double) getMaxProgress();
-    }
-
-    @NotNull
-    @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.PROCESSOR.get() || cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
             return myself();
         }
-        return LazyOptional.empty();
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        var tag = new CompoundTag();
-        if (currentRecipe != null) {
-            tag.putString("currentRecipe", currentRecipe.getId().toString());
-            tag.putLong("workProgress", workProgress);
-        }
-        return tag;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag tag) {
-        currentRecipe = null;
-        if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
-            currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
-            workProgress = tag.getLong("workProgress");
-        } else {
-            currentRecipeLoc = null;
-        }
+        return super.getCapability(cap, side);
     }
 }

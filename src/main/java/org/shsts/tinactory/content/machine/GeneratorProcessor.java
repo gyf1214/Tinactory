@@ -11,8 +11,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class GeneratorProcessor extends MachineProcessor<GeneratorRecipe> {
-    protected GeneratorProcessor(BlockEntity blockEntity, RecipeType<? extends GeneratorRecipe> recipeType,
-                                 Voltage voltage) {
+    public GeneratorProcessor(BlockEntity blockEntity, RecipeType<? extends GeneratorRecipe> recipeType,
+                              Voltage voltage) {
         super(blockEntity, recipeType, voltage);
     }
 
@@ -23,7 +23,7 @@ public class GeneratorProcessor extends MachineProcessor<GeneratorRecipe> {
     }
 
     @Override
-    protected long getProgressPerTick(double partial) {
+    protected long onWorkProgress(GeneratorRecipe recipe, double partial) {
         return PROGRESS_PER_TICK;
     }
 
