@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -198,10 +199,6 @@ public class Machine extends UpdatableCapabilityProvider
         return AllCapabilities.ELECTRIC_MACHINE.tryGet(blockEntity);
     }
 
-    public Optional<LogisticsComponent> getLogistics() {
-        return getNetwork().map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT));
-    }
-
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
@@ -236,5 +233,20 @@ public class Machine extends UpdatableCapabilityProvider
 
     public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, "network/machine", Machine::new);
+    }
+
+    public static Optional<IProcessor> getProcessor(BlockEntity be) {
+        if (be instanceof PrimitiveMachine) {
+            return AllCapabilities.PROCESSOR.tryGet(be);
+        }
+        return AllCapabilities.MACHINE.tryGet(be).flatMap(Machine::getProcessor);
+    }
+
+    public static Optional<IContainer> getContainer(BlockEntity be) {
+        return AllCapabilities.MACHINE.tryGet(be).flatMap(Machine::getContainer);
+    }
+
+    public static Optional<IElectricMachine> getElectric(BlockEntity be) {
+        return AllCapabilities.MACHINE.tryGet(be).flatMap(Machine::getElectric);
     }
 }

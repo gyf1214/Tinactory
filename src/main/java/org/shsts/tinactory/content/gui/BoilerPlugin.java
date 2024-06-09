@@ -3,8 +3,9 @@ package org.shsts.tinactory.content.gui;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.Boiler;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -27,9 +28,9 @@ public class BoilerPlugin implements IMenuPlugin<ProcessingMenu> {
 
     public BoilerPlugin(ProcessingMenu menu) {
         this.burnSlot = menu.addSyncSlot(MenuSyncPacket.Double::new,
-                be -> AllCapabilities.PROCESSOR.get(be).getProgress());
+                be -> Machine.getProcessor(be).map(IProcessor::getProgress).orElse(0d));
         this.heatSlot = menu.addSyncSlot(MenuSyncPacket.Double::new,
-                be -> ((Boiler) AllCapabilities.PROCESSOR.get(be)).getHeat() / MAX_HEAT);
+                be -> Machine.getProcessor(be).map($ -> ((Boiler) $).getHeat() / MAX_HEAT).orElse(0d));
     }
 
     @OnlyIn(Dist.CLIENT)
