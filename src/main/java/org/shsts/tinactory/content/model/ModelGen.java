@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
+import org.shsts.tinactory.content.machine.SidedMachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.OreVariant;
@@ -138,6 +139,12 @@ public final class ModelGen {
     Transformer<S> primitiveMachine(ResourceLocation casing, ResourceLocation front) {
         var model = new MachineModel(casing, front);
         return $ -> $.blockState(model::primitiveBlockState).translucent();
+    }
+
+    public static <S extends BlockBuilder<? extends SidedMachineBlock<?>, ?, S>>
+    Transformer<S> sidedMachine(ResourceLocation casing, ResourceLocation front) {
+        var model = new MachineModel(casing, front);
+        return $ -> $.blockState(model::sidedBlockState).translucent();
     }
 
     public static <S extends BlockBuilder<? extends Block, ?, S>>

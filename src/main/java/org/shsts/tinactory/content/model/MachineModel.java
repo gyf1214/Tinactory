@@ -7,6 +7,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -29,7 +30,7 @@ public final class MachineModel {
 
     private static final String IO_MODEL = "block/machine/io";
     private static final String IO_TEX_KEY = "io_overlay";
-    public static final String IO_TEX = "blocks/overlay/machine/overlay_energy_out";
+    public static final String IO_TEX = "blocks/overlay/appeng/me_output_bus";
 
     private static void genCasingModel(DataContext<BlockStateProvider> ctx) {
         var model = ctx.provider.models().withExistingParent(CASING_MODEL, ModelGen.mcLoc("block/block"))
@@ -108,8 +109,21 @@ public final class MachineModel {
     }
 
     public void primitiveBlockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var casing = genModel(ctx.id, ctx.provider.models());
-        ctx.provider.horizontalBlock(ctx.object, casing);
+        var model = genModel(ctx.id, ctx.provider.models());
+        ctx.provider.horizontalBlock(ctx.object, model);
+    }
+
+    public void sidedBlockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var model = genModel(ctx.id, ctx.provider.models());
+        ctx.provider.getVariantBuilder(ctx.object)
+                .forAllStates(state -> {
+                    var dir = state.getValue(MachineBlock.IO_FACING);
+                    return ConfiguredModel.builder()
+                            .modelFile(model)
+                            .rotationX(ModelGen.yRotation(dir))
+                            .rotationY(ModelGen.yRotation(dir))
+                            .build();
+                });
     }
 
     public void blockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {

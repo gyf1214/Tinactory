@@ -15,8 +15,10 @@ import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.ProcessingSet;
+import org.shsts.tinactory.content.machine.SidedMachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
+import org.shsts.tinactory.content.model.MachineModel;
 import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -63,7 +65,7 @@ public final class AllBlockEntities {
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
-    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
+    public static final BlockEntitySet<SmartBlockEntity, SidedMachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -280,7 +282,7 @@ public final class AllBlockEntities {
                 .register();
 
         MULTI_BLOCK_INTERFACE = REGISTRATE.blockEntitySet("multi_block/interface",
-                        SmartBlockEntity::new, MachineBlock.factory(Voltage.PRIMITIVE))
+                        SmartBlockEntity::new, MachineBlock.sided(Voltage.LV))
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
                 .eventManager()
@@ -291,7 +293,8 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .block()
-                .transform(ModelGen.machine(Voltage.LV, gregtech("blocks/multiblock/blast_furnace")))
+                .transform(ModelGen.sidedMachine(gregtech("blocks/casings/solid/machine_casing_solid_steel"),
+                        gregtech(MachineModel.IO_TEX)))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .build()

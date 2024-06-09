@@ -50,6 +50,11 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
         return (properties, entityType) -> new MachineBlock<>(properties, entityType, voltage);
     }
 
+    public static <T extends SmartBlockEntity>
+    EntityBlockBuilder.Factory<T, SidedMachineBlock<T>> sided(Voltage voltage) {
+        return (properties, entityType) -> new SidedMachineBlock<>(properties, entityType, voltage);
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, IO_FACING);
@@ -77,7 +82,8 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     }
 
     @Override
-    public void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool, Direction dir, boolean sneaky) {
+    public void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool,
+                             Direction dir, boolean sneaky) {
         if (!sneaky && dir != state.getValue(FACING)) {
             setIOFacing(world, pos, state, dir);
         }
