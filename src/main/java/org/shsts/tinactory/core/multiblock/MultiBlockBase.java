@@ -22,7 +22,7 @@ import java.util.Optional;
 public abstract class MultiBlockBase extends CapabilityProvider implements IEventSubscriber {
     private static final int CHECK_CYCLE = 40;
 
-    protected final BlockEntity blockEntity;
+    public final BlockEntity blockEntity;
     protected MultiBlockManager manager;
     @Nullable
     protected WeakMap.Ref<MultiBlockBase> ref = null;
@@ -40,7 +40,8 @@ public abstract class MultiBlockBase extends CapabilityProvider implements IEven
         }
     }
 
-    protected abstract boolean checkMultiBlock(int dx, int dy, int dz, BlockState blockState);
+    protected abstract boolean checkMultiBlock(Level world, int dx, int dy, int dz,
+                                               BlockPos pos, BlockState blockState);
 
     protected Optional<Collection<BlockPos>> checkMultiBlock(BlockPos start, int tx, int ty, int tz) {
         var world = blockEntity.getLevel();
@@ -58,7 +59,7 @@ public abstract class MultiBlockBase extends CapabilityProvider implements IEven
                     } else if (pos.equals(myPos)) {
                         continue;
                     }
-                    if (!checkMultiBlock(dx, dy, dz, world.getBlockState(pos))) {
+                    if (!checkMultiBlock(world, dx, dy, dz, pos, world.getBlockState(pos))) {
                         return Optional.empty();
                     }
                     list.add(pos);
@@ -85,8 +86,6 @@ public abstract class MultiBlockBase extends CapabilityProvider implements IEven
 
     private void onServerLoad(Level world) {
         manager = MultiBlockManager.get(world);
-        invalidate();
-        checkMultiBlock().ifPresent(blocks -> manager.register(this, blocks));
     }
 
     private void onRemove() {

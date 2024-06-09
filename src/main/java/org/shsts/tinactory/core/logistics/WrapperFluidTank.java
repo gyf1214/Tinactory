@@ -10,9 +10,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
@@ -21,7 +20,8 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     public static final WrapperFluidTank EMPTY = new WrapperFluidTank(0);
 
     private final IFluidTank tank;
-    private final List<Runnable> updateListeners = new ArrayList<>();
+    @Nullable
+    private Runnable updateListener = null;
     public boolean allowInput = true;
     public boolean allowOutput = true;
     public Predicate<FluidStack> filter = $ -> true;
@@ -37,7 +37,11 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     }
 
     public void onUpdate(Runnable cb) {
-        updateListeners.add(cb);
+        updateListener = cb;
+    }
+
+    public void resetOnUpdate() {
+        updateListener = null;
     }
 
     public void resetFilter() {
@@ -45,8 +49,8 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     }
 
     protected void invokeUpdate() {
-        for (var cb : updateListeners) {
-            cb.run();
+        if (updateListener != null) {
+            updateListener.run();
         }
     }
 

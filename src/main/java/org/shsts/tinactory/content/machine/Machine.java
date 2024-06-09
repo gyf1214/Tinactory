@@ -43,14 +43,14 @@ public class Machine extends UpdatableCapabilityProvider
         implements IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final SmartBlockEntity blockEntity;
+    protected final SmartBlockEntity blockEntity;
 
     @Nullable
-    private Network network;
+    protected Network network;
 
     public final MachineConfig config = new MachineConfig();
 
-    private Machine(SmartBlockEntity be) {
+    protected Machine(SmartBlockEntity be) {
         this.blockEntity = be;
     }
 
@@ -231,8 +231,10 @@ public class Machine extends UpdatableCapabilityProvider
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
 
+    protected static final String ID = "network/machine";
+
     public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, "network/machine", Machine::new);
+        return CapabilityProviderBuilder.fromFactory(parent, ID, Machine::new);
     }
 
     public static Optional<IProcessor> getProcessor(BlockEntity be) {

@@ -69,8 +69,6 @@ public class MachineProcessor<T extends ProcessingRecipe>
     @SuppressWarnings("unchecked")
     @Override
     protected void doSetTargetRecipe(Recipe<?> recipe) {
-        assert container != null;
-
         var recipe1 = (ProcessingRecipe) recipe;
 
         if (recipe.getType() == MARKER.get()) {
@@ -79,6 +77,7 @@ public class MachineProcessor<T extends ProcessingRecipe>
             targetRecipe = (T) recipe1;
         }
 
+        var container = getContainer().orElseThrow();
         var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
         var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
 

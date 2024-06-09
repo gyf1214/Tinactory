@@ -21,6 +21,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.GeneratorProcessor;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -28,6 +29,7 @@ import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
+import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
@@ -62,8 +64,6 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     protected T currentRecipe = null;
     @Nullable
     protected T targetRecipe = null;
-    @Nullable
-    protected IContainer container = null;
     private boolean needUpdate = true;
     protected long workProgress = 0;
 
@@ -104,7 +104,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         }
         var world = getWorld();
         assert currentRecipeLoc == null;
-        assert container != null;
+        var container = getContainer().orElseThrow();
         currentRecipe = getNewRecipe(world, container).orElse(null);
         workProgress = 0;
         if (currentRecipe != null) {
@@ -140,7 +140,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     public void resetTargetRecipe() {
         LOGGER.debug("update target recipe = <null>");
         targetRecipe = null;
-        assert container != null;
+        var container = getContainer().orElseThrow();
         var portSize = container.portSize();
         for (var i = 0; i < portSize; i++) {
             if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
@@ -155,9 +155,13 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     private void updateTargetRecipe() {
-        AllCapabilities.MACHINE.tryGet(blockEntity)
-                .ifPresent(machine -> machine.config.getLoc("targetRecipe")
-                        .ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe));
+        var machine = AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
+                .flatMap(MultiBlock::getInterface)
+                .map($ -> (Machine) $)
+                .or(() -> AllCapabilities.MACHINE.tryGet(blockEntity));
+
+        machine.ifPresent($ -> $.config.getLoc("targetRecipe")
+                .ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe));
     }
 
     protected abstract void onWorkBegin(T recipe, IContainer container);
@@ -180,7 +184,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         if (currentRecipe == null) {
             return;
         }
-        assert container != null;
+        var container = getContainer().orElseThrow();
         var progress = onWorkProgress(currentRecipe, partial);
         workProgress += progress;
         if (workProgress >= getMaxWorkProgress(currentRecipe)) {
@@ -200,19 +204,19 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     private void onTechChange(ITeamProfile team) {
-        if (container != null && team == container.getOwnerTeam().orElse(null)) {
+        if (team == getContainer().flatMap(IContainer::getOwnerTeam).orElse(null)) {
             setUpdateRecipe();
         }
     }
 
-    public void onLoad() {
-        container = AllCapabilities.CONTAINER.get(blockEntity);
+    protected Optional<IContainer> getContainer() {
+        return AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
+                .flatMap(MultiBlock::getContainer)
+                .or(() -> AllCapabilities.CONTAINER.tryGet(blockEntity));
     }
 
     @SuppressWarnings("unchecked")
     public void onServerLoad(Level world) {
-        onLoad();
-
         var recipeManager = world.getRecipeManager();
         currentRecipe = (T) Optional.ofNullable(currentRecipeLoc)
                 .flatMap(recipeManager::byKey)
@@ -242,7 +246,6 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     @Override
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
         eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());

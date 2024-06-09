@@ -35,25 +35,35 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     private final Voltage voltage;
     private final double workFactor;
 
-    private IItemCollection inputPort;
-    private RecipeWrapper inputWrapper;
-    private IItemCollection outputPort;
-
     public ElectricFurnace(BlockEntity blockEntity, Voltage voltage) {
         super(blockEntity, RecipeType.SMELTING);
         this.voltage = voltage;
         this.workFactor = 1 << (voltage.rank - 1);
     }
 
+    private IItemCollection getInputPort(IContainer container) {
+        return container.getPort(0, false).asItem();
+    }
+
+    private IItemCollection getOutputPort(IContainer container) {
+        return container.getPort(1, true).asItem();
+    }
+
+    private RecipeWrapper getInputWrapper(IContainer container) {
+        return new RecipeWrapper((IItemHandlerModifiable)
+                ((ItemHandlerCollection) getInputPort(container)).itemHandler);
+    }
+
     @Override
     protected boolean matches(Level world, SmeltingRecipe recipe, IContainer container) {
-        var result = recipe.assemble(inputWrapper);
+        var result = recipe.assemble(getInputWrapper(container));
+        var outputPort = getOutputPort(container);
         return outputPort.acceptInput(result) && outputPort.insertItem(result, true).isEmpty();
     }
 
     @Override
     protected List<? extends SmeltingRecipe> getMatchedRecipes(Level world, IContainer container) {
-        return world.getRecipeManager().getRecipeFor(recipeType, inputWrapper, world)
+        return world.getRecipeManager().getRecipeFor(recipeType, getInputWrapper(container), world)
                 .filter($ -> matches(world, $, container))
                 .map(List::of).orElse(List.of());
     }
@@ -66,6 +76,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     @Override
     protected void doSetTargetRecipe(Recipe<?> recipe) {
         targetRecipe = (SmeltingRecipe) recipe;
+        var inputPort = getInputPort(getContainer().orElseThrow());
         inputPort.setItemFilter(targetRecipe.getIngredients());
     }
 
@@ -73,13 +84,14 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     public void resetTargetRecipe() {
         LOGGER.debug("update target recipe = <null>");
         targetRecipe = null;
+        var inputPort = getInputPort(getContainer().orElseThrow());
         inputPort.resetItemFilter();
     }
 
     @Override
     protected void onWorkBegin(SmeltingRecipe recipe, IContainer container) {
         var ingredient = recipe.getIngredients().get(0);
-        ItemHelper.consumeItemCollection(inputPort, ingredient, 1, false);
+        ItemHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false);
     }
 
     @Override
@@ -89,7 +101,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
 
     @Override
     protected void onWorkDone(SmeltingRecipe recipe, IContainer container, Random random) {
-        outputPort.insertItem(recipe.assemble(inputWrapper), false);
+        getOutputPort(container).insertItem(recipe.assemble(getInputWrapper(container)), false);
     }
 
     @Override
@@ -115,15 +127,6 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     @Override
     public double getPowerCons() {
         return currentRecipe == null ? 0d : voltage.value * 0.625d;
-    }
-
-    @Override
-    public void onLoad() {
-        container = AllCapabilities.CONTAINER.get(blockEntity);
-        inputPort = container.getPort(0, false).asItem();
-        outputPort = container.getPort(1, true).asItem();
-        inputWrapper = new RecipeWrapper((IItemHandlerModifiable)
-                ((ItemHandlerCollection) inputPort).itemHandler);
     }
 
     @Nonnull

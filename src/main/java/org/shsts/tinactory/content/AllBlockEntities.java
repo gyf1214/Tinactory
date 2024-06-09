@@ -7,6 +7,7 @@ import org.shsts.tinactory.content.gui.BoilerPlugin;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.Machine;
@@ -17,12 +18,14 @@ import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.model.ModelGen;
-import org.shsts.tinactory.content.multiblock.MultiBlock;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.multiblock.MultiBlock;
+import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -60,6 +63,7 @@ public final class AllBlockEntities {
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
+    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -263,12 +267,31 @@ public final class AllBlockEntities {
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
                 .eventManager().ticking()
-                .simpleCapability(MultiBlock.blastFurnace())
+                .simpleCapability(MultiBlock::blastFurnace)
+                .simpleCapability(RecipeProcessor.basic(AllRecipes.BLAST_FURNACE, Voltage.LV))
                 .build()
                 .block()
                 .transform(ModelGen.primitiveMachine(
                         gregtech("blocks/casings/solid/machine_casing_heatproof"),
                         gregtech("blocks/multiblock/blast_furnace")))
+                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .defaultBlockItem().dropSelf()
+                .build()
+                .register();
+
+        MULTI_BLOCK_INTERFACE = REGISTRATE.blockEntitySet("multi_block/interface",
+                        SmartBlockEntity::new, MachineBlock.factory(Voltage.PRIMITIVE))
+                .entityClass(SmartBlockEntity.class)
+                .blockEntity()
+                .eventManager()
+                .simpleCapability(MultiBlockInterface::basic)
+                .simpleCapability(FlexibleStackContainer::builder)
+                .menu(ProcessingMenu.factory(AllLayouts.BLAST_FURNACE))
+                .plugin(MachinePlugin.processing(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE))
+                .build()
+                .build()
+                .block()
+                .transform(ModelGen.machine(Voltage.LV, gregtech("blocks/multiblock/blast_furnace")))
                 .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .build()

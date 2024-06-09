@@ -8,6 +8,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +21,8 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
     private static final Predicate<ItemStack> TRUE = $ -> true;
 
     private final IItemHandlerModifiable compose;
-    private final List<Runnable> updateListener = new ArrayList<>();
+    @Nullable
+    private Runnable updateListener = null;
     public boolean allowInput = true;
     public boolean allowOutput = true;
     private final List<Predicate<ItemStack>> filters;
@@ -47,12 +49,16 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
     }
 
     public void onUpdate(Runnable cons) {
-        updateListener.add(cons);
+        updateListener = cons;
+    }
+
+    public void resetOnUpdate() {
+        updateListener = null;
     }
 
     private void invokeUpdate() {
-        for (var cons : updateListener) {
-            cons.run();
+        if (updateListener != null) {
+            updateListener.run();
         }
     }
 

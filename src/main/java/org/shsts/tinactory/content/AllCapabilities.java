@@ -6,10 +6,10 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.IWorkbench;
 import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.content.multiblock.MultiBlock;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.UpdateHelper;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
+import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.registrate.common.CapabilityEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;

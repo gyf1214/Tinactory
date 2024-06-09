@@ -42,6 +42,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
     public static final RecipeTypeEntry<GeneratorRecipe, GeneratorRecipe.Builder> STEAM_TURBINE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> BLAST_FURNACE;
     // Recipes only used to mark input for recipe book purpose
     public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
 
@@ -100,6 +101,9 @@ public final class AllRecipes {
                 .clazz(GeneratorRecipe.class)
                 .builder(GeneratorRecipe.Builder::new)
                 .defaults($ -> $.autoVoid().amperage(1d).workTicks(100))
+                .register();
+
+        BLAST_FURNACE = REGISTRATE.processingRecipeType("blast_furnace")
                 .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.SERIALIZER)
@@ -235,6 +239,14 @@ public final class AllRecipes {
         STONE_GENERATOR.recipe(Fluids.WATER)
                 .outputFluid(1, Fluids.WATER, 1000)
                 .voltage(Voltage.ULV)
+                .build();
+
+        BLAST_FURNACE.recipe(AllMaterials.STEEL.loc("ingot"))
+                .inputItem(0, AllMaterials.IRON.tag("dust"), 1)
+                .outputItem(2, AllMaterials.STEEL.entry("ingot"), 1)
+                .voltage(Voltage.LV)
+                .power(32)
+                .workTicks(200)
                 .build();
     }
 
