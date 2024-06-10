@@ -75,7 +75,7 @@ public class Machine extends UpdatableCapabilityProvider
         return network != null && network.team.hasPlayer(player);
     }
 
-    private void onServerUse(AllEvents.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
+    protected void onServerUse(AllEvents.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
         if (!canPlayerInteract(arg.player())) {
             token.setReturn(InteractionResult.FAIL);
         } else {

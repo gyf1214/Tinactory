@@ -120,7 +120,7 @@ public final class MachineModel {
                     var dir = state.getValue(MachineBlock.IO_FACING);
                     return ConfiguredModel.builder()
                             .modelFile(model)
-                            .rotationX(ModelGen.yRotation(dir))
+                            .rotationX(ModelGen.xRotation(dir))
                             .rotationY(ModelGen.yRotation(dir))
                             .build();
                 });

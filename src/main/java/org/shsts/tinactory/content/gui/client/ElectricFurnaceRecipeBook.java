@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricFurnaceRecipeBook extends MachineRecipeBook<SmeltingRecipe> {
+public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe> {
     private final Layout.SlotInfo inputSlot;
     private final Layout.SlotInfo outputSlot;
 

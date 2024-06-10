@@ -26,6 +26,7 @@ import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.multiblock.MultiBlockProcessor;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
@@ -285,7 +286,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     private static final String ID = "machine/recipe_processor";
 
-    private static Voltage getBlockVoltage(BlockEntity be) {
+    public static Voltage getBlockVoltage(BlockEntity be) {
         return be.getBlockState().getBlock() instanceof MachineBlock<?> machineBlock ?
                 machineBlock.voltage : Voltage.PRIMITIVE;
     }
@@ -311,5 +312,11 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     electricFurnace(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, ID,
                 be -> new ElectricFurnace(be, getBlockVoltage(be)));
+    }
+
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
+    multiBlock(RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        return CapabilityProviderBuilder.fromFactory(ID,
+                be -> new MultiBlockProcessor<>(be, type.get()));
     }
 }

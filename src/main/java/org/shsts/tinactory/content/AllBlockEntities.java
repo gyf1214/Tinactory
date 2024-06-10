@@ -270,7 +270,7 @@ public final class AllBlockEntities {
                 .blockEntity()
                 .eventManager().ticking()
                 .simpleCapability(MultiBlock::blastFurnace)
-                .simpleCapability(RecipeProcessor.machine(AllRecipes.BLAST_FURNACE))
+                .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.BLAST_FURNACE))
                 .build()
                 .block()
                 .transform(ModelGen.primitiveMachine(
@@ -289,7 +289,7 @@ public final class AllBlockEntities {
                 .simpleCapability(MultiBlockInterface::basic)
                 .simpleCapability(FlexibleStackContainer::builder)
                 .menu(ProcessingMenu.multiBlock())
-                .plugin(MachinePlugin.processing(AllRecipes.BLAST_FURNACE))
+                .plugin(MachinePlugin::multiBlock)
                 .build()
                 .build()
                 .block()

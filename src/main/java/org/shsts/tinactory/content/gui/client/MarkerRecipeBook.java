@@ -2,8 +2,6 @@ package org.shsts.tinactory.content.gui.client;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.RecipeType;
-import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
@@ -14,7 +12,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MarkerRecipeBook extends ProcessingRecipeBook {
+public class MarkerRecipeBook extends MachineRecipeBook {
     public MarkerRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
                             RecipeType<? extends ProcessingRecipe> recipeType) {
         super(screen, recipeType);
@@ -22,10 +20,7 @@ public class MarkerRecipeBook extends ProcessingRecipeBook {
 
     @Override
     protected void doRefreshRecipes() {
-        var be = screen.getMenu().blockEntity;
-        var voltage = (long) AllCapabilities.ELECTRIC_MACHINE.tryGet(be)
-                .map(IElectricMachine::getVoltage)
-                .orElse(0L);
+        var voltage = getMachineVoltage();
         for (var recipe : ClientUtil.getRecipeManager().getAllRecipesFor(AllRecipes.MARKER.get())) {
             if (recipe.baseType != recipeType || !recipe.canCraftInVoltage(voltage)) {
                 continue;

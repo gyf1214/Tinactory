@@ -26,9 +26,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
-import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BUTTON_TOP_MARGIN;
-import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_BORDER;
+import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
+import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BUTTON_TOP_MARGIN;
+import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_BORDER;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;

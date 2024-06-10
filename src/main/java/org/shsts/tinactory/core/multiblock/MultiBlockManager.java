@@ -32,7 +32,6 @@ public final class MultiBlockManager {
             }
         }
         for (var pos : blocks) {
-            LOGGER.debug("add block pos {} to multi block {}", pos, multiBlock);
             multiBlock.addToMap(posMap, pos);
         }
         return true;

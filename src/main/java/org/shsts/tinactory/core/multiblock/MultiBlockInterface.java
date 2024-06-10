@@ -2,6 +2,8 @@ package org.shsts.tinactory.core.multiblock;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -10,9 +12,12 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
@@ -25,6 +30,7 @@ import java.util.Optional;
 public class MultiBlockInterface extends Machine {
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    public final Voltage voltage;
     private IFlexibleContainer container;
     @Nullable
     private MultiBlock multiBlock = null;
@@ -32,9 +38,23 @@ public class MultiBlockInterface extends Machine {
     private IProcessor processor = null;
     @Nullable
     private IElectricMachine electricMachine = null;
+    @Nullable
+    private RecipeType<?> recipeType = null;
 
     public MultiBlockInterface(SmartBlockEntity be) {
         super(be);
+        this.voltage = RecipeProcessor.getBlockVoltage(be);
+    }
+
+    private void onMultiBlockUpdate() {
+        var world = blockEntity.getLevel();
+        if (world == null || world.isClientSide) {
+            return;
+        }
+        if (network != null) {
+            network.invalidate();
+        }
+        sendUpdate(blockEntity);
     }
 
     public void setMultiBlock(MultiBlock target) {
@@ -42,10 +62,10 @@ public class MultiBlockInterface extends Machine {
         multiBlock = target;
         processor = target.getProcessor();
         electricMachine = target.getElectric();
+        recipeType = processor instanceof RecipeProcessor<?> recipeProcessor ?
+                recipeProcessor.recipeType : null;
         container.setLayout(target.layout);
-        if (network != null) {
-            network.invalidate();
-        }
+        onMultiBlockUpdate();
     }
 
     public void resetMultiBlock() {
@@ -54,14 +74,7 @@ public class MultiBlockInterface extends Machine {
         processor = null;
         electricMachine = null;
         container.resetLayout();
-        if (network != null) {
-            network.invalidate();
-        }
-    }
-
-    @Override
-    public void setConfig(SetMachinePacket packet) {
-        super.setConfig(packet);
+        onMultiBlockUpdate();
     }
 
     private void onLoad() {
@@ -71,6 +84,14 @@ public class MultiBlockInterface extends Machine {
     private void onContainerChange(boolean input) {
         if (multiBlock != null) {
             EventManager.invoke(multiBlock.blockEntity, AllEvents.CONTAINER_CHANGE, input);
+        }
+    }
+
+    @Override
+    public void setConfig(SetMachinePacket packet) {
+        super.setConfig(packet);
+        if (multiBlock != null) {
+            EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
         }
     }
 
@@ -99,6 +120,38 @@ public class MultiBlockInterface extends Machine {
 
     public Optional<Layout> getLayout() {
         return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.layout);
+    }
+
+    public Optional<RecipeType<?>> getRecipeType() {
+        return Optional.ofNullable(recipeType);
+    }
+
+    @Override
+    public CompoundTag serializeOnUpdate() {
+        var tag = super.serializeOnUpdate();
+        if (multiBlock != null) {
+            var pos = multiBlock.blockEntity.getBlockPos();
+            tag.put("multiBlockPos", CodecHelper.serializeBlockPos(pos));
+        }
+        return tag;
+    }
+
+    @Override
+    public void deserializeOnUpdate(CompoundTag tag) {
+        super.deserializeOnUpdate(tag);
+        var world = blockEntity.getLevel();
+        assert world != null;
+
+        if (tag.contains("multiBlockPos")) {
+            var pos = CodecHelper.deserializeBlockPos(tag.getCompound("multiBlockPos"));
+            var be1 = world.getBlockEntity(pos);
+            if (be1 == null) {
+                return;
+            }
+            AllCapabilities.MULTI_BLOCK.tryGet(be1).ifPresent(this::setMultiBlock);
+        } else {
+            resetMultiBlock();
+        }
     }
 
     public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> basic(P parent) {
