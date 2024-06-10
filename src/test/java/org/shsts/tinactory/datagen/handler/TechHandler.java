@@ -3,6 +3,7 @@ package org.shsts.tinactory.datagen.handler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.datagen.DataGen;
+import org.shsts.tinactory.datagen.builder.TechBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -27,5 +28,9 @@ public class TechHandler extends DataHandler<TechProvider> {
     @Override
     protected TechProvider createProvider(GatherDataEvent event) {
         return new Provider(event);
+    }
+
+    public void addTech(TechBuilder<?> tech) {
+        addCallback(prov -> prov.addTech(tech));
     }
 }

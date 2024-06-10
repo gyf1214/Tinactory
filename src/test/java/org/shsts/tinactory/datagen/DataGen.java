@@ -9,6 +9,7 @@ import org.shsts.tinactory.datagen.builder.TechBuilder;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
 import org.shsts.tinactory.datagen.handler.DataHandler;
+import org.shsts.tinactory.datagen.handler.RecipeHandler;
 import org.shsts.tinactory.datagen.handler.TechHandler;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public final class DataGen {
     public final String modid;
     public final TechHandler techHandler;
+    public final RecipeHandler recipeHandler;
 
     private final List<DataHandler<?>> dataHandlers;
 
@@ -29,6 +31,7 @@ public final class DataGen {
         this.dataHandlers = new ArrayList<>();
 
         this.techHandler = handler(new TechHandler(this));
+        this.recipeHandler = handler(new RecipeHandler(this));
     }
 
     public TechBuilder<DataGen> tech(String id) {

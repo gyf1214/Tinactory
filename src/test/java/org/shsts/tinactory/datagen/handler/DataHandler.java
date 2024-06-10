@@ -19,7 +19,7 @@ public abstract class DataHandler<P extends DataProvider> {
         this.dataGen = dataGen;
     }
 
-    public void addCallback(Consumer<P> callback) {
+    protected void addCallback(Consumer<P> callback) {
         callbacks.add(callback);
     }
 
@@ -31,7 +31,7 @@ public abstract class DataHandler<P extends DataProvider> {
     }
 
     public void register(P provider) {
-        LOGGER.info("Data Handler {} add {} callbacks", this, callbacks.size());
+        LOGGER.info("{}: add {} callbacks", this, callbacks.size());
         for (var callback : callbacks) {
             callback.accept(provider);
         }
@@ -40,5 +40,10 @@ public abstract class DataHandler<P extends DataProvider> {
 
     public void clear() {
         callbacks.clear();
+    }
+
+    @Override
+    public String toString() {
+        return "%s{%s}".formatted(getClass().getSimpleName(), dataGen.modid);
     }
 }

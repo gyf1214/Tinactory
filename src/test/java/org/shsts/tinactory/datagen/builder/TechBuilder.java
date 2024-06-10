@@ -63,7 +63,7 @@ public class TechBuilder<P> extends DataBuilder<JsonObject, P, TechBuilder<P>> {
     @Override
     protected void register() {
         assert maxProgress > 0;
-        dataGen.techHandler.addCallback(prov -> prov.addTech(this));
+        dataGen.techHandler.addTech(this);
 //        registrate.languageHandler.track(ITechnology.getDescriptionId(loc));
 //        registrate.languageHandler.track(ITechnology.getDetailsId(loc));
     }
