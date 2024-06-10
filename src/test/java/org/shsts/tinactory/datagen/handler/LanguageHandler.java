@@ -3,7 +3,6 @@ package org.shsts.tinactory.datagen.handler;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.HashCache;
@@ -12,10 +11,9 @@ import net.minecraft.server.packs.PackType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.content.LanguageProcessor;
-import org.slf4j.Logger;
+import org.shsts.tinactory.datagen.context.TrackedContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
@@ -28,7 +26,7 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LanguageHandler extends DataHandler<LanguageProvider> {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private final TrackedContext<String> trackedCtx;
 
     private class Provider extends LanguageProvider {
         private final Gson gson = new Gson();
@@ -50,15 +48,13 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
         }
 
         private void gatherTracked() {
-            trackedKeys.addAll(Tinactory.REGISTRATE.translationKeys);
-            trackedKeys.addAll(DataGen.REGISTRATE.translationKeys);
-            LOGGER.debug("{} add {} tracked translations", LanguageHandler.this, trackedKeys.size());
+            trackedKeys.addAll(trackedCtx.getTracked());
         }
 
         private void processTracked() throws IOException {
             var processor = new LanguageProcessor();
             var extra = readJson(modLoc("lang/extra.json"));
-            processor.process(trackedKeys, extra, this);
+            processor.process(trackedKeys, extra, this, trackedCtx::process);
             trackedKeys.clear();
         }
 
@@ -70,11 +66,13 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
             gatherTracked();
             processTracked();
             super.run(cache);
+            clear();
         }
     }
 
-    public LanguageHandler(DataGen dataGen) {
+    public LanguageHandler(DataGen dataGen, TrackedContext<String> trackedCtx) {
         super(dataGen);
+        this.trackedCtx = trackedCtx;
     }
 
     @Override

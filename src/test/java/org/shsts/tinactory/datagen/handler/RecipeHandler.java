@@ -37,6 +37,11 @@ public class RecipeHandler extends DataHandler<RecipeProvider> {
             addRecipes();
             this.consumer = null;
         }
+
+        @Override
+        public String getName() {
+            return "Recipes: " + dataGen.modid;
+        }
     }
 
     public RecipeHandler(DataGen dataGen) {

@@ -1,43 +1,85 @@
 package org.shsts.tinactory.datagen;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Registry;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
+import org.shsts.tinactory.datagen.content.Materials;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
+import org.shsts.tinactory.datagen.context.TrackedContext;
 import org.shsts.tinactory.datagen.handler.DataHandler;
 import org.shsts.tinactory.datagen.handler.LanguageHandler;
 import org.shsts.tinactory.datagen.handler.RecipeHandler;
+import org.shsts.tinactory.datagen.handler.TagsHandler;
 import org.shsts.tinactory.datagen.handler.TechHandler;
-import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.tracking.TrackedType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class DataGen implements IRecipeDataConsumer {
     public final String modid;
-    public final TechHandler techHandler;
+
+
     public final RecipeHandler recipeHandler;
+    public final TechHandler techHandler;
     public final LanguageHandler languageHandler;
 
-    private final List<DataHandler<?>> dataHandlers;
+    public final TrackedContext<String> langTrackedCtx;
 
+    private final List<DataHandler<?>> dataHandlers;
+    private final Map<ResourceKey<? extends Registry<?>>, TagsHandler<?>> tagsHandlers;
+    private final Set<TrackedContext<?>> trackedContexts;
+
+    @SuppressWarnings("deprecation")
     public DataGen(String modid) {
         this.modid = modid;
         this.dataHandlers = new ArrayList<>();
+        this.tagsHandlers = new HashMap<>();
+        this.trackedContexts = new HashSet<>();
 
-        this.techHandler = handler(new TechHandler(this));
+        this.langTrackedCtx = trackedCtx(TrackedType.LANG);
+
+        createTagsHandler(Registry.BLOCK);
+        createTagsHandler(Registry.ITEM);
         this.recipeHandler = handler(new RecipeHandler(this));
-        this.languageHandler = handler(new LanguageHandler(this));
+        this.techHandler = handler(new TechHandler(this));
+        this.languageHandler = handler(new LanguageHandler(this, langTrackedCtx));
+    }
+
+    @SafeVarargs
+    public final <T> void tag(T object, TagKey<T>... tags) {
+        Supplier<T> supplier = () -> object;
+        tag(supplier, tags);
+    }
+
+    @SafeVarargs
+    public final <T> void tag(Supplier<? extends T> object, TagKey<T>... tags) {
+        assert tags.length > 0;
+        tagsHandler(tags[0].registry()).addTags(object, tags);
+    }
+
+    public <T> void tag(TagKey<T> object, TagKey<T> tag) {
+        tagsHandler(tag.registry()).addTag(object, tag);
     }
 
     public TechBuilder<DataGen> tech(String id) {
@@ -49,9 +91,7 @@ public final class DataGen implements IRecipeDataConsumer {
     }
 
     public void register(IEventBus modEventBus) {
-        for (var handler : dataHandlers) {
-            modEventBus.addListener(handler::onGatherData);
-        }
+        modEventBus.addListener(this::onGatherData);
         modEventBus.addListener(this::onCommonSetup);
     }
 
@@ -70,20 +110,56 @@ public final class DataGen implements IRecipeDataConsumer {
         return dataHandler;
     }
 
+    private <T> void createTagsHandler(Registry<T> registry) {
+        var ret = new TagsHandler<>(this, registry);
+        tagsHandlers.put(registry.key(), ret);
+        handler(ret);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> TagsHandler<T> tagsHandler(ResourceKey<? extends Registry<T>> key) {
+        assert tagsHandlers.containsKey(key);
+        return (TagsHandler<T>) tagsHandlers.get(key);
+    }
+
+    private <V> TrackedContext<V> trackedCtx(TrackedType<V> type) {
+        var ret = new TrackedContext<>(Tinactory.REGISTRATE, type);
+        trackedContexts.add(ret);
+        return ret;
+    }
+
+    private void onGatherData(GatherDataEvent event) {
+        for (var handler : dataHandlers) {
+            handler.onGatherData(event);
+        }
+        event.getGenerator().addProvider(new DataProvider() {
+            @Override
+            public void run(HashCache cache) {
+                for (var trackedCtx : trackedContexts) {
+                    trackedCtx.postValidate();
+                }
+            }
+
+            @Override
+            public String getName() {
+                return "Validation: " + modid;
+            }
+        });
+    }
+
     private void onCommonSetup(FMLCommonSetupEvent event) {
         for (var handler : dataHandlers) {
             handler.clear();
         }
     }
 
-    public static final Registrate REGISTRATE = new Registrate(Tinactory.ID);
     public static final DataGen DATA_GEN = new DataGen(Tinactory.ID);
 
     public static void init(IEventBus modEventBus) {
+        Materials.init();
         Technologies.init();
         Veins.init();
 
-        REGISTRATE.register(modEventBus);
         DATA_GEN.register(modEventBus);
     }
 }

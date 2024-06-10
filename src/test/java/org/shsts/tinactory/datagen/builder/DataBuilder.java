@@ -10,14 +10,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class DataBuilder<U, P, S extends DataBuilder<U, P, S>> extends BuilderBase<U, P, S> {
-    public final String id;
     public final ResourceLocation loc;
     protected final DataGen dataGen;
 
     public DataBuilder(DataGen dataGen, P parent, String id) {
         super(parent);
         this.dataGen = dataGen;
-        this.id = id;
         this.loc = new ResourceLocation(dataGen.modid, id);
         onBuild.add(this::register);
     }
@@ -26,7 +24,6 @@ public abstract class DataBuilder<U, P, S extends DataBuilder<U, P, S>> extends 
         super(parent);
         this.dataGen = dataGen;
         this.loc = loc;
-        this.id = loc.getPath();
         onBuild.add(this::register);
     }
 

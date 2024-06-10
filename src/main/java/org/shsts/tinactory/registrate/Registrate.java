@@ -65,14 +65,14 @@ import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
 import org.shsts.tinactory.registrate.handler.TagsHandler;
 import org.shsts.tinactory.registrate.handler.TintHandler;
+import org.shsts.tinactory.registrate.tracking.TrackedObjects;
+import org.shsts.tinactory.registrate.tracking.TrackedType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -116,7 +116,7 @@ public class Registrate implements IRecipeDataConsumer {
     public final MenuScreenHandler menuScreenHandler;
     public final TintHandler tintHandler;
 
-    public final Set<String> translationKeys = new HashSet<>();
+    private final TrackedObjects trackedObjects;
 
     @SuppressWarnings("deprecation")
     public Registrate(String modid) {
@@ -147,6 +147,8 @@ public class Registrate implements IRecipeDataConsumer {
         putDataHandler(itemModelHandler);
         putDataHandler(recipeDataHandler);
         putDataHandler(lootTableHandler);
+
+        this.trackedObjects = new TrackedObjects();
     }
 
     public <T extends IForgeRegistryEntry<T>>
@@ -454,15 +456,19 @@ public class Registrate implements IRecipeDataConsumer {
     }
 
     public void trackTranslation(String key) {
-        translationKeys.add(key);
+        trackedObjects.put(TrackedType.LANG, key, key);
     }
 
     public void trackTranslation(Item item) {
-        translationKeys.add(item.getDescriptionId());
+        trackTranslation(item.getDescriptionId());
     }
 
     public void trackTranslation(Block block) {
-        translationKeys.add(block.getDescriptionId());
+        trackTranslation(block.getDescriptionId());
+    }
+
+    public <V> Map<V, String> getTracked(TrackedType<V> type) {
+        return trackedObjects.getObjects(type);
     }
 
     @Override

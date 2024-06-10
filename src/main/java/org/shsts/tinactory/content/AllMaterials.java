@@ -56,7 +56,7 @@ public final class AllMaterials {
     public static MaterialSet FLINT;
 
     static {
-        MATERIALS = new HashMap<>();
+        SET = new HashMap<>();
         Elements.init();
         FirstDegrees.init();
         Ores.init();
@@ -93,18 +93,18 @@ public final class AllMaterials {
         REGISTRATE.tag(AllMaterials.IRON.tag("screw"), AllTags.TOOL_SCREW);
     }
 
-    public static final Map<String, MaterialSet> MATERIALS;
+    public static final Map<String, MaterialSet> SET;
 
     public static MaterialSet get(String name) {
-        if (!MATERIALS.containsKey(name)) {
+        if (!SET.containsKey(name)) {
             throw new IllegalArgumentException("material %s does not exist".formatted(name));
         }
-        return MATERIALS.get(name);
+        return SET.get(name);
     }
 
     public static MaterialSet.Builder<?> set(String id) {
         return (new MaterialSet.Builder<>(Unit.INSTANCE, id))
-                .onCreateObject(mat -> MATERIALS.put(mat.name, mat));
+                .onCreateObject(mat -> SET.put(mat.name, mat));
     }
 
     public static Supplier<Item> primary(String name) {
@@ -130,7 +130,7 @@ public final class AllMaterials {
     public static void init() {}
 
     public static void initRecipes() {
-        for (var material : MATERIALS.values()) {
+        for (var material : SET.values()) {
             material.freeze();
         }
 

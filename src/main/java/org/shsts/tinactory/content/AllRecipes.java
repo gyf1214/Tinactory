@@ -113,7 +113,6 @@ public final class AllRecipes {
     }
 
     public static void initRecipes() {
-        AllTechs.initRecipes();
         AllMaterials.initRecipes();
         vanillaRecipes();
         primitiveRecipes();

@@ -1,10 +1,8 @@
 package org.shsts.tinactory.datagen.content;
 
 import com.google.gson.JsonObject;
-import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.common.data.LanguageProvider;
-import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -12,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LanguageProcessor {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final String MISSING_TR = "<MISSING TR>";
 
     private record Processor(Pattern pattern, Function<Matcher, String> func) {}
 
@@ -83,15 +82,18 @@ public class LanguageProcessor {
         return Optional.empty();
     }
 
-    public void process(Set<String> keys, JsonObject extra, LanguageProvider prov) {
+    public void process(Set<String> keys, JsonObject extra,
+                        LanguageProvider prov, Consumer<String> onProcess) {
         for (var key : keys) {
             if (extra.has(key)) {
+                onProcess.accept(key);
                 continue;
             }
-            process(key).ifPresentOrElse(val -> prov.add(key, val), () -> {
-                LOGGER.warn("key not processed: {}", key);
-                prov.add(key, "MISSING TR");
-            });
+            var value = process(key);
+            if (value.isPresent()) {
+                onProcess.accept(key);
+            }
+            prov.add(key, value.orElse(MISSING_TR));
         }
         for (var entry : extra.entrySet()) {
             prov.add(entry.getKey(), entry.getValue().getAsString());

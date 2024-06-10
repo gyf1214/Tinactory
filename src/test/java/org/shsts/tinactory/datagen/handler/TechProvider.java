@@ -73,6 +73,6 @@ public abstract class TechProvider implements DataProvider {
 
     @Override
     public String getName() {
-        return modid + " technology";
+        return "Technologies: " + modid;
     }
 }
