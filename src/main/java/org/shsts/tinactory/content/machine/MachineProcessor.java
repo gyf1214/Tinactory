@@ -13,6 +13,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -77,36 +78,41 @@ public class MachineProcessor<T extends ProcessingRecipe>
             targetRecipe = (T) recipe1;
         }
 
-        var container = getContainer().orElseThrow();
-        var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
-        var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
+        getContainer().ifPresent(container -> {
+            var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
+            var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
 
-        for (var input : recipe1.inputs) {
-            var idx = input.port();
-            var ingredient = input.ingredient();
-            if (!container.hasPort(idx)) {
-                continue;
+            for (var input : recipe1.inputs) {
+                var idx = input.port();
+                var ingredient = input.ingredient();
+                if (!container.hasPort(idx)) {
+                    continue;
+                }
+                if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
+                    itemFilters.put(idx, item.ingredient);
+                } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
+                    var stack1 = item.stack();
+                    itemFilters.put(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
+                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
+                    var stack1 = fluid.fluid();
+                    fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
+                }
             }
-            if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
-                itemFilters.put(idx, item.ingredient);
-            } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                var stack1 = item.stack();
-                itemFilters.put(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
-            } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                var stack1 = fluid.fluid();
-                fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
+
+            for (var idx : itemFilters.keys().elementSet()) {
+                var port = container.getPort(idx, false);
+                if (port.type() == PortType.ITEM) {
+                    port.asItem().setItemFilter(itemFilters.get(idx));
+                }
             }
-        }
 
-        for (var idx : itemFilters.keys().elementSet()) {
-            var port = container.getPort(idx, false);
-            port.asItem().setItemFilter(itemFilters.get(idx));
-        }
-
-        for (var idx : fluidFilters.keys().elementSet()) {
-            var port = container.getPort(idx, false);
-            port.asFluid().setFluidFilter(fluidFilters.get(idx));
-        }
+            for (var idx : fluidFilters.keys().elementSet()) {
+                var port = container.getPort(idx, false);
+                if (port.type() == PortType.FLUID) {
+                    port.asFluid().setFluidFilter(fluidFilters.get(idx));
+                }
+            }
+        });
     }
 
     protected void calculateFactors(ProcessingRecipe recipe) {

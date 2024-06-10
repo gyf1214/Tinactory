@@ -127,7 +127,6 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     protected abstract void doSetTargetRecipe(Recipe<?> recipe);
 
     public void setTargetRecipe(ResourceLocation loc) {
-        LOGGER.debug("update target recipe = {}", loc);
         var recipeManager = getWorld().getRecipeManager();
 
         var recipe = recipeManager.byKey(loc).orElse(null);
@@ -136,34 +135,36 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
             return;
         }
 
+        LOGGER.debug("update target recipe = {}", loc);
         doSetTargetRecipe(recipe);
     }
 
     public void resetTargetRecipe() {
         LOGGER.debug("update target recipe = <null>");
         targetRecipe = null;
-        var container = getContainer().orElseThrow();
-        var portSize = container.portSize();
-        for (var i = 0; i < portSize; i++) {
-            if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
-                continue;
+        getContainer().ifPresent(container -> {
+            var portSize = container.portSize();
+            for (var i = 0; i < portSize; i++) {
+                if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
+                    continue;
+                }
+                var port = container.getPort(i, false);
+                switch (port.type()) {
+                    case ITEM -> port.asItem().resetItemFilter();
+                    case FLUID -> port.asFluid().resetFluidFilter();
+                }
             }
-            var port = container.getPort(i, false);
-            switch (port.type()) {
-                case ITEM -> port.asItem().resetItemFilter();
-                case FLUID -> port.asFluid().resetFluidFilter();
-            }
-        }
+        });
     }
 
     private void updateTargetRecipe() {
-        var machine = AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
+        var recipe = AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
                 .flatMap(MultiBlock::getInterface)
                 .map($ -> (Machine) $)
-                .or(() -> AllCapabilities.MACHINE.tryGet(blockEntity));
+                .or(() -> AllCapabilities.MACHINE.tryGet(blockEntity))
+                .flatMap($ -> $.config.getLoc("targetRecipe"));
 
-        machine.ifPresent($ -> $.config.getLoc("targetRecipe")
-                .ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe));
+        recipe.ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
     }
 
     protected abstract void onWorkBegin(T recipe, IContainer container);

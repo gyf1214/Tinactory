@@ -47,6 +47,9 @@ public class MultiBlockInterface extends Machine {
         this.voltage = RecipeProcessor.getBlockVoltage(be);
     }
 
+    /**
+     * Only called on server.
+     */
     private void onMultiBlockUpdate() {
         var world = blockEntity.getLevel();
         if (world == null || world.isClientSide) {
@@ -149,7 +152,6 @@ public class MultiBlockInterface extends Machine {
         var world = blockEntity.getLevel();
         assert world != null;
 
-        var oldMultiBlock = multiBlock;
         if (tag.contains("multiBlockPos", Tag.TAG_COMPOUND)) {
             var pos = CodecHelper.deserializeBlockPos(tag.getCompound("multiBlockPos"));
             var be1 = world.getBlockEntity(pos);
@@ -161,7 +163,7 @@ public class MultiBlockInterface extends Machine {
             resetMultiBlock();
         }
 
-        if (oldMultiBlock == multiBlock && multiBlock != null) {
+        if (multiBlock != null) {
             EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
         }
     }

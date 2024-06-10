@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.machine;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.crafting.Recipe;
@@ -19,7 +18,6 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
-import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,8 +28,6 @@ import java.util.Random;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements IElectricMachine {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     private final Voltage voltage;
     private double workFactor;
 
@@ -75,16 +71,12 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     @Override
     protected void doSetTargetRecipe(Recipe<?> recipe) {
         targetRecipe = (SmeltingRecipe) recipe;
-        var inputPort = getInputPort(getContainer().orElseThrow());
-        inputPort.setItemFilter(targetRecipe.getIngredients());
-    }
-
-    @Override
-    public void resetTargetRecipe() {
-        LOGGER.debug("update target recipe = <null>");
-        targetRecipe = null;
-        var inputPort = getInputPort(getContainer().orElseThrow());
-        inputPort.resetItemFilter();
+        getContainer().ifPresent(container -> {
+            if (container.hasPort(0) && container.getPort(0, false)
+                    instanceof IItemCollection itemPort) {
+                itemPort.setItemFilter(targetRecipe.getIngredients());
+            }
+        });
     }
 
     private void calculateFactors() {

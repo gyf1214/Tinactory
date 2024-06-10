@@ -84,8 +84,10 @@ public class FlexibleStackContainer extends CapabilityProvider
         var minSlot = slots.get(0).index();
         var maxSlot = slots.get(slots.size() - 1).index() + 1;
         assert minSlot >= 0 && maxSlot <= items.getSlots() && minSlot < maxSlot;
-        for (var i = minSlot; i < maxSlot; i++) {
-            items.resetFilter(i);
+        if (type == SlotType.ITEM_INPUT) {
+            for (var i = minSlot; i < maxSlot; i++) {
+                items.resetFilter(i);
+            }
         }
 
         var port = new ItemHandlerCollection(items, minSlot, maxSlot);
@@ -99,7 +101,7 @@ public class FlexibleStackContainer extends CapabilityProvider
         var k = 0;
         for (var slot : slots) {
             var i = slot.index();
-            if (type == SlotType.ITEM_INPUT) {
+            if (type == SlotType.FLUID_INPUT) {
                 fluids[i].allowInput = true;
             }
             views[k] = fluids[i];
