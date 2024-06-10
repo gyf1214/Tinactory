@@ -29,6 +29,12 @@ public class TechBuilder<P> extends Builder<ResourceLocation, P, TechBuilder<P>>
 
     public TechBuilder(Registrate registrate, P parent, String id) {
         super(registrate, parent, id);
+        onBuild.add(this::buildObject);
+    }
+
+    public TechBuilder(Registrate registrate, P parent, ResourceLocation loc) {
+        super(registrate, parent, loc);
+        onBuild.add(this::buildObject);
     }
 
     public TechBuilder<P> depends(ResourceLocation... loc) {

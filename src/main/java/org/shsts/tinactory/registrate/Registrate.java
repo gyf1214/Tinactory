@@ -432,6 +432,10 @@ public class Registrate {
         return new TechBuilder<>(this, this, id);
     }
 
+    public <P> TechBuilder<P> tech(P parent, ResourceLocation loc) {
+        return new TechBuilder<>(this, parent, loc);
+    }
+
     public void nullRecipe(ResourceLocation loc) {
         recipeDataHandler.addCallback(prov -> prov.addRecipe(new NullRecipe(loc)));
     }

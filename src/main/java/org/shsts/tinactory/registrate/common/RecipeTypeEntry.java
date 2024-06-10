@@ -68,16 +68,16 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends Builder<?, ?, B
         return addRecipe(registrate, new ResourceLocation(registrate.modid, id));
     }
 
+    public B recipe(Registrate registrate, String id) {
+        return recipe(registrate, new ResourceLocation(registrate.modid, id));
+    }
+
     public B recipe(ResourceLocation loc) {
         return recipe(registrate, loc);
     }
 
     public B recipe(String id) {
         return recipe(new ResourceLocation(registrate.modid, id));
-    }
-
-    public B recipe(Registrate registrate, String id) {
-        return recipe(registrate, new ResourceLocation(registrate.modid, id));
     }
 
     public B recipe(IForgeRegistryEntry<?> item) {
@@ -88,5 +88,9 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends Builder<?, ?, B
 
     public B recipe(RegistryEntry<?> item) {
         return recipe(item.loc);
+    }
+
+    public RecipeFactory<B> factory(Registrate registrate) {
+        return new RecipeFactory<>(registrate, this);
     }
 }

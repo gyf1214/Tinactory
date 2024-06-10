@@ -82,10 +82,25 @@ minecraft {
                     source sourceSets.test
                 }
             }
+        }
 
-            workingDirectory project.file('run/data')
+        mainData {
+            parent minecraft.runs.data
+
+            workingDirectory project.file('run/mainData')
             args '--mod', 'tinactory', '--all', '--output', file('src/main/generated/resources/')
             args '--existing', file('src/main/resources/')
+            args '--existing', file('libs/gtceu_resources_2.8.7.zip')
+        }
+
+        testData {
+            parent minecraft.runs.data
+
+            workingDirectory project.file('run/testData')
+            args '--mod', 'tinactory_test', '--all', '--output', file('src/test/generated/resources/')
+            args '--existing', file('src/test/resources/')
+            args '--existing', file('src/main/resources/')
+            args '--existing', file('src/main/generated/resources')
             args '--existing', file('libs/gtceu_resources_2.8.7.zip')
         }
     }

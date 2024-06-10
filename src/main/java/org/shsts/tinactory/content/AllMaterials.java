@@ -93,9 +93,9 @@ public final class AllMaterials {
         REGISTRATE.tag(AllMaterials.IRON.tag("screw"), AllTags.TOOL_SCREW);
     }
 
-    private static final Map<String, MaterialSet> MATERIALS;
+    public static final Map<String, MaterialSet> MATERIALS;
 
-    private static MaterialSet get(String name) {
+    public static MaterialSet get(String name) {
         if (!MATERIALS.containsKey(name)) {
             throw new IllegalArgumentException("material %s does not exist".formatted(name));
         }
@@ -133,8 +133,6 @@ public final class AllMaterials {
         for (var material : MATERIALS.values()) {
             material.freeze();
         }
-
-        Ores.initRecipes();
 
         // smelt wrought iron nugget
         REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
