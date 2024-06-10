@@ -56,7 +56,6 @@ import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.DynamicHandler;
 import org.shsts.tinactory.registrate.handler.ItemModelHandler;
-import org.shsts.tinactory.registrate.handler.LanguageHandler;
 import org.shsts.tinactory.registrate.handler.LootTableHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RecipeDataHandler;
@@ -70,8 +69,10 @@ import org.shsts.tinactory.registrate.handler.TintHandler;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -109,12 +110,13 @@ public class Registrate implements IRecipeDataConsumer {
     // DataGen
     public final RecipeDataHandler recipeDataHandler;
     public final LootTableHandler lootTableHandler;
-    public final LanguageHandler languageHandler;
 
     // Client
     public final RenderTypeHandler renderTypeHandler;
     public final MenuScreenHandler menuScreenHandler;
     public final TintHandler tintHandler;
+
+    public final Set<String> translationKeys = new HashSet<>();
 
     @SuppressWarnings("deprecation")
     public Registrate(String modid) {
@@ -134,7 +136,6 @@ public class Registrate implements IRecipeDataConsumer {
         this.itemModelHandler = new ItemModelHandler(this);
         this.recipeDataHandler = new RecipeDataHandler(this);
         this.lootTableHandler = new LootTableHandler(this);
-        this.languageHandler = new LanguageHandler(this);
 
         this.renderTypeHandler = new RenderTypeHandler();
         this.menuScreenHandler = new MenuScreenHandler();
@@ -146,7 +147,6 @@ public class Registrate implements IRecipeDataConsumer {
         putDataHandler(itemModelHandler);
         putDataHandler(recipeDataHandler);
         putDataHandler(lootTableHandler);
-        putDataHandler(languageHandler);
     }
 
     public <T extends IForgeRegistryEntry<T>>
@@ -241,7 +241,7 @@ public class Registrate implements IRecipeDataConsumer {
 
         protected SimpleItemBuilder(String id, Function<Item.Properties, U> factory) {
             super(Registrate.this, id, Registrate.this, factory);
-            onCreateEntry.add(registrate.languageHandler::item);
+            onCreateObject.add(registrate::trackTranslation);
         }
     }
 
@@ -453,6 +453,18 @@ public class Registrate implements IRecipeDataConsumer {
         });
     }
 
+    public void trackTranslation(String key) {
+        translationKeys.add(key);
+    }
+
+    public void trackTranslation(Item item) {
+        translationKeys.add(item.getDescriptionId());
+    }
+
+    public void trackTranslation(Block block) {
+        translationKeys.add(block.getDescriptionId());
+    }
+
     @Override
     public String getModId() {
         return modid;
@@ -461,6 +473,6 @@ public class Registrate implements IRecipeDataConsumer {
     @Override
     public void registerRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe) {
         recipeDataHandler.addCallback(prov -> prov.addRecipe(recipe.get()));
-        languageHandler.track(SmartRecipe.getDescriptionId(loc));
+        trackTranslation(SmartRecipe.getDescriptionId(loc));
     }
 }

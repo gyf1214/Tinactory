@@ -11,6 +11,7 @@ import org.shsts.tinactory.datagen.builder.TechBuilder;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
 import org.shsts.tinactory.datagen.handler.DataHandler;
+import org.shsts.tinactory.datagen.handler.LanguageHandler;
 import org.shsts.tinactory.datagen.handler.RecipeHandler;
 import org.shsts.tinactory.datagen.handler.TechHandler;
 import org.shsts.tinactory.registrate.Registrate;
@@ -26,6 +27,7 @@ public final class DataGen implements IRecipeDataConsumer {
     public final String modid;
     public final TechHandler techHandler;
     public final RecipeHandler recipeHandler;
+    public final LanguageHandler languageHandler;
 
     private final List<DataHandler<?>> dataHandlers;
 
@@ -35,6 +37,7 @@ public final class DataGen implements IRecipeDataConsumer {
 
         this.techHandler = handler(new TechHandler(this));
         this.recipeHandler = handler(new RecipeHandler(this));
+        this.languageHandler = handler(new LanguageHandler(this));
     }
 
     public TechBuilder<DataGen> tech(String id) {

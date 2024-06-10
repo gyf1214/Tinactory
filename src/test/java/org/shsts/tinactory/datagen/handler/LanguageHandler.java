@@ -1,20 +1,21 @@
-package org.shsts.tinactory.registrate.handler;
+package org.shsts.tinactory.datagen.handler;
+
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.shsts.tinactory.content.model.LanguageProcessor;
-import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.datagen.DataGen;
+import org.shsts.tinactory.datagen.content.LanguageProcessor;
+import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
@@ -27,9 +28,7 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LanguageHandler extends DataHandler<LanguageProvider> {
-    public LanguageHandler(Registrate registrate) {
-        super(registrate);
-    }
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private class Provider extends LanguageProvider {
         private final Gson gson = new Gson();
@@ -37,16 +36,8 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
         private final Set<String> trackedKeys = new HashSet<>();
 
         public Provider(DataGenerator gen, ExistingFileHelper existingFileHelper) {
-            super(gen, registrate.modid, "en_us");
+            super(gen, dataGen.modid, "en_us");
             this.existingFileHelper = existingFileHelper;
-        }
-
-        private void track(Item item) {
-            trackedKeys.add(item.getDescriptionId());
-        }
-
-        private void track(Block block) {
-            trackedKeys.add(block.getDescriptionId());
         }
 
         private JsonObject readJson(ResourceLocation loc) throws IOException {
@@ -56,6 +47,12 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
                  var br = new InputStreamReader(is)) {
                 return gson.fromJson(br, JsonObject.class);
             }
+        }
+
+        private void gatherTracked() {
+            trackedKeys.addAll(Tinactory.REGISTRATE.translationKeys);
+            trackedKeys.addAll(DataGen.REGISTRATE.translationKeys);
+            LOGGER.debug("{} add {} tracked translations", LanguageHandler.this, trackedKeys.size());
         }
 
         private void processTracked() throws IOException {
@@ -70,27 +67,18 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
 
         @Override
         public void run(HashCache cache) throws IOException {
-            LanguageHandler.this.register(this);
+            gatherTracked();
             processTracked();
             super.run(cache);
         }
     }
 
-    public void track(String key) {
-        addCallback(prov -> ((Provider) prov).trackedKeys.add(key));
-    }
-
-    public void item(RegistryEntry<? extends Item> entry) {
-        addCallback(prov -> ((Provider) prov).track(entry.get()));
-    }
-
-    public void block(RegistryEntry<? extends Block> entry) {
-        addCallback(prov -> ((Provider) prov).track(entry.get()));
+    public LanguageHandler(DataGen dataGen) {
+        super(dataGen);
     }
 
     @Override
-    public void onGatherData(GatherDataEvent event) {
-        var generator = event.getGenerator();
-        generator.addProvider(new Provider(generator, event.getExistingFileHelper()));
+    protected LanguageProvider createProvider(GatherDataEvent event) {
+        return new Provider(event.getGenerator(), event.getExistingFileHelper());
     }
 }

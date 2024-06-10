@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.model;
+package org.shsts.tinactory.datagen.content;
 
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;

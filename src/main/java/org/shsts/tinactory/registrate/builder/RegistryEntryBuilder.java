@@ -32,9 +32,13 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
     public void registerObject(IForgeRegistry<T> registry) {
         LOGGER.trace("register object {} {}", registry.getRegistryName(), loc);
         assert entry != null;
-        var object = buildObject();
+        var object = createObject();
         object.setRegistryName(loc);
         registry.register(object);
+        for (var cb : onCreateObject) {
+            cb.accept(object);
+        }
+        onCreateObject.clear();
         entry.setObject(object);
     }
 
