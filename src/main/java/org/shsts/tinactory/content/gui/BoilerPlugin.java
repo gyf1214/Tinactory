@@ -38,14 +38,16 @@ public class BoilerPlugin implements IMenuPlugin<ProcessingMenu> {
     public void applyMenuScreen(MenuScreen<ProcessingMenu> screen) {
         var menu = screen.getMenu();
 
-        var xOffset = menu.layout.getXOffset();
-        var burnBar = new ProgressBar(menu, Texture.PROGRESS_BURN, burnSlot);
-        burnBar.direction = ProgressBar.Direction.VERTICAL;
-        screen.addWidget(new Rect(xOffset + 1, 1 + SLOT_SIZE, 16, 16), burnBar);
+        if (menu.layout != null) {
+            var xOffset = menu.layout.getXOffset();
+            var burnBar = new ProgressBar(menu, Texture.PROGRESS_BURN, burnSlot);
+            burnBar.direction = ProgressBar.Direction.VERTICAL;
+            screen.addWidget(new Rect(xOffset + 1, 1 + SLOT_SIZE, 16, 16), burnBar);
 
-        var heatBar = new ProgressBar(menu, Texture.HEAT_EMPTY, Texture.HEAT_FULL, heatSlot);
-        heatBar.direction = ProgressBar.Direction.VERTICAL;
-        var rect = new Rect(xOffset + SLOT_SIZE * 2, 1, Texture.HEAT_EMPTY.width(), Texture.HEAT_EMPTY.height());
-        screen.addWidget(rect, heatBar);
+            var heatBar = new ProgressBar(menu, Texture.HEAT_EMPTY, Texture.HEAT_FULL, heatSlot);
+            heatBar.direction = ProgressBar.Direction.VERTICAL;
+            var rect = new Rect(xOffset + SLOT_SIZE * 2, 1, Texture.HEAT_EMPTY.width(), Texture.HEAT_EMPTY.height());
+            screen.addWidget(rect, heatBar);
+        }
     }
 }

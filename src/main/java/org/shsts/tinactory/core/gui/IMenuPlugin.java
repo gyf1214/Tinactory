@@ -18,4 +18,14 @@ public interface IMenuPlugin<M extends Menu<?, M>> {
 
     @OnlyIn(Dist.CLIENT)
     default void onScreenRemoved() {}
+
+    @FunctionalInterface
+    interface Factory<M extends Menu<?, M>> {
+        IMenuPlugin<M> create(M menu);
+
+        @SuppressWarnings("unchecked")
+        default <M1 extends Menu<?, M1>> IMenuPlugin<M1> castCreate(M1 menu) {
+            return (IMenuPlugin<M1>) create((M) menu);
+        }
+    }
 }

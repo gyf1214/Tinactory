@@ -10,7 +10,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
@@ -29,15 +30,21 @@ import java.util.function.Consumer;
 public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
     protected final RecipeType<? extends ProcessingRecipe> recipeType;
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
+    @Nullable
     private final Layout layout;
 
-    public ProcessingRecipeBook(MenuScreen<? extends Menu<?, ?>> screen,
-                                RecipeType<? extends ProcessingRecipe> recipeType,
-                                Layout layout) {
-        super(screen, layout.getXOffset());
+    protected ProcessingRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
+                                   RecipeType<? extends ProcessingRecipe> recipeType,
+                                   @Nullable Layout layout) {
+        super(screen, layout == null ? 0 : layout.getXOffset());
         this.recipeType = recipeType;
         this.layout = layout;
         TechManager.client().onProgressChange(onTechChange);
+    }
+
+    public ProcessingRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
+                                RecipeType<? extends ProcessingRecipe> recipeType) {
+        this(screen, recipeType, screen.getMenu().layout);
     }
 
     public void remove() {
@@ -61,8 +68,10 @@ public class ProcessingRecipeBook extends MachineRecipeBook<ProcessingRecipe> {
 
     @Override
     protected void selectRecipe(ProcessingRecipe recipe) {
-        layout.getProcessingInputs(recipe).forEach(ghostRecipe::addIngredient);
-        layout.getProcessingOutputs(recipe).forEach(ghostRecipe::addIngredient);
+        if (layout != null) {
+            layout.getProcessingInputs(recipe).forEach(ghostRecipe::addIngredient);
+            layout.getProcessingOutputs(recipe).forEach(ghostRecipe::addIngredient);
+        }
     }
 
     @Override

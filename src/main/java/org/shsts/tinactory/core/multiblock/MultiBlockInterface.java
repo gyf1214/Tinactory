@@ -12,6 +12,7 @@ import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
@@ -94,6 +95,10 @@ public class MultiBlockInterface extends Machine {
     @Override
     public Optional<IElectricMachine> getElectric() {
         return Optional.ofNullable(electricMachine);
+    }
+
+    public Optional<Layout> getLayout() {
+        return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.layout);
     }
 
     public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> basic(P parent) {

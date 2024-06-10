@@ -33,12 +33,11 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Voltage voltage;
-    private final double workFactor;
+    private double workFactor;
 
     public ElectricFurnace(BlockEntity blockEntity, Voltage voltage) {
         super(blockEntity, RecipeType.SMELTING);
         this.voltage = voltage;
-        this.workFactor = 1 << (voltage.rank - 1);
     }
 
     private IItemCollection getInputPort(IContainer container) {
@@ -88,10 +87,28 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
         inputPort.resetItemFilter();
     }
 
+    private void calculateFactors() {
+        var baseVoltage = Voltage.ULV.value;
+        var voltage = getVoltage();
+        var voltageFactor = 1L;
+        var overclock = 1L;
+        while (baseVoltage * voltageFactor * 4 <= voltage) {
+            overclock *= 2;
+            voltageFactor *= 4;
+        }
+        workFactor = overclock;
+    }
+
     @Override
     protected void onWorkBegin(SmeltingRecipe recipe, IContainer container) {
         var ingredient = recipe.getIngredients().get(0);
         ItemHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false);
+        calculateFactors();
+    }
+
+    @Override
+    protected void onWorkContinue(SmeltingRecipe recipe) {
+        calculateFactors();
     }
 
     @Override
@@ -126,7 +143,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
 
     @Override
     public double getPowerCons() {
-        return currentRecipe == null ? 0d : voltage.value * 0.625d;
+        return currentRecipe == null ? 0d : getVoltage() * 0.625d;
     }
 
     @Nonnull

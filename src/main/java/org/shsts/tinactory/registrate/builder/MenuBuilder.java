@@ -27,7 +27,9 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<? super T, M
     private final Menu.Factory<T, M> factory;
     private Function<T, Component> title = be -> I18n.name(be.getBlockState().getBlock());
     private boolean showInventory = true;
-    private final List<Function<M, IMenuPlugin<M>>> plugins = new ArrayList<>();
+
+    private final List<IMenuPlugin.Factory<?>> plugins = new ArrayList<>();
+
 
     public MenuBuilder(Registrate registrate, String id, P parent, Menu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
@@ -39,7 +41,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<? super T, M
         return self();
     }
 
-    public MenuBuilder<T, M, P> plugin(Function<M, IMenuPlugin<M>> plugin) {
+    public <M1 extends Menu<?, M1>> MenuBuilder<T, M, P> plugin(IMenuPlugin.Factory<M1> plugin) {
         plugins.add(plugin);
         return self();
     }
@@ -56,7 +58,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<? super T, M
         return (type, id, inventory, blockEntity) -> {
             var menu = factory.create(type, id, inventory, blockEntity);
             for (var plugin : plugins) {
-                menu.addPlugin(plugin.apply(menu));
+                menu.addPlugin(plugin.castCreate(menu));
             }
             menu.setLayout(showInventory);
             return menu;

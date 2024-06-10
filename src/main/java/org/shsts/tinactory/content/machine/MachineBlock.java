@@ -35,7 +35,7 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final DirectionProperty IO_FACING = DirectionProperty.create("io_facing");
 
-    protected final Voltage voltage;
+    public final Voltage voltage;
     protected final double resistance;
 
     public MachineBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType, Voltage voltage) {

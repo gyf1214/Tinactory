@@ -41,8 +41,8 @@ import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.machine.ProcessingSet.generator;
+import static org.shsts.tinactory.content.machine.ProcessingSet.machine;
 import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
-import static org.shsts.tinactory.content.machine.ProcessingSet.processing;
 import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
@@ -103,7 +103,7 @@ public final class AllBlockEntities {
                 .build()
                 .register();
 
-        RESEARCH_TABLE = set(processing(AllRecipes.RESEARCH))
+        RESEARCH_TABLE = set(machine(AllRecipes.RESEARCH))
                 .overlay(gregtech("blocks/overlay/machine/overlay_screen"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
@@ -113,7 +113,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        var assembler = set(processing(AllRecipes.ASSEMBLER))
+        var assembler = set(machine(AllRecipes.ASSEMBLER))
                 .overlay(gregtech("blocks/machines/assembler"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
@@ -131,7 +131,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        STONE_GENERATOR = set(processing(AllRecipes.STONE_GENERATOR))
+        STONE_GENERATOR = set(machine(AllRecipes.STONE_GENERATOR))
                 .overlay(gregtech("blocks/machines/rock_crusher"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
@@ -236,7 +236,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ALLOY_SMELTER = set(processing(AllRecipes.ALLOY_SMELTER))
+        ALLOY_SMELTER = set(machine(AllRecipes.ALLOY_SMELTER))
                 .voltage(Voltage.ULV)
                 .overlay(gregtech("blocks/machines/alloy_smelter"))
                 .layoutSet()
@@ -270,7 +270,7 @@ public final class AllBlockEntities {
                 .blockEntity()
                 .eventManager().ticking()
                 .simpleCapability(MultiBlock::blastFurnace)
-                .simpleCapability(RecipeProcessor.basic(AllRecipes.BLAST_FURNACE, Voltage.LV))
+                .simpleCapability(RecipeProcessor.machine(AllRecipes.BLAST_FURNACE))
                 .build()
                 .block()
                 .transform(ModelGen.primitiveMachine(
@@ -288,8 +288,8 @@ public final class AllBlockEntities {
                 .eventManager()
                 .simpleCapability(MultiBlockInterface::basic)
                 .simpleCapability(FlexibleStackContainer::builder)
-                .menu(ProcessingMenu.factory(AllLayouts.BLAST_FURNACE))
-                .plugin(MachinePlugin.processing(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE))
+                .menu(ProcessingMenu.multiBlock())
+                .plugin(MachinePlugin.processing(AllRecipes.BLAST_FURNACE))
                 .build()
                 .build()
                 .block()
@@ -319,8 +319,8 @@ public final class AllBlockEntities {
                 .simpleCapability(Machine::builder)
                 .simpleCapability(Boiler.builder(burnSpeed))
                 .simpleCapability(StackProcessingContainer.builder(layout))
-                .menu(ProcessingMenu.factory(layout))
-                .plugin(MachinePlugin.noBook(layout))
+                .menu(ProcessingMenu.machine(layout))
+                .plugin(MachinePlugin::noBook)
                 .plugin(BoilerPlugin::new)
                 .build()
                 .build()

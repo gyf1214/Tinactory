@@ -47,13 +47,13 @@ public class MachineProcessor<T extends ProcessingRecipe>
 
     @Override
     protected boolean matches(Level world, T recipe, IContainer container) {
-        return recipe.matches(container, world) && recipe.canCraftInVoltage(voltage.value);
+        return recipe.matches(container, world) && recipe.canCraftInVoltage(getVoltage());
     }
 
     @Override
     protected List<? extends T> getMatchedRecipes(Level world, IContainer container) {
         return SmartRecipe.getRecipesFor(recipeType, container, world)
-                .stream().filter(r -> r.canCraftInVoltage(voltage.value))
+                .stream().filter(r -> r.canCraftInVoltage(getVoltage()))
                 .toList();
     }
 
@@ -111,9 +111,10 @@ public class MachineProcessor<T extends ProcessingRecipe>
 
     protected void calculateFactors(ProcessingRecipe recipe) {
         var baseVoltage = recipe.voltage == 0 ? Voltage.ULV.value : recipe.voltage;
+        var voltage = getVoltage();
         var voltageFactor = 1L;
         var overclock = 1L;
-        while (baseVoltage * voltageFactor * 4 <= voltage.value) {
+        while (baseVoltage * voltageFactor * 4 <= voltage) {
             overclock *= 2;
             voltageFactor *= 4;
         }
@@ -164,14 +165,13 @@ public class MachineProcessor<T extends ProcessingRecipe>
 
     @Override
     public double getPowerCons() {
-        return voltage == Voltage.PRIMITIVE || currentRecipe == null ?
-                0 : currentRecipe.power * energyFactor;
+        return currentRecipe == null ? 0d : currentRecipe.power * energyFactor;
     }
 
     @Nonnull
     @Override
     public <T1> LazyOptional<T1> getCapability(Capability<T1> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.ELECTRIC_MACHINE.get() && voltage != Voltage.PRIMITIVE) {
+        if (cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
             return myself();
         }
         return super.getCapability(cap, side);

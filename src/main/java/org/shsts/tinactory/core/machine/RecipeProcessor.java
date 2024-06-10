@@ -22,6 +22,7 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.GeneratorProcessor;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.machine.Voltage;
@@ -284,26 +285,31 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     private static final String ID = "machine/recipe_processor";
 
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    basic(RecipeTypeEntry<? extends ProcessingRecipe, ?> type, Voltage voltage) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-                be -> new MachineProcessor<>(be, type.get(), voltage));
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> oreProcessor(Voltage voltage) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-                be -> new OreAnalyzerProcessor(be, voltage));
+    private static Voltage getBlockVoltage(BlockEntity be) {
+        return be.getBlockState().getBlock() instanceof MachineBlock<?> machineBlock ?
+                machineBlock.voltage : Voltage.PRIMITIVE;
     }
 
     public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    generator(RecipeTypeEntry<? extends GeneratorRecipe, ?> type, Voltage voltage) {
+    machine(RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         return CapabilityProviderBuilder.fromFactory(ID,
-                be -> new GeneratorProcessor(be, type.get(), voltage));
+                be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be)));
+    }
+
+    public static <P> CapabilityProviderBuilder<BlockEntity, P> oreProcessor(P parent) {
+        return CapabilityProviderBuilder.fromFactory(parent, ID,
+                be -> new OreAnalyzerProcessor(be, getBlockVoltage(be)));
     }
 
     public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    electricFurnace(Voltage voltage) {
+    generator(RecipeTypeEntry<? extends GeneratorRecipe, ?> type) {
         return CapabilityProviderBuilder.fromFactory(ID,
-                be -> new ElectricFurnace(be, voltage));
+                be -> new GeneratorProcessor(be, type.get(), getBlockVoltage(be)));
+    }
+
+    public static <P> CapabilityProviderBuilder<BlockEntity, P>
+    electricFurnace(P parent) {
+        return CapabilityProviderBuilder.fromFactory(parent, ID,
+                be -> new ElectricFurnace(be, getBlockVoltage(be)));
     }
 }
