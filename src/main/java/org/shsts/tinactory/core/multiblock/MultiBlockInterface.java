@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
@@ -103,6 +104,11 @@ public class MultiBlockInterface extends Machine {
         if (multiBlock != null) {
             EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
         }
+    }
+
+    @Override
+    public boolean canPlayerInteract(Player player) {
+        return super.canPlayerInteract(player) && multiBlock != null;
     }
 
     @Override
