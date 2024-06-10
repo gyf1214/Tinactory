@@ -1,4 +1,4 @@
-package org.shsts.tinactory.registrate.builder;
+package org.shsts.tinactory.datagen.builder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -7,9 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.handler.TechProvider;
+import org.shsts.tinactory.datagen.DataGen;
+import org.shsts.tinactory.datagen.handler.TechProvider;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -20,21 +19,19 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TechBuilder<P> extends Builder<ResourceLocation, P, TechBuilder<P>> {
+public class TechBuilder<P> extends DataBuilder<JsonObject, P, TechBuilder<P>> {
     private final List<ResourceLocation> depends = new ArrayList<>();
     private long maxProgress = 0;
     private final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     private ResourceLocation displayItem = null;
 
-    public TechBuilder(Registrate registrate, P parent, String id) {
-        super(registrate, parent, id);
-        onBuild.add(this::buildObject);
+    public TechBuilder(DataGen dataGen, P parent, String id) {
+        super(dataGen, parent, id);
     }
 
-    public TechBuilder(Registrate registrate, P parent, ResourceLocation loc) {
-        super(registrate, parent, loc);
-        onBuild.add(this::buildObject);
+    public TechBuilder(DataGen dataGen, P parent, ResourceLocation loc) {
+        super(dataGen, parent, loc);
     }
 
     public TechBuilder<P> depends(ResourceLocation... loc) {
@@ -64,16 +61,17 @@ public class TechBuilder<P> extends Builder<ResourceLocation, P, TechBuilder<P>>
     }
 
     @Override
-    protected ResourceLocation createObject() {
+    protected void register() {
         assert maxProgress > 0;
-        registrate.techHandler.addCallback(prov -> prov.addTech(this));
-        registrate.languageHandler.track(ITechnology.getDescriptionId(loc));
-        registrate.languageHandler.track(ITechnology.getDetailsId(loc));
-        return loc;
+        dataGen.techHandler.addCallback(prov -> prov.addTech(this));
+//        registrate.languageHandler.track(ITechnology.getDescriptionId(loc));
+//        registrate.languageHandler.track(ITechnology.getDetailsId(loc));
     }
 
-    public JsonObject serialize() {
-        var jo = new JsonObject();
+    @Override
+    protected JsonObject createObject() {
+        assert maxProgress > 0;
+        var jo = new com.google.gson.JsonObject();
         jo.addProperty("max_progress", maxProgress);
         var ja = new JsonArray();
         depends.forEach(d -> ja.add(d.toString()));
@@ -81,7 +79,7 @@ public class TechBuilder<P> extends Builder<ResourceLocation, P, TechBuilder<P>>
         var displayItemLoc = displayItem == null ? Items.AIR.getRegistryName() : displayItem;
         assert displayItemLoc != null;
         jo.addProperty("display_item", displayItemLoc.toString());
-        var jo1 = new JsonObject();
+        var jo1 = new com.google.gson.JsonObject();
         for (var entry : modifiers.entrySet()) {
             jo1.addProperty(entry.getKey(), entry.getValue());
         }

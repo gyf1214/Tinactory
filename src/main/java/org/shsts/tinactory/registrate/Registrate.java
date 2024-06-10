@@ -45,7 +45,6 @@ import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
-import org.shsts.tinactory.registrate.builder.TechBuilder;
 import org.shsts.tinactory.registrate.common.CapabilityEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
@@ -64,7 +63,6 @@ import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
 import org.shsts.tinactory.registrate.handler.TagsHandler;
-import org.shsts.tinactory.registrate.handler.TechHandler;
 import org.shsts.tinactory.registrate.handler.TintHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -109,7 +107,6 @@ public class Registrate {
     // DataGen
     public final RecipeDataHandler recipeDataHandler;
     public final LootTableHandler lootTableHandler;
-    public final TechHandler techHandler;
     public final LanguageHandler languageHandler;
 
     // Client
@@ -135,7 +132,6 @@ public class Registrate {
         this.itemModelHandler = new ItemModelHandler(this);
         this.recipeDataHandler = new RecipeDataHandler(this);
         this.lootTableHandler = new LootTableHandler(this);
-        this.techHandler = new TechHandler(this);
         this.languageHandler = new LanguageHandler(this);
 
         this.renderTypeHandler = new RenderTypeHandler();
@@ -148,7 +144,6 @@ public class Registrate {
         putDataHandler(itemModelHandler);
         putDataHandler(recipeDataHandler);
         putDataHandler(lootTableHandler);
-        putDataHandler(techHandler);
         putDataHandler(languageHandler);
     }
 
@@ -426,14 +421,6 @@ public class Registrate {
         for (var id : ids) {
             biomeHandler.addLocation(new ResourceLocation(modid, id));
         }
-    }
-
-    public TechBuilder<Registrate> tech(String id) {
-        return new TechBuilder<>(this, this, id);
-    }
-
-    public <P> TechBuilder<P> tech(P parent, ResourceLocation loc) {
-        return new TechBuilder<>(this, parent, loc);
     }
 
     public void nullRecipe(ResourceLocation loc) {

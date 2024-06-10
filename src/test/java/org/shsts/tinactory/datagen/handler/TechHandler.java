@@ -1,21 +1,21 @@
-package org.shsts.tinactory.registrate.handler;
+package org.shsts.tinactory.datagen.handler;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.datagen.DataGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechHandler extends DataHandler<TechProvider> {
-    public TechHandler(Registrate registrate) {
-        super(registrate);
+    public TechHandler(DataGen dataGen) {
+        super(dataGen);
     }
 
     private class Provider extends TechProvider {
         protected Provider(GatherDataEvent event) {
-            super(event.getGenerator(), registrate.modid, event.getExistingFileHelper());
+            super(event.getGenerator(), dataGen.modid, event.getExistingFileHelper());
         }
 
         @Override
@@ -25,7 +25,7 @@ public class TechHandler extends DataHandler<TechProvider> {
     }
 
     @Override
-    public void onGatherData(GatherDataEvent event) {
-        event.getGenerator().addProvider(new Provider(event));
+    protected TechProvider createProvider(GatherDataEvent event) {
+        return new Provider(event);
     }
 }

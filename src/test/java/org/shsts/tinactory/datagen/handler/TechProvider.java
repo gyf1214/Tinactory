@@ -1,4 +1,5 @@
-package org.shsts.tinactory.registrate.handler;
+package org.shsts.tinactory.datagen.handler;
+
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,7 +10,7 @@ import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import org.shsts.tinactory.registrate.builder.TechBuilder;
+import org.shsts.tinactory.datagen.builder.TechBuilder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
@@ -55,7 +56,7 @@ public abstract class TechProvider implements DataProvider {
         addTechs();
         for (var tech : techs) {
             tech.validate(existingFileHelper);
-            var jo = tech.serialize();
+            var jo = tech.buildObject();
             var path = getPath(tech.loc);
             var s = gson.toJson(jo);
             var hash = SHA1.hashUnencodedChars(s).toString();

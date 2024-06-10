@@ -4,14 +4,14 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
-import org.shsts.tinactory.registrate.builder.TechBuilder;
+import org.shsts.tinactory.datagen.builder.TechBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.AllTechs.BASE_ORE;
 import static org.shsts.tinactory.content.AllTechs.LOGISTICS;
-import static org.shsts.tinactory.datagen.DataGen.REGISTRATE;
+import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.RecipeTypes.RESEARCH;
 
 @ParametersAreNonnullByDefault
@@ -53,7 +53,7 @@ public final class Technologies {
         private ResourceLocation base = null;
 
         public TechBuilder<TechFactory> tech(ResourceLocation loc) {
-            var builder = REGISTRATE.tech(this, loc);
+            var builder = DATA_GEN.tech(this, loc);
             if (base != null) {
                 builder.depends(base);
             }

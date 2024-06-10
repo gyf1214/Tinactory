@@ -23,7 +23,7 @@ import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllTechs.BASE_ORE;
-import static org.shsts.tinactory.datagen.DataGen.REGISTRATE;
+import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.RecipeTypes.ORE_ANALYZER;
 import static org.shsts.tinactory.datagen.content.RecipeTypes.RESEARCH;
 
@@ -115,10 +115,10 @@ public final class Veins {
             var tech = BASE_ORE.get(variant);
             var baseProgress = 50L * (1L << (long) variant.rank);
             if (!baseOre) {
-                tech = REGISTRATE.tech("ore/" + id)
+                tech = DATA_GEN.tech("ore/" + id)
                         .maxProgress(baseProgress)
                         .displayItem(ores.get(0).loc("raw"))
-                        .depends(tech).buildObject();
+                        .depends(tech).buildLoc();
 
                 RESEARCH.recipe(tech)
                         .target(tech)
