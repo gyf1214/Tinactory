@@ -35,6 +35,7 @@ import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.NullRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
@@ -77,7 +78,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Registrate {
+public class Registrate implements IRecipeDataConsumer {
     public final String modid;
 
     private final Map<ResourceLocation, RegistryEntryHandler<?>> registryEntryHandlers = new HashMap<>();
@@ -452,6 +453,12 @@ public class Registrate {
         });
     }
 
+    @Override
+    public String getModId() {
+        return modid;
+    }
+
+    @Override
     public void registerRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe) {
         recipeDataHandler.addCallback(prov -> prov.addRecipe(recipe.get()));
         languageHandler.track(SmartRecipe.getDescriptionId(loc));

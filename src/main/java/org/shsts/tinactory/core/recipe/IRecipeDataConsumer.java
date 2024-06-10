@@ -7,9 +7,20 @@ import net.minecraft.resources.ResourceLocation;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
-@FunctionalInterface
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IRecipeDataConsumer {
-    void addRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe);
+    String getModId();
+
+    void registerRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe);
+
+    IRecipeDataConsumer EMPTY = new IRecipeDataConsumer() {
+        @Override
+        public String getModId() {
+            return "";
+        }
+
+        @Override
+        public void registerRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe) {}
+    };
 }

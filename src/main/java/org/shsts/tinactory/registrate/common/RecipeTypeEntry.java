@@ -8,6 +8,7 @@ import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -48,28 +49,29 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, 
     }
 
     public B getBuilder(ResourceLocation loc) {
-        return builderFactory.create(($1, $2) -> {}, this, loc);
+        return builderFactory.create(IRecipeDataConsumer.EMPTY, this, loc);
     }
 
-    private B getBuilder(Registrate registrate, ResourceLocation loc) {
-        return builderFactory.create(registrate::registerRecipe, this, loc);
+    private B getBuilder(IRecipeDataConsumer consumer, ResourceLocation loc) {
+        return builderFactory.create(consumer, this, loc);
     }
 
-    private B addRecipe(Registrate registrate, ResourceLocation loc) {
-        return getBuilder(registrate, loc).transform(defaults);
+    private B addRecipe(IRecipeDataConsumer consumer, ResourceLocation loc) {
+        return getBuilder(consumer, loc).transform(defaults);
     }
 
-    public B recipe(Registrate registrate, ResourceLocation loc) {
+    public B recipe(IRecipeDataConsumer consumer, ResourceLocation loc) {
+        var modid = consumer.getModId();
         var id = loc.getPath();
-        if (!registrate.modid.equals(loc.getNamespace())) {
+        if (!modid.equals(loc.getNamespace())) {
             id = loc.getNamespace() + "/" + id;
         }
         id = prefix + "/" + id;
-        return addRecipe(registrate, new ResourceLocation(registrate.modid, id));
+        return addRecipe(consumer, new ResourceLocation(modid, id));
     }
 
-    public B recipe(Registrate registrate, String id) {
-        return recipe(registrate, new ResourceLocation(registrate.modid, id));
+    public B recipe(IRecipeDataConsumer consumer, String id) {
+        return recipe(consumer, new ResourceLocation(consumer.getModId(), id));
     }
 
     public B recipe(ResourceLocation loc) {
@@ -88,9 +90,5 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, 
 
     public B recipe(RegistryEntry<?> item) {
         return recipe(item.loc);
-    }
-
-    public RecipeFactory<B> factory(Registrate registrate) {
-        return new RecipeFactory<>(registrate, this);
     }
 }

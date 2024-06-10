@@ -16,6 +16,6 @@ public abstract class SimpleRecipeBuilder<P, S extends SimpleRecipeBuilder<P, S>
     public SimpleRecipeBuilder(IRecipeDataConsumer consumer, P parent, ResourceLocation loc) {
         super(parent);
         this.loc = loc;
-        onBuild.add(() -> consumer.addRecipe(loc, this::buildObject));
+        onBuild.add(() -> consumer.registerRecipe(loc, this::buildObject));
     }
 }

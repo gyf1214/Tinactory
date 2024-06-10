@@ -3,9 +3,7 @@ package org.shsts.tinactory.datagen.handler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.datagen.DataGen;
 
 import javax.annotation.Nullable;
@@ -15,7 +13,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeHandler extends DataHandler<RecipeProvider> implements IRecipeDataConsumer {
+public class RecipeHandler extends DataHandler<RecipeProvider> {
     private class Provider extends RecipeProvider {
         @Nullable
         private Consumer<FinishedRecipe> consumer = null;
@@ -50,8 +48,7 @@ public class RecipeHandler extends DataHandler<RecipeProvider> implements IRecip
         return new Provider(event);
     }
 
-    @Override
-    public void addRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe) {
+    public void registerRecipe(Supplier<FinishedRecipe> recipe) {
         addCallback(prov -> ((Provider) prov).addRecipe(recipe.get()));
     }
 }

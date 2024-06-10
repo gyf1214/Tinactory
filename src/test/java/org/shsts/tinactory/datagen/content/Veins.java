@@ -22,10 +22,10 @@ import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
+import static org.shsts.tinactory.content.AllRecipes.RESEARCH;
 import static org.shsts.tinactory.content.AllTechs.BASE_ORE;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
-import static org.shsts.tinactory.datagen.content.RecipeTypes.ORE_ANALYZER;
-import static org.shsts.tinactory.datagen.content.RecipeTypes.RESEARCH;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -78,7 +78,7 @@ public final class Veins {
             super(parent);
             this.id = id;
             this.rate = rate;
-            this.builder = ORE_ANALYZER.recipe(id).rate(rate);
+            this.builder = ORE_ANALYZER.recipe(DATA_GEN, id).rate(rate);
         }
 
         public VeinBuilder ore(MaterialSet material, double rate) {
@@ -120,14 +120,14 @@ public final class Veins {
                         .displayItem(ores.get(0).loc("raw"))
                         .depends(tech).buildLoc();
 
-                RESEARCH.recipe(tech)
+                RESEARCH.recipe(DATA_GEN, tech)
                         .target(tech)
                         .defaultInput(variant.voltage)
                         .build();
             }
 
             for (var ore : new HashSet<>(ores)) {
-                RESEARCH.recipe(tech.getPath() + "_from_" + ore.name)
+                RESEARCH.recipe(DATA_GEN, tech.getPath() + "_from_" + ore.name)
                         .target(tech)
                         .inputItem(ore.tag("raw"))
                         .voltage(variant.voltage)

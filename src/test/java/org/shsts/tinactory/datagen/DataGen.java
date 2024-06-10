@@ -1,10 +1,12 @@
 package org.shsts.tinactory.datagen;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
@@ -16,10 +18,11 @@ import org.shsts.tinactory.registrate.Registrate;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class DataGen {
+public final class DataGen implements IRecipeDataConsumer {
     public final String modid;
     public final TechHandler techHandler;
     public final RecipeHandler recipeHandler;
@@ -47,6 +50,16 @@ public final class DataGen {
             modEventBus.addListener(handler::onGatherData);
         }
         modEventBus.addListener(this::onCommonSetup);
+    }
+
+    @Override
+    public String getModId() {
+        return modid;
+    }
+
+    @Override
+    public void registerRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe) {
+        recipeHandler.registerRecipe(recipe);
     }
 
     private <T extends DataHandler<?>> T handler(T dataHandler) {
