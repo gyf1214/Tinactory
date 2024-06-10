@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
-import static org.shsts.tinactory.content.model.ModelGen.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

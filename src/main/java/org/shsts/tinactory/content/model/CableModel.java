@@ -20,11 +20,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.shsts.tinactory.content.model.ModelGen.WHITE_TEX;
-import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 import static org.shsts.tinactory.content.network.CableBlock.PIPE_RADIUS;
 import static org.shsts.tinactory.content.network.CableBlock.RADIUS;
 import static org.shsts.tinactory.content.network.CableBlock.SMALL_WIRE_RADIUS;
 import static org.shsts.tinactory.content.network.CableBlock.WIRE_RADIUS;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -146,12 +147,12 @@ public final class CableModel {
             var property = CableBlock.PROPERTY_BY_DIRECTION.get(dir);
             multipart.part()
                     // open end
-                    .modelFile(models.getExistingFile(ModelGen.modLoc(openModel)))
+                    .modelFile(models.getExistingFile(modLoc(openModel)))
                     .rotationX(xRot).rotationY(yRot).addModel()
                     .condition(property, true)
                     .end().part()
                     // closed end
-                    .modelFile(models.getExistingFile(ModelGen.modLoc(closedModel)))
+                    .modelFile(models.getExistingFile(modLoc(closedModel)))
                     .rotationX(xRot).rotationY(yRot).addModel()
                     .condition(property, false)
                     .end();
@@ -159,11 +160,11 @@ public final class CableModel {
     }
 
     public static void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(ITEM_MODEL));
+        ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_MODEL));
     }
 
     public static void wireModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(ITEM_WIRE_MODEL));
+        ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_WIRE_MODEL));
     }
 
     public static void ulvCableModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
@@ -173,6 +174,6 @@ public final class CableModel {
     }
 
     public static void pipeModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        ctx.provider.withExistingParent(ctx.id, ModelGen.modLoc(ITEM_PIPE_MODEL));
+        ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_PIPE_MODEL));
     }
 }

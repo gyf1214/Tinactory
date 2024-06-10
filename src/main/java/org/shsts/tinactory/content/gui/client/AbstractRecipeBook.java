@@ -10,7 +10,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.machine.MachineConfig;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -37,6 +36,8 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -55,11 +56,11 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             -PANEL_BORDER, -PANEL_BORDER);
 
     public static final Texture RECIPE_BOOK_BUTTON = new Texture(
-            ModelGen.mcLoc("gui/recipe_button"), 256, 256);
+            mcLoc("gui/recipe_button"), 256, 256);
     private static final Texture DISABLE_BUTTON = new Texture(
-            ModelGen.modLoc("gui/disable_recipe"), 16, 16);
+            modLoc("gui/disable_recipe"), 16, 16);
     private static final Texture RECIPE_BUTTON = new Texture(
-            ModelGen.modLoc("gui/recipe_book_button"), 42, 21);
+            modLoc("gui/recipe_book_button"), 42, 21);
 
     private class RecipeButtonPanel extends ButtonPanel {
         public RecipeButtonPanel() {

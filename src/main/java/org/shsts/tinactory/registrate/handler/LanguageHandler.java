@@ -13,7 +13,6 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.content.model.LanguageProcessor;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
@@ -22,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -59,7 +60,7 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
 
         private void processTracked() throws IOException {
             var processor = new LanguageProcessor();
-            var extra = readJson(ModelGen.modLoc("lang/extra.json"));
+            var extra = readJson(modLoc("lang/extra.json"));
             processor.process(trackedKeys, extra, this);
             trackedKeys.clear();
         }

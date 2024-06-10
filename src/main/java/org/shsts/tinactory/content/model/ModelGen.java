@@ -10,8 +10,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import org.apache.commons.lang3.StringUtils;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
 import org.shsts.tinactory.content.machine.SidedMachineBlock;
@@ -28,6 +26,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.core.util.LocHelper.extend;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.core.util.LocHelper.prepend;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -60,32 +62,6 @@ public final class ModelGen {
 
     public static final ResourceLocation VOID_TEX = modLoc("void");
     public static final ResourceLocation WHITE_TEX = modLoc("white");
-
-    public static ResourceLocation mcLoc(String id) {
-        return new ResourceLocation(id);
-    }
-
-    public static ResourceLocation modLoc(String id) {
-        return new ResourceLocation(Tinactory.ID, id);
-    }
-
-    public static ResourceLocation gregtech(String id) {
-        return new ResourceLocation("gregtech", id);
-    }
-
-    public static ResourceLocation extend(ResourceLocation loc, String suffix) {
-        if (StringUtils.isEmpty(suffix)) {
-            return loc;
-        }
-        return new ResourceLocation(loc.getNamespace(), loc.getPath() + "/" + suffix);
-    }
-
-    public static ResourceLocation prepend(ResourceLocation loc, String prefix) {
-        if (StringUtils.isEmpty(prefix)) {
-            return loc;
-        }
-        return new ResourceLocation(loc.getNamespace(), prefix + "/" + loc.getPath());
-    }
 
     public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
     basicItem(ResourceLocation... layers) {

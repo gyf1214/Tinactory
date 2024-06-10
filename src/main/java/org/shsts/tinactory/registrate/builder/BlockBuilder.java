@@ -14,7 +14,6 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
@@ -26,6 +25,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.core.util.LocHelper.prepend;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -156,13 +157,13 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
     }
 
     public S drop(Supplier<? extends Item> item) {
-        var loc = ModelGen.prepend(this.loc, "blocks");
+        var loc = prepend(this.loc, "blocks");
         registrate.lootTableHandler.blockLoot(loot -> loot.dropSingle(loc, item.get()));
         return self();
     }
 
     public S dropSelf() {
-        var loc = ModelGen.prepend(this.loc, "blocks");
+        var loc = prepend(this.loc, "blocks");
         onCreateEntry.add(block ->
                 registrate.lootTableHandler.blockLoot(loot -> loot.dropSingle(loc, block.get())));
         return self();

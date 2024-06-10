@@ -45,7 +45,7 @@ import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllRecipes.TOOL;
 import static org.shsts.tinactory.content.AllRecipes.has;
-import static org.shsts.tinactory.content.model.ModelGen.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

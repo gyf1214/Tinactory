@@ -9,7 +9,7 @@ import org.shsts.tinactory.core.gui.Texture;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-import static org.shsts.tinactory.content.model.ModelGen.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

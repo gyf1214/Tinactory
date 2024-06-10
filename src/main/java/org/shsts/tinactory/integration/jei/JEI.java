@@ -15,7 +15,6 @@ import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.machine.Voltage;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
@@ -25,11 +24,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+
 @JeiPlugin
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class JEI implements IModPlugin {
-    private static final ResourceLocation LOC = ModelGen.modLoc("jei");
+    private static final ResourceLocation LOC = modLoc("jei");
 
     private final List<RecipeCategory<?, ?>> categories;
 

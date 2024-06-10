@@ -31,7 +31,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.shsts.tinactory.api.logistics.SlotType;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
@@ -45,6 +44,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.shsts.tinactory.core.util.LocHelper.prepend;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -61,7 +62,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     protected RecipeCategory(RecipeTypeEntry<? extends T, ?> recipeType, Layout layout, Ingredient catalyst,
                              ItemStack iconItem, Class<M> menuClazz) {
         this.recipeType = recipeType;
-        this.type = new RecipeType<>(ModelGen.prepend(recipeType.loc, "jei/category"), recipeType.clazz);
+        this.type = new RecipeType<>(prepend(recipeType.loc, "jei/category"), recipeType.clazz);
         this.layout = layout;
         this.catalyst = catalyst;
         this.iconItem = iconItem;

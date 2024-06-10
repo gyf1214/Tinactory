@@ -20,8 +20,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 
 import static org.shsts.tinactory.content.model.ModelGen.TEXTURE_TYPE;
-import static org.shsts.tinactory.content.model.ModelGen.extend;
-import static org.shsts.tinactory.content.model.ModelGen.modLoc;
+import static org.shsts.tinactory.core.util.LocHelper.extend;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -33,7 +35,7 @@ public final class MachineModel {
     public static final String IO_TEX = "blocks/overlay/appeng/me_output_bus";
 
     private static void genCasingModel(DataContext<BlockStateProvider> ctx) {
-        var model = ctx.provider.models().withExistingParent(CASING_MODEL, ModelGen.mcLoc("block/block"))
+        var model = ctx.provider.models().withExistingParent(CASING_MODEL, mcLoc("block/block"))
                 .texture("particle", "#side")
                 .element().from(0, 0, 0).to(16, 16, 16)
                 .allFaces((d, f) -> f.cullface(d).texture(switch (d) {
@@ -50,13 +52,13 @@ public final class MachineModel {
     }
 
     private static void genIOModel(DataContext<BlockStateProvider> ctx) {
-        ctx.provider.models().withExistingParent(IO_MODEL, ModelGen.mcLoc("block/block"))
+        ctx.provider.models().withExistingParent(IO_MODEL, mcLoc("block/block"))
                 .element().from(0, 0, 0).to(16, 16, 16)
                 .face(ModelGen.FRONT_FACING)
                 .cullface(ModelGen.FRONT_FACING)
                 .texture("#" + IO_TEX_KEY)
                 .end().end()
-                .texture(IO_TEX_KEY, ModelGen.gregtech(IO_TEX));
+                .texture(IO_TEX_KEY, gregtech(IO_TEX));
     }
 
     public static void genBlockModels(DataContext<BlockStateProvider> ctx) {

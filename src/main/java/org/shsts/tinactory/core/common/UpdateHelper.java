@@ -10,7 +10,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.model.ModelGen;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,10 +19,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class UpdateHelper extends CapabilityProvider {
-    public static final ResourceLocation LOC = ModelGen.modLoc("update_helper");
+    public static final ResourceLocation LOC = modLoc("update_helper");
 
     private final Map<ResourceLocation, INBTUpdatable<?>> updatableCapability = new HashMap<>();
     private final Set<ResourceLocation> dirtyCapabilities = new HashSet<>();

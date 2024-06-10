@@ -6,13 +6,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -47,7 +47,7 @@ public final class AllTags {
     }
 
     public static TagKey<Item> modItem(String id) {
-        return item(ModelGen.modLoc(id));
+        return item(modLoc(id));
     }
 
     public static TagKey<Block> block(ResourceLocation loc) {
@@ -55,7 +55,7 @@ public final class AllTags {
     }
 
     public static TagKey<Block> modBlock(String id) {
-        return block(ModelGen.modLoc(id));
+        return block(modLoc(id));
     }
 
     public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {

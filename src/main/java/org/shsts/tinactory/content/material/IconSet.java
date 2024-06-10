@@ -15,7 +15,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static org.shsts.tinactory.content.model.ModelGen.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.extend;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -43,7 +45,7 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
             return Optional.of(MAGNETIC_LOC);
         }
         for (var set = this; set != null; set = set.parent) {
-            var loc = ModelGen.extend(baseLoc, set.subfolder + "/" + sub);
+            var loc = extend(baseLoc, set.subfolder + "/" + sub);
             if (helper.exists(loc, ModelGen.TEXTURE_TYPE)) {
                 return Optional.of(loc);
             }
@@ -71,7 +73,7 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         var tex = getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() ->
                 new IllegalArgumentException("No block overlay %s for icon set %s"
                         .formatted(sub, subfolder)));
-        return prov.withExistingParent(id + "_overlay", ModelGen.modLoc("block/cube_tint"))
+        return prov.withExistingParent(id + "_overlay", modLoc("block/cube_tint"))
                 .texture("all", tex);
     }
 }

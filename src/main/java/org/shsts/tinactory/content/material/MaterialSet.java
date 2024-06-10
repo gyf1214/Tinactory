@@ -56,6 +56,8 @@ import static org.shsts.tinactory.content.AllTags.TOOL_SCREW;
 import static org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -461,7 +463,7 @@ public class MaterialSet {
             @Override
             protected Unit createObject() {
                 var raw = put("raw", () -> REGISTRATE.item(newId("raw"), Item::new)
-                        .model(ModelGen.basicItem(ModelGen.modLoc("items/material/raw")))
+                        .model(ModelGen.basicItem(modLoc("items/material/raw")))
                         .tint(color)
                         .register());
 
@@ -606,7 +608,7 @@ public class MaterialSet {
             }
 
             private static ResourceLocation toolTex(String sub) {
-                return ModelGen.gregtech("items/tools/" + sub);
+                return gregtech("items/tools/" + sub);
             }
 
             private static final Map<String, String> TOOL_HANDLE_TEX = ImmutableMap.<String, String>builder()
@@ -622,7 +624,7 @@ public class MaterialSet {
                 var handle = Optional.ofNullable(TOOL_HANDLE_TEX.get(category))
                         .map(MaterialSet.Builder.ToolBuilder::toolTex)
                         .orElse(ModelGen.VOID_TEX);
-                var head = ModelGen.gregtech("items/tools/" + category);
+                var head = gregtech("items/tools/" + category);
                 var sub = "tool/" + category;
                 put(sub, () -> REGISTRATE.item(newId(sub), factory)
                         .model(ModelGen.basicItem(handle, head))

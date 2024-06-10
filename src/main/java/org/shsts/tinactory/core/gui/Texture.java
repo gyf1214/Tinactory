@@ -5,9 +5,9 @@ import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static org.shsts.tinactory.content.model.ModelGen.gregtech;
-import static org.shsts.tinactory.content.model.ModelGen.mcLoc;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

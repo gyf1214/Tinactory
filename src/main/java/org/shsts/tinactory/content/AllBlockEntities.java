@@ -43,8 +43,8 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.machine.ProcessingSet.generator;
 import static org.shsts.tinactory.content.machine.ProcessingSet.machine;
 import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
-import static org.shsts.tinactory.content.model.ModelGen.gregtech;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
