@@ -61,7 +61,7 @@ public class Network extends NetworkBase {
     }
 
     protected void putMachine(Machine be) {
-        LOGGER.debug("network {}: put machine {}", this, be);
+        LOGGER.trace("{}: put machine {}", this, be);
         machines.add(be);
     }
 

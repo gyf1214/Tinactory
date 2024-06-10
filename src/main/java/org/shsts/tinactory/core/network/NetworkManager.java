@@ -39,7 +39,7 @@ public final class NetworkManager {
 
     public void putNetworkAtPos(BlockPos pos, NetworkBase network) {
         assert !hasNetworkAtPos(pos);
-        LOGGER.debug("track block at {}:{} to network {}", world.dimension(), pos, network);
+        LOGGER.trace("track block at {}:{} to network {}", world.dimension(), pos, network);
         network.addToMap(networkPosMap, pos);
     }
 

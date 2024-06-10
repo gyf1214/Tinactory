@@ -43,7 +43,7 @@ public class Machine extends UpdatableCapabilityProvider
         implements IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final SmartBlockEntity blockEntity;
+    public final SmartBlockEntity blockEntity;
 
     @Nullable
     protected Network network;
@@ -58,7 +58,7 @@ public class Machine extends UpdatableCapabilityProvider
         if (network != null) {
             network.invalidate();
         }
-        LOGGER.debug("machine {}: removed in world", this);
+        LOGGER.debug("{}: removed in world", this);
     }
 
     /**
@@ -142,7 +142,7 @@ public class Machine extends UpdatableCapabilityProvider
      * Called when connect to the network
      */
     public void onConnectToNetwork(Network network) {
-        LOGGER.debug("machine {}: connect to network {}", this, network);
+        LOGGER.debug("{}: connect to network {}", this, network);
         this.network = network;
         updatePassiveRequests();
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
@@ -153,7 +153,7 @@ public class Machine extends UpdatableCapabilityProvider
      */
     public void onDisconnectFromNetwork() {
         network = null;
-        LOGGER.debug("machine {}: disconnect from network", this);
+        LOGGER.trace("{}: disconnect from network", this);
     }
 
     private void onPreWork(Level world, Network network) {

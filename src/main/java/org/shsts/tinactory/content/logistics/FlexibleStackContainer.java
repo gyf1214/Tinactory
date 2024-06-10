@@ -9,8 +9,6 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -42,11 +40,10 @@ import java.util.Optional;
 public class FlexibleStackContainer extends CapabilityProvider
         implements IFlexibleContainer, INBTSerializable<CompoundTag> {
     private final BlockEntity blockEntity;
-    private final WrapperItemHandler[] items;
-    private final WrapperItemHandler[] internalItems;
+    private final WrapperItemHandler items;
+    private final WrapperItemHandler internalItems;
     private final WrapperFluidTank[] fluids;
     private final WrapperFluidTank[] internalFluids;
-    private final CombinedInvWrapper combinedItems;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports = new ArrayList<>();
     private final LazyOptional<IItemHandler> itemHandlerCap;
@@ -54,54 +51,46 @@ public class FlexibleStackContainer extends CapabilityProvider
 
     public FlexibleStackContainer(BlockEntity blockEntity, int maxItemSlots, int maxFluidSlots) {
         this.blockEntity = blockEntity;
-        this.items = new WrapperItemHandler[maxItemSlots];
-        this.internalItems = new WrapperItemHandler[maxItemSlots];
-        this.fluids = new WrapperFluidTank[maxFluidSlots];
-        this.internalFluids = new WrapperFluidTank[maxFluidSlots];
+
+        this.internalItems = new WrapperItemHandler(maxItemSlots);
+        this.items = new WrapperItemHandler(internalItems);
         for (var i = 0; i < maxItemSlots; i++) {
-            internalItems[i] = new WrapperItemHandler(1);
-            items[i] = new WrapperItemHandler(internalItems[i]);
-            internalItems[i].allowInput = false;
-            items[i].allowInput = false;
+            items.setFilter(i, $ -> false);
         }
+        internalItems.onUpdate(this::onUpdate);
+
+        this.internalFluids = new WrapperFluidTank[maxFluidSlots];
+        this.fluids = new WrapperFluidTank[maxFluidSlots];
         var fluidSize = TinactoryConfig.INSTANCE.fluidSlotSize.get();
         for (var i = 0; i < maxFluidSlots; i++) {
             internalFluids[i] = new WrapperFluidTank(fluidSize);
+            internalFluids[i].onUpdate(this::onUpdate);
             fluids[i] = new WrapperFluidTank(internalFluids[i]);
-            internalFluids[i].allowInput = false;
             fluids[i].allowInput = false;
         }
 
-        this.combinedItems = new CombinedInvWrapper(items);
         this.combinedFluids = new CombinedFluidTank(fluids);
-        this.itemHandlerCap = LazyOptional.of(() -> combinedItems);
+        this.itemHandlerCap = LazyOptional.of(() -> items);
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
     private record PortInfo(SlotType type, IPort port, IPort internal) {}
 
     private PortInfo createItemPort(SlotType type, List<Layout.SlotInfo> slots) {
-        var views = new IItemHandlerModifiable[slots.size()];
-        var internalViews = new IItemHandlerModifiable[slots.size()];
-        var k = 0;
-        for (var slot : slots) {
-            var i = slot.index();
-            internalItems[i].allowInput = true;
-            switch (type) {
-                case ITEM_INPUT -> {
-                    items[i].allowInput = true;
-                    internalItems[i].onUpdate(this::onInputUpdate);
-                }
-                case ITEM_OUTPUT -> internalItems[i].onUpdate(this::onOutputUpdate);
-                default -> throw new IllegalArgumentException();
-            }
-            views[k] = items[i];
-            internalViews[k] = internalItems[i];
-            k++;
+        if (slots.isEmpty()) {
+            return new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
         }
-        var view = new WrapperItemHandler(new CombinedInvWrapper(views));
-        var internalView = new WrapperItemHandler(new CombinedInvWrapper(internalViews));
-        return new PortInfo(type, new ItemHandlerCollection(view), new ItemHandlerCollection(internalView));
+
+        var minSlot = slots.get(0).index();
+        var maxSlot = slots.get(slots.size() - 1).index() + 1;
+        assert minSlot >= 0 && maxSlot <= items.getSlots() && minSlot < maxSlot;
+        for (var i = minSlot; i < maxSlot; i++) {
+            items.resetFilter(i);
+        }
+
+        var port = new ItemHandlerCollection(items, minSlot, maxSlot);
+        var internalPort = new ItemHandlerCollection(internalItems, minSlot, maxSlot);
+        return new PortInfo(type, port, internalPort);
     }
 
     private PortInfo createFluidPort(SlotType type, List<Layout.SlotInfo> slots) {
@@ -110,13 +99,8 @@ public class FlexibleStackContainer extends CapabilityProvider
         var k = 0;
         for (var slot : slots) {
             var i = slot.index();
-            internalFluids[i].allowInput = true;
-            switch (type) {
-                case ITEM_INPUT -> {
-                    fluids[i].allowInput = true;
-                    internalFluids[i].onUpdate(this::onInputUpdate);
-                }
-                case ITEM_OUTPUT -> internalFluids[i].onUpdate(this::onOutputUpdate);
+            if (type == SlotType.ITEM_INPUT) {
+                fluids[i].allowInput = true;
             }
             views[k] = fluids[i];
             internalViews[k] = internalFluids[i];
@@ -147,28 +131,18 @@ public class FlexibleStackContainer extends CapabilityProvider
 
     @Override
     public void resetLayout() {
-        for (var i = 0; i < items.length; i++) {
-            internalItems[i].allowInput = false;
-            items[i].allowInput = false;
-            internalItems[i].resetOnUpdate();
-            items[i].resetFilter(0);
+        for (var i = 0; i < items.getSlots(); i++) {
+            items.setFilter(i, $ -> false);
         }
-        for (var i = 0; i < fluids.length; i++) {
-            internalFluids[i].allowInput = false;
-            fluids[i].allowInput = false;
-            internalFluids[i].resetOnUpdate();
-            fluids[i].resetFilter();
+        for (var fluid : fluids) {
+            fluid.allowInput = false;
+            fluid.resetFilter();
         }
         ports.clear();
     }
 
-    private void onInputUpdate() {
-        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE, true);
-        blockEntity.setChanged();
-    }
-
-    private void onOutputUpdate() {
-        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE, false);
+    private void onUpdate() {
+        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE);
         blockEntity.setChanged();
     }
 
@@ -214,14 +188,14 @@ public class FlexibleStackContainer extends CapabilityProvider
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.put("stack", ItemHelper.serializeItemHandler(combinedItems));
+        tag.put("stack", ItemHelper.serializeItemHandler(items));
         tag.put("fluid", combinedFluids.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(combinedItems, tag.getCompound("stack"));
+        ItemHelper.deserializeItemHandler(items, tag.getCompound("stack"));
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 

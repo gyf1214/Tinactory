@@ -3,16 +3,21 @@ package org.shsts.tinactory.core.multiblock;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
+import org.shsts.tinactory.core.common.EventManager;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import javax.annotation.Nonnull;
@@ -32,7 +37,7 @@ public abstract class MultiBlock extends MultiBlockBase {
     @Nullable
     protected MultiBlockInterface multiBlockInterface = null;
 
-    public MultiBlock(BlockEntity blockEntity, Layout layout) {
+    public MultiBlock(SmartBlockEntity blockEntity, Layout layout) {
         super(blockEntity);
         this.layout = layout;
     }
@@ -64,6 +69,8 @@ public abstract class MultiBlock extends MultiBlockBase {
     protected void onRegister() {
         assert multiBlockInterface != null;
         multiBlockInterface.setMultiBlock(this);
+        sendUpdate(blockEntity);
+        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
 
     @Override
@@ -72,14 +79,12 @@ public abstract class MultiBlock extends MultiBlockBase {
             multiBlockInterface.resetMultiBlock();
         }
         multiBlockInterface = null;
+        sendUpdate(blockEntity);
+        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
 
     public Optional<MultiBlockInterface> getInterface() {
-        if (ref == null) {
-            return Optional.empty();
-        }
-        assert multiBlockInterface != null;
-        return Optional.of(multiBlockInterface);
+        return Optional.ofNullable(multiBlockInterface);
     }
 
     public Optional<IContainer> getContainer() {
@@ -103,7 +108,38 @@ public abstract class MultiBlock extends MultiBlockBase {
         return LazyOptional.empty();
     }
 
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> blastFurnace(P parent) {
+    @Override
+    public CompoundTag serializeOnUpdate() {
+        var tag = new CompoundTag();
+        if (multiBlockInterface != null) {
+            var pos = multiBlockInterface.blockEntity.getBlockPos();
+            tag.put("interfacePos", CodecHelper.serializeBlockPos(pos));
+        }
+        return tag;
+    }
+
+    @Override
+    public void deserializeOnUpdate(CompoundTag tag) {
+        var world = blockEntity.getLevel();
+        assert world != null;
+
+        if (tag.contains("interfacePos", Tag.TAG_COMPOUND)) {
+            var pos = CodecHelper.deserializeBlockPos(tag.getCompound("interfacePos"));
+
+            var be1 = world.getBlockEntity(pos);
+            if (be1 == null) {
+                return;
+            }
+            AllCapabilities.MACHINE.tryGet(be1).ifPresent(machine ->
+                    multiBlockInterface = (MultiBlockInterface) machine);
+        } else {
+            multiBlockInterface = null;
+        }
+
+        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
+    }
+
+    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> blastFurnace(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, "multi_block", BlastFurnace::new);
     }
 }

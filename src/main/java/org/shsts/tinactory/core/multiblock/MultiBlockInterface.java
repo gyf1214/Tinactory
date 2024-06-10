@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.multiblock;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
@@ -58,6 +59,9 @@ public class MultiBlockInterface extends Machine {
     }
 
     public void setMultiBlock(MultiBlock target) {
+        if (multiBlock == target) {
+            return;
+        }
         LOGGER.debug("{} set multiBlock = {}", this, target);
         multiBlock = target;
         processor = target.getProcessor();
@@ -69,6 +73,9 @@ public class MultiBlockInterface extends Machine {
     }
 
     public void resetMultiBlock() {
+        if (multiBlock == null) {
+            return;
+        }
         LOGGER.debug("{} reset multiBlock", this);
         multiBlock = null;
         processor = null;
@@ -81,9 +88,9 @@ public class MultiBlockInterface extends Machine {
         container = (IFlexibleContainer) AllCapabilities.CONTAINER.get(blockEntity);
     }
 
-    private void onContainerChange(boolean input) {
+    private void onContainerChange() {
         if (multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents.CONTAINER_CHANGE, input);
+            EventManager.invoke(multiBlock.blockEntity, AllEvents.CONTAINER_CHANGE);
         }
     }
 
@@ -142,7 +149,8 @@ public class MultiBlockInterface extends Machine {
         var world = blockEntity.getLevel();
         assert world != null;
 
-        if (tag.contains("multiBlockPos")) {
+        var oldMultiBlock = multiBlock;
+        if (tag.contains("multiBlockPos", Tag.TAG_COMPOUND)) {
             var pos = CodecHelper.deserializeBlockPos(tag.getCompound("multiBlockPos"));
             var be1 = world.getBlockEntity(pos);
             if (be1 == null) {
@@ -151,6 +159,10 @@ public class MultiBlockInterface extends Machine {
             AllCapabilities.MULTI_BLOCK.tryGet(be1).ifPresent(this::setMultiBlock);
         } else {
             resetMultiBlock();
+        }
+
+        if (oldMultiBlock == multiBlock && multiBlock != null) {
+            EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
         }
     }
 

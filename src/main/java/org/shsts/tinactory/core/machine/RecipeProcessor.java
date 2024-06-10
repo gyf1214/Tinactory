@@ -250,7 +250,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
         eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
-        eventManager.subscribe(AllEvents.CONTAINER_CHANGE, $ -> setUpdateRecipe());
+        eventManager.subscribe(AllEvents.CONTAINER_CHANGE, this::setUpdateRecipe);
         eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
     }
 

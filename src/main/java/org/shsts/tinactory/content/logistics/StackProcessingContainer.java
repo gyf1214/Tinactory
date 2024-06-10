@@ -71,7 +71,7 @@ public class StackProcessingContainer extends CapabilityProvider
             switch (type) {
                 case ITEM_INPUT -> {
                     var view = new WrapperItemHandler(port.slots());
-                    view.onUpdate(this::onInputUpdate);
+                    view.onUpdate(this::onUpdate);
                     items.add(view);
 
                     var collection = new ItemHandlerCollection(view);
@@ -80,7 +80,7 @@ public class StackProcessingContainer extends CapabilityProvider
                 }
                 case ITEM_OUTPUT -> {
                     var inner = new WrapperItemHandler(port.slots());
-                    inner.onUpdate(this::onOutputUpdate);
+                    inner.onUpdate(this::onUpdate);
 
                     var view = new WrapperItemHandler(inner);
                     view.allowInput = false;
@@ -93,7 +93,7 @@ public class StackProcessingContainer extends CapabilityProvider
                     var views = new WrapperFluidTank[port.slots()];
                     for (var i = 0; i < port.slots(); i++) {
                         var view = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
-                        view.onUpdate(this::onInputUpdate);
+                        view.onUpdate(this::onUpdate);
 
                         views[i] = view;
                         fluids.add(view);
@@ -109,7 +109,7 @@ public class StackProcessingContainer extends CapabilityProvider
 
                     for (var i = 0; i < port.slots(); i++) {
                         var inner = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
-                        inner.onUpdate(this::onOutputUpdate);
+                        inner.onUpdate(this::onUpdate);
                         inners[i] = inner;
 
                         var view = new WrapperFluidTank(inner);
@@ -131,13 +131,8 @@ public class StackProcessingContainer extends CapabilityProvider
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
-    private void onInputUpdate() {
-        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE, true);
-        blockEntity.setChanged();
-    }
-
-    private void onOutputUpdate() {
-        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE, false);
+    private void onUpdate() {
+        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE);
         blockEntity.setChanged();
     }
 

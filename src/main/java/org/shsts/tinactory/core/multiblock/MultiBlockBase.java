@@ -3,12 +3,12 @@ package org.shsts.tinactory.core.multiblock;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.common.WeakMap;
 
 import javax.annotation.Nullable;
@@ -19,16 +19,16 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class MultiBlockBase extends CapabilityProvider implements IEventSubscriber {
+public abstract class MultiBlockBase extends UpdatableCapabilityProvider implements IEventSubscriber {
     private static final int CHECK_CYCLE = 40;
 
-    public final BlockEntity blockEntity;
+    public final SmartBlockEntity blockEntity;
     protected MultiBlockManager manager;
     @Nullable
     protected WeakMap.Ref<MultiBlockBase> ref = null;
     private int checkTick = 0;
 
-    public MultiBlockBase(BlockEntity blockEntity) {
+    public MultiBlockBase(SmartBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
     }
 

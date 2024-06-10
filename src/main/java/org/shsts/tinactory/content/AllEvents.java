@@ -24,7 +24,7 @@ public final class AllEvents {
     public static final RegistryEntry<Event<Level>> SERVER_TICK;
     public static final RegistryEntry<ReturnEvent<OnUseArg, InteractionResult>> SERVER_USE;
 
-    public static final RegistryEntry<Event<Boolean>> CONTAINER_CHANGE;
+    public static final RegistryEntry<Event<Unit>> CONTAINER_CHANGE;
     public static final RegistryEntry<Event<Network>> CONNECT;
     public static final RegistryEntry<Event<Component.SchedulingBuilder>> BUILD_SCHEDULING;
     public static final RegistryEntry<Event<Unit>> SET_MACHINE_CONFIG;

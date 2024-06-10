@@ -4,11 +4,11 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.machine.PrimitiveBlock;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.slf4j.Logger;
 
@@ -21,7 +21,7 @@ import java.util.Optional;
 public class BlastFurnace extends MultiBlock {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public BlastFurnace(BlockEntity blockEntity) {
+    public BlastFurnace(SmartBlockEntity blockEntity) {
         super(blockEntity, AllLayouts.BLAST_FURNACE);
     }
 

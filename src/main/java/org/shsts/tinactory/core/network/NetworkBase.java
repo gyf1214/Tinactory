@@ -102,7 +102,7 @@ public class NetworkBase {
     }
 
     protected void onDisconnect() {
-        LOGGER.debug("network {}: disconnect", this);
+        LOGGER.debug("{}: disconnect", this);
     }
 
     private void reset() {
@@ -121,7 +121,7 @@ public class NetworkBase {
             ref.invalidate();
         }
         reset();
-        LOGGER.debug("network {}: invalidated", this);
+        LOGGER.debug("{}: invalidated", this);
     }
 
     public void destroy() {
@@ -136,7 +136,7 @@ public class NetworkBase {
         state = State.DESTROYED;
         bfsContext.reset();
         manager.unregisterNetwork(this);
-        LOGGER.debug("network {}: destroyed", this);
+        LOGGER.debug("{}: destroyed", this);
     }
 
     public <K> void addToMap(WeakMap<K, NetworkBase> map, K key) {
@@ -148,19 +148,19 @@ public class NetworkBase {
     }
 
     protected void connectFinish() {
-        LOGGER.debug("network {}: connect finished", this);
+        LOGGER.debug("{}: connect finished", this);
         state = State.CONNECTED;
         bfsContext.reset();
     }
 
     protected void connectConflict(BlockPos pos) {
-        LOGGER.debug("network {}: conflict detected at {}:{}", this, world.dimension(), pos);
+        LOGGER.debug("{}: conflict detected at {}:{}", this, world.dimension(), pos);
         state = State.CONFLICT;
         bfsContext.reset();
     }
 
     protected void putBlock(BlockPos pos, BlockState state) {
-        LOGGER.debug("network {}: add block {} at {}:{}", this, state, world.dimension(), pos);
+        LOGGER.trace("{}: add block {} at {}:{}", this, state, world.dimension(), pos);
     }
 
     private boolean connectNextBlock() {

@@ -3,7 +3,9 @@ package org.shsts.tinactory.core.logistics;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.wrapper.RangedWrapper;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,14 +21,24 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 public class ItemHandlerCollection implements IItemCollection {
     public final IItemHandler itemHandler;
+    private final int minSlot;
+    private final int maxSlot;
+    private final RangedWrapper rangedWrapper;
 
-    public ItemHandlerCollection(IItemHandler itemHandler) {
+    public ItemHandlerCollection(IItemHandlerModifiable itemHandler, int minSlot, int maxSlot) {
         this.itemHandler = itemHandler;
+        this.minSlot = minSlot;
+        this.maxSlot = maxSlot;
+        this.rangedWrapper = new RangedWrapper(itemHandler, minSlot, maxSlot);
+    }
+
+    public ItemHandlerCollection(IItemHandlerModifiable itemHandler) {
+        this(itemHandler, 0, itemHandler.getSlots());
     }
 
     @Override
     public boolean isEmpty() {
-        for (var i = 0; i < itemHandler.getSlots(); i++) {
+        for (var i = minSlot; i < maxSlot; i++) {
             if (!itemHandler.getStackInSlot(i).isEmpty()) {
                 return false;
             }
@@ -36,8 +48,7 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public boolean acceptInput(ItemStack stack) {
-        var size = itemHandler.getSlots();
-        for (var i = 0; i < size; i++) {
+        for (var i = minSlot; i < maxSlot; i++) {
             if (itemHandler.isItemValid(i, stack)) {
                 return true;
             }
@@ -53,7 +64,7 @@ public class ItemHandlerCollection implements IItemCollection {
     @Override
     public ItemStack insertItem(ItemStack stack, boolean simulate) {
         // need to make sure stack is not set to some itemHandler
-        return ItemHandlerHelper.insertItemStacked(itemHandler, stack.copy(), simulate);
+        return ItemHandlerHelper.insertItemStacked(rangedWrapper, stack.copy(), simulate);
     }
 
     @Override
@@ -61,10 +72,9 @@ public class ItemHandlerCollection implements IItemCollection {
         if (item.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        var slots = itemHandler.getSlots();
         var ret = ItemStack.EMPTY;
         var amount = item.getCount();
-        for (var i = 0; i < slots; i++) {
+        for (var i = minSlot; i < maxSlot; i++) {
             if (amount <= 0) {
                 break;
             }
@@ -93,9 +103,8 @@ public class ItemHandlerCollection implements IItemCollection {
         if (item.isEmpty()) {
             return 0;
         }
-        var slots = itemHandler.getSlots();
         var ret = 0;
-        for (var i = 0; i < slots; i++) {
+        for (var i = minSlot; i < maxSlot; i++) {
             var slotItem = itemHandler.getStackInSlot(i);
             if (ItemHelper.canItemsStack(item, slotItem)) {
                 ret += slotItem.getCount();
@@ -107,8 +116,7 @@ public class ItemHandlerCollection implements IItemCollection {
     @Override
     public Collection<ItemStack> getAllItems() {
         var allItems = new ArrayList<ItemStack>();
-        var slots = itemHandler.getSlots();
-        for (var i = 0; i < slots; i++) {
+        for (var i = minSlot; i < maxSlot; i++) {
             var slotItem = itemHandler.getStackInSlot(i);
             if (!slotItem.isEmpty()) {
                 allItems.add(slotItem);
@@ -122,9 +130,9 @@ public class ItemHandlerCollection implements IItemCollection {
         if (!(itemHandler instanceof WrapperItemHandler wrapper)) {
             return;
         }
-        for (var i = 0; i < wrapper.getSlots(); i++) {
-            if (i < filters.size()) {
-                wrapper.setFilter(i, filters.get(i));
+        for (var i = minSlot; i < maxSlot; i++) {
+            if (i - minSlot < filters.size()) {
+                wrapper.setFilter(i, filters.get(i - minSlot));
             } else {
                 wrapper.setFilter(i, $ -> false);
             }
@@ -136,7 +144,7 @@ public class ItemHandlerCollection implements IItemCollection {
         if (!(itemHandler instanceof WrapperItemHandler wrapper)) {
             return;
         }
-        for (var i = 0; i < wrapper.getSlots(); i++) {
+        for (var i = minSlot; i < maxSlot; i++) {
             wrapper.resetFilter(i);
         }
     }
