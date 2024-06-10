@@ -30,7 +30,6 @@ public abstract class DataHandler<P extends DataProvider> {
         event.getGenerator().addProvider(prov);
     }
 
-
     public void register(P provider) {
         LOGGER.info("Data Handler {} add {} callbacks", this, callbacks.size());
         for (var callback : callbacks) {

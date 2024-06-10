@@ -4,12 +4,12 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.Builder;
-import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends Builder<?, ?, B>>
+public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
         extends RegistryEntry<RecipeType<T>> {
     private final Registrate registrate;
     private final SmartRecipeBuilder.Factory<T, B> builderFactory;
@@ -48,11 +48,11 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends Builder<?, ?, B
     }
 
     public B getBuilder(ResourceLocation loc) {
-        return builderFactory.create(registrate, this, loc);
+        return builderFactory.create(($1, $2) -> {}, this, loc);
     }
 
     private B getBuilder(Registrate registrate, ResourceLocation loc) {
-        return builderFactory.create(registrate, this, loc);
+        return builderFactory.create(registrate::registerRecipe, this, loc);
     }
 
     private B addRecipe(Registrate registrate, ResourceLocation loc) {

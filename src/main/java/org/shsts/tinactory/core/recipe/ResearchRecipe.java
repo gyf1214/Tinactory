@@ -17,7 +17,6 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
@@ -61,9 +60,9 @@ public class ResearchRecipe extends ProcessingRecipe {
         private ResourceLocation target = null;
         private long progress = 1;
 
-        public Builder(Registrate registrate, RecipeTypeEntry<ResearchRecipe, Builder> parent,
+        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<ResearchRecipe, Builder> parent,
                        ResourceLocation loc) {
-            super(registrate, parent, loc);
+            super(consumer, parent, loc);
         }
 
         public Builder input(IProcessingIngredient ingredient) {

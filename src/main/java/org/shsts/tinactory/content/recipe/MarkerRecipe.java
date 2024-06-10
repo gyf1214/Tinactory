@@ -11,8 +11,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
+import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
@@ -32,9 +32,9 @@ public class MarkerRecipe extends ProcessingRecipe {
         @Nullable
         private ResourceLocation baseType;
 
-        public Builder(Registrate registrate, RecipeTypeEntry<MarkerRecipe, Builder> parent,
+        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<MarkerRecipe, Builder> parent,
                        ResourceLocation loc) {
-            super(registrate, parent, loc);
+            super(consumer, parent, loc);
         }
 
         public Builder baseType(ResourceLocation value) {

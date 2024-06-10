@@ -8,14 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistryEntry;
-import org.shsts.tinactory.registrate.builder.Builder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class SmartRecipeSerializer<T extends SmartRecipe<?>, B extends Builder<?, ?, B>>
+public abstract class SmartRecipeSerializer<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
         extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
 
     protected final Gson gson = new Gson();
@@ -23,7 +22,7 @@ public abstract class SmartRecipeSerializer<T extends SmartRecipe<?>, B extends 
     protected final RecipeTypeEntry<T, B> type;
 
     @FunctionalInterface
-    public interface Factory<T1 extends SmartRecipe<?>, B1 extends Builder<?, ?, B1>> {
+    public interface Factory<T1 extends SmartRecipe<?>, B1 extends BuilderBase<?, ?, B1>> {
         SmartRecipeSerializer<T1, B1> create(RecipeTypeEntry<T1, B1> type);
     }
 

@@ -11,7 +11,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -25,15 +24,12 @@ import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -118,11 +114,6 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         return I18n.tr(getDescriptionId(getId()));
     }
 
-    public static Optional<ProcessingRecipe> byKey(RecipeManager manager, ResourceLocation loc) {
-        return manager.byKey(loc)
-                .flatMap(r -> r instanceof ProcessingRecipe recipe ? Optional.of(recipe) : Optional.empty());
-    }
-
     public abstract static class BuilderBase<U extends ProcessingRecipe, S extends BuilderBase<U, S>>
             extends SmartRecipeBuilder<U, S> {
         protected final List<Supplier<Input>> inputs = new ArrayList<>();
@@ -132,8 +123,8 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         protected long power = 0;
         protected double amperage = 0d;
 
-        public BuilderBase(Registrate registrate, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
-            super(registrate, parent, loc);
+        public BuilderBase(IRecipeDataConsumer consumer, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
+            super(consumer, parent, loc);
         }
 
         public S autoVoid() {
@@ -256,9 +247,9 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     }
 
     public static class Builder extends BuilderBase<ProcessingRecipe, Builder> {
-        public Builder(Registrate registrate, RecipeTypeEntry<ProcessingRecipe, Builder> parent,
+        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<ProcessingRecipe, Builder> parent,
                        ResourceLocation loc) {
-            super(registrate, parent, loc);
+            super(consumer, parent, loc);
         }
 
         @Override

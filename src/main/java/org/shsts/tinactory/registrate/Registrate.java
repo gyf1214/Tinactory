@@ -2,6 +2,7 @@ package org.shsts.tinactory.registrate;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.resources.ResourceKey;
@@ -23,6 +24,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.common.SimpleFluid;
@@ -38,7 +40,6 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
-import org.shsts.tinactory.registrate.builder.Builder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.builder.ItemBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
@@ -398,7 +399,7 @@ public class Registrate {
         return registryEntry(id, AllRegistries.EVENT, () -> new ReturnEvent<>(defaultRet));
     }
 
-    public <T extends SmartRecipe<?>, B extends Builder<?, ?, B>>
+    public <T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
     RecipeTypeBuilder<T, B, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
@@ -449,5 +450,10 @@ public class Registrate {
             var recipeLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + suffix);
             recipe.get().save(prov::addRecipe, recipeLoc);
         });
+    }
+
+    public void registerRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe) {
+        recipeDataHandler.addCallback(prov -> prov.addRecipe(recipe.get()));
+        languageHandler.track(SmartRecipe.getDescriptionId(loc));
     }
 }

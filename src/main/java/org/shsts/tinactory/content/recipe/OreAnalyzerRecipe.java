@@ -9,7 +9,7 @@ import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
-import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -45,9 +45,9 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
     public static class Builder extends AssemblyRecipe.BuilderBase<OreAnalyzerRecipe, Builder> {
         public double rate = 0d;
 
-        public Builder(Registrate registrate, RecipeTypeEntry<OreAnalyzerRecipe, Builder> parent,
+        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<OreAnalyzerRecipe, Builder> parent,
                        ResourceLocation loc) {
-            super(registrate, parent, loc);
+            super(consumer, parent, loc);
         }
 
         public Builder rate(double value) {

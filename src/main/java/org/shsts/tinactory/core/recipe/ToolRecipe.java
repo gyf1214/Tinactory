@@ -25,8 +25,6 @@ import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.SimpleRecipeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
@@ -169,8 +167,9 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
         private final Map<Character, Supplier<Ingredient>> keys = new HashMap<>();
         private final List<Supplier<Ingredient>> tools = new ArrayList<>();
 
-        public Builder(Registrate registrate, RecipeTypeEntry<ToolRecipe, Builder> parent, ResourceLocation loc) {
-            super(registrate, parent, loc);
+        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<ToolRecipe, Builder> parent,
+                       ResourceLocation loc) {
+            super(consumer, parent, loc);
         }
 
         public Builder result(Supplier<? extends ItemLike> result, int count) {

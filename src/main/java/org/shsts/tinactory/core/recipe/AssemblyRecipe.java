@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -37,9 +36,9 @@ public class AssemblyRecipe extends ProcessingRecipe {
             ProcessingRecipe.BuilderBase<U, S> {
         protected final List<ResourceLocation> requiredTech = new ArrayList<>();
 
-        public BuilderBase(Registrate registrate, RecipeTypeEntry<U, S> parent,
+        public BuilderBase(IRecipeDataConsumer consumer, RecipeTypeEntry<U, S> parent,
                            ResourceLocation loc) {
-            super(registrate, parent, loc);
+            super(consumer, parent, loc);
         }
 
         public S requireTech(ResourceLocation loc) {
@@ -49,9 +48,9 @@ public class AssemblyRecipe extends ProcessingRecipe {
     }
 
     public static class Builder extends BuilderBase<AssemblyRecipe, Builder> {
-        public Builder(Registrate registrate, RecipeTypeEntry<AssemblyRecipe, Builder> parent,
+        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<AssemblyRecipe, Builder> parent,
                        ResourceLocation loc) {
-            super(registrate, parent, loc);
+            super(consumer, parent, loc);
         }
 
         @Override

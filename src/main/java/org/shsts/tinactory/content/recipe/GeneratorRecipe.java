@@ -6,8 +6,8 @@ import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
+import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -37,9 +37,9 @@ public class GeneratorRecipe extends ProcessingRecipe {
     }
 
     public static class Builder extends BuilderBase<GeneratorRecipe, Builder> {
-        public Builder(Registrate registrate, RecipeTypeEntry<GeneratorRecipe, Builder> parent,
+        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<GeneratorRecipe, Builder> parent,
                        ResourceLocation loc) {
-            super(registrate, parent, loc);
+            super(consumer, parent, loc);
         }
 
         @Override

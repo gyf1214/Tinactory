@@ -3,14 +3,14 @@ package org.shsts.tinactory.registrate.common;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.Builder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeFactory<B extends Builder<?, ?, B>> {
+public class RecipeFactory<B extends BuilderBase<?, ?, B>> {
     private final Registrate registrate;
     private final RecipeTypeEntry<?, B> recipeType;
 
