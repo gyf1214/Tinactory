@@ -537,7 +537,6 @@ public class MaterialSet {
                         .material(variant.baseBlock.defaultBlockState().getMaterial())
                         .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
                         .tint(color)
-                        .drop(raw::getItem)
                         .register();
                 blocks.put("ore", new BlockEntry(ore.loc, ore));
             }

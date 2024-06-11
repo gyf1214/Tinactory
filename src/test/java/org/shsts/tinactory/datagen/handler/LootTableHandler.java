@@ -1,9 +1,10 @@
-package org.shsts.tinactory.registrate.handler;
+package org.shsts.tinactory.datagen.handler;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -14,7 +15,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.datagen.DataGen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
@@ -24,11 +25,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.core.util.LocHelper.prepend;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LootTableHandler extends DataHandler<LootTableHandler.Provider> {
-    public LootTableHandler(Registrate registrate) {
-        super(registrate);
+public class LootTableHandler extends DataHandler<LootTableProvider> {
+    public LootTableHandler(DataGen dataGen) {
+        super(dataGen);
     }
 
     public static class Loot implements Consumer<BiConsumer<ResourceLocation, LootTable.Builder>> {
@@ -80,12 +83,13 @@ public class LootTableHandler extends DataHandler<LootTableHandler.Provider> {
         }
     }
 
-    public void blockLoot(Consumer<Loot> cb) {
-        callbacks.add(prov -> cb.accept(prov.blockLoot));
+    @Override
+    protected LootTableProvider createProvider(GatherDataEvent event) {
+        return new Provider(event);
     }
 
-    @Override
-    public void onGatherData(GatherDataEvent event) {
-        event.getGenerator().addProvider(new Provider(event));
+    public void dropSingle(ResourceLocation loc, Supplier<? extends Item> item) {
+        var loc1 = prepend(loc, "blocks");
+        addCallback(prov -> ((Provider) prov).blockLoot.dropSingle(loc1, item.get()));
     }
 }

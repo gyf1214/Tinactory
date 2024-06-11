@@ -12,8 +12,8 @@ import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.model.IconSet;
+import org.shsts.tinactory.datagen.context.RegistryDataContext;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -116,6 +116,7 @@ public class MaterialBuilder<P> extends DataBuilder<Unit, P, MaterialBuilder<P>>
                     .blockState(oreBlock(variant))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(variant.mineTier.getTag())
+                    .drop(material.entry("raw"))
                     .build();
         }
     }

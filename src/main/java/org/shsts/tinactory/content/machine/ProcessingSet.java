@@ -59,7 +59,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                     .build()
                     .block()
                     .translucent()
-                    .defaultBlockItem().dropSelf()
+                    .defaultBlockItem()
                     .build();
         }
 
@@ -78,7 +78,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                     .build()
                     .block()
                     .translucent()
-                    .defaultBlockItem().dropSelf()
+                    .defaultBlockItem()
                     .build();
         }
 
@@ -178,7 +178,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .build()
                         .block()
                         .translucent()
-                        .defaultBlockItem().dropSelf()
+                        .defaultBlockItem()
                         .build();
             }
         };

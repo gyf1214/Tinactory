@@ -83,7 +83,6 @@ public final class Machines {
     private static void machineSet(MachineSet set, String overlay) {
         for (var voltage : set.voltages) {
             var builder = DATA_GEN.block(set.entry(voltage))
-                    .blockState(machineBlock(voltage, overlay))
                     .tag(MINEABLE_WITH_WRENCH);
             if (set instanceof ProcessingSet<?> processingSet) {
                 builder.itemTag(machineTag(processingSet.recipeType));
@@ -91,7 +90,10 @@ public final class Machines {
                 builder.itemTag(AllTags.ELECTRIC_FURNACE);
             }
             if (voltage == Voltage.PRIMITIVE) {
-                builder.tag(BlockTags.MINEABLE_WITH_AXE);
+                builder.blockState(primitiveBlock(overlay))
+                        .tag(BlockTags.MINEABLE_WITH_AXE);
+            } else {
+                builder.blockState(machineBlock(voltage, overlay));
             }
             builder.build();
         }

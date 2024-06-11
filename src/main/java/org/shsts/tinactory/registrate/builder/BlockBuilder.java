@@ -4,7 +4,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -19,9 +18,6 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
-import java.util.function.Supplier;
-
-import static org.shsts.tinactory.core.util.LocHelper.prepend;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -107,10 +103,6 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
 
         @Override
         protected RegistryEntry<U1> createEntry() {
-            if (modelCallback == null) {
-                modelCallback = ctx -> ctx.provider.withExistingParent(ctx.id,
-                        new ResourceLocation(ctx.modid, "block/" + ctx.id));
-            }
             if (tint == null) {
                 tint = getItemTint();
             }
@@ -132,19 +124,6 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
 
     public S defaultBlockItem() {
         return blockItem().build();
-    }
-
-    public S drop(Supplier<? extends Item> item) {
-        var loc = prepend(this.loc, "blocks");
-        registrate.lootTableHandler.blockLoot(loot -> loot.dropSingle(loc, item.get()));
-        return self();
-    }
-
-    public S dropSelf() {
-        var loc = prepend(this.loc, "blocks");
-        onCreateEntry.add(block ->
-                registrate.lootTableHandler.blockLoot(loot -> loot.dropSingle(loc, block.get())));
-        return self();
     }
 
     @Override

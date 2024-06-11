@@ -1,4 +1,4 @@
-package org.shsts.tinactory.registrate.context;
+package org.shsts.tinactory.datagen.context;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataProvider;

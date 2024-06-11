@@ -79,7 +79,7 @@ public final class AllBlockEntities {
                 .build()
                 .block()
                 .translucent()
-                .defaultBlockItem().dropSelf()
+                .defaultBlockItem()
                 .build()
                 .register();
 
@@ -93,7 +93,7 @@ public final class AllBlockEntities {
                 .build()
                 .block()
                 .translucent()
-                .defaultBlockItem().dropSelf()
+                .defaultBlockItem()
                 .build()
                 .register();
 
@@ -258,7 +258,7 @@ public final class AllBlockEntities {
                 .build()
                 .block()
                 .translucent()
-                .defaultBlockItem().dropSelf()
+                .defaultBlockItem()
                 .build()
                 .register();
 
@@ -275,7 +275,7 @@ public final class AllBlockEntities {
                 .build()
                 .block()
                 .translucent()
-                .defaultBlockItem().dropSelf()
+                .defaultBlockItem()
                 .build()
                 .register();
     }
@@ -305,7 +305,7 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .block()
-                .defaultBlockItem().dropSelf()
+                .defaultBlockItem()
                 .build()
                 .register();
     }

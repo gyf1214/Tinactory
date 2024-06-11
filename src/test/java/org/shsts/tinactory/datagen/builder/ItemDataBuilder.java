@@ -6,7 +6,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.datagen.DataGen;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
+import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

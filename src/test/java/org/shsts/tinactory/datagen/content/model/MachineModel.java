@@ -14,8 +14,8 @@ import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.machine.MachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
-import org.shsts.tinactory.registrate.context.DataContext;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
+import org.shsts.tinactory.datagen.context.DataContext;
+import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;

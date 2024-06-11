@@ -26,17 +26,18 @@ import org.shsts.tinactory.datagen.content.Materials;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
+import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.TrackedContext;
 import org.shsts.tinactory.datagen.handler.BlockStateHandler;
 import org.shsts.tinactory.datagen.handler.DataHandler;
 import org.shsts.tinactory.datagen.handler.ItemModelHandler;
 import org.shsts.tinactory.datagen.handler.LanguageHandler;
+import org.shsts.tinactory.datagen.handler.LootTableHandler;
 import org.shsts.tinactory.datagen.handler.RecipeHandler;
 import org.shsts.tinactory.datagen.handler.TagsHandler;
 import org.shsts.tinactory.datagen.handler.TechHandler;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
-import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -60,6 +61,7 @@ public final class DataGen implements IRecipeDataConsumer {
 
     public final BlockStateHandler blockStateHandler;
     public final ItemModelHandler itemModelHandler;
+    public final LootTableHandler lootTableHandler;
     public final RecipeHandler recipeHandler;
     public final TechHandler techHandler;
     public final LanguageHandler languageHandler;
@@ -85,6 +87,7 @@ public final class DataGen implements IRecipeDataConsumer {
         createTagsHandler(Registry.ITEM);
         this.blockStateHandler = handler(new BlockStateHandler(this));
         this.itemModelHandler = handler(new ItemModelHandler(this));
+        this.lootTableHandler = handler(new LootTableHandler(this));
         this.recipeHandler = handler(new RecipeHandler(this));
         this.techHandler = handler(new TechHandler(this));
         this.languageHandler = handler(new LanguageHandler(this, langTrackedCtx));

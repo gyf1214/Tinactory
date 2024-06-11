@@ -11,8 +11,8 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.network.CableBlock;
-import org.shsts.tinactory.registrate.context.DataContext;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
+import org.shsts.tinactory.datagen.context.DataContext;
+import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;

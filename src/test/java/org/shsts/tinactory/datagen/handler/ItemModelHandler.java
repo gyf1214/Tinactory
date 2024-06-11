@@ -10,8 +10,8 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.datagen.DataGen;
-import org.shsts.tinactory.registrate.context.DataContext;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
+import org.shsts.tinactory.datagen.context.DataContext;
+import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;

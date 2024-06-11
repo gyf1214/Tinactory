@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.datagen.DataGen;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
+import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
@@ -19,6 +19,7 @@ public class BlockDataBuilder<U extends Block, P> extends
     private Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockState = null;
     @Nullable
     private Consumer<RegistryDataContext<Item, ? extends Item, ItemModelProvider>> itemModel = null;
+    private boolean dropSet = false;
 
     public BlockDataBuilder(DataGen dataGen, P parent, ResourceLocation loc, Supplier<U> object) {
         super(dataGen, parent, loc, dataGen.blockTrackedCtx, object);
@@ -48,12 +49,21 @@ public class BlockDataBuilder<U extends Block, P> extends
         return this;
     }
 
+    public BlockDataBuilder<U, P> drop(Supplier<? extends Item> item) {
+        dataGen.lootTableHandler.dropSingle(loc, item);
+        dropSet = true;
+        return self();
+    }
+
     @Override
     protected void doRegister() {
         assert blockState != null;
         if (itemModel == null) {
             itemModel = ctx -> ctx.provider.withExistingParent(ctx.id,
                     new ResourceLocation(ctx.modid, "block/" + ctx.id));
+        }
+        if (!dropSet) {
+            dataGen.lootTableHandler.dropSingle(loc, () -> object.get().asItem());
         }
         dataGen.blockStateHandler.addBlockStateCallback(loc, object, blockState);
         dataGen.itemModelHandler.addBlockItemCallback(loc, object, ctx -> itemModel.accept(ctx));

@@ -17,7 +17,7 @@ import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.datagen.content.model.CableModel;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
+import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
@@ -165,6 +165,12 @@ public final class Models {
     Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
     primitiveBlock(String casing, String overlay) {
         return getMachineModel(casing, overlay)::primitiveBlockState;
+    }
+
+    public static <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
+    primitiveBlock(String overlay) {
+        return getMachineModel(Voltage.PRIMITIVE, overlay)::primitiveBlockState;
     }
 
     public static <U extends Block>

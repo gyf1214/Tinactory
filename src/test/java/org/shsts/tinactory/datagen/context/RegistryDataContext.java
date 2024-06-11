@@ -1,9 +1,8 @@
-package org.shsts.tinactory.registrate.context;
+package org.shsts.tinactory.datagen.context;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataProvider;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -18,11 +17,5 @@ public class RegistryDataContext<T extends IForgeRegistryEntry<T>, U extends T, 
         super(modid, provider);
         this.id = id;
         this.object = object;
-    }
-
-    public RegistryDataContext(RegistryEntry<U> entry, P provider) {
-        super(entry.modid, provider);
-        this.id = entry.id;
-        this.object = entry.get();
     }
 }

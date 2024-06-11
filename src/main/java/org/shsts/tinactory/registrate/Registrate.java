@@ -50,7 +50,6 @@ import org.shsts.tinactory.registrate.common.SmartRegistry;
 import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.DynamicHandler;
-import org.shsts.tinactory.registrate.handler.LootTableHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RecipeDataHandler;
 import org.shsts.tinactory.registrate.handler.RecipeTypeHandler;
@@ -96,7 +95,6 @@ public class Registrate implements IRecipeDataConsumer {
 
     // DataGen
     public final RecipeDataHandler recipeDataHandler;
-    public final LootTableHandler lootTableHandler;
 
     // Client
     public final RenderTypeHandler renderTypeHandler;
@@ -119,14 +117,12 @@ public class Registrate implements IRecipeDataConsumer {
 
         this.recipeTypeHandler = new RecipeTypeHandler(this);
         this.recipeDataHandler = new RecipeDataHandler(this);
-        this.lootTableHandler = new LootTableHandler(this);
 
         this.renderTypeHandler = new RenderTypeHandler();
         this.menuScreenHandler = new MenuScreenHandler();
         this.tintHandler = new TintHandler();
 
         putDataHandler(recipeDataHandler);
-        putDataHandler(lootTableHandler);
 
         this.trackedObjects = new TrackedObjects();
     }
