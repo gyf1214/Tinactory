@@ -54,31 +54,6 @@ public final class AllItems {
                 .component(Voltage.IV, STEEL, TIN)
                 .buildObject();
 
-        // TODO
-//                .material(STEEL).heat(COPPER).pipe(BRONZE).rotor(TIN).magnetic(STEEL)
-//                .cable(TIN)
-//                .build()
-//                .component(Voltage.MV)
-//                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-//                .cable(COPPER)
-//                .build()
-//                // TODO
-//                .component(Voltage.HV)
-//                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-//                .cable(COPPER)
-//                .build()
-//                .component(Voltage.EV)
-//                // TODO
-//                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-//                .cable(COPPER)
-//                .build()
-//                .component(Voltage.IV)
-//                // TODO
-//                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-//                .cable(COPPER)
-//                .build()
-//                .buildObject();
-
         VACUUM_TUBE = REGISTRATE.item("circuit/vacuum_tube", Item::new).register();
 
         STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
@@ -89,13 +64,9 @@ public final class AllItems {
                 .register();
     }
 
-    public static ComponentSet componentSet(Voltage voltage) {
-        return COMPONENT_SETS.get(voltage);
-    }
-
     public static RegistryEntry<Item> researchEquipment(Voltage voltage) {
         return voltage == Voltage.ULV ? ULV_RESEARCH_EQUIPMENT :
-                componentSet(voltage).researchEquipment;
+                COMPONENT_SETS.get(voltage).researchEquipment;
     }
 
     public static void init() {}
