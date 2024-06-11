@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
         extends RegistryEntry<RecipeType<T>> {
-    private final Registrate registrate;
     private final SmartRecipeBuilder.Factory<T, B> builderFactory;
     @Nullable
     private SmartRecipeSerializer<T, B> serializer;
@@ -32,7 +31,6 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, 
                            SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix, Class<T> clazz,
                            Transformer<B> defaults) {
         super(registrate.modid, id, supplier);
-        this.registrate = registrate;
         this.builderFactory = builderFactory;
         this.prefix = prefix;
         this.clazz = clazz;
@@ -82,13 +80,5 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, 
 
     public B recipe(IRecipeDataConsumer consumer, RegistryEntry<?> item) {
         return recipe(consumer, item.loc);
-    }
-
-    public B recipe(ResourceLocation loc) {
-        return recipe(registrate, loc);
-    }
-
-    public B recipe(String id) {
-        return recipe(new ResourceLocation(registrate.modid, id));
     }
 }

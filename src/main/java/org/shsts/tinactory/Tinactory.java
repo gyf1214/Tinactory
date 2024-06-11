@@ -113,7 +113,6 @@ public class Tinactory {
         AllWorldGens.init();
         MenuSyncHandler.init();
         MenuEventHandler.init();
-        AllRecipes.initRecipes();
 
         REGISTRATE.register(modEventBus);
         modEventBus.addListener(Tinactory::init);

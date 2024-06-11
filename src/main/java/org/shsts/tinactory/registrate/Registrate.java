@@ -2,8 +2,6 @@ package org.shsts.tinactory.registrate;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +15,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -32,7 +29,6 @@ import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
-import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
@@ -47,10 +43,8 @@ import org.shsts.tinactory.registrate.common.CapabilityEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
 import org.shsts.tinactory.registrate.handler.CapabilityHandler;
-import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.DynamicHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
-import org.shsts.tinactory.registrate.handler.RecipeDataHandler;
 import org.shsts.tinactory.registrate.handler.RecipeTypeHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
@@ -60,20 +54,17 @@ import org.shsts.tinactory.registrate.tracking.TrackedObjects;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Registrate implements IRecipeDataConsumer {
+public class Registrate {
     public final String modid;
 
     private final Map<ResourceLocation, RegistryEntryHandler<?>> registryEntryHandlers = new HashMap<>();
-    private final List<DataHandler<?>> dataHandlers = new ArrayList<>();
 
     // Registry
     public final RegistryHandler registryHandler;
@@ -91,9 +82,6 @@ public class Registrate implements IRecipeDataConsumer {
     // Others
     public final CapabilityHandler capabilityHandler;
     public final RecipeTypeHandler recipeTypeHandler;
-
-    // DataGen
-    public final RecipeDataHandler recipeDataHandler;
 
     // Client
     public final RenderTypeHandler renderTypeHandler;
@@ -115,13 +103,10 @@ public class Registrate implements IRecipeDataConsumer {
         this.capabilityHandler = new CapabilityHandler(this);
 
         this.recipeTypeHandler = new RecipeTypeHandler(this);
-        this.recipeDataHandler = new RecipeDataHandler(this);
 
         this.renderTypeHandler = new RenderTypeHandler();
         this.menuScreenHandler = new MenuScreenHandler();
         this.tintHandler = new TintHandler();
-
-        putDataHandler(recipeDataHandler);
 
         this.trackedObjects = new TrackedObjects();
     }
@@ -151,16 +136,6 @@ public class Registrate implements IRecipeDataConsumer {
         return forgeHandler(key.location(), entryClass, registry);
     }
 
-    private void putDataHandler(DataHandler<?> handler) {
-        dataHandlers.add(handler);
-    }
-
-    private void onCommonSetup(FMLCommonSetupEvent event) {
-        for (var handler : dataHandlers) {
-            handler.clear();
-        }
-    }
-
     public void register(IEventBus modEventBus) {
         // mod BUS
         modEventBus.addListener(registryHandler::onNewRegistry);
@@ -168,10 +143,6 @@ public class Registrate implements IRecipeDataConsumer {
             handler.addListener(modEventBus);
         }
         biomeHandler.addListener(modEventBus);
-        for (var handler : dataHandlers) {
-            modEventBus.addListener(handler::onGatherData);
-        }
-        modEventBus.addListener(this::onCommonSetup);
         modEventBus.addListener(capabilityHandler::onRegisterEvent);
         recipeTypeHandler.addListeners(modEventBus);
     }
@@ -366,20 +337,6 @@ public class Registrate implements IRecipeDataConsumer {
         }
     }
 
-    public void vanillaRecipe(Supplier<RecipeBuilder> recipe) {
-        vanillaRecipe(recipe, "");
-    }
-
-    public void vanillaRecipe(Supplier<RecipeBuilder> recipe, String suffix) {
-        recipeDataHandler.addCallback(prov -> {
-            var builder = recipe.get();
-            var loc = builder.getResult().getRegistryName();
-            assert loc != null;
-            var recipeLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + suffix);
-            builder.save(prov::addRecipe, recipeLoc);
-        });
-    }
-
     public void trackTranslation(String key) {
         trackedObjects.put(TrackedType.LANG, key, key);
     }
@@ -400,16 +357,5 @@ public class Registrate implements IRecipeDataConsumer {
 
     public <V> Map<V, String> getTracked(TrackedType<V> type) {
         return trackedObjects.getObjects(type);
-    }
-
-    @Override
-    public String getModId() {
-        return modid;
-    }
-
-    @Override
-    public void registerRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe) {
-        recipeDataHandler.addCallback(prov -> prov.addRecipe(recipe.get()));
-        trackTranslation(SmartRecipe.getDescriptionId(loc));
     }
 }

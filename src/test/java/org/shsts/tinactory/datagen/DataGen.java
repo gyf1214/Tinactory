@@ -24,6 +24,7 @@ import org.shsts.tinactory.datagen.builder.ItemDataBuilder;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
 import org.shsts.tinactory.datagen.content.Components;
 import org.shsts.tinactory.datagen.content.Machines;
+import org.shsts.tinactory.datagen.content.Markers;
 import org.shsts.tinactory.datagen.content.Materials;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.Technologies;
@@ -247,6 +248,7 @@ public final class DataGen implements IRecipeDataConsumer {
         Machines.init();
         Technologies.init();
         Veins.init();
+        Markers.init();
 
         DATA_GEN.register(modEventBus);
     }
