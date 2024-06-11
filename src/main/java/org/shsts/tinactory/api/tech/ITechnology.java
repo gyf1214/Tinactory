@@ -1,7 +1,6 @@
 package org.shsts.tinactory.api.tech;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -13,8 +12,6 @@ import java.util.Map;
 @MethodsReturnNonnullByDefault
 public interface ITechnology {
     ResourceLocation getLoc();
-
-    Component getName();
 
     List<ITechnology> getDepends();
 

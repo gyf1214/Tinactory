@@ -3,8 +3,6 @@ package org.shsts.tinactory.core.tech;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -53,12 +51,6 @@ public class Technology implements ITechnology {
         dependIds.stream()
                 .flatMap(loc -> manager.techByKey(loc).stream())
                 .forEach(depends::add);
-    }
-
-    // TODO
-    @Override
-    public Component getName() {
-        return new TextComponent(getLoc().toString());
     }
 
     @Override
