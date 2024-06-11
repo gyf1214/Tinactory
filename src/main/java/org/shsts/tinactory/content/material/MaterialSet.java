@@ -283,130 +283,6 @@ public class MaterialSet {
             return dummies("magnetic");
         }
 
-        // TODO
-//        public class OreBuilder extends SimpleBuilder<Unit, Builder<P>, OreBuilder> {
-//            private final int amount;
-//            private boolean primitive = false;
-//            private final OreVariant variant;
-//            private final Map<String, Supplier<Item>> byproducts = new HashMap<>();
-//
-//            private OreBuilder(OreVariant variant, int amount) {
-//                super(Builder.this);
-//                this.variant = variant;
-//                this.amount = amount;
-//            }
-//
-//            public OreBuilder primitive() {
-//                primitive = true;
-//                return this;
-//            }
-//
-//            public OreBuilder byproduct(String key, Supplier<Item> b1) {
-//                byproducts.put(key, b1);
-//                return this;
-//            }
-//
-//            public OreBuilder byproduct(Supplier<Item> b1, Supplier<Item> b2, Supplier<Item> b3) {
-//                byproducts.put("wash", b1);
-//                byproducts.put("centrifuge", b2);
-//                byproducts.put("thermal_centrifuge", b3);
-//                return this;
-//            }
-//
-//            public OreBuilder byproduct(Supplier<Item> b1) {
-//                return byproduct(b1, b1, b1);
-//            }
-//
-//            private void crush(String output, String input) {
-//                callbacks.add($ -> MACERATOR.recipe($.loc(output))
-//                        .inputItem(0, $.tag(input), 1)
-//                        .outputItem(1, $.entry(output), input.equals("raw") ? 2 * amount : 1)
-//                        .voltage(Voltage.LV)
-//                        .workTicks((long) (variant.destroyTime * 40f))
-//                        .build());
-//            }
-//
-//            private void wash(String output, String input, Voltage voltage) {
-//                callbacks.add($ -> {
-//                    var loc = $.loc(output);
-//                    if (input.equals("dust_pure")) {
-//                        loc = new ResourceLocation(loc.getNamespace(), loc.getPath() + "_from_pure");
-//                    }
-//                    var builder = ORE_WASHER.recipe(loc)
-//                            .inputItem(0, $.tag(input), 1)
-//                            .outputItem(2, $.entry(output), 1);
-//                    if (input.equals("crushed")) {
-//                        var byproduct = byproducts.getOrDefault("wash", $.entry("dust"));
-//                        builder.outputItem(4, byproduct, 1, 0.1)
-//                                .workTicks(200);
-//                    } else {
-//                        builder.workTicks(32);
-//                    }
-//                    builder.voltage(voltage)
-//                            .build();
-//                });
-//            }
-//
-//            @Override
-//            protected Unit createObject() {
-//                var raw = put("raw", () -> REGISTRATE.item(newId("raw"), Item::new)
-//                        .model(ModelGen.basicItem(modLoc("items/material/raw")))
-//                        .tint(color)
-//                        .register());
-//
-//                dust().dummies("crushed", "crushed_centrifuged", "crushed_purified")
-//                        .dummies("dust_impure", "dust_pure");
-//
-//                oreVariant = variant;
-//                if (!blocks.containsKey("ore")) {
-//                    var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
-//                            .material(variant.baseBlock.defaultBlockState().getMaterial())
-//                            .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
-//                            .transform(ModelGen.oreBlock(variant))
-//                            .tint(color)
-//                            .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-//                            .tag(variant.mineTier.getTag())
-//                            .drop(raw::getItem)
-//                            .register();
-//                    blocks.put("ore", ore::get);
-//                }
-//
-//                if (variant.voltage.rank <= Voltage.ULV.rank) {
-//                    Builder.this.process("crushed", amount, "raw", TOOL_HAMMER);
-//                    Builder.this.process("dust_pure", 1, "crushed_purified", TOOL_HAMMER);
-//                    Builder.this.process("dust_impure", 1, "crushed", TOOL_HAMMER);
-//                }
-//
-//                crush("crushed", "raw");
-//                crush("dust_impure", "crushed");
-//                crush("dust_pure", "crushed_purified");
-//                crush("dust", "crushed_centrifuged");
-//                wash("crushed_purified", "crushed", Voltage.ULV);
-//                wash("dust", "dust_impure", primitive ? Voltage.PRIMITIVE : Voltage.ULV);
-//                wash("dust", "dust_pure", Voltage.ULV);
-//                callbacks.add($ -> {
-//                    var byproduct = byproducts.getOrDefault("centrifuge", $.entry("dust"));
-//                    CENTRIFUGE.recipe($.loc("dust"))
-//                            .inputItem(0, $.tag("dust_pure"), 1)
-//                            .outputItem(2, $.entry("dust"), 1)
-//                            .outputItem(2, byproduct, 1, 0.1)
-//                            .voltage(Voltage.LV)
-//                            .workTicks(80)
-//                            .build();
-//                });
-//                callbacks.add($ -> {
-//                    var byproduct = byproducts.getOrDefault("thermal_centrifuge", $.entry("dust"));
-//                    THERMAL_CENTRIFUGE.recipe($.loc("crushed_centrifuged"))
-//                            .inputItem(0, $.tag("crushed_purified"), 1)
-//                            .outputItem(1, $.entry("crushed_centrifuged"), 1)
-//                            .outputItem(1, byproduct, 1, 0.1)
-//                            .build();
-//                });
-//
-//                return Unit.INSTANCE;
-//            }
-//        }
-
         public Builder<P> ore(OreVariant variant) {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
@@ -448,35 +324,6 @@ public class MaterialSet {
                 assert tier != null;
                 return item(category, p -> new UsableToolItem(p, durability, tier, blockTag));
             }
-            // TODO
-//
-//            private void tool(String category, String pattern, Object... args) {
-//                process(toolItem(category), 1, pattern, args);
-//            }
-//
-//            private void usable(String category, TagKey<Block> blockTag, String pattern, Object... args) {
-//                process(usableItem(category, blockTag), 1, pattern, args);
-//            }
-//
-//            public ToolBuilder hammer() {
-//                tool("hammer", "AA \nAAB\nAA ", "primary", TOOL_HANDLE);
-//                return this;
-//            }
-//
-//            public ToolBuilder mortar() {
-//                tool("mortar", " A \nBAB\nBBB", "primary", ItemTags.STONE_TOOL_MATERIALS);
-//                return this;
-//            }
-//
-//            public ToolBuilder basic() {
-//                tool("file", "A\nA\nB", "plate", TOOL_HANDLE);
-//                tool("saw", "AAB\n  B", "plate", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
-//                tool("screwdriver", "  A\n A \nB  ", "stick", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
-//                usable("wrench", MINEABLE_WITH_WRENCH, "A A\nAAA\n A ", "plate", TOOL_HAMMER);
-//                usable("wire_cutter", MINEABLE_WITH_CUTTER, "A A\n A \nBCB", "plate", TOOL_HANDLE, TOOL_SCREW,
-//                        TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
-//                return hammer().mortar();
-//            }
 
             public ToolBuilder hammer() {
                 return toolItem("hammer");
@@ -487,7 +334,8 @@ public class MaterialSet {
             }
 
             public ToolBuilder basic() {
-                return hammer().mortar().toolItem("file").toolItem("saw").toolItem("screwdriver")
+                return hammer().mortar().toolItem("file")
+                        .toolItem("saw").toolItem("screwdriver")
                         .usableItem("wrench", MINEABLE_WITH_WRENCH)
                         .usableItem("wire_cutter", MINEABLE_WITH_CUTTER);
             }

@@ -38,12 +38,12 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends BuilderBase<?
 
     public RecipeTypeBuilder<T, B, P> builder(SmartRecipeBuilder.Factory<T, B> factory) {
         builderFactory = factory;
-        return self();
+        return this;
     }
 
     public RecipeTypeBuilder<T, B, P> clazz(Class<T> value) {
         clazz = value;
-        return self();
+        return this;
     }
 
     public RecipeTypeBuilder<T, B, P> defaults(Transformer<B> trans) {

@@ -74,18 +74,18 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, 
         return recipe(consumer, new ResourceLocation(consumer.getModId(), id));
     }
 
+    public B recipe(IRecipeDataConsumer consumer, IForgeRegistryEntry<?> item) {
+        var loc = item.getRegistryName();
+        assert loc != null;
+        return recipe(consumer, loc);
+    }
+
     public B recipe(ResourceLocation loc) {
         return recipe(registrate, loc);
     }
 
     public B recipe(String id) {
         return recipe(new ResourceLocation(registrate.modid, id));
-    }
-
-    public B recipe(IForgeRegistryEntry<?> item) {
-        var loc = item.getRegistryName();
-        assert loc != null;
-        return recipe(loc);
     }
 
     public B recipe(RegistryEntry<?> item) {

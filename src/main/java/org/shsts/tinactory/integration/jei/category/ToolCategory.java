@@ -21,7 +21,7 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchMenu> {
     private ToolCategory(Block workbench) {
-        super(AllRecipes.TOOL, AllLayouts.WORKBENCH, Ingredient.of(workbench),
+        super(AllRecipes.TOOL_CRAFTING, AllLayouts.WORKBENCH, Ingredient.of(workbench),
                 new ItemStack(workbench), WorkbenchMenu.class);
     }
 

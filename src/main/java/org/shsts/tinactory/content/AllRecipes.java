@@ -5,13 +5,8 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
@@ -31,7 +26,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
-    public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL;
+    public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL_CRAFTING;
     public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
@@ -47,7 +42,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
 
     static {
-        TOOL = REGISTRATE.recipeType("tool", ToolRecipe.SERIALIZER)
+        TOOL_CRAFTING = REGISTRATE.recipeType("tool_crafting", ToolRecipe.SERIALIZER)
                 .clazz(ToolRecipe.class)
                 .builder(ToolRecipe.Builder::new)
                 .register();
@@ -77,9 +72,7 @@ public final class AllRecipes {
                 .register();
 
         ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
-                .defaults($ -> $.inputFluid(1, Fluids.WATER, 500)
-                        .outputItem(3, AllMaterials.STONE.entry("dust"), 1)
-                        .amperage(0.125d))
+                .defaults($ -> $.amperage(0.125d))
                 .register();
 
         CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge")
@@ -113,140 +106,8 @@ public final class AllRecipes {
     }
 
     public static void initRecipes() {
-        AllMaterials.initRecipes();
-        vanillaRecipes();
-        primitiveRecipes();
         AllItems.initRecipes();
         markerRecipes();
-    }
-
-    private static void vanillaRecipes() {
-        // disable wooden and iron tools
-        REGISTRATE.nullRecipe(Items.WOODEN_AXE);
-        REGISTRATE.nullRecipe(Items.WOODEN_HOE);
-        REGISTRATE.nullRecipe(Items.WOODEN_PICKAXE);
-        REGISTRATE.nullRecipe(Items.WOODEN_SHOVEL);
-        REGISTRATE.nullRecipe(Items.WOODEN_SWORD);
-        REGISTRATE.nullRecipe(Items.IRON_AXE);
-        REGISTRATE.nullRecipe(Items.IRON_HOE);
-        REGISTRATE.nullRecipe(Items.IRON_PICKAXE);
-        REGISTRATE.nullRecipe(Items.IRON_SHOVEL);
-        REGISTRATE.nullRecipe(Items.IRON_SWORD);
-
-        // all wood recipes
-        woodRecipes("oak");
-        woodRecipes("spruce");
-        woodRecipes("birch");
-        woodRecipes("jungle");
-        woodRecipes("acacia");
-        woodRecipes("dark_oak");
-        woodRecipes("crimson");
-        woodRecipes("warped");
-
-        // sticks
-        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(Items.STICK, 2)
-                .define('#', ItemTags.PLANKS)
-                .pattern("#").pattern("#")
-                .unlockedBy("has_planks", has(ItemTags.PLANKS)));
-        TOOL.recipe(Items.STICK)
-                .result(Items.STICK, 4)
-                .pattern("#").pattern("#")
-                .define('#', ItemTags.PLANKS)
-                .toolTag(AllTags.TOOL_SAW)
-                .build();
-    }
-
-    private static void woodRecipes(String prefix) {
-        var nether = prefix.equals("crimson") || prefix.equals("warped");
-
-        var planks = REGISTRATE.itemHandler.getEntry(prefix + "_planks");
-        var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
-        var wood = prefix + (nether ? "_hyphae" : "_wood");
-        var woodStripped = "stripped_" + wood;
-
-        // saw
-        TOOL.recipe(planks.loc)
-                .result(planks, 4)
-                .pattern("X")
-                .define('X', logTag)
-                .toolTag(AllTags.TOOL_SAW)
-                .build();
-        // disable wood and woodStripped recipes
-        // TODO: maybe not necessary
-        REGISTRATE.nullRecipe(wood);
-        REGISTRATE.nullRecipe(woodStripped);
-        // reduce vanilla recipe to 2 planks
-        REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
-                .shapeless(planks.get(), 2)
-                .requires(logTag)
-                .group("planks")
-                .unlockedBy("has_logs", has(logTag)));
-    }
-
-    private static void primitiveRecipes() {
-        // workbench
-        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.WORKBENCH.block())
-                .pattern("WSW")
-                .pattern("SCS")
-                .pattern("WSW")
-                .define('S', AllMaterials.STONE.tag("block"))
-                .define('W', Items.STICK)
-                .define('C', Blocks.CRAFTING_TABLE)
-                .unlockedBy("has_cobblestone", has(AllMaterials.STONE.tag("block"))));
-
-        // primitive stone generator
-        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.STONE_GENERATOR.block(Voltage.PRIMITIVE))
-                .pattern("WLW")
-                .pattern("L L")
-                .pattern("WLW")
-                .define('W', ItemTags.PLANKS)
-                .define('L', ItemTags.LOGS)
-                .unlockedBy("has_planks", has(ItemTags.PLANKS)));
-
-        // primitive ore analyzer
-        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.ORE_ANALYZER.block(Voltage.PRIMITIVE))
-                .pattern("WLW")
-                .pattern("LFL")
-                .pattern("WLW")
-                .define('W', ItemTags.PLANKS)
-                .define('L', ItemTags.LOGS)
-                .define('F', AllMaterials.FLINT.tag("primary"))
-                .unlockedBy("has_flint", has(AllMaterials.FLINT.tag("primary"))));
-
-        // primitive ore washer
-        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(AllBlockEntities.ORE_WASHER.block(Voltage.PRIMITIVE))
-                .pattern("WLW")
-                .pattern("LFL")
-                .pattern("WLW")
-                .define('W', ItemTags.PLANKS)
-                .define('L', ItemTags.LOGS)
-                .define('F', Items.WATER_BUCKET)
-                .unlockedBy("has_water_bucket", has(Items.WATER_BUCKET)));
-
-        // generate cobblestone
-        STONE_GENERATOR.recipe(Items.COBBLESTONE)
-                .outputItem(0, Items.COBBLESTONE, 1)
-                .primitive()
-                .build();
-
-        // generate water
-        STONE_GENERATOR.recipe(Fluids.WATER)
-                .outputFluid(1, Fluids.WATER, 1000)
-                .voltage(Voltage.ULV)
-                .build();
-
-        BLAST_FURNACE.recipe(AllMaterials.STEEL.loc("ingot"))
-                .inputItem(0, AllMaterials.IRON.tag("dust"), 1)
-                .outputItem(2, AllMaterials.STEEL.entry("ingot"), 1)
-                .voltage(Voltage.LV)
-                .power(32)
-                .workTicks(200)
-                .build();
     }
 
     public static void markerRecipes() {

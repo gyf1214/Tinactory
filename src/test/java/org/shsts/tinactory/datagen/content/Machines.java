@@ -1,7 +1,11 @@
 package org.shsts.tinactory.datagen.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -26,6 +30,9 @@ import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
+import static org.shsts.tinactory.content.AllMaterials.FLINT;
+import static org.shsts.tinactory.content.AllMaterials.STONE;
+import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.machineTag;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
@@ -41,6 +48,68 @@ public final class Machines {
     private static final String BOILER_TEX = "generators/boiler/coal";
 
     public static void init() {
+        primitive();
+        machines();
+        misc();
+    }
+
+    private static void primitive() {
+        // workbench
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+                        .shaped(WORKBENCH.block())
+                        .pattern("WSW")
+                        .pattern("SCS")
+                        .pattern("WSW")
+                        .define('S', STONE.tag("block"))
+                        .define('W', Items.STICK)
+                        .define('C', Blocks.CRAFTING_TABLE)
+                        .unlockedBy("has_cobblestone", has(STONE.tag("block"))))
+                // primitive stone generator
+                .vanillaRecipe(() -> ShapedRecipeBuilder
+                        .shaped(STONE_GENERATOR.block(Voltage.PRIMITIVE))
+                        .pattern("WLW")
+                        .pattern("L L")
+                        .pattern("WLW")
+                        .define('W', ItemTags.PLANKS)
+                        .define('L', ItemTags.LOGS)
+                        .unlockedBy("has_planks", has(ItemTags.PLANKS)))
+                // primitive ore analyzer
+                .vanillaRecipe(() -> ShapedRecipeBuilder
+                        .shaped(ORE_ANALYZER.block(Voltage.PRIMITIVE))
+                        .pattern("WLW")
+                        .pattern("LFL")
+                        .pattern("WLW")
+                        .define('W', ItemTags.PLANKS)
+                        .define('L', ItemTags.LOGS)
+                        .define('F', FLINT.tag("primary"))
+                        .unlockedBy("has_flint", has(FLINT.tag("primary"))))
+                // primitive ore washer
+                .vanillaRecipe(() -> ShapedRecipeBuilder
+                        .shaped(ORE_WASHER.block(Voltage.PRIMITIVE))
+                        .pattern("WLW")
+                        .pattern("LFL")
+                        .pattern("WLW")
+                        .define('W', ItemTags.PLANKS)
+                        .define('L', ItemTags.LOGS)
+                        .define('F', Items.WATER_BUCKET)
+                        .unlockedBy("has_water_bucket", has(Items.WATER_BUCKET)));
+    }
+
+    private static void machines() {
+        machine(RESEARCH_TABLE, "overlay/machine/overlay_screen");
+        machine(ASSEMBLER, "machines/assembler");
+        machine(STONE_GENERATOR, "machines/rock_crusher");
+        machine(ORE_ANALYZER, "machines/electromagnetic_separator");
+        machine(MACERATOR, "machines/macerator");
+        machine(ORE_WASHER, "machines/ore_washer");
+        machine(CENTRIFUGE, "machines/centrifuge");
+        machine(THERMAL_CENTRIFUGE, "machines/thermal_centrifuge");
+        machine(ELECTRIC_FURNACE, "machines/electric_furnace");
+        machine(ALLOY_SMELTER, "machines/alloy_smelter");
+        machine(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
+    }
+
+    private static void misc() {
         DATA_GEN.block(NETWORK_CONTROLLER.entry())
                 .blockState(machineBlock(Voltage.LV, "overlay/machine/overlay_screen"))
                 .tag(MINEABLE_WITH_WRENCH)
@@ -64,23 +133,11 @@ public final class Machines {
                 .build()
                 .block(MULTI_BLOCK_INTERFACE.entry())
                 .blockState(sidedMachine("casings/solid/machine_casing_solid_steel", IO_TEX))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .tag(MINEABLE_WITH_WRENCH)
                 .build();
-
-        machineSet(RESEARCH_TABLE, "overlay/machine/overlay_screen");
-        machineSet(ASSEMBLER, "machines/assembler");
-        machineSet(STONE_GENERATOR, "machines/rock_crusher");
-        machineSet(ORE_ANALYZER, "machines/electromagnetic_separator");
-        machineSet(MACERATOR, "machines/macerator");
-        machineSet(ORE_WASHER, "machines/ore_washer");
-        machineSet(CENTRIFUGE, "machines/centrifuge");
-        machineSet(THERMAL_CENTRIFUGE, "machines/thermal_centrifuge");
-        machineSet(ELECTRIC_FURNACE, "machines/electric_furnace");
-        machineSet(ALLOY_SMELTER, "machines/alloy_smelter");
-        machineSet(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
     }
 
-    private static void machineSet(MachineSet set, String overlay) {
+    private static void machine(MachineSet set, String overlay) {
         for (var voltage : set.voltages) {
             var builder = DATA_GEN.block(set.entry(voltage))
                     .tag(MINEABLE_WITH_WRENCH);

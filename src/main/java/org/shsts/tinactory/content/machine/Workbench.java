@@ -132,7 +132,7 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
 
         var recipeManager = world.getRecipeManager();
 
-        currentRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL.get(), this, world)
+        currentRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL_CRAFTING.get(), this, world)
                 .map($ -> (Recipe) $)
                 .or(() -> recipeManager.getRecipeFor(RecipeType.CRAFTING, craftingStack, world))
                 .orElse(null);

@@ -38,7 +38,7 @@ import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.content.AllRecipes.TOOL;
+import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
@@ -150,7 +150,7 @@ public final class AllItems {
                 .define('B', IRON.tag("bolt"))
                 .unlockedBy("has_wire", has(COPPER.tag("wire"))));
 
-        TOOL.recipe(ULV_MACHINE_HULL)
+        TOOL_CRAFTING.recipe(ULV_MACHINE_HULL)
                 .result(ULV_MACHINE_HULL, 1)
                 .pattern("###").pattern("#W#").pattern("###")
                 .define('#', IRON.tag("plate"))
@@ -166,7 +166,7 @@ public final class AllItems {
         ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH.entry());
         ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
 
-        TOOL.recipe(ALLOY_SMELTER.entry(Voltage.ULV))
+        TOOL_CRAFTING.recipe(ALLOY_SMELTER.entry(Voltage.ULV))
                 .result(ALLOY_SMELTER.entry(Voltage.ULV), 1)
                 .pattern("WVW").pattern("VHV").pattern("WVW")
                 .define('W', ULV_CABLE)
@@ -175,7 +175,7 @@ public final class AllItems {
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
 
-        TOOL.recipe(STEAM_TURBINE.entry(Voltage.ULV))
+        TOOL_CRAFTING.recipe(STEAM_TURBINE.entry(Voltage.ULV))
                 .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
                 .pattern("PVP").pattern("RHR").pattern("WVW")
                 .define('P', COPPER.tag("pipe"))
@@ -186,7 +186,7 @@ public final class AllItems {
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
 
-        TOOL.recipe(LOW_PRESSURE_BOILER.entry())
+        TOOL_CRAFTING.recipe(LOW_PRESSURE_BOILER.entry())
                 .result(LOW_PRESSURE_BOILER.entry(), 1)
                 .pattern("PPP").pattern("PWP").pattern("VFV")
                 .define('P', IRON.tag("plate"))
@@ -199,7 +199,7 @@ public final class AllItems {
 
     private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
                                    Supplier<? extends ItemLike> base) {
-        TOOL.recipe(result)
+        TOOL_CRAFTING.recipe(result)
                 .result(result, 1)
                 .pattern("BBB").pattern("VHV").pattern("WVW")
                 .define('B', base)

@@ -32,7 +32,6 @@ public final class Elements {
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
                 .metalSet()
                 .ore(OreVariant.DEEPSLATE)
-                // TODO: byproduct ?
                 .buildObject();
 
         COPPER = set("copper")
@@ -45,7 +44,6 @@ public final class Elements {
                 .color(0xFFDCDCDC)
                 .mechanicalSet().wire()
                 .ore(OreVariant.STONE)
-                // TODO: byproduct tin, zinc
                 .buildObject();
 
         NICKEL = set("nickel")

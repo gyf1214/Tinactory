@@ -27,6 +27,14 @@ public final class Components {
     private static final String RESEARCH_TEX = "metaitems/glass_vial/";
 
     public static void init() {
+        ulv();
+        for (var entry : COMPONENT_SETS.entrySet()) {
+            componentItems(entry.getKey(), entry.getValue());
+        }
+        misc();
+    }
+
+    private static void ulv() {
         DATA_GEN.block(ULV_CABLE)
                 .blockState(Models::ulvCableBlock)
                 .itemModel(Models::ulvCableItem)
@@ -40,15 +48,7 @@ public final class Components {
                 .build()
                 .item(VACUUM_TUBE)
                 .model(basicItem("metaitems/circuit.vacuum_tube"))
-                .build()
-                .block(HEAT_PROOF_BLOCK)
-                .blockState(solidBlock("casings/solid/machine_casing_heatproof"))
-                .tag(MINEABLE_WITH_WRENCH)
                 .build();
-
-        for (var entry : COMPONENT_SETS.entrySet()) {
-            componentItems(entry.getKey(), entry.getValue());
-        }
     }
 
     private static void componentItems(Voltage voltage, ComponentSet set) {
@@ -72,6 +72,13 @@ public final class Components {
                 .build()
                 .item(set.researchEquipment)
                 .model(basicItem(RESEARCH_TEX + "base", RESEARCH_TEX + "overlay"))
+                .build();
+    }
+
+    private static void misc() {
+        DATA_GEN.block(HEAT_PROOF_BLOCK)
+                .blockState(solidBlock("casings/solid/machine_casing_heatproof"))
+                .tag(MINEABLE_WITH_WRENCH)
                 .build();
     }
 }

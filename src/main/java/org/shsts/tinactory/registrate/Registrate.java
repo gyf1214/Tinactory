@@ -33,7 +33,6 @@ import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
-import org.shsts.tinactory.core.recipe.NullRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
@@ -365,20 +364,6 @@ public class Registrate implements IRecipeDataConsumer {
         for (var id : ids) {
             biomeHandler.addLocation(new ResourceLocation(modid, id));
         }
-    }
-
-    public void nullRecipe(ResourceLocation loc) {
-        recipeDataHandler.addCallback(prov -> prov.addRecipe(new NullRecipe(loc)));
-    }
-
-    public void nullRecipe(String loc) {
-        nullRecipe(new ResourceLocation(loc));
-    }
-
-    public void nullRecipe(Item item) {
-        var loc = item.getRegistryName();
-        assert loc != null;
-        nullRecipe(loc);
     }
 
     public void vanillaRecipe(Supplier<RecipeBuilder> recipe) {

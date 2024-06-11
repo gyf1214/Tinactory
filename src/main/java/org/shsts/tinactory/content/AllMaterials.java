@@ -1,13 +1,11 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.material.Elements;
 import org.shsts.tinactory.content.material.FirstDegrees;
 import org.shsts.tinactory.content.material.MaterialSet;
@@ -16,9 +14,6 @@ import org.shsts.tinactory.content.material.Ores;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
-
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -87,24 +82,9 @@ public final class AllMaterials {
 
     public static final Map<String, MaterialSet> SET;
 
-    public static MaterialSet get(String name) {
-        if (!SET.containsKey(name)) {
-            throw new IllegalArgumentException("material %s does not exist".formatted(name));
-        }
-        return SET.get(name);
-    }
-
     public static MaterialSet.Builder<?> set(String id) {
         return (new MaterialSet.Builder<>(Unit.INSTANCE, id))
                 .onCreateObject(mat -> SET.put(mat.name, mat));
-    }
-
-    public static Supplier<Item> ingot(String name) {
-        return item(name, "ingot");
-    }
-
-    public static Supplier<Item> item(String name, String sub) {
-        return () -> get(name).item(sub);
     }
 
     public static TagKey<Item> tag(String sub) {
@@ -112,36 +92,4 @@ public final class AllMaterials {
     }
 
     public static void init() {}
-
-    public static void initRecipes() {
-        // smelt wrought iron nugget
-        REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
-                .smelting(Ingredient.of(IRON.tag("nugget")), WROUGHT_IRON.item("nugget"), 0, 200)
-                .unlockedBy("has_material", AllRecipes.has(IRON.tag("nugget"))), "_from_iron");
-
-        // stone -> gravel
-        AllRecipes.TOOL.recipe(Items.GRAVEL)
-                .result(Items.GRAVEL, 1)
-                .pattern("#").pattern("#")
-                .define('#', STONE.tag("block"))
-                .toolTag(AllTags.TOOL_HAMMER)
-                .build();
-
-        // gravel -> flint
-        AllRecipes.TOOL.recipe(FLINT.loc("primary"))
-                .result(FLINT.entry("primary"), 1)
-                .pattern("###")
-                .define('#', Items.GRAVEL)
-                .toolTag(AllTags.TOOL_HAMMER)
-                .build();
-
-        // gravel -> sand
-        AllRecipes.TOOL.recipe(Items.SAND)
-                .result(Items.SAND, 1)
-                .pattern("#")
-                .define('#', Items.GRAVEL)
-                .toolTag(AllTags.TOOL_MORTAR)
-                .build();
-
-    }
 }

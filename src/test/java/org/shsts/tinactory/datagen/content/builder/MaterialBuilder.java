@@ -8,13 +8,16 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.builder.DataBuilder;
 import org.shsts.tinactory.datagen.content.Models;
@@ -30,13 +33,20 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
-import static org.shsts.tinactory.content.AllRecipes.TOOL;
+import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
+import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
+import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
+import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
+import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.TOOL_FILE;
 import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
+import static org.shsts.tinactory.content.AllTags.TOOL_HANDLE;
 import static org.shsts.tinactory.content.AllTags.TOOL_MORTAR;
 import static org.shsts.tinactory.content.AllTags.TOOL_SAW;
+import static org.shsts.tinactory.content.AllTags.TOOL_SCREW;
 import static org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
@@ -137,8 +147,29 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
+    public MaterialBuilder<P>
+    oreProcess(int amount, MaterialSet... byproduct) {
+        var builder = new OreRecipeBuilder(amount, false, byproduct);
+        builder.buildRecipes();
+        return this;
+    }
+
+    public MaterialBuilder<P>
+    oreProcess(MaterialSet... byproduct) {
+        var builder = new OreRecipeBuilder(1, false, byproduct);
+        builder.buildRecipes();
+        return this;
+    }
+
+    public MaterialBuilder<P>
+    primitiveOreProcess(MaterialSet... byproduct) {
+        var builder = new OreRecipeBuilder(1, true, byproduct);
+        builder.buildRecipes();
+        return this;
+    }
+
     private <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
-    toolItem(String sub) {
+    toolModel(String sub) {
         var category = sub.substring("tool/".length());
         var handle = Optional.ofNullable(TOOL_HANDLE_TEX.get(category))
                 .map(MaterialBuilder::toolTex)
@@ -151,7 +182,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         assert icon != null;
         var builder = dataGen.item(material.loc(sub), entry).tag(tag);
         if (sub.startsWith("tool/")) {
-            builder = builder.model(toolItem(sub));
+            builder = builder.model(toolModel(sub));
         } else if (sub.equals("wire")) {
             builder = builder.model(Models::wireItem);
         } else if (sub.equals("pipe")) {
@@ -200,7 +231,6 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                 .build();
     }
 
-
     @SuppressWarnings("unchecked")
     private RecipeBuilder shapedProcess(String result, int count, String[] patterns, Object[] args) {
         var builder = ShapedRecipeBuilder.shaped(material.item(result), count);
@@ -234,7 +264,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
 
     @SuppressWarnings("unchecked")
     private void toolProcess(String result, int count, String[] patterns, int size, Object[] args) {
-        var builder = TOOL.recipe(dataGen, material.loc(result))
+        var builder = TOOL_CRAFTING.recipe(dataGen, material.loc(result))
                 .result(material.entry(result), count);
         for (var pat : patterns) {
             builder.pattern(pat);
@@ -294,6 +324,108 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                 .unlockedBy("has_material", has(material.tag(input))));
     }
 
+    private void toolRecipe(String sub, String pattern, Object... args) {
+        process("tool/" + sub, 1, pattern, args);
+    }
+
+    private class OreRecipeBuilder {
+        private final int amount;
+        private final boolean primitive;
+        private final OreVariant variant;
+        private final Supplier<? extends Item> byproduct0, byproduct1, byproduct2;
+
+        private Supplier<? extends Item> getByProduct(MaterialSet[] byproduct, int index) {
+            if (byproduct.length == 0) {
+                return material.entry("dust");
+            } else if (index < byproduct.length) {
+                return byproduct[index].entry("dust");
+            } else {
+                return byproduct[0].entry("dust");
+            }
+        }
+
+        public OreRecipeBuilder(int amount, boolean primitive, MaterialSet[] byproduct) {
+            this.amount = amount;
+            this.primitive = primitive;
+
+            this.byproduct0 = getByProduct(byproduct, 0);
+            this.byproduct1 = getByProduct(byproduct, 1);
+            this.byproduct2 = getByProduct(byproduct, 2);
+            this.variant = material.oreVariant();
+        }
+
+        private void crush(String input, String output) {
+            MACERATOR.recipe(dataGen, material.loc(output))
+                    .inputItem(0, material.tag(input), 1)
+                    .outputItem(1, material.entry(output), input.equals("raw") ? 2 * amount : 1)
+                    .voltage(Voltage.LV)
+                    .workTicks((long) (variant.destroyTime * 40f))
+                    .build();
+        }
+
+        private void wash(String input, String output) {
+            var loc = material.loc(output);
+            if (input.equals("dust_pure")) {
+                loc = new ResourceLocation(loc.getNamespace(), loc.getPath() + "_from_pure");
+            }
+            var builder = ORE_WASHER.recipe(dataGen, loc)
+                    .inputItem(0, material.tag(input), 1)
+                    .outputItem(2, material.entry(output), 1);
+            if (input.equals("crushed")) {
+                builder.inputFluid(1, Fluids.WATER, 1000)
+                        .outputItem(3, STONE.entry("dust"), 1)
+                        .outputItem(4, byproduct0, 1, 0.1)
+                        .workTicks(200);
+            } else {
+                builder.inputFluid(1, Fluids.WATER, 100).workTicks(32);
+            }
+            var voltage = primitive && input.equals("dust_impure") ?
+                    Voltage.PRIMITIVE : Voltage.ULV;
+            builder.voltage(voltage).build();
+        }
+
+        public void buildRecipes() {
+            if (primitive || variant.voltage.rank <= Voltage.ULV.rank) {
+                process("crushed", amount, "raw", TOOL_HAMMER);
+                process("dust_pure", 1, "crushed_purified", TOOL_HAMMER);
+                process("dust_impure", 1, "crushed", TOOL_HAMMER);
+            }
+
+            crush("crushed", "raw");
+            crush("dust_impure", "crushed");
+            crush("dust_pure", "crushed_purified");
+            crush("dust", "crushed_centrifuged");
+            wash("crushed_purified", "crushed");
+            wash("dust", "dust_impure");
+            wash("dust", "dust_pure");
+
+            CENTRIFUGE.recipe(dataGen, material.loc("dust"))
+                    .inputItem(0, material.tag("dust_pure"), 1)
+                    .outputItem(2, material.entry("dust"), 1)
+                    .outputItem(2, byproduct1, 1, 0.1)
+                    .voltage(Voltage.LV)
+                    .workTicks(80)
+                    .build();
+
+            THERMAL_CENTRIFUGE.recipe(dataGen, material.loc("crushed_centrifuged"))
+                    .inputItem(0, material.tag("crushed_purified"), 1)
+                    .outputItem(1, material.entry("crushed_centrifuged"), 1)
+                    .outputItem(1, byproduct2, 1, 0.1)
+                    .build();
+        }
+    }
+
+    private void toolRecipes() {
+        toolRecipe("hammer", "AA \nAAB\nAA ", "primary", TOOL_HANDLE);
+        toolRecipe("mortar", " A \nBAB\nBBB", "primary", ItemTags.STONE_TOOL_MATERIALS);
+        toolRecipe("file", "A\nA\nB", "plate", TOOL_HANDLE);
+        toolRecipe("saw", "AAB\n  B", "plate", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
+        toolRecipe("screwdriver", "  A\n A \nB  ", "stick", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
+        toolRecipe("wrench", "A A\nAAA\n A ", "plate", TOOL_HAMMER);
+        toolRecipe("wire_cutter", "A A\n A \nBCB", "plate", TOOL_HANDLE, TOOL_SCREW,
+                TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
+    }
+
     @Override
     protected void register() {
         for (var sub : material.itemSubs()) {
@@ -313,5 +445,6 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                     .requires(Ingredient.of(material.tag("dust_tiny")), 9)
                     .unlockedBy("has_dust_small", has(material.tag("dust_tiny"))));
         }
+        toolRecipes();
     }
 }

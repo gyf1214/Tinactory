@@ -18,6 +18,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
+import org.shsts.tinactory.core.recipe.NullRecipe;
 import org.shsts.tinactory.datagen.builder.BlockDataBuilder;
 import org.shsts.tinactory.datagen.builder.ItemDataBuilder;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
@@ -136,8 +137,9 @@ public final class DataGen implements IRecipeDataConsumer {
         return this;
     }
 
-    public void vanillaRecipe(Supplier<RecipeBuilder> recipe) {
+    public DataGen vanillaRecipe(Supplier<RecipeBuilder> recipe) {
         recipeHandler.registerRecipe(cons -> recipe.get().save(cons));
+        return this;
     }
 
     public void vanillaRecipe(Supplier<RecipeBuilder> recipe, String suffix) {
@@ -148,6 +150,21 @@ public final class DataGen implements IRecipeDataConsumer {
             var recipeLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + suffix);
             builder.save(cons, recipeLoc);
         });
+    }
+
+    public DataGen nullRecipe(ResourceLocation loc) {
+        recipeHandler.registerRecipe(() -> new NullRecipe(loc));
+        return this;
+    }
+
+    public DataGen nullRecipe(String loc) {
+        return nullRecipe(new ResourceLocation(loc));
+    }
+
+    public DataGen nullRecipe(Item item) {
+        var loc = item.getRegistryName();
+        assert loc != null;
+        return nullRecipe(loc);
     }
 
     public TechBuilder<DataGen> tech(String id) {
