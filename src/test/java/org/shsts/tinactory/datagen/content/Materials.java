@@ -253,14 +253,6 @@ public final class Materials {
                 .toolTag(TOOL_MORTAR)
                 .build();
 
-        BLAST_FURNACE.recipe(DATA_GEN, STEEL.loc("ingot"))
-                .inputItem(0, IRON.tag("dust"), 1)
-                .outputItem(2, STEEL.entry("ingot"), 1)
-                .voltage(Voltage.LV)
-                .power(32)
-                .workTicks(200)
-                .build();
-
         // generate steam
         for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
             var consume = (int) voltage.value / 8 * (14 - voltage.rank);
@@ -270,6 +262,15 @@ public final class Materials {
                     .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
                     .build();
         }
+
+        // TEST
+        BLAST_FURNACE.recipe(DATA_GEN, STEEL.loc("ingot"))
+                .inputItem(0, IRON.tag("dust"), 1)
+                .outputItem(2, STEEL.entry("ingot"), 1)
+                .voltage(Voltage.LV)
+                .power(32)
+                .workTicks(200)
+                .build();
     }
 
     private static void tags() {

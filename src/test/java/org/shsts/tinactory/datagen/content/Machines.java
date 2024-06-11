@@ -162,9 +162,7 @@ public final class Machines {
                 .define('V', VACUUM_TUBE)
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
-    }
 
-    private static void misc() {
         TOOL_CRAFTING.recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
                 .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
                 .pattern("PVP").pattern("RHR").pattern("WVW")
@@ -175,7 +173,9 @@ public final class Machines {
                 .define('V', VACUUM_TUBE)
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
+    }
 
+    private static void misc() {
         TOOL_CRAFTING.recipe(DATA_GEN, LOW_PRESSURE_BOILER.entry())
                 .result(LOW_PRESSURE_BOILER.entry(), 1)
                 .pattern("PPP").pattern("PWP").pattern("VFV")
