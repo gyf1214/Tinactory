@@ -17,6 +17,7 @@ import org.shsts.tinactory.datagen.content.model.IconSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static org.shsts.tinactory.content.AllItems.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
@@ -42,6 +43,7 @@ import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
+import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
@@ -258,6 +260,16 @@ public final class Materials {
                 .power(32)
                 .workTicks(200)
                 .build();
+
+        // generate steam
+        for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
+            var consume = (int) voltage.value / 8 * (14 - voltage.rank);
+            STEAM_TURBINE.recipe(DATA_GEN, voltage.id)
+                    .voltage(voltage)
+                    .inputFluid(0, STEAM, consume)
+                    .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
+                    .build();
+        }
     }
 
     private static void tags() {

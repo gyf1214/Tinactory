@@ -1,16 +1,8 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Fluids;
-import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
 import org.shsts.tinactory.content.network.CableBlock;
@@ -19,27 +11,13 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
-import static org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER;
-import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
-import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
-import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
-import static org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER;
-import static org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER;
-import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_TABLE;
-import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
-import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
-import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
-import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
@@ -121,110 +99,5 @@ public final class AllItems {
     }
 
     public static void init() {}
-
-    public static void initRecipes() {
-        ulvRecipes();
-        researchEquipments();
-
-        for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
-            var consume = (int) voltage.value / 8 * (14 - voltage.rank);
-            AllRecipes.STEAM_TURBINE.recipe(voltage.id)
-                    .voltage(voltage)
-                    .inputFluid(0, STEAM, consume)
-                    .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
-                    .build();
-        }
-    }
-
-    private static void ulvRecipes() {
-        REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
-                .shapeless(ULV_CABLE.get())
-                .requires(Ingredient.of(IRON.tag("wire")), 4)
-                .unlockedBy("has_wire", has(IRON.tag("wire"))));
-
-        REGISTRATE.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(VACUUM_TUBE.get())
-                .pattern("BGB").pattern("WWW")
-                .define('G', Items.GLASS)
-                .define('W', COPPER.tag("wire"))
-                .define('B', IRON.tag("bolt"))
-                .unlockedBy("has_wire", has(COPPER.tag("wire"))));
-
-        TOOL_CRAFTING.recipe(ULV_MACHINE_HULL)
-                .result(ULV_MACHINE_HULL, 1)
-                .pattern("###").pattern("#W#").pattern("###")
-                .define('#', IRON.tag("plate"))
-                .define('W', ULV_CABLE)
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
-
-        ulvMachine(STONE_GENERATOR);
-        ulvMachine(ORE_ANALYZER);
-        ulvMachine(ORE_WASHER);
-        ulvMachine(NETWORK_CONTROLLER.entry(), VACUUM_TUBE);
-        ulvMachine(RESEARCH_TABLE.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
-        ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH.entry());
-        ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
-
-        TOOL_CRAFTING.recipe(ALLOY_SMELTER.entry(Voltage.ULV))
-                .result(ALLOY_SMELTER.entry(Voltage.ULV), 1)
-                .pattern("WVW").pattern("VHV").pattern("WVW")
-                .define('W', ULV_CABLE)
-                .define('H', ELECTRIC_FURNACE.entry(Voltage.ULV))
-                .define('V', VACUUM_TUBE)
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
-
-        TOOL_CRAFTING.recipe(STEAM_TURBINE.entry(Voltage.ULV))
-                .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
-                .pattern("PVP").pattern("RHR").pattern("WVW")
-                .define('P', COPPER.tag("pipe"))
-                .define('R', IRON.tag("rotor"))
-                .define('W', ULV_CABLE)
-                .define('H', ULV_MACHINE_HULL)
-                .define('V', VACUUM_TUBE)
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
-
-        TOOL_CRAFTING.recipe(LOW_PRESSURE_BOILER.entry())
-                .result(LOW_PRESSURE_BOILER.entry(), 1)
-                .pattern("PPP").pattern("PWP").pattern("VFV")
-                .define('P', IRON.tag("plate"))
-                .define('W', ULV_CABLE)
-                .define('V', VACUUM_TUBE)
-                .define('F', Blocks.FURNACE.asItem())
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
-    }
-
-    private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
-                                   Supplier<? extends ItemLike> base) {
-        TOOL_CRAFTING.recipe(result)
-                .result(result, 1)
-                .pattern("BBB").pattern("VHV").pattern("WVW")
-                .define('B', base)
-                .define('W', ULV_CABLE)
-                .define('H', ULV_MACHINE_HULL)
-                .define('V', VACUUM_TUBE)
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
-    }
-
-    private static void ulvMachine(MachineSet set) {
-        ulvMachine(set.entry(Voltage.ULV), set.entry(Voltage.PRIMITIVE));
-    }
-
-    private static void researchEquipments() {
-        var workTicks = 200;
-
-        var item = ULV_RESEARCH_EQUIPMENT;
-        AllRecipes.ASSEMBLER.recipe(item)
-                .outputItem(2, item, 1)
-                .inputItem(0, IRON.tag("plate"), 1)
-                .inputItem(0, COPPER.tag("wire"), 1)
-                .workTicks(workTicks)
-                .voltage(Voltage.ULV)
-                .build();
-    }
 }
 

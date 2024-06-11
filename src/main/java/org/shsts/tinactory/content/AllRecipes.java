@@ -106,7 +106,6 @@ public final class AllRecipes {
     }
 
     public static void initRecipes() {
-        AllItems.initRecipes();
         markerRecipes();
     }
 

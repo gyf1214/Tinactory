@@ -5,13 +5,16 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER;
@@ -30,8 +33,14 @@ import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
+import static org.shsts.tinactory.content.AllItems.ULV_CABLE;
+import static org.shsts.tinactory.content.AllItems.ULV_MACHINE_HULL;
+import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
+import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
+import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
+import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.machineTag;
@@ -48,9 +57,50 @@ public final class Machines {
     private static final String BOILER_TEX = "generators/boiler/coal";
 
     public static void init() {
+        machineItems();
         primitive();
-        machines();
+        ulv();
         misc();
+    }
+
+    private static void machineItems() {
+        machine(RESEARCH_TABLE, "overlay/machine/overlay_screen");
+        machine(ASSEMBLER, "machines/assembler");
+        machine(STONE_GENERATOR, "machines/rock_crusher");
+        machine(ORE_ANALYZER, "machines/electromagnetic_separator");
+        machine(MACERATOR, "machines/macerator");
+        machine(ORE_WASHER, "machines/ore_washer");
+        machine(CENTRIFUGE, "machines/centrifuge");
+        machine(THERMAL_CENTRIFUGE, "machines/thermal_centrifuge");
+        machine(ELECTRIC_FURNACE, "machines/electric_furnace");
+        machine(ALLOY_SMELTER, "machines/alloy_smelter");
+        machine(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
+
+        DATA_GEN.block(NETWORK_CONTROLLER.entry())
+                .blockState(machineBlock(Voltage.LV, "overlay/machine/overlay_screen"))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build()
+                .block(WORKBENCH.entry())
+                .blockState(cubeBlock("casings/crafting_table"))
+                .tag(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH)
+                .build()
+                .block(LOW_PRESSURE_BOILER.entry())
+                .blockState(machineBlock(Voltage.ULV, BOILER_TEX))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build()
+                .block(HIGH_PRESSURE_BOILER.entry())
+                .blockState(machineBlock(Voltage.MV, BOILER_TEX))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build()
+                .block(BLAST_FURNACE.entry())
+                .blockState(primitiveBlock("casings/solid/machine_casing_heatproof",
+                        "multiblock/blast_furnace"))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build()
+                .block(MULTI_BLOCK_INTERFACE.entry())
+                .blockState(sidedMachine("casings/solid/machine_casing_solid_steel", IO_TEX))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build();
     }
 
     private static void primitive() {
@@ -95,45 +145,45 @@ public final class Machines {
                         .unlockedBy("has_water_bucket", has(Items.WATER_BUCKET)));
     }
 
-    private static void machines() {
-        machine(RESEARCH_TABLE, "overlay/machine/overlay_screen");
-        machine(ASSEMBLER, "machines/assembler");
-        machine(STONE_GENERATOR, "machines/rock_crusher");
-        machine(ORE_ANALYZER, "machines/electromagnetic_separator");
-        machine(MACERATOR, "machines/macerator");
-        machine(ORE_WASHER, "machines/ore_washer");
-        machine(CENTRIFUGE, "machines/centrifuge");
-        machine(THERMAL_CENTRIFUGE, "machines/thermal_centrifuge");
-        machine(ELECTRIC_FURNACE, "machines/electric_furnace");
-        machine(ALLOY_SMELTER, "machines/alloy_smelter");
-        machine(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
+    private static void ulv() {
+        ulvFromPrimitive(STONE_GENERATOR);
+        ulvFromPrimitive(ORE_ANALYZER);
+        ulvFromPrimitive(ORE_WASHER);
+        ulvMachine(NETWORK_CONTROLLER.entry(), VACUUM_TUBE);
+        ulvMachine(RESEARCH_TABLE.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
+        ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH.entry());
+        ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
+
+        TOOL_CRAFTING.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
+                .result(ALLOY_SMELTER.entry(Voltage.ULV), 1)
+                .pattern("WVW").pattern("VHV").pattern("WVW")
+                .define('W', ULV_CABLE)
+                .define('H', ELECTRIC_FURNACE.entry(Voltage.ULV))
+                .define('V', VACUUM_TUBE)
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
     }
 
     private static void misc() {
-        DATA_GEN.block(NETWORK_CONTROLLER.entry())
-                .blockState(machineBlock(Voltage.LV, "overlay/machine/overlay_screen"))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(WORKBENCH.entry())
-                .blockState(cubeBlock("casings/crafting_table"))
-                .tag(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH)
-                .build()
-                .block(LOW_PRESSURE_BOILER.entry())
-                .blockState(machineBlock(Voltage.ULV, BOILER_TEX))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(HIGH_PRESSURE_BOILER.entry())
-                .blockState(machineBlock(Voltage.MV, BOILER_TEX))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(BLAST_FURNACE.entry())
-                .blockState(primitiveBlock("casings/solid/machine_casing_heatproof",
-                        "multiblock/blast_furnace"))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(MULTI_BLOCK_INTERFACE.entry())
-                .blockState(sidedMachine("casings/solid/machine_casing_solid_steel", IO_TEX))
-                .tag(MINEABLE_WITH_WRENCH)
+        TOOL_CRAFTING.recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
+                .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
+                .pattern("PVP").pattern("RHR").pattern("WVW")
+                .define('P', COPPER.tag("pipe"))
+                .define('R', IRON.tag("rotor"))
+                .define('W', ULV_CABLE)
+                .define('H', ULV_MACHINE_HULL)
+                .define('V', VACUUM_TUBE)
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
+
+        TOOL_CRAFTING.recipe(DATA_GEN, LOW_PRESSURE_BOILER.entry())
+                .result(LOW_PRESSURE_BOILER.entry(), 1)
+                .pattern("PPP").pattern("PWP").pattern("VFV")
+                .define('P', IRON.tag("plate"))
+                .define('W', ULV_CABLE)
+                .define('V', VACUUM_TUBE)
+                .define('F', Blocks.FURNACE.asItem())
+                .toolTag(AllTags.TOOL_WRENCH)
                 .build();
     }
 
@@ -154,5 +204,22 @@ public final class Machines {
             }
             builder.build();
         }
+    }
+
+    private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
+                                   Supplier<? extends ItemLike> base) {
+        TOOL_CRAFTING.recipe(DATA_GEN, result)
+                .result(result, 1)
+                .pattern("BBB").pattern("VHV").pattern("WVW")
+                .define('B', base)
+                .define('W', ULV_CABLE)
+                .define('H', ULV_MACHINE_HULL)
+                .define('V', VACUUM_TUBE)
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
+    }
+
+    private static void ulvFromPrimitive(MachineSet set) {
+        ulvMachine(set.entry(Voltage.ULV), set.entry(Voltage.PRIMITIVE));
     }
 }
