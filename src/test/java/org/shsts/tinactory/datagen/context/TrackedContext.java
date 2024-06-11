@@ -7,6 +7,7 @@ import org.shsts.tinactory.registrate.tracking.TrackedType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,7 @@ public class TrackedContext<V> {
 
     private final TrackedType<V> type;
     private final Supplier<Map<V, String>> tracked;
+    private final Map<V, String> extraTracked = new HashMap<>();
     private final List<Supplier<? extends V>> processed;
 
     public TrackedContext(Registrate registrate, TrackedType<V> type) {
@@ -26,8 +28,14 @@ public class TrackedContext<V> {
         this.processed = new ArrayList<>();
     }
 
+    public Map<V, String> getTrackedMap() {
+        var ret = new HashMap<>(tracked.get());
+        ret.putAll(extraTracked);
+        return ret;
+    }
+
     public Set<V> getTracked() {
-        return tracked.get().keySet();
+        return getTrackedMap().keySet();
     }
 
     public void process(V obj) {
@@ -38,10 +46,14 @@ public class TrackedContext<V> {
         processed.add(obj);
     }
 
+    public void trackExtra(V obj, String key) {
+        extraTracked.put(obj, key);
+    }
+
     public void postValidate() {
         var processed = this.processed.stream().map($ -> (V) $.get())
                 .collect(Collectors.toSet());
-        var tracked = this.tracked.get();
+        var tracked = getTrackedMap();
 
         var missing = 0;
         for (var entry : tracked.entrySet()) {

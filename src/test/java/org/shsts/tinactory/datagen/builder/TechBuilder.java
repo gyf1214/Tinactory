@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.handler.TechProvider;
 
@@ -64,8 +65,10 @@ public class TechBuilder<P> extends DataBuilder<JsonObject, P, TechBuilder<P>> {
     protected void register() {
         assert maxProgress > 0;
         dataGen.techHandler.addTech(this);
-//        registrate.languageHandler.track(ITechnology.getDescriptionId(loc));
-//        registrate.languageHandler.track(ITechnology.getDetailsId(loc));
+        var description = ITechnology.getDescriptionId(loc);
+        var details = ITechnology.getDetailsId(loc);
+        dataGen.langTrackedCtx.trackExtra(description, description);
+        dataGen.langTrackedCtx.trackExtra(details, details);
     }
 
     @Override
