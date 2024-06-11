@@ -22,8 +22,7 @@ eclipse
 run
 
 # generated
-src/main/generated
-src/test/generated
+src/generated
 
 # libs
 libs/
