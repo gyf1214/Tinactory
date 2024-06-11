@@ -20,7 +20,7 @@ import static org.shsts.tinactory.content.AllMaterials.set;
 public final class Elements {
     static {
         IRON = set("iron")
-                .color(0xFFC8C8C8).icon(IconSet.METALLIC)
+                .color(0xFFC8C8C8)
                 .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
                 .mechanicalSet().wire()
@@ -28,7 +28,7 @@ public final class Elements {
                 .buildObject();
 
         GOLD = set("gold")
-                .color(0xFFFFE650).icon(IconSet.SHINY)
+                .color(0xFFFFE650)
                 .existing("ore", Blocks.DEEPSLATE_GOLD_ORE)
                 .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
@@ -37,33 +37,31 @@ public final class Elements {
                 .toolProcess().smelt()
                 .ore(OreVariant.DEEPSLATE)
                 // TODO: byproduct ?
-                .build()
                 .buildObject();
 
         COPPER = set("copper")
-                .color(0xFFFF6400).icon(IconSet.SHINY)
+                .color(0xFFFF6400)
                 .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
                 .metalSet().wireAndPlate().pipe()
                 .toolProcess().smelt()
                 .buildObject();
 
         TIN = set("tin")
-                .color(0xFFDCDCDC).icon(IconSet.DULL)
+                .color(0xFFDCDCDC)
                 .mechanicalSet().wire()
                 .toolProcess().smelt()
                 .ore(OreVariant.STONE)
                 // TODO: byproduct tin, zinc
-                .build()
                 .buildObject();
 
         NICKEL = set("nickel")
-                .color(0xFFC8C8FA).icon(IconSet.METALLIC)
+                .color(0xFFC8C8FA)
                 .metalSet()
                 .toolProcess().smelt()
                 .buildObject();
 
         ALUMINIUM = set("aluminium")
-                .color(0xFF80C8F0).icon(IconSet.DULL)
+                .color(0xFF80C8F0)
                 .mechanicalSet()
                 .buildObject();
     }

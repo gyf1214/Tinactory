@@ -48,12 +48,12 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
                         Function<BlockBehaviour.Properties, U> factory) {
         super(registrate, registrate.blockHandler, id, parent);
         this.factory = factory;
-        onCreateObject.add(registrate::trackTranslation);
+        onCreateObject.add(registrate::trackBlock);
     }
 
     protected BlockBuilder(Registrate registrate, String id, P parent) {
         super(registrate, registrate.blockHandler, id, parent);
-        onCreateObject.add(registrate::trackTranslation);
+        onCreateObject.add(registrate::trackBlock);
     }
 
     public S material(Material value) {

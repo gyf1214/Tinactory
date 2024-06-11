@@ -10,7 +10,6 @@ import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.material.Elements;
 import org.shsts.tinactory.content.material.FirstDegrees;
-import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.Ores;
 
@@ -33,8 +32,8 @@ public final class AllMaterials {
     public static MaterialSet ALUMINIUM;
 
     // First Degree
-    public static MaterialSet BRONZE;
     public static MaterialSet WROUGHT_IRON;
+    public static MaterialSet BRONZE;
     public static MaterialSet INVAR;
     public static MaterialSet CUPRONICKEL;
     public static MaterialSet STEEL;
@@ -62,11 +61,11 @@ public final class AllMaterials {
         Ores.init();
 
         TEST = set("test")
-                .tool(12800000, Tiers.NETHERITE).basic().build()
+                .toolSet(12800000, Tiers.NETHERITE)
                 .buildObject();
 
         STONE = set("stone")
-                .color(0xFFCDCDCD).icon(IconSet.ROUGH)
+                .color(0xFFCDCDCD)
                 .existing("block", Items.COBBLESTONE)
                 .existing("tool/pickaxe", Items.STONE_PICKAXE)
                 .existing("tool/shovel", Items.STONE_SHOVEL)
@@ -80,7 +79,7 @@ public final class AllMaterials {
                 .buildObject();
 
         FLINT = set("flint")
-                .color(0xFF002040).icon(IconSet.DULL)
+                .color(0xFF002040)
                 .existing("primary", Items.FLINT)
                 .dust()
                 .toolProcess()
@@ -130,10 +129,6 @@ public final class AllMaterials {
     public static void init() {}
 
     public static void initRecipes() {
-        for (var material : SET.values()) {
-            material.freeze();
-        }
-
         // smelt wrought iron nugget
         REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
                 .smelting(Ingredient.of(IRON.tag("nugget")), WROUGHT_IRON.item("nugget"), 0, 200)

@@ -14,6 +14,10 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class RecipeHandler extends DataHandler<RecipeProvider> {
+    public RecipeHandler(DataGen dataGen) {
+        super(dataGen);
+    }
+
     private class Provider extends RecipeProvider {
         @Nullable
         private Consumer<FinishedRecipe> consumer = null;
@@ -42,10 +46,6 @@ public class RecipeHandler extends DataHandler<RecipeProvider> {
         public String getName() {
             return "Recipes: " + dataGen.modid;
         }
-    }
-
-    public RecipeHandler(DataGen dataGen) {
-        super(dataGen);
     }
 
     @Override

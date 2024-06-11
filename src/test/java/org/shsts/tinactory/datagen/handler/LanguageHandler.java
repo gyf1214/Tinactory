@@ -28,6 +28,11 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 public class LanguageHandler extends DataHandler<LanguageProvider> {
     private final TrackedContext<String> trackedCtx;
 
+    public LanguageHandler(DataGen dataGen, TrackedContext<String> trackedCtx) {
+        super(dataGen);
+        this.trackedCtx = trackedCtx;
+    }
+
     private class Provider extends LanguageProvider {
         private final Gson gson = new Gson();
         private final ExistingFileHelper existingFileHelper;
@@ -66,13 +71,7 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
             gatherTracked();
             processTracked();
             super.run(cache);
-            clear();
         }
-    }
-
-    public LanguageHandler(DataGen dataGen, TrackedContext<String> trackedCtx) {
-        super(dataGen);
-        this.trackedCtx = trackedCtx;
     }
 
     @Override

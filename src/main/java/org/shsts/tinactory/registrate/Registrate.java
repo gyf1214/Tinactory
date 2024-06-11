@@ -243,7 +243,7 @@ public class Registrate implements IRecipeDataConsumer {
 
         protected SimpleItemBuilder(String id, Function<Item.Properties, U> factory) {
             super(Registrate.this, id, Registrate.this, factory);
-            onCreateObject.add(registrate::trackTranslation);
+            onCreateObject.add(registrate::trackItem);
         }
     }
 
@@ -459,12 +459,18 @@ public class Registrate implements IRecipeDataConsumer {
         trackedObjects.put(TrackedType.LANG, key, key);
     }
 
-    public void trackTranslation(Item item) {
-        trackTranslation(item.getDescriptionId());
+    public void trackBlock(Block block) {
+        var loc = block.getRegistryName();
+        assert loc != null;
+        trackedObjects.put(TrackedType.BLOCK, block, loc.toString());
+        trackTranslation(block.getDescriptionId());
     }
 
-    public void trackTranslation(Block block) {
-        trackTranslation(block.getDescriptionId());
+    public void trackItem(Item item) {
+        var loc = item.getRegistryName();
+        assert loc != null;
+        trackedObjects.put(TrackedType.ITEM, item, loc.toString());
+        trackTranslation(item.getDescriptionId());
     }
 
     public <V> Map<V, String> getTracked(TrackedType<V> type) {

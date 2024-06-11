@@ -3,6 +3,7 @@ package org.shsts.tinactory.registrate.tracking;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.Set;
 public record TrackedType<V>(String name) {
     public static final Set<TrackedType<?>> ALL_TYPES = new HashSet<>();
 
+    public static final TrackedType<Block> BLOCK = create("block");
     public static final TrackedType<Item> ITEM = create("item");
     public static final TrackedType<ResourceLocation> TECH = create("tech");
     public static final TrackedType<String> LANG = create("lang");

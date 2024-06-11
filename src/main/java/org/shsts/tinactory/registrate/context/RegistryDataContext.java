@@ -14,7 +14,7 @@ public class RegistryDataContext<T extends IForgeRegistryEntry<T>, U extends T, 
     public final String id;
     public final U object;
 
-    private RegistryDataContext(String modid, P provider, String id, U object) {
+    public RegistryDataContext(String modid, P provider, String id, U object) {
         super(modid, provider);
         this.id = id;
         this.object = object;
@@ -24,10 +24,5 @@ public class RegistryDataContext<T extends IForgeRegistryEntry<T>, U extends T, 
         super(entry.modid, provider);
         this.id = entry.id;
         this.object = entry.get();
-    }
-
-    @SuppressWarnings("unchecked")
-    public <U1 extends T> RegistryDataContext<T, U1, P> cast() {
-        return new RegistryDataContext<>(modid, provider, id, (U1) object);
     }
 }

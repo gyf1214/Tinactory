@@ -2,7 +2,6 @@ package org.shsts.tinactory.registrate.context;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -15,9 +14,5 @@ public class DataContext<P extends DataProvider> {
     public DataContext(String modid, P provider) {
         this.modid = modid;
         this.provider = provider;
-    }
-
-    public ResourceLocation modLoc(String id) {
-        return new ResourceLocation(modid, id);
     }
 }

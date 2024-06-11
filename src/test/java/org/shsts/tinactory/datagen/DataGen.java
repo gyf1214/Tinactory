@@ -8,21 +8,28 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
+import org.shsts.tinactory.datagen.builder.ItemDataBuilder;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
 import org.shsts.tinactory.datagen.content.Materials;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
 import org.shsts.tinactory.datagen.context.TrackedContext;
 import org.shsts.tinactory.datagen.handler.DataHandler;
+import org.shsts.tinactory.datagen.handler.ItemModelHandler;
 import org.shsts.tinactory.datagen.handler.LanguageHandler;
 import org.shsts.tinactory.datagen.handler.RecipeHandler;
 import org.shsts.tinactory.datagen.handler.TagsHandler;
 import org.shsts.tinactory.datagen.handler.TechHandler;
+import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinactory.registrate.context.DataContext;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -32,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -39,31 +47,50 @@ import java.util.function.Supplier;
 public final class DataGen implements IRecipeDataConsumer {
     public final String modid;
 
+    public final TrackedContext<String> langTrackedCtx;
+    public final TrackedContext<Item> itemTrackedCtx;
 
+    public final ItemModelHandler itemModelHandler;
     public final RecipeHandler recipeHandler;
     public final TechHandler techHandler;
     public final LanguageHandler languageHandler;
 
-    public final TrackedContext<String> langTrackedCtx;
-
+    private final Registrate registrate;
     private final List<DataHandler<?>> dataHandlers;
     private final Map<ResourceKey<? extends Registry<?>>, TagsHandler<?>> tagsHandlers;
     private final Set<TrackedContext<?>> trackedContexts;
 
     @SuppressWarnings("deprecation")
-    public DataGen(String modid) {
-        this.modid = modid;
+    public DataGen(Registrate registrate) {
+        this.modid = registrate.modid;
+        this.registrate = registrate;
         this.dataHandlers = new ArrayList<>();
         this.tagsHandlers = new HashMap<>();
         this.trackedContexts = new HashSet<>();
 
+        this.itemTrackedCtx = trackedCtx(TrackedType.ITEM);
         this.langTrackedCtx = trackedCtx(TrackedType.LANG);
 
         createTagsHandler(Registry.BLOCK);
         createTagsHandler(Registry.ITEM);
+        this.itemModelHandler = handler(new ItemModelHandler(this));
         this.recipeHandler = handler(new RecipeHandler(this));
         this.techHandler = handler(new TechHandler(this));
         this.languageHandler = handler(new LanguageHandler(this, langTrackedCtx));
+    }
+
+    public <U extends Item, P> ItemDataBuilder<U, P>
+    item(P parent, RegistryEntry<U> entry) {
+        return new ItemDataBuilder<>(this, parent, entry);
+    }
+
+    public <U extends Item> ItemDataBuilder<U, DataGen> item(RegistryEntry<U> item) {
+        return item(this, item);
+    }
+
+    public DataGen itemModel(Consumer<DataContext<ItemModelProvider>> cons) {
+        itemModelHandler.addModelCallback(cons);
+        return this;
     }
 
     @SafeVarargs
@@ -123,7 +150,7 @@ public final class DataGen implements IRecipeDataConsumer {
     }
 
     private <V> TrackedContext<V> trackedCtx(TrackedType<V> type) {
-        var ret = new TrackedContext<>(Tinactory.REGISTRATE, type);
+        var ret = new TrackedContext<>(registrate, type);
         trackedContexts.add(ret);
         return ret;
     }
@@ -153,7 +180,7 @@ public final class DataGen implements IRecipeDataConsumer {
         }
     }
 
-    public static final DataGen DATA_GEN = new DataGen(Tinactory.ID);
+    public static final DataGen DATA_GEN = new DataGen(Tinactory.REGISTRATE);
 
     public static void init(IEventBus modEventBus) {
         Materials.init();

@@ -42,7 +42,6 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
     }
 
     public S model(Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
-        modelCallback = cons;
         return self();
     }
 
@@ -63,9 +62,6 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
 
     @Override
     protected RegistryEntry<U> createEntry() {
-        if (modelCallback != null) {
-            addDataCallback(registrate.itemModelHandler, modelCallback);
-        }
         var tint = this.tint;
         if (tint != null) {
             onCreateObject.add(item -> tint.runOnDist(Dist.CLIENT, () -> itemColor ->

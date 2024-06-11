@@ -18,38 +18,38 @@ import static org.shsts.tinactory.content.AllMaterials.set;
 public final class FirstDegrees {
     static {
         WROUGHT_IRON = set("wrought_iron")
-                .color(0xFFC8B4B4).icon(IconSet.METALLIC)
+                .color(0xFFC8B4B4)
                 .metalSetExt()
                 .toolProcess().smelt()
-                .tool(200, Tiers.IRON).basic().build()
+                .toolSet(200, Tiers.IRON)
                 .buildObject();
 
         BRONZE = set("bronze")
-                .color(0xFFFF8000).icon(IconSet.METALLIC)
+                .color(0xFFFF8000)
                 .mechanicalSet().pipe()
                 .alloy(Voltage.ULV, COPPER, 3, TIN, 1)
                 .smelt()
                 .buildObject();
 
         INVAR = set("invar")
-                .color(0xFFB4B478).icon(IconSet.METALLIC)
+                .color(0xFFB4B478)
                 .metalSetExt()
                 .toolProcess()
                 .alloy(Voltage.ULV, IRON, 2, NICKEL, 1)
                 .buildObject();
 
         CUPRONICKEL = set("cupronickel")
-                .color(0xFFE39680).icon(IconSet.METALLIC)
+                .color(0xFFE39680)
                 .metalSet().wireAndPlate()
                 .toolProcess()
                 .alloy(Voltage.ULV, COPPER, 1, NICKEL, 1)
                 .buildObject();
 
         STEEL = set("steel")
-                .color(0xFF808080).icon(IconSet.METALLIC)
+                .color(0xFF808080)
                 .mechanicalSet().magnetic().pipe()
                 .toolProcess()
-                .tool(800, Tiers.IRON).basic().build()
+                .toolSet(800, Tiers.IRON)
                 .buildObject();
     }
 
