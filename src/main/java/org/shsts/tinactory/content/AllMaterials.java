@@ -74,7 +74,6 @@ public final class AllMaterials {
                 .existing("tool/sword", Items.STONE_SWORD)
                 .alias("primary", "block")
                 .dust()
-                .toolProcess()
                 .tool(16).hammer().build()
                 .buildObject();
 
@@ -82,7 +81,6 @@ public final class AllMaterials {
                 .color(0xFF002040)
                 .existing("primary", Items.FLINT)
                 .dust()
-                .toolProcess()
                 .tool(16).mortar().build()
                 .buildObject();
     }

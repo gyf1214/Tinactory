@@ -1,19 +1,13 @@
 package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.recipes.RecipeBuilder;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.core.common.SimpleBuilder;
@@ -21,29 +15,15 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
-import static org.shsts.tinactory.content.AllRecipes.TOOL;
-import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
-import static org.shsts.tinactory.content.AllTags.TOOL_FILE;
-import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
-import static org.shsts.tinactory.content.AllTags.TOOL_MORTAR;
-import static org.shsts.tinactory.content.AllTags.TOOL_SAW;
-import static org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER;
-import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
-import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -136,6 +116,10 @@ public class MaterialSet {
         return ret;
     }
 
+    public boolean hasItem(String sub) {
+        return items.containsKey(sub);
+    }
+
     public Set<String> itemSubs() {
         return items.keySet();
     }
@@ -155,8 +139,8 @@ public class MaterialSet {
         return blocks.get(sub).getBlock();
     }
 
-    public Set<String> blockSubs() {
-        return blocks.keySet();
+    public boolean hasBlock(String sub) {
+        return blocks.containsKey(sub);
     }
 
     public OreVariant oreVariant() {
@@ -164,106 +148,10 @@ public class MaterialSet {
         return oreVariant;
     }
 
-    @SuppressWarnings("unchecked")
-    private RecipeBuilder shapedProcess(String result, int count, String[] patterns, Object[] args) {
-        var builder = ShapedRecipeBuilder.shaped(item(result), count);
-        TagKey<Item> unlock = null;
-        for (var pat : patterns) {
-            builder.pattern(pat);
-        }
-        for (var i = 0; i < args.length; i++) {
-            var material = args[i];
-            var key = (char) ('A' + i);
-            if (material instanceof String sub) {
-                var tag = tag(sub);
-                if (unlock == null) {
-                    unlock = tag;
-                }
-                builder.define(key, tag);
-            } else if (material instanceof TagKey<?> tag) {
-                if (unlock == null) {
-                    unlock = (TagKey<Item>) tag;
-                }
-                builder.define(key, (TagKey<Item>) tag);
-            } else {
-                throw new IllegalArgumentException();
-            }
-        }
-        if (unlock == null) {
-            throw new IllegalArgumentException();
-        }
-        return builder.unlockedBy("has_material", AllRecipes.has(unlock));
-    }
-
-    @SuppressWarnings("unchecked")
-    private void toolProcess(String result, int count, String[] patterns, int materialCount, Object[] args) {
-        var builder = TOOL.recipe(loc(result))
-                .result(entry(result), count);
-        for (var pat : patterns) {
-            builder.pattern(pat);
-        }
-        for (var i = 0; i < materialCount; i++) {
-            var material = args[i];
-            var key = (char) ('A' + i);
-            if (material instanceof String sub) {
-                builder.define(key, tag(sub));
-            } else if (material instanceof TagKey<?> tag) {
-                builder.define(key, (TagKey<Item>) tag);
-            } else {
-                throw new IllegalArgumentException();
-            }
-        }
-        for (var i = materialCount; i < args.length; i++) {
-            var material = args[i];
-            if (material instanceof TagKey<?> tag) {
-                builder.toolTag((TagKey<Item>) tag);
-            } else {
-                throw new IllegalArgumentException();
-            }
-        }
-        builder.build();
-    }
-
-    private void process(String result, int count, String pattern, Object[] args) {
-        if (!items.containsKey(result)) {
-            return;
-        }
-        if (Arrays.stream(args).anyMatch(o -> o instanceof String s && !items.containsKey(s))) {
-            return;
-        }
-        var patterns = pattern.split("\n");
-        var materialCount = 1 + pattern.chars()
-                .filter(x -> x >= 'A' && x <= 'Z')
-                .map(x -> x - 'A')
-                .max().orElse(-1);
-        if (args.length > materialCount) {
-            toolProcess(result, count, patterns, materialCount, args);
-        } else {
-            REGISTRATE.vanillaRecipe(() -> shapedProcess(result, count, patterns, args));
-        }
-    }
-
-    private MaterialSet smelt(String output, String input) {
-        if (!items.containsKey(output) || !items.containsKey(input)) {
-            return this;
-        }
-        REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
-                .smelting(Ingredient.of(tag(input)), item(output), 0, 200)
-                .unlockedBy("has_material", has(tag(input))));
-        return this;
-    }
-
-    private void smelt(Supplier<Item> item) {
-        REGISTRATE.vanillaRecipe(() -> SimpleCookingRecipeBuilder
-                .smelting(Ingredient.of(tag("dust")), item.get(), 0, 200)
-                .unlockedBy("has_material", has(tag("dust"))), "_from_" + name);
-    }
-
     public static class Builder<P> extends SimpleBuilder<MaterialSet, P, Builder<P>> {
         private final String name;
         private final Map<String, ItemEntry> items = new HashMap<>();
         private final Map<String, BlockEntry> blocks = new HashMap<>();
-        private final List<Consumer<MaterialSet>> callbacks = new ArrayList<>();
         private int color = 0xFFFFFFFF;
         @Nullable
         private OreVariant oreVariant = null;
@@ -295,22 +183,23 @@ public class MaterialSet {
             return this;
         }
 
-        private ItemEntry put(String sub, ResourceLocation loc, Supplier<? extends Item> item) {
+        private void put(String sub, ResourceLocation loc, Supplier<? extends Item> item) {
             if (items.containsKey(sub)) {
-                return items.get(sub);
+                items.get(sub);
+                return;
             }
             var tag = newTag(sub);
             var entry = new ItemEntry(loc, tag, item);
             items.put(sub, entry);
-            return entry;
         }
 
-        private ItemEntry put(String sub, Supplier<RegistryEntry<? extends Item>> item) {
+        private void put(String sub, Supplier<RegistryEntry<? extends Item>> item) {
             if (items.containsKey(sub)) {
-                return items.get(sub);
+                items.get(sub);
+                return;
             }
             var entry = item.get();
-            return put(sub, entry.loc, entry);
+            put(sub, entry.loc, entry);
         }
 
         public Builder<P> existing(String sub, Item item) {
@@ -342,8 +231,8 @@ public class MaterialSet {
             return prefix + sub + "/" + name;
         }
 
-        private ItemEntry dummy(String sub) {
-            return put(sub, () -> REGISTRATE.item(newId(sub), Item::new)
+        private void dummy(String sub) {
+            put(sub, () -> REGISTRATE.item(newId(sub), Item::new)
                     .tint(color)
                     .register());
         }
@@ -361,17 +250,6 @@ public class MaterialSet {
 
         public Builder<P> dustSet() {
             return dummies("dust", "dust_tiny");
-            // TODO
-//            callbacks.add($ -> {
-//                REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
-//                        .shapeless($.item("dust_tiny"), 9)
-//                        .requires($.tag("dust"))
-//                        .unlockedBy("has_dust", has($.tag("dust"))));
-//                REGISTRATE.vanillaRecipe(() -> ShapelessRecipeBuilder
-//                        .shapeless($.item("dust"))
-//                        .requires(Ingredient.of($.tag("dust_tiny")), 9)
-//                        .unlockedBy("has_dust_small", has($.tag("dust_tiny"))));
-//            });
         }
 
         public Builder<P> metalSet() {
@@ -531,7 +409,6 @@ public class MaterialSet {
 
         public Builder<P> ore(OreVariant variant) {
             oreVariant = variant;
-            var raw = dummy("raw");
             if (!blocks.containsKey("ore")) {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
                         .material(variant.baseBlock.defaultBlockState().getMaterial())
@@ -540,76 +417,8 @@ public class MaterialSet {
                         .register();
                 blocks.put("ore", new BlockEntry(ore.loc, ore));
             }
-            return dummies("crushed", "crushed_centrifuged", "crushed_purified")
+            return dummies("raw", "crushed", "crushed_centrifuged", "crushed_purified")
                     .dummies("dust_impure", "dust_pure").dust();
-        }
-
-        public Builder<P> alloy(Object... components) {
-            callbacks.add($ -> {
-                Voltage voltage = Voltage.LV;
-                var i = 0;
-                if (components[0] instanceof Voltage v) {
-                    voltage = v;
-                    i = 1;
-                }
-                var totalCount = 0;
-
-                var builder = ALLOY_SMELTER.recipe($.loc("ingot"))
-                        .workTicks(200)
-                        .voltage(voltage);
-
-                for (; i < components.length; i += 2) {
-                    var component = (MaterialSet) components[i];
-                    var count = (int) components[i + 1];
-                    builder.inputItem(0, component.tag("dust"), count);
-                    totalCount += count;
-                }
-                builder.outputItem(1, $.entry("ingot"), totalCount)
-                        .build();
-            });
-            return this;
-        }
-
-        private void process(String result, int count, String pattern, Object... args) {
-            callbacks.add($ -> $.process(result, count, pattern, args));
-        }
-
-        private void process(String result, int count, String input, TagKey<Item> tool) {
-            process(result, count, "A", input, tool);
-        }
-
-        public Builder<P> toolProcess() {
-            // grind dust
-            process("dust", 1, "primary", TOOL_MORTAR);
-            process("dust_tiny", 1, "nugget", TOOL_MORTAR);
-            // plate
-            process("plate", 1, "A\nA", "ingot", TOOL_HAMMER);
-            // stick
-            process("stick", 1, "ingot", TOOL_FILE);
-            // bolt
-            process("bolt", 2, "stick", TOOL_SAW);
-            // screw
-            process("screw", 1, "bolt", TOOL_FILE);
-            // gear
-            process("gear", 1, "A\nB\nA", "stick", "plate", TOOL_HAMMER, TOOL_WIRE_CUTTER);
-            // rotor
-            process("rotor", 1, "A A\nBC \nA A", "plate", "stick", "screw",
-                    TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
-            // cut wire
-            process("wire", 1, "plate", TOOL_WIRE_CUTTER);
-            // pipe
-            process("pipe", 1, "AAA", "plate", TOOL_HAMMER, TOOL_WRENCH);
-            return this;
-        }
-
-        public Builder<P> smelt() {
-            callbacks.add($ -> $.smelt("ingot", "dust").smelt("nugget", "dust_tiny"));
-            return this;
-        }
-
-        public Builder<P> smelt(Supplier<Item> to) {
-            callbacks.add($ -> $.smelt(to));
-            return this;
         }
 
         public class ToolBuilder extends SimpleBuilder<Unit, Builder<P>, ToolBuilder> {

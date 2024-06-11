@@ -56,4 +56,8 @@ public class RecipeHandler extends DataHandler<RecipeProvider> {
     public void registerRecipe(Supplier<FinishedRecipe> recipe) {
         addCallback(prov -> ((Provider) prov).addRecipe(recipe.get()));
     }
+
+    public void registerRecipe(Consumer<Consumer<FinishedRecipe>> recipe) {
+        addCallback(prov -> recipe.accept(((Provider) prov)::addRecipe));
+    }
 }

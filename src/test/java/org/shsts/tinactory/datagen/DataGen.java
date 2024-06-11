@@ -5,6 +5,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -133,6 +134,20 @@ public final class DataGen implements IRecipeDataConsumer {
     public <T> DataGen tag(TagKey<T> object, TagKey<T> tag) {
         tagsHandler(tag.registry()).addTag(object, tag);
         return this;
+    }
+
+    public void vanillaRecipe(Supplier<RecipeBuilder> recipe) {
+        recipeHandler.registerRecipe(cons -> recipe.get().save(cons));
+    }
+
+    public void vanillaRecipe(Supplier<RecipeBuilder> recipe, String suffix) {
+        recipeHandler.registerRecipe(cons -> {
+            var builder = recipe.get();
+            var loc = builder.getResult().getRegistryName();
+            assert loc != null;
+            var recipeLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + suffix);
+            builder.save(cons, recipeLoc);
+        });
     }
 
     public TechBuilder<DataGen> tech(String id) {

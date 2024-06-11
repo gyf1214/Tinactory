@@ -16,7 +16,6 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
-import static org.shsts.tinactory.content.AllMaterials.ingot;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
 @ParametersAreNonnullByDefault
@@ -25,7 +24,6 @@ public final class Ores {
     static {
         CHALCOPYRITE = set("chalcopyrite")
                 .color(0xFFA07828)
-                .smelt(ingot("copper"))
                 .ore(OreVariant.STONE)
 //                .primitive()
 //                // TODO: pyrite, cobalt, cadmium?
@@ -35,7 +33,6 @@ public final class Ores {
 
         PYRITE = set("pyrite")
                 .color(0xFF967828)
-                .smelt(ingot("iron"))
                 .ore(OreVariant.STONE)
 //                .primitive()
 //                // TODO: sulfur, tricalcium phosphate?
@@ -44,7 +41,6 @@ public final class Ores {
 
         LIMONITE = set("limonite")
                 .color(0xFFC8C800)
-                .smelt(ingot("iron"))
                 .ore(OreVariant.STONE)
 //                // TODO: nickel, cobalt
 //                .byproduct("wash", dust("nickel"))
@@ -53,7 +49,6 @@ public final class Ores {
 
         BANDED_IRON = set("banded_iron")
                 .color(0xFF915A5A)
-                .smelt(ingot("iron"))
                 .ore(OreVariant.STONE)
 //                // TODO: magnetite, magnesium?
 //                .byproduct("wash", dust("magnetite"))
@@ -72,7 +67,6 @@ public final class Ores {
 
         CASSITERITE = set("cassiterite")
                 .color(0xFFDCDCDC)
-                .smelt(ingot("tin"))
                 .ore(OreVariant.STONE)
 //                .ore(OreVariant.STONE, 2)
 //                // TODO: tin, zinc
@@ -107,7 +101,6 @@ public final class Ores {
 
         MAGNETITE = set("magnetite")
                 .color(0xFF1E1E1E)
-                .smelt(ingot("iron"))
                 .ore(OreVariant.DEEPSLATE)
 //                .byproduct(dust("gold"))
 //                .byproduct("wash", dust("iron"))

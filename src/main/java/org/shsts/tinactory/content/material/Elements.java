@@ -23,7 +23,6 @@ public final class Elements {
                 .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
                 .mechanicalSet().wire()
-                .toolProcess().smelt()
                 .buildObject();
 
         GOLD = set("gold")
@@ -32,7 +31,6 @@ public final class Elements {
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
                 .metalSet()
-                .toolProcess().smelt()
                 .ore(OreVariant.DEEPSLATE)
                 // TODO: byproduct ?
                 .buildObject();
@@ -41,13 +39,11 @@ public final class Elements {
                 .color(0xFFFF6400)
                 .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
                 .metalSet().wireAndPlate().pipe()
-                .toolProcess().smelt()
                 .buildObject();
 
         TIN = set("tin")
                 .color(0xFFDCDCDC)
                 .mechanicalSet().wire()
-                .toolProcess().smelt()
                 .ore(OreVariant.STONE)
                 // TODO: byproduct tin, zinc
                 .buildObject();
@@ -55,7 +51,6 @@ public final class Elements {
         NICKEL = set("nickel")
                 .color(0xFFC8C8FA)
                 .metalSet()
-                .toolProcess().smelt()
                 .buildObject();
 
         ALUMINIUM = set("aluminium")
