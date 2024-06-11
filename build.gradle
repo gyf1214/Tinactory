@@ -20,7 +20,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 //jarJar.enable()
 
 group = 'org.shsts.tinactory'
-// archivesBaseName = "tinactory-${minecraft_version}"
+archivesBaseName = "tinactory-${minecraft_version}"
 version = "${mod_version}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
