@@ -85,11 +85,6 @@ public final class AllMaterials {
                 .toolProcess()
                 .tool(16).mortar().build()
                 .buildObject();
-
-        // tool component tags
-        REGISTRATE.tag(Items.STICK, AllTags.TOOL_HANDLE);
-        REGISTRATE.tag(WROUGHT_IRON.tag("stick"), AllTags.TOOL_HANDLE);
-        REGISTRATE.tag(AllMaterials.IRON.tag("screw"), AllTags.TOOL_SCREW);
     }
 
     public static final Map<String, MaterialSet> SET;
@@ -104,14 +99,6 @@ public final class AllMaterials {
     public static MaterialSet.Builder<?> set(String id) {
         return (new MaterialSet.Builder<>(Unit.INSTANCE, id))
                 .onCreateObject(mat -> SET.put(mat.name, mat));
-    }
-
-    public static Supplier<Item> primary(String name) {
-        return item(name, "primary");
-    }
-
-    public static Supplier<Item> dust(String name) {
-        return item(name, "dust");
     }
 
     public static Supplier<Item> ingot(String name) {

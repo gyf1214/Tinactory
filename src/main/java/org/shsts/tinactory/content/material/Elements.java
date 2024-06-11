@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,7 +28,6 @@ public final class Elements {
 
         GOLD = set("gold")
                 .color(0xFFFFE650)
-                .existing("ore", Blocks.DEEPSLATE_GOLD_ORE)
                 .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)

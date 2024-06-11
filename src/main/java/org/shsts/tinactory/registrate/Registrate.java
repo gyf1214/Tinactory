@@ -7,7 +7,6 @@ import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
@@ -15,8 +14,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -50,12 +47,9 @@ import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
 import org.shsts.tinactory.registrate.common.CapabilityEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
-import org.shsts.tinactory.registrate.context.DataContext;
-import org.shsts.tinactory.registrate.handler.BlockStateHandler;
 import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.DynamicHandler;
-import org.shsts.tinactory.registrate.handler.ItemModelHandler;
 import org.shsts.tinactory.registrate.handler.LootTableHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RecipeDataHandler;
@@ -63,7 +57,6 @@ import org.shsts.tinactory.registrate.handler.RecipeTypeHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
-import org.shsts.tinactory.registrate.handler.TagsHandler;
 import org.shsts.tinactory.registrate.handler.TintHandler;
 import org.shsts.tinactory.registrate.tracking.TrackedObjects;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
@@ -73,7 +66,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -84,7 +76,6 @@ public class Registrate implements IRecipeDataConsumer {
 
     private final Map<ResourceLocation, RegistryEntryHandler<?>> registryEntryHandlers = new HashMap<>();
     private final List<DataHandler<?>> dataHandlers = new ArrayList<>();
-    private final Map<ResourceKey<? extends Registry<?>>, TagsHandler<?>> tagsHandlers = new HashMap<>();
 
     // Registry
     public final RegistryHandler registryHandler;
@@ -103,10 +94,6 @@ public class Registrate implements IRecipeDataConsumer {
     public final CapabilityHandler capabilityHandler;
     public final RecipeTypeHandler recipeTypeHandler;
 
-    // ModelGen
-    public final BlockStateHandler blockStateHandler;
-    public final ItemModelHandler itemModelHandler;
-
     // DataGen
     public final RecipeDataHandler recipeDataHandler;
     public final LootTableHandler lootTableHandler;
@@ -118,7 +105,6 @@ public class Registrate implements IRecipeDataConsumer {
 
     private final TrackedObjects trackedObjects;
 
-    @SuppressWarnings("deprecation")
     public Registrate(String modid) {
         this.modid = modid;
 
@@ -132,8 +118,6 @@ public class Registrate implements IRecipeDataConsumer {
         this.capabilityHandler = new CapabilityHandler(this);
 
         this.recipeTypeHandler = new RecipeTypeHandler(this);
-        this.blockStateHandler = new BlockStateHandler(this);
-        this.itemModelHandler = new ItemModelHandler(this);
         this.recipeDataHandler = new RecipeDataHandler(this);
         this.lootTableHandler = new LootTableHandler(this);
 
@@ -141,10 +125,6 @@ public class Registrate implements IRecipeDataConsumer {
         this.menuScreenHandler = new MenuScreenHandler();
         this.tintHandler = new TintHandler();
 
-        tagsHandler(Registry.ITEM);
-        tagsHandler(Registry.BLOCK);
-        putDataHandler(blockStateHandler);
-        putDataHandler(itemModelHandler);
         putDataHandler(recipeDataHandler);
         putDataHandler(lootTableHandler);
 
@@ -162,12 +142,6 @@ public class Registrate implements IRecipeDataConsumer {
         return (RegistryEntryHandler<T>) registryEntryHandlers.computeIfAbsent(
                 registry.getRegistryName(),
                 loc -> RegistryEntryHandler.forge(registry));
-    }
-
-    private <T> void tagsHandler(Registry<T> registry) {
-        var handler = new TagsHandler<>(this, registry);
-        putDataHandler(handler);
-        tagsHandlers.put(registry.key(), handler);
     }
 
     @SuppressWarnings("unchecked")
@@ -294,36 +268,6 @@ public class Registrate implements IRecipeDataConsumer {
         return new SimpleBlockEntitySetBuilder<>(id, blockEntityFactory, blockFactory);
     }
 
-    public void blockState(Consumer<DataContext<BlockStateProvider>> cons) {
-        blockStateHandler.addCallback(prov -> cons.accept(new DataContext<>(modid, prov)));
-    }
-
-    public void itemModel(Consumer<DataContext<ItemModelProvider>> cons) {
-        itemModelHandler.addCallback(prov -> cons.accept(new DataContext<>(modid, prov)));
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> TagsHandler<T> getTagsHandler(ResourceKey<? extends Registry<T>> key) {
-        assert tagsHandlers.containsKey(key);
-        return (TagsHandler<T>) tagsHandlers.get(key);
-    }
-
-    @SafeVarargs
-    public final <T> void tag(T object, TagKey<T>... tags) {
-        Supplier<T> supplier = () -> object;
-        tag(supplier, tags);
-    }
-
-    @SafeVarargs
-    public final <T> void tag(Supplier<? extends T> object, TagKey<T>... tags) {
-        assert tags.length > 0;
-        getTagsHandler(tags[0].registry()).addTags(object, tags);
-    }
-
-    public <T> void tag(TagKey<T> object, TagKey<T> tag) {
-        getTagsHandler(tag.registry()).addTag(object, tag);
-    }
-
     public <T extends IForgeRegistryEntry<T>>
     RegistryBuilderWrapper<T, Registrate> registry(String id, Class<T> clazz) {
         return new RegistryBuilderWrapper<>(this, id, clazz, this);
@@ -372,12 +316,12 @@ public class Registrate implements IRecipeDataConsumer {
         return (new SimpleRegistryEntryBuilder<>(handler, id, factory)).register();
     }
 
-    public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation stillTexture, int color) {
-        return registryEntry(id, fluidHandler, () -> new SimpleFluid(stillTexture, color));
+    public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex, int color) {
+        return registryEntry(id, fluidHandler, () -> new SimpleFluid(tex, color));
     }
 
-    public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation stillTexture) {
-        return simpleFluid(id, stillTexture, 0xFFFFFFFF);
+    public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex) {
+        return simpleFluid(id, tex, 0xFFFFFFFF);
     }
 
     public <T> CapabilityEntry<T> capability(Class<T> clazz, CapabilityToken<T> token) {
@@ -451,7 +395,7 @@ public class Registrate implements IRecipeDataConsumer {
             var loc = builder.getResult().getRegistryName();
             assert loc != null;
             var recipeLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + suffix);
-            recipe.get().save(prov::addRecipe, recipeLoc);
+            builder.save(prov::addRecipe, recipeLoc);
         });
     }
 

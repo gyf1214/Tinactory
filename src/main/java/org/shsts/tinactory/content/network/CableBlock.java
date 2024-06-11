@@ -75,7 +75,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     }
 
     public static Function<Properties, CableBlock> cable(Voltage voltage, double resistance) {
-        return properties -> new CableBlock(properties, RADIUS, voltage, resistance);
+        return prop -> new CableBlock(prop, RADIUS, voltage, resistance);
     }
 
     private Map<BlockState, VoxelShape> makeShapes() {

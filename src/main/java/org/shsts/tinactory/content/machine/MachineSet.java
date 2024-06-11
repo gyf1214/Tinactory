@@ -21,16 +21,18 @@ import java.util.stream.Collectors;
 @MethodsReturnNonnullByDefault
 public class MachineSet {
     public final Map<Voltage, Layout> layoutSet;
+    public final Set<Voltage> voltages;
     protected final Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines;
     @Nullable
     protected final BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive;
 
-    public MachineSet(Map<Voltage, Layout> layoutSet,
+    public MachineSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                       Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
                       @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
         this.layoutSet = layoutSet;
         this.machines = machines;
         this.primitive = primitive;
+        this.voltages = voltages;
     }
 
     public RegistryEntry<? extends Block> entry(Voltage voltage) {
@@ -100,7 +102,7 @@ public class MachineSet {
         }
 
         protected abstract T
-        createSet(Map<Voltage, Layout> layoutSet,
+        createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                   Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
                   @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive);
 
@@ -114,7 +116,7 @@ public class MachineSet {
                     .filter(v -> v != Voltage.PRIMITIVE)
                     .collect(Collectors.toMap($ -> $, this::createMachine));
             var primitive = voltages.contains(Voltage.PRIMITIVE) ? createPrimitive() : null;
-            return createSet(layoutSet, machines, primitive);
+            return createSet(voltages, layoutSet, machines, primitive);
         }
     }
 
@@ -125,10 +127,10 @@ public class MachineSet {
 
         @Override
         protected MachineSet
-        createSet(Map<Voltage, Layout> layoutSet,
+        createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                   Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
                   @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
-            return new MachineSet(layoutSet, machines, primitive);
+            return new MachineSet(voltages, layoutSet, machines, primitive);
         }
     }
 }

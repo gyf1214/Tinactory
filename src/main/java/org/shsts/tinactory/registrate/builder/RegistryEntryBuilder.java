@@ -2,18 +2,14 @@ package org.shsts.tinactory.registrate.builder;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.DataProvider;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
-import org.shsts.tinactory.registrate.handler.DataHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.function.Consumer;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -40,13 +36,6 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
         }
         onCreateObject.clear();
         entry.setObject(object);
-    }
-
-    protected <P1 extends DataProvider>
-    void addDataCallback(DataHandler<P1> handler, Consumer<RegistryDataContext<T, U, P1>> cons) {
-        onCreateEntry.add(entry ->
-                handler.addCallback(provider ->
-                        cons.accept(new RegistryDataContext<>(entry, provider))));
     }
 
     @Override

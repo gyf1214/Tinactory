@@ -3,14 +3,15 @@ package org.shsts.tinactory.datagen.builder;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.AllMaterials;
-import org.shsts.tinactory.content.material.IconSet;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.content.model.CableModel;
 import org.shsts.tinactory.datagen.DataGen;
+import org.shsts.tinactory.datagen.content.Models;
+import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
@@ -24,6 +25,7 @@ import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
+import static org.shsts.tinactory.datagen.content.Models.oreBlock;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -70,7 +72,6 @@ public class MaterialBuilder<P> extends DataBuilder<Unit, P, MaterialBuilder<P>>
         return basicItem(handle, head);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void register() {
         assert icon != null;
@@ -89,16 +90,16 @@ public class MaterialBuilder<P> extends DataBuilder<Unit, P, MaterialBuilder<P>>
             }
 
             var entry = material.entry(sub);
-            if (entry instanceof RegistryEntry<?> entry1) {
-                var entry2 = (RegistryEntry<? extends Item>) entry1;
-                var builder = dataGen.item(entry2).tag(tag);
+            if (entry instanceof RegistryEntry<?>) {
+                var builder = dataGen.item(material.loc(sub), entry)
+                        .tag(tag);
 
                 if (sub.startsWith("tool/")) {
                     builder = builder.model(toolItem(sub));
                 } else if (sub.equals("wire")) {
-                    builder = builder.model(CableModel::wireModel);
+                    builder = builder.model(Models::wireItem);
                 } else if (sub.equals("pipe")) {
-                    builder = builder.model(CableModel::pipeModel);
+                    builder = builder.model(Models::pipeItem);
                 } else if (sub.equals("raw")) {
                     builder = builder.model(basicItem(modLoc("items/material/raw")));
                 } else {
@@ -108,6 +109,14 @@ public class MaterialBuilder<P> extends DataBuilder<Unit, P, MaterialBuilder<P>>
             } else {
                 dataGen.tag(entry, tag);
             }
+        }
+        if (material.blockSubs().contains("ore")) {
+            var variant = material.oreVariant();
+            dataGen.block(material.blockLoc("ore"), material.blockEntry("ore"))
+                    .blockState(oreBlock(variant))
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .tag(variant.mineTier.getTag())
+                    .build();
         }
     }
 }

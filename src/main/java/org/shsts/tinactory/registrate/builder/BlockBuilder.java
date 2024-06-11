@@ -5,24 +5,19 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
-import org.shsts.tinactory.registrate.context.RegistryDataContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -39,8 +34,6 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
 
     @Nullable
     protected BlockItemBuilder<?> blockItemBuilder = null;
-    @Nullable
-    protected Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockStateCallback = null;
     @Nullable
     protected DistLazy<BlockColor> tint = null;
 
@@ -85,12 +78,6 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         return tint(() -> () -> ($1, $2, $3, index) -> index < colors.length ? colors[index] : 0xFFFFFFFF);
     }
 
-    @SafeVarargs
-    public final S tag(TagKey<Block>... tags) {
-        onCreateObject.add(entry -> registrate.tag(entry, tags));
-        return self();
-    }
-
     @Nullable
     private DistLazy<ItemColor> getItemTint() {
         var tint = this.tint;
@@ -101,11 +88,6 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
                 return itemColor.getColor(item.getBlock().defaultBlockState(), null, null, index);
             };
         };
-    }
-
-    public S blockState(Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
-        blockStateCallback = cons;
-        return self();
     }
 
     public class BlockItemBuilder<U1 extends BlockItem> extends ItemBuilder<U1, S, BlockItemBuilder<U1>> {
@@ -148,10 +130,6 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         return blockItemBuilder != null ? blockItemBuilder : blockItem(BlockItem::new);
     }
 
-    public S defaultBlockItem(Consumer<RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider>> cons) {
-        return blockItem().model(cons::accept).build();
-    }
-
     public S defaultBlockItem() {
         return blockItem().build();
     }
@@ -171,9 +149,6 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
 
     @Override
     protected RegistryEntry<U> createEntry() {
-        if (blockStateCallback != null) {
-            addDataCallback(registrate.blockStateHandler, blockStateCallback);
-        }
         var tint = this.tint;
         if (tint != null) {
             onCreateObject.add(block -> tint.runOnDist(Dist.CLIENT, () -> blockColor ->

@@ -3,6 +3,8 @@ package org.shsts.tinactory.datagen.handler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -56,11 +58,22 @@ public class ItemModelHandler extends DataHandler<ItemModelProvider> {
         return new Provider(event);
     }
 
-    public <U extends Item>
-    void addModelCallback(ResourceLocation loc, Supplier<U> item,
-                          Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
+    public <U extends Item> void
+    addModelCallback(ResourceLocation loc, Supplier<U> item,
+                     Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
         addCallback(prov -> cons.accept(new RegistryDataContext<>(dataGen.modid, prov,
                 loc.getPath(), item.get())));
+    }
+
+    public <U extends Block> void
+    addBlockItemCallback(ResourceLocation loc, Supplier<U> block,
+                         Consumer<RegistryDataContext<Item, ? extends Item, ItemModelProvider>> cons) {
+        addCallback(prov -> {
+            var item = block.get().asItem();
+            if (item != Items.AIR) {
+                cons.accept(new RegistryDataContext<>(dataGen.modid, prov, loc.getPath(), item));
+            }
+        });
     }
 
     public void addModelCallback(Consumer<DataContext<ItemModelProvider>> cons) {

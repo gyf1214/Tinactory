@@ -1,14 +1,10 @@
 package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.content.AllRecipes;
-import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -23,42 +19,34 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
+import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     public final RecipeTypeEntry<T, ?> recipeType;
 
-    private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Map<Voltage, Layout> layoutSet,
+    private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                           Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
                           @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
-        super(layoutSet, machines, primitive);
+        super(voltages, layoutSet, machines, primitive);
         this.recipeType = recipeType;
     }
 
     public abstract static class Builder<T extends ProcessingRecipe, P> extends
             BuilderBase<ProcessingSet<T>, P, Builder<T, P>> {
         protected final RecipeTypeEntry<T, ?> recipeType;
-        @Nullable
-        protected ResourceLocation overlay = null;
 
         public Builder(RecipeTypeEntry<T, ?> recipeType, P parent) {
             super(parent);
             this.recipeType = recipeType;
         }
 
-        public Builder<T, P> overlay(ResourceLocation loc) {
-            overlay = loc;
-            return this;
-        }
-
         @Override
         protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         getMachineBuilder(Voltage voltage) {
-            assert overlay != null;
             var id = "machine/" + voltage.id + "/" + recipeType.id;
             var layout = getLayout(voltage);
             return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
@@ -70,17 +58,14 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                     .menu(ProcessingMenu.machine(layout)).build()
                     .build()
                     .block()
-                    .transform(ModelGen.machine(voltage, overlay))
-                    .tag(AllTags.MINEABLE_WITH_WRENCH)
-                    .dropSelf()
-                    .blockItem().tag(AllTags.processingMachine(recipeType)).build()
+                    .translucent()
+                    .defaultBlockItem().dropSelf()
                     .build();
         }
 
         @Override
         protected BlockEntitySetBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
         getPrimitiveBuilder() {
-            assert overlay != null;
             var id = "primitive/" + recipeType.id;
             var layout = getLayout(Voltage.PRIMITIVE);
             return REGISTRATE.blockEntitySet(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
@@ -92,21 +77,17 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                     .menu(ProcessingMenu.machine(layout)).build()
                     .build()
                     .block()
-                    .transform(ModelGen.primitiveMachine(gregtech("blocks/casings/wood_wall"),
-                            overlay))
-                    .tag(AllTags.MINEABLE_WITH_WRENCH)
-                    .tag(BlockTags.MINEABLE_WITH_AXE)
-                    .dropSelf()
-                    .blockItem().tag(AllTags.processingMachine(recipeType)).build()
+                    .translucent()
+                    .defaultBlockItem().dropSelf()
                     .build();
         }
 
         @Override
         protected ProcessingSet<T>
-        createSet(Map<Voltage, Layout> layoutSet,
+        createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                   Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
                   @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
-            return new ProcessingSet<>(recipeType, layoutSet, machines, primitive);
+            return new ProcessingSet<>(recipeType, voltages, layoutSet, machines, primitive);
         }
     }
 
@@ -145,7 +126,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     }
 
     public static Builder<OreAnalyzerRecipe, ?> oreAnalyzer() {
-        var builder = new Builder<>(AllRecipes.ORE_ANALYZER, Unit.INSTANCE) {
+        return new Builder<>(AllRecipes.ORE_ANALYZER, Unit.INSTANCE) {
             @Override
             protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
@@ -158,7 +139,6 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .build();
             }
         };
-        return builder.overlay(gregtech("blocks/machines/electromagnetic_separator"));
     }
 
     public static Builder<GeneratorRecipe, ?>
@@ -180,8 +160,6 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
 
     public static MachineSet.Builder<?> electricFurnace() {
         return new MachineSet.Builder<Object>(Unit.INSTANCE) {
-            private final ResourceLocation overlay = gregtech("blocks/machines/electric_furnace");
-
             @Override
             protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
@@ -199,10 +177,8 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .build()
                         .build()
                         .block()
-                        .transform(ModelGen.machine(voltage, overlay))
-                        .tag(AllTags.MINEABLE_WITH_WRENCH)
-                        .blockItem().tag(AllTags.ELECTRIC_FURNACE).build()
-                        .dropSelf()
+                        .translucent()
+                        .defaultBlockItem().dropSelf()
                         .build();
             }
         };

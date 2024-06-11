@@ -10,12 +10,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class BlockEntitySet<T extends SmartBlockEntity, U extends SmartEntityBlock<T>> {
-    public final RegistryEntry<SmartBlockEntityType<T>> blockEntityType;
-    public final RegistryEntry<U> block;
+    private final RegistryEntry<SmartBlockEntityType<T>> blockEntityType;
+    private final RegistryEntry<U> block;
 
     public BlockEntitySet(RegistryEntry<SmartBlockEntityType<T>> blockEntityType, RegistryEntry<U> block) {
         this.blockEntityType = blockEntityType;
         this.block = block;
+    }
+
+    public SmartBlockEntityType<T> blockEntityType() {
+        return blockEntityType.get();
     }
 
     public U block() {

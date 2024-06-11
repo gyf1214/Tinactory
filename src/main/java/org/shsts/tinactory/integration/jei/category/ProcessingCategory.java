@@ -42,7 +42,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
 
     public ProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
                               Layout layout, Block icon) {
-        super(recipeType, layout, Ingredient.of(AllTags.processingMachine(recipeType)),
+        super(recipeType, layout, Ingredient.of(AllTags.machineTag(recipeType)),
                 new ItemStack(icon), ProcessingMenu.class);
     }
 

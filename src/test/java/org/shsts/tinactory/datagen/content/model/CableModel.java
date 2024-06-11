@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.model;
+package org.shsts.tinactory.datagen.content.model;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
@@ -19,19 +19,22 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.shsts.tinactory.content.model.ModelGen.WHITE_TEX;
 import static org.shsts.tinactory.content.network.CableBlock.PIPE_RADIUS;
 import static org.shsts.tinactory.content.network.CableBlock.RADIUS;
 import static org.shsts.tinactory.content.network.CableBlock.SMALL_WIRE_RADIUS;
 import static org.shsts.tinactory.content.network.CableBlock.WIRE_RADIUS;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
+import static org.shsts.tinactory.datagen.content.Models.WHITE_TEX;
+import static org.shsts.tinactory.datagen.content.Models.xRotation;
+import static org.shsts.tinactory.datagen.content.Models.yRotation;
 
-@MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public final class CableModel {
     private static final Set<Direction> OPEN_FACES = Arrays.stream(Direction.values())
-            .filter(dir -> dir != ModelGen.FRONT_FACING.getOpposite())
+            .filter(dir -> dir != FRONT_FACING.getOpposite())
             .collect(Collectors.toUnmodifiableSet());
 
     private static final String OPEN_MODEL = "block/network/cable/open";
@@ -48,6 +51,7 @@ public final class CableModel {
     private static final ResourceLocation PIPE_SIDE_TEX = gregtech("blocks/pipe/pipe_side");
     private static final ResourceLocation PIPE_IN_TEX = gregtech("blocks/pipe/pipe_normal_in");
 
+
     private static BlockModelBuilder genOpenEnd(BlockModelProvider prov, String id, int radius, boolean insulation) {
         var model = prov.withExistingParent(id, prov.mcLoc("block/block"))
                 .texture("particle", "#base");
@@ -56,7 +60,7 @@ public final class CableModel {
                 .to(8 + radius, 8 + radius, 8 - radius);
         for (var dir : OPEN_FACES) {
             var face = element.face(dir);
-            if (dir == ModelGen.FRONT_FACING) {
+            if (dir == FRONT_FACING) {
                 face.cullface(dir).texture("#wire").tintindex(1);
             } else {
                 face.texture("#base").tintindex(0);
@@ -66,8 +70,8 @@ public final class CableModel {
             return model.element()
                     .from(8 - radius, 8 - radius, 0)
                     .to(8 + radius, 8 + radius, 8 - radius)
-                    .face(ModelGen.FRONT_FACING)
-                    .cullface(ModelGen.FRONT_FACING).texture("#insulation").tintindex(0)
+                    .face(FRONT_FACING)
+                    .cullface(FRONT_FACING).texture("#insulation").tintindex(0)
                     .end().end();
         }
         return model;
@@ -79,11 +83,12 @@ public final class CableModel {
                 .element()
                 .from(8 - radius, 8 - radius, 8 - radius)
                 .to(8 + radius, 8 + radius, 8 - radius)
-                .face(ModelGen.FRONT_FACING).texture("#base").tintindex(0).end()
+                .face(FRONT_FACING).texture("#base").tintindex(0).end()
                 .end();
     }
 
-    private static ItemModelBuilder genItem(ItemModelProvider prov, String id, int radius, boolean insulation) {
+    private static ItemModelBuilder genItem(ItemModelProvider prov, String id,
+                                            int radius, boolean insulation) {
         var model = prov.withExistingParent(id, prov.mcLoc("block/block"))
                 .element()
                 .from(0, 8 - radius, 8 - radius)
@@ -106,17 +111,17 @@ public final class CableModel {
         return model;
     }
 
-    public static void genBlockModels(DataContext<BlockStateProvider> ctx) {
-        genOpenEnd(ctx.provider.models(), OPEN_MODEL, RADIUS, true)
+    public static void genBlockModels(DataContext<BlockModelProvider> ctx) {
+        genOpenEnd(ctx.provider, OPEN_MODEL, RADIUS, true)
                 .texture("base", INSULATION_TEX)
                 .texture("insulation", INSULATION_OPEN_TEX)
                 .texture("wire", WIRE_TEX);
-        genOpenEnd(ctx.provider.models(), OPEN_WIRE_MODEL, WIRE_RADIUS, false)
+        genOpenEnd(ctx.provider, OPEN_WIRE_MODEL, WIRE_RADIUS, false)
                 .texture("base", WHITE_TEX)
                 .texture("wire", WIRE_TEX);
-        genClosedEnd(ctx.provider.models(), CLOSED_MODEL, RADIUS)
+        genClosedEnd(ctx.provider, CLOSED_MODEL, RADIUS)
                 .texture("base", INSULATION_TEX);
-        genClosedEnd(ctx.provider.models(), CLOSED_WIRE_MODEL, WIRE_RADIUS)
+        genClosedEnd(ctx.provider, CLOSED_WIRE_MODEL, WIRE_RADIUS)
                 .texture("base", WHITE_TEX);
     }
 
@@ -142,8 +147,8 @@ public final class CableModel {
         var closedModel = wire ? CLOSED_WIRE_MODEL : CLOSED_MODEL;
 
         for (var dir : Direction.values()) {
-            var xRot = ModelGen.xRotation(dir);
-            var yRot = ModelGen.yRotation(dir);
+            var xRot = xRotation(dir);
+            var yRot = yRotation(dir);
             var property = CableBlock.PROPERTY_BY_DIRECTION.get(dir);
             multipart.part()
                     // open end
@@ -159,21 +164,21 @@ public final class CableModel {
         }
     }
 
-    public static void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public static void cable(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_MODEL));
     }
 
-    public static void wireModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public static void wire(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_WIRE_MODEL));
     }
 
-    public static void ulvCableModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        genItem(ctx.provider, ctx.id, CableBlock.WIRE_RADIUS, false)
+    public static void ulvCable(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        genItem(ctx.provider, ctx.id, WIRE_RADIUS, false)
                 .texture("base", WIRE_TEX)
                 .texture("wire", "#base");
     }
 
-    public static void pipeModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public static void pipe(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_PIPE_MODEL));
     }
 }

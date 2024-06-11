@@ -13,9 +13,6 @@ import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
-import org.shsts.tinactory.content.model.CableModel;
-import org.shsts.tinactory.content.model.MachineModel;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -37,9 +34,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
-import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
-import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
@@ -60,61 +55,58 @@ public final class AllItems {
 
     static {
         ULV_CABLE = REGISTRATE.block("network/cable/ulv",
-                        properties -> new CableBlock(properties, CableBlock.WIRE_RADIUS, Voltage.ULV, 2.0))
-                .blockState(ctx -> CableModel.blockState(ctx, true))
+                        prop -> new CableBlock(prop, CableBlock.WIRE_RADIUS, Voltage.ULV, 2.0))
                 .tint(IRON.color)
-                .tag(AllTags.MINEABLE_WITH_CUTTER)
-                .defaultBlockItem(CableModel::ulvCableModel).dropSelf()
+                .defaultBlockItem().dropSelf()
                 .register();
 
         ULV_MACHINE_HULL = REGISTRATE.item("component/ulv/machine_hull", Item::new)
-                .model(ModelGen.machineItem(Voltage.ULV, gregtech(MachineModel.IO_TEX)))
                 .register();
 
         ULV_RESEARCH_EQUIPMENT = REGISTRATE.item("component/ulv/research_equipment", Item::new)
-                .model(ModelGen.basicItem(gregtech("items/metaitems/glass_vial/base"),
-                        gregtech("items/metaitems/glass_vial/overlay")))
                 .tint(0xFFFFFFFF, IRON.color)
                 .register();
 
         COMPONENT_SETS = ComponentSet.builder()
-                .components(Voltage.LV)
-                .material(STEEL).heat(COPPER).pipe(BRONZE).rotor(TIN).magnetic(STEEL)
-                .cable(TIN)
-                .build()
-                .components(Voltage.MV)
-                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-                .cable(COPPER)
-                .build()
+                .component(Voltage.LV, STEEL, TIN)
+                .component(Voltage.MV, ALUMINIUM, COPPER)
                 // TODO
-                .components(Voltage.HV)
-                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-                .cable(COPPER)
-                .build()
-                .components(Voltage.EV)
-                // TODO
-                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-                .cable(COPPER)
-                .build()
-                .components(Voltage.IV)
-                // TODO
-                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
-                .cable(COPPER)
-                .build()
+                .component(Voltage.HV, STEEL, TIN)
+                .component(Voltage.EV, STEEL, TIN)
+                .component(Voltage.IV, STEEL, TIN)
                 .buildObject();
 
-        VACUUM_TUBE = REGISTRATE.item("circuit/vacuum_tube", Item::new)
-                .model(ModelGen.basicItem(gregtech("items/metaitems/circuit.vacuum_tube")))
-                .register();
+        // TODO
+//                .material(STEEL).heat(COPPER).pipe(BRONZE).rotor(TIN).magnetic(STEEL)
+//                .cable(TIN)
+//                .build()
+//                .component(Voltage.MV)
+//                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
+//                .cable(COPPER)
+//                .build()
+//                // TODO
+//                .component(Voltage.HV)
+//                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
+//                .cable(COPPER)
+//                .build()
+//                .component(Voltage.EV)
+//                // TODO
+//                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
+//                .cable(COPPER)
+//                .build()
+//                .component(Voltage.IV)
+//                // TODO
+//                .material(ALUMINIUM).heat(CUPRONICKEL).pipe(STEEL).rotor(BRONZE).magnetic(STEEL)
+//                .cable(COPPER)
+//                .build()
+//                .buildObject();
+
+        VACUUM_TUBE = REGISTRATE.item("circuit/vacuum_tube", Item::new).register();
 
         STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
 
         HEAT_PROOF_BLOCK = REGISTRATE.block("multi_block/solid/heat_proof", Block::new)
                 .properties($ -> $.strength(2f, 8f))
-                .blockState(ctx -> ctx.provider.simpleBlock(ctx.object,
-                        ctx.provider.models().cubeAll(ctx.id,
-                                gregtech("blocks/casings/solid/machine_casing_heatproof"))))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .register();
     }
@@ -132,7 +124,6 @@ public final class AllItems {
 
     public static void initRecipes() {
         ulvRecipes();
-        COMPONENT_SETS.values().forEach(ComponentSet::addRecipes);
         researchEquipments();
 
         for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {

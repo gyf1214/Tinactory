@@ -29,7 +29,6 @@ import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTechs;
 import org.shsts.tinactory.content.AllWorldGens;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.core.common.IPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuSyncHandler;
@@ -105,7 +104,6 @@ public class Tinactory {
         AllEvents.init();
         AllNetworks.init();
 
-        ModelGen.init();
         AllMaterials.init();
         AllItems.init();
         AllBlockEntities.init();

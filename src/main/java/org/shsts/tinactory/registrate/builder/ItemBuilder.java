@@ -2,7 +2,6 @@ package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
@@ -41,10 +40,6 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
         return self();
     }
 
-    public S model(Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
-        return self();
-    }
-
     public S tint(DistLazy<ItemColor> color) {
         tint = color;
         return self();
@@ -52,12 +47,6 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
 
     public S tint(int... colors) {
         return tint(() -> () -> ($, index) -> index < colors.length ? colors[index] : 0xFFFFFFFF);
-    }
-
-    @SafeVarargs
-    public final S tag(TagKey<Item>... tags) {
-        onCreateEntry.add(entry -> registrate.tag(entry, tags));
-        return self();
     }
 
     @Override

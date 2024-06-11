@@ -7,11 +7,11 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -34,7 +34,7 @@ public final class AllTags {
     public static final TagKey<Block> MINEABLE_WITH_CUTTER = modBlock("mineable/cutter");
 
     public static TagKey<Item>
-    processingMachine(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
+    machineTag(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
         return item(new ResourceLocation(recipeType.modid, "machine/" + recipeType.id));
     }
 
@@ -59,10 +59,6 @@ public final class AllTags {
     }
 
     public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {
-        var loc = tag.location();
-        var loc1 = new ResourceLocation(loc.getNamespace(), loc.getPath() + "/" + suffix);
-        var tag1 = TagKey.create(tag.registry(), loc1);
-        REGISTRATE.tag(tag1, tag);
-        return tag1;
+        return TagKey.create(tag.registry(), LocHelper.extend(tag.location(), suffix));
     }
 }

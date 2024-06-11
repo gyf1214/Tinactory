@@ -78,12 +78,12 @@ public class MaterialSet {
         }
     }
 
-    private record BlockEntry(ResourceLocation loc, Supplier<Block> block) {
+    private record BlockEntry(ResourceLocation loc, Supplier<? extends Block> block) {
         public Block getBlock() {
             return getEntry().get();
         }
 
-        public Supplier<Block> getEntry() {
+        public Supplier<? extends Block> getEntry() {
             assert block != null;
             return block;
         }
@@ -140,9 +140,23 @@ public class MaterialSet {
         return items.keySet();
     }
 
+    public ResourceLocation blockLoc(String sub) {
+        assert blocks.containsKey(sub);
+        return blocks.get(sub).loc;
+    }
+
+    public Supplier<? extends Block> blockEntry(String sub) {
+        assert blocks.containsKey(sub);
+        return blocks.get(sub).getEntry();
+    }
+
     public Block block(String sub) {
         assert blocks.containsKey(sub);
         return blocks.get(sub).getBlock();
+    }
+
+    public Set<String> blockSubs() {
+        return blocks.keySet();
     }
 
     public OreVariant oreVariant() {
@@ -313,13 +327,6 @@ public class MaterialSet {
             var loc = item.getRegistryName();
             assert loc != null;
             items.put(sub, new ItemEntry(loc, tag, () -> item, targetTag));
-            return this;
-        }
-
-        public Builder<P> existing(String sub, Block block) {
-            var loc = block.getRegistryName();
-            assert loc != null;
-            blocks.put(sub, new BlockEntry(loc, () -> block));
             return this;
         }
 
@@ -525,18 +532,14 @@ public class MaterialSet {
         public Builder<P> ore(OreVariant variant) {
             oreVariant = variant;
             var raw = dummy("raw");
-            // TODO
             if (!blocks.containsKey("ore")) {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
                         .material(variant.baseBlock.defaultBlockState().getMaterial())
                         .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
-//                        .transform(ModelGen.oreBlock(variant))
                         .tint(color)
-//                        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-//                        .tag(variant.mineTier.getTag())
                         .drop(raw::getItem)
                         .register();
-                blocks.put("ore", new BlockEntry(ore.loc, ore::get));
+                blocks.put("ore", new BlockEntry(ore.loc, ore));
             }
             return dummies("crushed", "crushed_centrifuged", "crushed_purified")
                     .dummies("dust_impure", "dust_pure").dust();

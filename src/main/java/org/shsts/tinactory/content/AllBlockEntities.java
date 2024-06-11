@@ -1,7 +1,6 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.tags.BlockTags;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.gui.BoilerPlugin;
 import org.shsts.tinactory.content.gui.MachinePlugin;
@@ -18,8 +17,6 @@ import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.SidedMachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
-import org.shsts.tinactory.content.model.MachineModel;
-import org.shsts.tinactory.content.model.ModelGen;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -44,7 +41,6 @@ import static org.shsts.tinactory.content.machine.ProcessingSet.generator;
 import static org.shsts.tinactory.content.machine.ProcessingSet.machine;
 import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -82,8 +78,7 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .block()
-                .transform(ModelGen.machine(Voltage.LV, gregtech("blocks/overlay/machine/overlay_screen")))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .translucent()
                 .defaultBlockItem().dropSelf()
                 .build()
                 .register();
@@ -97,14 +92,12 @@ public final class AllBlockEntities {
                 .menu(WorkbenchMenu::new).build()
                 .build()
                 .block()
-                .transform(ModelGen.primitive(gregtech("blocks/casings/crafting_table")))
-                .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.MINEABLE_WITH_WRENCH)
+                .translucent()
                 .defaultBlockItem().dropSelf()
                 .build()
                 .register();
 
         RESEARCH_TABLE = set(machine(AllRecipes.RESEARCH))
-                .overlay(gregtech("blocks/overlay/machine/overlay_screen"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -114,7 +107,6 @@ public final class AllBlockEntities {
                 .buildObject();
 
         var assembler = set(machine(AllRecipes.ASSEMBLER))
-                .overlay(gregtech("blocks/machines/assembler"))
                 .voltage(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT);
@@ -132,7 +124,6 @@ public final class AllBlockEntities {
                 .buildObject();
 
         STONE_GENERATOR = set(machine(AllRecipes.STONE_GENERATOR))
-                .overlay(gregtech("blocks/machines/rock_crusher"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
@@ -144,7 +135,6 @@ public final class AllBlockEntities {
                 .buildObject();
 
         var oreAnalyzer = set(ProcessingSet.oreAnalyzer())
-                .overlay(gregtech("blocks/machines/electromagnetic_separator"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -160,7 +150,6 @@ public final class AllBlockEntities {
         ORE_ANALYZER = oreAnalyzer.build().buildObject();
 
         MACERATOR = set(marker(AllRecipes.MACERATOR))
-                .overlay(gregtech("blocks/machines/macerator"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -180,7 +169,6 @@ public final class AllBlockEntities {
                 .buildObject();
 
         ORE_WASHER = set(marker(AllRecipes.ORE_WASHER))
-                .overlay(gregtech("blocks/machines/ore_washer"))
                 .voltage(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -198,7 +186,6 @@ public final class AllBlockEntities {
                 .buildObject();
 
         CENTRIFUGE = set(marker(AllRecipes.CENTRIFUGE))
-                .overlay(gregtech("blocks/machines/centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -214,7 +201,6 @@ public final class AllBlockEntities {
                 .buildObject();
 
         THERMAL_CENTRIFUGE = set(marker(AllRecipes.THERMAL_CENTRIFUGE))
-                .overlay(gregtech("blocks/machines/thermal_centrifuge"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -238,7 +224,6 @@ public final class AllBlockEntities {
 
         ALLOY_SMELTER = set(machine(AllRecipes.ALLOY_SMELTER))
                 .voltage(Voltage.ULV)
-                .overlay(gregtech("blocks/machines/alloy_smelter"))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -251,7 +236,6 @@ public final class AllBlockEntities {
 
         STEAM_TURBINE = set(generator(AllRecipes.STEAM_TURBINE))
                 .voltage(Voltage.ULV, Voltage.HV)
-                .overlay(gregtech("blocks/generators/steam_turbine/overlay_side"))
                 .layoutSet()
                 .port(SlotType.FLUID_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -261,8 +245,8 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        LOW_PRESSURE_BOILER = boiler("low", 1d, Voltage.ULV);
-        HIGH_PRESSURE_BOILER = boiler("high", 2.2d, Voltage.MV);
+        LOW_PRESSURE_BOILER = boiler("low", 1d);
+        HIGH_PRESSURE_BOILER = boiler("high", 2.2d);
 
         BLAST_FURNACE = REGISTRATE.blockEntitySet("multi_block/blast_furnace",
                         SmartBlockEntity::new, PrimitiveBlock<SmartBlockEntity>::new)
@@ -273,10 +257,7 @@ public final class AllBlockEntities {
                 .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.BLAST_FURNACE))
                 .build()
                 .block()
-                .transform(ModelGen.primitiveMachine(
-                        gregtech("blocks/casings/solid/machine_casing_heatproof"),
-                        gregtech("blocks/multiblock/blast_furnace")))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .translucent()
                 .defaultBlockItem().dropSelf()
                 .build()
                 .register();
@@ -293,9 +274,7 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .block()
-                .transform(ModelGen.sidedMachine(gregtech("blocks/casings/solid/machine_casing_solid_steel"),
-                        gregtech(MachineModel.IO_TEX)))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
+                .translucent()
                 .defaultBlockItem().dropSelf()
                 .build()
                 .register();
@@ -309,10 +288,11 @@ public final class AllBlockEntities {
     }
 
     private static BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
-    boiler(String name, double burnSpeed, Voltage casingVoltage) {
+    boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;
-        return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(Voltage.PRIMITIVE))
+        return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new,
+                        MachineBlock.factory(Voltage.PRIMITIVE))
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
                 .eventManager()
@@ -325,8 +305,6 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .block()
-                .transform(ModelGen.machine(casingVoltage, gregtech("blocks/generators/boiler/coal")))
-                .tag(AllTags.MINEABLE_WITH_WRENCH)
                 .defaultBlockItem().dropSelf()
                 .build()
                 .register();

@@ -1,9 +1,10 @@
 package org.shsts.tinactory.datagen.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.content.material.IconSet;
+import net.minecraft.world.item.Items;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.datagen.builder.MaterialBuilder;
+import org.shsts.tinactory.datagen.content.model.IconSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -31,11 +32,21 @@ import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
-import static org.shsts.tinactory.content.material.IconSet.DULL;
-import static org.shsts.tinactory.content.material.IconSet.METALLIC;
-import static org.shsts.tinactory.content.material.IconSet.ROUGH;
-import static org.shsts.tinactory.content.material.IconSet.SHINY;
+import static org.shsts.tinactory.content.AllTags.TOOL;
+import static org.shsts.tinactory.content.AllTags.TOOL_FILE;
+import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
+import static org.shsts.tinactory.content.AllTags.TOOL_HANDLE;
+import static org.shsts.tinactory.content.AllTags.TOOL_MORTAR;
+import static org.shsts.tinactory.content.AllTags.TOOL_SAW;
+import static org.shsts.tinactory.content.AllTags.TOOL_SCREW;
+import static org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER;
+import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
+import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
+import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
+import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
+import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -65,6 +76,17 @@ public final class Materials {
                 .material(TEST, DULL).build()
                 .material(STONE, ROUGH).build()
                 .material(FLINT, DULL).build();
+
+        DATA_GEN.tag(TOOL_HAMMER, TOOL)
+                .tag(TOOL_MORTAR, TOOL)
+                .tag(TOOL_FILE, TOOL)
+                .tag(TOOL_SAW, TOOL)
+                .tag(TOOL_SCREWDRIVER, TOOL)
+                .tag(TOOL_WRENCH, TOOL)
+                .tag(TOOL_WIRE_CUTTER, TOOL)
+                .tag(() -> Items.STICK, TOOL_HANDLE)
+                .tag(WROUGHT_IRON.tag("stick"), TOOL_HANDLE)
+                .tag(IRON.tag("screw"), TOOL_SCREW);
     }
 
     private static class MaterialFactory {
