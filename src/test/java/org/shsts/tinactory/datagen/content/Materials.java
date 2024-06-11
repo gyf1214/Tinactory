@@ -3,7 +3,7 @@ package org.shsts.tinactory.datagen.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.datagen.builder.MaterialBuilder;
+import org.shsts.tinactory.datagen.content.builder.MaterialBuilder;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -20,7 +20,7 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TechBuilder<P> extends DataBuilder<JsonObject, P, TechBuilder<P>> {
+public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     private final List<ResourceLocation> depends = new ArrayList<>();
     private long maxProgress = 0;
     private final Map<String, Integer> modifiers = new HashMap<>();
@@ -71,8 +71,7 @@ public class TechBuilder<P> extends DataBuilder<JsonObject, P, TechBuilder<P>> {
         dataGen.langTrackedCtx.trackExtra(details, details);
     }
 
-    @Override
-    protected JsonObject createObject() {
+    public JsonObject serialize() {
         assert maxProgress > 0;
         var jo = new com.google.gson.JsonObject();
         jo.addProperty("max_progress", maxProgress);

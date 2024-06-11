@@ -56,7 +56,7 @@ public abstract class TechProvider implements DataProvider {
         addTechs();
         for (var tech : techs) {
             tech.validate(existingFileHelper);
-            var jo = tech.buildObject();
+            var jo = tech.serialize();
             var path = getPath(tech.loc);
             var s = gson.toJson(jo);
             var hash = SHA1.hashUnencodedChars(s).toString();

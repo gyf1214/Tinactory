@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Unit;
 import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.datagen.DataGen;
 
@@ -9,7 +10,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class DataBuilder<U, P, S extends DataBuilder<U, P, S>> extends BuilderBase<U, P, S> {
+public abstract class DataBuilder<P, S extends DataBuilder<P, S>> extends BuilderBase<Unit, P, S> {
     public final ResourceLocation loc;
     protected final DataGen dataGen;
 
@@ -32,5 +33,10 @@ public abstract class DataBuilder<U, P, S extends DataBuilder<U, P, S>> extends 
     public ResourceLocation buildLoc() {
         build();
         return loc;
+    }
+
+    @Override
+    protected Unit createObject() {
+        return Unit.INSTANCE;
     }
 }

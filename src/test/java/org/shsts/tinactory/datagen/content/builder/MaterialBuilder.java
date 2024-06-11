@@ -1,15 +1,15 @@
-package org.shsts.tinactory.datagen.builder;
+package org.shsts.tinactory.datagen.content.builder;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.datagen.DataGen;
+import org.shsts.tinactory.datagen.builder.DataBuilder;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
@@ -29,7 +29,7 @@ import static org.shsts.tinactory.datagen.content.Models.oreBlock;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MaterialBuilder<P> extends DataBuilder<Unit, P, MaterialBuilder<P>> {
+public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     private static ResourceLocation toolTex(String sub) {
         return gregtech("items/tools/" + sub);
     }
@@ -55,11 +55,6 @@ public class MaterialBuilder<P> extends DataBuilder<Unit, P, MaterialBuilder<P>>
     public MaterialBuilder<P> icon(IconSet value) {
         icon = value;
         return this;
-    }
-
-    @Override
-    protected Unit createObject() {
-        return Unit.INSTANCE;
     }
 
     private <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
