@@ -354,7 +354,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             this.variant = material.oreVariant();
         }
 
-        private void crush(String input, String output) {
+        private void crush(String output, String input) {
             MACERATOR.recipe(dataGen, material.loc(output))
                     .inputItem(0, material.tag(input), 1)
                     .outputItem(1, material.entry(output), input.equals("raw") ? 2 * amount : 1)
@@ -363,7 +363,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                     .build();
         }
 
-        private void wash(String input, String output) {
+        private void wash(String output, String input) {
             var loc = material.loc(output);
             if (input.equals("dust_pure")) {
                 loc = new ResourceLocation(loc.getNamespace(), loc.getPath() + "_from_pure");
@@ -421,7 +421,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         toolRecipe("file", "A\nA\nB", "plate", TOOL_HANDLE);
         toolRecipe("saw", "AAB\n  B", "plate", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
         toolRecipe("screwdriver", "  A\n A \nB  ", "stick", TOOL_HANDLE, TOOL_FILE, TOOL_HAMMER);
-        toolRecipe("wrench", "A A\nAAA\n A ", "plate", TOOL_HAMMER);
+        toolRecipe("wrench", "A A\n A \n A ", "plate", TOOL_HAMMER);
         toolRecipe("wire_cutter", "A A\n A \nBCB", "plate", TOOL_HANDLE, TOOL_SCREW,
                 TOOL_HAMMER, TOOL_FILE, TOOL_SCREWDRIVER);
     }
