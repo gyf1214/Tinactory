@@ -170,7 +170,7 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         }
 
         var amount = stack.getCount();
-        LOGGER.debug("{} on craft {}", this, stack);
+        LOGGER.trace("{} on craft {}", this, stack);
 
         // vanilla logic of crafting triggers
         stack.onCraftedBy(player.level, player, amount);
