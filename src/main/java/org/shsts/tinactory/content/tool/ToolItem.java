@@ -11,7 +11,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class ToolItem extends Item {
-
     public ToolItem(Properties properties, int durability) {
         super(properties.defaultDurability(durability).setNoRepair());
     }
@@ -38,5 +37,10 @@ public class ToolItem extends Item {
     @Override
     public boolean isBarVisible(ItemStack stack) {
         return true;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack pStack) {
+        return false;
     }
 }

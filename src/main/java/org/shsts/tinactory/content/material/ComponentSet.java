@@ -62,8 +62,8 @@ public final class ComponentSet {
         this.machineHull = item(voltage, "machine_hull").register();
 
         this.cable = REGISTRATE.block("network/cable/" + voltage.id, CableBlock.cable(voltage, 1d))
-                .translucent()
                 .tint(CableBlock.INSULATION_COLOR, cableMaterial.color)
+                .translucent()
                 .register();
 
         this.researchEquipment = item(voltage, "research_equipment")

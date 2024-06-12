@@ -30,6 +30,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
 
     @Nullable
     protected BlockItemBuilder<?> blockItemBuilder = null;
+    protected boolean noBlockItem = false;
     @Nullable
     protected DistLazy<BlockColor> tint = null;
 
@@ -122,8 +123,9 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         return blockItemBuilder != null ? blockItemBuilder : blockItem(BlockItem::new);
     }
 
-    public S defaultBlockItem() {
-        return blockItem().build();
+    public S noBlockItem() {
+        noBlockItem = true;
+        return self();
     }
 
     @Override
@@ -132,6 +134,9 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         if (tint != null) {
             onCreateObject.add(block -> tint.runOnDist(Dist.CLIENT, () -> blockColor ->
                     registrate.tintHandler.addBlockColor(block, blockColor)));
+        }
+        if (blockItemBuilder == null && !noBlockItem) {
+            blockItem().build();
         }
         return super.createEntry();
     }

@@ -42,8 +42,11 @@ public abstract class BlockEntitySetBuilder<T extends SmartBlockEntity, U extend
     }
 
     public BlockEntitySetBuilder<T, U> entityClass(Class<T> entityClass) {
-        this.blockEntity().entityClass(entityClass);
-        return this;
+        return blockEntity().entityClass(entityClass).build();
+    }
+
+    public BlockEntitySetBuilder<T, U> translucent() {
+        return block().translucent().build();
     }
 
     public BlockEntitySet<T, U> register() {

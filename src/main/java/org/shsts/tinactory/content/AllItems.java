@@ -35,7 +35,6 @@ public final class AllItems {
         ULV_CABLE = REGISTRATE.block("network/cable/ulv",
                         prop -> new CableBlock(prop, CableBlock.WIRE_RADIUS, Voltage.ULV, 2.0))
                 .tint(IRON.color)
-                .defaultBlockItem()
                 .register();
 
         ULV_MACHINE_HULL = REGISTRATE.item("component/ulv/machine_hull", Item::new)
@@ -60,7 +59,6 @@ public final class AllItems {
 
         HEAT_PROOF_BLOCK = REGISTRATE.block("multi_block/solid/heat_proof", Block::new)
                 .properties($ -> $.strength(2f, 8f))
-                .defaultBlockItem()
                 .register();
     }
 

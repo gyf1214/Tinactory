@@ -77,10 +77,7 @@ public final class AllBlockEntities {
                 .title("networkController")
                 .build()
                 .build()
-                .block()
                 .translucent()
-                .defaultBlockItem()
-                .build()
                 .register();
 
         WORKBENCH = REGISTRATE.blockEntitySet("primitive/workbench",
@@ -90,10 +87,6 @@ public final class AllBlockEntities {
                 .blockEntity()
                 .simpleCapability(Workbench::builder)
                 .menu(WorkbenchMenu::new).build()
-                .build()
-                .block()
-                .translucent()
-                .defaultBlockItem()
                 .build()
                 .register();
 
@@ -256,10 +249,7 @@ public final class AllBlockEntities {
                 .simpleCapability(MultiBlock::blastFurnace)
                 .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.BLAST_FURNACE))
                 .build()
-                .block()
                 .translucent()
-                .defaultBlockItem()
-                .build()
                 .register();
 
         MULTI_BLOCK_INTERFACE = REGISTRATE.blockEntitySet("multi_block/interface",
@@ -273,10 +263,7 @@ public final class AllBlockEntities {
                 .plugin(MachinePlugin::multiBlock)
                 .build()
                 .build()
-                .block()
                 .translucent()
-                .defaultBlockItem()
-                .build()
                 .register();
     }
 
@@ -304,9 +291,7 @@ public final class AllBlockEntities {
                 .plugin(BoilerPlugin::new)
                 .build()
                 .build()
-                .block()
-                .defaultBlockItem()
-                .build()
+                .translucent()
                 .register();
     }
 

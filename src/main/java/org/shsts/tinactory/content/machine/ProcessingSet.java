@@ -57,10 +57,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                     .simpleCapability(StackProcessingContainer.builder(layout))
                     .menu(ProcessingMenu.machine(layout)).build()
                     .build()
-                    .block()
-                    .translucent()
-                    .defaultBlockItem()
-                    .build();
+                    .translucent();
         }
 
         @Override
@@ -76,10 +73,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                     .simpleCapability(StackProcessingContainer.builder(layout))
                     .menu(ProcessingMenu.machine(layout)).build()
                     .build()
-                    .block()
-                    .translucent()
-                    .defaultBlockItem()
-                    .build();
+                    .translucent();
         }
 
         @Override
@@ -176,10 +170,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .plugin(MachinePlugin.electricFurnace(layout))
                         .build()
                         .build()
-                        .block()
-                        .translucent()
-                        .defaultBlockItem()
-                        .build();
+                        .translucent();
             }
         };
     }
