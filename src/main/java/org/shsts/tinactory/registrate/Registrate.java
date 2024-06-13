@@ -32,7 +32,7 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
-import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
+import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.builder.ItemBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
@@ -192,46 +192,41 @@ public class Registrate {
         return new SimpleItemBuilder<>(id, factory);
     }
 
-    public <U extends SmartBlockEntity> BlockEntityBuilder<U, Registrate>
-    blockEntity(String id, BlockEntityBuilder.Factory<U> factory) {
-        return new BlockEntityBuilder<>(this, id, this, factory);
+    public <U extends SmartBlockEntity, P> BlockEntityTypeBuilder<U, P>
+    blockEntityType(P parent, String id, BlockEntityTypeBuilder.Factory<U> factory) {
+        return new BlockEntityTypeBuilder<>(this, id, parent, factory);
     }
 
-    public <U extends SmartBlockEntity, P> BlockEntityBuilder<U, P>
-    blockEntity(P parent, String id, BlockEntityBuilder.Factory<U> factory) {
-        return new BlockEntityBuilder<>(this, id, parent, factory);
-    }
-
-    private class SimpleBlockEntitySetBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-            extends BlockEntitySetBuilder<T, U> {
+    private class SimpleBlockEntityBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
+            extends BlockEntityBuilder<T, U> {
         private final String id;
-        private final BlockEntityBuilder.Factory<T> blockEntityFactory;
+        private final BlockEntityTypeBuilder.Factory<T> blockEntityFactory;
         private final EntityBlockBuilder.Factory<T, U> blockFactory;
 
-        private SimpleBlockEntitySetBuilder(String id,
-                                            BlockEntityBuilder.Factory<T> blockEntityFactory,
-                                            EntityBlockBuilder.Factory<T, U> blockFactory) {
+        private SimpleBlockEntityBuilder(String id,
+                                         BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
+                                         EntityBlockBuilder.Factory<T, U> blockFactory) {
             this.id = id;
             this.blockEntityFactory = blockEntityFactory;
             this.blockFactory = blockFactory;
         }
 
         @Override
-        protected BlockEntityBuilder<T, BlockEntitySetBuilder<T, U>> createBlockEntityBuilder() {
-            return Registrate.this.blockEntity(this, id, blockEntityFactory);
+        protected BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U>> createBlockEntityBuilder() {
+            return Registrate.this.blockEntityType(this, id, blockEntityFactory);
         }
 
         @Override
-        protected EntityBlockBuilder<T, U, BlockEntitySetBuilder<T, U>> createBlockBuilder() {
+        protected EntityBlockBuilder<T, U, BlockEntityBuilder<T, U>> createBlockBuilder() {
             return Registrate.this.entityBlock(this, id, blockFactory);
         }
     }
 
     public <T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-    BlockEntitySetBuilder<T, U>
-    blockEntitySet(String id, BlockEntityBuilder.Factory<T> blockEntityFactory,
-                   EntityBlockBuilder.Factory<T, U> blockFactory) {
-        return new SimpleBlockEntitySetBuilder<>(id, blockEntityFactory, blockFactory);
+    BlockEntityBuilder<T, U>
+    blockEntity(String id, BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
+                EntityBlockBuilder.Factory<T, U> blockFactory) {
+        return new SimpleBlockEntityBuilder<>(id, blockEntityFactory, blockFactory);
     }
 
     public <T extends IForgeRegistryEntry<T>>

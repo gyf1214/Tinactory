@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
+import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
@@ -28,7 +28,8 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     public final RecipeTypeEntry<T, ?> recipeType;
 
-    private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+    private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Set<Voltage> voltages,
+                          Map<Voltage, Layout> layoutSet,
                           Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
                           @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
         super(voltages, layoutSet, machines, primitive);
@@ -45,11 +46,11 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
         }
 
         @Override
-        protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+        protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         getMachineBuilder(Voltage voltage) {
             var id = "machine/" + voltage.id + "/" + recipeType.id;
             var layout = getLayout(voltage);
-            return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
+            return REGISTRATE.blockEntity(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
                     .entityClass(SmartBlockEntity.class)
                     .blockEntity()
                     .eventManager()
@@ -61,11 +62,11 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
         }
 
         @Override
-        protected BlockEntitySetBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
+        protected BlockEntityBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
         getPrimitiveBuilder() {
             var id = "primitive/" + recipeType.id;
             var layout = getLayout(Voltage.PRIMITIVE);
-            return REGISTRATE.blockEntitySet(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
+            return REGISTRATE.blockEntity(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
                     .entityClass(PrimitiveMachine.class)
                     .blockEntity()
                     .eventManager().ticking()
@@ -89,7 +90,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     machine(RecipeTypeEntry<T, ?> recipeType) {
         return new Builder<>(recipeType, Unit.INSTANCE) {
             @Override
-            protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
@@ -106,7 +107,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     marker(RecipeTypeEntry<T, ?> recipeType) {
         return new Builder<>(recipeType, Unit.INSTANCE) {
             @Override
-            protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
@@ -122,7 +123,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     public static Builder<OreAnalyzerRecipe, ?> oreAnalyzer() {
         return new Builder<>(AllRecipes.ORE_ANALYZER, Unit.INSTANCE) {
             @Override
-            protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
@@ -139,7 +140,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     generator(RecipeTypeEntry<GeneratorRecipe, ?> recipeType) {
         return new Builder<>(recipeType, Unit.INSTANCE) {
             @Override
-            protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
                 return super.getMachineBuilder(voltage)
                         .blockEntity()
@@ -155,11 +156,11 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     public static MachineSet.Builder<?> electricFurnace() {
         return new MachineSet.Builder<Object>(Unit.INSTANCE) {
             @Override
-            protected BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+            protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
             getMachineBuilder(Voltage voltage) {
                 var id = "machine/" + voltage.id + "/electric_furnace";
                 var layout = getLayout(voltage);
-                return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
+                return REGISTRATE.blockEntity(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
                         .entityClass(SmartBlockEntity.class)
                         .blockEntity()
                         .eventManager()

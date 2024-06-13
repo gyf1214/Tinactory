@@ -68,7 +68,7 @@ public final class AllBlockEntities {
     static {
         PROCESSING_SETS = new HashSet<>();
 
-        NETWORK_CONTROLLER = REGISTRATE.blockEntitySet("network/controller",
+        NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",
                         NetworkController::new,
                         MachineBlock.factory(Voltage.PRIMITIVE))
                 .entityClass(NetworkController.class)
@@ -82,7 +82,7 @@ public final class AllBlockEntities {
                 .translucent()
                 .register();
 
-        WORKBENCH = REGISTRATE.blockEntitySet("primitive/workbench",
+        WORKBENCH = REGISTRATE.blockEntity("primitive/workbench",
                         SmartBlockEntity::new,
                         PrimitiveBlock<SmartBlockEntity>::new)
                 .entityClass(SmartBlockEntity.class)
@@ -243,7 +243,7 @@ public final class AllBlockEntities {
         LOW_PRESSURE_BOILER = boiler("low", 1d);
         HIGH_PRESSURE_BOILER = boiler("high", 2.2d);
 
-        BLAST_FURNACE = REGISTRATE.blockEntitySet("multi_block/blast_furnace",
+        BLAST_FURNACE = REGISTRATE.blockEntity("multi_block/blast_furnace",
                         SmartBlockEntity::new, PrimitiveBlock<SmartBlockEntity>::new)
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
@@ -254,7 +254,7 @@ public final class AllBlockEntities {
                 .translucent()
                 .register();
 
-        MULTI_BLOCK_INTERFACE = REGISTRATE.blockEntitySet("multi_block/interface",
+        MULTI_BLOCK_INTERFACE = REGISTRATE.blockEntity("multi_block/interface",
                         SmartBlockEntity::new, MachineBlock.sided(Voltage.LV))
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
@@ -268,7 +268,7 @@ public final class AllBlockEntities {
                 .translucent()
                 .register();
 
-        BATTERY_BOX = REGISTRATE.blockEntitySet("electric/battery_box",
+        BATTERY_BOX = REGISTRATE.blockEntity("electric/battery_box",
                         SmartBlockEntity::new, MachineBlock.factory(Voltage.ULV))
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()
@@ -292,7 +292,7 @@ public final class AllBlockEntities {
     boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;
-        return REGISTRATE.blockEntitySet(id, SmartBlockEntity::new,
+        return REGISTRATE.blockEntity(id, SmartBlockEntity::new,
                         MachineBlock.factory(Voltage.PRIMITIVE))
                 .entityClass(SmartBlockEntity.class)
                 .blockEntity()

@@ -6,7 +6,7 @@ import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
-import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
+import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
@@ -79,11 +79,11 @@ public class MachineSet {
             return layoutSet.get(voltage);
         }
 
-        protected abstract BlockEntitySetBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+        protected abstract BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
         getMachineBuilder(Voltage voltage);
 
         @Nullable
-        protected BlockEntitySetBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
+        protected BlockEntityBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
         getPrimitiveBuilder() {
             return null;
         }
