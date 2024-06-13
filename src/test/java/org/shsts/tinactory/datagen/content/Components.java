@@ -15,6 +15,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.AllItems.COMPONENT_SETS;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
+import static org.shsts.tinactory.content.AllItems.TEST_BATTERY;
 import static org.shsts.tinactory.content.AllItems.ULV_CABLE;
 import static org.shsts.tinactory.content.AllItems.ULV_MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.ULV_RESEARCH_EQUIPMENT;
@@ -63,6 +64,9 @@ public final class Components {
                 .build()
                 .item(VACUUM_TUBE)
                 .model(basicItem("metaitems/circuit.vacuum_tube"))
+                .build()
+                .item(TEST_BATTERY)
+                .model(basicItem("metaitems/battery.re.lv.lithium"))
                 .build();
 
         for (var entry : COMPONENT_SETS.entrySet()) {

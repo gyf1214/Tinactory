@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER;
+import static org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX;
 import static org.shsts.tinactory.content.AllBlockEntities.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
@@ -99,6 +100,10 @@ public final class Machines {
                 .build()
                 .block(MULTI_BLOCK_INTERFACE.entry())
                 .blockState(sidedMachine("casings/solid/machine_casing_solid_steel", IO_TEX))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build()
+                .block(BATTERY_BOX.entry())
+                .blockState(sidedMachine(Voltage.LV, "overlay/machine/overlay_energy_out"))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build();
     }

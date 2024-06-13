@@ -11,6 +11,7 @@ public final class AllLayouts {
     public static final Layout WORKBENCH;
     public static final Layout BOILER;
     public static final Layout BLAST_FURNACE;
+    public static final Layout BATTERY_BOX;
 
     static {
         var workbenchBuilder = Layout.builder()
@@ -45,6 +46,11 @@ public final class AllLayouts {
                 .port(SlotType.FLUID_OUTPUT)
                 .slot(5 * SLOT_SIZE, 1 + SLOT_SIZE)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + 3 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
+                .buildLayout();
+
+        BATTERY_BOX = Layout.builder()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 0)
                 .buildLayout();
     }
 }

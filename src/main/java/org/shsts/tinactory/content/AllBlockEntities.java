@@ -17,6 +17,7 @@ import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.SidedMachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
+import org.shsts.tinactory.content.network.BatteryBox;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -62,6 +63,7 @@ public final class AllBlockEntities {
     public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
     public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
     public static final BlockEntitySet<SmartBlockEntity, SidedMachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
+    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> BATTERY_BOX;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -262,6 +264,18 @@ public final class AllBlockEntities {
                 .menu(ProcessingMenu.multiBlock())
                 .plugin(MachinePlugin::multiBlock)
                 .build()
+                .build()
+                .translucent()
+                .register();
+
+        BATTERY_BOX = REGISTRATE.blockEntitySet("electric/battery_box",
+                        SmartBlockEntity::new, MachineBlock.factory(Voltage.ULV))
+                .entityClass(SmartBlockEntity.class)
+                .blockEntity()
+                .eventManager()
+                .simpleCapability(Machine::builder)
+                .simpleCapability(BatteryBox::builder)
+                .menu(ProcessingMenu.machine(AllLayouts.BATTERY_BOX)).build()
                 .build()
                 .translucent()
                 .register();

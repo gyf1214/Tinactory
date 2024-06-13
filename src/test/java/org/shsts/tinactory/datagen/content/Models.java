@@ -179,6 +179,12 @@ public final class Models {
         return getMachineModel(casing, overlay)::sidedBlockState;
     }
 
+    public static <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
+    sidedMachine(Voltage voltage, String overlay) {
+        return getMachineModel(voltage, overlay)::sidedBlockState;
+    }
+
     public static void init() {
         DATA_GEN.blockModel(ctx -> ctx.provider
                         .withExistingParent("cube_tint", mcLoc("block/block"))
