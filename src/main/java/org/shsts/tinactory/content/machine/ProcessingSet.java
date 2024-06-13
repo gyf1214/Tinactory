@@ -13,8 +13,8 @@ import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
-import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,8 +29,8 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     public final RecipeTypeEntry<T, ?> recipeType;
 
     private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                          Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
-                          @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
+                          Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
+                          @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
         super(voltages, layoutSet, machines, primitive);
         this.recipeType = recipeType;
     }
@@ -79,8 +79,8 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
         @Override
         protected ProcessingSet<T>
         createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                  Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
-                  @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
+                  Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
+                  @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
             return new ProcessingSet<>(recipeType, voltages, layoutSet, machines, primitive);
         }
     }

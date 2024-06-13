@@ -4,7 +4,7 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.ValueHolder;
-import org.shsts.tinactory.registrate.common.BlockEntitySet;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -49,13 +49,13 @@ public abstract class BlockEntitySetBuilder<T extends SmartBlockEntity, U extend
         return block().translucent().build();
     }
 
-    public BlockEntitySet<T, U> register() {
+    public RegistryEntry<U> register() {
         var block = this.block().register();
         var blockEntity = this.blockEntity().register();
 
         this.blockHolder.setValue(block);
         this.blockEntityHolder.setValue(blockEntity);
 
-        return new BlockEntitySet<>(blockEntity, block);
+        return block;
     }
 }

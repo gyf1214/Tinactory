@@ -7,7 +7,6 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntitySetBuilder;
-import org.shsts.tinactory.registrate.common.BlockEntitySet;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
@@ -22,13 +21,13 @@ import java.util.stream.Collectors;
 public class MachineSet {
     public final Map<Voltage, Layout> layoutSet;
     public final Set<Voltage> voltages;
-    protected final Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines;
+    protected final Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines;
     @Nullable
-    protected final BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive;
+    protected final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive;
 
     public MachineSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                      Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
-                      @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
+                      Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
+                      @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
         this.layoutSet = layoutSet;
         this.machines = machines;
         this.primitive = primitive;
@@ -38,17 +37,17 @@ public class MachineSet {
     public RegistryEntry<? extends Block> entry(Voltage voltage) {
         if (voltage == Voltage.PRIMITIVE) {
             assert primitive != null;
-            return primitive.entry();
+            return primitive;
         }
-        return machines.get(voltage).entry();
+        return machines.get(voltage);
     }
 
     public Block block(Voltage voltage) {
         if (voltage == Voltage.PRIMITIVE) {
             assert primitive != null;
-            return primitive.block();
+            return primitive.get();
         }
-        return machines.get(voltage).block();
+        return machines.get(voltage).get();
     }
 
     public static abstract class BuilderBase<T extends MachineSet, P, S extends BuilderBase<T, P, S>>
@@ -89,12 +88,12 @@ public class MachineSet {
             return null;
         }
 
-        protected BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+        protected RegistryEntry<MachineBlock<SmartBlockEntity>>
         createMachine(Voltage voltage) {
             return getMachineBuilder(voltage).register();
         }
 
-        protected BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
+        protected RegistryEntry<PrimitiveBlock<PrimitiveMachine>>
         createPrimitive() {
             var builder = getPrimitiveBuilder();
             assert builder != null;
@@ -103,8 +102,8 @@ public class MachineSet {
 
         protected abstract T
         createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                  Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
-                  @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive);
+                  Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
+                  @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive);
 
         @Override
         protected T createObject() {
@@ -128,8 +127,8 @@ public class MachineSet {
         @Override
         protected MachineSet
         createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                  Map<Voltage, BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>> machines,
-                  @Nullable BlockEntitySet<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>> primitive) {
+                  Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
+                  @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
             return new MachineSet(voltages, layoutSet, machines, primitive);
         }
     }

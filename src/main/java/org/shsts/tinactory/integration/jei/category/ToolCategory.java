@@ -26,7 +26,7 @@ public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchMenu> {
     }
 
     public ToolCategory() {
-        this(AllBlockEntities.WORKBENCH.block());
+        this(AllBlockEntities.WORKBENCH.get());
     }
 
     @Override

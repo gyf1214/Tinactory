@@ -30,7 +30,7 @@ import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
-import org.shsts.tinactory.registrate.common.BlockEntitySet;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
@@ -46,8 +46,8 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllBlockEntities {
-    public static final BlockEntitySet<NetworkController, MachineBlock<NetworkController>> NETWORK_CONTROLLER;
-    public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
+    public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
+    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
     public static final ProcessingSet<ResearchRecipe> RESEARCH_TABLE;
     public static final ProcessingSet<AssemblyRecipe> ASSEMBLER;
     public static final ProcessingSet<ProcessingRecipe> STONE_GENERATOR;
@@ -59,11 +59,11 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_FURNACE;
     public static final ProcessingSet<ProcessingRecipe> ALLOY_SMELTER;
     public static final ProcessingSet<GeneratorRecipe> STEAM_TURBINE;
-    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
-    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
-    public static final BlockEntitySet<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
-    public static final BlockEntitySet<SmartBlockEntity, SidedMachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
-    public static final BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>> BATTERY_BOX;
+    public static final RegistryEntry<MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
+    public static final RegistryEntry<MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
+    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
+    public static final RegistryEntry<SidedMachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
+    public static final RegistryEntry<MachineBlock<SmartBlockEntity>> BATTERY_BOX;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -288,7 +288,7 @@ public final class AllBlockEntities {
         return builder.onCreateObject(PROCESSING_SETS::add);
     }
 
-    private static BlockEntitySet<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+    private static RegistryEntry<MachineBlock<SmartBlockEntity>>
     boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;

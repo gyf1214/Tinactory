@@ -77,32 +77,32 @@ public final class Machines {
         machine(ALLOY_SMELTER, "machines/alloy_smelter");
         machine(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
 
-        DATA_GEN.block(NETWORK_CONTROLLER.entry())
+        DATA_GEN.block(NETWORK_CONTROLLER)
                 .blockState(machineBlock(Voltage.LV, "overlay/machine/overlay_screen"))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
-                .block(WORKBENCH.entry())
+                .block(WORKBENCH)
                 .blockState(cubeBlock("casings/crafting_table"))
                 .tag(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH)
                 .build()
-                .block(LOW_PRESSURE_BOILER.entry())
+                .block(LOW_PRESSURE_BOILER)
                 .blockState(machineBlock(Voltage.ULV, BOILER_TEX))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
-                .block(HIGH_PRESSURE_BOILER.entry())
+                .block(HIGH_PRESSURE_BOILER)
                 .blockState(machineBlock(Voltage.MV, BOILER_TEX))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
-                .block(BLAST_FURNACE.entry())
+                .block(BLAST_FURNACE)
                 .blockState(primitiveBlock("casings/solid/machine_casing_heatproof",
                         "multiblock/blast_furnace"))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
-                .block(MULTI_BLOCK_INTERFACE.entry())
+                .block(MULTI_BLOCK_INTERFACE)
                 .blockState(sidedMachine("casings/solid/machine_casing_solid_steel", IO_TEX))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
-                .block(BATTERY_BOX.entry())
+                .block(BATTERY_BOX)
                 .blockState(sidedMachine(Voltage.LV, "overlay/machine/overlay_energy_out"))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build();
@@ -111,7 +111,7 @@ public final class Machines {
     private static void primitive() {
         // workbench
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(WORKBENCH.block())
+                        .shaped(WORKBENCH.get())
                         .pattern("WSW")
                         .pattern("SCS")
                         .pattern("WSW")
@@ -154,9 +154,9 @@ public final class Machines {
         ulvFromPrimitive(STONE_GENERATOR);
         ulvFromPrimitive(ORE_ANALYZER);
         ulvFromPrimitive(ORE_WASHER);
-        ulvMachine(NETWORK_CONTROLLER.entry(), VACUUM_TUBE);
+        ulvMachine(NETWORK_CONTROLLER, VACUUM_TUBE);
         ulvMachine(RESEARCH_TABLE.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
-        ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH.entry());
+        ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
         ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
 
         TOOL_CRAFTING.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
@@ -181,8 +181,8 @@ public final class Machines {
     }
 
     private static void misc() {
-        TOOL_CRAFTING.recipe(DATA_GEN, LOW_PRESSURE_BOILER.entry())
-                .result(LOW_PRESSURE_BOILER.entry(), 1)
+        TOOL_CRAFTING.recipe(DATA_GEN, LOW_PRESSURE_BOILER)
+                .result(LOW_PRESSURE_BOILER, 1)
                 .pattern("PPP").pattern("PWP").pattern("VFV")
                 .define('P', IRON.tag("plate"))
                 .define('W', ULV_CABLE)
