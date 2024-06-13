@@ -80,7 +80,7 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .translucent()
-                .register();
+                .buildObject();
 
         WORKBENCH = REGISTRATE.blockEntity("primitive/workbench",
                         SmartBlockEntity::new,
@@ -90,7 +90,7 @@ public final class AllBlockEntities {
                 .simpleCapability(Workbench::builder)
                 .menu(WorkbenchMenu::new).build()
                 .build()
-                .register();
+                .buildObject();
 
         RESEARCH_TABLE = set(machine(AllRecipes.RESEARCH))
                 .voltage(Voltage.ULV)
@@ -252,7 +252,7 @@ public final class AllBlockEntities {
                 .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.BLAST_FURNACE))
                 .build()
                 .translucent()
-                .register();
+                .buildObject();
 
         MULTI_BLOCK_INTERFACE = REGISTRATE.blockEntity("multi_block/interface",
                         SmartBlockEntity::new, MachineBlock.sided(Voltage.LV))
@@ -266,7 +266,7 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .translucent()
-                .register();
+                .buildObject();
 
         BATTERY_BOX = REGISTRATE.blockEntity("electric/battery_box",
                         SmartBlockEntity::new, MachineBlock.factory(Voltage.ULV))
@@ -278,7 +278,7 @@ public final class AllBlockEntities {
                 .menu(ProcessingMenu.machine(AllLayouts.BATTERY_BOX)).build()
                 .build()
                 .translucent()
-                .register();
+                .buildObject();
     }
 
     public static final Set<ProcessingSet<?>> PROCESSING_SETS;
@@ -306,7 +306,7 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .translucent()
-                .register();
+                .buildObject();
     }
 
     public static void init() {}

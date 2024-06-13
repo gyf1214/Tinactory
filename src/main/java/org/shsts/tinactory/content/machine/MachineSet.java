@@ -79,25 +79,25 @@ public class MachineSet {
             return layoutSet.get(voltage);
         }
 
-        protected abstract BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
+        protected abstract BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>
         getMachineBuilder(Voltage voltage);
 
         @Nullable
-        protected BlockEntityBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>>
+        protected BlockEntityBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>, ?>
         getPrimitiveBuilder() {
             return null;
         }
 
         protected RegistryEntry<MachineBlock<SmartBlockEntity>>
         createMachine(Voltage voltage) {
-            return getMachineBuilder(voltage).register();
+            return getMachineBuilder(voltage).buildObject();
         }
 
         protected RegistryEntry<PrimitiveBlock<PrimitiveMachine>>
         createPrimitive() {
             var builder = getPrimitiveBuilder();
             assert builder != null;
-            return builder.register();
+            return builder.buildObject();
         }
 
         protected abstract T

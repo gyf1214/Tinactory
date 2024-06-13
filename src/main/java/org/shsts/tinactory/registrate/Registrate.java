@@ -198,7 +198,7 @@ public class Registrate {
     }
 
     private class SimpleBlockEntityBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-            extends BlockEntityBuilder<T, U> {
+            extends BlockEntityBuilder<T, U, Registrate> {
         private final String id;
         private final BlockEntityTypeBuilder.Factory<T> blockEntityFactory;
         private final EntityBlockBuilder.Factory<T, U> blockFactory;
@@ -206,24 +206,27 @@ public class Registrate {
         private SimpleBlockEntityBuilder(String id,
                                          BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
                                          EntityBlockBuilder.Factory<T, U> blockFactory) {
+            super(Registrate.this);
             this.id = id;
             this.blockEntityFactory = blockEntityFactory;
             this.blockFactory = blockFactory;
         }
 
         @Override
-        protected BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U>> createBlockEntityBuilder() {
+        protected BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U, Registrate>>
+        createBlockEntityBuilder() {
             return Registrate.this.blockEntityType(this, id, blockEntityFactory);
         }
 
         @Override
-        protected EntityBlockBuilder<T, U, BlockEntityBuilder<T, U>> createBlockBuilder() {
+        protected EntityBlockBuilder<T, U, BlockEntityBuilder<T, U, Registrate>>
+        createBlockBuilder() {
             return Registrate.this.entityBlock(this, id, blockFactory);
         }
     }
 
     public <T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-    BlockEntityBuilder<T, U>
+    BlockEntityBuilder<T, U, Registrate>
     blockEntity(String id, BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
                 EntityBlockBuilder.Factory<T, U> blockFactory) {
         return new SimpleBlockEntityBuilder<>(id, blockEntityFactory, blockFactory);
