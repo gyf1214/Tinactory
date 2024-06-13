@@ -141,48 +141,33 @@ public final class Models {
         CableModel.pipe(ctx);
     }
 
-    private static MachineModel getMachineModel(Voltage voltage, String overlay) {
-        return new MachineModel(voltage, gregtech("blocks/" + overlay));
+    public static <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
+    machineBlock(String overlay) {
+        var model = new MachineModel(gregtech("blocks/" + overlay));
+        return model::blockState;
     }
 
-    private static MachineModel getMachineModel(String casing, String overlay) {
-        return new MachineModel(gregtech("blocks/" + casing), gregtech("blocks/" + overlay));
+    public static <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
+    machineBlock(String casing, String overlay) {
+        var model = new MachineModel(gregtech("blocks/" + casing),
+                gregtech("blocks/" + overlay));
+        return model::blockState;
     }
 
     public static <U extends Block>
     Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
     machineBlock(Voltage voltage, String overlay) {
-        return getMachineModel(voltage, overlay)::blockState;
+        var model = new MachineModel(voltage, gregtech("blocks/" + overlay));
+        return model::blockState;
     }
 
     public static <U extends Item>
     Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
     machineItem(Voltage voltage, String overlay) {
-        return getMachineModel(voltage, overlay)::itemModel;
-    }
-
-    public static <U extends Block>
-    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
-    primitiveBlock(String casing, String overlay) {
-        return getMachineModel(casing, overlay)::primitiveBlockState;
-    }
-
-    public static <U extends Block>
-    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
-    primitiveBlock(String overlay) {
-        return getMachineModel(Voltage.PRIMITIVE, overlay)::primitiveBlockState;
-    }
-
-    public static <U extends Block>
-    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
-    sidedMachine(String casing, String overlay) {
-        return getMachineModel(casing, overlay)::sidedBlockState;
-    }
-
-    public static <U extends Block>
-    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
-    sidedMachine(Voltage voltage, String overlay) {
-        return getMachineModel(voltage, overlay)::sidedBlockState;
+        var model = new MachineModel(voltage, gregtech("blocks/" + overlay));
+        return model::itemModel;
     }
 
     public static void init() {

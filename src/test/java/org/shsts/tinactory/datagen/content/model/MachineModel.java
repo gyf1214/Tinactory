@@ -13,10 +13,13 @@ import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.machine.MachineBlock;
+import org.shsts.tinactory.content.machine.PrimitiveBlock;
+import org.shsts.tinactory.content.machine.SidedMachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 
@@ -36,7 +39,7 @@ import static org.shsts.tinactory.datagen.content.Models.yRotation;
 public class MachineModel {
     private static final String CASING_MODEL = "block/machine/casing";
     private static final String IO_MODEL = "block/machine/io";
-    public static final String PRIMITIVE_TEX = "casings/wood_wall";
+    public static final ResourceLocation PRIMITIVE_TEX = gregtech("blocks/casings/wood_wall");
     public static final String IO_TEX = "overlay/appeng/me_output_bus";
 
     private static void genCasingModel(DataContext<BlockModelProvider> ctx) {
@@ -66,20 +69,15 @@ public class MachineModel {
                 .texture("io_overlay", gregtech("blocks/" + IO_TEX));
     }
 
-    public static void genBlockModels(DataContext<BlockModelProvider> ctx) {
-        genCasingModel(ctx);
-        genIOModel(ctx);
-    }
-
-    public static ResourceLocation casing(Voltage voltage) {
+    private static ResourceLocation casingTex(Voltage voltage) {
         if (voltage == Voltage.PRIMITIVE) {
-            return gregtech("blocks/" + PRIMITIVE_TEX);
+            return PRIMITIVE_TEX;
         }
         return gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
     }
 
-    public static <B extends ModelBuilder<B>>
-    B casing(B model, ResourceLocation tex, ExistingFileHelper existingHelper) {
+    private static <B extends ModelBuilder<B>>
+    B applyCasing(B model, ResourceLocation tex, ExistingFileHelper existingHelper) {
         if (existingHelper.exists(tex, TEXTURE_TYPE)) {
             return model.texture("top", tex)
                     .texture("bottom", tex)
@@ -91,8 +89,14 @@ public class MachineModel {
         }
     }
 
+    @Nullable
     private final ResourceLocation casing;
     private final ResourceLocation overlay;
+
+    public MachineModel(ResourceLocation overlay) {
+        this.casing = null;
+        this.overlay = overlay;
+    }
 
     public MachineModel(ResourceLocation casing, ResourceLocation overlay) {
         this.casing = casing;
@@ -100,12 +104,13 @@ public class MachineModel {
     }
 
     public MachineModel(Voltage voltage, ResourceLocation overlay) {
-        this.casing = casing(voltage);
+        this.casing = casingTex(voltage);
         this.overlay = overlay;
     }
 
-    private <B extends ModelBuilder<B>> B applyTextures(B model, ExistingFileHelper existingHelper) {
-        model = casing(model, casing, existingHelper);
+    private <B extends ModelBuilder<B>> B
+    applyTextures(B model, ResourceLocation casing, ExistingFileHelper existingHelper) {
+        model = applyCasing(model, casing, existingHelper);
         if (existingHelper.exists(overlay, TEXTURE_TYPE)) {
             return model.texture("front_overlay", overlay);
         } else {
@@ -123,17 +128,30 @@ public class MachineModel {
         }
     }
 
-    private ModelFile genModel(String id, BlockModelProvider prov) {
-        return applyTextures(prov.withExistingParent(id, modLoc(CASING_MODEL)), prov.existingFileHelper);
+    private ResourceLocation getCasing(Block block) {
+        if (casing != null) {
+            return casing;
+        }
+        if (block instanceof PrimitiveBlock<?>) {
+            return PRIMITIVE_TEX;
+        } else if (block instanceof MachineBlock<?> machineBlock) {
+            return casingTex(machineBlock.voltage);
+        }
+        throw new IllegalArgumentException();
     }
 
-    public void primitiveBlockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var model = genModel(ctx.id, ctx.provider.models());
+    private ModelFile genModel(String id, Block block, BlockModelProvider prov) {
+        var model = prov.withExistingParent(id, modLoc(CASING_MODEL));
+        return applyTextures(model, getCasing(block), prov.existingFileHelper);
+    }
+
+    private void primitive(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var model = genModel(ctx.id, ctx.object, ctx.provider.models());
         ctx.provider.horizontalBlock(ctx.object, model);
     }
 
-    public void sidedBlockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var model = genModel(ctx.id, ctx.provider.models());
+    private void sided(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var model = genModel(ctx.id, ctx.object, ctx.provider.models());
         ctx.provider.getVariantBuilder(ctx.object)
                 .forAllStates(state -> {
                     var dir = state.getValue(MachineBlock.IO_FACING);
@@ -145,8 +163,8 @@ public class MachineModel {
                 });
     }
 
-    public void blockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var casing = genModel(ctx.id, ctx.provider.models());
+    private void machine(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var casing = genModel(ctx.id, ctx.object, ctx.provider.models());
         var io = ctx.provider.models().getExistingFile(modLoc(IO_MODEL));
         var multipart = ctx.provider.getMultipartBuilder(ctx.object);
 
@@ -176,8 +194,26 @@ public class MachineModel {
         }
     }
 
+    public void blockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        if (ctx.object instanceof PrimitiveBlock<?>) {
+            primitive(ctx);
+        } else if (ctx.object instanceof SidedMachineBlock<?>) {
+            sided(ctx);
+        } else if (ctx.object instanceof MachineBlock<?>) {
+            machine(ctx);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     public void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        assert casing != null;
         var model = ctx.provider.withExistingParent(ctx.id, modLoc(CASING_MODEL));
-        applyTextures(model, ctx.provider.existingFileHelper);
+        applyTextures(model, casing, ctx.provider.existingFileHelper);
+    }
+
+    public static void genBlockModels(DataContext<BlockModelProvider> ctx) {
+        genCasingModel(ctx);
+        genIOModel(ctx);
     }
 }

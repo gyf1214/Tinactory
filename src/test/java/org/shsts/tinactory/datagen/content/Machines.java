@@ -48,8 +48,6 @@ import static org.shsts.tinactory.content.AllTags.machineTag;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
-import static org.shsts.tinactory.datagen.content.Models.primitiveBlock;
-import static org.shsts.tinactory.datagen.content.Models.sidedMachine;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 
 @ParametersAreNonnullByDefault
@@ -76,6 +74,7 @@ public final class Machines {
         machine(ELECTRIC_FURNACE, "machines/electric_furnace");
         machine(ALLOY_SMELTER, "machines/alloy_smelter");
         machine(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
+        machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
 
         DATA_GEN.block(NETWORK_CONTROLLER)
                 .blockState(machineBlock(Voltage.LV, "overlay/machine/overlay_screen"))
@@ -94,16 +93,12 @@ public final class Machines {
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
                 .block(BLAST_FURNACE)
-                .blockState(primitiveBlock("casings/solid/machine_casing_heatproof",
+                .blockState(machineBlock("casings/solid/machine_casing_heatproof",
                         "multiblock/blast_furnace"))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
                 .block(MULTI_BLOCK_INTERFACE)
-                .blockState(sidedMachine("casings/solid/machine_casing_solid_steel", IO_TEX))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(BATTERY_BOX)
-                .blockState(sidedMachine(Voltage.LV, "overlay/machine/overlay_energy_out"))
+                .blockState(machineBlock("casings/solid/machine_casing_solid_steel", IO_TEX))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build();
     }
@@ -192,9 +187,10 @@ public final class Machines {
                 .build();
     }
 
-    private static void machine(MachineSet set, String overlay) {
+    private static void machine(MachineSet<?> set, String overlay) {
         for (var voltage : set.voltages) {
             var builder = DATA_GEN.block(set.entry(voltage))
+                    .blockState(machineBlock(overlay))
                     .tag(MINEABLE_WITH_WRENCH);
             if (set instanceof ProcessingSet<?> processingSet) {
                 builder.itemTag(machineTag(processingSet.recipeType));
@@ -202,10 +198,7 @@ public final class Machines {
                 builder.itemTag(AllTags.ELECTRIC_FURNACE);
             }
             if (voltage == Voltage.PRIMITIVE) {
-                builder.blockState(primitiveBlock(overlay))
-                        .tag(BlockTags.MINEABLE_WITH_AXE);
-            } else {
-                builder.blockState(machineBlock(voltage, overlay));
+                builder.tag(BlockTags.MINEABLE_WITH_AXE);
             }
             builder.build();
         }
@@ -224,7 +217,7 @@ public final class Machines {
                 .build();
     }
 
-    private static void ulvFromPrimitive(MachineSet set) {
+    private static void ulvFromPrimitive(MachineSet<?> set) {
         ulvMachine(set.entry(Voltage.ULV), set.entry(Voltage.PRIMITIVE));
     }
 }

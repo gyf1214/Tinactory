@@ -17,7 +17,6 @@ import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.SidedMachineBlock;
 import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.machine.Workbench;
-import org.shsts.tinactory.content.network.BatteryBox;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -56,14 +55,14 @@ public final class AllBlockEntities {
     public static final ProcessingSet<ProcessingRecipe> ORE_WASHER;
     public static final ProcessingSet<ProcessingRecipe> CENTRIFUGE;
     public static final ProcessingSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
-    public static final MachineSet ELECTRIC_FURNACE;
+    public static final MachineSet<MachineBlock<SmartBlockEntity>> ELECTRIC_FURNACE;
     public static final ProcessingSet<ProcessingRecipe> ALLOY_SMELTER;
     public static final ProcessingSet<GeneratorRecipe> STEAM_TURBINE;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
     public static final RegistryEntry<SidedMachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
-    public static final RegistryEntry<MachineBlock<SmartBlockEntity>> BATTERY_BOX;
+    public static final MachineSet<SidedMachineBlock<SmartBlockEntity>> BATTERY_BOX;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -83,9 +82,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         WORKBENCH = REGISTRATE.blockEntity("primitive/workbench",
-                        SmartBlockEntity::new,
                         PrimitiveBlock<SmartBlockEntity>::new)
-                .entityClass(SmartBlockEntity.class)
                 .blockEntity()
                 .simpleCapability(Workbench::builder)
                 .menu(WorkbenchMenu::new).build()
@@ -244,8 +241,7 @@ public final class AllBlockEntities {
         HIGH_PRESSURE_BOILER = boiler("high", 2.2d);
 
         BLAST_FURNACE = REGISTRATE.blockEntity("multi_block/blast_furnace",
-                        SmartBlockEntity::new, PrimitiveBlock<SmartBlockEntity>::new)
-                .entityClass(SmartBlockEntity.class)
+                        PrimitiveBlock<SmartBlockEntity>::new)
                 .blockEntity()
                 .eventManager().ticking()
                 .simpleCapability(MultiBlock::blastFurnace)
@@ -255,8 +251,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         MULTI_BLOCK_INTERFACE = REGISTRATE.blockEntity("multi_block/interface",
-                        SmartBlockEntity::new, MachineBlock.sided(Voltage.LV))
-                .entityClass(SmartBlockEntity.class)
+                        MachineBlock.sided(Voltage.LV))
                 .blockEntity()
                 .eventManager()
                 .simpleCapability(MultiBlockInterface::basic)
@@ -268,16 +263,12 @@ public final class AllBlockEntities {
                 .translucent()
                 .buildObject();
 
-        BATTERY_BOX = REGISTRATE.blockEntity("electric/battery_box",
-                        SmartBlockEntity::new, MachineBlock.factory(Voltage.ULV))
-                .entityClass(SmartBlockEntity.class)
-                .blockEntity()
-                .eventManager()
-                .simpleCapability(Machine::builder)
-                .simpleCapability(BatteryBox::builder)
-                .menu(ProcessingMenu.machine(AllLayouts.BATTERY_BOX)).build()
+        BATTERY_BOX = ProcessingSet.batteryBox()
+                .voltage(Voltage.LV, Voltage.HV)
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT)
+                .slot(0, 0)
                 .build()
-                .translucent()
                 .buildObject();
     }
 
@@ -292,9 +283,7 @@ public final class AllBlockEntities {
     boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;
-        return REGISTRATE.blockEntity(id, SmartBlockEntity::new,
-                        MachineBlock.factory(Voltage.PRIMITIVE))
-                .entityClass(SmartBlockEntity.class)
+        return REGISTRATE.blockEntity(id, MachineBlock.factory(Voltage.PRIMITIVE))
                 .blockEntity()
                 .eventManager()
                 .simpleCapability(Machine::builder)

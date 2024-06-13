@@ -2,8 +2,10 @@ package org.shsts.tinactory.content.network;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -19,6 +21,7 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
@@ -29,8 +32,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class BatteryBox extends CapabilityProvider
-        implements IEventSubscriber, IProcessor, IElectricMachine {
+public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
+        IProcessor, IElectricMachine, INBTSerializable<CompoundTag> {
     private final BlockEntity blockEntity;
     private final Voltage voltage;
     private Machine machine;
@@ -108,6 +111,16 @@ public class BatteryBox extends CapabilityProvider
             return itemHandlerCap.cast();
         }
         return LazyOptional.empty();
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        return ItemHelper.serializeItemHandler(handler);
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        ItemHelper.deserializeItemHandler(handler, tag);
     }
 
     public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {

@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MachineSet {
+public class MachineSet<U extends MachineBlock<?>> {
     public final Map<Voltage, Layout> layoutSet;
     public final Set<Voltage> voltages;
-    protected final Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines;
+    protected final Map<Voltage, RegistryEntry<U>> machines;
     @Nullable
     protected final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive;
 
     public MachineSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                      Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
+                      Map<Voltage, RegistryEntry<U>> machines,
                       @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
         this.layoutSet = layoutSet;
         this.machines = machines;
@@ -50,7 +50,8 @@ public class MachineSet {
         return machines.get(voltage).get();
     }
 
-    public static abstract class BuilderBase<T extends MachineSet, P, S extends BuilderBase<T, P, S>>
+    public static abstract class BuilderBase<U extends MachineBlock<SmartBlockEntity>,
+            T extends MachineSet<U>, P, S extends BuilderBase<U, T, P, S>>
             extends SimpleBuilder<T, P, S> {
         protected final Set<Voltage> voltages = new HashSet<>();
         @Nullable
@@ -79,7 +80,7 @@ public class MachineSet {
             return layoutSet.get(voltage);
         }
 
-        protected abstract BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>
+        protected abstract BlockEntityBuilder<SmartBlockEntity, U, ?>
         getMachineBuilder(Voltage voltage);
 
         @Nullable
@@ -88,7 +89,7 @@ public class MachineSet {
             return null;
         }
 
-        protected RegistryEntry<MachineBlock<SmartBlockEntity>>
+        protected RegistryEntry<U>
         createMachine(Voltage voltage) {
             return getMachineBuilder(voltage).buildObject();
         }
@@ -102,7 +103,7 @@ public class MachineSet {
 
         protected abstract T
         createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                  Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
+                  Map<Voltage, RegistryEntry<U>> machines,
                   @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive);
 
         @Override
@@ -119,17 +120,18 @@ public class MachineSet {
         }
     }
 
-    public abstract static class Builder<P> extends BuilderBase<MachineSet, P, Builder<P>> {
+    public abstract static class Builder<U extends MachineBlock<SmartBlockEntity>, P>
+            extends BuilderBase<U, MachineSet<U>, P, Builder<U, P>> {
         protected Builder(P parent) {
             super(parent);
         }
 
         @Override
-        protected MachineSet
+        protected MachineSet<U>
         createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                  Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
+                  Map<Voltage, RegistryEntry<U>> machines,
                   @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
-            return new MachineSet(voltages, layoutSet, machines, primitive);
+            return new MachineSet<>(voltages, layoutSet, machines, primitive);
         }
     }
 }

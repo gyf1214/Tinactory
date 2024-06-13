@@ -232,6 +232,13 @@ public class Registrate {
         return new SimpleBlockEntityBuilder<>(id, blockEntityFactory, blockFactory);
     }
 
+    public <U extends SmartEntityBlock<SmartBlockEntity>>
+    BlockEntityBuilder<SmartBlockEntity, U, Registrate>
+    blockEntity(String id, EntityBlockBuilder.Factory<SmartBlockEntity, U> blockFactory) {
+        return (new SimpleBlockEntityBuilder<>(id, SmartBlockEntity::new, blockFactory))
+                .entityClass(SmartBlockEntity.class);
+    }
+
     public <T extends IForgeRegistryEntry<T>>
     RegistryBuilderWrapper<T, Registrate> registry(String id, Class<T> clazz) {
         return new RegistryBuilderWrapper<>(this, id, clazz, this);

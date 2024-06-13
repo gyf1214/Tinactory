@@ -5,6 +5,7 @@ import net.minecraft.util.Unit;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
+import org.shsts.tinactory.content.network.BatteryBox;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -25,7 +26,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
+public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<MachineBlock<SmartBlockEntity>> {
     public final RecipeTypeEntry<T, ?> recipeType;
 
     private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Set<Voltage> voltages,
@@ -37,7 +38,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
     }
 
     public abstract static class Builder<T extends ProcessingRecipe, P> extends
-            BuilderBase<ProcessingSet<T>, P, Builder<T, P>> {
+            BuilderBase<MachineBlock<SmartBlockEntity>, ProcessingSet<T>, P, Builder<T, P>> {
         protected final RecipeTypeEntry<T, ?> recipeType;
 
         public Builder(RecipeTypeEntry<T, ?> recipeType, P parent) {
@@ -50,8 +51,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
         getMachineBuilder(Voltage voltage) {
             var id = "machine/" + voltage.id + "/" + recipeType.id;
             var layout = getLayout(voltage);
-            return REGISTRATE.blockEntity(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
-                    .entityClass(SmartBlockEntity.class)
+            return REGISTRATE.blockEntity(id, MachineBlock.factory(voltage))
                     .blockEntity()
                     .eventManager()
                     .simpleCapability(Machine::builder)
@@ -153,15 +153,14 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
         };
     }
 
-    public static MachineSet.Builder<?> electricFurnace() {
-        return new MachineSet.Builder<Object>(Unit.INSTANCE) {
+    public static MachineSet.Builder<MachineBlock<SmartBlockEntity>, ?> electricFurnace() {
+        return new MachineSet.Builder<>(Unit.INSTANCE) {
             @Override
             protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>
             getMachineBuilder(Voltage voltage) {
                 var id = "machine/" + voltage.id + "/electric_furnace";
                 var layout = getLayout(voltage);
-                return REGISTRATE.blockEntity(id, SmartBlockEntity::new, MachineBlock.factory(voltage))
-                        .entityClass(SmartBlockEntity.class)
+                return REGISTRATE.blockEntity(id, MachineBlock.factory(voltage))
                         .blockEntity()
                         .eventManager()
                         .simpleCapability(Machine::builder)
@@ -172,6 +171,24 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet {
                         .build()
                         .build()
                         .translucent();
+            }
+        };
+    }
+
+    public static MachineSet.Builder<SidedMachineBlock<SmartBlockEntity>, ?> batteryBox() {
+        return new MachineSet.Builder<>(Unit.INSTANCE) {
+            @Override
+            protected BlockEntityBuilder<SmartBlockEntity, SidedMachineBlock<SmartBlockEntity>, ?>
+            getMachineBuilder(Voltage voltage) {
+                var id = "machine/" + voltage.id + "/battery_box";
+                var layout = getLayout(voltage);
+                return REGISTRATE.blockEntity(id, MachineBlock.sided(voltage))
+                        .blockEntity()
+                        .eventManager()
+                        .simpleCapability(Machine::builder)
+                        .simpleCapability(BatteryBox::builder)
+                        .menu(ProcessingMenu.machine(layout)).build()
+                        .build().translucent();
             }
         };
     }
