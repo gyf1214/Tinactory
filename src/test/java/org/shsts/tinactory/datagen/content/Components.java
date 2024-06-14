@@ -7,7 +7,7 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
 import org.shsts.tinactory.content.material.MaterialSet;
 

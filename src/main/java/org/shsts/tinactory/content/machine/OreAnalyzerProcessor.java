@@ -5,6 +5,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllRecipes;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.network;
+package org.shsts.tinactory.content.electric;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
@@ -15,7 +15,6 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.electric;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

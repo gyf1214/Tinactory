@@ -15,7 +15,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.AllMaterials;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.datagen.DataGen;

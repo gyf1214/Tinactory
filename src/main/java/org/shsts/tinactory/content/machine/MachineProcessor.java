@@ -15,6 +15,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.logistics.ItemHelper;

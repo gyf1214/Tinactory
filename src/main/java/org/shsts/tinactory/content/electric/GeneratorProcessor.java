@@ -1,8 +1,9 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.electric;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 

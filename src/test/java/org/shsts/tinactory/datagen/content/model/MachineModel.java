@@ -12,10 +12,10 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import org.shsts.tinactory.content.machine.MachineBlock;
-import org.shsts.tinactory.content.machine.PrimitiveBlock;
-import org.shsts.tinactory.content.machine.SidedMachineBlock;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.network.MachineBlock;
+import org.shsts.tinactory.content.network.PrimitiveBlock;
+import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 

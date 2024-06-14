@@ -11,7 +11,7 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.datagen.content.model.CableModel;

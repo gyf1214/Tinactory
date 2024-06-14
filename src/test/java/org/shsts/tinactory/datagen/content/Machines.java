@@ -8,9 +8,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
-import org.shsts.tinactory.content.machine.Voltage;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -24,7 +24,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.core.network.IConnector;

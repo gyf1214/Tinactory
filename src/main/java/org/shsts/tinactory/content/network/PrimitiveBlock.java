@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.network;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.context.BlockPlaceContext;

@@ -7,7 +7,7 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;

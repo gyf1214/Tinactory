@@ -15,6 +15,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.machine.RecipeProcessor;

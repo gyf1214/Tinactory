@@ -3,7 +3,7 @@ package org.shsts.tinactory.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;

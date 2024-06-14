@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.network;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;

@@ -7,7 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllLayouts;
-import org.shsts.tinactory.content.machine.PrimitiveBlock;
+import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.slf4j.Logger;

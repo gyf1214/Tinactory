@@ -2,7 +2,7 @@ package org.shsts.tinactory.datagen.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
 

@@ -2,6 +2,9 @@ package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.network.MachineBlock;
+import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;

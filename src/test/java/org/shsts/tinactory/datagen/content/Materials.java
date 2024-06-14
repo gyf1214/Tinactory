@@ -10,7 +10,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.Voltage;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.datagen.content.builder.MaterialBuilder;
 import org.shsts.tinactory.datagen.content.model.IconSet;
