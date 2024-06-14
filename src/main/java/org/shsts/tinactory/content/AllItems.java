@@ -35,7 +35,7 @@ public final class AllItems {
 
     static {
         ULV_CABLE = REGISTRATE.block("network/cable/ulv",
-                        prop -> new CableBlock(prop, CableBlock.WIRE_RADIUS, Voltage.ULV, 2.0))
+                        prop -> new CableBlock(prop, CableBlock.WIRE_RADIUS, Voltage.ULV))
                 .tint(IRON.color)
                 .register();
 

@@ -57,11 +57,12 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     private final double resistance;
     private final Map<BlockState, VoxelShape> shapes;
 
-    public CableBlock(Properties properties, int radius, Voltage voltage, double resistance) {
+    public CableBlock(Properties properties, int radius, Voltage voltage) {
         super(properties.strength(2f).requiresCorrectToolForDrops());
         this.radius = radius;
         this.voltage = voltage;
-        this.resistance = resistance * TinactoryConfig.INSTANCE.cableResistanceFactor.get();
+        this.resistance = (double) voltage.rank *
+                TinactoryConfig.INSTANCE.cableResistanceFactor.get();
         this.shapes = makeShapes();
 
         var defaultState = stateDefinition.any()
@@ -74,8 +75,8 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         registerDefaultState(defaultState);
     }
 
-    public static Function<Properties, CableBlock> cable(Voltage voltage, double resistance) {
-        return prop -> new CableBlock(prop, RADIUS, voltage, resistance);
+    public static Function<Properties, CableBlock> cable(Voltage voltage) {
+        return prop -> new CableBlock(prop, RADIUS, voltage);
     }
 
     private Map<BlockState, VoxelShape> makeShapes() {
