@@ -66,8 +66,8 @@ public class Network extends NetworkBase {
     }
 
     @Override
-    protected void putBlock(BlockPos pos, BlockState state) {
-        super.putBlock(pos, state);
+    protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
+        super.putBlock(pos, state, subnet);
         for (var component : components.values()) {
             component.putBlock(pos, state);
         }

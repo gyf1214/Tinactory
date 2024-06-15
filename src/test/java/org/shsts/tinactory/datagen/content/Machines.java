@@ -34,6 +34,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
+import static org.shsts.tinactory.content.AllItems.TEST_TRANSFORMER;
 import static org.shsts.tinactory.content.AllItems.ULV_CABLE;
 import static org.shsts.tinactory.content.AllItems.ULV_MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
@@ -99,6 +100,10 @@ public final class Machines {
                 .build()
                 .block(MULTI_BLOCK_INTERFACE)
                 .blockState(machineBlock("casings/solid/machine_casing_solid_steel", IO_TEX))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build()
+                .block(TEST_TRANSFORMER)
+                .blockState(machineBlock(IO_TEX))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build();
     }

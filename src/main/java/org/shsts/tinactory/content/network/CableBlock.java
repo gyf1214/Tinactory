@@ -170,7 +170,8 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         var property = PROPERTY_BY_DIRECTION.get(dir);
         if (state.getValue(property)) {
             setConnected(world, pos, state, dir, false);
-        } else if (IConnector.allowConnect(world, pos, state, dir)) {
+        } else if (allowConnectWith(world, pos, state, dir) &&
+                IConnector.allowConnectWith(world, pos.relative(dir), dir.getOpposite())) {
             setConnected(world, pos, state, dir, true);
         }
     }
@@ -191,17 +192,23 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     }
 
     @Override
-    public boolean allowConnectFrom(Level world, BlockPos pos, BlockState state,
+    public boolean allowConnectWith(Level world, BlockPos pos, BlockState state,
                                     Direction dir, BlockState state1) {
-        return state1.getBlock() instanceof IElectricBlock block1 &&
-                (voltage == Voltage.PRIMITIVE || voltage.value == block1.getVoltage(state1));
+        var block1 = state1.getBlock();
+        return block1 instanceof IConnector &&
+                (!(block1 instanceof CableBlock cableBlock) || cableBlock.voltage == voltage);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var world = ctx.getLevel();
+        var pos = ctx.getClickedPos();
         var state = defaultBlockState();
         var dir = ctx.getClickedFace().getOpposite();
-        if (IConnector.autoConnectOnPlace(ctx, state)) {
+        var pos1 = pos.relative(dir);
+        var dir1 = ctx.getClickedFace();
+        if (autoConnectWith(world, pos, state, dir) &&
+                IConnector.autoConnectWith(world, pos1, dir1, state)) {
             return state.setValue(PROPERTY_BY_DIRECTION.get(dir), true);
         }
         return state;
@@ -211,9 +218,10 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     public void setPlacedBy(Level world, BlockPos pos, BlockState state,
                             @Nullable LivingEntity placer, ItemStack stack) {
         NetworkManager.tryGet(world).ifPresent(manager -> {
+            manager.invalidatePos(pos);
             for (var dir : Direction.values()) {
                 if (isConnected(world, pos, state, dir)) {
-                    manager.invalidatePosDir(pos, dir);
+                    manager.invalidatePos(pos.relative(dir));
                 }
             }
         });
@@ -224,8 +232,17 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     public BlockState updateShape(BlockState state, Direction dir, BlockState state1,
                                   LevelAccessor levelAccessor, BlockPos pos, BlockPos pos1) {
         var world = (Level) levelAccessor;
-        var connected = IConnector.autoConnectFromNeighbor(world, pos1, state1, dir.getOpposite(), state);
-        return setConnected(world, pos, state, dir, connected);
+        var dir1 = dir.getOpposite();
+
+        var old = isConnected(world, pos, state, dir);
+        if (!old && autoConnectWith(world, pos, state, dir, state1) &&
+                IConnector.isConnectedInWorld(world, pos1, state1, dir1)) {
+            return setConnected(world, pos, state, dir, true);
+        } else if (old && (!allowConnectWith(world, pos, state, dir, state1) ||
+                !IConnector.isConnectedInWorld(world, pos1, state1, dir1))) {
+            return setConnected(world, pos, state, dir, false);
+        }
+        return state;
     }
 
     private void onDestroy(Level world, BlockPos pos, BlockState state) {

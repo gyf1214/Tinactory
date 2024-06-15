@@ -36,6 +36,8 @@ public class SidedMachineBlock<T extends BlockEntity> extends MachineBlock<T> {
     @Override
     public void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool,
                              Direction dir, boolean sneaky) {
-        setIOFacing(world, pos, state, dir);
+        if (!sneaky) {
+            setIOFacing(world, pos, state, dir);
+        }
     }
 }

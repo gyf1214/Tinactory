@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.ComponentSet;
 import org.shsts.tinactory.content.network.CableBlock;
+import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -32,6 +33,7 @@ public final class AllItems {
     public static final RegistryEntry<SimpleFluid> STEAM;
     public static final RegistryEntry<Block> HEAT_PROOF_BLOCK;
     public static final RegistryEntry<BatteryItem> TEST_BATTERY;
+    public static final RegistryEntry<SubnetBlock> TEST_TRANSFORMER;
 
     static {
         ULV_CABLE = REGISTRATE.block("network/cable/ulv",
@@ -64,6 +66,11 @@ public final class AllItems {
                 .register();
 
         TEST_BATTERY = REGISTRATE.item("battery/lv", prop -> new BatteryItem(prop, 12800))
+                .register();
+
+        TEST_TRANSFORMER = REGISTRATE.block("network/transformer",
+                        prop -> new SubnetBlock(prop, Voltage.LV, Voltage.ULV))
+                .translucent()
                 .register();
     }
 

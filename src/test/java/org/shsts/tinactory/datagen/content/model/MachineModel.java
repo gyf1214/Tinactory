@@ -16,6 +16,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
+import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
@@ -136,6 +137,8 @@ public class MachineModel {
             return PRIMITIVE_TEX;
         } else if (block instanceof MachineBlock<?> machineBlock) {
             return casingTex(machineBlock.voltage);
+        } else if (block instanceof SubnetBlock subnetBlock) {
+            return casingTex(subnetBlock.voltage);
         }
         throw new IllegalArgumentException();
     }
@@ -197,7 +200,8 @@ public class MachineModel {
     public void blockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
         if (ctx.object instanceof PrimitiveBlock<?>) {
             primitive(ctx);
-        } else if (ctx.object instanceof SidedMachineBlock<?>) {
+        } else if (ctx.object instanceof SidedMachineBlock<?> ||
+                ctx.object instanceof SubnetBlock) {
             sided(ctx);
         } else if (ctx.object instanceof MachineBlock<?>) {
             machine(ctx);

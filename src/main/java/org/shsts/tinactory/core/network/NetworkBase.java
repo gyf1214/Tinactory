@@ -43,16 +43,20 @@ public class NetworkBase {
     private WeakMap.Ref<NetworkBase> ref = null;
 
     private class BFSContext {
+        public record BlockInfo(BlockState state, BlockPos parent, BlockPos subnet) {}
+
         private final Queue<BlockPos> queue = new ArrayDeque<>();
-        public final Map<BlockPos, BlockState> visited = new HashMap<>();
+        public final Map<BlockPos, BlockInfo> visited = new HashMap<>();
+        public boolean conflict = false;
 
         public void reset() {
+            conflict = false;
             queue.clear();
             visited.clear();
 
             if (world.isLoaded(center)) {
                 queue.add(center);
-                visited.put(center, world.getBlockState(center));
+                visited.put(center, new BlockInfo(world.getBlockState(center), center, center));
             }
         }
 
@@ -66,17 +70,32 @@ public class NetworkBase {
             }
 
             var pos = queue.remove();
-            var blockState = visited.get(pos);
-            assert blockState != null;
+            var info = visited.get(pos);
+            assert info != null;
+            var subnet = IConnector.isSubnetInWorld(world, pos, info.state) ?
+                    pos : info.subnet;
             for (var dir : Direction.values()) {
                 var pos1 = pos.relative(dir);
-                if (visited.containsKey(pos1) || !world.isLoaded(pos1) || !connected(pos, blockState, dir)) {
+
+                if (!connected(pos, info.state, dir)) {
                     continue;
                 }
+
+                if (info.parent.equals(pos1)) {
+                    continue;
+                }
+
+                if (visited.containsKey(pos1)) {
+                    if (!visited.get(pos1).subnet.equals(subnet)) {
+                        conflict = true;
+                    }
+                    continue;
+                }
+
                 var blockState1 = world.getBlockState(pos1);
                 if (connected(pos1, blockState1, dir.getOpposite())) {
                     queue.add(pos1);
-                    visited.put(pos1, blockState1);
+                    visited.put(pos1, new BlockInfo(blockState1, pos, subnet));
                 }
             }
 
@@ -159,8 +178,9 @@ public class NetworkBase {
         bfsContext.reset();
     }
 
-    protected void putBlock(BlockPos pos, BlockState state) {
-        LOGGER.trace("{}: add block {} at {}:{}", this, state, world.dimension(), pos);
+    protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
+        LOGGER.debug("{}: add block {} at {}:{}, subnet = {}", this, state,
+                world.dimension(), pos, subnet);
     }
 
     private boolean connectNextBlock() {
@@ -169,6 +189,10 @@ public class NetworkBase {
             return false;
         }
         var nextPos = bfsContext.next();
+        if (bfsContext.conflict) {
+            connectConflict(center);
+            return false;
+        }
         if (nextPos.isEmpty()) {
             connectFinish();
             return false;
@@ -181,8 +205,8 @@ public class NetworkBase {
             }
             manager.putNetworkAtPos(pos, this);
         }
-        var state = bfsContext.visited.get(pos);
-        putBlock(pos, state);
+        var info = bfsContext.visited.get(pos);
+        putBlock(pos, info.state, info.subnet);
         return true;
     }
 

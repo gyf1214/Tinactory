@@ -106,10 +106,10 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     }
 
     @Override
-    public boolean allowConnectFrom(Level world, BlockPos pos, BlockState state,
+    public boolean allowConnectWith(Level world, BlockPos pos, BlockState state,
                                     Direction dir, BlockState state1) {
-        return dir == state.getValue(IO_FACING) && state1.getBlock() instanceof IElectricBlock block1 &&
-                (voltage == Voltage.PRIMITIVE || voltage.value == block1.getVoltage(state1));
+        return dir == state.getValue(IO_FACING) &&
+                IElectricBlock.canVoltagesConnect(voltage.value, state1);
     }
 
     protected void onDestroy(Level world, BlockPos pos, BlockState state) {
