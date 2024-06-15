@@ -24,7 +24,7 @@ public abstract class Component {
     /**
      * Called during network connect when adding a block to the network.
      */
-    public void putBlock(BlockPos pos, BlockState state) {}
+    public void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {}
 
     /**
      * Called when network connect is finished.

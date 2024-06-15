@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.gui.sync;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.content.AllNetworks;
+import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.network.NetworkBase;
 import org.shsts.tinactory.core.network.NetworkController;
@@ -15,7 +16,7 @@ import java.util.Objects;
 public class NetworkControllerSyncPacket extends MenuSyncPacket {
     private boolean present;
     private NetworkBase.State state;
-    private double workFactor;
+    private ElectricComponent.Metrics electricMetrics;
 
     public NetworkControllerSyncPacket() {}
 
@@ -25,7 +26,8 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         if (present) {
             var network = be.getNetwork().get();
             this.state = network.getState();
-            this.workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
+            this.electricMetrics = network.getComponent(AllNetworks.ELECTRIC_COMPONENT)
+                    .getMetrics();
         }
     }
 
@@ -38,9 +40,8 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         return state;
     }
 
-    public double getWorkFactor() {
-        assert present;
-        return workFactor;
+    public ElectricComponent.Metrics getElectricMetrics() {
+        return electricMetrics;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         buf.writeBoolean(present);
         if (present) {
             buf.writeEnum(state);
-            buf.writeDouble(workFactor);
+            electricMetrics.writeToBuf(buf);
         }
     }
 
@@ -59,7 +60,8 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         present = buf.readBoolean();
         if (present) {
             state = buf.readEnum(NetworkBase.State.class);
-            workFactor = buf.readDouble();
+            electricMetrics = new ElectricComponent.Metrics();
+            electricMetrics.readFromBuf(buf);
         }
     }
 
@@ -73,7 +75,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         }
         if (present) {
             return Objects.equals(state, that.state) &&
-                    workFactor == that.workFactor;
+                    Objects.equals(electricMetrics, that.electricMetrics);
         } else {
             return true;
         }
@@ -84,7 +86,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         if (present) {
             return Objects.hash(super.hashCode(), present);
         } else {
-            return Objects.hash(super.hashCode(), present, state, workFactor);
+            return Objects.hash(super.hashCode(), present, state, electricMetrics);
         }
     }
 }

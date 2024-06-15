@@ -22,6 +22,7 @@ import org.shsts.tinactory.core.gui.client.Tab;
 import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -118,7 +119,27 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         } else {
             refreshTeam();
             stateLabel.setLine(1, tr("stateLabel", packet.getState()));
-            stateLabel.setLine(2, tr("workFactorLabel", "%.0f%%".formatted(packet.getWorkFactor() * 100d)));
+            var metric = packet.getElectricMetrics();
+            stateLabel.setLine(2, tr("workFactorLabel",
+                    "%.0f%%".formatted(metric.getWorkFactor() * 100d)));
+            stateLabel.setLine(3, tr("efficiencyLabel",
+                    "%.0f%%".formatted(metric.getEfficiency() * 100d)));
+            var comp = MathUtil.compare(metric.getBuffer());
+            if (comp == 0) {
+                stateLabel.setLine(4, tr("powerLabel0",
+                        "%.0f".formatted(metric.getWorkCons()),
+                        "%.0f".formatted(metric.getGen())));
+            } else if (comp > 0) {
+                stateLabel.setLine(4, tr("powerLabel1",
+                        "%.0f".formatted(metric.getWorkCons()),
+                        "%.0f".formatted(metric.getBuffer()),
+                        "%.0f".formatted(metric.getGen())));
+            } else {
+                stateLabel.setLine(4, tr("powerLabel2",
+                        "%.0f".formatted(metric.getWorkCons()),
+                        "%.0f".formatted(metric.getGen()),
+                        "%.0f".formatted(-metric.getBuffer())));
+            }
             welcomePanel.setActive(false);
             tabs.setActive(true);
         }

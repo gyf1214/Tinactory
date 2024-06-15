@@ -16,10 +16,7 @@ import org.shsts.tinactory.core.util.BiKeyHashMap;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -29,7 +26,7 @@ public class Network extends NetworkBase {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Map<ComponentType<?>, Component> components = new HashMap<>();
-    private final List<Machine> machines = new ArrayList<>();
+    private final Multimap<BlockPos, Machine> machines = ArrayListMultimap.create();
     private final BiKeyHashMap<IScheduling, ComponentType<?>, Component.Ticker> componentSchedulings =
             new BiKeyHashMap<>();
     private final Multimap<IScheduling, Component.Ticker> machineSchedulings = ArrayListMultimap.create();
@@ -56,25 +53,25 @@ public class Network extends NetworkBase {
         ComponentType.getComponentTypes().forEach(this::attachComponent);
     }
 
-    public Collection<Machine> getMachines() {
+    public Multimap<BlockPos, Machine> getMachines() {
         return machines;
     }
 
-    protected void putMachine(Machine be) {
-        LOGGER.trace("{}: put machine {}", this, be);
-        machines.add(be);
+    protected void putMachine(BlockPos subnet, Machine machine) {
+        LOGGER.trace("{}: put machine {}", this, machine);
+        machines.put(subnet, machine);
     }
 
     @Override
     protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
         super.putBlock(pos, state, subnet);
         for (var component : components.values()) {
-            component.putBlock(pos, state);
+            component.putBlock(pos, state, subnet);
         }
         if (state.getBlock() instanceof SmartEntityBlock<?> entityBlock) {
             entityBlock.getBlockEntity(world, pos)
                     .flatMap(AllCapabilities.MACHINE::tryGet)
-                    .ifPresent(this::putMachine);
+                    .ifPresent(machine -> putMachine(subnet, machine));
         }
     }
 
@@ -84,10 +81,10 @@ public class Network extends NetworkBase {
         for (var component : components.values()) {
             component.onConnect();
         }
-        for (var machine : machines) {
+        for (var machine : machines.values()) {
             machine.onConnectToNetwork(this);
         }
-        for (var machine : machines) {
+        for (var machine : machines.values()) {
             machine.buildSchedulings((scheduling, ticker) ->
                     machineSchedulings.put(scheduling.get(), ticker));
         }
@@ -95,7 +92,7 @@ public class Network extends NetworkBase {
 
     @Override
     protected void onDisconnect() {
-        for (var machine : machines) {
+        for (var machine : machines.values()) {
             machine.onDisconnectFromNetwork();
         }
         for (var component : components.values()) {
