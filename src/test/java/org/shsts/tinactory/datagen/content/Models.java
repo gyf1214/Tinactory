@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
@@ -82,6 +83,17 @@ public final class Models {
         };
     }
 
+    public static <U extends Item> void
+    componentItem(RegistryDataContext<Item, U, ItemModelProvider> ctx) {
+        var names = ctx.id.split("/");
+        var name = names[names.length - 1];
+        var voltage = names[names.length - 2];
+
+        var tex = "items/metaitems/" + name.replace('_', '.') + "." + voltage;
+        ctx.provider.withExistingParent(ctx.id, "item/generated")
+                .texture("layer0", gregtech(tex));
+    }
+
     public static <U extends Block>
     Consumer<RegistryDataContext<Block, U, BlockStateProvider>> oreBlock(OreVariant variant) {
         return ctx -> {
@@ -118,23 +130,21 @@ public final class Models {
     }
 
     public static void cableBlock(RegistryDataContext<Block, ? extends CableBlock, BlockStateProvider> ctx) {
-        CableModel.blockState(ctx, false);
+        var voltage = ctx.object.voltage;
+        CableModel.blockState(ctx, voltage == Voltage.ULV);
     }
 
-    public static void ulvCableBlock(RegistryDataContext<Block, ? extends CableBlock, BlockStateProvider> ctx) {
-        CableModel.blockState(ctx, true);
-    }
-
-    public static void cableItem(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        CableModel.cable(ctx);
+    public static void cableItem(RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider> ctx) {
+        var voltage = ((CableBlock) ctx.object.getBlock()).voltage;
+        if (voltage == Voltage.ULV) {
+            CableModel.ulvCable(ctx);
+        } else {
+            CableModel.cable(ctx);
+        }
     }
 
     public static void wireItem(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         CableModel.wire(ctx);
-    }
-
-    public static void ulvCableItem(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        CableModel.ulvCable(ctx);
     }
 
     public static void pipeItem(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {

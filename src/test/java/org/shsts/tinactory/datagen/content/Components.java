@@ -8,18 +8,21 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.material.ComponentSet;
 import org.shsts.tinactory.content.material.MaterialSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static org.shsts.tinactory.content.AllItems.COMPONENT_SETS;
+import static org.shsts.tinactory.content.AllItems.BATTERY;
+import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.DUMMY_ITEMS;
+import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
+import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
+import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
-import static org.shsts.tinactory.content.AllItems.TEST_BATTERY;
-import static org.shsts.tinactory.content.AllItems.ULV_CABLE;
-import static org.shsts.tinactory.content.AllItems.ULV_MACHINE_HULL;
-import static org.shsts.tinactory.content.AllItems.ULV_RESEARCH_EQUIPMENT;
+import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
+import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
+import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
@@ -51,32 +54,36 @@ public final class Components {
     }
 
     private static void componentItems() {
-        DATA_GEN.block(ULV_CABLE)
-                .blockState(Models::ulvCableBlock)
-                .itemModel(Models::ulvCableItem)
-                .tag(MINEABLE_WITH_CUTTER)
-                .build()
-                .item(ULV_MACHINE_HULL)
-                .model(machineItem(Voltage.ULV, MACHINE_HULL_TEX))
-                .build()
-                .item(ULV_RESEARCH_EQUIPMENT)
-                .model(basicItem(RESEARCH_TEX + "base", RESEARCH_TEX + "overlay"))
-                .build()
-                .item(VACUUM_TUBE)
+        DATA_GEN.item(VACUUM_TUBE)
                 .model(basicItem("metaitems/circuit.vacuum_tube"))
-                .build()
-                .item(TEST_BATTERY)
-                .model(basicItem("metaitems/battery.re.lv.lithium"))
                 .build();
 
-        for (var entry : COMPONENT_SETS.entrySet()) {
-            componentItem(entry.getKey(), entry.getValue());
-        }
+        DUMMY_ITEMS.forEach(entry -> DATA_GEN.item(entry)
+                .model(Models::componentItem)
+                .build());
+
+        BATTERY.forEach((v, entry) -> DATA_GEN.item(entry)
+                .model(basicItem("metaitems/battery.re." + v.id + ".lithium"))
+                .build());
+
+        MACHINE_HULL.forEach((v, entry) -> DATA_GEN.item(entry)
+                .model(machineItem(v, MACHINE_HULL_TEX))
+                .build());
+
+        RESEARCH_EQUIPMENT.forEach((v, entry) -> DATA_GEN.item(entry)
+                .model(basicItem(RESEARCH_TEX + "base", RESEARCH_TEX + "overlay"))
+                .build());
+
+        CABLE.forEach((v, entry) -> DATA_GEN.block(entry)
+                .blockState(Models::cableBlock)
+                .itemModel(Models::cableItem)
+                .tag(MINEABLE_WITH_CUTTER)
+                .build());
     }
 
     private static void ulv() {
         DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
-                        .shapeless(ULV_CABLE.get())
+                        .shapeless(CABLE.get(Voltage.ULV).get())
                         .requires(Ingredient.of(IRON.tag("wire")), 4)
                         .unlockedBy("has_wire", has(IRON.tag("wire"))))
                 .vanillaRecipe(() -> ShapedRecipeBuilder
@@ -87,16 +94,16 @@ public final class Components {
                         .define('B', IRON.tag("bolt"))
                         .unlockedBy("has_wire", has(COPPER.tag("wire"))));
 
-        TOOL_CRAFTING.recipe(DATA_GEN, ULV_MACHINE_HULL)
-                .result(ULV_MACHINE_HULL, 1)
+        TOOL_CRAFTING.recipe(DATA_GEN, MACHINE_HULL.get(Voltage.ULV))
+                .result(MACHINE_HULL.get(Voltage.ULV), 1)
                 .pattern("###").pattern("#W#").pattern("###")
                 .define('#', IRON.tag("plate"))
-                .define('W', ULV_CABLE)
+                .define('W', CABLE.get(Voltage.ULV))
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
 
-        ASSEMBLER.recipe(DATA_GEN, ULV_RESEARCH_EQUIPMENT)
-                .outputItem(2, ULV_RESEARCH_EQUIPMENT, 1)
+        ASSEMBLER.recipe(DATA_GEN, RESEARCH_EQUIPMENT.get(Voltage.ULV))
+                .outputItem(2, RESEARCH_EQUIPMENT.get(Voltage.ULV), 1)
                 .inputItem(0, IRON.tag("plate"), 1)
                 .inputItem(0, COPPER.tag("wire"), 1)
                 .workTicks(200)
@@ -105,8 +112,8 @@ public final class Components {
     }
 
     private static void componentRecipes() {
-        componentRecipe(Voltage.LV, COPPER, BRONZE, TIN, STEEL);
-        componentRecipe(Voltage.MV, CUPRONICKEL, STEEL, BRONZE, STEEL);
+        componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL);
+        componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, STEEL, BRONZE, STEEL);
     }
 
     private static void misc() {
@@ -116,72 +123,50 @@ public final class Components {
                 .build();
     }
 
-    private static void componentItem(Voltage voltage, ComponentSet set) {
-        for (var entry : set.dummyItems) {
-            var names = entry.id.split("/");
-            var name = names[names.length - 1];
+    private static void componentRecipe(Voltage voltage, MaterialSet mainMaterial,
+                                        MaterialSet heatMaterial, MaterialSet pipeMaterial,
+                                        MaterialSet rotorMaterial, MaterialSet magneticMaterial) {
 
-            var tex = "metaitems/" + name.replace('_', '.') + "." + voltage.id;
-            DATA_GEN.item(entry)
-                    .model(basicItem(tex))
-                    .build();
-        }
-
-        DATA_GEN.item(set.machineHull)
-                .model(machineItem(voltage, MACHINE_HULL_TEX))
-                .build()
-                .block(set.cable)
-                .blockState(Models::cableBlock)
-                .itemModel(Models::cableItem)
-                .tag(MINEABLE_WITH_CUTTER)
-                .build()
-                .item(set.researchEquipment)
-                .model(basicItem(RESEARCH_TEX + "base", RESEARCH_TEX + "overlay"))
-                .build();
-    }
-
-    private static void componentRecipe(Voltage voltage, MaterialSet heatMaterial,
-                                        MaterialSet pipeMaterial, MaterialSet rotorMaterial,
-                                        MaterialSet magneticMaterial) {
-        var set = COMPONENT_SETS.get(voltage);
         var v = voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
         var ticks = ASSEMBLE_TICKS;
-        var mainMaterial = set.mainMaterial;
 
-        ASSEMBLER.recipe(DATA_GEN, set.motor)
-                .outputItem(2, set.motor, 1)
+        var cable = CABLE.get(voltage);
+        var motor = ELECTRIC_MOTOR.get(voltage);
+
+        ASSEMBLER.recipe(DATA_GEN, motor)
+                .outputItem(2, motor, 1)
                 .inputItem(0, magneticMaterial.tag("magnetic"), 1)
                 .inputItem(0, mainMaterial.tag("stick"), 2)
                 .inputItem(0, heatMaterial.tag("wire"), 2 * v.rank)
-                .inputItem(0, set.cable, 2)
+                .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
                 .build()
-                .recipe(DATA_GEN, set.pump)
-                .outputItem(2, set.pump, 1)
-                .inputItem(0, set.motor, 1)
+                .recipe(DATA_GEN, ELECTRIC_PUMP.get(voltage))
+                .outputItem(2, ELECTRIC_PUMP.get(voltage), 1)
+                .inputItem(0, motor, 1)
                 .inputItem(0, pipeMaterial.tag("pipe"), 1)
                 .inputItem(0, rotorMaterial.tag("rotor"), 1)
                 .inputItem(0, rotorMaterial.tag("screw"), 3)
                 // TODO rubber seal
-                .inputItem(0, set.cable, 1)
+                .inputItem(0, cable, 1)
                 .workTicks(ticks)
                 .voltage(v)
                 .build()
-                .recipe(DATA_GEN, set.piston)
-                .outputItem(2, set.piston, 1)
-                .inputItem(0, set.motor, 1)
+                .recipe(DATA_GEN, ELECTRIC_PISTON.get(voltage))
+                .outputItem(2, ELECTRIC_PISTON.get(voltage), 1)
+                .inputItem(0, motor, 1)
                 .inputItem(0, mainMaterial.tag("plate"), 3)
                 .inputItem(0, mainMaterial.tag("stick"), 2)
                 .inputItem(0, mainMaterial.tag("gear"), 1)
-                .inputItem(0, set.cable, 2)
+                .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
                 .build()
-                .recipe(DATA_GEN, set.machineHull)
-                .outputItem(2, set.machineHull, 1)
+                .recipe(DATA_GEN, MACHINE_HULL.get(voltage))
+                .outputItem(2, MACHINE_HULL.get(voltage), 1)
                 .inputItem(0, mainMaterial.tag("plate"), 8)
-                .inputItem(0, set.cable, 2)
+                .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
                 .build();

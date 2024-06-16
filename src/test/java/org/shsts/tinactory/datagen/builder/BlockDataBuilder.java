@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.builder;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
@@ -18,7 +19,7 @@ public class BlockDataBuilder<U extends Block, P> extends
     @Nullable
     private Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockState = null;
     @Nullable
-    private Consumer<RegistryDataContext<Item, ? extends Item, ItemModelProvider>> itemModel = null;
+    private Consumer<RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider>> itemModel = null;
     private boolean dropSet = false;
 
     public BlockDataBuilder(DataGen dataGen, P parent, ResourceLocation loc, Supplier<U> object) {
@@ -32,7 +33,7 @@ public class BlockDataBuilder<U extends Block, P> extends
     }
 
     public BlockDataBuilder<U, P>
-    itemModel(Consumer<RegistryDataContext<Item, ? extends Item, ItemModelProvider>> cons) {
+    itemModel(Consumer<RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider>> cons) {
         this.itemModel = cons;
         return this;
     }

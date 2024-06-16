@@ -23,8 +23,8 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
@@ -33,7 +33,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<MachineBlock<SmartBlockEntity>> {
     public final RecipeTypeEntry<T, ?> recipeType;
 
-    private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Set<Voltage> voltages,
+    private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Collection<Voltage> voltages,
                           Map<Voltage, Layout> layoutSet,
                           Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
                           @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
@@ -83,7 +83,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
 
         @Override
         protected ProcessingSet<T>
-        createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+        createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                   Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
                   @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
             return new ProcessingSet<>(recipeType, voltages, layoutSet, machines, primitive);

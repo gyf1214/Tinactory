@@ -83,7 +83,7 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
 
         public Builder defaultInput(Voltage voltage) {
-            return voltage(voltage).inputItem(AllItems.researchEquipment(voltage));
+            return voltage(voltage).inputItem(AllItems.RESEARCH_EQUIPMENT.get(voltage));
         }
 
         public Builder target(ResourceLocation value) {

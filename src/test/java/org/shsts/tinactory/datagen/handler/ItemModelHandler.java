@@ -2,8 +2,8 @@ package org.shsts.tinactory.datagen.handler;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -67,11 +67,10 @@ public class ItemModelHandler extends DataHandler<ItemModelProvider> {
 
     public <U extends Block> void
     addBlockItemCallback(ResourceLocation loc, Supplier<U> block,
-                         Consumer<RegistryDataContext<Item, ? extends Item, ItemModelProvider>> cons) {
+                         Consumer<RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider>> cons) {
         addCallback(prov -> {
-            var item = block.get().asItem();
-            if (item != Items.AIR) {
-                cons.accept(new RegistryDataContext<>(dataGen.modid, prov, loc.getPath(), item));
+            if (block.get().asItem() instanceof BlockItem blockItem) {
+                cons.accept(new RegistryDataContext<>(dataGen.modid, prov, loc.getPath(), blockItem));
             }
         });
     }

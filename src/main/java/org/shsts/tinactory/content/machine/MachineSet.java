@@ -14,7 +14,10 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,13 +31,13 @@ public class MachineSet<U extends MachineBlock<?>> {
     @Nullable
     protected final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive;
 
-    public MachineSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+    public MachineSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                       Map<Voltage, RegistryEntry<U>> machines,
                       @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
         this.layoutSet = layoutSet;
         this.machines = machines;
         this.primitive = primitive;
-        this.voltages = voltages;
+        this.voltages = new HashSet<>(voltages);
     }
 
     public RegistryEntry<? extends Block> entry(Voltage voltage) {
@@ -56,7 +59,7 @@ public class MachineSet<U extends MachineBlock<?>> {
     public static abstract class BuilderBase<U extends MachineBlock<SmartBlockEntity>,
             T extends MachineSet<U>, P, S extends BuilderBase<U, T, P, S>>
             extends SimpleBuilder<T, P, S> {
-        protected final Set<Voltage> voltages = new HashSet<>();
+        protected final List<Voltage> voltages = new ArrayList<>();
         @Nullable
         protected Map<Voltage, Layout> layoutSet = null;
 
@@ -64,12 +67,12 @@ public class MachineSet<U extends MachineBlock<?>> {
             super(parent);
         }
 
-        public S voltage(Voltage from) {
+        public S voltages(Voltage from) {
             voltages.addAll(Voltage.between(from, Voltage.IV));
             return self();
         }
 
-        public S voltage(Voltage from, Voltage to) {
+        public S voltages(Voltage from, Voltage to) {
             voltages.addAll(Voltage.between(from, to));
             return self();
         }
@@ -105,7 +108,7 @@ public class MachineSet<U extends MachineBlock<?>> {
         }
 
         protected abstract T
-        createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+        createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                   Map<Voltage, RegistryEntry<U>> machines,
                   @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive);
 
@@ -113,7 +116,7 @@ public class MachineSet<U extends MachineBlock<?>> {
         protected T createObject() {
             assert layoutSet != null;
             if (voltages.isEmpty()) {
-                voltage(Voltage.LV);
+                voltages(Voltage.LV);
             }
             var machines = voltages.stream()
                     .filter(v -> v != Voltage.PRIMITIVE)
@@ -131,7 +134,7 @@ public class MachineSet<U extends MachineBlock<?>> {
 
         @Override
         protected MachineSet<U>
-        createSet(Set<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+        createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
                   Map<Voltage, RegistryEntry<U>> machines,
                   @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
             return new MachineSet<>(voltages, layoutSet, machines, primitive);

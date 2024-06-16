@@ -90,7 +90,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         RESEARCH_TABLE = set(machine(AllRecipes.RESEARCH))
-                .voltage(Voltage.ULV)
+                .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -99,7 +99,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         var assembler = set(machine(AllRecipes.ASSEMBLER))
-                .voltage(Voltage.ULV)
+                .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT);
         for (var i = 0; i < 3; i++) {
@@ -116,7 +116,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         STONE_GENERATOR = set(machine(AllRecipes.STONE_GENERATOR))
-                .voltage(Voltage.PRIMITIVE)
+                .voltages(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE / 2)
@@ -127,7 +127,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         var oreAnalyzer = set(ProcessingSet.oreAnalyzer())
-                .voltage(Voltage.PRIMITIVE)
+                .voltages(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -161,7 +161,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         ORE_WASHER = set(marker(AllRecipes.ORE_WASHER))
-                .voltage(Voltage.PRIMITIVE)
+                .voltages(Voltage.PRIMITIVE)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -204,7 +204,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         ELECTRIC_FURNACE = ProcessingSet.electricFurnace()
-                .voltage(Voltage.ULV)
+                .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -215,7 +215,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         ALLOY_SMELTER = set(machine(AllRecipes.ALLOY_SMELTER))
-                .voltage(Voltage.ULV)
+                .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -227,7 +227,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         STEAM_TURBINE = set(generator(AllRecipes.STEAM_TURBINE))
-                .voltage(Voltage.ULV, Voltage.HV)
+                .voltages(Voltage.ULV, Voltage.HV)
                 .layoutSet()
                 .port(SlotType.FLUID_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -264,7 +264,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         BATTERY_BOX = ProcessingSet.batteryBox()
-                .voltage(Voltage.LV, Voltage.HV)
+                .voltages(Voltage.LV, Voltage.HV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 0)

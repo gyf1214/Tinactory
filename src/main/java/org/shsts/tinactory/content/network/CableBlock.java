@@ -27,8 +27,10 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.content.tool.UsableToolItem;
+import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
+import org.shsts.tinactory.registrate.builder.BlockBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -53,7 +55,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     public static final int INSULATION_COLOR = 0xFF36302E;
 
     private final int radius;
-    private final Voltage voltage;
+    public final Voltage voltage;
     private final double resistance;
     private final Map<BlockState, VoxelShape> shapes;
 
@@ -76,7 +78,17 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     }
 
     public static Function<Properties, CableBlock> cable(Voltage voltage) {
-        return prop -> new CableBlock(prop, RADIUS, voltage);
+        var radius = voltage == Voltage.ULV ? WIRE_RADIUS : RADIUS;
+        return prop -> new CableBlock(prop, radius, voltage);
+    }
+
+    public static <S extends BlockBuilder<?, ?, S>>
+    Transformer<S> tint(Voltage voltage, int color) {
+        if (voltage == Voltage.ULV) {
+            return $ -> $.tint(color);
+        } else {
+            return $ -> $.tint(CableBlock.INSULATION_COLOR, color);
+        }
     }
 
     private Map<BlockState, VoxelShape> makeShapes() {

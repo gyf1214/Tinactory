@@ -34,9 +34,9 @@ import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
+import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.TEST_TRANSFORMER;
-import static org.shsts.tinactory.content.AllItems.ULV_CABLE;
-import static org.shsts.tinactory.content.AllItems.ULV_MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
@@ -162,7 +162,7 @@ public final class Machines {
         TOOL_CRAFTING.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
                 .result(ALLOY_SMELTER.entry(Voltage.ULV), 1)
                 .pattern("WVW").pattern("VHV").pattern("WVW")
-                .define('W', ULV_CABLE)
+                .define('W', CABLE.get(Voltage.ULV))
                 .define('H', ELECTRIC_FURNACE.entry(Voltage.ULV))
                 .define('V', VACUUM_TUBE)
                 .toolTag(AllTags.TOOL_WRENCH)
@@ -173,8 +173,8 @@ public final class Machines {
                 .pattern("PVP").pattern("RHR").pattern("WVW")
                 .define('P', COPPER.tag("pipe"))
                 .define('R', IRON.tag("rotor"))
-                .define('W', ULV_CABLE)
-                .define('H', ULV_MACHINE_HULL)
+                .define('W', CABLE.get(Voltage.ULV))
+                .define('H', MACHINE_HULL.get(Voltage.ULV))
                 .define('V', VACUUM_TUBE)
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
@@ -185,7 +185,7 @@ public final class Machines {
                 .result(LOW_PRESSURE_BOILER, 1)
                 .pattern("PPP").pattern("PWP").pattern("VFV")
                 .define('P', IRON.tag("plate"))
-                .define('W', ULV_CABLE)
+                .define('W', CABLE.get(Voltage.ULV))
                 .define('V', VACUUM_TUBE)
                 .define('F', Blocks.FURNACE.asItem())
                 .toolTag(AllTags.TOOL_WRENCH)
@@ -215,8 +215,8 @@ public final class Machines {
                 .result(result, 1)
                 .pattern("BBB").pattern("VHV").pattern("WVW")
                 .define('B', base)
-                .define('W', ULV_CABLE)
-                .define('H', ULV_MACHINE_HULL)
+                .define('W', CABLE.get(Voltage.ULV))
+                .define('H', MACHINE_HULL.get(Voltage.ULV))
                 .define('V', VACUUM_TUBE)
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();

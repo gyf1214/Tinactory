@@ -46,7 +46,7 @@ public class LanguageProcessor {
     public LanguageProcessor() {
         pattern("block[.]tinactory[.]material[.]ore[.](.*)", matcher ->
                 fmt("%s Ore", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]network[.]cable[.](.*)", matcher ->
+        pattern("block[.]tinactory[.]network[.](.*)[.]cable", matcher ->
                 fmt("%s Cable", capitalize(matcher, 1)));
         pattern("item[.]tinactory[.]component[.](.*)[.](.*)", matcher ->
                 fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
