@@ -29,7 +29,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.MULTI_BLOCK_INTERFACE
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER;
-import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_TABLE;
+import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_BENCH;
 import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE;
@@ -64,7 +64,7 @@ public final class Machines {
     }
 
     private static void machineItems() {
-        machine(RESEARCH_TABLE, "overlay/machine/overlay_screen");
+        machine(RESEARCH_BENCH, "overlay/machine/overlay_screen");
         machine(ASSEMBLER, "machines/assembler");
         machine(STONE_GENERATOR, "machines/rock_crusher");
         machine(ORE_ANALYZER, "machines/electromagnetic_separator");
@@ -155,7 +155,7 @@ public final class Machines {
         ulvFromPrimitive(ORE_ANALYZER);
         ulvFromPrimitive(ORE_WASHER);
         ulvMachine(NETWORK_CONTROLLER, VACUUM_TUBE);
-        ulvMachine(RESEARCH_TABLE.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
+        ulvMachine(RESEARCH_BENCH.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
         ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
         ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
 

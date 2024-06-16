@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.datagen.DataGen;
 
 import javax.annotation.Nullable;
@@ -31,6 +32,13 @@ public class RecipeHandler extends DataHandler<RecipeProvider> {
             consumer.accept(recipe);
         }
 
+        public void addRecipe(SmartRecipe<?> recipe) {
+            if (recipe.hasDescription()) {
+                var key = recipe.getDescriptionId();
+                dataGen.langTrackedCtx.trackExtra(key, key);
+            }
+        }
+
         private void addRecipes() {
             RecipeHandler.this.register(this);
         }
@@ -54,6 +62,10 @@ public class RecipeHandler extends DataHandler<RecipeProvider> {
     }
 
     public void registerRecipe(Supplier<FinishedRecipe> recipe) {
+        addCallback(prov -> ((Provider) prov).addRecipe(recipe.get()));
+    }
+
+    public void registerSmartRecipe(Supplier<SmartRecipe<?>> recipe) {
         addCallback(prov -> ((Provider) prov).addRecipe(recipe.get()));
     }
 

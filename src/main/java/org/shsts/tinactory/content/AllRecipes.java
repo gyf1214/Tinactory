@@ -25,7 +25,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL_CRAFTING;
-    public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH;
+    public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH_BENCH;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final RecipeTypeEntry<OreAnalyzerRecipe, OreAnalyzerRecipe.Builder> ORE_ANALYZER;
@@ -45,7 +45,7 @@ public final class AllRecipes {
                 .builder(ToolRecipe.Builder::new)
                 .register();
 
-        RESEARCH = REGISTRATE.recipeType("research", ResearchRecipe.SERIALIZER)
+        RESEARCH_BENCH = REGISTRATE.recipeType("research_bench", ResearchRecipe.SERIALIZER)
                 .clazz(ResearchRecipe.class)
                 .builder(ResearchRecipe.Builder::new)
                 .defaults($ -> $.amperage(0.25d).workTicks(200))

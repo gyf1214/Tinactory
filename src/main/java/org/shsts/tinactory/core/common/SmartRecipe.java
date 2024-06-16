@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.core.logistics.NullContainer;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
@@ -113,6 +115,18 @@ public abstract class SmartRecipe<C> implements Recipe<SmartRecipe.ContainerWrap
 
     public static String getDescriptionId(ResourceLocation loc) {
         return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
+    }
+
+    public String getDescriptionId() {
+        return getDescriptionId(loc);
+    }
+
+    public Component getDescription() {
+        return I18n.tr(getDescriptionId(loc));
+    }
+
+    public boolean hasDescription() {
+        return false;
     }
 
     protected abstract static class SimpleFinished implements FinishedRecipe {

@@ -22,6 +22,6 @@ public abstract class SmartRecipeBuilder<U extends SmartRecipe<?>, S extends Sma
     protected SmartRecipeBuilder(IRecipeDataConsumer consumer, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
         super(parent);
         this.loc = loc;
-        onBuild.add(() -> consumer.registerRecipe(loc, () -> buildObject().toFinished()));
+        onBuild.add(() -> consumer.registerSmartRecipe(loc, this::buildObject));
     }
 }

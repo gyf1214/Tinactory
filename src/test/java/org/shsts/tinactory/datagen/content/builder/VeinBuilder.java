@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
-import static org.shsts.tinactory.content.AllRecipes.RESEARCH;
+import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
 import static org.shsts.tinactory.content.AllTechs.BASE_ORE;
 
 @ParametersAreNonnullByDefault
@@ -73,14 +73,14 @@ public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
                     .displayItem(ores.get(0).loc("raw"))
                     .depends(tech).buildLoc();
 
-            RESEARCH.recipe(dataGen, tech)
+            RESEARCH_BENCH.recipe(dataGen, tech)
                     .target(tech)
                     .defaultInput(variant.voltage)
                     .build();
         }
 
         for (var ore : new HashSet<>(ores)) {
-            RESEARCH.recipe(dataGen, tech.getPath() + "_from_" + ore.name)
+            RESEARCH_BENCH.recipe(dataGen, tech.getPath() + "_from_" + ore.name)
                     .target(tech)
                     .inputItem(ore.tag("raw"))
                     .voltage(variant.voltage)

@@ -47,7 +47,7 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 public final class AllBlockEntities {
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
-    public static final ProcessingSet<ResearchRecipe> RESEARCH_TABLE;
+    public static final ProcessingSet<ResearchRecipe> RESEARCH_BENCH;
     public static final ProcessingSet<AssemblyRecipe> ASSEMBLER;
     public static final ProcessingSet<ProcessingRecipe> STONE_GENERATOR;
     public static final ProcessingSet<OreAnalyzerRecipe> ORE_ANALYZER;
@@ -89,7 +89,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        RESEARCH_TABLE = set(machine(AllRecipes.RESEARCH))
+        RESEARCH_BENCH = set(machine(AllRecipes.RESEARCH_BENCH))
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)

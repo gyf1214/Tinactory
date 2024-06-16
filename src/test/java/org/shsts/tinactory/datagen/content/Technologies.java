@@ -9,7 +9,7 @@ import org.shsts.tinactory.datagen.builder.TechBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static org.shsts.tinactory.content.AllRecipes.RESEARCH;
+import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
 import static org.shsts.tinactory.content.AllTechs.BASE_ORE;
 import static org.shsts.tinactory.content.AllTechs.LOGISTICS;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
@@ -36,13 +36,13 @@ public final class Technologies {
         for (var entry : BASE_ORE.entrySet()) {
             var variant = entry.getKey();
             var tech = entry.getValue();
-            RESEARCH.recipe(DATA_GEN, tech)
+            RESEARCH_BENCH.recipe(DATA_GEN, tech)
                     .target(tech)
                     .defaultInput(variant.voltage)
                     .build();
         }
 
-        RESEARCH.recipe(DATA_GEN, LOGISTICS.get(0))
+        RESEARCH_BENCH.recipe(DATA_GEN, LOGISTICS.get(0))
                 .target(LOGISTICS.get(0))
                 .defaultInput(Voltage.LV)
                 .build();

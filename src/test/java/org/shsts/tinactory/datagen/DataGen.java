@@ -17,6 +17,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.NullRecipe;
 import org.shsts.tinactory.datagen.builder.BlockDataBuilder;
@@ -189,6 +190,11 @@ public final class DataGen implements IRecipeDataConsumer {
     @Override
     public void registerRecipe(ResourceLocation loc, Supplier<FinishedRecipe> recipe) {
         recipeHandler.registerRecipe(recipe);
+    }
+
+    @Override
+    public void registerSmartRecipe(ResourceLocation loc, Supplier<SmartRecipe<?>> recipe) {
+        recipeHandler.registerSmartRecipe(recipe);
     }
 
     private <T extends DataHandler<?>> T handler(T dataHandler) {
