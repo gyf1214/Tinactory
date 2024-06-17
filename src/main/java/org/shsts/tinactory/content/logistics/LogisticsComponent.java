@@ -21,9 +21,9 @@ import org.shsts.tinactory.core.logistics.ILogisticsContentWrapper;
 import org.shsts.tinactory.core.logistics.ILogisticsTypeWrapper;
 import org.shsts.tinactory.core.logistics.ItemContentWrapper;
 import org.shsts.tinactory.core.logistics.ItemTypeWrapper;
-import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.util.RoundRobinList;
 import org.slf4j.Logger;
 
@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticsComponent extends Component {
+public class LogisticsComponent extends NetworkComponent {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private record Request(PortDirection dir, IPort port,

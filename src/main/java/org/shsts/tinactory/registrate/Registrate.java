@@ -26,8 +26,8 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
+import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
@@ -303,8 +303,8 @@ public class Registrate {
         return registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
     }
 
-    public <T extends Component>
-    RegistryEntry<ComponentType<T>> componentType(String id, Class<T> clazz, Component.Factory<T> factory) {
+    public <T extends NetworkComponent>
+    RegistryEntry<ComponentType<T>> componentType(String id, Class<T> clazz, NetworkComponent.Factory<T> factory) {
         return registryEntry(id, AllRegistries.COMPONENT_TYPE_REGISTRY,
                 () -> new ComponentType<>(clazz, factory));
     }

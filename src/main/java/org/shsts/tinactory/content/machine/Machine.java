@@ -4,8 +4,10 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
@@ -26,8 +28,8 @@ import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
-import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
@@ -66,7 +68,9 @@ public class Machine extends UpdatableCapabilityProvider
      */
     public void setConfig(SetMachinePacket packet) {
         config.apply(packet);
-        updatePassiveRequests();
+        if (packet.isSetPort()) {
+            updatePassiveRequests();
+        }
         sendUpdate(blockEntity);
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
@@ -76,11 +80,25 @@ public class Machine extends UpdatableCapabilityProvider
     }
 
     protected void onServerUse(AllEvents.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
-        if (!canPlayerInteract(arg.player())) {
+        var player = arg.player();
+        if (!canPlayerInteract(player)) {
             token.setReturn(InteractionResult.FAIL);
-        } else {
-            token.setReturn(InteractionResult.PASS);
+            return;
         }
+
+        var item = player.getItemInHand(arg.hand());
+        if (item.is(Items.NAME_TAG) && item.hasCustomHoverName()) {
+            if (!player.level.isClientSide) {
+                var name = Component.Serializer.toJson(item.getHoverName());
+                setConfig(SetMachinePacket.builder().set("name", name).create());
+                item.shrink(1);
+            }
+
+            token.setReturn(InteractionResult.sidedSuccess(player.level.isClientSide));
+            return;
+        }
+
+        token.setReturn(InteractionResult.PASS);
     }
 
     private void addActiveRequests(IContainer container, LogisticsComponent logistics) {
@@ -131,6 +149,11 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
+    public Optional<Component> getTitle() {
+        return config.getString("name")
+                .map(Component.Serializer::fromJson);
+    }
+
     @Override
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
@@ -169,7 +192,7 @@ public class Machine extends UpdatableCapabilityProvider
         getProcessor().ifPresent(processor -> processor.onWorkTick(workFactor));
     }
 
-    public void buildSchedulings(Component.SchedulingBuilder builder) {
+    public void buildSchedulings(NetworkComponent.SchedulingBuilder builder) {
         builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
         builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
         EventManager.invoke(blockEntity, AllEvents.BUILD_SCHEDULING, builder);

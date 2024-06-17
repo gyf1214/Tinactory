@@ -60,7 +60,9 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
                     .eventManager()
                     .simpleCapability(Machine::builder)
                     .simpleCapability(StackProcessingContainer.builder(layout))
-                    .menu(ProcessingMenu.machine(layout)).build()
+                    .menu(ProcessingMenu.machine(layout))
+                    .title(ProcessingMenu::getTitle)
+                    .build()
                     .build()
                     .translucent();
         }
@@ -76,7 +78,9 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
                     .eventManager().ticking()
                     .simpleCapability(RecipeProcessor.machine(recipeType))
                     .simpleCapability(StackProcessingContainer.builder(layout))
-                    .menu(ProcessingMenu.machine(layout)).build()
+                    .menu(ProcessingMenu.machine(layout))
+                    .title(ProcessingMenu::getTitle)
+                    .build()
                     .build()
                     .translucent();
         }
@@ -171,6 +175,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
                         .simpleCapability(StackProcessingContainer.builder(layout))
                         .simpleCapability(RecipeProcessor::electricFurnace)
                         .menu(ProcessingMenu.machine(layout))
+                        .title(ProcessingMenu::getTitle)
                         .plugin(MachinePlugin.electricFurnace(layout))
                         .build()
                         .build()
@@ -191,7 +196,9 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
                         .eventManager()
                         .simpleCapability(Machine::builder)
                         .simpleCapability(BatteryBox::builder)
-                        .menu(ProcessingMenu.machine(layout)).build()
+                        .menu(ProcessingMenu.machine(layout))
+                        .title(ProcessingMenu::getTitle)
+                        .build()
                         .build().translucent();
             }
         };

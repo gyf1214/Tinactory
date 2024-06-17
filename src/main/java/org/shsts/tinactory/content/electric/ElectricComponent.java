@@ -8,9 +8,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllNetworks;
-import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.slf4j.Logger;
 
@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricComponent extends Component {
+public class ElectricComponent extends NetworkComponent {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static class Subnet {

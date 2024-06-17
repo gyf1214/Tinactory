@@ -8,15 +8,15 @@ import org.shsts.tinactory.api.network.IScheduling;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-public abstract class Component {
-    public interface Factory<T extends Component> {
+public abstract class NetworkComponent {
+    public interface Factory<T extends NetworkComponent> {
         T create(ComponentType<T> type, Network network);
     }
 
     protected final ComponentType<?> type;
     protected final Network network;
 
-    public Component(ComponentType<?> type, Network network) {
+    public NetworkComponent(ComponentType<?> type, Network network) {
         this.type = type;
         this.network = network;
     }
@@ -43,7 +43,7 @@ public abstract class Component {
 
     @FunctionalInterface
     public interface SchedulingBuilder {
-        void add(Supplier<IScheduling> scheduling, Component.Ticker ticker);
+        void add(Supplier<IScheduling> scheduling, NetworkComponent.Ticker ticker);
     }
 
     public abstract void buildSchedulings(BiConsumer<Supplier<IScheduling>, Ticker> cons);

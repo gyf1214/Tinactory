@@ -25,18 +25,18 @@ import java.util.function.Supplier;
 public class Network extends NetworkBase {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Map<ComponentType<?>, Component> components = new HashMap<>();
+    private final Map<ComponentType<?>, NetworkComponent> components = new HashMap<>();
     private final Multimap<BlockPos, Machine> machines = ArrayListMultimap.create();
-    private final BiKeyHashMap<IScheduling, ComponentType<?>, Component.Ticker> componentSchedulings =
+    private final BiKeyHashMap<IScheduling, ComponentType<?>, NetworkComponent.Ticker> componentSchedulings =
             new BiKeyHashMap<>();
-    private final Multimap<IScheduling, Component.Ticker> machineSchedulings = ArrayListMultimap.create();
+    private final Multimap<IScheduling, NetworkComponent.Ticker> machineSchedulings = ArrayListMultimap.create();
 
     public Network(Level world, BlockPos center, TeamProfile team) {
         super(world, center, team);
         attachComponents();
     }
 
-    public <T extends Component> T getComponent(Supplier<ComponentType<T>> typeSupp) {
+    public <T extends NetworkComponent> T getComponent(Supplier<ComponentType<T>> typeSupp) {
         var type = typeSupp.get();
         return type.cast(components.get(type));
     }

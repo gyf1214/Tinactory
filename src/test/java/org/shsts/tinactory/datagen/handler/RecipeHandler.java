@@ -37,6 +37,7 @@ public class RecipeHandler extends DataHandler<RecipeProvider> {
                 var key = recipe.getDescriptionId();
                 dataGen.langTrackedCtx.trackExtra(key, key);
             }
+            addRecipe(recipe.toFinished());
         }
 
         private void addRecipes() {

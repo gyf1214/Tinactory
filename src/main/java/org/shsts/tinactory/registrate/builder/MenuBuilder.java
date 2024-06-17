@@ -41,6 +41,11 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<? super T, M
         return self();
     }
 
+    public MenuBuilder<T, M, P> title(Function<T, Component> value) {
+        title = value;
+        return self();
+    }
+
     public <M1 extends Menu<?, M1>> MenuBuilder<T, M, P> plugin(IMenuPlugin.Factory<M1> plugin) {
         plugins.add(plugin);
         return self();

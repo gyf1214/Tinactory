@@ -9,11 +9,11 @@ import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ComponentType<T extends Component> extends ForgeRegistryEntry<ComponentType<?>> {
+public class ComponentType<T extends NetworkComponent> extends ForgeRegistryEntry<ComponentType<?>> {
     private final Class<T> componentClass;
-    private final Component.Factory<T> factory;
+    private final NetworkComponent.Factory<T> factory;
 
-    public ComponentType(Class<T> componentClass, Component.Factory<T> factory) {
+    public ComponentType(Class<T> componentClass, NetworkComponent.Factory<T> factory) {
         this.componentClass = componentClass;
         this.factory = factory;
     }
@@ -22,8 +22,8 @@ public class ComponentType<T extends Component> extends ForgeRegistryEntry<Compo
         return factory.create(this, network);
     }
 
-    public T cast(Component component) {
-        return componentClass.cast(component);
+    public T cast(NetworkComponent networkComponent) {
+        return componentClass.cast(networkComponent);
     }
 
     private static Collection<ComponentType<?>> componentTypes;

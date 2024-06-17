@@ -8,8 +8,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.common.ReturnEvent;
-import org.shsts.tinactory.core.network.Component;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -26,7 +26,7 @@ public final class AllEvents {
 
     public static final RegistryEntry<Event<Unit>> CONTAINER_CHANGE;
     public static final RegistryEntry<Event<Network>> CONNECT;
-    public static final RegistryEntry<Event<Component.SchedulingBuilder>> BUILD_SCHEDULING;
+    public static final RegistryEntry<Event<NetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
     public static final RegistryEntry<Event<Unit>> SET_MACHINE_CONFIG;
 
     static {

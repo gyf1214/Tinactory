@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
+import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -118,5 +119,11 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
             return new ProcessingMenu(type, id, inventory, be,
                     multiBlockInterface.getLayout().orElse(null));
         };
+    }
+
+    public static Component getTitle(BlockEntity be) {
+        return AllCapabilities.MACHINE.tryGet(be)
+                .flatMap(Machine::getTitle)
+                .orElseGet(() -> I18n.name(be.getBlockState().getBlock()));
     }
 }
