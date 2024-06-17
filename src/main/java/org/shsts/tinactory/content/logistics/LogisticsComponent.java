@@ -44,8 +44,9 @@ public class LogisticsComponent extends NetworkComponent {
 
     private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
     private final RoundRobinList<Request> activeRequestList = new RoundRobinList<>();
-    private final Multimap<PortDirection, IPort> passiveContainers = HashMultimap.create();
+    private final Multimap<PortDirection, IPort> passivePorts = HashMultimap.create();
     private final Map<PortDirection, RoundRobinList<IPort>> passiveList = new HashMap<>();
+    private final RoundRobinList<IPort> storages = new RoundRobinList<>();
 
     private int ticks;
 
@@ -96,10 +97,11 @@ public class LogisticsComponent extends NetworkComponent {
     public void onDisconnect() {
         activeRequests.clear();
         activeRequestList.clear();
-        passiveContainers.clear();
+        passivePorts.clear();
         for (var list : passiveList.values()) {
             list.clear();
         }
+        storages.clear();
     }
 
     /**
@@ -179,14 +181,23 @@ public class LogisticsComponent extends NetworkComponent {
             remaining = transmitItem(req, otherReq.port, remaining, limit1);
             otherReq.content.shrink(originalCount - remaining.getCount());
         }
-        for (var storage : passiveList.get(req.dir.invert())) {
+        for (var port : passiveList.get(req.dir.invert())) {
             if (remaining.isEmpty()) {
                 return true;
             }
-            if (storage.type() != remaining.getPortType()) {
+            if (port.type() != remaining.getPortType()) {
                 continue;
             }
-            remaining = transmitItem(req, storage, remaining, remaining.getCount());
+            remaining = transmitItem(req, port, remaining, remaining.getCount());
+        }
+        for (var port : storages) {
+            if (remaining.isEmpty()) {
+                return true;
+            }
+            if (port.type() != remaining.getPortType()) {
+                continue;
+            }
+            remaining = transmitItem(req, port, remaining, remaining.getCount());
         }
         return true;
     }
@@ -211,22 +222,6 @@ public class LogisticsComponent extends NetworkComponent {
         activeRequests.clear();
     }
 
-    public void addPassiveStorage(PortDirection dir, IPort port) {
-        if (!passiveContainers.containsEntry(dir, port)) {
-            LOGGER.debug("add PassiveStorage {} {}", dir, port);
-            passiveContainers.put(dir, port);
-            passiveList.get(dir).add(port);
-        }
-    }
-
-    public void removePassiveStorage(PortDirection dir, IPort port) {
-        if (passiveContainers.containsEntry(dir, port)) {
-            LOGGER.debug("remove PassiveStorage {} {}", dir, port);
-            passiveContainers.remove(dir, port);
-            passiveList.get(dir).remove(port);
-        }
-    }
-
     public void addActiveItem(PortDirection type, IItemCollection port, ItemStack item) {
         var item1 = item.copy();
         var req = new Request(type, port, new ItemTypeWrapper(item1), new ItemContentWrapper(item1));
@@ -239,6 +234,27 @@ public class LogisticsComponent extends NetworkComponent {
         var req = new Request(type, port, new FluidTypeWrapper(fluid1), new FluidContentWrapper(fluid1));
         activeRequestList.add(req);
         activeRequests.put(req.type, req);
+    }
+
+    public void addPassivePort(PortDirection dir, IPort port) {
+        if (!passivePorts.containsEntry(dir, port)) {
+            LOGGER.debug("add PassivePort {} {}", dir, port);
+            passivePorts.put(dir, port);
+            passiveList.get(dir).add(port);
+        }
+    }
+
+    public void removePassivePort(PortDirection dir, IPort port) {
+        if (passivePorts.containsEntry(dir, port)) {
+            LOGGER.debug("remove PassivePort {} {}", dir, port);
+            passivePorts.remove(dir, port);
+            passiveList.get(dir).remove(port);
+        }
+    }
+
+    public void addStorage(IPort port) {
+        LOGGER.debug("add Storage {}", port);
+        storages.add(port);
     }
 
     @Override

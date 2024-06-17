@@ -142,9 +142,9 @@ public class Machine extends UpdatableCapabilityProvider
             var port = container.getPort(i, false);
 
             if (config.getPortConfig(i) == MachineConfig.PortConfig.PASSIVE) {
-                logistics.addPassiveStorage(direction, port);
+                logistics.addPassivePort(direction, port);
             } else {
-                logistics.removePassiveStorage(direction, port);
+                logistics.removePassivePort(direction, port);
             }
         }
     }
