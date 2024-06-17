@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RoundRobinList<T> extends ArrayList<T> {
     private final AtomicInteger nextIndex = new AtomicInteger();
 
-
     @Override
     public Iterator<T> iterator() {
         return new Iterator<>() {

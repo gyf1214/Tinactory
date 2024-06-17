@@ -44,15 +44,15 @@ public class LogisticsComponent extends NetworkComponent {
 
     private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
     private final RoundRobinList<Request> activeRequestList = new RoundRobinList<>();
-    private final Multimap<PortDirection, IPort> passiveStorages = HashMultimap.create();
-    private final Map<PortDirection, RoundRobinList<IPort>> passiveStorageList = new HashMap<>();
+    private final Multimap<PortDirection, IPort> passiveContainers = HashMultimap.create();
+    private final Map<PortDirection, RoundRobinList<IPort>> passiveList = new HashMap<>();
 
     private int ticks;
 
     public LogisticsComponent(ComponentType<LogisticsComponent> type, Network network) {
         super(type, network);
-        this.passiveStorageList.put(PortDirection.INPUT, new RoundRobinList<>());
-        this.passiveStorageList.put(PortDirection.OUTPUT, new RoundRobinList<>());
+        this.passiveList.put(PortDirection.INPUT, new RoundRobinList<>());
+        this.passiveList.put(PortDirection.OUTPUT, new RoundRobinList<>());
     }
 
     private int getTechLevel() {
@@ -96,8 +96,8 @@ public class LogisticsComponent extends NetworkComponent {
     public void onDisconnect() {
         activeRequests.clear();
         activeRequestList.clear();
-        passiveStorages.clear();
-        for (var list : passiveStorageList.values()) {
+        passiveContainers.clear();
+        for (var list : passiveList.values()) {
             list.clear();
         }
     }
@@ -179,7 +179,7 @@ public class LogisticsComponent extends NetworkComponent {
             remaining = transmitItem(req, otherReq.port, remaining, limit1);
             otherReq.content.shrink(originalCount - remaining.getCount());
         }
-        for (var storage : passiveStorageList.get(req.dir.invert())) {
+        for (var storage : passiveList.get(req.dir.invert())) {
             if (remaining.isEmpty()) {
                 return true;
             }
@@ -212,18 +212,18 @@ public class LogisticsComponent extends NetworkComponent {
     }
 
     public void addPassiveStorage(PortDirection dir, IPort port) {
-        if (!passiveStorages.containsEntry(dir, port)) {
+        if (!passiveContainers.containsEntry(dir, port)) {
             LOGGER.debug("add PassiveStorage {} {}", dir, port);
-            passiveStorages.put(dir, port);
-            passiveStorageList.get(dir).add(port);
+            passiveContainers.put(dir, port);
+            passiveList.get(dir).add(port);
         }
     }
 
     public void removePassiveStorage(PortDirection dir, IPort port) {
-        if (passiveStorages.containsEntry(dir, port)) {
+        if (passiveContainers.containsEntry(dir, port)) {
             LOGGER.debug("remove PassiveStorage {} {}", dir, port);
-            passiveStorages.remove(dir, port);
-            passiveStorageList.get(dir).remove(port);
+            passiveContainers.remove(dir, port);
+            passiveList.get(dir).remove(port);
         }
     }
 
