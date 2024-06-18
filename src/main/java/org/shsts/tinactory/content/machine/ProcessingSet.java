@@ -203,4 +203,24 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
             }
         };
     }
+
+    public static MachineSet.Builder<MachineBlock<SmartBlockEntity>, ?> electricChest() {
+        return new MachineSet.Builder<>(Unit.INSTANCE) {
+            @Override
+            protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>
+            getMachineBuilder(Voltage voltage) {
+                var id = "machine/" + voltage.id + "/chest";
+                var layout = getLayout(voltage);
+                return REGISTRATE.blockEntity(id, MachineBlock.factory(voltage))
+                        .blockEntity()
+                        .eventManager()
+                        .simpleCapability(Machine::builder)
+                        .simpleCapability(ElectricChest.builder(layout))
+                        .menu(ProcessingMenu.machine(layout))
+                        .title(ProcessingMenu::getTitle)
+                        .build()
+                        .build().translucent();
+            }
+        };
+    }
 }

@@ -13,18 +13,18 @@ public final class AllLayouts {
     public static final Layout BLAST_FURNACE;
 
     static {
-        var workbenchBuilder = Layout.builder()
+        var workbench = Layout.builder()
                 .dummySlot(6 * SLOT_SIZE, SLOT_SIZE)
                 .port(SlotType.ITEM_INPUT);
         for (var j = 0; j < 9; j++) {
-            workbenchBuilder.slot(j * SLOT_SIZE, 3 * SLOT_SIZE + SPACING);
+            workbench.slot(j * SLOT_SIZE, 3 * SLOT_SIZE + SPACING);
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
-                workbenchBuilder.slot((2 + j) * SLOT_SIZE, i * SLOT_SIZE);
+                workbench.slot((2 + j) * SLOT_SIZE, i * SLOT_SIZE);
             }
         }
-        WORKBENCH = workbenchBuilder.buildLayout();
+        WORKBENCH = workbench.buildLayout();
 
         BOILER = Layout.builder()
                 .port(SlotType.ITEM_INPUT)

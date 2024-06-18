@@ -36,4 +36,10 @@ public enum Voltage {
         }
         return MAXIMUM;
     }
+
+    public static Voltage fromRank(int rank) {
+        return Arrays.stream(Voltage.values())
+                .filter(v -> v.rank == rank)
+                .findAny().orElseThrow();
+    }
 }

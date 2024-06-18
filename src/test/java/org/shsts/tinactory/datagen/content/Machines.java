@@ -21,6 +21,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER;
 import static org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX;
 import static org.shsts.tinactory.content.AllBlockEntities.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
+import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
@@ -76,6 +77,7 @@ public final class Machines {
         machine(ALLOY_SMELTER, "machines/alloy_smelter");
         machine(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
         machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
+        machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest");
 
         DATA_GEN.block(NETWORK_CONTROLLER)
                 .blockState(machineBlock(Voltage.LV, "overlay/machine/overlay_screen"))

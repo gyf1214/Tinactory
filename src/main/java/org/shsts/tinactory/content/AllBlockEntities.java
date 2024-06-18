@@ -63,6 +63,7 @@ public final class AllBlockEntities {
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
     public static final RegistryEntry<SidedMachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
     public static final MachineSet<SidedMachineBlock<SmartBlockEntity>> BATTERY_BOX;
+    public static final MachineSet<MachineBlock<SmartBlockEntity>> ELECTRIC_CHEST;
 
     static {
         PROCESSING_SETS = new HashSet<>();
@@ -271,6 +272,18 @@ public final class AllBlockEntities {
                 .slot(0, 0)
                 .build()
                 .buildObject();
+
+        var electricChest = ProcessingSet.electricChest()
+                .voltages(Voltage.ULV)
+                .layoutSet()
+                .port(SlotType.ITEM_INPUT);
+        for (var i = 0; i < 12; i++) {
+            for (var j = 0; j < 9; j++) {
+                var voltage = Voltage.fromRank(1 + i / 2);
+                electricChest.slot(j * SLOT_SIZE, 1 + i * SLOT_SIZE, voltage);
+            }
+        }
+        ELECTRIC_CHEST = electricChest.build().buildObject();
     }
 
     public static final Set<ProcessingSet<?>> PROCESSING_SETS;
