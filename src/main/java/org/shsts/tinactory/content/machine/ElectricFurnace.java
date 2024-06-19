@@ -50,17 +50,22 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
                 ((ItemHandlerCollection) getInputPort(container)).itemHandler);
     }
 
-    @Override
-    protected boolean matches(Level world, SmeltingRecipe recipe, IContainer container) {
+    private boolean canOutput(SmeltingRecipe recipe, IContainer container) {
         var result = recipe.assemble(getInputWrapper(container));
         var outputPort = getOutputPort(container);
         return outputPort.acceptInput(result) && outputPort.insertItem(result, true).isEmpty();
     }
 
     @Override
+    protected boolean matches(Level world, SmeltingRecipe recipe, IContainer container) {
+        return recipe.matches(getInputWrapper(container), world) &&
+                canOutput(recipe, container);
+    }
+
+    @Override
     protected List<? extends SmeltingRecipe> getMatchedRecipes(Level world, IContainer container) {
         return world.getRecipeManager().getRecipeFor(recipeType, getInputWrapper(container), world)
-                .filter($ -> matches(world, $, container))
+                .filter(recipe -> canOutput(recipe, container))
                 .map(List::of).orElse(List.of());
     }
 
