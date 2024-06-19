@@ -9,8 +9,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.sync.FluidEventPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
+import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -18,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.FLUID_CLICK;
+import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.FLUID_SLOT_CLICK;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FluidSlot extends MenuWidget {
-    private static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
+    public static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
 
     private final int tank;
     private final int syncSlot;
@@ -68,13 +69,31 @@ public class FluidSlot extends MenuWidget {
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        menu.triggerEvent(FLUID_CLICK, (containerId, eventId) ->
-                new FluidEventPacket(containerId, eventId, tank, button));
+        menu.triggerEvent(FLUID_SLOT_CLICK, (containerId, eventId) ->
+                new SlotEventPacket(containerId, eventId, tank, button));
+    }
+
+    public String getAmountString(int amount) {
+        if (amount < 1000) {
+            return amount + "mB";
+        } else if (amount < 1000000) {
+            return amount / 1000 + "B";
+        } else {
+            return amount / 1000000 + "kB";
+        }
     }
 
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        RenderUtil.renderFluid(poseStack, getFluidStack(), rect, getBlitOffset());
+        var stack = getFluidStack();
+        RenderUtil.renderFluid(poseStack, stack, rect, getBlitOffset());
+
+        if (!stack.isEmpty()) {
+            var s = getAmountString(stack.getAmount());
+            var font = ClientUtil.getFont();
+            var w = font.width(s) + 1;
+            font.drawShadow(poseStack, s, rect.endX() - w, rect.endY() - font.lineHeight, 0xFFFFFFFF);
+        }
 
         if (isHovering(mouseX, mouseY)) {
             RenderSystem.colorMask(true, true, true, false);

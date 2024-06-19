@@ -40,6 +40,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.machine.ProcessingSet.generator;
 import static org.shsts.tinactory.content.machine.ProcessingSet.machine;
 import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @ParametersAreNonnullByDefault
@@ -276,11 +277,11 @@ public final class AllBlockEntities {
         var electricChest = ProcessingSet.electricChest()
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT);
-        for (var i = 0; i < 12; i++) {
-            for (var j = 0; j < 9; j++) {
-                var voltage = Voltage.fromRank(1 + i / 2);
-                electricChest.slot(j * SLOT_SIZE, 1 + i * SLOT_SIZE, voltage);
+                .port(SlotType.NONE);
+        for (var i = 0; i < 2; i++) {
+            for (var j = 0; j < 8; j++) {
+                var voltage = Voltage.fromValue(8 * (j + 1) * (j + 1));
+                electricChest.slot(j * SLOT_SIZE * 3 / 2, 1 + i * 2 * (SLOT_SIZE + MARGIN_VERTICAL), voltage);
             }
         }
         ELECTRIC_CHEST = electricChest.build().buildObject();

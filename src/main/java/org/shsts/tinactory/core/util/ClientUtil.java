@@ -6,10 +6,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.RecipeManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -37,5 +41,10 @@ public final class ClientUtil {
         var player = Minecraft.getInstance().player;
         assert player != null;
         return player;
+    }
+
+    public static List<Component> getTooltipsFromStack(ItemStack stack) {
+        return stack.getTooltipLines(getPlayer(), Minecraft.getInstance().options.advancedItemTooltips ?
+                TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
     }
 }

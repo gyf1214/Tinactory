@@ -7,34 +7,34 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FluidEventPacket extends MenuEventPacket {
-    private int tankIndex;
+public class SlotEventPacket extends MenuEventPacket {
+    private int index;
     private int button;
 
-    public FluidEventPacket() {}
+    public SlotEventPacket() {}
 
-    public FluidEventPacket(int containerId, int eventId, int tankIndex, int button) {
+    public SlotEventPacket(int containerId, int eventId, int index, int button) {
         super(containerId, eventId);
-        this.tankIndex = tankIndex;
+        this.index = index;
         this.button = button;
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         super.serializeToBuf(buf);
-        buf.writeVarInt(tankIndex);
+        buf.writeVarInt(index);
         buf.writeVarInt(button);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         super.deserializeFromBuf(buf);
-        tankIndex = buf.readVarInt();
+        index = buf.readVarInt();
         button = buf.readVarInt();
     }
 
-    public int getTankIndex() {
-        return tankIndex;
+    public int getIndex() {
+        return index;
     }
 
     public int getButton() {

@@ -5,7 +5,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Containers;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.IItemHandler;
@@ -55,6 +57,31 @@ public final class ItemHelper {
         }
     }
 
+    public static void serializeStackToBuf(ItemStack stack, FriendlyByteBuf buf) {
+        if (stack.isEmpty()) {
+            buf.writeBoolean(false);
+        } else {
+            buf.writeBoolean(true);
+            var item = stack.getItem();
+            buf.writeVarInt(Item.getId(item));
+            buf.writeVarInt(stack.getCount());
+            var tag = item.isDamageable(stack) || item.shouldOverrideMultiplayerNbt() ?
+                    stack.getShareTag() : null;
+            buf.writeNbt(tag);
+        }
+    }
+
+    public static ItemStack deserializeStackFromBuf(FriendlyByteBuf buf) {
+        if (!buf.readBoolean()) {
+            return ItemStack.EMPTY;
+        }
+        int id = buf.readVarInt();
+        int count = buf.readVarInt();
+        var stack = new ItemStack(Item.byId(id), count);
+        stack.readShareTag(buf.readNbt());
+        return stack;
+    }
+
     /**
      * This also ignores the stack limit. This means ItemStack with exact same NBT can also stack.
      */
@@ -66,6 +93,13 @@ public final class ItemHelper {
 
     public static boolean itemStackEqual(ItemStack a, ItemStack b) {
         return (a.isEmpty() && b.isEmpty()) || (canItemsStack(a, b) && a.getCount() == b.getCount());
+    }
+
+    public static ItemStack copyWithCount(ItemStack stack, int count) {
+        if (stack.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        return ItemHandlerHelper.copyStackWithSize(stack, count);
     }
 
     /**

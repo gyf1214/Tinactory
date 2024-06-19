@@ -70,43 +70,37 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private class Screen extends MenuScreen<ProcessingMenu> {
-        public Screen(Inventory inventory, Component title) {
-            super(ProcessingMenu.this, inventory, title);
-
-            if (layout != null) {
-
-                var layoutPanel = new Panel(this);
-
-                for (var slot : layout.slots) {
-                    if (slot.type().portType == PortType.FLUID) {
-                        var syncSlot = fluidSyncIndex.get(slot);
-                        var rect = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
-                        var rect1 = rect.offset(1, 1).enlarge(-2, -2);
-                        layoutPanel.addWidget(rect, new StaticWidget(menu, Texture.SLOT_BACKGROUND));
-                        layoutPanel.addWidget(rect1, new FluidSlot(menu, slot.index(), syncSlot));
-                    }
-                }
-
-                for (var image : layout.images) {
-                    layoutPanel.addWidget(image.rect(), new StaticWidget(menu, image.texture()));
-                }
-
-                var progressBar = layout.progressBar;
-                if (progressBar != null) {
-                    var widget = new ProgressBar(menu, progressBar.texture(), progressBarIndex);
-                    layoutPanel.addWidget(progressBar.rect(), widget);
-                }
-
-                addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
-            }
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
     @Override
     public MenuScreen<ProcessingMenu> createScreen(Inventory inventory, Component title) {
-        return new Screen(inventory, title);
+        var screen = new MenuScreen<>(this, inventory, title);
+
+        if (layout != null) {
+            var layoutPanel = new Panel(screen);
+
+            for (var slot : layout.slots) {
+                if (slot.type().portType == PortType.FLUID) {
+                    var syncSlot = fluidSyncIndex.get(slot);
+                    var rect = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
+                    var rect1 = rect.offset(1, 1).enlarge(-2, -2);
+                    layoutPanel.addWidget(rect, new StaticWidget(this, Texture.SLOT_BACKGROUND));
+                    layoutPanel.addWidget(rect1, new FluidSlot(this, slot.index(), syncSlot));
+                }
+            }
+
+            for (var image : layout.images) {
+                layoutPanel.addWidget(image.rect(), new StaticWidget(this, image.texture()));
+            }
+
+            var progressBar = layout.progressBar;
+            if (progressBar != null) {
+                var widget = new ProgressBar(this, progressBar.texture(), progressBarIndex);
+                layoutPanel.addWidget(progressBar.rect(), widget);
+            }
+
+            screen.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
+        }
+
+        return screen;
     }
 
     public static <T extends BlockEntity> Menu.Factory<T, ProcessingMenu> machine(Layout layout) {

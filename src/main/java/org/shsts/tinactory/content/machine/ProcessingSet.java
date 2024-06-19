@@ -5,6 +5,7 @@ import net.minecraft.util.Unit;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
@@ -213,10 +214,10 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
                 var layout = getLayout(voltage);
                 return REGISTRATE.blockEntity(id, MachineBlock.factory(voltage))
                         .blockEntity()
-                        .eventManager()
+                        .eventManager().ticking()
                         .simpleCapability(Machine::builder)
                         .simpleCapability(ElectricChest.builder(layout))
-                        .menu(ProcessingMenu.machine(layout))
+                        .menu(ElectricChestMenu.factory(layout))
                         .title(ProcessingMenu::getTitle)
                         .build()
                         .build().translucent();

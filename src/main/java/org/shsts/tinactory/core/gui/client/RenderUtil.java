@@ -26,6 +26,7 @@ import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 
@@ -140,7 +141,7 @@ public final class RenderUtil {
             var attribute = fluid.getAttributes();
             var sprite = atlas.apply(attribute.getStillTexture());
             var renderColor = mixColor(attribute.getColor(), color);
-            RenderUtil.blitAtlas(poseStack, InventoryMenu.BLOCK_ATLAS, sprite, renderColor, zIndex, rect);
+            blitAtlas(poseStack, InventoryMenu.BLOCK_ATLAS, sprite, renderColor, zIndex, rect);
         }
     }
 
@@ -153,7 +154,24 @@ public final class RenderUtil {
     }
 
     public static void renderItem(ItemStack stack, int x, int y) {
-        ClientUtil.getItemRenderer().renderAndDecorateFakeItem(stack, x, y);
+        ClientUtil.getItemRenderer().renderAndDecorateItem(stack, x, y);
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableBlend();
+    }
+
+    public static void renderItemWithDecoration(ItemStack stack, int x, int y, @Nullable String text) {
+        var renderer = ClientUtil.getItemRenderer();
+        renderer.renderAndDecorateItem(stack, x, y);
+        renderer.renderGuiItemDecorations(ClientUtil.getFont(), stack, x, y, text);
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableBlend();
+    }
+
+    public static void renderGhostItem(PoseStack poseStack, ItemStack stack, int x, int y) {
+        ClientUtil.getItemRenderer().renderAndDecorateItem(stack, x, y);
+        RenderSystem.depthFunc(516);
+        RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), 0xAA8B8B8B);
+        RenderSystem.depthFunc(515);
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
     }

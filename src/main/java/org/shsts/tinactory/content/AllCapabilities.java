@@ -4,6 +4,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.content.machine.IWorkbench;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
@@ -25,6 +26,7 @@ public final class AllCapabilities {
 
     public static final CapabilityEntry<Machine> MACHINE;
     public static final CapabilityEntry<MultiBlock> MULTI_BLOCK;
+    public static final CapabilityEntry<ElectricChest> ELECTRIC_CHEST;
 
     static {
         UPDATE_HELPER = REGISTRATE.capability(UpdateHelper.class, new CapabilityToken<>() {});
@@ -37,6 +39,7 @@ public final class AllCapabilities {
 
         MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
         MULTI_BLOCK = REGISTRATE.capability(MultiBlock.class, new CapabilityToken<>() {});
+        ELECTRIC_CHEST = REGISTRATE.capability(ElectricChest.class, new CapabilityToken<>() {});
     }
 
     public static void init() {}

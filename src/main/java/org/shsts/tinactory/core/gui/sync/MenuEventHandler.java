@@ -21,7 +21,8 @@ public final class MenuEventHandler {
 
     public record Event<P extends MenuEventPacket>(int id, Class<P> clazz) {}
 
-    public static final Event<FluidEventPacket> FLUID_CLICK;
+    public static final Event<SlotEventPacket> FLUID_SLOT_CLICK;
+    public static final Event<SlotEventPacket> CHEST_SLOT_CLICK;
     public static final Event<SetMachinePacket> SET_MACHINE;
 
     private static <P extends MenuEventPacket> void handle(P packet, NetworkEvent.Context ctx) {
@@ -47,7 +48,8 @@ public final class MenuEventHandler {
     }
 
     static {
-        FLUID_CLICK = register(FluidEventPacket.class, FluidEventPacket::new);
+        FLUID_SLOT_CLICK = register(SlotEventPacket.class, SlotEventPacket::new);
+        CHEST_SLOT_CLICK = register(SlotEventPacket.class, SlotEventPacket::new);
         SET_MACHINE = register(SetMachinePacket.class, SetMachinePacket::new);
     }
 

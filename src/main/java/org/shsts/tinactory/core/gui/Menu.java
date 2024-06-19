@@ -3,6 +3,8 @@ package org.shsts.tinactory.core.gui;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -52,6 +54,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     public static final int SPACING = 3;
     public static final int MARGIN_VERTICAL = 3 + SPACING;
     public static final int MARGIN_TOP = MARGIN_VERTICAL + FONT_HEIGHT + SPACING;
+    public static final Container EMPTY_CONTAINER = new SimpleContainer(0);
 
     public final boolean isClientSide;
     public final T blockEntity;
@@ -124,7 +127,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
                 .resolve().orElse(null);
         this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
                 .resolve().orElse(null);
-        onEventPacket(MenuEventHandler.FLUID_CLICK, p -> clickFluidSlot(p.getTankIndex(), p.getButton()));
+        onEventPacket(MenuEventHandler.FLUID_SLOT_CLICK, p -> clickFluidSlot(p.getIndex(), p.getButton()));
         this.height = 0;
     }
 
