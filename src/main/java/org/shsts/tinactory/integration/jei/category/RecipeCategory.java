@@ -5,7 +5,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -38,6 +37,8 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
+import org.shsts.tinactory.integration.jei.ingredient.FluidStackType;
+import org.shsts.tinactory.integration.jei.ingredient.FluidStackWrapper;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
@@ -99,7 +100,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         }
 
         default void fluid(Layout.SlotInfo slot, FluidStack stack) {
-            addIngredient(slot, ForgeTypes.FLUID_STACK, stack);
+            addIngredient(slot, FluidStackType.INSTANCE, new FluidStackWrapper(stack));
         }
     }
 

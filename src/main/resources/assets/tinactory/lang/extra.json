@@ -4,7 +4,6 @@
   "block.tinactory.network.controller": "Network Controller",
   "block.tinactory.primitive.workbench": "Workbench",
   "item.tinactory.circuit.vacuum_tube": "Vacuum Tube",
-  "tinactory.tooltip.liquid": "%s mB",
   "tinactory.tooltip.openRecipeBook": "Open recipe book",
   "tinactory.tooltip.unselectRecipe": "Clear recipe",
   "tinactory.tooltip.openPortConfig": "Configure port",

@@ -32,6 +32,7 @@ public abstract class MenuWidget extends GuiComponent implements
 
     public MenuWidget(Menu<?, ?> menu) {
         this.menu = menu;
+        this.setBlitOffset(0);
     }
 
     public void setRect(Rect value) {
