@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -35,9 +35,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE;
-import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE_CONFIG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -54,13 +52,6 @@ public abstract class AbstractRecipeBook<T> extends Panel {
     public static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
     private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER, PANEL_BORDER + BUTTON_TOP_MARGIN,
             -PANEL_BORDER, -PANEL_BORDER);
-
-    public static final Texture RECIPE_BOOK_BUTTON = new Texture(
-            mcLoc("gui/recipe_button"), 256, 256);
-    private static final Texture DISABLE_BUTTON = new Texture(
-            modLoc("gui/disable_recipe"), 16, 16);
-    private static final Texture RECIPE_BUTTON = new Texture(
-            modLoc("gui/recipe_book_button"), 42, 21);
 
     private class RecipeButtonPanel extends ButtonPanel {
         public RecipeButtonPanel() {
@@ -94,12 +85,12 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             var recipe = getRecipe(loc);
             var z = getBlitOffset();
             if (Objects.equals(getCurrentRecipeLoc(), loc)) {
-                RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect, 21, 0);
+                RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, z, rect, 21, 0);
             } else {
-                RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect);
+                RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, z, rect);
             }
             if (recipe == null) {
-                RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect.offset(2, 2).enlarge(-5, -5));
+                RenderUtil.blit(poseStack, Texture.DISABLE_BUTTON, z, rect.offset(2, 2).enlarge(-5, -5));
             } else {
                 AbstractRecipeBook.this.renderButton(poseStack, mouseX, mouseY, partialTick, recipe, rect, z);
             }
@@ -111,9 +102,9 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             var recipe = getRecipe(loc);
             ghostRecipe.clear();
             if (recipe == null) {
-                menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().reset("targetRecipe"));
+                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder().reset("targetRecipe"));
             } else {
-                menu.triggerEvent(SET_MACHINE, SetMachinePacket.builder().set("targetRecipe", loc));
+                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder().set("targetRecipe", loc));
                 selectRecipe(recipe);
             }
         }

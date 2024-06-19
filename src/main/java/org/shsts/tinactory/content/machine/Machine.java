@@ -21,7 +21,7 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
-import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.LogisticsComponent;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
@@ -66,7 +66,7 @@ public class Machine extends UpdatableCapabilityProvider
     /**
      * Called only on server
      */
-    public void setConfig(SetMachinePacket packet) {
+    public void setConfig(SetMachineConfigPacket packet) {
         config.apply(packet);
         if (packet.isSetPort()) {
             updatePassiveRequests();
@@ -90,7 +90,7 @@ public class Machine extends UpdatableCapabilityProvider
         if (item.is(Items.NAME_TAG) && item.hasCustomHoverName()) {
             if (!player.level.isClientSide) {
                 var name = Component.Serializer.toJson(item.getHoverName());
-                setConfig(SetMachinePacket.builder().set("name", name).create());
+                setConfig(SetMachineConfigPacket.builder().set("name", name).create());
                 item.shrink(1);
             }
 
@@ -104,19 +104,16 @@ public class Machine extends UpdatableCapabilityProvider
     private void addActiveRequests(IContainer container, LogisticsComponent logistics) {
         var size = container.portSize();
         for (var i = 0; i < size; i++) {
-            if (!container.hasPort(i) || config.getPortConfig(i) != MachineConfig.PortConfig.ACTIVE ||
+            if (!container.hasPort(i) || config.getPortConfig("portConfig_" + i) !=
+                    MachineConfig.PortConfig.ACTIVE ||
                     container.portDirection(i) != PortDirection.OUTPUT) {
                 continue;
             }
             var port = container.getPort(i, false);
             if (port.type() == PortType.ITEM) {
-                for (var stack : port.asItem().getAllItems()) {
-                    logistics.addActiveItem(PortDirection.OUTPUT, port.asItem(), stack);
-                }
+                logistics.addActiveItem(PortDirection.OUTPUT, port.asItem());
             } else if (port.type() == PortType.FLUID) {
-                for (var stack : port.asFluid().getAllFluids()) {
-                    logistics.addActiveFluid(PortDirection.OUTPUT, port.asFluid(), stack);
-                }
+                logistics.addActiveFluid(PortDirection.OUTPUT, port.asFluid());
             }
         }
     }
@@ -141,7 +138,7 @@ public class Machine extends UpdatableCapabilityProvider
             var direction = container.portDirection(i);
             var port = container.getPort(i, false);
 
-            if (config.getPortConfig(i) == MachineConfig.PortConfig.PASSIVE) {
+            if (config.getPortConfig("portConfig_" + i) == MachineConfig.PortConfig.PASSIVE) {
                 logistics.addPassivePort(direction, port);
             } else {
                 logistics.removePassivePort(direction, port);
@@ -265,13 +262,5 @@ public class Machine extends UpdatableCapabilityProvider
             return AllCapabilities.PROCESSOR.tryGet(be);
         }
         return AllCapabilities.MACHINE.tryGet(be).flatMap(Machine::getProcessor);
-    }
-
-    public static Optional<IContainer> getContainer(BlockEntity be) {
-        return AllCapabilities.MACHINE.tryGet(be).flatMap(Machine::getContainer);
-    }
-
-    public static Optional<IElectricMachine> getElectric(BlockEntity be) {
-        return AllCapabilities.MACHINE.tryGet(be).flatMap(Machine::getElectric);
     }
 }

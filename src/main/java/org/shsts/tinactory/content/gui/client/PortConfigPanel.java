@@ -6,25 +6,20 @@ import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
 import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
-import java.util.Optional;
 
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BUTTON_TOP_MARGIN;
@@ -34,17 +29,10 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class PortConfigPanel extends Panel {
-    private static final Texture ITEM_OUT_BUTTON = new Texture(
-            gregtech("gui/widget/button_item_output_overlay"), 18, 18);
-    private static final Texture AUTO_OUT_BUTTON = new Texture(
-            gregtech("gui/widget/button_output"), 18, 18);
-    private static final Texture CLEAR_GRID_BUTTON = new Texture(
-            gregtech("gui/widget/button_clear_grid"), 18, 18);
     private static final Rect LABEL_RECT =
             new Rect(PANEL_BORDER + SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
                     -(PANEL_BORDER + SPACING) * 2 - SLOT_SIZE, SLOT_SIZE);
@@ -55,66 +43,25 @@ public class PortConfigPanel extends Panel {
     private static final int OVERLAY_COLOR = 0x80FFAA00;
 
 
-    private class ConfigButton extends Button {
-
-        private final int port;
-        private final PortDirection direction;
+    private class ConfigButton extends PortConfigButton {
         private final List<Layout.SlotInfo> slots;
 
         public ConfigButton(Menu<?, ?> menu, int port, PortDirection direction,
                             List<Layout.SlotInfo> slots) {
-            super(menu);
-            this.port = port;
-            this.direction = direction;
+            super(menu, machineConfig, "portConfig_" + port, direction);
             this.slots = slots;
         }
 
         @Override
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            var config = machineConfig.getPortConfig(port);
-            var z = getBlitOffset();
-            if (config != MachineConfig.PortConfig.NONE) {
-                RenderUtil.blit(poseStack, Texture.SWITCH_BUTTON, z, rect);
-            }
-            switch (config) {
-                case NONE -> RenderUtil.blit(poseStack, CLEAR_GRID_BUTTON, z, rect);
-                case PASSIVE -> RenderUtil.blit(poseStack, AUTO_OUT_BUTTON, z, rect);
-                case ACTIVE -> RenderUtil.blit(poseStack, ITEM_OUT_BUTTON, z, rect);
-            }
+            super.doRender(poseStack, mouseX, mouseY, partialTick);
             if (isHovering(mouseX, mouseY)) {
                 renderHoverOverlay(poseStack, slots);
             }
         }
-
-        @Override
-        public void onMouseClicked(double mouseX, double mouseY, int button) {
-            super.onMouseClicked(mouseX, mouseY, button);
-            var config = machineConfig.getPortConfig(port);
-
-            var nextConfig = MachineConfig.PortConfig.fromIndex((config.index + 1) % 3);
-            // Disallow active input request
-            if (nextConfig == MachineConfig.PortConfig.ACTIVE && direction != PortDirection.OUTPUT) {
-                nextConfig = MachineConfig.PortConfig.NONE;
-            }
-
-            var packet = SetMachinePacket.builder().setPort(port, nextConfig);
-            menu.triggerEvent(MenuEventHandler.SET_MACHINE, packet);
-        }
-
-        @Override
-        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            var subKey = I18n.tr("tinactory.tooltip.portConfig." + direction.name().toLowerCase());
-            var tooltip = switch (machineConfig.getPortConfig(port)) {
-                case NONE -> I18n.tr("tinactory.tooltip.portConfig.none", subKey);
-                case PASSIVE -> I18n.tr("tinactory.tooltip.portConfig.passive", subKey);
-                case ACTIVE -> I18n.tr("tinactory.tooltip.portConfig.active", subKey);
-            };
-            return Optional.of(List.of(tooltip));
-        }
     }
 
     private class ConfigLabel extends Label {
-
         private final List<Layout.SlotInfo> slots;
 
         public ConfigLabel(Menu<?, ?> menu, Component line, List<Layout.SlotInfo> slots) {

@@ -13,13 +13,13 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SetMachinePacket extends MenuEventPacket {
+public class SetMachineConfigPacket extends MenuEventPacket {
     private CompoundTag sets;
     private List<String> resets;
 
-    public SetMachinePacket() {}
+    public SetMachineConfigPacket() {}
 
-    private SetMachinePacket(int containerId, int eventId, Builder builder) {
+    private SetMachineConfigPacket(int containerId, int eventId, Builder builder) {
         super(containerId, eventId);
         this.sets = builder.sets;
         this.resets = builder.resets;
@@ -51,7 +51,7 @@ public class SetMachinePacket extends MenuEventPacket {
         resets = buf.readCollection(ArrayList::new, FriendlyByteBuf::readUtf);
     }
 
-    public static class Builder implements MenuEventPacket.Factory<SetMachinePacket> {
+    public static class Builder implements MenuEventPacket.Factory<SetMachineConfigPacket> {
         private final CompoundTag sets = new CompoundTag();
         private final List<String> resets = new ArrayList<>();
 
@@ -75,18 +75,17 @@ public class SetMachinePacket extends MenuEventPacket {
             return this;
         }
 
-        public Builder setPort(int port, MachineConfig.PortConfig config) {
-            var key = "portConfig_" + port;
+        public Builder setPort(String key, MachineConfig.PortConfig config) {
             sets.putByte(key, (byte) config.index);
             return this;
         }
 
         @Override
-        public SetMachinePacket create(int containerId, int eventId) {
-            return new SetMachinePacket(containerId, eventId, this);
+        public SetMachineConfigPacket create(int containerId, int eventId) {
+            return new SetMachineConfigPacket(containerId, eventId, this);
         }
 
-        public SetMachinePacket create() {
+        public SetMachineConfigPacket create() {
             // where containerId and eventId are irrelevant
             return create(0, 0);
         }

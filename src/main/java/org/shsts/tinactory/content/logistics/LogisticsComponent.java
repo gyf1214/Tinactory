@@ -229,11 +229,23 @@ public class LogisticsComponent extends NetworkComponent {
         activeRequests.put(req.type, req);
     }
 
+    public void addActiveItem(PortDirection type, IItemCollection port) {
+        for (var stack : port.getAllItems()) {
+            addActiveItem(type, port, stack);
+        }
+    }
+
     public void addActiveFluid(PortDirection type, IFluidCollection port, FluidStack fluid) {
         var fluid1 = fluid.copy();
         var req = new Request(type, port, new FluidTypeWrapper(fluid1), new FluidContentWrapper(fluid1));
         activeRequestList.add(req);
         activeRequests.put(req.type, req);
+    }
+
+    public void addActiveFluid(PortDirection type, IFluidCollection port) {
+        for (var stack : port.getAllFluids()) {
+            addActiveFluid(type, port, stack);
+        }
     }
 
     public void addPassivePort(PortDirection dir, IPort port) {

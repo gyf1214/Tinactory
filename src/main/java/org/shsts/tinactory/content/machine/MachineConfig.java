@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
-import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
         }
 
         public static PortConfig fromIndex(int i) {
-            return values()[i];
+            return i >= 0 && i < 3 ? values()[i] : NONE;
         }
     }
 
@@ -37,12 +37,15 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
         return getString(key).map(ResourceLocation::new);
     }
 
-    public PortConfig getPortConfig(int port) {
-        var key = "portConfig_" + port;
+    public PortConfig getPortConfig(String key) {
         return PortConfig.fromIndex(tag.contains(key, Tag.TAG_BYTE) ? tag.getByte(key) : 0);
     }
 
-    public void apply(SetMachinePacket packet) {
+    public boolean getBoolean(String key) {
+        return tag.getBoolean(key);
+    }
+
+    public void apply(SetMachineConfigPacket packet) {
         tag.merge(packet.getSets());
         for (var key : packet.getResets()) {
             tag.remove(key);

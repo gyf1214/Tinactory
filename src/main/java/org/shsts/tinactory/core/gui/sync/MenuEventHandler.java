@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.network.NetworkEvent;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.content.gui.sync.SetMachinePacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.Menu;
 import org.slf4j.Logger;
 
@@ -23,7 +23,7 @@ public final class MenuEventHandler {
 
     public static final Event<SlotEventPacket> FLUID_SLOT_CLICK;
     public static final Event<SlotEventPacket> CHEST_SLOT_CLICK;
-    public static final Event<SetMachinePacket> SET_MACHINE;
+    public static final Event<SetMachineConfigPacket> SET_MACHINE_CONFIG;
 
     private static <P extends MenuEventPacket> void handle(P packet, NetworkEvent.Context ctx) {
         var player = ctx.getSender();
@@ -50,7 +50,7 @@ public final class MenuEventHandler {
     static {
         FLUID_SLOT_CLICK = register(SlotEventPacket.class, SlotEventPacket::new);
         CHEST_SLOT_CLICK = register(SlotEventPacket.class, SlotEventPacket::new);
-        SET_MACHINE = register(SetMachinePacket.class, SetMachinePacket::new);
+        SET_MACHINE_CONFIG = register(SetMachineConfigPacket.class, SetMachineConfigPacket::new);
     }
 
     public static void init() {}

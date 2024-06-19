@@ -10,6 +10,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
@@ -18,8 +19,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.FLUID_SLOT_CLICK;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -69,17 +68,17 @@ public class FluidSlot extends MenuWidget {
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        menu.triggerEvent(FLUID_SLOT_CLICK, (containerId, eventId) ->
+        menu.triggerEvent(MenuEventHandler.FLUID_SLOT_CLICK, (containerId, eventId) ->
                 new SlotEventPacket(containerId, eventId, tank, button));
     }
 
     public String getAmountString(int amount) {
         if (amount < 1000) {
-            return amount + "mB";
+            return String.valueOf(amount);
         } else if (amount < 1000000) {
             return amount / 1000 + "B";
         } else {
-            return amount / 1000000 + "kB";
+            return amount / 1000000 + "k";
         }
     }
 
@@ -91,8 +90,9 @@ public class FluidSlot extends MenuWidget {
         if (!stack.isEmpty()) {
             var s = getAmountString(stack.getAmount());
             var font = ClientUtil.getFont();
-            var w = font.width(s) + 1;
-            font.drawShadow(poseStack, s, rect.endX() - w, rect.endY() - font.lineHeight, 0xFFFFFFFF);
+            var x = rect.endX() + 1 - font.width(s);
+            var y = rect.endY() + 2 - font.lineHeight;
+            font.drawShadow(poseStack, s, x, y, 0xFFFFFFFF);
         }
 
         if (isHovering(mouseX, mouseY)) {

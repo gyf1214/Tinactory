@@ -8,6 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -38,6 +39,16 @@ public record Texture(ResourceLocation loc, int width, int height) {
             gregtech("gui/progress_bar/progress_bar_boiler_heat"), 10, 54);
     public static final Texture RECIPE_BOOK_BG = new Texture(
             mcLoc("gui/recipe_book"), 256, 256);
+    public static final Texture RECIPE_BOOK_BUTTON = new Texture(
+            mcLoc("gui/recipe_button"), 256, 256);
+    public static final Texture DISABLE_BUTTON = new Texture(
+            modLoc("gui/disable_recipe"), 16, 16);
+    public static final Texture RECIPE_BUTTON = new Texture(
+            modLoc("gui/recipe_book_button"), 42, 21);
+    public static final Texture IMPORT_EXPORT_BUTTON = new Texture(
+            modLoc("gui/import_export"), 18, 18);
+    public static final Texture CLEAR_GRID_BUTTON = new Texture(
+            gregtech("gui/widget/button_clear_grid"), 18, 18);
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = new ResourceLocation(loc.getNamespace(), "textures/" + loc.getPath() + ".png");

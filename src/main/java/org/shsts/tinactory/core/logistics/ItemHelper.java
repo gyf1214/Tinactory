@@ -27,11 +27,12 @@ public final class ItemHelper {
         var listTag = new ListTag();
         var size = itemHandler.getSlots();
         for (var i = 0; i < size; i++) {
-            var item = itemHandler.getStackInSlot(i);
-            if (!item.isEmpty()) {
+            var stack = itemHandler.getStackInSlot(i);
+            if (!stack.isEmpty()) {
                 CompoundTag itemTag = new CompoundTag();
                 itemTag.putInt("Slot", i);
-                item.save(itemTag);
+                stack.save(itemTag);
+                itemTag.putInt("CountInt", stack.getCount());
                 listTag.add(itemTag);
             }
         }
@@ -48,11 +49,14 @@ public final class ItemHelper {
         }
         ListTag tagList = tag.getList("Items", Tag.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++) {
-            CompoundTag itemTags = tagList.getCompound(i);
-            int slot = itemTags.getInt("Slot");
-
+            CompoundTag itemTag = tagList.getCompound(i);
+            int slot = itemTag.getInt("Slot");
             if (slot >= 0 && slot < size) {
-                itemHandler.setStackInSlot(slot, ItemStack.of(itemTags));
+                var stack = ItemStack.of(itemTag);
+                if (itemTag.contains("CountInt", Tag.TAG_INT)) {
+                    stack.setCount(itemTag.getInt("CountInt"));
+                }
+                itemHandler.setStackInSlot(slot, stack);
             }
         }
     }
