@@ -14,6 +14,8 @@
   "tinactory.tooltip.portConfig.input": "Input",
   "tinactory.tooltip.portConfig.output": "Output",
   "tinactory.tooltip.oreAnalyzer.recipeButton": "Analyze %s",
+  "tinactory.tooltip.chestLock": "Empty slot locked",
+  "tinactory.tooltip.chestUnlock": "Empty slot unlocked",
   "tinactory.gui.networkController.title": "Network Controller",
   "tinactory.gui.networkController.welcome": "New Team Name: ",
   "tinactory.gui.networkController.welcomeButton": "Create Team",

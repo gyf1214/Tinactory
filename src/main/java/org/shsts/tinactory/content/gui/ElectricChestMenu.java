@@ -40,6 +40,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.gui.client.FluidSlot.HIGHLIGHT_COLOR;
+import static org.shsts.tinactory.core.util.I18n.tr;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
@@ -257,7 +258,9 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
 
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            return super.getTooltip(mouseX, mouseY);
+            var component = machineConfig.getBoolean("unlockChest") ?
+                    tr("tinactory.tooltip.chestUnlock") : tr("tinactory.tooltip.chestLock");
+            return Optional.of(List.of(component));
         }
 
         @Override
