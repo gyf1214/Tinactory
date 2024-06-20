@@ -223,8 +223,8 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        LOW_PRESSURE_BOILER = boiler("low", 1d);
-        HIGH_PRESSURE_BOILER = boiler("high", 2.2d);
+        LOW_PRESSURE_BOILER = boiler("low", 5d);
+        HIGH_PRESSURE_BOILER = boiler("high", 17d);
 
         BLAST_FURNACE = REGISTRATE.blockEntity("multi_block/blast_furnace",
                         PrimitiveBlock<SmartBlockEntity>::new)

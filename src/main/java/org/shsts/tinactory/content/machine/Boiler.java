@@ -38,7 +38,7 @@ public class Boiler extends CapabilityProvider implements
     private static final double BASE_HEAT = 20d;
     private static final double BURN_HEAT = 100d;
     private static final double BASE_DECAY = 0.0002d;
-    private static final double BASE_BURN = 0.1d;
+    private static final double BASE_BURN = 0.02d;
     private static final double BASE_ABSORB = 0.001d;
     private static final double BURN_EFFICIENCY = 10d;
 
