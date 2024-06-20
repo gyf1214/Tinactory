@@ -3,6 +3,7 @@ package org.shsts.tinactory.datagen.content.model;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
@@ -17,12 +18,17 @@ import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
+import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.util.LocHelper.extend;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
@@ -41,7 +47,253 @@ public class MachineModel {
     private static final String CASING_MODEL = "block/machine/casing";
     private static final String IO_MODEL = "block/machine/io";
     public static final ResourceLocation PRIMITIVE_TEX = gregtech("blocks/casings/wood_wall");
-    public static final String IO_TEX = "overlay/appeng/me_output_bus";
+    public static final String IO_TEX = "overlay/machine/overlay_energy_in";
+    public static final String ME_BUS = "overlay/appeng/me_output_bus";
+
+    @Nullable
+    private final ResourceLocation casing;
+    private final ResourceLocation overlay;
+    private final ResourceLocation ioTex;
+    private final Map<Direction, ResourceLocation> dirOverlay;
+
+    private MachineModel(@Nullable ResourceLocation casing,
+                         @Nullable ResourceLocation overlay,
+                         ResourceLocation ioTex,
+                         Map<Direction, ResourceLocation> dirOverlay) {
+        this.casing = casing;
+        this.overlay = overlay;
+        this.ioTex = ioTex;
+        this.dirOverlay = dirOverlay;
+    }
+
+    private ResourceLocation getCasing(Block block) {
+        if (casing != null) {
+            return casing;
+        }
+        if (block instanceof PrimitiveBlock<?>) {
+            return PRIMITIVE_TEX;
+        } else if (block instanceof MachineBlock<?> machineBlock) {
+            return casingTex(machineBlock.voltage);
+        } else if (block instanceof SubnetBlock subnetBlock) {
+            return casingTex(subnetBlock.voltage);
+        }
+        throw new IllegalArgumentException();
+    }
+
+    private <B extends ModelBuilder<B>>
+    B applyCasing(B model, ResourceLocation tex, ExistingFileHelper existingHelper) {
+        if (existingHelper.exists(tex, TEXTURE_TYPE)) {
+            return model.texture("top", tex)
+                    .texture("bottom", tex)
+                    .texture("side", tex);
+        } else {
+            return model.texture("top", extend(tex, "top"))
+                    .texture("bottom", extend(tex, "bottom"))
+                    .texture("side", extend(tex, "side"));
+        }
+    }
+
+    private Optional<ResourceLocation> getOverlay(Direction dir, ExistingFileHelper existingHelper) {
+        if (dirOverlay.containsKey(dir)) {
+            return Optional.of(dirOverlay.get(dir));
+        }
+        if (overlay == null) {
+            return Optional.empty();
+        }
+        if (existingHelper.exists(overlay, TEXTURE_TYPE)) {
+            return dir == Direction.NORTH ? Optional.of(overlay) : Optional.empty();
+        }
+        var loc = extend(overlay, "overlay_" + DIR_TEX_KEYS.get(dir));
+        if (existingHelper.exists(loc, TEXTURE_TYPE)) {
+            return Optional.of(loc);
+        }
+        var side = extend(overlay, "overlay_side");
+        if (existingHelper.exists(side, TEXTURE_TYPE) && dir.getAxis() == Direction.Axis.X) {
+            return Optional.of(side);
+        }
+        return Optional.empty();
+    }
+
+    private <B extends ModelBuilder<B>> B
+    applyOverlay(B model, ExistingFileHelper existingHelper) {
+        for (var e : DIR_TEX_KEYS.entrySet()) {
+            var tex = getOverlay(e.getKey(), existingHelper);
+            if (tex.isPresent()) {
+                model = model.texture(e.getValue() + "_overlay", tex.get());
+            }
+        }
+        return model;
+    }
+
+    private <B extends ModelBuilder<B>> B
+    applyTextures(B model, Block block, ExistingFileHelper existingHelper) {
+        var casingTex = getCasing(block);
+        model = applyCasing(model, casingTex, existingHelper);
+        return applyOverlay(model, existingHelper);
+    }
+
+    private <B extends ModelBuilder<B>> void
+    applyTextures(B model, ExistingFileHelper existingHelper) {
+        assert casing != null;
+        model = applyCasing(model, casing, existingHelper);
+        applyOverlay(model, existingHelper);
+    }
+
+    private ModelFile blockModel(String id, Block block, BlockModelProvider prov) {
+        var model = prov.withExistingParent(id, modLoc(CASING_MODEL));
+        return applyTextures(model, block, prov.existingFileHelper);
+    }
+
+    private ModelFile ioModel(String id, BlockModelProvider prov) {
+        return prov.withExistingParent(id + "_io", modLoc(IO_MODEL))
+                .texture("io_overlay", ioTex);
+    }
+
+    private void primitive(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var model = blockModel(ctx.id, ctx.object, ctx.provider.models());
+        ctx.provider.horizontalBlock(ctx.object, model);
+    }
+
+    private void sided(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var model = blockModel(ctx.id, ctx.object, ctx.provider.models());
+        ctx.provider.getVariantBuilder(ctx.object)
+                .forAllStates(state -> {
+                    var dir = state.getValue(MachineBlock.IO_FACING);
+                    return ConfiguredModel.builder()
+                            .modelFile(model)
+                            .rotationX(xRotation(dir))
+                            .rotationY(yRotation(dir))
+                            .build();
+                });
+    }
+
+    private void machine(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var modelProv = ctx.provider.models();
+        var base = blockModel(ctx.id, ctx.object, modelProv);
+        var io = ioModel(ctx.id, modelProv);
+        var multipart = ctx.provider.getMultipartBuilder(ctx.object);
+
+        for (var dir : Direction.values()) {
+            if (dir.getAxis() != Direction.Axis.Y) {
+                multipart.part().modelFile(base)
+                        .rotationY(yRotation(dir)).addModel()
+                        .condition(MachineBlock.FACING, dir)
+                        .end();
+            }
+        }
+
+        for (var dir : Direction.values()) {
+            var builder = multipart.part().modelFile(io);
+            if (dir.getAxis() == Direction.Axis.Y) {
+                builder.rotationX(xRotation(dir))
+                        .rotationY(yRotation(dir)).addModel()
+                        .condition(MachineBlock.IO_FACING, dir);
+            } else {
+                var otherDir = Arrays.stream(Direction.values())
+                        .filter(d -> d.getAxis() != Direction.Axis.Y && d != dir)
+                        .toArray(Direction[]::new);
+                builder.rotationY(yRotation(dir)).addModel()
+                        .condition(MachineBlock.FACING, otherDir)
+                        .condition(MachineBlock.IO_FACING, dir);
+            }
+        }
+    }
+
+    public <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockState() {
+        return ctx -> {
+            if (ctx.object instanceof PrimitiveBlock<?>) {
+                primitive(ctx);
+            } else if (ctx.object instanceof SidedMachineBlock<?> ||
+                    ctx.object instanceof SubnetBlock) {
+                sided(ctx);
+            } else if (ctx.object instanceof MachineBlock<?>) {
+                machine(ctx);
+            } else {
+                throw new IllegalArgumentException();
+            }
+        };
+    }
+
+    public void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        var model = ctx.provider.withExistingParent(ctx.id, modLoc(CASING_MODEL));
+        applyTextures(model, ctx.provider.existingFileHelper);
+    }
+
+    public static class Builder<P> extends SimpleBuilder<MachineModel, P, Builder<P>> {
+        @Nullable
+        private ResourceLocation casing = null;
+        @Nullable
+        private ResourceLocation overlay = null;
+        private ResourceLocation ioTex = tex(IO_TEX);
+        private final Map<Direction, ResourceLocation> dirOverlay = new HashMap<>();
+
+        private Builder(P parent) {
+            super(parent);
+        }
+
+        private static ResourceLocation tex(String val) {
+            return gregtech("blocks/" + val);
+        }
+
+        public Builder<P> casing(ResourceLocation val) {
+            casing = val;
+            return this;
+        }
+
+        public Builder<P> casing(Voltage voltage) {
+            return casing(casingTex(voltage));
+        }
+
+        public Builder<P> casing(String val) {
+            return casing(tex(val));
+        }
+
+        public Builder<P> overlay(ResourceLocation val) {
+            overlay = val;
+            return this;
+        }
+
+        public Builder<P> overlay(String val) {
+            return overlay(tex(val));
+        }
+
+        public Builder<P> overlay(Direction dir, ResourceLocation val) {
+            dirOverlay.put(dir, val);
+            return this;
+        }
+
+        public Builder<P> overlay(Direction dir, String val) {
+            return overlay(dir, tex(val));
+        }
+
+        public Builder<P> ioTex(ResourceLocation val) {
+            ioTex = val;
+            return this;
+        }
+
+        public Builder<P> ioTex(String val) {
+            return ioTex(tex(val));
+        }
+
+        @Override
+        protected MachineModel createObject() {
+            return new MachineModel(casing, overlay, ioTex, dirOverlay);
+        }
+    }
+
+    public static void genBlockModels(DataContext<BlockModelProvider> ctx) {
+        genCasingModel(ctx);
+        genIOModel(ctx);
+    }
+
+    public static Builder<?> builder() {
+        return new Builder<>(Unit.INSTANCE);
+    }
+
+    public static <P> Builder<P> builder(P parent) {
+        return new Builder<>(parent);
+    }
 
     private static void genCasingModel(DataContext<BlockModelProvider> ctx) {
         var model = ctx.provider.withExistingParent(CASING_MODEL, mcLoc("block/block"))
@@ -66,8 +318,7 @@ public class MachineModel {
                 .face(FRONT_FACING)
                 .cullface(FRONT_FACING)
                 .texture("#io_overlay")
-                .end().end()
-                .texture("io_overlay", gregtech("blocks/" + IO_TEX));
+                .end().end();
     }
 
     private static ResourceLocation casingTex(Voltage voltage) {
@@ -75,149 +326,5 @@ public class MachineModel {
             return PRIMITIVE_TEX;
         }
         return gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
-    }
-
-    private static <B extends ModelBuilder<B>>
-    B applyCasing(B model, ResourceLocation tex, ExistingFileHelper existingHelper) {
-        if (existingHelper.exists(tex, TEXTURE_TYPE)) {
-            return model.texture("top", tex)
-                    .texture("bottom", tex)
-                    .texture("side", tex);
-        } else {
-            return model.texture("top", extend(tex, "top"))
-                    .texture("bottom", extend(tex, "bottom"))
-                    .texture("side", extend(tex, "side"));
-        }
-    }
-
-    @Nullable
-    private final ResourceLocation casing;
-    private final ResourceLocation overlay;
-
-    public MachineModel(ResourceLocation overlay) {
-        this.casing = null;
-        this.overlay = overlay;
-    }
-
-    public MachineModel(ResourceLocation casing, ResourceLocation overlay) {
-        this.casing = casing;
-        this.overlay = overlay;
-    }
-
-    public MachineModel(Voltage voltage, ResourceLocation overlay) {
-        this.casing = casingTex(voltage);
-        this.overlay = overlay;
-    }
-
-    private <B extends ModelBuilder<B>> B
-    applyTextures(B model, ResourceLocation casing, ExistingFileHelper existingHelper) {
-        model = applyCasing(model, casing, existingHelper);
-        if (existingHelper.exists(overlay, TEXTURE_TYPE)) {
-            return model.texture("front_overlay", overlay);
-        } else {
-            for (var dir : DIR_TEX_KEYS.values()) {
-                var loc = extend(overlay, "overlay_" + dir);
-                if (existingHelper.exists(loc, TEXTURE_TYPE)) {
-                    model = model.texture(dir + "_overlay", loc);
-                }
-            }
-            var side = extend(overlay, "overlay_side");
-            if (existingHelper.exists(side, TEXTURE_TYPE)) {
-                model = model.texture("left_overlay", side).texture("right_overlay", side);
-            }
-            return model;
-        }
-    }
-
-    private ResourceLocation getCasing(Block block) {
-        if (casing != null) {
-            return casing;
-        }
-        if (block instanceof PrimitiveBlock<?>) {
-            return PRIMITIVE_TEX;
-        } else if (block instanceof MachineBlock<?> machineBlock) {
-            return casingTex(machineBlock.voltage);
-        } else if (block instanceof SubnetBlock subnetBlock) {
-            return casingTex(subnetBlock.voltage);
-        }
-        throw new IllegalArgumentException();
-    }
-
-    private ModelFile genModel(String id, Block block, BlockModelProvider prov) {
-        var model = prov.withExistingParent(id, modLoc(CASING_MODEL));
-        return applyTextures(model, getCasing(block), prov.existingFileHelper);
-    }
-
-    private void primitive(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var model = genModel(ctx.id, ctx.object, ctx.provider.models());
-        ctx.provider.horizontalBlock(ctx.object, model);
-    }
-
-    private void sided(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var model = genModel(ctx.id, ctx.object, ctx.provider.models());
-        ctx.provider.getVariantBuilder(ctx.object)
-                .forAllStates(state -> {
-                    var dir = state.getValue(MachineBlock.IO_FACING);
-                    return ConfiguredModel.builder()
-                            .modelFile(model)
-                            .rotationX(xRotation(dir))
-                            .rotationY(yRotation(dir))
-                            .build();
-                });
-    }
-
-    private void machine(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var casing = genModel(ctx.id, ctx.object, ctx.provider.models());
-        var io = ctx.provider.models().getExistingFile(modLoc(IO_MODEL));
-        var multipart = ctx.provider.getMultipartBuilder(ctx.object);
-
-        for (var dir : Direction.values()) {
-            if (dir.getAxis() != Direction.Axis.Y) {
-                multipart.part().modelFile(casing)
-                        .rotationY(yRotation(dir)).addModel()
-                        .condition(MachineBlock.FACING, dir)
-                        .end();
-            }
-        }
-
-        for (var dir : Direction.values()) {
-            var builder = multipart.part().modelFile(io);
-            if (dir.getAxis() == Direction.Axis.Y) {
-                builder.rotationX(xRotation(dir))
-                        .rotationY(yRotation(dir)).addModel()
-                        .condition(MachineBlock.IO_FACING, dir);
-            } else {
-                var otherDir = Arrays.stream(Direction.values())
-                        .filter(d -> d.getAxis() != Direction.Axis.Y && d != dir)
-                        .toArray(Direction[]::new);
-                builder.rotationY(yRotation(dir)).addModel()
-                        .condition(MachineBlock.FACING, otherDir)
-                        .condition(MachineBlock.IO_FACING, dir);
-            }
-        }
-    }
-
-    public void blockState(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        if (ctx.object instanceof PrimitiveBlock<?>) {
-            primitive(ctx);
-        } else if (ctx.object instanceof SidedMachineBlock<?> ||
-                ctx.object instanceof SubnetBlock) {
-            sided(ctx);
-        } else if (ctx.object instanceof MachineBlock<?>) {
-            machine(ctx);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    public void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        assert casing != null;
-        var model = ctx.provider.withExistingParent(ctx.id, modLoc(CASING_MODEL));
-        applyTextures(model, casing, ctx.provider.existingFileHelper);
-    }
-
-    public static void genBlockModels(DataContext<BlockModelProvider> ctx) {
-        genCasingModel(ctx);
-        genIOModel(ctx);
     }
 }

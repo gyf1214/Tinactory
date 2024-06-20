@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -14,6 +15,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
+import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -58,6 +60,7 @@ import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
+import static org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -84,10 +87,14 @@ public final class Machines {
         machine(ALLOY_SMELTER, "machines/alloy_smelter");
         machine(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
         machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
-        machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest");
+        machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest", ME_BUS);
 
         DATA_GEN.block(NETWORK_CONTROLLER)
-                .blockState(machineBlock(Voltage.LV, "overlay/machine/overlay_screen"))
+                .blockState(MachineModel::builder, MachineModel::blockState)
+                .casing(Voltage.LV)
+                .overlay("overlay/machine/overlay_screen")
+                .ioTex(ME_BUS)
+                .build()
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
                 .block(WORKBENCH)
@@ -112,7 +119,10 @@ public final class Machines {
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
                 .block(TEST_TRANSFORMER)
-                .blockState(machineBlock(IO_TEX))
+                .blockState(MachineModel::builder, MachineModel::blockState)
+                .overlay(Direction.NORTH, "overlay/machine/overlay_energy_in")
+                .overlay(Direction.SOUTH, "overlay/machine/overlay_energy_out_multi")
+                .build()
                 .tag(MINEABLE_WITH_WRENCH)
                 .build();
     }
@@ -210,19 +220,22 @@ public final class Machines {
         return Optional.empty();
     }
 
-    private static void machine(MachineSet set, String overlay) {
+    private static void machine(MachineSet set, String overlay, String ioTex) {
         var tag = getMachineTag(set);
         tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
         for (var voltage : set.voltages) {
             var builder = DATA_GEN.block(set.entry(voltage))
-                    .blockState(machineBlock(overlay))
+                    .blockState(MachineModel::builder, MachineModel::blockState)
+                    .overlay(overlay).ioTex(ioTex)
+                    .build()
                     .tag(MINEABLE_WITH_WRENCH);
             tag.ifPresent(builder::itemTag);
-            if (voltage == Voltage.PRIMITIVE) {
-                builder.tag(BlockTags.MINEABLE_WITH_AXE);
-            }
             builder.build();
         }
+    }
+
+    private static void machine(MachineSet set, String overlay) {
+        machine(set, overlay, IO_TEX);
     }
 
     private static void primitiveMachine(MachineSet set, RegistryEntry<? extends Block> primitive,

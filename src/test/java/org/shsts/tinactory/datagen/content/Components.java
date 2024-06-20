@@ -38,11 +38,11 @@ import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
 import static org.shsts.tinactory.datagen.content.Models.solidBlock;
+import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Components {
-    private static final String MACHINE_HULL_TEX = "overlay/machine/overlay_energy_out";
     private static final String RESEARCH_TEX = "metaitems/glass_vial/";
     private static final int ASSEMBLE_TICKS = 100;
 
@@ -67,7 +67,7 @@ public final class Components {
                 .build());
 
         MACHINE_HULL.forEach((v, entry) -> DATA_GEN.item(entry)
-                .model(machineItem(v, MACHINE_HULL_TEX))
+                .model(machineItem(v, IO_TEX))
                 .build());
 
         RESEARCH_EQUIPMENT.forEach((v, entry) -> DATA_GEN.item(entry)

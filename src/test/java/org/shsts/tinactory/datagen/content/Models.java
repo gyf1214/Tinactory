@@ -154,29 +154,39 @@ public final class Models {
     public static <U extends Block>
     Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
     machineBlock(String overlay) {
-        var model = new MachineModel(gregtech("blocks/" + overlay));
-        return model::blockState;
+        var model = MachineModel.builder()
+                .overlay(overlay)
+                .buildObject();
+        return model.blockState();
     }
 
     public static <U extends Block>
     Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
     machineBlock(String casing, String overlay) {
-        var model = new MachineModel(gregtech("blocks/" + casing),
-                gregtech("blocks/" + overlay));
-        return model::blockState;
+        var model = MachineModel.builder()
+                .casing(casing)
+                .overlay(overlay)
+                .buildObject();
+        return model.blockState();
     }
 
     public static <U extends Block>
     Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
     machineBlock(Voltage voltage, String overlay) {
-        var model = new MachineModel(voltage, gregtech("blocks/" + overlay));
-        return model::blockState;
+        var model = MachineModel.builder()
+                .casing(voltage)
+                .overlay(overlay)
+                .buildObject();
+        return model.blockState();
     }
 
     public static <U extends Item>
     Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
     machineItem(Voltage voltage, String overlay) {
-        var model = new MachineModel(voltage, gregtech("blocks/" + overlay));
+        var model = MachineModel.builder()
+                .casing(voltage)
+                .overlay(overlay)
+                .buildObject();
         return model::itemModel;
     }
 

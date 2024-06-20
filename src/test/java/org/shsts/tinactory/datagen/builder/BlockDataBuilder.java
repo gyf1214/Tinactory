@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.builder;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
@@ -7,13 +8,18 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
+import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class BlockDataBuilder<U extends Block, P> extends
         TrackedDataBuilder<Block, U, P, BlockDataBuilder<U, P>> {
     @Nullable
@@ -30,6 +36,14 @@ public class BlockDataBuilder<U extends Block, P> extends
     blockState(Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
         this.blockState = cons;
         return this;
+    }
+
+    public <R, S extends BuilderBase<R, BlockDataBuilder<U, P>, S>>
+    S blockState(Function<BlockDataBuilder<U, P>, S> builderFactory,
+                 Function<R, Consumer<RegistryDataContext<Block, U, BlockStateProvider>>> consFunction) {
+        var childBuilder = builderFactory.apply(this);
+        childBuilder.onCreateObject(model -> this.blockState = consFunction.apply(model));
+        return childBuilder;
     }
 
     public BlockDataBuilder<U, P>
