@@ -11,6 +11,8 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
+
 /**
  * Machine that can run without a network.
  */
@@ -28,5 +30,9 @@ public class PrimitiveMachine extends SmartBlockEntity {
         var processor = AllCapabilities.PROCESSOR.get(this);
         processor.onPreWork();
         processor.onWorkTick(workSpeed);
+        var working = processor.getProgress() > 0d;
+        if (state.getValue(WORKING) != working) {
+            world.setBlock(pos, state.setValue(WORKING, working), 3);
+        }
     }
 }

@@ -120,7 +120,7 @@ public final class Machines {
                 .build()
                 .block(TEST_TRANSFORMER)
                 .blockState(MachineModel::builder, MachineModel::blockState)
-                .overlay(Direction.NORTH, "overlay/machine/overlay_energy_in")
+                .overlay(Direction.NORTH, IO_TEX)
                 .overlay(Direction.SOUTH, "overlay/machine/overlay_energy_out_multi")
                 .build()
                 .tag(MINEABLE_WITH_WRENCH)

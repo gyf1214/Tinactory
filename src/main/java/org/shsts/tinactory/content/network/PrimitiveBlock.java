@@ -14,6 +14,8 @@ import org.shsts.tinactory.core.common.SmartEntityBlock;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
+
 /**
  * Entity block that has a face and do not connect to a network.
  */
@@ -28,11 +30,13 @@ public class PrimitiveBlock<T extends BlockEntity> extends SmartEntityBlock<T> {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, WORKING);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return defaultBlockState()
+                .setValue(FACING, context.getHorizontalDirection().getOpposite())
+                .setValue(WORKING, false);
     }
 }

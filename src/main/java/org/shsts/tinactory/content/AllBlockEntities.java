@@ -99,7 +99,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         STONE_GENERATOR = set(machine(AllRecipes.STONE_GENERATOR))
-                .voltages(Voltage.PRIMITIVE)
+                .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE / 2)
@@ -110,7 +110,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         var oreAnalyzer = set(ProcessingSet.oreAnalyzer())
-                .voltages(Voltage.PRIMITIVE)
+                .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -144,7 +144,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         ORE_WASHER = set(marker(AllRecipes.ORE_WASHER))
-                .voltages(Voltage.PRIMITIVE)
+                .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)

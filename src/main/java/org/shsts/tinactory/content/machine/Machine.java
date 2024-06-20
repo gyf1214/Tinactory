@@ -39,6 +39,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
+
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class Machine extends UpdatableCapabilityProvider
@@ -174,6 +176,13 @@ public class Machine extends UpdatableCapabilityProvider
     public void onDisconnectFromNetwork() {
         network = null;
         LOGGER.trace("{}: disconnect from network", this);
+        var world = blockEntity.getLevel();
+        assert world != null;
+        var state = blockEntity.getBlockState();
+        if (state.hasProperty(WORKING) && state.getValue(WORKING)) {
+            world.setBlock(blockEntity.getBlockPos(), state.setValue(WORKING, false), 3);
+        }
+
     }
 
     private void onPreWork(Level world, Network network) {
@@ -186,7 +195,16 @@ public class Machine extends UpdatableCapabilityProvider
     private void onWork(Level world, Network network) {
         assert this.network == network;
         var workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
-        getProcessor().ifPresent(processor -> processor.onWorkTick(workFactor));
+        getProcessor().ifPresent(processor -> {
+            processor.onWorkTick(workFactor);
+            var working = processor.getProgress() > 0d;
+            var state = blockEntity.getBlockState();
+            if (state.hasProperty(WORKING) &&
+                    state.getValue(WORKING) != working) {
+                world.setBlock(blockEntity.getBlockPos(),
+                        state.setValue(WORKING, working), 3);
+            }
+        });
     }
 
     public void buildSchedulings(NetworkComponent.SchedulingBuilder builder) {

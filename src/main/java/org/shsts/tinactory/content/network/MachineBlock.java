@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
@@ -35,6 +36,7 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
         implements IWrenchable, IConnector, IElectricBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final DirectionProperty IO_FACING = DirectionProperty.create("io_facing");
+    public static final BooleanProperty WORKING = BooleanProperty.create("working");
 
     public final Voltage voltage;
     protected final double resistance;
@@ -58,13 +60,14 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, IO_FACING);
+        builder.add(FACING, IO_FACING, WORKING);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite())
-                .setValue(IO_FACING, ctx.getHorizontalDirection());
+                .setValue(IO_FACING, ctx.getHorizontalDirection())
+                .setValue(WORKING, false);
     }
 
     @Override

@@ -34,6 +34,7 @@ import static org.shsts.tinactory.core.util.LocHelper.extend;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.DIR_TEX_KEYS;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
 import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
@@ -47,7 +48,7 @@ public class MachineModel {
     private static final String CASING_MODEL = "block/machine/casing";
     private static final String IO_MODEL = "block/machine/io";
     public static final ResourceLocation PRIMITIVE_TEX = gregtech("blocks/casings/wood_wall");
-    public static final String IO_TEX = "overlay/machine/overlay_energy_in";
+    public static final String IO_TEX = "overlay/machine/overlay_energy_in_multi";
     public static final String ME_BUS = "overlay/appeng/me_output_bus";
 
     @Nullable
@@ -93,21 +94,24 @@ public class MachineModel {
         }
     }
 
-    private Optional<ResourceLocation> getOverlay(Direction dir, ExistingFileHelper existingHelper) {
+    private Optional<ResourceLocation> getOverlay(Direction dir, String suffix,
+                                                  ExistingFileHelper existingHelper) {
         if (dirOverlay.containsKey(dir)) {
-            return Optional.of(dirOverlay.get(dir));
+            var tex = suffix(dirOverlay.get(dir), suffix);
+            return existingHelper.exists(tex, TEXTURE_TYPE) ? Optional.of(tex) : Optional.empty();
         }
         if (overlay == null) {
             return Optional.empty();
         }
-        if (existingHelper.exists(overlay, TEXTURE_TYPE)) {
-            return dir == Direction.NORTH ? Optional.of(overlay) : Optional.empty();
+        var tex = suffix(overlay, suffix);
+        if (existingHelper.exists(tex, TEXTURE_TYPE)) {
+            return dir == Direction.NORTH ? Optional.of(tex) : Optional.empty();
         }
-        var loc = extend(overlay, "overlay_" + DIR_TEX_KEYS.get(dir));
+        var loc = extend(overlay, "overlay_" + DIR_TEX_KEYS.get(dir) + suffix);
         if (existingHelper.exists(loc, TEXTURE_TYPE)) {
             return Optional.of(loc);
         }
-        var side = extend(overlay, "overlay_side");
+        var side = extend(overlay, "overlay_side" + suffix);
         if (existingHelper.exists(side, TEXTURE_TYPE) && dir.getAxis() == Direction.Axis.X) {
             return Optional.of(side);
         }
@@ -115,9 +119,9 @@ public class MachineModel {
     }
 
     private <B extends ModelBuilder<B>> B
-    applyOverlay(B model, ExistingFileHelper existingHelper) {
+    applyOverlay(B model, boolean working, ExistingFileHelper existingHelper) {
         for (var e : DIR_TEX_KEYS.entrySet()) {
-            var tex = getOverlay(e.getKey(), existingHelper);
+            var tex = getOverlay(e.getKey(), working ? "_active" : "", existingHelper);
             if (tex.isPresent()) {
                 model = model.texture(e.getValue() + "_overlay", tex.get());
             }
@@ -126,22 +130,22 @@ public class MachineModel {
     }
 
     private <B extends ModelBuilder<B>> B
-    applyTextures(B model, Block block, ExistingFileHelper existingHelper) {
+    applyTextures(B model, Block block, boolean working, ExistingFileHelper existingHelper) {
         var casingTex = getCasing(block);
         model = applyCasing(model, casingTex, existingHelper);
-        return applyOverlay(model, existingHelper);
+        return applyOverlay(model, working, existingHelper);
     }
 
     private <B extends ModelBuilder<B>> void
     applyTextures(B model, ExistingFileHelper existingHelper) {
         assert casing != null;
         model = applyCasing(model, casing, existingHelper);
-        applyOverlay(model, existingHelper);
+        applyOverlay(model, false, existingHelper);
     }
 
-    private ModelFile blockModel(String id, Block block, BlockModelProvider prov) {
+    private ModelFile blockModel(String id, Block block, boolean working, BlockModelProvider prov) {
         var model = prov.withExistingParent(id, modLoc(CASING_MODEL));
-        return applyTextures(model, block, prov.existingFileHelper);
+        return applyTextures(model, block, working, prov.existingFileHelper);
     }
 
     private ModelFile ioModel(String id, BlockModelProvider prov) {
@@ -150,12 +154,24 @@ public class MachineModel {
     }
 
     private void primitive(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var model = blockModel(ctx.id, ctx.object, ctx.provider.models());
-        ctx.provider.horizontalBlock(ctx.object, model);
+        var prov = ctx.provider.models();
+        var model = blockModel(ctx.id, ctx.object, false, prov);
+        var workingModel = blockModel(ctx.id + "_active", ctx.object, true, prov);
+
+        ctx.provider.getVariantBuilder(ctx.object)
+                .forAllStates(state -> {
+                    var dir = state.getValue(MachineBlock.FACING);
+                    var working = state.getValue(MachineBlock.WORKING);
+                    return ConfiguredModel.builder()
+                            .modelFile(working ? workingModel : model)
+                            .rotationX(xRotation(dir))
+                            .rotationY(yRotation(dir))
+                            .build();
+                });
     }
 
     private void sided(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var model = blockModel(ctx.id, ctx.object, ctx.provider.models());
+        var model = blockModel(ctx.id, ctx.object, false, ctx.provider.models());
         ctx.provider.getVariantBuilder(ctx.object)
                 .forAllStates(state -> {
                     var dir = state.getValue(MachineBlock.IO_FACING);
@@ -168,9 +184,10 @@ public class MachineModel {
     }
 
     private void machine(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var modelProv = ctx.provider.models();
-        var base = blockModel(ctx.id, ctx.object, modelProv);
-        var io = ioModel(ctx.id, modelProv);
+        var prov = ctx.provider.models();
+        var base = blockModel(ctx.id, ctx.object, false, prov);
+        var working = blockModel(ctx.id + "_active", ctx.object, true, prov);
+        var io = ioModel(ctx.id, prov);
         var multipart = ctx.provider.getMultipartBuilder(ctx.object);
 
         for (var dir : Direction.values()) {
@@ -178,6 +195,12 @@ public class MachineModel {
                 multipart.part().modelFile(base)
                         .rotationY(yRotation(dir)).addModel()
                         .condition(MachineBlock.FACING, dir)
+                        .condition(MachineBlock.WORKING, false)
+                        .end()
+                        .part().modelFile(working)
+                        .rotationY(yRotation(dir)).addModel()
+                        .condition(MachineBlock.FACING, dir)
+                        .condition(MachineBlock.WORKING, true)
                         .end();
             }
         }

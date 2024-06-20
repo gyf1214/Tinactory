@@ -29,6 +29,10 @@ public final class LocHelper {
         return new ResourceLocation(loc.getNamespace(), loc.getPath() + "/" + suffix);
     }
 
+    public static ResourceLocation suffix(ResourceLocation loc, String suffix) {
+        return new ResourceLocation(loc.getNamespace(), loc.getPath() + suffix);
+    }
+
     public static ResourceLocation prepend(ResourceLocation loc, String prefix) {
         if (StringUtils.isEmpty(prefix)) {
             return loc;
