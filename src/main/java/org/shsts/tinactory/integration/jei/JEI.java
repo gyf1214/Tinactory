@@ -4,21 +4,16 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
-import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -29,14 +24,14 @@ import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
-import org.shsts.tinactory.integration.jei.ingredient.FluidIngredientRenderer;
-import org.shsts.tinactory.integration.jei.ingredient.FluidStackHelper;
-import org.shsts.tinactory.integration.jei.ingredient.FluidStackType;
-import org.shsts.tinactory.integration.jei.ingredient.FluidStackWrapper;
+import org.shsts.tinactory.integration.jei.ingredient.EmptyRenderer;
+import org.shsts.tinactory.integration.jei.ingredient.TechIngredientHelper;
+import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,15 +75,8 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
-        var allFluids = ForgeRegistries.FLUIDS.getValues().stream()
-                .filter(fluid -> fluid.isSource(fluid.defaultFluidState()))
-                .map(fluid -> new FluidStackWrapper(
-                        new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME)))
-                .toList();
-        var helper = new FluidStackHelper(registration.getSubtypeManager(),
-                registration.getColorHelper());
-        var renderer = new FluidIngredientRenderer();
-        registration.register(FluidStackType.INSTANCE, allFluids, helper, renderer);
+        registration.register(TechIngredientType.INSTANCE, Collections.emptyList(),
+                new TechIngredientHelper(), EmptyRenderer.instance());
     }
 
     @Override
@@ -127,12 +115,5 @@ public class JEI implements IModPlugin {
             category.registerRecipeTransferHandlers(registration);
         }
         registration.addRecipeTransferHandler(WorkbenchMenu.class, RecipeTypes.CRAFTING, 9, 9, 19, 36);
-    }
-
-    @Override
-    public void onRuntimeAvailable(IJeiRuntime jei) {
-        var ingredientManager = jei.getIngredientManager();
-        var allFluids = new ArrayList<>(ingredientManager.getAllIngredients(ForgeTypes.FLUID_STACK));
-        ingredientManager.removeIngredientsAtRuntime(ForgeTypes.FLUID_STACK, allFluids);
     }
 }

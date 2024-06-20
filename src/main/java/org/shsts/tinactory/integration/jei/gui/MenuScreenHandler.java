@@ -4,15 +4,19 @@ import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.integration.jei.JEI;
+import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -53,9 +57,17 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
     @Override
     public @Nullable Object getIngredientUnderMouse(MenuScreen<?> screen, double mouseX, double mouseY) {
         var hovered = screen.getHovered((int) mouseX, (int) mouseY);
-        if (hovered.isPresent() && hovered.get() instanceof FluidSlot slot) {
+        if (hovered.isEmpty()) {
+            return null;
+        }
+        if (hovered.get() instanceof FluidSlot slot) {
             var stack = slot.getFluidStack();
             return stack.isEmpty() ? null : stack;
+        } else if (hovered.get() instanceof ResearchBenchPlugin.TechButton) {
+            return TechManager.localTeam()
+                    .flatMap(ITeamProfile::getTargetTech)
+                    .map(tech -> new TechWrapper(tech.getLoc()))
+                    .orElse(null);
         }
         return null;
     }

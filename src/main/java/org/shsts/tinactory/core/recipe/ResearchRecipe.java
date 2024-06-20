@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ResearchRecipe extends ProcessingRecipe {
-    private final ResourceLocation target;
+    public final ResourceLocation target;
     private final long progress;
 
     private ResearchRecipe(Builder builder) {

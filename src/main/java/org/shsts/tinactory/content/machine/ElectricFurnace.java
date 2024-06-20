@@ -23,6 +23,7 @@ import org.shsts.tinactory.core.machine.RecipeProcessor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -66,7 +67,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     protected List<? extends SmeltingRecipe> getMatchedRecipes(Level world, IContainer container) {
         return world.getRecipeManager().getRecipeFor(recipeType, getInputWrapper(container), world)
                 .filter(recipe -> canOutput(recipe, container))
-                .map(List::of).orElse(List.of());
+                .map(List::of).orElse(Collections.emptyList());
     }
 
     @Override

@@ -194,6 +194,17 @@ public final class RenderUtil {
         RenderSystem.disableBlend();
     }
 
+    public static void renderItem(PoseStack poseStack, ItemStack stack, int x, int y) {
+        var poseStack1 = RenderSystem.getModelViewStack();
+        poseStack1.pushPose();
+        poseStack1.mulPoseMatrix(poseStack.last().pose());
+        ClientUtil.getItemRenderer().renderAndDecorateItem(stack, x, y);
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableBlend();
+        poseStack1.popPose();
+        RenderSystem.applyModelViewMatrix();
+    }
+
     public static void renderItemWithDecoration(ItemStack stack, int x, int y, @Nullable String text) {
         var renderer = ClientUtil.getItemRenderer();
         renderer.renderAndDecorateItem(stack, x, y);

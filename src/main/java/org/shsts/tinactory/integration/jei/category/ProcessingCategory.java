@@ -3,6 +3,7 @@ package org.shsts.tinactory.integration.jei.category;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllTags;
@@ -21,14 +23,18 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
+import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
+import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
+import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -102,6 +108,13 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
         }
         for (var output : outputs) {
             addIngredient(builder, output.slot(), output.val());
+        }
+
+        if (recipe instanceof ResearchRecipe recipe1) {
+            var rect = layout.images.get(0).rect();
+            var slot = new Layout.SlotInfo(0, rect.x(), rect.y(), 0, SlotType.NONE);
+            builder.addIngredients(slot, RecipeIngredientRole.OUTPUT, TechIngredientType.INSTANCE,
+                    List.of(new TechWrapper(recipe1.target)));
         }
     }
 

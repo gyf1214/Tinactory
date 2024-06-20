@@ -13,6 +13,8 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record Texture(ResourceLocation loc, int width, int height) {
+    public static final Texture VOID = new Texture(modLoc("void"), 16, 16);
+
     public static final Texture SLOT_BACKGROUND = new Texture(
             gregtech("gui/base/slot"), SLOT_SIZE, SLOT_SIZE);
     public static final Texture SWITCH_BUTTON = new Texture(

@@ -8,6 +8,7 @@ import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
+import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
@@ -18,6 +19,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -101,6 +103,23 @@ public class ProcessingSet extends MachineSet {
                         .simpleCapability(RecipeProcessor.machine(recipeType))
                         .menu()
                         .plugin(MachinePlugin.marker(recipeType))
+                        .build()
+                        .build();
+            }
+        };
+    }
+
+    public static Builder<ResearchRecipe, ?> research() {
+        return new Builder<>(AllRecipes.RESEARCH_BENCH, Unit.INSTANCE) {
+            @Override
+            protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>
+            getMachineBuilder(Voltage voltage) {
+                return super.getMachineBuilder(voltage)
+                        .blockEntity()
+                        .simpleCapability(RecipeProcessor.machine(recipeType))
+                        .menu()
+                        .plugin(MachinePlugin.processing(recipeType))
+                        .plugin(ResearchBenchPlugin.builder())
                         .build()
                         .build();
             }

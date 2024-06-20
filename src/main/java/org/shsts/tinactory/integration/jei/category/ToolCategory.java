@@ -15,7 +15,7 @@ import org.shsts.tinactory.core.recipe.ToolRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -52,7 +52,7 @@ public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchMenu> {
                     var ingredient = recipe.shapedRecipe.getIngredients().get(i * shaped.getWidth() + j);
                     builder.ingredient(slot, ingredient);
                 } else {
-                    builder.items(slot, List.of());
+                    builder.items(slot, Collections.emptyList());
                 }
             }
         }

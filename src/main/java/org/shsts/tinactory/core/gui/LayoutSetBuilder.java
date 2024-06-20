@@ -71,6 +71,10 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return image(new Rect(x, y, tex.width(), tex.height()), tex);
     }
 
+    public LayoutSetBuilder<P> placeHolder(Rect rect) {
+        return image(rect, Texture.VOID);
+    }
+
     public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {
         progressBar = new Layout.WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
         return this;

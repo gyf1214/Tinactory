@@ -245,14 +245,12 @@ public class TechPanel extends Panel {
         addPanel(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
     }
 
-    private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,
-                                  boolean renderPressed) {
-        if (team == null) {
-            return;
-        }
-
+    public static void renderTechButton(PoseStack poseStack, int z, Rect rect, @Nullable ITeamProfile team,
+                                        ITechnology technology, boolean pressed) {
         int color;
-        if (team.isTechFinished(technology)) {
+        if (team == null) {
+            color = INVALID_COLOR;
+        } else if (team.isTechFinished(technology)) {
             color = FINISHED_COLOR;
         } else if (team.isTechAvailable(technology)) {
             color = AVAILABLE_COLOR;
@@ -263,14 +261,22 @@ public class TechPanel extends Panel {
         var tex = Texture.SWITCH_BUTTON;
         var th = Texture.SWITCH_BUTTON.height() / 2;
         var texRect = new Rect(0, 0, tex.width(), th);
-        if (renderPressed && technology == selectedTech) {
+        if (pressed) {
             texRect = texRect.offset(0, th);
         }
         StretchImage.render(poseStack, Texture.SWITCH_BUTTON, z, color, rect, texRect, 1);
 
         var x = rect.x() + (rect.width() - 16) / 2;
         var y = rect.y() + (rect.height() - 16) / 2;
-        RenderUtil.renderItem(technology.getDisplayItem(), x, y);
+        RenderUtil.renderItem(poseStack, technology.getDisplayItem(), x, y);
+    }
+
+    private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,
+                                  boolean renderPressed) {
+        if (team == null) {
+            return;
+        }
+        renderTechButton(poseStack, z, rect, team, technology, renderPressed && technology == selectedTech);
     }
 
     private Optional<List<Component>> techTooltip(ITechnology technology) {

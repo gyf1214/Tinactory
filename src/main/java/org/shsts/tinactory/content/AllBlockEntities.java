@@ -20,6 +20,7 @@ import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
+import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
@@ -37,6 +38,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.machine.ProcessingSet.generator;
 import static org.shsts.tinactory.content.machine.ProcessingSet.machine;
 import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
+import static org.shsts.tinactory.content.machine.ProcessingSet.research;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
@@ -72,11 +74,12 @@ public final class AllBlockEntities {
     static {
         PROCESSING_SETS = new HashSet<>();
 
-        RESEARCH_BENCH = set(machine(AllRecipes.RESEARCH_BENCH))
+        RESEARCH_BENCH = set(research())
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
+                .placeHolder(new Rect(3 * SLOT_SIZE, SLOT_SIZE / 2 - 2, 24, 24))
                 .progressBar(Texture.PROGRESS_MULTIPLE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();

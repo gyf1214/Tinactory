@@ -35,6 +35,7 @@ public class NetworkController extends SmartBlockEntity {
         assert level != null && !level.isClientSide;
         assert network == null;
         network = new Network(level, worldPosition, team);
+        teamName = network.team.getName();
         setChanged();
     }
 
@@ -47,7 +48,6 @@ public class NetworkController extends SmartBlockEntity {
         super.onServerLoad(world);
         if (teamName != null) {
             TechManager.server().teamByName(teamName).ifPresent(this::createNetwork);
-            teamName = null;
         }
     }
 
@@ -99,8 +99,8 @@ public class NetworkController extends SmartBlockEntity {
     @Override
     protected void serializeOnSave(CompoundTag tag) {
         super.serializeOnSave(tag);
-        if (network != null) {
-            tag.putString("team", network.team.getName());
+        if (teamName != null) {
+            tag.putString("team", teamName);
         }
     }
 
