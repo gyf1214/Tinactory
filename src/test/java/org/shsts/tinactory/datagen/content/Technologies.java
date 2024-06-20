@@ -9,6 +9,7 @@ import org.shsts.tinactory.datagen.builder.TechBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
 import static org.shsts.tinactory.content.AllTechs.BASE_ORE;
 import static org.shsts.tinactory.content.AllTechs.LOGISTICS;
@@ -17,19 +18,21 @@ import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Technologies {
+    private static final TechFactory TECH_FACTORY = new TechFactory();
+
     public static void init() {
-        var $ = new TechFactory();
         for (var variant : OreVariant.values()) {
-            $.tech(BASE_ORE.get(variant))
+            TECH_FACTORY.tech(BASE_ORE.get(variant))
                     .maxProgress(200L * (1L << (long) variant.rank))
                     .displayItem(variant.baseItem)
                     .build();
         }
-        $.reset();
+        TECH_FACTORY.reset();
         for (var i = 0; i < LOGISTICS.size(); i++) {
-            $.tech(LOGISTICS.get(i))
+            TECH_FACTORY.tech(LOGISTICS.get(i))
                     .maxProgress(30L * (1L << (2L * i)))
                     .modifier("logistics_level", 1)
+                    .displayItem(CONVEYOR_MODULE.get(Voltage.fromRank(2 + 2 * i)))
                     .build();
         }
 

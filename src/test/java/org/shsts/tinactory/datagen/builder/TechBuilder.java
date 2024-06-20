@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -25,7 +26,7 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     private long maxProgress = 0;
     private final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
-    private ResourceLocation displayItem = null;
+    private Supplier<ResourceLocation> displayItem = null;
 
     public TechBuilder(DataGen dataGen, P parent, String id) {
         super(dataGen, parent, id);
@@ -46,14 +47,17 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     }
 
     public TechBuilder<P> displayItem(ResourceLocation loc) {
-        displayItem = loc;
+        displayItem = () -> loc;
         return this;
     }
 
     public TechBuilder<P> displayItem(ItemLike item) {
-        var loc = item.asItem().getRegistryName();
-        assert loc != null;
-        return displayItem(loc);
+        return displayItem(() -> item);
+    }
+
+    public TechBuilder<P> displayItem(Supplier<? extends ItemLike> item) {
+        displayItem = () -> item.get().asItem().getRegistryName();
+        return this;
     }
 
     public TechBuilder<P> modifier(String key, int val) {
@@ -78,7 +82,7 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
         var ja = new JsonArray();
         depends.forEach(d -> ja.add(d.toString()));
         jo.add("depends", ja);
-        var displayItemLoc = displayItem == null ? Items.AIR.getRegistryName() : displayItem;
+        var displayItemLoc = displayItem == null ? Items.AIR.getRegistryName() : displayItem.get();
         assert displayItemLoc != null;
         jo.addProperty("display_item", displayItemLoc.toString());
         var jo1 = new com.google.gson.JsonObject();
