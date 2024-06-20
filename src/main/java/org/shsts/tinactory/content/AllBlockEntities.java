@@ -12,13 +12,12 @@ import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineSet;
+import org.shsts.tinactory.content.machine.PrimitiveMachine;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
-import org.shsts.tinactory.content.recipe.GeneratorRecipe;
-import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Texture;
@@ -26,9 +25,7 @@ import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.network.NetworkController;
-import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -46,50 +43,34 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllBlockEntities {
+    public static final ProcessingSet RESEARCH_BENCH;
+    public static final ProcessingSet ASSEMBLER;
+    public static final ProcessingSet STONE_GENERATOR;
+    public static final ProcessingSet ORE_ANALYZER;
+    public static final ProcessingSet MACERATOR;
+    public static final ProcessingSet ORE_WASHER;
+    public static final ProcessingSet CENTRIFUGE;
+    public static final ProcessingSet THERMAL_CENTRIFUGE;
+    public static final MachineSet ELECTRIC_FURNACE;
+    public static final ProcessingSet ALLOY_SMELTER;
+    public static final ProcessingSet STEAM_TURBINE;
+    public static final MachineSet BATTERY_BOX;
+    public static final MachineSet ELECTRIC_CHEST;
+
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
-    public static final ProcessingSet<ResearchRecipe> RESEARCH_BENCH;
-    public static final ProcessingSet<AssemblyRecipe> ASSEMBLER;
-    public static final ProcessingSet<ProcessingRecipe> STONE_GENERATOR;
-    public static final ProcessingSet<OreAnalyzerRecipe> ORE_ANALYZER;
-    public static final ProcessingSet<ProcessingRecipe> MACERATOR;
-    public static final ProcessingSet<ProcessingRecipe> ORE_WASHER;
-    public static final ProcessingSet<ProcessingRecipe> CENTRIFUGE;
-    public static final ProcessingSet<ProcessingRecipe> THERMAL_CENTRIFUGE;
-    public static final MachineSet<MachineBlock<SmartBlockEntity>> ELECTRIC_FURNACE;
-    public static final ProcessingSet<ProcessingRecipe> ALLOY_SMELTER;
-    public static final ProcessingSet<GeneratorRecipe> STEAM_TURBINE;
+    public static final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> PRIMITIVE_STONE_GENERATOR;
+    public static final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> PRIMITIVE_ORE_ANALYZER;
+    public static final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> PRIMITIVE_ORE_WASHER;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
     public static final RegistryEntry<SidedMachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
-    public static final MachineSet<SidedMachineBlock<SmartBlockEntity>> BATTERY_BOX;
-    public static final MachineSet<MachineBlock<SmartBlockEntity>> ELECTRIC_CHEST;
+
+    public static final Set<ProcessingSet> PROCESSING_SETS;
 
     static {
         PROCESSING_SETS = new HashSet<>();
-
-        NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",
-                        NetworkController::new,
-                        MachineBlock.factory(Voltage.PRIMITIVE))
-                .entityClass(NetworkController.class)
-                .blockEntity()
-                .eventManager().ticking()
-                .menu(NetworkControllerMenu::new)
-                .noInventory()
-                .title("networkController")
-                .build()
-                .build()
-                .translucent()
-                .buildObject();
-
-        WORKBENCH = REGISTRATE.blockEntity("primitive/workbench",
-                        PrimitiveBlock<SmartBlockEntity>::new)
-                .blockEntity()
-                .simpleCapability(Workbench::builder)
-                .menu(WorkbenchMenu::new).build()
-                .build()
-                .buildObject();
 
         RESEARCH_BENCH = set(machine(AllRecipes.RESEARCH_BENCH))
                 .voltages(Voltage.ULV)
@@ -285,9 +266,54 @@ public final class AllBlockEntities {
             }
         }
         ELECTRIC_CHEST = electricChest.build().buildObject();
+
+        NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",
+                        NetworkController::new,
+                        MachineBlock.factory(Voltage.PRIMITIVE))
+                .entityClass(NetworkController.class)
+                .blockEntity()
+                .eventManager().ticking()
+                .menu(NetworkControllerMenu::new)
+                .noInventory()
+                .title("networkController")
+                .build()
+                .build()
+                .translucent()
+                .buildObject();
+
+        WORKBENCH = REGISTRATE.blockEntity("primitive/workbench",
+                        PrimitiveBlock<SmartBlockEntity>::new)
+                .blockEntity()
+                .simpleCapability(Workbench::builder)
+                .menu(WorkbenchMenu::new).build()
+                .build()
+                .buildObject();
+
+        PRIMITIVE_STONE_GENERATOR = primitive(STONE_GENERATOR);
+        PRIMITIVE_ORE_ANALYZER = primitive(ORE_ANALYZER);
+        PRIMITIVE_ORE_WASHER = primitive(ORE_WASHER);
     }
 
-    public static final Set<ProcessingSet<?>> PROCESSING_SETS;
+    public static void init() {}
+
+    private static RegistryEntry<PrimitiveBlock<PrimitiveMachine>>
+    primitive(ProcessingSet set) {
+        var recipeType = set.recipeType;
+        var id = "primitive/" + recipeType.id;
+        var layout = set.layout(Voltage.PRIMITIVE);
+        return REGISTRATE.blockEntity(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
+                .entityClass(PrimitiveMachine.class)
+                .blockEntity()
+                .eventManager().ticking()
+                .simpleCapability(RecipeProcessor.machine(recipeType))
+                .simpleCapability(StackProcessingContainer.builder(layout))
+                .menu(ProcessingMenu.machine(layout))
+                .title(ProcessingMenu::getTitle)
+                .build()
+                .build()
+                .translucent()
+                .buildObject();
+    }
 
     private static <T extends ProcessingRecipe> ProcessingSet.Builder<T, ?>
     set(ProcessingSet.Builder<T, ?> builder) {
@@ -313,6 +339,4 @@ public final class AllBlockEntities {
                 .translucent()
                 .buildObject();
     }
-
-    public static void init() {}
 }

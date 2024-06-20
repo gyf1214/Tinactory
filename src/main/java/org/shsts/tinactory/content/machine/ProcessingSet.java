@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.machine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
+import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -9,7 +10,6 @@ import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
-import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -22,7 +22,6 @@ import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.Map;
@@ -31,19 +30,18 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<MachineBlock<SmartBlockEntity>> {
-    public final RecipeTypeEntry<T, ?> recipeType;
+public class ProcessingSet extends MachineSet {
+    public final RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType;
 
-    private ProcessingSet(RecipeTypeEntry<T, ?> recipeType, Collection<Voltage> voltages,
-                          Map<Voltage, Layout> layoutSet,
-                          Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
-                          @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
-        super(voltages, layoutSet, machines, primitive);
+    private ProcessingSet(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
+                          Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+                          Map<Voltage, RegistryEntry<? extends Block>> machines) {
+        super(voltages, layoutSet, machines);
         this.recipeType = recipeType;
     }
 
     public abstract static class Builder<T extends ProcessingRecipe, P> extends
-            BuilderBase<MachineBlock<SmartBlockEntity>, ProcessingSet<T>, P, Builder<T, P>> {
+            BuilderBase<ProcessingSet, P, Builder<T, P>> {
         protected final RecipeTypeEntry<T, ?> recipeType;
 
         public Builder(RecipeTypeEntry<T, ?> recipeType, P parent) {
@@ -69,29 +67,9 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
         }
 
         @Override
-        protected BlockEntityBuilder<PrimitiveMachine, PrimitiveBlock<PrimitiveMachine>, ?>
-        getPrimitiveBuilder() {
-            var id = "primitive/" + recipeType.id;
-            var layout = getLayout(Voltage.PRIMITIVE);
-            return REGISTRATE.blockEntity(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
-                    .entityClass(PrimitiveMachine.class)
-                    .blockEntity()
-                    .eventManager().ticking()
-                    .simpleCapability(RecipeProcessor.machine(recipeType))
-                    .simpleCapability(StackProcessingContainer.builder(layout))
-                    .menu(ProcessingMenu.machine(layout))
-                    .title(ProcessingMenu::getTitle)
-                    .build()
-                    .build()
-                    .translucent();
-        }
-
-        @Override
-        protected ProcessingSet<T>
-        createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                  Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> machines,
-                  @Nullable RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive) {
-            return new ProcessingSet<>(recipeType, voltages, layoutSet, machines, primitive);
+        protected ProcessingSet createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+                                          Map<Voltage, RegistryEntry<? extends Block>> machines) {
+            return new ProcessingSet(recipeType, voltages, layoutSet, machines);
         }
     }
 
@@ -162,7 +140,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
         };
     }
 
-    public static MachineSet.Builder<MachineBlock<SmartBlockEntity>, ?> electricFurnace() {
+    public static MachineSet.Builder<?> electricFurnace() {
         return new MachineSet.Builder<>(Unit.INSTANCE) {
             @Override
             protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>
@@ -185,7 +163,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
         };
     }
 
-    public static MachineSet.Builder<SidedMachineBlock<SmartBlockEntity>, ?> batteryBox() {
+    public static MachineSet.Builder<?> batteryBox() {
         return new MachineSet.Builder<>(Unit.INSTANCE) {
             @Override
             protected BlockEntityBuilder<SmartBlockEntity, SidedMachineBlock<SmartBlockEntity>, ?>
@@ -205,7 +183,7 @@ public class ProcessingSet<T extends ProcessingRecipe> extends MachineSet<Machin
         };
     }
 
-    public static MachineSet.Builder<MachineBlock<SmartBlockEntity>, ?> electricChest() {
+    public static MachineSet.Builder<?> electricChest() {
         return new MachineSet.Builder<>(Unit.INSTANCE) {
             @Override
             protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>

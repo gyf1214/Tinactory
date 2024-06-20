@@ -8,6 +8,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -33,6 +34,9 @@ import static org.shsts.tinactory.content.AllBlockEntities.MULTI_BLOCK_INTERFACE
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER;
+import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_ANALYZER;
+import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_WASHER;
+import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_BENCH;
 import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
@@ -68,12 +72,12 @@ public final class Machines {
     }
 
     private static void machineItems() {
+        primitiveMachine(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR, "machines/rock_crusher");
+        primitiveMachine(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER, "machines/electromagnetic_separator");
+        primitiveMachine(ORE_WASHER, PRIMITIVE_ORE_WASHER, "machines/ore_washer");
         machine(RESEARCH_BENCH, "overlay/machine/overlay_screen");
         machine(ASSEMBLER, "machines/assembler");
-        machine(STONE_GENERATOR, "machines/rock_crusher");
-        machine(ORE_ANALYZER, "machines/electromagnetic_separator");
         machine(MACERATOR, "machines/macerator");
-        machine(ORE_WASHER, "machines/ore_washer");
         machine(CENTRIFUGE, "machines/centrifuge");
         machine(THERMAL_CENTRIFUGE, "machines/thermal_centrifuge");
         machine(ELECTRIC_FURNACE, "machines/electric_furnace");
@@ -126,7 +130,7 @@ public final class Machines {
                         .unlockedBy("has_cobblestone", has(STONE.tag("block"))))
                 // primitive stone generator
                 .vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(STONE_GENERATOR.block(Voltage.PRIMITIVE))
+                        .shaped(PRIMITIVE_STONE_GENERATOR.get())
                         .pattern("WLW")
                         .pattern("L L")
                         .pattern("WLW")
@@ -135,7 +139,7 @@ public final class Machines {
                         .unlockedBy("has_planks", has(ItemTags.PLANKS)))
                 // primitive ore analyzer
                 .vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(ORE_ANALYZER.block(Voltage.PRIMITIVE))
+                        .shaped(PRIMITIVE_ORE_ANALYZER.get())
                         .pattern("WLW")
                         .pattern("LFL")
                         .pattern("WLW")
@@ -145,7 +149,7 @@ public final class Machines {
                         .unlockedBy("has_flint", has(FLINT.tag("primary"))))
                 // primitive ore washer
                 .vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(ORE_WASHER.block(Voltage.PRIMITIVE))
+                        .shaped(PRIMITIVE_ORE_WASHER.get())
                         .pattern("WLW")
                         .pattern("LFL")
                         .pattern("WLW")
@@ -156,9 +160,9 @@ public final class Machines {
     }
 
     private static void ulv() {
-        ulvFromPrimitive(STONE_GENERATOR);
-        ulvFromPrimitive(ORE_ANALYZER);
-        ulvFromPrimitive(ORE_WASHER);
+        ulvFromPrimitive(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR);
+        ulvFromPrimitive(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER);
+        ulvFromPrimitive(ORE_WASHER, PRIMITIVE_ORE_WASHER);
         ulvMachine(NETWORK_CONTROLLER, VACUUM_TUBE);
         ulvMachine(RESEARCH_BENCH.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
         ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
@@ -197,8 +201,8 @@ public final class Machines {
                 .build();
     }
 
-    private static Optional<TagKey<Item>> getMachineTag(MachineSet<?> set) {
-        if (set instanceof ProcessingSet<?> processingSet) {
+    private static Optional<TagKey<Item>> getMachineTag(MachineSet set) {
+        if (set instanceof ProcessingSet processingSet) {
             return Optional.of(machineTag(processingSet.recipeType));
         } else if (set == ELECTRIC_FURNACE) {
             return Optional.of(AllTags.ELECTRIC_FURNACE);
@@ -206,7 +210,7 @@ public final class Machines {
         return Optional.empty();
     }
 
-    private static void machine(MachineSet<?> set, String overlay) {
+    private static void machine(MachineSet set, String overlay) {
         var tag = getMachineTag(set);
         tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
         for (var voltage : set.voltages) {
@@ -219,6 +223,18 @@ public final class Machines {
             }
             builder.build();
         }
+    }
+
+    private static void primitiveMachine(MachineSet set, RegistryEntry<? extends Block> primitive,
+                                         String overlay) {
+        machine(set, overlay);
+        var tag = getMachineTag(set);
+        var builder = DATA_GEN.block(primitive)
+                .blockState(machineBlock(overlay))
+                .tag(MINEABLE_WITH_WRENCH)
+                .tag(BlockTags.MINEABLE_WITH_AXE);
+        tag.ifPresent(builder::itemTag);
+        builder.build();
     }
 
     private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
@@ -234,7 +250,7 @@ public final class Machines {
                 .build();
     }
 
-    private static void ulvFromPrimitive(MachineSet<?> set) {
-        ulvMachine(set.entry(Voltage.ULV), set.entry(Voltage.PRIMITIVE));
+    private static void ulvFromPrimitive(MachineSet set, RegistryEntry<? extends Block> primitive) {
+        ulvMachine(set.entry(Voltage.ULV), primitive);
     }
 }
