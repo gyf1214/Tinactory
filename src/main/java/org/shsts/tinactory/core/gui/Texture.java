@@ -49,6 +49,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
             modLoc("gui/import_export"), 18, 18);
     public static final Texture CLEAR_GRID_BUTTON = new Texture(
             gregtech("gui/widget/button_clear_grid"), 18, 18);
+    public static final Texture CRAFTING_ARROW = new Texture(
+            modLoc("gui/arrow_crafting"), 22, 15);
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = new ResourceLocation(loc.getNamespace(), "textures/" + loc.getPath() + ".png");

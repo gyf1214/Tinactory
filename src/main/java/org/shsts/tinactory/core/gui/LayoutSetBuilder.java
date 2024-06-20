@@ -19,6 +19,7 @@ import java.util.Map;
 public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
     private record SlotAndVoltages(Layout.SlotInfo slot, Collection<Voltage> voltages) {}
 
+    private final List<Layout.WidgetInfo> images = new ArrayList<>();
     private final List<SlotAndVoltages> slots = new ArrayList<>();
     private SlotType curSlotType = SlotType.NONE;
     private int curPort = -1;
@@ -61,6 +62,15 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return slot(x, y, Arrays.asList(Voltage.values()));
     }
 
+    public LayoutSetBuilder<P> image(Rect rect, Texture tex) {
+        images.add(new Layout.WidgetInfo(rect, tex));
+        return this;
+    }
+
+    public LayoutSetBuilder<P> image(int x, int y, Texture tex) {
+        return image(new Rect(x, y, tex.width(), tex.height()), tex);
+    }
+
     public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {
         progressBar = new Layout.WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
         return this;
@@ -89,13 +99,13 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         var ret = new HashMap<Voltage, Layout>();
         for (var voltage : Voltage.values()) {
             var slots = getSlots(voltage);
-            ret.put(voltage, new Layout(slots, List.of(), progressBar));
+            ret.put(voltage, new Layout(slots, images, progressBar));
         }
         return ret;
     }
 
     public Layout buildLayout() {
         var slots = getSlots(Voltage.MAXIMUM);
-        return new Layout(slots, List.of(), progressBar);
+        return new Layout(slots, images, progressBar);
     }
 }

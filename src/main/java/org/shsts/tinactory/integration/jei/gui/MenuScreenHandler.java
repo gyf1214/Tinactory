@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
-import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -36,9 +35,12 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
         this.clickableHandlers = new HashMap<>();
         clickableHandler(ProcessingMenu.class, this::processingClickable);
 
-        var x = AllLayouts.WORKBENCH.getXOffset() + 5 * SLOT_SIZE;
-        var workbenchArea = IGuiClickableArea.createBasic(x, SLOT_SIZE + MARGIN_TOP,
-                SLOT_SIZE, SLOT_SIZE, plugin.toolCategory.type);
+        var layout = AllLayouts.WORKBENCH;
+        var rect = layout.images.get(0).rect();
+        var x = rect.x() + layout.getXOffset() + MARGIN_HORIZONTAL;
+        var y = rect.y() + MARGIN_TOP;
+        var workbenchArea = IGuiClickableArea.createBasic(x, y,
+                rect.width(), rect.height(), plugin.toolCategory.type);
 
         clickableHandler(WorkbenchMenu.class, screen -> Optional.of(workbenchArea));
     }

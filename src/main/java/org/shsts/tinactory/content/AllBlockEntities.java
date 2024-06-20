@@ -275,13 +275,13 @@ public final class AllBlockEntities {
                 .buildObject();
 
         var electricChest = ProcessingSet.electricChest()
-                .voltages(Voltage.ULV)
+                .voltages(Voltage.ULV, Voltage.HV)
                 .layoutSet()
                 .port(SlotType.NONE);
         for (var i = 0; i < 2; i++) {
             for (var j = 0; j < 8; j++) {
                 var voltage = Voltage.fromValue(8 * (j + 1) * (j + 1));
-                electricChest.slot(j * SLOT_SIZE * 3 / 2, 1 + i * 2 * (SLOT_SIZE + MARGIN_VERTICAL), voltage);
+                electricChest.slot(j * (SLOT_SIZE + 2), 1 + i * 2 * (SLOT_SIZE + MARGIN_VERTICAL), voltage);
             }
         }
         ELECTRIC_CHEST = electricChest.build().buildObject();

@@ -14,14 +14,15 @@ public final class AllLayouts {
 
     static {
         var workbench = Layout.builder()
-                .dummySlot(6 * SLOT_SIZE, SLOT_SIZE)
+                .dummySlot(9 + 6 * SLOT_SIZE, SLOT_SIZE)
+                .image(16 + 4 * SLOT_SIZE, 20, Texture.CRAFTING_ARROW)
                 .port(SlotType.ITEM_INPUT);
         for (var j = 0; j < 9; j++) {
             workbench.slot(j * SLOT_SIZE, 3 * SLOT_SIZE + SPACING);
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
-                workbench.slot((2 + j) * SLOT_SIZE, i * SLOT_SIZE);
+                workbench.slot(9 + (1 + j) * SLOT_SIZE, i * SLOT_SIZE);
             }
         }
         WORKBENCH = workbench.buildLayout();
