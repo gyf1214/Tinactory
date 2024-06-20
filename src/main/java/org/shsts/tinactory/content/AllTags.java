@@ -33,9 +33,11 @@ public final class AllTags {
     public static final TagKey<Block> MINEABLE_WITH_WRENCH = modBlock("mineable/wrench");
     public static final TagKey<Block> MINEABLE_WITH_CUTTER = modBlock("mineable/cutter");
 
+    public static final TagKey<Item> MACHINE = modItem("machine");
+
     public static TagKey<Item>
     machineTag(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
-        return item(new ResourceLocation(recipeType.modid, "machine/" + recipeType.id));
+        return extend(MACHINE, recipeType.id);
     }
 
     public static TagKey<Item> item(ResourceLocation loc) {

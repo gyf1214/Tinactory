@@ -109,21 +109,31 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         font.draw(poseStack, title, (float) titleLabelX, (float) titleLabelY, RenderUtil.TEXT_COLOR);
     }
 
+    public Optional<GuiComponent> getHovered(int mouseX, int mouseY) {
+        for (var hoverable : hoverables) {
+            if (hoverable instanceof MenuWidget widget && widget.isHovering(mouseX, mouseY)) {
+                return Optional.of(hoverable);
+            } else if (hoverable instanceof AbstractWidget widget && widget.isHoveredOrFocused()) {
+                return Optional.of(hoverable);
+            }
+        }
+        return Optional.empty();
+    }
+
     @Override
     protected void renderTooltip(PoseStack poseStack, int mouseX, int mouseY) {
         super.renderTooltip(poseStack, mouseX, mouseY);
         if (menu.getCarried().isEmpty() && hoveredSlot != null && hoveredSlot.hasItem()) {
             return;
         }
-        for (var hoverable : hoverables) {
-            if (hoverable instanceof MenuWidget widget && widget.isHovering(mouseX, mouseY)) {
+
+        getHovered(mouseX, mouseY).ifPresent(hoverable -> {
+            if (hoverable instanceof MenuWidget widget) {
                 widget.getTooltip(mouseX, mouseY).ifPresent(tooltip ->
                         renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
-                return;
-            } else if (hoverable instanceof AbstractWidget widget && widget.isHoveredOrFocused()) {
+            } else if (hoverable instanceof AbstractWidget widget) {
                 widget.renderToolTip(poseStack, mouseX, mouseY);
-                return;
             }
-        }
+        });
     }
 }

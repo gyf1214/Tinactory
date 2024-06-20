@@ -4,6 +4,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
@@ -14,6 +16,7 @@ import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
@@ -194,16 +197,23 @@ public final class Machines {
                 .build();
     }
 
+    private static Optional<TagKey<Item>> getMachineTag(MachineSet<?> set) {
+        if (set instanceof ProcessingSet<?> processingSet) {
+            return Optional.of(machineTag(processingSet.recipeType));
+        } else if (set == ELECTRIC_FURNACE) {
+            return Optional.of(AllTags.ELECTRIC_FURNACE);
+        }
+        return Optional.empty();
+    }
+
     private static void machine(MachineSet<?> set, String overlay) {
+        var tag = getMachineTag(set);
+        tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
         for (var voltage : set.voltages) {
             var builder = DATA_GEN.block(set.entry(voltage))
                     .blockState(machineBlock(overlay))
                     .tag(MINEABLE_WITH_WRENCH);
-            if (set instanceof ProcessingSet<?> processingSet) {
-                builder.itemTag(machineTag(processingSet.recipeType));
-            } else if (set == ELECTRIC_FURNACE) {
-                builder.itemTag(AllTags.ELECTRIC_FURNACE);
-            }
+            tag.ifPresent(builder::itemTag);
             if (voltage == Voltage.PRIMITIVE) {
                 builder.tag(BlockTags.MINEABLE_WITH_AXE);
             }

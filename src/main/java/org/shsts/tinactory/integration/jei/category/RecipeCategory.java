@@ -54,7 +54,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     protected static final int WIDTH = Menu.CONTENT_WIDTH;
 
     protected final RecipeTypeEntry<? extends T, ?> recipeType;
-    protected final RecipeType<T> type;
+    public final RecipeType<T> type;
     protected final Layout layout;
     protected final Ingredient catalyst;
     protected final ItemStack iconItem;

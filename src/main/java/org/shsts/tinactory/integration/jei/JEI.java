@@ -5,6 +5,7 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.forge.ForgeTypes;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
@@ -14,6 +15,7 @@ import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -21,18 +23,23 @@ import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
+import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
 import org.shsts.tinactory.integration.jei.ingredient.FluidIngredientRenderer;
 import org.shsts.tinactory.integration.jei.ingredient.FluidStackHelper;
 import org.shsts.tinactory.integration.jei.ingredient.FluidStackType;
 import org.shsts.tinactory.integration.jei.ingredient.FluidStackWrapper;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -42,18 +49,28 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 public class JEI implements IModPlugin {
     private static final ResourceLocation LOC = modLoc("jei");
 
+    public final ToolCategory toolCategory;
+
     private final List<RecipeCategory<?, ?>> categories;
+    private final Map<RecipeType<?>, RecipeCategory<?, ?>> processingCategories;
 
     public JEI() {
         this.categories = new ArrayList<>();
+        this.processingCategories = new HashMap<>();
 
-        categories.add(new ToolCategory());
+        this.toolCategory = new ToolCategory();
+        categories.add(toolCategory);
         for (var set : AllBlockEntities.PROCESSING_SETS) {
             var layout = set.layoutSet.get(Voltage.MAXIMUM);
             var icon = set.block(Voltage.LV);
             var category = new ProcessingCategory(set.recipeType, layout, icon);
             categories.add(category);
+            processingCategories.put(set.recipeType.get(), category);
         }
+    }
+
+    public RecipeCategory<?, ?> processingCategory(RecipeTypeEntry<?, ?> recipeType) {
+        return processingCategories.get(recipeType.get());
     }
 
     @Override
@@ -97,6 +114,11 @@ public class JEI implements IModPlugin {
         for (var itemStack : Ingredient.of(AllTags.ELECTRIC_FURNACE).getItems()) {
             registration.addRecipeCatalyst(VanillaTypes.ITEM_STACK, itemStack, RecipeTypes.SMELTING);
         }
+    }
+
+    @Override
+    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        registration.addGenericGuiContainerHandler(MenuScreen.class, new MenuScreenHandler(this));
     }
 
     @Override

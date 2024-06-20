@@ -31,7 +31,7 @@ public class FluidSlot extends MenuWidget {
         this.syncSlot = syncSlot;
     }
 
-    private FluidStack getFluidStack() {
+    public FluidStack getFluidStack() {
         return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
                 .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
     }
