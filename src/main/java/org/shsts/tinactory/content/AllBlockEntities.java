@@ -301,7 +301,8 @@ public final class AllBlockEntities {
         var recipeType = set.recipeType;
         var id = "primitive/" + recipeType.id;
         var layout = set.layout(Voltage.PRIMITIVE);
-        return REGISTRATE.blockEntity(id, PrimitiveMachine::new, PrimitiveBlock<PrimitiveMachine>::new)
+        return REGISTRATE.blockEntity(id, PrimitiveMachine::new,
+                        PrimitiveBlock<PrimitiveMachine>::new)
                 .entityClass(PrimitiveMachine.class)
                 .blockEntity()
                 .eventManager().ticking()

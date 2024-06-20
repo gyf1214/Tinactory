@@ -188,11 +188,11 @@ public class ProcessingSet extends MachineSet {
             @Override
             protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>
             getMachineBuilder(Voltage voltage) {
-                var id = "machine/" + voltage.id + "/chest";
+                var id = "machine/" + voltage.id + "/electric_chest";
                 var layout = getLayout(voltage);
                 return REGISTRATE.blockEntity(id, MachineBlock.factory(voltage))
                         .blockEntity()
-                        .eventManager().ticking()
+                        .eventManager()
                         .simpleCapability(Machine::builder)
                         .simpleCapability(ElectricChest.builder(layout))
                         .menu(ElectricChestMenu.factory(layout))
