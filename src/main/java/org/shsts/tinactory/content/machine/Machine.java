@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -160,6 +161,20 @@ public class Machine extends UpdatableCapabilityProvider
         eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);
     }
 
+    protected Optional<BlockState> getWorkBlock() {
+        return Optional.of(blockEntity.getBlockState());
+    }
+
+    protected void setWorkBlock(Level world, BlockState state) {
+        world.setBlock(blockEntity.getBlockPos(), state, 3);
+    }
+
+    protected void updateWorkBlock(Level world, boolean working) {
+        getWorkBlock()
+                .filter(state -> state.hasProperty(WORKING) && state.getValue(WORKING) != working)
+                .ifPresent(state -> setWorkBlock(world, state.setValue(WORKING, working)));
+    }
+
     /**
      * Called when connect to the network
      */
@@ -178,11 +193,7 @@ public class Machine extends UpdatableCapabilityProvider
         LOGGER.trace("{}: disconnect from network", this);
         var world = blockEntity.getLevel();
         assert world != null;
-        var state = blockEntity.getBlockState();
-        if (state.hasProperty(WORKING) && state.getValue(WORKING)) {
-            world.setBlock(blockEntity.getBlockPos(), state.setValue(WORKING, false), 3);
-        }
-
+        updateWorkBlock(world, false);
     }
 
     private void onPreWork(Level world, Network network) {
@@ -197,13 +208,7 @@ public class Machine extends UpdatableCapabilityProvider
         var workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
         getProcessor().ifPresent(processor -> {
             processor.onWorkTick(workFactor);
-            var working = processor.getProgress() > 0d;
-            var state = blockEntity.getBlockState();
-            if (state.hasProperty(WORKING) &&
-                    state.getValue(WORKING) != working) {
-                world.setBlock(blockEntity.getBlockPos(),
-                        state.setValue(WORKING, working), 3);
-            }
+            updateWorkBlock(world, processor.getProgress() > 0d);
         });
     }
 

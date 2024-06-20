@@ -60,9 +60,16 @@ public abstract class MultiBlock extends MultiBlockBase {
 
     @Override
     protected Optional<Collection<BlockPos>> checkMultiBlock(BlockPos start, int tx, int ty, int tz) {
+        var oldInterface = multiBlockInterface;
         multiBlockInterface = null;
         var ret = super.checkMultiBlock(start, tx, ty, tz);
-        return multiBlockInterface != null ? ret : Optional.empty();
+        var ok = ret.isPresent() && multiBlockInterface != null &&
+                (oldInterface == null || oldInterface == multiBlockInterface);
+        if (!ok) {
+            // for invalidation
+            multiBlockInterface = oldInterface;
+        }
+        return ok ? ret : Optional.empty();
     }
 
     @Override

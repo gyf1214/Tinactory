@@ -6,6 +6,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -81,6 +83,9 @@ public class MultiBlockInterface extends Machine {
             return;
         }
         LOGGER.debug("{} reset multiBlock", this);
+        var world = blockEntity.getLevel();
+        assert world != null;
+        updateWorkBlock(world, false);
         multiBlock = null;
         processor = null;
         electricMachine = null;
@@ -117,6 +122,22 @@ public class MultiBlockInterface extends Machine {
         eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> onLoad());
         eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
         eventManager.subscribe(AllEvents.CONTAINER_CHANGE, this::onContainerChange);
+    }
+
+    @Override
+    protected Optional<BlockState> getWorkBlock() {
+        if (multiBlock == null) {
+            return Optional.empty();
+        }
+        return Optional.of(multiBlock.blockEntity.getBlockState());
+    }
+
+    @Override
+    protected void setWorkBlock(Level world, BlockState state) {
+        if (multiBlock == null) {
+            return;
+        }
+        world.setBlock(multiBlock.blockEntity.getBlockPos(), state, 3);
     }
 
     @Override
@@ -164,7 +185,8 @@ public class MultiBlockInterface extends Machine {
             if (be1 == null) {
                 return;
             }
-            AllCapabilities.MULTI_BLOCK.tryGet(be1).ifPresent(this::setMultiBlock);
+            AllCapabilities.MULTI_BLOCK.tryGet(be1)
+                    .ifPresentOrElse(this::setMultiBlock, this::resetMultiBlock);
         } else {
             resetMultiBlock();
         }

@@ -38,7 +38,7 @@ public final class MultiBlockManager {
     }
 
     public void invalidate(BlockPos pos) {
-        posMap.get(pos).ifPresent(MultiBlockBase::invalidate);
+        posMap.get(pos).ifPresent(MultiBlockBase::markPreInvalid);
     }
 
     private static final Map<ResourceKey<Level>, MultiBlockManager> INSTANCES = new HashMap<>();

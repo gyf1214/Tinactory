@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.multiblock;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -10,6 +11,7 @@ import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.common.WeakMap;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -20,6 +22,8 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MultiBlockBase extends UpdatableCapabilityProvider implements IEventSubscriber {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private static final int CHECK_CYCLE = 40;
 
     public final SmartBlockEntity blockEntity;
@@ -27,6 +31,7 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider impleme
     @Nullable
     protected WeakMap.Ref<MultiBlockBase> ref = null;
     private int checkTick = 0;
+    private boolean preInvalid = false;
 
     public MultiBlockBase(SmartBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
@@ -73,6 +78,11 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider impleme
 
     protected void onInvalidate() {}
 
+    public void markPreInvalid() {
+        LOGGER.debug("{} mark pre invalid", this);
+        preInvalid = true;
+    }
+
     public void invalidate() {
         if (ref != null) {
             ref.invalidate();
@@ -93,6 +103,10 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider impleme
     }
 
     private void onServerTick() {
+        if (preInvalid && checkMultiBlock().isEmpty()) {
+            invalidate();
+        }
+        preInvalid = false;
         if (ref != null) {
             return;
         }
