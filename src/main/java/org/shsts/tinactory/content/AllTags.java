@@ -26,6 +26,7 @@ public final class AllTags {
     public static final TagKey<Item> TOOL_WRENCH = extend(TOOL, "wrench");
     public static final TagKey<Item> TOOL_WIRE_CUTTER = extend(TOOL, "wire_cutter");
 
+    public static final TagKey<Item> TOOL_SHEARS = modItem("tool_shears");
     public static final TagKey<Item> TOOL_HANDLE = modItem("tool_handle");
     public static final TagKey<Item> TOOL_SCREW = modItem("tool_screw");
     public static final TagKey<Item> ELECTRIC_FURNACE = modItem("machine/electric_furnace");

@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -12,12 +13,17 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.datagen.content.builder.MaterialBuilder;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
+import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
+import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
 import static org.shsts.tinactory.content.AllItems.STEAM;
+import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
@@ -35,10 +41,12 @@ import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
+import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
+import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
@@ -55,9 +63,13 @@ import static org.shsts.tinactory.content.AllTags.TOOL_MORTAR;
 import static org.shsts.tinactory.content.AllTags.TOOL_SAW;
 import static org.shsts.tinactory.content.AllTags.TOOL_SCREW;
 import static org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER;
+import static org.shsts.tinactory.content.AllTags.TOOL_SHEARS;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.content.Models.basicItem;
+import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
 import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
@@ -112,13 +124,36 @@ public final class Materials {
                 .result(Items.STICK, 4)
                 .pattern("#").pattern("#")
                 .define('#', ItemTags.PLANKS)
-                .toolTag(AllTags.TOOL_SAW)
+                .toolTag(TOOL_SAW)
                 .build();
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(Items.STICK, 2)
                 .define('#', ItemTags.PLANKS)
                 .pattern("#").pattern("#")
                 .unlockedBy("has_planks", has(ItemTags.PLANKS)));
+
+        // rubber
+        DATA_GEN.block(RUBBER_LOG)
+                .blockState(ctx -> ctx.provider
+                        .axisBlock(ctx.object, gregtech("blocks/wood/rubber/log_rubber_side"),
+                                gregtech("blocks/wood/rubber/log_rubber_top")))
+                .tag(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN)
+                .itemTag(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN)
+                .dropSelf()
+                .dropOnState(STICKY_RESIN, RubberLogBlock.HAS_RUBBER, true)
+                .build()
+                .block(RUBBER_LEAVES)
+                .blockState(cubeTint("wood/rubber/leaves_rubber"))
+                .tag(BlockTags.LEAVES).itemTag(ItemTags.LEAVES)
+                .dropSelfOnTool(TOOL_SHEARS)
+                .drop(RUBBER_SAPLING, 0.05f)
+                .build()
+                .block(RUBBER_SAPLING)
+                .blockState(ctx -> ctx.provider.simpleBlock(ctx.object, ctx.provider.models()
+                        .cross(ctx.id, gregtech("blocks/wood/rubber/sapling_rubber"))))
+                .itemModel(basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
+                .tag(BlockTags.SAPLINGS).itemTag(ItemTags.SAPLINGS)
+                .build();
     }
 
     private static void elements() {
@@ -137,6 +172,8 @@ public final class Materials {
                 .toolProcess().smelt()
                 // TODO: tin, zinc
                 .oreProcess()
+                .build()
+                .material(SULFUR, DULL)
                 .build()
                 .material(NICKEL, METALLIC)
                 .toolProcess().smelt()
@@ -168,15 +205,15 @@ public final class Materials {
 
     private static void ores() {
         FACTORY.material(CHALCOPYRITE, DULL)
-                // TODO: pyrite, cobalt, cadmium?
-                .primitiveOreProcess(PYRITE).smelt(COPPER)
+                // TODO: sulfur, cobaltite
+                .primitiveOreProcess(SULFUR).smelt(COPPER)
                 .build()
                 .material(PYRITE, ROUGH)
-                // TODO: sulfur, tricalcium phosphate?
-                .primitiveOreProcess().smelt(IRON)
+                // TODO: sulfur, cadmium
+                .primitiveOreProcess(SULFUR).smelt(IRON)
                 .build()
                 .material(LIMONITE, METALLIC)
-                // TODO: nickel, cobalt
+                // TODO: nickel
                 .oreProcess(NICKEL).smelt(IRON)
                 .build()
                 .material(BANDED_IRON, DULL)
@@ -213,7 +250,8 @@ public final class Materials {
     private static void misc() {
         FACTORY.material(TEST, DULL).build()
                 .material(STONE, ROUGH).toolProcess().build()
-                .material(FLINT, DULL).toolProcess().build();
+                .material(FLINT, DULL).toolProcess().build()
+                .material(RAW_RUBBER, DULL).build();
 
         // smelt wrought iron nugget
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
@@ -281,6 +319,7 @@ public final class Materials {
                 .tag(TOOL_SCREWDRIVER, TOOL)
                 .tag(TOOL_WRENCH, TOOL)
                 .tag(TOOL_WIRE_CUTTER, TOOL)
+                .tag(() -> Items.SHEARS, TOOL_SHEARS)
                 .tag(() -> Items.STICK, TOOL_HANDLE)
                 .tag(WROUGHT_IRON.tag("stick"), TOOL_HANDLE)
                 .tag(IRON.tag("screw"), TOOL_SCREW);
@@ -299,7 +338,7 @@ public final class Materials {
                 .result(planks, 4)
                 .pattern("X")
                 .define('X', logTag)
-                .toolTag(AllTags.TOOL_SAW)
+                .toolTag(TOOL_SAW)
                 .build();
         // disable wood and woodStripped recipes
         DATA_GEN.nullRecipe(wood)

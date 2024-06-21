@@ -23,6 +23,7 @@ public final class AllMaterials {
     public static MaterialSet GOLD;
     public static MaterialSet COPPER;
     public static MaterialSet TIN;
+    public static MaterialSet SULFUR;
     public static MaterialSet NICKEL;
     public static MaterialSet ALUMINIUM;
 
@@ -48,6 +49,7 @@ public final class AllMaterials {
     public static MaterialSet TEST;
     public static MaterialSet STONE;
     public static MaterialSet FLINT;
+    public static MaterialSet RAW_RUBBER;
 
     static {
         SET = new HashMap<>();
@@ -77,6 +79,11 @@ public final class AllMaterials {
                 .existing("primary", Items.FLINT)
                 .dust()
                 .tool(16).mortar().build()
+                .buildObject();
+
+        RAW_RUBBER = set("raw_rubber")
+                .color(0xFFCCC789)
+                .dust()
                 .buildObject();
     }
 

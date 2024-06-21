@@ -11,6 +11,7 @@ import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
+import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
@@ -44,6 +45,11 @@ public final class Elements {
                 .color(0xFFDCDCDC)
                 .mechanicalSet().wire()
                 .ore(OreVariant.STONE)
+                .buildObject();
+
+        SULFUR = set("sulfur")
+                .color(0xFFC8C800)
+                .dust()
                 .buildObject();
 
         NICKEL = set("nickel")

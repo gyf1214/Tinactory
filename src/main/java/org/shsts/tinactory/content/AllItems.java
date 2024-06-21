@@ -1,11 +1,18 @@
 package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.content.material.RubberLogBlock;
+import org.shsts.tinactory.content.material.RubberTreeGrower;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
@@ -42,14 +49,44 @@ public final class AllItems {
     public static final Map<Voltage, RegistryEntry<BatteryItem>> BATTERY;
     public static final Map<Voltage, RegistryEntry<CableBlock>> CABLE;
     public static final RegistryEntry<Item> VACUUM_TUBE;
+    public static final RegistryEntry<Item> STICKY_RESIN;
     public static final RegistryEntry<SimpleFluid> STEAM;
     public static final RegistryEntry<Block> HEAT_PROOF_BLOCK;
     public static final RegistryEntry<SubnetBlock> TEST_TRANSFORMER;
+    public static final RegistryEntry<RubberLogBlock> RUBBER_LOG;
+    public static final RegistryEntry<LeavesBlock> RUBBER_LEAVES;
+    public static final RegistryEntry<SaplingBlock> RUBBER_SAPLING;
 
     static {
         DUMMY_ITEMS = new ArrayList<>();
 
         VACUUM_TUBE = REGISTRATE.item("circuit/vacuum_tube", Item::new).register();
+
+        STICKY_RESIN = REGISTRATE.item("rubber_tree/sticky_resin", Item::new).register();
+
+        RUBBER_LOG = REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
+                .material(Material.WOOD)
+                .properties(p -> p.sound(SoundType.WOOD))
+                .register();
+
+        RUBBER_LEAVES = REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
+                .material(Material.LEAVES)
+                .properties(p -> p.strength(0.2f).randomTicks()
+                        .sound(SoundType.GRASS).noOcclusion()
+                        .isValidSpawn(($1, $2, $3, $4) -> false)
+                        .isSuffocating(($1, $2, $3) -> false)
+                        .isViewBlocking(($1, $2, $3) -> false))
+                .renderType(() -> RenderType::cutout)
+                .tint(0xFF55FF55)
+                .register();
+
+        RUBBER_SAPLING = REGISTRATE.block("rubber_tree/sapling",
+                        prop -> new SaplingBlock(new RubberTreeGrower(), prop))
+                .material(Material.PLANT)
+                .properties(p -> p.noCollission().randomTicks()
+                        .instabreak().sound(SoundType.GRASS))
+                .renderType(() -> RenderType::cutout)
+                .register();
 
         STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
 

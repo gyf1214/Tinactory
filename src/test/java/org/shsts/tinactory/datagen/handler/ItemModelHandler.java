@@ -67,7 +67,7 @@ public class ItemModelHandler extends DataHandler<ItemModelProvider> {
 
     public <U extends Block> void
     addBlockItemCallback(ResourceLocation loc, Supplier<U> block,
-                         Consumer<RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider>> cons) {
+                         Consumer<RegistryDataContext<Item, ? super BlockItem, ItemModelProvider>> cons) {
         addCallback(prov -> {
             if (block.get().asItem() instanceof BlockItem blockItem) {
                 cons.accept(new RegistryDataContext<>(dataGen.modid, prov, loc.getPath(), blockItem));

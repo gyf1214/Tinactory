@@ -21,19 +21,23 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
+import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
+import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
+import static org.shsts.tinactory.content.AllTags.TOOL_MORTAR;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
@@ -49,8 +53,9 @@ public final class Components {
     public static void init() {
         componentItems();
         ulv();
-        componentRecipes();
         misc();
+        componentRecipes();
+        miscRecipes();
     }
 
     private static void componentItems() {
@@ -120,6 +125,9 @@ public final class Components {
         DATA_GEN.block(HEAT_PROOF_BLOCK)
                 .blockState(solidBlock("casings/solid/machine_casing_heatproof"))
                 .tag(MINEABLE_WITH_WRENCH)
+                .build()
+                .item(STICKY_RESIN)
+                .model(basicItem("metaitems/rubber_drop"))
                 .build();
     }
 
@@ -169,6 +177,21 @@ public final class Components {
                 .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
+                .build();
+    }
+
+    private static void miscRecipes() {
+        TOOL_CRAFTING.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
+                .result(RAW_RUBBER.entry("dust"), 1)
+                .pattern("A").define('A', STICKY_RESIN)
+                .toolTag(TOOL_MORTAR)
+                .build();
+
+        MACERATOR.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
+                .inputItem(0, STICKY_RESIN, 1)
+                .outputItem(1, RAW_RUBBER.entry("dust"), 3)
+                .voltage(Voltage.LV)
+                .workTicks(100)
                 .build();
     }
 }

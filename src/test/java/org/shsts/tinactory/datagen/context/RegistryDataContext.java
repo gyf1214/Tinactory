@@ -18,4 +18,9 @@ public class RegistryDataContext<T extends IForgeRegistryEntry<T>, U extends T, 
         this.id = id;
         this.object = object;
     }
+
+    @SuppressWarnings("unchecked")
+    public <U1 extends T> RegistryDataContext<T, U1, P> convert() {
+        return (RegistryDataContext<T, U1, P>) this;
+    }
 }

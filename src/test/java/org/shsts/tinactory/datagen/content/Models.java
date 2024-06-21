@@ -121,6 +121,16 @@ public final class Models {
     }
 
     public static <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cubeTint(String tex) {
+        return ctx -> {
+            var model = ctx.provider.models()
+                    .withExistingParent(ctx.id, modLoc("block/cube_tint"))
+                    .texture("all", gregtech("blocks/" + tex));
+            ctx.provider.simpleBlock(ctx.object, model);
+        };
+    }
+
+    public static <U extends Block>
     Consumer<RegistryDataContext<Block, U, BlockStateProvider>> solidBlock(String tex) {
         return ctx -> {
             var model = ctx.provider.models()
@@ -134,7 +144,7 @@ public final class Models {
         CableModel.blockState(ctx, voltage == Voltage.ULV);
     }
 
-    public static void cableItem(RegistryDataContext<Item, ? extends BlockItem, ItemModelProvider> ctx) {
+    public static void cableItem(RegistryDataContext<Item, BlockItem, ItemModelProvider> ctx) {
         var voltage = ((CableBlock) ctx.object.getBlock()).voltage;
         if (voltage == Voltage.ULV) {
             CableModel.ulvCable(ctx);
