@@ -15,6 +15,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.network.CableBlock;
+import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.datagen.content.model.CableModel;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
@@ -92,6 +93,21 @@ public final class Models {
         var tex = "items/metaitems/" + name.replace('_', '.') + "." + voltage;
         ctx.provider.withExistingParent(ctx.id, "item/generated")
                 .texture("layer0", gregtech(tex));
+    }
+
+    public static <U extends BatteryItem> void
+    batteryItem(RegistryDataContext<Item, U, ItemModelProvider> ctx) {
+        var voltage = ctx.object.voltage;
+        var base = gregtech("items/metaitems/battery.re." + voltage.id + ".lithium");
+        var model = ctx.provider.withExistingParent(ctx.id, "item/generated")
+                .texture("layer0", extend(base, "1"));
+        for (var i = 2; i <= 8; i++) {
+            var override = ctx.provider.withExistingParent(ctx.id + "_" + i, "item/generated")
+                    .texture("layer0", extend(base, Integer.toString(i)));
+            model.override()
+                    .model(override)
+                    .predicate(BatteryItem.ITEM_PROPERTY, (float) (i - 1) / 8f);
+        }
     }
 
     public static <U extends Block>

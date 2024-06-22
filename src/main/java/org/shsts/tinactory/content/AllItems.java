@@ -120,7 +120,7 @@ public final class AllItems {
 
         BATTERY = ComponentBuilder.dummy(v -> REGISTRATE
                         .item("network/" + v.id + "/battery", prop ->
-                                new BatteryItem(prop, 12000 * v.value))
+                                new BatteryItem(prop, v, 12000 * v.value))
                         .register())
                 .voltages(Voltage.LV, Voltage.HV)
                 .buildObject();

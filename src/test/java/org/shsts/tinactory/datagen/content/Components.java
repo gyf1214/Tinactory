@@ -68,7 +68,7 @@ public final class Components {
                 .build());
 
         BATTERY.forEach((v, entry) -> DATA_GEN.item(entry)
-                .model(basicItem("metaitems/battery.re." + v.id + ".lithium"))
+                .model(Models::batteryItem)
                 .build());
 
         MACHINE_HULL.forEach((v, entry) -> DATA_GEN.item(entry)

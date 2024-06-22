@@ -1,20 +1,37 @@
 package org.shsts.tinactory.content.tool;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.IItemRenderProperties;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.util.MathUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
+
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BatteryItem extends Item {
+    public static final ResourceLocation ITEM_PROPERTY = modLoc("battery_level");
+
+    public final Voltage voltage;
     public final long capacity;
 
-    public BatteryItem(Properties properties, long capacity) {
+    public BatteryItem(Properties properties, Voltage voltage, long capacity) {
         super(properties.stacksTo(1));
+        this.voltage = voltage;
         this.capacity = capacity;
+    }
+
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        ItemProperties.register(this, ITEM_PROPERTY, (stack, $1, $2, $3) ->
+                (float) getPowerLevel(stack) / capacity);
     }
 
     public long getPowerLevel(ItemStack stack) {

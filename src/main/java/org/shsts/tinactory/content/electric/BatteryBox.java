@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.electric;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -43,8 +44,13 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         this.blockEntity = blockEntity;
         this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
         this.handler = new WrapperItemHandler(1);
-        handler.setFilter(0, $ -> $.getItem() instanceof BatteryItem);
+        handler.setFilter(0, this::allowItem);
         this.itemHandlerCap = LazyOptional.of(() -> handler);
+    }
+
+    private boolean allowItem(ItemStack stack) {
+        return stack.getItem() instanceof BatteryItem batteryItem &&
+                batteryItem.voltage == voltage;
     }
 
     @Override
