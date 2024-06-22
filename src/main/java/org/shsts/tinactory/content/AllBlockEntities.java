@@ -250,13 +250,16 @@ public final class AllBlockEntities {
                 .translucent()
                 .buildObject();
 
-        BATTERY_BOX = ProcessingSet.batteryBox()
+        var batteryBox = ProcessingSet.batteryBox()
                 .voltages(Voltage.LV, Voltage.HV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
-                .slot(0, 0)
-                .build()
-                .buildObject();
+                .port(SlotType.ITEM_INPUT);
+        for (var i = 0; i < 4; i++) {
+            for (var j = 0; j < 4; j++) {
+                batteryBox.slot(j * SLOT_SIZE, i * SLOT_SIZE, Voltage.fromRank(1 + Math.max(i, j)));
+            }
+        }
+        BATTERY_BOX = batteryBox.build().buildObject();
 
         var electricChest = ProcessingSet.electricChest()
                 .voltages(Voltage.ULV, Voltage.HV)

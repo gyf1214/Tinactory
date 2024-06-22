@@ -24,6 +24,7 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import javax.annotation.Nonnull;
@@ -43,7 +44,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     public BatteryBox(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
         this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
-        this.handler = new WrapperItemHandler(1);
+        var size = voltage.rank * voltage.rank;
+        this.handler = new WrapperItemHandler(size);
         handler.setFilter(0, this::allowItem);
         this.itemHandlerCap = LazyOptional.of(() -> handler);
     }
@@ -58,12 +60,22 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public void onWorkTick(double partial) {
-        var electric = machine.getNetwork().orElseThrow()
-                .getComponent(AllNetworks.ELECTRIC_COMPONENT);
-        var delta = (long) Math.floor(electric.getBufferFactor() * voltage.value);
-        var stack = handler.getStackInSlot(0);
-        if (stack.getItem() instanceof BatteryItem battery) {
-            battery.charge(stack, delta);
+        var factor = machine.getNetwork().orElseThrow()
+                .getComponent(AllNetworks.ELECTRIC_COMPONENT)
+                .getBufferFactor();
+        var sign = MathUtil.compare(factor);
+        if (sign == 0) {
+            return;
+        }
+        for (var i = 0; i < handler.getSlots(); i++) {
+            var stack = handler.getStackInSlot(i);
+            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+                continue;
+            }
+            var cap = Math.min(voltage.value, sign > 0 ?
+                    battery.capacity - battery.getPowerLevel(stack) :
+                    battery.getPowerLevel(stack));
+            battery.charge(stack, (long) Math.floor(cap * factor));
         }
     }
 
@@ -84,20 +96,26 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public double getPowerGen() {
-        var stack = handler.getStackInSlot(0);
-        if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
-            return 0;
+        var ret = 0d;
+        for (var i = 0; i < handler.getSlots(); i++) {
+            var stack = handler.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
+                ret += Math.min(voltage.value, battery.getPowerLevel(stack));
+            }
         }
-        return Math.min(voltage.value, battery.getPowerLevel(stack));
+        return ret;
     }
 
     @Override
     public double getPowerCons() {
-        var stack = handler.getStackInSlot(0);
-        if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
-            return 0;
+        var ret = 0d;
+        for (var i = 0; i < handler.getSlots(); i++) {
+            var stack = handler.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
+                ret += Math.min(voltage.value, battery.capacity - battery.getPowerLevel(stack));
+            }
         }
-        return Math.min(voltage.value, battery.capacity - battery.getPowerLevel(stack));
+        return ret;
     }
 
     @Override
@@ -128,7 +146,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         ItemHelper.deserializeItemHandler(handler, tag);
     }
 
-    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {
+    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P>
+    builder(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, "battery_box", BatteryBox::new);
     }
 }
