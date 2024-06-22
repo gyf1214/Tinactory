@@ -116,12 +116,12 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
     }
 
     public static IMenuPlugin.Factory<ProcessingMenu>
-    marker(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
+    marker(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType, boolean includeNormal) {
         return menu -> new MachinePlugin(menu) {
             @OnlyIn(Dist.CLIENT)
             @Override
             protected AbstractRecipeBook<?> createRecipeBook(MenuScreen<ProcessingMenu> screen) {
-                return new MarkerRecipeBook(screen, recipeType.get());
+                return new MarkerRecipeBook(screen, recipeType.get(), includeNormal);
             }
         };
     }

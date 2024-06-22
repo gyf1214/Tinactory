@@ -93,7 +93,7 @@ public class ProcessingSet extends MachineSet {
     }
 
     public static <T extends ProcessingRecipe> Builder<T, ?>
-    marker(RecipeTypeEntry<T, ?> recipeType) {
+    marker(RecipeTypeEntry<T, ?> recipeType, boolean includeNormal) {
         return new Builder<>(recipeType, Unit.INSTANCE) {
             @Override
             protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>
@@ -102,7 +102,7 @@ public class ProcessingSet extends MachineSet {
                         .blockEntity()
                         .simpleCapability(RecipeProcessor.machine(recipeType))
                         .menu()
-                        .plugin(MachinePlugin.marker(recipeType))
+                        .plugin(MachinePlugin.marker(recipeType, includeNormal))
                         .build()
                         .build();
             }
@@ -135,7 +135,7 @@ public class ProcessingSet extends MachineSet {
                         .blockEntity()
                         .simpleCapability(RecipeProcessor::oreProcessor)
                         .menu()
-                        .plugin(MachinePlugin.marker(recipeType))
+                        .plugin(MachinePlugin.marker(recipeType, false))
                         .build()
                         .build();
             }

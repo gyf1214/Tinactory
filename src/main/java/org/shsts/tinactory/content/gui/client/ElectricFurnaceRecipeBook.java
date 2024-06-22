@@ -43,6 +43,11 @@ public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe
     }
 
     @Override
+    protected int compareRecipes(SmeltingRecipe r1, SmeltingRecipe r2) {
+        return r1.getId().compareNamespaced(r2.getId());
+    }
+
+    @Override
     protected void selectRecipe(SmeltingRecipe recipe) {
         var ingredient = ProcessingIngredients.ItemsIngredientBase.of(recipe.getIngredients().get(0), 1);
         var result = new ProcessingResults.ItemResult(1d, recipe.getResultItem());

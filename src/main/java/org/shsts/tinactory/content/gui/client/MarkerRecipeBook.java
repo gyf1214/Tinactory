@@ -13,9 +13,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MarkerRecipeBook extends MachineRecipeBook {
+    private final boolean includeNormal;
+
     public MarkerRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
-                            RecipeType<? extends ProcessingRecipe> recipeType) {
+                            RecipeType<? extends ProcessingRecipe> recipeType,
+                            boolean includeNormal) {
         super(screen, recipeType);
+        this.includeNormal = includeNormal;
     }
 
     @Override
@@ -27,5 +31,18 @@ public class MarkerRecipeBook extends MachineRecipeBook {
             }
             recipes.put(recipe.getId(), recipe);
         }
+        if (includeNormal) {
+            super.doRefreshRecipes();
+        }
+    }
+
+    @Override
+    protected int compareRecipes(ProcessingRecipe r1, ProcessingRecipe r2) {
+        var marker1 = r1.getType() == AllRecipes.MARKER.get();
+        var marker2 = r2.getType() == AllRecipes.MARKER.get();
+        if (marker1 != marker2) {
+            return marker1 ? -1 : 1;
+        }
+        return super.compareRecipes(r1, r2);
     }
 }

@@ -182,6 +182,7 @@ public class Machine extends UpdatableCapabilityProvider
         LOGGER.debug("{}: connect to network {}", this, network);
         this.network = network;
         updatePassiveRequests();
+        sendUpdate(blockEntity);
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 

@@ -72,6 +72,11 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     }
 
     @Override
+    protected int compareRecipes(ProcessingRecipe r1, ProcessingRecipe r2) {
+        return r1.getId().compareNamespaced(r2.getId());
+    }
+
+    @Override
     protected void selectRecipe(ProcessingRecipe recipe) {
         if (layout != null) {
             layout.getProcessingInputs(recipe).forEach(ghostRecipe::addIngredient);

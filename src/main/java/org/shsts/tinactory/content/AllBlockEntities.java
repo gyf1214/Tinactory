@@ -127,7 +127,7 @@ public final class AllBlockEntities {
         }
         ORE_ANALYZER = oreAnalyzer.build().buildObject();
 
-        MACERATOR = set(marker(AllRecipes.MACERATOR))
+        MACERATOR = set(marker(AllRecipes.MACERATOR, true))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -146,7 +146,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_WASHER = set(marker(AllRecipes.ORE_WASHER))
+        ORE_WASHER = set(marker(AllRecipes.ORE_WASHER, false))
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
@@ -163,7 +163,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        CENTRIFUGE = set(marker(AllRecipes.CENTRIFUGE))
+        CENTRIFUGE = set(marker(AllRecipes.CENTRIFUGE, true))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -178,7 +178,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        THERMAL_CENTRIFUGE = set(marker(AllRecipes.THERMAL_CENTRIFUGE))
+        THERMAL_CENTRIFUGE = set(machine(AllRecipes.THERMAL_CENTRIFUGE))
                 .layoutSet()
                 .port(SlotType.ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)

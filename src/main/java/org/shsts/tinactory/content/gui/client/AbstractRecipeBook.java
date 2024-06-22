@@ -24,7 +24,6 @@ import org.shsts.tinactory.core.util.I18n;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,6 +165,8 @@ public abstract class AbstractRecipeBook<T> extends Panel {
 
     protected abstract void doRefreshRecipes();
 
+    protected abstract int compareRecipes(T r1, T r2);
+
     protected abstract void selectRecipe(T recipe);
 
     protected abstract Optional<List<Component>> buttonToolTip(T recipe);
@@ -177,8 +178,9 @@ public abstract class AbstractRecipeBook<T> extends Panel {
         recipes.clear();
         doRefreshRecipes();
         recipeList.clear();
-        recipeList.addAll(recipes.keySet().stream()
-                .sorted(Comparator.comparing(Objects::toString))
+        recipeList.addAll(recipes.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(this::compareRecipes))
+                .map(Map.Entry::getKey)
                 .toList());
     }
 
