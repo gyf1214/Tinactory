@@ -28,6 +28,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_ANCHOR;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_OFFSET;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
 import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE_CONFIG;
@@ -42,8 +43,11 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
     private AbstractRecipeBook<?> recipeBook = null;
 
     public MachinePlugin(ProcessingMenu menu) {
-        menu.onEventPacket(SET_MACHINE_CONFIG, p -> AllCapabilities.MACHINE.get(menu.blockEntity).setConfig(p));
-        this.buttonY = menu.getHeight() - SLOT_SIZE;
+        this.buttonY = menu.getHeight() + MARGIN_VERTICAL;
+        menu.setHeight(buttonY + SLOT_SIZE);
+
+        menu.onEventPacket(SET_MACHINE_CONFIG, p ->
+                AllCapabilities.MACHINE.get(menu.blockEntity).setConfig(p));
     }
 
     @OnlyIn(Dist.CLIENT)

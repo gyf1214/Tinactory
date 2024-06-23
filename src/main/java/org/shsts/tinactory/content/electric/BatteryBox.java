@@ -46,7 +46,9 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
         var size = voltage.rank * voltage.rank;
         this.handler = new WrapperItemHandler(size);
-        handler.setFilter(0, this::allowItem);
+        for (var i = 0; i < size; i++) {
+            handler.setFilter(i, this::allowItem);
+        }
         this.itemHandlerCap = LazyOptional.of(() -> handler);
     }
 

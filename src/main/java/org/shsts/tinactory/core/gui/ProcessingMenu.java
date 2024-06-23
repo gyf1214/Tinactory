@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
@@ -36,6 +37,7 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
     public ProcessingMenu(SmartMenuType<?, ?> type, int id, Inventory inventory,
                           BlockEntity blockEntity, @Nullable Layout layout) {
         super(type, id, inventory, blockEntity);
+        var isPrimitive = blockEntity.getBlockState().getBlock() instanceof PrimitiveBlock<?>;
 
         this.layout = layout;
         if (layout != null) {
@@ -56,7 +58,7 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
             } else {
                 this.progressBarIndex = -1;
             }
-            this.height = layout.rect.endY() + SLOT_SIZE + MARGIN_VERTICAL;
+            this.height = layout.rect.endY() + (isPrimitive ? SLOT_SIZE / 2 : 0);
         } else {
             this.progressBarIndex = -1;
         }
