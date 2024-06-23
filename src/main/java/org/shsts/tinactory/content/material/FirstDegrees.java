@@ -20,7 +20,7 @@ public final class FirstDegrees {
 
         BRONZE = set("bronze")
                 .color(0xFFFF8000)
-                .mechanicalSet().pipe()
+                .mechanicalSet().pipe().foil()
                 .buildObject();
 
         INVAR = set("invar")

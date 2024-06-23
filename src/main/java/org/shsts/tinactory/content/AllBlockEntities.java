@@ -7,7 +7,6 @@ import org.shsts.tinactory.content.gui.BoilerPlugin;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
-import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.Machine;
@@ -15,6 +14,7 @@ import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveMachine;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Workbench;
+import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
@@ -24,7 +24,6 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -32,6 +31,7 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -65,6 +65,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet STEAM_TURBINE;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
+    public static final Map<Voltage, RegistryEntry<SidedMachineBlock<SmartBlockEntity>>> MULTI_BLOCK_INTERFACE;
 
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
@@ -74,7 +75,6 @@ public final class AllBlockEntities {
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
-    public static final RegistryEntry<SidedMachineBlock<SmartBlockEntity>> MULTI_BLOCK_INTERFACE;
 
     public static final Set<ProcessingSet> PROCESSING_SETS;
 
@@ -277,18 +277,8 @@ public final class AllBlockEntities {
                 .translucent()
                 .buildObject();
 
-        MULTI_BLOCK_INTERFACE = REGISTRATE.blockEntity("multi_block/interface",
-                        MachineBlock.sided(Voltage.LV))
-                .blockEntity()
-                .eventManager()
-                .simpleCapability(MultiBlockInterface::basic)
-                .simpleCapability(FlexibleStackContainer::builder)
-                .menu(ProcessingMenu.multiBlock())
-                .title(ProcessingMenu::getTitle)
-                .plugin(MachinePlugin::multiBlock)
-                .build()
-                .build()
-                .translucent()
+        MULTI_BLOCK_INTERFACE = ComponentBuilder.dummy(ProcessingSet::multiblockInterface)
+                .voltages(Voltage.LV, Voltage.IV)
                 .buildObject();
 
         var batteryBox = ProcessingSet.batteryBox()

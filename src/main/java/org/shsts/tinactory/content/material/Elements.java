@@ -38,7 +38,7 @@ public final class Elements {
         COPPER = set("copper")
                 .color(0xFFFF6400)
                 .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
-                .metalSet().wireAndPlate().pipe()
+                .metalSet().wireAndPlate().pipe().foil()
                 .buildObject();
 
         TIN = set("tin")

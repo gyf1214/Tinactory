@@ -11,7 +11,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.shsts.tinactory.content.AllRecipes;
+import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
-import static org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER;
 import static org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX;
 import static org.shsts.tinactory.content.AllBlockEntities.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
@@ -50,13 +49,15 @@ import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
-import static org.shsts.tinactory.content.AllItems.TEST_TRANSFORMER;
+import static org.shsts.tinactory.content.AllItems.TRANSFORMER;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
+import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
@@ -71,6 +72,7 @@ import static org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS;
 @MethodsReturnNonnullByDefault
 public final class Machines {
     private static final String BOILER_TEX = "generators/boiler/coal";
+    private static final long ASSEMBLE_TICKS = 200;
 
     public static void init() {
         machineItems();
@@ -84,7 +86,7 @@ public final class Machines {
         primitiveMachine(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER, "machines/electromagnetic_separator");
         primitiveMachine(ORE_WASHER, PRIMITIVE_ORE_WASHER, "machines/ore_washer");
         machine(RESEARCH_BENCH, "overlay/machine/overlay_screen");
-        machine(ASSEMBLER);
+        machine(AllBlockEntities.ASSEMBLER);
         machine(MACERATOR);
         machine(CENTRIFUGE);
         machine(THERMAL_CENTRIFUGE);
@@ -123,18 +125,20 @@ public final class Machines {
                 .blockState(machineBlock("casings/solid/machine_casing_heatproof",
                         "multiblock/blast_furnace"))
                 .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(MULTI_BLOCK_INTERFACE)
-                .blockState(machineBlock("casings/solid/machine_casing_solid_steel", IO_TEX))
+                .build();
+
+        MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
+                .blockState(machineBlock(ME_BUS))
                 .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(TEST_TRANSFORMER)
+                .build());
+
+        TRANSFORMER.values().forEach(b -> DATA_GEN.block(b)
                 .blockState(MachineModel::builder, MachineModel::blockState)
                 .overlay(Direction.NORTH, IO_TEX)
                 .overlay(Direction.SOUTH, "overlay/machine/overlay_energy_out_multi")
                 .build()
                 .tag(MINEABLE_WITH_WRENCH)
-                .build();
+                .build());
     }
 
     private static void primitive() {
@@ -185,17 +189,8 @@ public final class Machines {
         ulvFromPrimitive(ORE_WASHER, PRIMITIVE_ORE_WASHER);
         ulvMachine(NETWORK_CONTROLLER, VACUUM_TUBE);
         ulvMachine(RESEARCH_BENCH.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
-        ulvMachine(ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
+        ulvMachine(AllBlockEntities.ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
         ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
-
-        TOOL_CRAFTING.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
-                .result(ALLOY_SMELTER.entry(Voltage.ULV), 1)
-                .pattern("WVW").pattern("VHV").pattern("WVW")
-                .define('W', CABLE.get(Voltage.ULV))
-                .define('H', ELECTRIC_FURNACE.entry(Voltage.ULV))
-                .define('V', VACUUM_TUBE)
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
 
         TOOL_CRAFTING.recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
                 .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
@@ -208,12 +203,24 @@ public final class Machines {
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
 
-        AllRecipes.ASSEMBLER.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
-                .outputItem(1, ALLOY_SMELTER.entry(Voltage.ULV), 1)
+        ASSEMBLER.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
+                .outputItem(2, ALLOY_SMELTER.entry(Voltage.ULV), 1)
                 .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 1)
                 .inputItem(0, VACUUM_TUBE, 2)
                 .inputItem(0, CABLE.get(Voltage.ULV), 4)
                 .requireTech(Technologies.ALLOY_SMELTING)
+                .voltage(Voltage.ULV)
+                .workTicks(ASSEMBLE_TICKS)
+                .build()
+                .recipe(DATA_GEN, BLAST_FURNACE)
+                .outputItem(2, BLAST_FURNACE, 1)
+                .inputItem(0, HEAT_PROOF_BLOCK, 1)
+                .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 3)
+                .inputItem(0, VACUUM_TUBE, 3)
+                .inputItem(0, CABLE.get(Voltage.ULV), 2)
+                .requireTech(Technologies.STEEL)
+                .voltage(Voltage.ULV)
+                .workTicks(ASSEMBLE_TICKS)
                 .build();
     }
 

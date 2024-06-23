@@ -9,6 +9,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
+import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
@@ -18,6 +19,7 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
@@ -220,5 +222,21 @@ public class ProcessingSet extends MachineSet {
                         .build().translucent();
             }
         };
+    }
+
+    public static RegistryEntry<SidedMachineBlock<SmartBlockEntity>> multiblockInterface(Voltage voltage) {
+        var id = "multi_block/interface/" + voltage.id;
+        return REGISTRATE.blockEntity(id, MachineBlock.sided(voltage))
+                .blockEntity()
+                .eventManager()
+                .simpleCapability(MultiBlockInterface::basic)
+                .simpleCapability(FlexibleStackContainer::builder)
+                .menu(ProcessingMenu.multiBlock())
+                .title(ProcessingMenu::getTitle)
+                .plugin(MachinePlugin::multiBlock)
+                .build()
+                .build()
+                .translucent()
+                .buildObject();
     }
 }

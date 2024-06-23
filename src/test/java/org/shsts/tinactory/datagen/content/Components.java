@@ -14,6 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.AllItems.BATTERY;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.CUPRONICKEL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllItems.DUMMY_ITEMS;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
@@ -27,6 +28,7 @@ import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
+import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
@@ -54,6 +56,7 @@ public final class Components {
         ulv();
         misc();
         componentRecipes();
+        miscRecipes();
     }
 
     private static void componentItems() {
@@ -132,6 +135,9 @@ public final class Components {
                 .blockState(solidBlock("casings/solid/machine_casing_heatproof"))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
+                .block(CUPRONICKEL_COIL_BLOCK)
+                .blockState(solidBlock("casings/coils/machine_coil_cupronickel"))
+                .build()
                 .item(STICKY_RESIN)
                 .model(basicItem("metaitems/rubber_drop"))
                 .build();
@@ -183,6 +189,25 @@ public final class Components {
                 .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
+                .build();
+    }
+
+    private static void miscRecipes() {
+        ASSEMBLER.recipe(DATA_GEN, HEAT_PROOF_BLOCK)
+                .outputItem(2, HEAT_PROOF_BLOCK, 1)
+                .inputItem(0, INVAR.entry("plate"), 3)
+                .inputItem(0, INVAR.entry("stick"), 2)
+                .workTicks(82L)
+                .voltage(Voltage.ULV)
+                .requireTech(Technologies.STEEL)
+                .build()
+                .recipe(DATA_GEN, CUPRONICKEL_COIL_BLOCK)
+                .outputItem(2, CUPRONICKEL_COIL_BLOCK, 1)
+                .inputItem(0, CUPRONICKEL.entry("wire"), 8)
+                .inputItem(0, BRONZE.entry("foil"), 8)
+                .workTicks(200L)
+                .voltage(Voltage.ULV)
+                .requireTech(Technologies.STEEL)
                 .build();
     }
 }

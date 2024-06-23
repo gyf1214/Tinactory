@@ -20,6 +20,7 @@ import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.content.network.MachineBlock.IO_FACING;
 
@@ -36,6 +37,11 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
         this.subVoltage = subVoltage;
         this.resistance = Math.sqrt((double) voltage.value / 2d) *
                 TinactoryConfig.INSTANCE.machineResistanceFactor.get();
+    }
+
+    public static Function<Properties, SubnetBlock> transformer(Voltage voltage) {
+        var subVoltage = Voltage.fromRank(voltage.rank - 1);
+        return prop -> new SubnetBlock(prop, voltage, subVoltage);
     }
 
     @Override

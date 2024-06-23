@@ -257,6 +257,10 @@ public class MaterialSet {
             return dummies("dust_tiny", "nugget");
         }
 
+        public Builder<P> foil() {
+            return dummies("foil");
+        }
+
         public Builder<P> metalSetExt() {
             return metalSet().dummies("plate", "stick");
         }

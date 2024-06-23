@@ -48,11 +48,12 @@ public final class AllItems {
     public static final Map<Voltage, RegistryEntry<Item>> RESEARCH_EQUIPMENT;
     public static final Map<Voltage, RegistryEntry<BatteryItem>> BATTERY;
     public static final Map<Voltage, RegistryEntry<CableBlock>> CABLE;
+    public static final Map<Voltage, RegistryEntry<SubnetBlock>> TRANSFORMER;
     public static final RegistryEntry<Item> VACUUM_TUBE;
     public static final RegistryEntry<Item> STICKY_RESIN;
     public static final RegistryEntry<SimpleFluid> STEAM;
     public static final RegistryEntry<Block> HEAT_PROOF_BLOCK;
-    public static final RegistryEntry<SubnetBlock> TEST_TRANSFORMER;
+    public static final RegistryEntry<Block> CUPRONICKEL_COIL_BLOCK;
     public static final RegistryEntry<RubberLogBlock> RUBBER_LOG;
     public static final RegistryEntry<LeavesBlock> RUBBER_LEAVES;
     public static final RegistryEntry<SaplingBlock> RUBBER_SAPLING;
@@ -91,6 +92,10 @@ public final class AllItems {
         STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
 
         HEAT_PROOF_BLOCK = REGISTRATE.block("multi_block/solid/heat_proof", Block::new)
+                .properties($ -> $.strength(2f, 8f))
+                .register();
+
+        CUPRONICKEL_COIL_BLOCK = REGISTRATE.block("multi_block/coil/cupronickel", Block::new)
                 .properties($ -> $.strength(2f, 8f))
                 .register();
 
@@ -137,10 +142,11 @@ public final class AllItems {
                 .voltage(Voltage.EV, ALUMINIUM)
                 .buildObject();
 
-        TEST_TRANSFORMER = REGISTRATE.block("network/transformer",
-                        prop -> new SubnetBlock(prop, Voltage.LV, Voltage.ULV))
-                .translucent()
-                .register();
+        TRANSFORMER = ComponentBuilder.dummy(v -> REGISTRATE
+                        .block("network/transformer/" + v.id, SubnetBlock.transformer(v))
+                        .translucent().register())
+                .voltages(Voltage.LV, Voltage.IV)
+                .buildObject();
     }
 
     public static void init() {}

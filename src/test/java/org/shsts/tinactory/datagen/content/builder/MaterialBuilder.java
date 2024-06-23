@@ -93,6 +93,8 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         // plate
         process("plate", 1, "A\nA", "ingot", TOOL_HAMMER);
         process("plate", 1, "A\nA", "bar", TOOL_HAMMER);
+        // foil
+        process("foil", 2, "plate", TOOL_HAMMER);
         // ring
         process("ring", 1, "plate", TOOL_WIRE_CUTTER);
         // stick
