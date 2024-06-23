@@ -11,6 +11,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
@@ -30,6 +31,8 @@ import static org.shsts.tinactory.content.AllBlockEntities.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
+import static org.shsts.tinactory.content.AllBlockEntities.EXTRACTOR;
+import static org.shsts.tinactory.content.AllBlockEntities.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
@@ -81,13 +84,15 @@ public final class Machines {
         primitiveMachine(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER, "machines/electromagnetic_separator");
         primitiveMachine(ORE_WASHER, PRIMITIVE_ORE_WASHER, "machines/ore_washer");
         machine(RESEARCH_BENCH, "overlay/machine/overlay_screen");
-        machine(ASSEMBLER, "machines/assembler");
-        machine(MACERATOR, "machines/macerator");
-        machine(CENTRIFUGE, "machines/centrifuge");
-        machine(THERMAL_CENTRIFUGE, "machines/thermal_centrifuge");
+        machine(ASSEMBLER);
+        machine(MACERATOR);
+        machine(CENTRIFUGE);
+        machine(THERMAL_CENTRIFUGE);
         machine(ELECTRIC_FURNACE, "machines/electric_furnace");
-        machine(ALLOY_SMELTER, "machines/alloy_smelter");
-        machine(POLARIZER, "machines/polarizer");
+        machine(ALLOY_SMELTER);
+        machine(POLARIZER);
+        machine(EXTRACTOR);
+        machine(FLUID_SOLIDIFIER);
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
                 .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
                 .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
@@ -202,6 +207,14 @@ public final class Machines {
                 .define('V', VACUUM_TUBE)
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
+
+        AllRecipes.ASSEMBLER.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
+                .outputItem(1, ALLOY_SMELTER.entry(Voltage.ULV), 1)
+                .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 1)
+                .inputItem(0, VACUUM_TUBE, 2)
+                .inputItem(0, CABLE.get(Voltage.ULV), 4)
+                .requireTech(Technologies.ALLOY_SMELTING)
+                .build();
     }
 
     private static void misc() {
@@ -245,6 +258,10 @@ public final class Machines {
 
     private static void machine(MachineSet set, String overlay) {
         machine(set, overlay, IO_TEX);
+    }
+
+    private static void machine(ProcessingSet set) {
+        machine(set, "machines/" + set.recipeType.id);
     }
 
     private static void primitiveMachine(MachineSet set, RegistryEntry<? extends Block> primitive,

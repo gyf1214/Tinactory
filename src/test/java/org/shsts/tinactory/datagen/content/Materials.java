@@ -43,6 +43,7 @@ import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
+import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
@@ -50,6 +51,7 @@ import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
+import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
@@ -251,7 +253,10 @@ public final class Materials {
         FACTORY.material(TEST, DULL).build()
                 .material(STONE, ROUGH).toolProcess().build()
                 .material(FLINT, DULL).toolProcess().build()
-                .material(RAW_RUBBER, DULL).build();
+                .material(RAW_RUBBER, DULL).build()
+                .material(RUBBER, SHINY)
+                .toolProcess()
+                .build();
 
         // smelt wrought iron nugget
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
@@ -300,6 +305,19 @@ public final class Materials {
                     .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
                     .build();
         }
+
+        // rubber
+        TOOL_CRAFTING.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
+                .result(RAW_RUBBER.entry("dust"), 1)
+                .pattern("A").define('A', STICKY_RESIN)
+                .toolTag(TOOL_MORTAR)
+                .build();
+
+        ALLOY_SMELTER.recipe(DATA_GEN, RUBBER.loc("bar"))
+                .inputItem(0, RAW_RUBBER.entry("dust"), 3)
+                .inputItem(0, SULFUR.entry("dust"), 1)
+                .outputItem(1, RUBBER.entry("bar"), 3)
+                .build();
 
         // TEST
         BLAST_FURNACE.recipe(DATA_GEN, STEEL.loc("ingot"))

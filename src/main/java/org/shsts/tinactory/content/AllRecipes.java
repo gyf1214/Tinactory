@@ -35,6 +35,8 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> POLARIZER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
     public static final RecipeTypeEntry<GeneratorRecipe, GeneratorRecipe.Builder> STEAM_TURBINE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> BLAST_FURNACE;
     // Recipes only used to mark input for recipe book purpose
@@ -91,6 +93,14 @@ public final class AllRecipes {
 
         POLARIZER = REGISTRATE.processingRecipeType("polarizer")
                 .defaults($ -> $.amperage(0.25d).workTicks(40))
+                .register();
+
+        EXTRACTOR = REGISTRATE.processingRecipeType("extractor")
+                .defaults($ -> $.amperage(0.5d))
+                .register();
+
+        FLUID_SOLIDIFIER = REGISTRATE.processingRecipeType("fluid_solidifier")
+                .defaults($ -> $.amperage(0.25d))
                 .register();
 
         STEAM_TURBINE = REGISTRATE.recipeType("steam_turbine", GeneratorRecipe.SERIALIZER)

@@ -92,6 +92,9 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         process("dust_tiny", 1, "nugget", TOOL_MORTAR);
         // plate
         process("plate", 1, "A\nA", "ingot", TOOL_HAMMER);
+        process("plate", 1, "A\nA", "bar", TOOL_HAMMER);
+        // ring
+        process("ring", 1, "plate", TOOL_WIRE_CUTTER);
         // stick
         process("stick", 1, "ingot", TOOL_FILE);
         // bolt

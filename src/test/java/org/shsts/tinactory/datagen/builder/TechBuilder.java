@@ -8,6 +8,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.handler.TechProvider;
 
@@ -19,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
+import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
@@ -27,6 +31,8 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     private final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     private Supplier<ResourceLocation> displayItem = null;
+    @Nullable
+    private Voltage researchVoltage;
 
     public TechBuilder(DataGen dataGen, P parent, String id) {
         super(dataGen, parent, id);
@@ -60,6 +66,11 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
         return this;
     }
 
+    public TechBuilder<P> researchVoltage(Voltage val) {
+        researchVoltage = val;
+        return this;
+    }
+
     public TechBuilder<P> modifier(String key, int val) {
         modifiers.put(key, val);
         return this;
@@ -73,6 +84,13 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
         var details = ITechnology.getDetailsId(loc);
         dataGen.langTrackedCtx.trackExtra(description, description);
         dataGen.langTrackedCtx.trackExtra(details, details);
+
+        if (researchVoltage != null) {
+            RESEARCH_BENCH.recipe(DATA_GEN, loc)
+                    .target(loc)
+                    .defaultInput(researchVoltage)
+                    .build();
+        }
     }
 
     public JsonObject serialize() {

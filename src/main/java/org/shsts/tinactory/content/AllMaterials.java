@@ -50,6 +50,7 @@ public final class AllMaterials {
     public static MaterialSet STONE;
     public static MaterialSet FLINT;
     public static MaterialSet RAW_RUBBER;
+    public static MaterialSet RUBBER;
 
     static {
         SET = new HashMap<>();
@@ -84,6 +85,11 @@ public final class AllMaterials {
         RAW_RUBBER = set("raw_rubber")
                 .color(0xFFCCC789)
                 .dust()
+                .buildObject();
+
+        RUBBER = set("rubber")
+                .color(0xFF000000)
+                .polymer()
                 .buildObject();
     }
 

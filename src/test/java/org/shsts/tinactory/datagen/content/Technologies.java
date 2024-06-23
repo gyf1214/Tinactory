@@ -8,59 +8,62 @@ import org.shsts.tinactory.datagen.builder.TechBuilder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
-import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
-import static org.shsts.tinactory.content.AllTechs.BASE_ORE;
-import static org.shsts.tinactory.content.AllTechs.LOGISTICS;
+import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Technologies {
-    private static final TechFactory TECH_FACTORY = new TechFactory();
+    private static final TechFactory TECH_FACTORY;
+    public static final Map<OreVariant, ResourceLocation> BASE_ORE;
+    public static final ResourceLocation ALLOY_SMELTING;
 
-    public static void init() {
+    static {
+        TECH_FACTORY = new TechFactory();
+
+        BASE_ORE = new HashMap<>();
         for (var variant : OreVariant.values()) {
-            TECH_FACTORY.tech(BASE_ORE.get(variant))
+            var tech = TECH_FACTORY.child("ore/" + variant.name().toLowerCase())
                     .maxProgress(200L * (1L << (long) variant.rank))
                     .displayItem(variant.baseItem)
-                    .build();
+                    .researchVoltage(variant.voltage)
+                    .buildLoc();
+            BASE_ORE.put(variant, tech);
         }
         TECH_FACTORY.reset();
-        for (var i = 0; i < LOGISTICS.size(); i++) {
-            TECH_FACTORY.tech(LOGISTICS.get(i))
-                    .maxProgress(30L * (1L << (2L * i)))
-                    .modifier("logistics_level", 1)
-                    .displayItem(CONVEYOR_MODULE.get(Voltage.fromRank(2 + 2 * i)))
-                    .build();
-        }
 
-        for (var entry : BASE_ORE.entrySet()) {
-            var variant = entry.getKey();
-            var tech = entry.getValue();
-            RESEARCH_BENCH.recipe(DATA_GEN, tech)
-                    .target(tech)
-                    .defaultInput(variant.voltage)
-                    .build();
-        }
-
-        RESEARCH_BENCH.recipe(DATA_GEN, LOGISTICS.get(0))
-                .target(LOGISTICS.get(0))
-                .defaultInput(Voltage.LV)
-                .build();
+        ALLOY_SMELTING = TECH_FACTORY.reset()
+                .tech("alloy_smelting")
+                .maxProgress(20L)
+                .displayItem(ALLOY_SMELTER.entry(Voltage.ULV))
+                .researchVoltage(Voltage.ULV)
+                .buildLoc();
     }
+
+    public static void init() {}
 
     private static class TechFactory {
         @Nullable
         private ResourceLocation base = null;
 
-        public TechBuilder<TechFactory> tech(ResourceLocation loc) {
-            var builder = DATA_GEN.tech(this, loc);
+        public TechBuilder<TechFactory> child(String id) {
+            var builder = DATA_GEN.tech(this, id);
             if (base != null) {
                 builder.depends(base);
             }
-            base = loc;
+            base = modLoc(id);
+            return builder;
+        }
+
+        public TechBuilder<TechFactory> tech(String id) {
+            var builder = DATA_GEN.tech(this, id);
+            if (base != null) {
+                builder.depends(base);
+            }
             return builder;
         }
 

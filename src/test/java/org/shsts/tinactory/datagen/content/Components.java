@@ -28,16 +28,15 @@ import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
-import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
+import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
-import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
-import static org.shsts.tinactory.content.AllTags.TOOL_MORTAR;
+import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
@@ -55,7 +54,6 @@ public final class Components {
         ulv();
         misc();
         componentRecipes();
-        miscRecipes();
     }
 
     private static void componentItems() {
@@ -117,6 +115,14 @@ public final class Components {
     }
 
     private static void componentRecipes() {
+        TOOL_CRAFTING.recipe(DATA_GEN, CABLE.get(Voltage.LV))
+                .result(CABLE.get(Voltage.LV), 1)
+                .pattern("WWR").pattern("WWR").pattern("RR ")
+                .define('W', TIN.tag("wire"))
+                .define('R', RUBBER.tag("plate"))
+                .toolTag(TOOL_WIRE_CUTTER)
+                .build();
+
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL);
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, STEEL, BRONZE, STEEL);
     }
@@ -177,21 +183,6 @@ public final class Components {
                 .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
-                .build();
-    }
-
-    private static void miscRecipes() {
-        TOOL_CRAFTING.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
-                .result(RAW_RUBBER.entry("dust"), 1)
-                .pattern("A").define('A', STICKY_RESIN)
-                .toolTag(TOOL_MORTAR)
-                .build();
-
-        MACERATOR.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
-                .inputItem(0, STICKY_RESIN, 1)
-                .outputItem(1, RAW_RUBBER.entry("dust"), 3)
-                .voltage(Voltage.LV)
-                .workTicks(100)
                 .build();
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
-import static org.shsts.tinactory.content.AllTechs.BASE_ORE;
+import static org.shsts.tinactory.datagen.content.Technologies.BASE_ORE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

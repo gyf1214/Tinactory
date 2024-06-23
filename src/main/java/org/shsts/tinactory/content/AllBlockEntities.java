@@ -60,6 +60,8 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_FURNACE;
     public static final ProcessingSet ALLOY_SMELTER;
     public static final ProcessingSet POLARIZER;
+    public static final ProcessingSet EXTRACTOR;
+    public static final ProcessingSet FLUID_SOLIDIFIER;
     public static final ProcessingSet STEAM_TURBINE;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
@@ -213,18 +215,41 @@ public final class AllBlockEntities {
                 .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
                 .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
+                .port(FLUID_OUTPUT)
+                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
         POLARIZER = set(machine(AllRecipes.POLARIZER))
-                .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
                 .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-                .progressBar(Texture.PROGRESS_MAGNETIC, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_MAGNETIC, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+                .build()
+                .buildObject();
+
+        EXTRACTOR = set(machine(AllRecipes.EXTRACTOR))
+                .layoutSet()
+                .port(ITEM_INPUT)
+                .slot(0, 1 + SLOT_SIZE / 2)
+                .port(ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+                .port(FLUID_OUTPUT)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+                .build()
+                .buildObject();
+
+        FLUID_SOLIDIFIER = set(machine(AllRecipes.FLUID_SOLIDIFIER))
+                .layoutSet()
+                .port(ITEM_INPUT)
+                .slot(0, 1 + SLOT_SIZE / 2)
+                .port(ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 

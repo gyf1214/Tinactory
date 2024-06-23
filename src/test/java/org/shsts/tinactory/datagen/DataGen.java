@@ -54,6 +54,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class DataGen implements IRecipeDataConsumer {
@@ -173,8 +175,8 @@ public final class DataGen implements IRecipeDataConsumer {
         return new TechBuilder<>(this, this, id);
     }
 
-    public <P> TechBuilder<P> tech(P parent, ResourceLocation loc) {
-        return new TechBuilder<>(this, parent, loc);
+    public <P> TechBuilder<P> tech(P parent, String id) {
+        return new TechBuilder<>(this, parent, modLoc(id));
     }
 
     public void register(IEventBus modEventBus) {
@@ -249,10 +251,10 @@ public final class DataGen implements IRecipeDataConsumer {
 
     public static void init(IEventBus modEventBus) {
         Models.init();
+        Technologies.init();
         Materials.init();
         Components.init();
         Machines.init();
-        Technologies.init();
         Veins.init();
         Markers.init();
 

@@ -282,6 +282,10 @@ public class MaterialSet {
             return dummies("magnetic");
         }
 
+        public Builder<P> polymer() {
+            return dust().dummies("bar", "plate", "ring");
+        }
+
         public Builder<P> ore(OreVariant variant) {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
