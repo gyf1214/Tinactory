@@ -182,7 +182,6 @@ public class Machine extends UpdatableCapabilityProvider
         LOGGER.debug("{}: connect to network {}", this, network);
         this.network = network;
         updatePassiveRequests();
-        sendUpdate(blockEntity);
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 
@@ -241,6 +240,13 @@ public class Machine extends UpdatableCapabilityProvider
 
     public Optional<IElectricMachine> getElectric() {
         return AllCapabilities.ELECTRIC_MACHINE.tryGet(blockEntity);
+    }
+
+    public void sendUpdate() {
+        var level = blockEntity.getLevel();
+        if (level != null && !level.isClientSide) {
+            sendUpdate(blockEntity);
+        }
     }
 
     @Nonnull

@@ -16,6 +16,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.client.PortConfigButton;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.ElectricChest;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
@@ -153,6 +154,8 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
         this.height = buttonY + SLOT_SIZE;
         onEventPacket(MenuEventHandler.CHEST_SLOT_CLICK, this::onClickSlot);
         onEventPacket(MenuEventHandler.SET_MACHINE_CONFIG, machine::setConfig);
+
+        AllCapabilities.MACHINE.tryGet(blockEntity).ifPresent(Machine::sendUpdate);
     }
 
     private SyncPacketFactory<BlockEntity, ChestItemSyncPacket> itemSyncPacket(int slot) {

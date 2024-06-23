@@ -62,6 +62,8 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
         } else {
             this.progressBarIndex = -1;
         }
+
+        AllCapabilities.MACHINE.tryGet(blockEntity).ifPresent(Machine::sendUpdate);
     }
 
     @Override
