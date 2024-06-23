@@ -121,24 +121,24 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             stateLabel.setLine(1, tr("stateLabel", packet.getState()));
             var metric = packet.getElectricMetrics();
             stateLabel.setLine(2, tr("workFactorLabel",
-                    "%.0f%%".formatted(metric.getWorkFactor() * 100d)));
+                    "%.0f%%".formatted(metric.workFactor() * 100d)));
             stateLabel.setLine(3, tr("efficiencyLabel",
-                    "%.0f%%".formatted(metric.getEfficiency() * 100d)));
-            var comp = MathUtil.compare(metric.getBuffer());
+                    "%.0f%%".formatted(metric.efficiency() * 100d)));
+            var comp = MathUtil.compare(metric.buffer());
             if (comp == 0) {
                 stateLabel.setLine(4, tr("powerLabel0",
-                        "%.0f".formatted(metric.getWorkCons()),
-                        "%.0f".formatted(metric.getGen())));
+                        "%.0f".formatted(metric.workCons()),
+                        "%.0f".formatted(metric.gen())));
             } else if (comp > 0) {
                 stateLabel.setLine(4, tr("powerLabel1",
-                        "%.0f".formatted(metric.getWorkCons()),
-                        "%.0f".formatted(metric.getBuffer()),
-                        "%.0f".formatted(metric.getGen())));
+                        "%.0f".formatted(metric.workCons()),
+                        "%.0f".formatted(metric.buffer()),
+                        "%.0f".formatted(metric.gen())));
             } else {
                 stateLabel.setLine(4, tr("powerLabel2",
-                        "%.0f".formatted(metric.getWorkCons()),
-                        "%.0f".formatted(metric.getGen()),
-                        "%.0f".formatted(-metric.getBuffer())));
+                        "%.0f".formatted(metric.workCons()),
+                        "%.0f".formatted(metric.gen()),
+                        "%.0f".formatted(-metric.buffer())));
             }
             welcomePanel.setActive(false);
             tabs.setActive(true);

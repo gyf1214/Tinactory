@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.DoublePredicate;
 import java.util.function.Supplier;
@@ -75,28 +74,12 @@ public class ElectricComponent extends NetworkComponent {
         }
     }
 
-    public static class Metrics {
-        private double workFactor, gen, workCons, buffer;
-
-        public Metrics() {}
-
-        public double getWorkFactor() {
-            return workFactor;
+    public record Metrics(double workFactor, double gen, double workCons, double buffer) {
+        public Metrics() {
+            this(0d, 0d, 0d, 0d);
         }
 
-        public double getGen() {
-            return gen;
-        }
-
-        public double getWorkCons() {
-            return workCons;
-        }
-
-        public double getBuffer() {
-            return buffer;
-        }
-
-        public double getEfficiency() {
+        public double efficiency() {
             var comp = MathUtil.compare(buffer);
             if (comp == 0) {
                 return workCons / gen;
@@ -114,34 +97,19 @@ public class ElectricComponent extends NetworkComponent {
             buf.writeDouble(buffer);
         }
 
-        public void readFromBuf(FriendlyByteBuf buf) {
-            workFactor = buf.readDouble();
-            gen = buf.readDouble();
-            workCons = buf.readDouble();
-            buffer = buf.readDouble();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Metrics metrics = (Metrics) o;
-            return Double.compare(metrics.workFactor, workFactor) == 0 &&
-                    Double.compare(metrics.gen, gen) == 0 &&
-                    Double.compare(metrics.workCons, workCons) == 0 &&
-                    Double.compare(metrics.buffer, buffer) == 0;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(workFactor, gen, workCons, buffer);
+        public static Metrics readFromBuf(FriendlyByteBuf buf) {
+            var workFactor = buf.readDouble();
+            var gen = buf.readDouble();
+            var workCons = buf.readDouble();
+            var buffer = buf.readDouble();
+            return new Metrics(workFactor, gen, workCons, buffer);
         }
     }
 
     private final Map<BlockPos, Subnet> subnets = new HashMap<>();
     private final Map<BlockPos, BlockPos> edges = new HashMap<>();
     private final List<Subnet> solveOrder = new ArrayList<>();
-    private final Metrics metrics = new Metrics();
+    private Metrics metrics = new Metrics();
 
     private double workFactor;
     private double bufferFactor;
@@ -251,20 +219,23 @@ public class ElectricComponent extends NetworkComponent {
             bufferFactor = -1d;
         }
 
-        metrics.gen = subnets.values().stream().mapToDouble(sub -> sub.gen).sum();
+        var gen = subnets.values().stream().mapToDouble(sub -> sub.gen).sum();
         var maxCons = subnets.values().stream().mapToDouble(sub -> sub.cons).sum();
-        metrics.workFactor = workFactor;
-        metrics.workCons = maxCons * workFactor;
+        var workCons = maxCons * workFactor;
         var bufferGen = subnets.values().stream().mapToDouble(sub -> sub.bGen).sum();
         var bufferCons = subnets.values().stream().mapToDouble(sub -> sub.bCons).sum();
         var comp = MathUtil.compare(bufferFactor);
+
+        double buffer;
         if (comp == 0) {
-            metrics.buffer = 0L;
+            buffer = 0d;
         } else if (comp > 0) {
-            metrics.buffer = bufferCons * bufferFactor;
+            buffer = bufferCons * bufferFactor;
         } else {
-            metrics.buffer = bufferGen * bufferFactor;
+            buffer = bufferGen * bufferFactor;
         }
+
+        metrics = new Metrics(workFactor, gen, workCons, buffer);
     }
 
     public double getWorkFactor() {

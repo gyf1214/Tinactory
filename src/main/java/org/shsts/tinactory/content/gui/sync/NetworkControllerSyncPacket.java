@@ -60,8 +60,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
         present = buf.readBoolean();
         if (present) {
             state = buf.readEnum(NetworkBase.State.class);
-            electricMetrics = new ElectricComponent.Metrics();
-            electricMetrics.readFromBuf(buf);
+            electricMetrics = ElectricComponent.Metrics.readFromBuf(buf);
         }
     }
 
