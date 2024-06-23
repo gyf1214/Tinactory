@@ -5,19 +5,18 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RoundRobinList<T> extends ArrayList<T> {
-    private final AtomicInteger nextIndex = new AtomicInteger();
+public class RandomList<T> extends ArrayList<T> {
+    private final Random random = new Random();
 
     @Override
     public Iterator<T> iterator() {
         return new Iterator<>() {
             private int count = size();
-            private int first = nextIndex.getAndAdd(1);
+            private int first = count > 0 ? (random.nextInt() % count + count) % count : 0;
 
             @Override
             public boolean hasNext() {
@@ -30,13 +29,5 @@ public class RoundRobinList<T> extends ArrayList<T> {
                 return get(first++ % size());
             }
         };
-    }
-
-    public T getNext() {
-        if (isEmpty()) {
-            throw new NoSuchElementException();
-        }
-        var next = nextIndex.getAndAdd(1);
-        return get(next % size());
     }
 }

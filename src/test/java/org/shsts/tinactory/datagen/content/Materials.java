@@ -219,8 +219,8 @@ public final class Materials {
                 .oreProcess(NICKEL).smelt(IRON)
                 .build()
                 .material(BANDED_IRON, DULL)
-                // TODO: magnetite, magnesium?
-                .oreProcess(MAGNETITE).smelt(IRON)
+                // TODO: nickel, magnesium?
+                .oreProcess(NICKEL).smelt(IRON)
                 .build()
                 .material(COAL, DULL)
                 // TODO: coal, thorium

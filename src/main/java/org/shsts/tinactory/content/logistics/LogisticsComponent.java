@@ -24,7 +24,7 @@ import org.shsts.tinactory.core.logistics.ItemTypeWrapper;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
-import org.shsts.tinactory.core.util.RoundRobinList;
+import org.shsts.tinactory.core.util.RandomList;
 import org.slf4j.Logger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -43,17 +43,17 @@ public class LogisticsComponent extends NetworkComponent {
                            ILogisticsContentWrapper content) {}
 
     private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
-    private final RoundRobinList<Request> activeRequestList = new RoundRobinList<>();
+    private final RandomList<Request> activeRequestList = new RandomList<>();
     private final Multimap<PortDirection, IPort> passivePorts = HashMultimap.create();
-    private final Map<PortDirection, RoundRobinList<IPort>> passiveList = new HashMap<>();
-    private final RoundRobinList<IPort> storages = new RoundRobinList<>();
+    private final Map<PortDirection, RandomList<IPort>> passiveList = new HashMap<>();
+    private final RandomList<IPort> storages = new RandomList<>();
 
     private int ticks;
 
     public LogisticsComponent(ComponentType<LogisticsComponent> type, Network network) {
         super(type, network);
-        this.passiveList.put(PortDirection.INPUT, new RoundRobinList<>());
-        this.passiveList.put(PortDirection.OUTPUT, new RoundRobinList<>());
+        this.passiveList.put(PortDirection.INPUT, new RandomList<>());
+        this.passiveList.put(PortDirection.OUTPUT, new RandomList<>());
     }
 
     private int getTechLevel() {
@@ -209,11 +209,11 @@ public class LogisticsComponent extends NetworkComponent {
         var cycles = Math.min(ticks / delay, (workers + index) / delay);
         ticks++;
 
-        for (var i = 0; i < activeRequestList.size(); i++) {
+        for (var req : activeRequestList) {
             if (cycles <= 0) {
                 break;
             }
-            if (handleItemActiveRequest(activeRequestList.getNext())) {
+            if (handleItemActiveRequest(req)) {
                 cycles--;
             }
         }
