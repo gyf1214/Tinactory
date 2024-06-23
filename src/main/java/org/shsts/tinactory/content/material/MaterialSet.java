@@ -248,14 +248,13 @@ public class MaterialSet {
             return dummies("dust");
         }
 
-        public Builder<P> dustSet() {
-            return dummies("dust", "dust_tiny");
+        public Builder<P> metalSet() {
+            return dust().dummies("ingot")
+                    .alias("primary", "ingot");
         }
 
-        public Builder<P> metalSet() {
-            return dustSet()
-                    .dummies("ingot", "nugget")
-                    .alias("primary", "ingot");
+        public Builder<P> nugget() {
+            return dummies("dust_tiny", "nugget");
         }
 
         public Builder<P> metalSetExt() {

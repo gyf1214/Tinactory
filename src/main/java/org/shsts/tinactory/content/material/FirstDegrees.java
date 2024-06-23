@@ -14,7 +14,7 @@ public final class FirstDegrees {
     static {
         WROUGHT_IRON = set("wrought_iron")
                 .color(0xFFC8B4B4)
-                .metalSetExt()
+                .metalSetExt().nugget()
                 .toolSet(200, Tiers.IRON)
                 .buildObject();
 

@@ -35,6 +35,10 @@ import java.util.List;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
+import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
+import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
+import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
 import static org.shsts.tinactory.content.machine.ProcessingSet.generator;
 import static org.shsts.tinactory.content.machine.ProcessingSet.machine;
 import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
@@ -55,6 +59,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet THERMAL_CENTRIFUGE;
     public static final MachineSet ELECTRIC_FURNACE;
     public static final ProcessingSet ALLOY_SMELTER;
+    public static final ProcessingSet POLARIZER;
     public static final ProcessingSet STEAM_TURBINE;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
@@ -77,7 +82,7 @@ public final class AllBlockEntities {
         RESEARCH_BENCH = set(research())
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
+                .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
                 .placeHolder(new Rect(3 * SLOT_SIZE, SLOT_SIZE / 2 - 2, 24, 24))
                 .progressBar(Texture.PROGRESS_MULTIPLE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
@@ -87,15 +92,15 @@ public final class AllBlockEntities {
         var assembler = set(machine(AllRecipes.ASSEMBLER))
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT);
+                .port(ITEM_INPUT);
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < (i == 2 ? 2 : 3); j++) {
                 assembler.slot(SLOT_SIZE * j, 1 + SLOT_SIZE * i);
             }
         }
-        ASSEMBLER = assembler.port(SlotType.FLUID_INPUT)
+        ASSEMBLER = assembler.port(FLUID_INPUT)
                 .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
                 .progressBar(Texture.PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE)
                 .build()
@@ -104,9 +109,9 @@ public final class AllBlockEntities {
         STONE_GENERATOR = set(machine(AllRecipes.STONE_GENERATOR))
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE / 2)
-                .port(SlotType.FLUID_OUTPUT)
+                .port(FLUID_OUTPUT)
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, Voltage.ULV)
                 .progressBar(Texture.PROGRESS_MACERATE, 8, SLOT_SIZE / 2)
                 .build()
@@ -115,12 +120,12 @@ public final class AllBlockEntities {
         var oreAnalyzer = set(ProcessingSet.oreAnalyzer())
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
+                .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
                 .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2);
         for (var i = 3; i < 6; i++) {
             var startVoltage = i == 5 ? Voltage.LV : Voltage.PRIMITIVE;
-            oreAnalyzer.port(SlotType.ITEM_OUTPUT)
+            oreAnalyzer.port(ITEM_OUTPUT)
                     .slot(SLOT_SIZE * i, 1 + SLOT_SIZE / 2, startVoltage, Voltage.MV)
                     .slot(SLOT_SIZE * i, 1, Voltage.HV)
                     .slot(SLOT_SIZE * i, 1 + SLOT_SIZE, Voltage.HV);
@@ -129,18 +134,18 @@ public final class AllBlockEntities {
 
         MACERATOR = set(marker(AllRecipes.MACERATOR, true))
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
+                .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, Voltage.LV, Voltage.HV)
                 .slot(SLOT_SIZE * 3, 1, Voltage.EV)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2, Voltage.MV, Voltage.HV)
                 .slot(SLOT_SIZE * 4, 1, Voltage.EV)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, List.of(Voltage.HV))
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE, Voltage.EV)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE, Voltage.EV)
                 .progressBar(Texture.PROGRESS_MACERATE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
@@ -149,15 +154,15 @@ public final class AllBlockEntities {
         ORE_WASHER = set(marker(AllRecipes.ORE_WASHER, false))
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
+                .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
-                .port(SlotType.FLUID_INPUT)
+                .port(FLUID_INPUT)
                 .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, Voltage.ULV)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE / 2, Voltage.ULV)
                 .progressBar(Texture.PROGRESS_BATH, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
@@ -165,13 +170,13 @@ public final class AllBlockEntities {
 
         CENTRIFUGE = set(marker(AllRecipes.CENTRIFUGE, true))
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
+                .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
-                .port(SlotType.FLUID_INPUT)
+                .port(FLUID_INPUT)
                 .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1).slot(SLOT_SIZE * 5, 1).slot(SLOT_SIZE * 6, 1)
-                .port(SlotType.FLUID_OUTPUT)
+                .port(FLUID_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE).slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
                 .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE)
                 .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
@@ -180,9 +185,9 @@ public final class AllBlockEntities {
 
         THERMAL_CENTRIFUGE = set(machine(AllRecipes.THERMAL_CENTRIFUGE))
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
+                .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
@@ -192,9 +197,9 @@ public final class AllBlockEntities {
         ELECTRIC_FURNACE = ProcessingSet.electricFurnace()
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
+                .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
@@ -203,21 +208,32 @@ public final class AllBlockEntities {
         ALLOY_SMELTER = set(machine(AllRecipes.ALLOY_SMELTER))
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT)
+                .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
                 .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
-                .port(SlotType.ITEM_OUTPUT)
+                .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+                .build()
+                .buildObject();
+
+        POLARIZER = set(machine(AllRecipes.POLARIZER))
+                .voltages(Voltage.ULV)
+                .layoutSet()
+                .port(ITEM_INPUT)
+                .slot(0, 1 + SLOT_SIZE / 2)
+                .port(ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_MAGNETIC, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
         STEAM_TURBINE = set(generator(AllRecipes.STEAM_TURBINE))
                 .voltages(Voltage.ULV, Voltage.HV)
                 .layoutSet()
-                .port(SlotType.FLUID_INPUT)
+                .port(FLUID_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
-                .port(SlotType.FLUID_OUTPUT)
+                .port(FLUID_OUTPUT)
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
                 .progressBar(Texture.PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
@@ -253,7 +269,7 @@ public final class AllBlockEntities {
         var batteryBox = ProcessingSet.batteryBox()
                 .voltages(Voltage.LV, Voltage.HV)
                 .layoutSet()
-                .port(SlotType.ITEM_INPUT);
+                .port(ITEM_INPUT);
         for (var i = 0; i < 4; i++) {
             for (var j = 0; j < 4; j++) {
                 batteryBox.slot(j * SLOT_SIZE, i * SLOT_SIZE, Voltage.fromRank(1 + Math.max(i, j)));

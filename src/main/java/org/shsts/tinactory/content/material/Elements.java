@@ -23,7 +23,7 @@ public final class Elements {
                 .color(0xFFC8C8C8)
                 .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
-                .mechanicalSet().wire()
+                .mechanicalSet().nugget().wire()
                 .buildObject();
 
         GOLD = set("gold")
@@ -31,7 +31,7 @@ public final class Elements {
                 .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
-                .metalSet()
+                .metalSet().nugget()
                 .ore(OreVariant.DEEPSLATE)
                 .buildObject();
 

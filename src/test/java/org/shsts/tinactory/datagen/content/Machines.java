@@ -15,6 +15,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
+import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
@@ -36,6 +37,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.MULTI_BLOCK_INTERFACE
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER;
+import static org.shsts.tinactory.content.AllBlockEntities.POLARIZER;
 import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_WASHER;
 import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_STONE_GENERATOR;
@@ -85,7 +87,10 @@ public final class Machines {
         machine(THERMAL_CENTRIFUGE, "machines/thermal_centrifuge");
         machine(ELECTRIC_FURNACE, "machines/electric_furnace");
         machine(ALLOY_SMELTER, "machines/alloy_smelter");
-        machine(STEAM_TURBINE, "generators/steam_turbine/overlay_side");
+        machine(POLARIZER, "machines/polarizer");
+        machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
+                .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
+                .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
         machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
         machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest", ME_BUS);
 
@@ -220,18 +225,22 @@ public final class Machines {
         return Optional.empty();
     }
 
-    private static void machine(MachineSet set, String overlay, String ioTex) {
+    private static void machine(MachineSet set, Transformer<MachineModel.Builder<?>> model) {
         var tag = getMachineTag(set);
         tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
         for (var voltage : set.voltages) {
             var builder = DATA_GEN.block(set.entry(voltage))
                     .blockState(MachineModel::builder, MachineModel::blockState)
-                    .overlay(overlay).ioTex(ioTex)
+                    .transform(model.cast())
                     .build()
                     .tag(MINEABLE_WITH_WRENCH);
             tag.ifPresent(builder::itemTag);
             builder.build();
         }
+    }
+
+    private static void machine(MachineSet set, String overlay, String ioTex) {
+        machine(set, $ -> $.overlay(overlay).ioTex(ioTex));
     }
 
     private static void machine(MachineSet set, String overlay) {
