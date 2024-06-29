@@ -17,9 +17,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public enum OreVariant implements StringRepresentable {
     STONE(0, Blocks.STONE, Tiers.IRON, Voltage.ULV, 3f, 6f),
-    DEEPSLATE(1, Blocks.DEEPSLATE, Tiers.IRON, Voltage.LV, 4.5f, 6f),
-    NETHERRACK(2, Blocks.NETHERRACK, Tiers.DIAMOND, Voltage.HV, 6f, 7.5f),
-    END_STONE(3, Blocks.END_STONE, Tiers.NETHERITE, Voltage.EV, 7.5f, 9f);
+//    DEEPSLATE(1, Blocks.DEEPSLATE, Tiers.IRON, Voltage.LV, 4.5f, 6f),
+//    NETHERRACK(2, Blocks.NETHERRACK, Tiers.DIAMOND, Voltage.HV, 6f, 7.5f),
+//    END_STONE(3, Blocks.END_STONE, Tiers.NETHERITE, Voltage.EV, 7.5f, 9f);
+    ;
 
     public final int rank;
     public final Block baseBlock;

@@ -32,7 +32,7 @@ public final class Elements {
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
                 .metalSet().nugget()
-                .ore(OreVariant.DEEPSLATE)
+//                .ore(OreVariant.DEEPSLATE)
                 .buildObject();
 
         COPPER = set("copper")

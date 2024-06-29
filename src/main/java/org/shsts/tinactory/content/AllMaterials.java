@@ -44,7 +44,7 @@ public final class AllMaterials {
     public static MaterialSet REDSTONE;
     public static MaterialSet CINNABAR;
     public static MaterialSet RUBY;
-    public static MaterialSet MAGNETITE;
+//    public static MaterialSet MAGNETITE;
 
     public static MaterialSet TEST;
     public static MaterialSet STONE;

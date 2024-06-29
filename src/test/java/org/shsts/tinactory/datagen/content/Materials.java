@@ -38,7 +38,6 @@ import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
-import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
@@ -166,7 +165,7 @@ public final class Materials {
                 .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 // TODO: ?
-                .oreProcess()
+//                .oreProcess()
                 .build()
                 .material(COPPER, SHINY)
                 .machineProcess(Voltage.LV)
@@ -250,12 +249,12 @@ public final class Materials {
                 .material(RUBY, IconSet.RUBY)
                 // TODO: cinnabar, chromium, sifting?
                 .oreProcess(CINNABAR)
-                .build()
-                .material(MAGNETITE, METALLIC)
-                // TODO: ?
-                .oreProcess(GOLD)
-                .smelt(IRON)
                 .build();
+//                .material(MAGNETITE, METALLIC)
+//                // TODO: ?
+//                .oreProcess(GOLD)
+//                .smelt(IRON)
+//                .build();
     }
 
     private static void misc() {
