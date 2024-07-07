@@ -230,12 +230,18 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
             return outputs.stream().map(Supplier::get).toList();
         }
 
+        protected void validate() {
+            assert power > 0 : loc;
+            assert workTicks > 0 : loc;
+        }
+
         @Override
         public U buildObject() {
             if (power <= 0) {
                 var voltage = this.voltage == 0 ? Voltage.ULV.value : this.voltage;
                 power = (long) (amperage * voltage);
             }
+            validate();
             return super.buildObject();
         }
     }

@@ -60,6 +60,9 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
 
         @Override
+        protected void validate() {}
+
+        @Override
         protected MarkerRecipe createObject() {
             assert baseType != null;
             var type = Registry.RECIPE_TYPE.get(baseType);

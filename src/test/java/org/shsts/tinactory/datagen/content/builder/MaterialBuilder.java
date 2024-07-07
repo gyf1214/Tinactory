@@ -138,7 +138,6 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         var totalCount = 0;
 
         var builder = ALLOY_SMELTER.recipe(dataGen, material.loc("ingot"))
-                .workTicks(200)
                 .voltage(voltage);
 
         for (; i < components.length; i += 2) {
@@ -148,6 +147,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             totalCount += count;
         }
         builder.outputItem(1, material.entry("ingot"), totalCount)
+                .workTicks(100L * totalCount)
                 .build();
         return this;
     }

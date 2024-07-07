@@ -317,6 +317,7 @@ public final class Materials {
                 .inputItem(0, RAW_RUBBER.entry("dust"), 3)
                 .inputItem(0, SULFUR.entry("dust"), 1)
                 .outputItem(1, RUBBER.entry("bar"), 3)
+                .workTicks(300)
                 .build();
 
         // TEST

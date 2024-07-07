@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import org.shsts.tinactory.content.AllItems;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -33,9 +34,10 @@ public class PlayerStartFeature extends Feature<NoneFeatureConfiguration> {
             chest.setItem(0, new ItemStack(Blocks.GRASS_BLOCK, 64));
             chest.setItem(1, new ItemStack(Blocks.DIRT, 64));
             chest.setItem(2, new ItemStack(Items.OAK_SAPLING, 16));
-            chest.setItem(3, new ItemStack(Items.BONE_MEAL, 16));
-            chest.setItem(4, new ItemStack(Items.WATER_BUCKET));
+            chest.setItem(3, new ItemStack(AllItems.RUBBER_SAPLING.get(), 16));
+            chest.setItem(4, new ItemStack(Items.BONE_MEAL, 16));
             chest.setItem(5, new ItemStack(Items.WATER_BUCKET));
+            chest.setItem(6, new ItemStack(Items.WATER_BUCKET));
         });
         return true;
     }
