@@ -34,9 +34,11 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingRecipe extends SmartRecipe<IContainer> {
-    public record Input(int port, IProcessingIngredient ingredient) {}
+    public record Input(int port, IProcessingIngredient ingredient) {
+    }
 
-    public record Output(int port, IProcessingResult result) {}
+    public record Output(int port, IProcessingResult result) {
+    }
 
     public final List<Input> inputs;
     public final List<Output> outputs;
@@ -106,11 +108,6 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         } else {
             return ProcessingResults.EMPTY;
         }
-    }
-
-    @Override
-    public boolean hasDescription() {
-        return true;
     }
 
     public abstract static class BuilderBase<U extends ProcessingRecipe, S extends BuilderBase<U, S>>

@@ -87,7 +87,7 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     @Override
     protected Optional<List<Component>> buttonToolTip(ProcessingRecipe recipe) {
         // TODO
-        return Optional.of(List.of(recipe.getDescription()));
+        return recipe.getDescription().map(List::of);
     }
 
     @Override

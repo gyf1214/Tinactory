@@ -33,10 +33,8 @@ public class RecipeHandler extends DataHandler<RecipeProvider> {
         }
 
         public void addRecipe(SmartRecipe<?> recipe) {
-            if (recipe.hasDescription()) {
-                var key = recipe.getDescriptionId();
-                dataGen.langTrackedCtx.trackExtra(key, key);
-            }
+            recipe.getDescriptionId().ifPresent(key ->
+                    dataGen.langTrackedCtx.trackExtra(key, key));
             addRecipe(recipe.toFinished());
         }
 

@@ -225,7 +225,7 @@ public class ProcessingSet extends MachineSet {
     }
 
     public static RegistryEntry<SidedMachineBlock<SmartBlockEntity>> multiblockInterface(Voltage voltage) {
-        var id = "multi_block/interface/" + voltage.id;
+        var id = "multi_block/" + voltage.id + "/interface";
         return REGISTRATE.blockEntity(id, MachineBlock.sided(voltage))
                 .blockEntity()
                 .eventManager()

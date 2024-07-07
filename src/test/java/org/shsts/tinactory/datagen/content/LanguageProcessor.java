@@ -46,8 +46,10 @@ public class LanguageProcessor {
     public LanguageProcessor() {
         pattern("block[.]tinactory[.]material[.]ore[.](.*)", matcher ->
                 fmt("%s Ore", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]network[.](.*)[.]cable", matcher ->
-                fmt("%s Cable", capitalize(matcher, 1)));
+        pattern("block[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
+                fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
+        pattern("item[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
+                fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("item[.]tinactory[.]component[.](.*)[.](.*)", matcher ->
                 fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("item[.]tinactory[.]material[.]dust_impure[.](.*)", matcher ->
@@ -70,6 +72,10 @@ public class LanguageProcessor {
                 fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("block[.]tinactory[.]primitive[.](.*)", matcher ->
                 fmt("Primitive %s", normalize(matcher, 1)));
+        pattern("block[.]tinactory[.]multi_block[.](.*)[.]interface", matcher ->
+                fmt("%s Multiblock Interface", capitalize(matcher, 1)));
+        pattern("block[.]tinactory[.]multi_block[.]coil[.](.*)", matcher ->
+                fmt("%s Furnace Coil", normalize(matcher, 1)));
     }
 
     private Optional<String> process(String key) {

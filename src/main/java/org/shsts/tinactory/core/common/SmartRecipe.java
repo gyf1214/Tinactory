@@ -117,16 +117,12 @@ public abstract class SmartRecipe<C> implements Recipe<SmartRecipe.ContainerWrap
         return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
     }
 
-    public String getDescriptionId() {
-        return getDescriptionId(loc);
+    public Optional<String> getDescriptionId() {
+        return Optional.empty();
     }
 
-    public Component getDescription() {
-        return I18n.tr(getDescriptionId(loc));
-    }
-
-    public boolean hasDescription() {
-        return false;
+    public Optional<Component> getDescription() {
+        return getDescriptionId().map(I18n::tr);
     }
 
     protected abstract static class SimpleFinished implements FinishedRecipe {

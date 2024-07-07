@@ -143,7 +143,7 @@ public final class AllItems {
                 .buildObject();
 
         TRANSFORMER = ComponentBuilder.dummy(v -> REGISTRATE
-                        .block("network/transformer/" + v.id, SubnetBlock.transformer(v))
+                        .block("network/" + v.id + "/transformer", SubnetBlock.transformer(v))
                         .translucent().register())
                 .voltages(Voltage.LV, Voltage.IV)
                 .buildObject();
