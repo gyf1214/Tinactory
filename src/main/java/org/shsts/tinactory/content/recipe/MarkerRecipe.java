@@ -17,6 +17,7 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -26,6 +27,11 @@ public class MarkerRecipe extends ProcessingRecipe {
     public MarkerRecipe(BuilderBase<?, ?> builder, RecipeType<?> baseType) {
         super(builder);
         this.baseType = baseType;
+    }
+
+    @Override
+    public Optional<String> getDescriptionId() {
+        return Optional.of(getDescriptionId(loc));
     }
 
     public static class Builder extends BuilderBase<MarkerRecipe, Builder> {

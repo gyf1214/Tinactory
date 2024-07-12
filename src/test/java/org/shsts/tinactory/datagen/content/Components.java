@@ -19,6 +19,7 @@ import static org.shsts.tinactory.content.AllItems.DUMMY_ITEMS;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
+import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
@@ -56,12 +57,19 @@ public final class Components {
         ulv();
         misc();
         componentRecipes();
+        circuitRecipes();
         miscRecipes();
     }
 
     private static void componentItems() {
         DATA_GEN.item(VACUUM_TUBE)
                 .model(basicItem("metaitems/circuit.vacuum_tube"))
+                .tag(AllTags.circuit(Voltage.ULV))
+                .build();
+
+        DATA_GEN.item(ELECTRONIC_CIRCUIT)
+                .model(basicItem("metaitems/circuit.electronic"))
+                .tag(AllTags.circuit(Voltage.LV))
                 .build();
 
         DUMMY_ITEMS.forEach(entry -> DATA_GEN.item(entry)
@@ -89,16 +97,9 @@ public final class Components {
 
     private static void ulv() {
         DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
-                        .shapeless(CABLE.get(Voltage.ULV).get())
-                        .requires(Ingredient.of(IRON.tag("wire")), 4)
-                        .unlockedBy("has_wire", has(IRON.tag("wire"))))
-                .vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(VACUUM_TUBE.get())
-                        .pattern("BGB").pattern("WWW")
-                        .define('G', Items.GLASS)
-                        .define('W', COPPER.tag("wire"))
-                        .define('B', IRON.tag("bolt"))
-                        .unlockedBy("has_wire", has(COPPER.tag("wire"))));
+                .shapeless(CABLE.get(Voltage.ULV).get())
+                .requires(Ingredient.of(IRON.tag("wire")), 4)
+                .unlockedBy("has_wire", has(IRON.tag("wire"))));
 
         TOOL_CRAFTING.recipe(DATA_GEN, MACHINE_HULL.get(Voltage.ULV))
                 .result(MACHINE_HULL.get(Voltage.ULV), 1)
@@ -161,6 +162,7 @@ public final class Components {
                 .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
+                .requireTech(Technologies.MOTOR)
                 .build()
                 .recipe(DATA_GEN, ELECTRIC_PUMP.get(voltage))
                 .outputItem(2, ELECTRIC_PUMP.get(voltage), 1)
@@ -168,10 +170,11 @@ public final class Components {
                 .inputItem(0, pipeMaterial.tag("pipe"), 1)
                 .inputItem(0, rotorMaterial.tag("rotor"), 1)
                 .inputItem(0, rotorMaterial.tag("screw"), 3)
-                // TODO rubber seal
+                .inputItem(0, RUBBER.tag("ring"), 2)
                 .inputItem(0, cable, 1)
                 .workTicks(ticks)
                 .voltage(v)
+                .requireTech(Technologies.PUMP_AND_PISTON)
                 .build()
                 .recipe(DATA_GEN, ELECTRIC_PISTON.get(voltage))
                 .outputItem(2, ELECTRIC_PISTON.get(voltage), 1)
@@ -182,6 +185,7 @@ public final class Components {
                 .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
+                .requireTech(Technologies.PUMP_AND_PISTON)
                 .build()
                 .recipe(DATA_GEN, MACHINE_HULL.get(voltage))
                 .outputItem(2, MACHINE_HULL.get(voltage), 1)
@@ -190,6 +194,16 @@ public final class Components {
                 .workTicks(ticks)
                 .voltage(v)
                 .build();
+    }
+
+    private static void circuitRecipes() {
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(VACUUM_TUBE.get())
+                .pattern("BGB").pattern("WWW")
+                .define('G', Items.GLASS)
+                .define('W', COPPER.tag("wire"))
+                .define('B', IRON.tag("bolt"))
+                .unlockedBy("has_wire", has(COPPER.tag("wire"))));
     }
 
     private static void miscRecipes() {

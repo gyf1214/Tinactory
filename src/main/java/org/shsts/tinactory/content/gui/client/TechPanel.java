@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -106,6 +107,10 @@ public class TechPanel extends Panel {
             super(TechPanel.this.screen, BUTTON_SIZE, BUTTON_SIZE, 0);
         }
 
+        private ITechnology getTech(int index) {
+            return availableTechs.get(index);
+        }
+
         @Override
         protected int getItemCount() {
             return availableTechs.size();
@@ -114,17 +119,17 @@ public class TechPanel extends Panel {
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
                                     float partialTick, Rect rect, int index) {
-            renderTechButton(poseStack, getBlitOffset(), rect, availableTechs.get(index), true);
+            renderTechButton(poseStack, getBlitOffset(), rect, getTech(index), true);
         }
 
         @Override
         protected void onSelect(int index) {
-            TechPanel.this.onSelect(availableTechs.get(index));
+            TechPanel.this.onSelect(getTech(index));
         }
 
         @Override
         protected Optional<List<Component>> buttonTooltip(int index) {
-            return techTooltip(availableTechs.get(index));
+            return techTooltip(getTech(index));
         }
     }
 
@@ -336,5 +341,24 @@ public class TechPanel extends Panel {
     public void refreshTech(ITeamProfile team) {
         this.team = team;
         refresh();
+    }
+
+    public static boolean isHoveringTech(GuiComponent component) {
+        return component instanceof TechButton ||
+                component instanceof RequiredTechButtons ||
+                (component instanceof ButtonPanel.ItemButton itemButton &&
+                        itemButton.getParent() instanceof TechButtonPanel);
+    }
+
+    public static Optional<ITechnology> getHoveredTech(GuiComponent component, double mouseX) {
+        if (component instanceof TechButton button) {
+            return Optional.ofNullable(button.technology);
+        } else if (component instanceof RequiredTechButtons buttons) {
+            return buttons.getSelectedTech(mouseX);
+        } else if (component instanceof ButtonPanel.ItemButton itemButton &&
+                itemButton.getParent() instanceof TechButtonPanel buttonPanel) {
+            return Optional.of(buttonPanel.getTech(itemButton.getIndex()));
+        }
+        return Optional.empty();
     }
 }

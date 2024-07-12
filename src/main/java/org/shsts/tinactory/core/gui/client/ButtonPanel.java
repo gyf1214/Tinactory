@@ -35,7 +35,7 @@ public abstract class ButtonPanel extends Panel {
     private final PageButton leftPageButton;
     private final PageButton rightPageButton;
 
-    private class ItemButton extends Button {
+    public class ItemButton extends Button {
         private int index = 0;
 
         public ItemButton() {
@@ -56,6 +56,14 @@ public abstract class ButtonPanel extends Panel {
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             super.onMouseClicked(mouseX, mouseY, button);
             onSelect(index);
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public ButtonPanel getParent() {
+            return ButtonPanel.this;
         }
     }
 

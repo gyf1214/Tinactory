@@ -18,11 +18,13 @@ import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.OreVariant;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.builder.DataBuilder;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.Nullable;
@@ -35,11 +37,16 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
+import static org.shsts.tinactory.content.AllRecipes.BENDER;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
+import static org.shsts.tinactory.content.AllRecipes.CUTTER;
+import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
+import static org.shsts.tinactory.content.AllRecipes.POLARIZER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
+import static org.shsts.tinactory.content.AllRecipes.WIREMILL;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.TOOL_FILE;
 import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
@@ -52,6 +59,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.oreBlock;
@@ -115,6 +123,41 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
+    private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
+                         String result, int count, String input, int outputPort,
+                         Voltage v, long workTicks) {
+        if (!material.hasItem(result) || !material.hasItem(input)) {
+            return;
+        }
+        recipeType.recipe(DATA_GEN, material.loc(result))
+                .outputItem(outputPort, material.entry(result), count)
+                .inputItem(0, material.tag(input), 1)
+                .voltage(v)
+                .workTicks(workTicks)
+                .build();
+    }
+
+    private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
+                         String result, int count, String input, Voltage v, long workTicks) {
+        process(recipeType, result, count, input, 1, v, workTicks);
+    }
+
+    public MaterialBuilder<P> simpleProcess(Voltage v) {
+        process(WIREMILL, "wire", 2, "ingot", v, 48L);
+        process(BENDER, "plate", 1, "ingot", v, 72L);
+        process(BENDER, "plate", 1, "bar", v, 72L);
+        process(BENDER, "foil", 2, "plate", v, 64L);
+        process(POLARIZER, "magnetic", 1, "stick", v, 40L);
+        process(LATHE, "stick", 1, "ingot", v, 64L);
+        process(LATHE, "screw", 1, "bolt", v, 16L);
+        process(CUTTER, "bolt", 4, "stick", 2, v, 128L);
+        return this;
+    }
+
+    public MaterialBuilder<P> machineProcess(Voltage v) {
+        return simpleProcess(v);
+    }
+
     public MaterialBuilder<P> smelt() {
         smelt("ingot", "dust");
         smelt("nugget", "dust_tiny");
@@ -128,19 +171,13 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
-    public MaterialBuilder<P> alloy(Object... components) {
-        Voltage voltage = Voltage.LV;
-        var i = 0;
-        if (components[0] instanceof Voltage v) {
-            voltage = v;
-            i = 1;
-        }
+    public MaterialBuilder<P> alloy(Voltage voltage, Object... components) {
         var totalCount = 0;
 
         var builder = ALLOY_SMELTER.recipe(dataGen, material.loc("ingot"))
                 .voltage(voltage);
 
-        for (; i < components.length; i += 2) {
+        for (var i = 0; i < components.length; i += 2) {
             var component = (MaterialSet) components[i];
             var count = (int) components[i + 1];
             builder.inputItem(0, component.tag("dust"), count);

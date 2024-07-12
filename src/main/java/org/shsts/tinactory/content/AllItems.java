@@ -50,6 +50,7 @@ public final class AllItems {
     public static final Map<Voltage, RegistryEntry<CableBlock>> CABLE;
     public static final Map<Voltage, RegistryEntry<SubnetBlock>> TRANSFORMER;
     public static final RegistryEntry<Item> VACUUM_TUBE;
+    public static final RegistryEntry<Item> ELECTRONIC_CIRCUIT;
     public static final RegistryEntry<Item> STICKY_RESIN;
     public static final RegistryEntry<SimpleFluid> STEAM;
     public static final RegistryEntry<Block> HEAT_PROOF_BLOCK;
@@ -62,6 +63,8 @@ public final class AllItems {
         DUMMY_ITEMS = new ArrayList<>();
 
         VACUUM_TUBE = REGISTRATE.item("circuit/vacuum_tube", Item::new).register();
+
+        ELECTRONIC_CIRCUIT = REGISTRATE.item("circuit/electronic", Item::new).register();
 
         STICKY_RESIN = REGISTRATE.item("rubber_tree/sticky_resin", Item::new).register();
 

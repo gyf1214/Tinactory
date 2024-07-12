@@ -108,6 +108,8 @@ dependencies {
     testCompileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 
+    compileOnly files("libs/gtceu_resources_2.8.7.zip")
+
     // optional Registrate
 //    jarJar(group: 'com.tterrag.registrate', name: 'Registrate', version: "[${registrate_version},)") {
 //        jarJar.pin(it, registrate_version)

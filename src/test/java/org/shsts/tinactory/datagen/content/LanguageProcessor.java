@@ -64,6 +64,8 @@ public class LanguageProcessor {
                 fmt("Crushed %s Ore", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]material[.]raw[.](.*)", matcher ->
                 fmt("Raw %s Ore", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]material[.]magnetic[.](.*)", matcher ->
+                fmt("Magnetic %s Stick", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]material[.](.*)[.](.*)", matcher ->
                 fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
         pattern("item[.]tinactory[.]tool[.](.*)[.](.*)", matcher ->
@@ -76,6 +78,14 @@ public class LanguageProcessor {
                 fmt("%s Multiblock Interface", capitalize(matcher, 1)));
         pattern("block[.]tinactory[.]multi_block[.]coil[.](.*)", matcher ->
                 fmt("%s Furnace Coil", normalize(matcher, 1)));
+        pattern("tinactory[.]technology[.]ore[.](.*)[.]details", matcher ->
+                fmt("Allow analyzing Raw %s Ore from base stones.", normalize(matcher, 1)));
+        pattern("tinactory[.]technology[.]ore[.](.*)", matcher ->
+                fmt("%s Ore", normalize(matcher, 1)));
+        pattern("tinactory[.]technology[.]ore_base[.](.*)[.]details", matcher ->
+                fmt("Unlock ores from %s.", normalize(matcher, 1)));
+        pattern("tinactory[.]technology[.]ore_base[.](.*)", matcher ->
+                fmt("%s Ores", normalize(matcher, 1)));
     }
 
     private Optional<String> process(String key) {

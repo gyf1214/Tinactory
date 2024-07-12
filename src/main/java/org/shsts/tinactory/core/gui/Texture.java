@@ -32,10 +32,15 @@ public record Texture(ResourceLocation loc, int width, int height) {
     public static final Texture PROGRESS_CIRCUIT = progressBar("circuit");
     public static final Texture PROGRESS_GAS = progressBar("gas_collector");
     public static final Texture PROGRESS_MULTIPLE = progressBar("arrow_multiple");
-    public static final Texture PROGRESS_MAGNETIC = new Texture(
-            gregtech("gui/progress_bar/progress_bar_magnet"), 18, 36);
+    public static final Texture PROCESS_BENDING = progressBar("bending");
+    public static final Texture PROCESS_WIREMILL = progressBar("wiremill");
+    public static final Texture PROCESS_LATHE = progressBar("lathe");
+    public static final Texture PROCESS_SLICE = progressBar("slice");
+    public static final Texture PROGRESS_MAGNETIC = progressBar("magnet");
     public static final Texture PROGRESS_BURN = new Texture(
             gregtech("gui/progress_bar/progress_bar_boiler_fuel_steel"), 18, 36);
+    public static final Texture PROGRESS_LATH_BASE = new Texture(
+            gregtech("gui/progress_bar/progress_bar_lathe_base"), 5, 18);
 
     public static final Texture HEAT_EMPTY = new Texture(
             gregtech("gui/progress_bar/progress_bar_boiler_empty_steel"), 10, 54);

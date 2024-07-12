@@ -49,7 +49,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private final EditBox welcomeEdit;
     private final Tab tabs;
     private final Label stateLabel;
-    private final TechPanel techPanel;
+    public final TechPanel techPanel;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
 
     public static Component tr(String key, Object... args) {

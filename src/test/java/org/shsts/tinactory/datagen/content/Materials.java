@@ -163,11 +163,13 @@ public final class Materials {
                 .toolProcess().smelt()
                 .build()
                 .material(GOLD, SHINY)
+                .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 // TODO: ?
                 .oreProcess()
                 .build()
                 .material(COPPER, SHINY)
+                .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 .build()
                 .material(TIN, DULL)
@@ -178,29 +180,36 @@ public final class Materials {
                 .material(SULFUR, DULL)
                 .build()
                 .material(NICKEL, METALLIC)
+                .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 .build()
                 .material(ALUMINIUM, DULL)
+                .machineProcess(Voltage.LV)
                 .build();
     }
 
     private static void firstDegrees() {
         FACTORY.material(WROUGHT_IRON, METALLIC)
+                .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 .build()
                 .material(BRONZE, METALLIC)
+                .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 .alloy(Voltage.ULV, COPPER, 3, TIN, 1)
                 .build()
                 .material(INVAR, METALLIC)
+                .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 .alloy(Voltage.ULV, IRON, 2, NICKEL, 1)
                 .build()
                 .material(CUPRONICKEL, METALLIC)
+                .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 .alloy(Voltage.ULV, COPPER, 1, NICKEL, 1)
                 .build()
                 .material(STEEL, METALLIC)
+                .machineProcess(Voltage.LV)
                 .toolProcess()
                 .build();
     }
@@ -255,6 +264,7 @@ public final class Materials {
                 .material(FLINT, DULL).toolProcess().build()
                 .material(RAW_RUBBER, DULL).build()
                 .material(RUBBER, SHINY)
+                .simpleProcess(Voltage.LV)
                 .toolProcess()
                 .build();
 

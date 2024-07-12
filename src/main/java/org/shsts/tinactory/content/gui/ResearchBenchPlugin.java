@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -27,7 +28,7 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class ResearchBenchPlugin implements IMenuPlugin<ProcessingMenu> {
     @OnlyIn(Dist.CLIENT)
-    public static class TechButton extends MenuWidget {
+    private static class TechButton extends MenuWidget {
         @Nullable
         private ITechnology tech = null;
 
@@ -71,5 +72,9 @@ public class ResearchBenchPlugin implements IMenuPlugin<ProcessingMenu> {
 
     public static IMenuPlugin.Factory<ProcessingMenu> builder() {
         return $ -> INSTANCE;
+    }
+
+    public static boolean isHoveringTech(GuiComponent component) {
+        return component instanceof TechButton;
     }
 }

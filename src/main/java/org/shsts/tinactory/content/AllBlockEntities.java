@@ -19,6 +19,7 @@ import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
@@ -26,6 +27,7 @@ import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -60,6 +62,10 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_FURNACE;
     public static final ProcessingSet ALLOY_SMELTER;
     public static final ProcessingSet POLARIZER;
+    public static final ProcessingSet WIREMILL;
+    public static final ProcessingSet BENDER;
+    public static final ProcessingSet LATHE;
+    public static final ProcessingSet CUTTER;
     public static final ProcessingSet EXTRACTOR;
     public static final ProcessingSet FLUID_SOLIDIFIER;
     public static final ProcessingSet STEAM_TURBINE;
@@ -198,13 +204,7 @@ public final class AllBlockEntities {
 
         ELECTRIC_FURNACE = ProcessingSet.electricFurnace()
                 .voltages(Voltage.ULV)
-                .layoutSet()
-                .port(ITEM_INPUT)
-                .slot(0, 1 + SLOT_SIZE / 2)
-                .port(ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-                .build()
+                .transform(simpleLayout(Texture.PROGRESS_ARROW))
                 .buildObject();
 
         ALLOY_SMELTER = set(machine(AllRecipes.ALLOY_SMELTER))
@@ -221,13 +221,26 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        POLARIZER = set(machine(AllRecipes.POLARIZER))
+        POLARIZER = simpleMachine(AllRecipes.POLARIZER, Texture.PROGRESS_MAGNETIC);
+        WIREMILL = simpleMachine(AllRecipes.WIREMILL, Texture.PROCESS_WIREMILL);
+        BENDER = simpleMachine(AllRecipes.BENDER, Texture.PROCESS_BENDING);
+
+        LATHE = set(machine(AllRecipes.LATHE))
+                .transform(simpleLayout(Texture.PROCESS_LATHE))
+                .layoutSet()
+                .image(28 + SLOT_SIZE, 1 + SLOT_SIZE / 2, Texture.PROGRESS_LATH_BASE)
+                .build()
+                .buildObject();
+
+        CUTTER = set(machine(AllRecipes.CUTTER))
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
+                .port(FLUID_INPUT)
+                .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
                 .port(ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-                .progressBar(Texture.PROGRESS_MAGNETIC, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROCESS_SLICE, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 
@@ -245,7 +258,7 @@ public final class AllBlockEntities {
 
         FLUID_SOLIDIFIER = set(machine(AllRecipes.FLUID_SOLIDIFIER))
                 .layoutSet()
-                .port(ITEM_INPUT)
+                .port(FLUID_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
                 .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
@@ -375,6 +388,24 @@ public final class AllBlockEntities {
                 .build()
                 .build()
                 .translucent()
+                .buildObject();
+    }
+
+    private static <S extends MachineSet.BuilderBase<?, ?, S>>
+    Transformer<S> simpleLayout(Texture progress) {
+        return $ -> $.layoutSet()
+                .port(ITEM_INPUT)
+                .slot(0, 1 + SLOT_SIZE / 2)
+                .port(ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+                .progressBar(progress, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+                .build();
+    }
+
+    private static <T extends ProcessingRecipe> ProcessingSet
+    simpleMachine(RecipeTypeEntry<T, ?> recipeType, Texture progress) {
+        return set(machine(recipeType))
+                .transform(simpleLayout(progress))
                 .buildObject();
     }
 }

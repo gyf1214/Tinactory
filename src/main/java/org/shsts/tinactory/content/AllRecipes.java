@@ -7,6 +7,7 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
@@ -35,6 +36,10 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> POLARIZER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> WIREMILL;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> BENDER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> LATHE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CUTTER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
     public static final RecipeTypeEntry<GeneratorRecipe, GeneratorRecipe.Builder> STEAM_TURBINE;
@@ -51,7 +56,7 @@ public final class AllRecipes {
         RESEARCH_BENCH = REGISTRATE.recipeType("research_bench", ResearchRecipe.SERIALIZER)
                 .clazz(ResearchRecipe.class)
                 .builder(ResearchRecipe.Builder::new)
-                .defaults($ -> $.amperage(0.25d).workTicks(200))
+                .defaults($ -> $.amperage(0.25d).workTicks(200L))
                 .register();
 
         ASSEMBLER = REGISTRATE.assemblyRecipeType("assembler")
@@ -59,13 +64,13 @@ public final class AllRecipes {
                 .register();
 
         STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator")
-                .defaults($ -> $.amperage(0.125d).workTicks(20))
+                .defaults($ -> $.amperage(0.125d).workTicks(20L))
                 .register();
 
         ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.SERIALIZER)
                 .clazz(OreAnalyzerRecipe.class)
                 .builder(OreAnalyzerRecipe.Builder::new)
-                .defaults($ -> $.amperage(0.125d).workTicks(32))
+                .defaults($ -> $.amperage(0.125d).workTicks(32L))
                 .register();
 
         MACERATOR = REGISTRATE.processingRecipeType("macerator")
@@ -81,9 +86,8 @@ public final class AllRecipes {
                 .register();
 
         THERMAL_CENTRIFUGE = REGISTRATE.processingRecipeType("thermal_centrifuge")
-                .defaults($ -> $
-                        .voltage(Voltage.LV)
-                        .workTicks(400)
+                .defaults($ -> $.voltage(Voltage.LV)
+                        .workTicks(400L)
                         .amperage(1d))
                 .register();
 
@@ -92,7 +96,24 @@ public final class AllRecipes {
                 .register();
 
         POLARIZER = REGISTRATE.processingRecipeType("polarizer")
-                .defaults($ -> $.amperage(0.25d).workTicks(40))
+                .defaults($ -> $.amperage(0.25d))
+                .register();
+
+        WIREMILL = REGISTRATE.processingRecipeType("wiremill")
+                .defaults($ -> $.amperage(0.25d))
+                .register();
+
+        BENDER = REGISTRATE.processingRecipeType("bender")
+                .defaults($ -> $.amperage(0.25d))
+                .register();
+
+        LATHE = REGISTRATE.processingRecipeType("lathe")
+                .defaults($ -> $.amperage(0.375d))
+                .register();
+
+        CUTTER = REGISTRATE.processingRecipeType("cutter")
+                .defaults($ -> $.inputFluid(1, Fluids.WATER, 10)
+                        .amperage(0.375d))
                 .register();
 
         EXTRACTOR = REGISTRATE.processingRecipeType("extractor")

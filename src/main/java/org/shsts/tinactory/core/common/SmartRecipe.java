@@ -28,7 +28,7 @@ public abstract class SmartRecipe<C> implements Recipe<SmartRecipe.ContainerWrap
         T create(RecipeTypeEntry<T, ?> type, ResourceLocation loc);
     }
 
-    private final ResourceLocation loc;
+    protected final ResourceLocation loc;
     private final RecipeType<?> type;
     private final SmartRecipeSerializer<?, ?> serializer;
 

@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
@@ -23,13 +24,15 @@ public final class Technologies {
     public static final Map<OreVariant, ResourceLocation> BASE_ORE;
     public static final ResourceLocation ALLOY_SMELTING;
     public static final ResourceLocation STEEL;
+    public static final ResourceLocation MOTOR;
+    public static final ResourceLocation PUMP_AND_PISTON;
 
     static {
         TECH_FACTORY = new TechFactory();
 
         BASE_ORE = new HashMap<>();
         for (var variant : OreVariant.values()) {
-            var tech = TECH_FACTORY.child("ore/" + variant.name().toLowerCase())
+            var tech = TECH_FACTORY.child("ore_base/" + variant.name().toLowerCase())
                     .maxProgress(20L * (1L << (long) variant.rank))
                     .displayItem(variant.baseItem)
                     .researchVoltage(variant.voltage)
@@ -42,13 +45,21 @@ public final class Technologies {
         ALLOY_SMELTING = TECH_FACTORY.child("alloy_smelting")
                 .maxProgress(20L)
                 .displayItem(ALLOY_SMELTER.entry(Voltage.ULV))
-                .researchVoltage(Voltage.ULV)
                 .buildLoc();
 
-        STEEL = TECH_FACTORY.tech("steel")
+        STEEL = TECH_FACTORY.child("steel")
                 .maxProgress(30L)
                 .displayItem(AllMaterials.STEEL.entry("ingot"))
-                .researchVoltage(Voltage.ULV)
+                .buildLoc();
+
+        MOTOR = TECH_FACTORY.child("motor")
+                .maxProgress(30L)
+                .displayItem(AllItems.ELECTRIC_MOTOR.get(Voltage.LV))
+                .buildLoc();
+
+        PUMP_AND_PISTON = TECH_FACTORY.tech("pump_and_piston")
+                .maxProgress(40L)
+                .displayItem(AllItems.ELECTRIC_PISTON.get(Voltage.LV))
                 .buildLoc();
     }
 

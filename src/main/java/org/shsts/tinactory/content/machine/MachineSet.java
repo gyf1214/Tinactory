@@ -50,6 +50,8 @@ public class MachineSet {
             extends SimpleBuilder<T, P, S> {
         protected final List<Voltage> voltages = new ArrayList<>();
         @Nullable
+        protected LayoutSetBuilder<S> layoutSetBuilder = null;
+        @Nullable
         protected Map<Voltage, Layout> layoutSet = null;
 
         protected BuilderBase(P parent) {
@@ -67,7 +69,10 @@ public class MachineSet {
         }
 
         public LayoutSetBuilder<S> layoutSet() {
-            return Layout.builder(self()).onCreateObject(value -> layoutSet = value);
+            if (layoutSetBuilder == null) {
+                layoutSetBuilder = Layout.builder(self());
+            }
+            return layoutSetBuilder;
         }
 
         protected Layout getLayout(Voltage voltage) {
@@ -89,7 +94,8 @@ public class MachineSet {
 
         @Override
         protected T createObject() {
-            assert layoutSet != null;
+            assert layoutSetBuilder != null;
+            layoutSet = layoutSetBuilder.buildObject();
             if (voltages.isEmpty()) {
                 voltages(Voltage.LV);
             }

@@ -13,6 +13,7 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
@@ -41,8 +42,8 @@ public class AssemblyRecipe extends ProcessingRecipe {
             super(consumer, parent, loc);
         }
 
-        public S requireTech(ResourceLocation loc) {
-            requiredTech.add(loc);
+        public S requireTech(ResourceLocation... loc) {
+            requiredTech.addAll(Arrays.asList(loc));
             return self();
         }
     }

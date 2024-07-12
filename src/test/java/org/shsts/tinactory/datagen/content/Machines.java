@@ -3,9 +3,11 @@ package org.shsts.tinactory.datagen.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -16,23 +18,30 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
+import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX;
+import static org.shsts.tinactory.content.AllBlockEntities.BENDER;
 import static org.shsts.tinactory.content.AllBlockEntities.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
+import static org.shsts.tinactory.content.AllBlockEntities.CUTTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.EXTRACTOR;
 import static org.shsts.tinactory.content.AllBlockEntities.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
+import static org.shsts.tinactory.content.AllBlockEntities.LATHE;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.MULTI_BLOCK_INTERFACE;
@@ -47,20 +56,24 @@ import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_BENCH;
 import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE;
+import static org.shsts.tinactory.content.AllBlockEntities.WIREMILL;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
+import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.TRANSFORMER;
-import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
+import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
+import static org.shsts.tinactory.content.AllTags.circuit;
 import static org.shsts.tinactory.content.AllTags.machineTag;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
@@ -78,6 +91,7 @@ public final class Machines {
         machineItems();
         primitive();
         ulv();
+        basic();
         misc();
     }
 
@@ -93,6 +107,10 @@ public final class Machines {
         machine(ELECTRIC_FURNACE, "machines/electric_furnace");
         machine(ALLOY_SMELTER);
         machine(POLARIZER);
+        machine(WIREMILL);
+        machine(BENDER);
+        machine(LATHE);
+        machine(CUTTER);
         machine(EXTRACTOR);
         machine(FLUID_SOLIDIFIER);
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
@@ -187,10 +205,19 @@ public final class Machines {
         ulvFromPrimitive(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR);
         ulvFromPrimitive(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER);
         ulvFromPrimitive(ORE_WASHER, PRIMITIVE_ORE_WASHER);
-        ulvMachine(NETWORK_CONTROLLER, VACUUM_TUBE);
         ulvMachine(RESEARCH_BENCH.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
         ulvMachine(AllBlockEntities.ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
         ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
+
+        TOOL_CRAFTING.recipe(DATA_GEN, NETWORK_CONTROLLER)
+                .result(NETWORK_CONTROLLER, 1)
+                .pattern("BBB").pattern("VHV").pattern("WVW")
+                .define('B', circuit(Voltage.ULV))
+                .define('W', CABLE.get(Voltage.ULV))
+                .define('H', MACHINE_HULL.get(Voltage.ULV))
+                .define('V', circuit(Voltage.ULV))
+                .toolTag(AllTags.TOOL_WRENCH)
+                .build();
 
         TOOL_CRAFTING.recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
                 .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
@@ -199,14 +226,14 @@ public final class Machines {
                 .define('R', IRON.tag("rotor"))
                 .define('W', CABLE.get(Voltage.ULV))
                 .define('H', MACHINE_HULL.get(Voltage.ULV))
-                .define('V', VACUUM_TUBE)
+                .define('V', circuit(Voltage.ULV))
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
 
         ASSEMBLER.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
                 .outputItem(2, ALLOY_SMELTER.entry(Voltage.ULV), 1)
                 .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 1)
-                .inputItem(0, VACUUM_TUBE, 2)
+                .inputItem(0, circuit(Voltage.ULV), 2)
                 .inputItem(0, CABLE.get(Voltage.ULV), 4)
                 .requireTech(Technologies.ALLOY_SMELTING)
                 .voltage(Voltage.ULV)
@@ -216,12 +243,17 @@ public final class Machines {
                 .outputItem(2, BLAST_FURNACE, 1)
                 .inputItem(0, HEAT_PROOF_BLOCK, 1)
                 .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 3)
-                .inputItem(0, VACUUM_TUBE, 3)
+                .inputItem(0, circuit(Voltage.ULV), 3)
                 .inputItem(0, CABLE.get(Voltage.ULV), 2)
                 .requireTech(Technologies.STEEL)
                 .voltage(Voltage.ULV)
                 .workTicks(ASSEMBLE_TICKS)
                 .build();
+    }
+
+    private static void basic() {
+        machineRecipe(Voltage.LV, TIN);
+        machineRecipe(Voltage.MV, COPPER);
     }
 
     private static void misc() {
@@ -230,7 +262,7 @@ public final class Machines {
                 .pattern("PPP").pattern("PWP").pattern("VFV")
                 .define('P', IRON.tag("plate"))
                 .define('W', CABLE.get(Voltage.ULV))
-                .define('V', VACUUM_TUBE)
+                .define('V', circuit(Voltage.ULV))
                 .define('F', Blocks.FURNACE.asItem())
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
@@ -291,12 +323,100 @@ public final class Machines {
                 .define('B', base)
                 .define('W', CABLE.get(Voltage.ULV))
                 .define('H', MACHINE_HULL.get(Voltage.ULV))
-                .define('V', VACUUM_TUBE)
+                .define('V', circuit(Voltage.ULV))
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
     }
 
     private static void ulvFromPrimitive(MachineSet set, RegistryEntry<? extends Block> primitive) {
         ulvMachine(set.entry(Voltage.ULV), primitive);
+    }
+
+    private static class MachineRecipeBuilder<P> extends
+            SimpleBuilder<Unit, P, MachineRecipeBuilder<P>> {
+        private final Voltage voltage;
+        private final AssemblyRecipe.Builder builder;
+
+        public MachineRecipeBuilder(P parent, Voltage voltage, AssemblyRecipe.Builder builder) {
+            super(parent);
+            this.voltage = voltage;
+            this.builder = builder;
+        }
+
+        public MachineRecipeBuilder<P> circuit(int count) {
+            builder.inputItem(0, AllTags.circuit(voltage), count);
+            return this;
+        }
+
+        public MachineRecipeBuilder<P>
+        component(Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
+            builder.inputItem(0, component.get(voltage), count);
+            return this;
+        }
+
+        public MachineRecipeBuilder<P>
+        material(MaterialSet material, String sub, int count) {
+            builder.inputItem(0, material.tag(sub), count);
+            return this;
+        }
+
+        public MachineRecipeBuilder<P> tech(ResourceLocation... loc) {
+            builder.requireTech(loc);
+            return this;
+        }
+
+        @Override
+        protected Unit createObject() {
+            builder.build();
+            return Unit.INSTANCE;
+        }
+    }
+
+    private static class MachineRecipeFactory {
+        private final Voltage voltage;
+
+        public MachineRecipeFactory(Voltage voltage) {
+            this.voltage = voltage;
+        }
+
+        public MachineRecipeBuilder<MachineRecipeFactory>
+        recipe(MachineSet machine, Voltage v1, boolean machineHull) {
+            var builder = ASSEMBLER.recipe(DATA_GEN, machine.entry(voltage))
+                    .outputItem(2, machine.entry(voltage), 1)
+                    .voltage(v1)
+                    .workTicks(ASSEMBLE_TICKS);
+            if (machineHull) {
+                builder.inputItem(0, MACHINE_HULL.get(voltage), 1);
+            }
+            return new MachineRecipeBuilder<>(this, voltage, builder);
+        }
+
+        public MachineRecipeBuilder<MachineRecipeFactory> recipe(MachineSet machine) {
+            return recipe(machine, Voltage.fromRank(voltage.rank - 1), true);
+        }
+    }
+
+    private static void machineRecipe(Voltage v, MaterialSet polarizerMaterial) {
+        var factory = new MachineRecipeFactory(v);
+
+        factory.recipe(POLARIZER)
+                .circuit(2)
+                .component(CABLE, 2)
+                .material(polarizerMaterial, "wire", 8 * (v.rank / 2))
+                .tech(Technologies.MOTOR)
+                .build()
+                .recipe(WIREMILL)
+                .circuit(2)
+                .component(CABLE, 2)
+                .component(ELECTRIC_MOTOR, 4)
+                .tech(Technologies.MOTOR)
+                .build()
+                .recipe(BENDER)
+                .circuit(2)
+                .component(CABLE, 2)
+                .component(ELECTRIC_MOTOR, 2)
+                .component(ELECTRIC_PISTON, 2)
+                .tech(Technologies.PUMP_AND_PISTON)
+                .build();
     }
 }

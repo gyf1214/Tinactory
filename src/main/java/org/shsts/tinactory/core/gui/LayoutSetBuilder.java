@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.gui;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.core.common.SimpleBuilder;
+import org.shsts.tinactory.core.common.BuilderBase;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
+public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
     private record SlotAndVoltages(Layout.SlotInfo slot, Collection<Voltage> voltages) {}
 
     private final List<Layout.WidgetInfo> images = new ArrayList<>();

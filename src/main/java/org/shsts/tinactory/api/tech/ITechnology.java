@@ -26,7 +26,7 @@ public interface ITechnology {
     }
 
     static String getDetailsId(ResourceLocation loc) {
-        return getDescriptionId(loc) + ".details;";
+        return getDescriptionId(loc) + ".details";
     }
 
     default String getDescriptionId() {
