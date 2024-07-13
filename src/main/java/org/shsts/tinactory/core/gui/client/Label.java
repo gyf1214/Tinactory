@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.FormattedCharSequence;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.util.ClientUtil;
 
@@ -29,6 +30,7 @@ public class Label extends MenuWidget {
     }
 
     private final List<Component> lines = new ArrayList<>();
+    private final List<FormattedCharSequence> formattedLines = new ArrayList<>();
     private int cacheWidth = 0;
     private int cacheHeight = 0;
     private final Font font = ClientUtil.getFont();
@@ -48,19 +50,28 @@ public class Label extends MenuWidget {
     }
 
     private void updateSize() {
-        cacheWidth = lines.stream()
-                .mapToInt(font::width)
-                .max().orElse(0);
-        cacheHeight = lines.size() * (LINE_HEIGHT + spacing) - spacing;
+        if (formattedLines.isEmpty()) {
+            cacheWidth = lines.stream()
+                    .mapToInt(font::width)
+                    .max().orElse(0);
+            cacheHeight = lines.size() * (LINE_HEIGHT + spacing) - spacing;
+        } else {
+            cacheWidth = formattedLines.stream()
+                    .mapToInt(font::width)
+                    .max().orElse(0);
+            cacheHeight = formattedLines.size() * (LINE_HEIGHT + spacing) - spacing;
+        }
     }
 
     public void setLines(Component... values) {
+        formattedLines.clear();
         lines.clear();
         lines.addAll(Arrays.asList(values));
         updateSize();
     }
 
     public void setLine(int index, Component value) {
+        formattedLines.clear();
         while (lines.size() <= index) {
             lines.add(TextComponent.EMPTY);
         }
@@ -68,13 +79,26 @@ public class Label extends MenuWidget {
         updateSize();
     }
 
+    public void setMultiline(Component value) {
+        formattedLines.clear();
+        lines.clear();
+        formattedLines.addAll(font.split(value, rect.width()));
+    }
+
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         int x = rect.inX(horizontalAlign.value) - (int) (cacheWidth * horizontalAlign.value);
         int y = rect.inY(verticalAlign.value) - (int) (cacheHeight * verticalAlign.value);
-        for (var line : lines) {
-            RenderUtil.renderText(poseStack, line, x, y, color);
-            y += LINE_HEIGHT + spacing;
+        if (formattedLines.isEmpty()) {
+            for (var line : lines) {
+                RenderUtil.renderText(poseStack, line, x, y, color);
+                y += LINE_HEIGHT + spacing;
+            }
+        } else {
+            for (var line : formattedLines) {
+                RenderUtil.renderText(poseStack, line, x, y, color);
+                y += LINE_HEIGHT + spacing;
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -248,6 +249,10 @@ public final class RenderUtil {
     }
 
     public static void renderText(PoseStack poseStack, Component text, int x, int y, int color) {
+        ClientUtil.getFont().draw(poseStack, text, (float) x, (float) y, color);
+    }
+
+    public static void renderText(PoseStack poseStack, FormattedCharSequence text, int x, int y, int color) {
         ClientUtil.getFont().draw(poseStack, text, (float) x, (float) y, color);
     }
 

@@ -63,6 +63,7 @@ public class TechPanel extends Panel {
     private final List<ITechnology> availableTechs = new ArrayList<>();
     private final Panel selectedTechPanel;
     private final Label selectedTechLabel;
+    private final Label selectedTechDetailsLabel;
     private final Button startResearchButton;
     @Nullable
     private ITeamProfile team = null;
@@ -230,6 +231,7 @@ public class TechPanel extends Panel {
         this.selectedTechPanel = new Panel(screen);
 
         this.selectedTechLabel = new Label(menu);
+        this.selectedTechDetailsLabel = new Label(menu);
         var label3 = new Label(menu, tr("techRequirementsLabel"));
         label3.verticalAlign = Label.Alignment.MIDDLE;
         this.startResearchButton = Widgets.simpleButton(menu, tr("startResearchButton"),
@@ -241,8 +243,10 @@ public class TechPanel extends Panel {
         y -= PROGRESS_HEIGHT + MARGIN_VERTICAL;
         var offset5 = Rect.corners(0, y - BUTTON_SIZE, 0, y);
         y -= BUTTON_SIZE + MARGIN_VERTICAL;
-        var offset4 = Rect.corners(0, 0, 0, y);
-        selectedTechPanel.addWidget(RectD.FULL, offset4, selectedTechLabel);
+        var offset4 = Rect.corners(0, LINE_HEIGHT + SPACING, 0, y);
+        var offset3 = Rect.corners(0, 0, 0, LINE_HEIGHT);
+        selectedTechPanel.addWidget(RectD.corners(0d, 0d, 1d, 0d), offset3, selectedTechLabel);
+        selectedTechPanel.addWidget(RectD.FULL, offset4, selectedTechDetailsLabel);
         selectedTechPanel.addWidget(RectD.corners(0d, 1d, 0d, 1d), offset5, label3);
         selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset5, new RequiredTechButtons());
         selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset6, new ProgressBar());
@@ -310,7 +314,7 @@ public class TechPanel extends Panel {
 
         if (selectedTech != null) {
             selectedTechLabel.setLine(0, I18n.tr(selectedTech.getDescriptionId()));
-            selectedTechLabel.setLine(1, I18n.tr(selectedTech.getDetailsId()));
+            selectedTechDetailsLabel.setMultiline(I18n.tr(selectedTech.getDetailsId()));
             startResearchButton.setActive(team.canResearch(selectedTech));
         }
     }
