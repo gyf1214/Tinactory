@@ -35,7 +35,6 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
 import org.shsts.tinactory.integration.jei.ingredient.FluidIngredientRenderer;
@@ -144,8 +143,11 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         return list;
     }
 
-    private class Category implements IRecipeCategory<T>, IDrawHelper {
+    protected Component categoryTitle() {
+        return iconItem.getDisplayName();
+    }
 
+    private class Category implements IRecipeCategory<T>, IDrawHelper {
         private final Component title;
         private final IDrawable icon;
         private final IDrawable background;
@@ -157,7 +159,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         private final Rect progressBarRect;
 
         private Category(IGuiHelper guiHelper) {
-            this.title = I18n.tr(type.getUid());
+            this.title = categoryTitle();
             this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, iconItem);
             this.xOffset = (WIDTH - layout.rect.width()) / 2;
             this.background = createBackground(guiHelper, xOffset);

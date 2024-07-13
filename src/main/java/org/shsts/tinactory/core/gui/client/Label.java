@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Label extends MenuWidget {
-    public static final int LINE_HEIGHT = 9;
-
     public enum Alignment {
         BEGIN(0d), MIDDLE(0.5), END(1d);
 
@@ -54,12 +54,12 @@ public class Label extends MenuWidget {
             cacheWidth = lines.stream()
                     .mapToInt(font::width)
                     .max().orElse(0);
-            cacheHeight = lines.size() * (LINE_HEIGHT + spacing) - spacing;
+            cacheHeight = lines.size() * (FONT_HEIGHT + spacing) - spacing;
         } else {
             cacheWidth = formattedLines.stream()
                     .mapToInt(font::width)
                     .max().orElse(0);
-            cacheHeight = formattedLines.size() * (LINE_HEIGHT + spacing) - spacing;
+            cacheHeight = formattedLines.size() * (FONT_HEIGHT + spacing) - spacing;
         }
     }
 
@@ -92,12 +92,12 @@ public class Label extends MenuWidget {
         if (formattedLines.isEmpty()) {
             for (var line : lines) {
                 RenderUtil.renderText(poseStack, line, x, y, color);
-                y += LINE_HEIGHT + spacing;
+                y += FONT_HEIGHT + spacing;
             }
         } else {
             for (var line : formattedLines) {
                 RenderUtil.renderText(poseStack, line, x, y, color);
-                y += LINE_HEIGHT + spacing;
+                y += FONT_HEIGHT + spacing;
             }
         }
     }

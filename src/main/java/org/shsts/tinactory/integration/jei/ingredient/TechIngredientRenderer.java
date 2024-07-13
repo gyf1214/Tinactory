@@ -14,10 +14,12 @@ import org.shsts.tinactory.core.util.I18n;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_SIZE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechIngredientRenderer implements IIngredientRenderer<TechWrapper> {
-    private static final Rect RECT = new Rect(0, 0, TechPanel.BUTTON_SIZE, TechPanel.BUTTON_SIZE);
+    private static final Rect RECT = new Rect(0, 0, BUTTON_SIZE, BUTTON_SIZE);
 
     private TechIngredientRenderer() {}
 
@@ -38,12 +40,12 @@ public class TechIngredientRenderer implements IIngredientRenderer<TechWrapper> 
 
     @Override
     public int getWidth() {
-        return TechPanel.BUTTON_SIZE;
+        return BUTTON_SIZE;
     }
 
     @Override
     public int getHeight() {
-        return TechPanel.BUTTON_SIZE;
+        return BUTTON_SIZE;
     }
 
     public static final TechIngredientRenderer INSTANCE = new TechIngredientRenderer();

@@ -52,6 +52,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.POLARIZER;
 import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_WASHER;
 import static org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_STONE_GENERATOR;
+import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
 import static org.shsts.tinactory.content.AllBlockEntities.RESEARCH_BENCH;
 import static org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
@@ -75,6 +76,7 @@ import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.circuit;
 import static org.shsts.tinactory.content.AllTags.machineTag;
+import static org.shsts.tinactory.core.util.LocHelper.prepend;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
@@ -267,6 +269,10 @@ public final class Machines {
                 .define('F', Blocks.FURNACE.asItem())
                 .toolTag(AllTags.TOOL_WRENCH)
                 .build();
+
+        for (var set : PROCESSING_SETS) {
+            DATA_GEN.trackLang(prepend(set.recipeType.loc, "jei/category"));
+        }
     }
 
     private static Optional<TagKey<Item>> getMachineTag(MachineSet set) {

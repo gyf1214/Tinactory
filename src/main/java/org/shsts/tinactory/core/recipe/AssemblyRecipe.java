@@ -19,7 +19,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AssemblyRecipe extends ProcessingRecipe {
-    protected final List<ResourceLocation> requiredTech;
+    public final List<ResourceLocation> requiredTech;
 
     protected AssemblyRecipe(BuilderBase<?, ?> builder) {
         super(builder);

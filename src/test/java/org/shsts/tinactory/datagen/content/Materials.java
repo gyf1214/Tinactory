@@ -327,6 +327,7 @@ public final class Materials {
                 .inputItem(0, SULFUR.entry("dust"), 1)
                 .outputItem(1, RUBBER.entry("bar"), 3)
                 .workTicks(300)
+                .voltage(Voltage.ULV)
                 .build();
 
         // TEST

@@ -179,6 +179,14 @@ public final class DataGen implements IRecipeDataConsumer {
         return new TechBuilder<>(this, parent, modLoc(id));
     }
 
+    public void trackLang(String key) {
+        langTrackedCtx.trackExtra(key, key);
+    }
+
+    public void trackLang(ResourceLocation key) {
+        trackLang(key.getNamespace() + '.' + key.getPath().replace('/', '.'));
+    }
+
     public void register(IEventBus modEventBus) {
         modEventBus.addListener(this::onGatherData);
         modEventBus.addListener(this::onCommonSetup);

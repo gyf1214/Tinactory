@@ -28,10 +28,10 @@ import org.slf4j.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
-import static org.shsts.tinactory.core.gui.client.Label.LINE_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 
@@ -42,7 +42,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int WELCOME_BUTTON_WIDTH = 72;
     private static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
-    private static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + LINE_HEIGHT +
+    private static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + FONT_HEIGHT +
             MARGIN_VERTICAL * 3 + MARGIN_TOP;
 
     private final Panel welcomePanel;

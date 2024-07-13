@@ -36,10 +36,10 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.gui.client.Label.LINE_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -221,10 +221,10 @@ public class TechPanel extends Panel {
         var label2 = new Label(menu, tr("availableTechLabel"));
         var anchor1 = RectD.corners(0d, 0d, 0d, 1d);
         var top = BUTTON_SIZE + MARGIN_VERTICAL * 2;
-        var offset1 = Rect.corners(-1, top + LINE_HEIGHT + SPACING, LEFT_WIDTH - 1, 0);
+        var offset1 = Rect.corners(-1, top + FONT_HEIGHT + SPACING, LEFT_WIDTH - 1, 0);
         var offset2 = offset1.offset(PANEL_BORDER, PANEL_BORDER).enlarge(-PANEL_BORDER * 2, -PANEL_BORDER * 2);
         var bg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
-        addWidget(new Rect(0, top, LEFT_WIDTH, LINE_HEIGHT), label2);
+        addWidget(new Rect(0, top, LEFT_WIDTH, FONT_HEIGHT), label2);
         addWidget(anchor1, offset1, bg);
         addPanel(anchor1, offset2, availableTechPanel);
 
@@ -243,8 +243,8 @@ public class TechPanel extends Panel {
         y -= PROGRESS_HEIGHT + MARGIN_VERTICAL;
         var offset5 = Rect.corners(0, y - BUTTON_SIZE, 0, y);
         y -= BUTTON_SIZE + MARGIN_VERTICAL;
-        var offset4 = Rect.corners(0, LINE_HEIGHT + SPACING, 0, y);
-        var offset3 = Rect.corners(0, 0, 0, LINE_HEIGHT);
+        var offset4 = Rect.corners(0, FONT_HEIGHT + SPACING, 0, y);
+        var offset3 = Rect.corners(0, 0, 0, FONT_HEIGHT);
         selectedTechPanel.addWidget(RectD.corners(0d, 0d, 1d, 0d), offset3, selectedTechLabel);
         selectedTechPanel.addWidget(RectD.FULL, offset4, selectedTechDetailsLabel);
         selectedTechPanel.addWidget(RectD.corners(0d, 1d, 0d, 1d), offset5, label3);
