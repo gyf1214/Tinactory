@@ -208,6 +208,7 @@ public final class Machines {
         ulvMachine(RESEARCH_BENCH.entry(Voltage.ULV), () -> Blocks.CRAFTING_TABLE);
         ulvMachine(AllBlockEntities.ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
         ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
+        ulvMachine(ELECTRIC_CHEST.entry(Voltage.ULV), () -> Blocks.CHEST);
 
         TOOL_CRAFTING.recipe(DATA_GEN, NETWORK_CONTROLLER)
                 .result(NETWORK_CONTROLLER, 1)
