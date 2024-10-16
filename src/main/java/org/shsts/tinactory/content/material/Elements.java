@@ -2,16 +2,22 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.Tags;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
+import static org.shsts.tinactory.content.AllMaterials.CHROME;
+import static org.shsts.tinactory.content.AllMaterials.COBALT;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
+import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
@@ -52,8 +58,34 @@ public final class Elements {
                 .dust()
                 .buildObject();
 
+        COBALT = set("cobalt")
+                .color(0xFF5050FA)
+                .metalSetExt()
+                .toolSet(600, Tiers.IRON)
+                .buildObject();
+
+        CADMIUM = set("cadmium")
+                .color(0xFF32323C)
+                .dust()
+                .buildObject();
+
         NICKEL = set("nickel")
                 .color(0xFFC8C8FA)
+                .metalSet()
+                .buildObject();
+
+        MAGNESIUM = set("magnesium")
+                .color(0xFFFFC8C8)
+                .dust()
+                .buildObject();
+
+        THORIUM = set("thorium")
+                .color(0xFF001E00)
+                .dust()
+                .buildObject();
+
+        CHROME = set("chrome")
+                .color(0xFFEAC4D8)
                 .metalSet()
                 .buildObject();
 

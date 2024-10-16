@@ -4,6 +4,7 @@ package org.shsts.tinactory.content.material;
 import net.minecraft.world.item.Tiers;
 
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
+import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
@@ -21,6 +22,11 @@ public final class FirstDegrees {
         BRONZE = set("bronze")
                 .color(0xFFFF8000)
                 .mechanicalSet().pipe().foil()
+                .buildObject();
+
+        COBALTITE = set("cobaltite")
+                .color(0xFF5050FA)
+                .dust()
                 .buildObject();
 
         INVAR = set("invar")

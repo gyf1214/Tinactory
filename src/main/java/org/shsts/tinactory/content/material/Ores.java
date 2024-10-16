@@ -11,6 +11,7 @@ import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
+import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
@@ -38,6 +39,11 @@ public final class Ores {
 
         BANDED_IRON = set("banded_iron")
                 .color(0xFF915A5A)
+                .ore(OreVariant.STONE)
+                .buildObject();
+
+        GARNIERITE = set("garnierite")
+                .color(0xFF32C846)
                 .ore(OreVariant.STONE)
                 .buildObject();
 

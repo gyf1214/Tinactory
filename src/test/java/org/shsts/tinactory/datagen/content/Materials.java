@@ -27,19 +27,27 @@ import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
+import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
+import static org.shsts.tinactory.content.AllMaterials.CHROME;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
+import static org.shsts.tinactory.content.AllMaterials.COBALT;
+import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
+import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
+import static org.shsts.tinactory.content.AllMaterials.GLOWSTONE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
+import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
+import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
@@ -48,6 +56,7 @@ import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.TEST;
+import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
@@ -173,15 +182,18 @@ public final class Materials {
                 .build()
                 .material(TIN, DULL)
                 .toolProcess().smelt()
-                // TODO: tin, zinc
                 .oreProcess()
                 .build()
-                .material(SULFUR, DULL)
-                .build()
+                .material(SULFUR, DULL).build()
+                .material(CADMIUM, SHINY).build()
+                .material(COBALT, METALLIC).build()
                 .material(NICKEL, METALLIC)
                 .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 .build()
+                .material(MAGNESIUM, METALLIC).build()
+                .material(THORIUM, SHINY).build()
+                .material(CHROME, SHINY).build()
                 .material(ALUMINIUM, DULL)
                 .machineProcess(Voltage.LV)
                 .build();
@@ -196,6 +208,9 @@ public final class Materials {
                 .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
                 .alloy(Voltage.ULV, COPPER, 3, TIN, 1)
+                .build()
+                .material(COBALTITE, METALLIC)
+                .smelt(COBALT)
                 .build()
                 .material(INVAR, METALLIC)
                 .machineProcess(Voltage.LV)
@@ -215,40 +230,37 @@ public final class Materials {
 
     private static void ores() {
         FACTORY.material(CHALCOPYRITE, DULL)
-                // TODO: sulfur, cobaltite
-                .primitiveOreProcess(SULFUR).smelt(COPPER)
+                .primitiveOreProcess(SULFUR, COBALTITE, SULFUR)
+                .smelt(COPPER)
                 .build()
                 .material(PYRITE, ROUGH)
-                // TODO: sulfur, cadmium
-                .primitiveOreProcess(SULFUR).smelt(IRON)
+                .primitiveOreProcess(SULFUR, SULFUR, CADMIUM)
+                .smelt(IRON)
                 .build()
                 .material(LIMONITE, METALLIC)
-                // TODO: nickel
                 .oreProcess(NICKEL).smelt(IRON)
                 .build()
                 .material(BANDED_IRON, DULL)
-                // TODO: nickel, magnesium?
                 .oreProcess(NICKEL).smelt(IRON)
                 .build()
+                .material(GARNIERITE, METALLIC)
+                .oreProcess(MAGNESIUM, MAGNESIUM, NICKEL)
+                .smelt(NICKEL)
+                .build()
                 .material(COAL, DULL)
-                // TODO: coal, thorium
-                .oreProcess(2)
+                .oreProcess(2, COAL, COAL, THORIUM)
                 .build()
                 .material(CASSITERITE, METALLIC)
-                // TODO: tin, zinc
                 .oreProcess(TIN).smelt(TIN)
                 .build()
                 .material(REDSTONE, DULL)
-                // TODO: cinnabar, glowstone, rare earth?
-                .oreProcess(5)
+                .oreProcess(5, GLOWSTONE, GLOWSTONE, RARE_EARTH)
                 .build()
                 .material(CINNABAR, SHINY)
-                // TODO: glowstone, rare earth?
-                .oreProcess()
+                .oreProcess(RARE_EARTH, GLOWSTONE, RARE_EARTH)
                 .build()
                 .material(RUBY, IconSet.RUBY)
-                // TODO: cinnabar, chromium, sifting?
-                .oreProcess(CINNABAR)
+                .oreProcess(CHROME, RUBY, CHROME)
                 .build();
 //                .material(MAGNETITE, METALLIC)
 //                // TODO: ?
@@ -265,7 +277,9 @@ public final class Materials {
                 .material(RUBBER, SHINY)
                 .simpleProcess(Voltage.LV)
                 .toolProcess()
-                .build();
+                .build()
+                .material(GLOWSTONE, SHINY).build()
+                .material(RARE_EARTH, ROUGH).build();
 
         // smelt wrought iron nugget
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder

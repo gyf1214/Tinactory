@@ -10,6 +10,7 @@ import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
+import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
@@ -28,8 +29,9 @@ public final class Veins {
                 .build()
                 .vein("limonite", 0.6)
                 .base()
-                .ore(LIMONITE, 1)
+                .ore(LIMONITE, 0.8)
                 .ore(BANDED_IRON, 0.4)
+                .ore(GARNIERITE, 0.2)
                 .build()
                 .vein("coal", 0.3)
                 .ore(COAL, 1)

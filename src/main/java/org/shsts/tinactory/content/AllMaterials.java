@@ -6,6 +6,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
+import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.material.Elements;
 import org.shsts.tinactory.content.material.FirstDegrees;
 import org.shsts.tinactory.content.material.MaterialSet;
@@ -24,12 +25,18 @@ public final class AllMaterials {
     public static MaterialSet COPPER;
     public static MaterialSet TIN;
     public static MaterialSet SULFUR;
+    public static MaterialSet COBALT;
+    public static MaterialSet CADMIUM;
     public static MaterialSet NICKEL;
+    public static MaterialSet MAGNESIUM;
+    public static MaterialSet THORIUM;
+    public static MaterialSet CHROME;
     public static MaterialSet ALUMINIUM;
 
     // First Degree
     public static MaterialSet WROUGHT_IRON;
     public static MaterialSet BRONZE;
+    public static MaterialSet COBALTITE;
     public static MaterialSet INVAR;
     public static MaterialSet CUPRONICKEL;
     public static MaterialSet STEEL;
@@ -39,6 +46,7 @@ public final class AllMaterials {
     public static MaterialSet PYRITE;
     public static MaterialSet LIMONITE;
     public static MaterialSet BANDED_IRON;
+    public static MaterialSet GARNIERITE;
     public static MaterialSet COAL;
     public static MaterialSet CASSITERITE;
     public static MaterialSet REDSTONE;
@@ -51,6 +59,8 @@ public final class AllMaterials {
     public static MaterialSet FLINT;
     public static MaterialSet RAW_RUBBER;
     public static MaterialSet RUBBER;
+    public static MaterialSet GLOWSTONE;
+    public static MaterialSet RARE_EARTH;
 
     static {
         SET = new HashMap<>();
@@ -90,6 +100,16 @@ public final class AllMaterials {
         RUBBER = set("rubber")
                 .color(0xFF000000)
                 .polymer()
+                .buildObject();
+
+        GLOWSTONE = set("glowstone")
+                .color(0xFFFFFF00)
+                .existing("dust", Tags.Items.DUSTS_GLOWSTONE, Items.GLOWSTONE)
+                .buildObject();
+
+        RARE_EARTH = set("rare_earth")
+                .color(0xFF808064)
+                .dust()
                 .buildObject();
     }
 

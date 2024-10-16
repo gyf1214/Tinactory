@@ -179,6 +179,7 @@ public class MaterialSet {
         }
 
         public Builder<P> color(int value) {
+            assert (value & 0xFF000000) != 0;
             color = value;
             return this;
         }
