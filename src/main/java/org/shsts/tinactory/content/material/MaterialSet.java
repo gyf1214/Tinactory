@@ -297,6 +297,7 @@ public class MaterialSet {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
                         .material(variant.baseBlock.defaultBlockState().getMaterial())
                         .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
+                        .translucent()
                         .tint(color)
                         .noBlockItem()
                         .register();
