@@ -45,6 +45,7 @@ import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
+import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
@@ -52,12 +53,14 @@ import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
+import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
@@ -173,8 +176,7 @@ public final class Materials {
                 .material(GOLD, SHINY)
                 .machineProcess(Voltage.LV)
                 .toolProcess().smelt()
-                // TODO: ?
-//                .oreProcess()
+                .oreProcess(SILVER, NICKEL, SILVER)
                 .build()
                 .material(COPPER, SHINY)
                 .machineProcess(Voltage.LV)
@@ -194,6 +196,8 @@ public final class Materials {
                 .material(MAGNESIUM, METALLIC).build()
                 .material(THORIUM, SHINY).build()
                 .material(CHROME, SHINY).build()
+                .material(SILVER, SHINY).build()
+                .material(VANADIUM, METALLIC).build()
                 .material(ALUMINIUM, DULL)
                 .machineProcess(Voltage.LV)
                 .build();
@@ -261,12 +265,11 @@ public final class Materials {
                 .build()
                 .material(RUBY, IconSet.RUBY)
                 .oreProcess(CHROME, RUBY, CHROME)
+                .build()
+                .material(MAGNETITE, METALLIC)
+                .oreProcess(GOLD, VANADIUM, GOLD)
+                .smelt(IRON)
                 .build();
-//                .material(MAGNETITE, METALLIC)
-//                // TODO: ?
-//                .oreProcess(GOLD)
-//                .smelt(IRON)
-//                .build();
     }
 
     private static void misc() {

@@ -31,6 +31,8 @@ public final class AllMaterials {
     public static MaterialSet MAGNESIUM;
     public static MaterialSet THORIUM;
     public static MaterialSet CHROME;
+    public static MaterialSet SILVER;
+    public static MaterialSet VANADIUM;
     public static MaterialSet ALUMINIUM;
 
     // First Degree
@@ -52,7 +54,7 @@ public final class AllMaterials {
     public static MaterialSet REDSTONE;
     public static MaterialSet CINNABAR;
     public static MaterialSet RUBY;
-//    public static MaterialSet MAGNETITE;
+    public static MaterialSet MAGNETITE;
 
     public static MaterialSet TEST;
     public static MaterialSet STONE;

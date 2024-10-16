@@ -16,9 +16,11 @@ import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
+import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
 @ParametersAreNonnullByDefault
@@ -38,7 +40,7 @@ public final class Elements {
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
                 .metalSet().nugget()
-//                .ore(OreVariant.DEEPSLATE)
+                .ore(OreVariant.DEEPSLATE)
                 .buildObject();
 
         COPPER = set("copper")
@@ -86,7 +88,17 @@ public final class Elements {
 
         CHROME = set("chrome")
                 .color(0xFFEAC4D8)
-                .metalSet()
+                .dust()
+                .buildObject();
+
+        SILVER = set("silver")
+                .color(0xFFDCDCFF)
+                .metalSet().wire()
+                .buildObject();
+
+        VANADIUM = set("vanadium")
+                .color(0xFF323232)
+                .dust()
                 .buildObject();
 
         ALUMINIUM = set("aluminium")

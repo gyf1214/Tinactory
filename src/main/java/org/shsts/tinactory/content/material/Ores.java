@@ -13,6 +13,7 @@ import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
+import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
@@ -74,10 +75,10 @@ public final class Ores {
                 .ore(OreVariant.STONE)
                 .buildObject();
 
-//        MAGNETITE = set("magnetite")
-//                .color(0xFF1E1E1E)
-//                .ore(OreVariant.DEEPSLATE)
-//                .buildObject();
+        MAGNETITE = set("magnetite")
+                .color(0xFF1E1E1E)
+                .ore(OreVariant.DEEPSLATE)
+                .buildObject();
     }
 
     public static void init() {}

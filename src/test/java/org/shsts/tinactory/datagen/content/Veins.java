@@ -11,7 +11,9 @@ import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
+import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
+import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
@@ -46,6 +48,11 @@ public final class Veins {
                 .ore(REDSTONE, 1)
                 .ore(RUBY, 0.3)
                 .ore(CINNABAR, 0.1)
+                .build()
+                .vein("magnetite", 0.8)
+                .ore(MAGNETITE, 1)
+                .ore(GOLD, 0.2)
+                .ore(MAGNETITE, 0.2)
                 .build();
     }
 
