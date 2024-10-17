@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.content.electric.CircuitComponentTier;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.LocHelper;
@@ -44,6 +45,10 @@ public final class AllTags {
 
     public static TagKey<Item> circuit(Voltage v) {
         return modItem("circuit/" + v.id);
+    }
+
+    public static TagKey<Item> circuitComponent(String component, CircuitComponentTier tier) {
+        return modItem(tier.getName(component));
     }
 
     public static TagKey<Item> item(ResourceLocation loc) {

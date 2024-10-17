@@ -7,6 +7,9 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.electric.CircuitComponentTier;
+import org.shsts.tinactory.content.electric.CircuitTier;
+import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 
@@ -19,7 +22,6 @@ import static org.shsts.tinactory.content.AllItems.DUMMY_ITEMS;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
-import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
@@ -54,6 +56,7 @@ public final class Components {
 
     public static void init() {
         componentItems();
+        circuits();
         ulv();
         misc();
         componentRecipes();
@@ -62,16 +65,6 @@ public final class Components {
     }
 
     private static void componentItems() {
-        DATA_GEN.item(VACUUM_TUBE)
-                .model(basicItem("metaitems/circuit.vacuum_tube"))
-                .tag(AllTags.circuit(Voltage.ULV))
-                .build();
-
-        DATA_GEN.item(ELECTRONIC_CIRCUIT)
-                .model(basicItem("metaitems/circuit.electronic"))
-                .tag(AllTags.circuit(Voltage.LV))
-                .build();
-
         DUMMY_ITEMS.forEach(entry -> DATA_GEN.item(entry)
                 .model(Models::componentItem)
                 .build());
@@ -93,6 +86,32 @@ public final class Components {
                 .itemModel(Models::cableItem)
                 .tag(MINEABLE_WITH_CUTTER)
                 .build());
+    }
+
+    private static void circuits() {
+        Circuits.forEach((tier, level, item) -> DATA_GEN.item(item)
+                .model(basicItem("metaitems/" + item.id.replace('/', '.')))
+                .tag(AllTags.circuit(Circuits.getVoltage(tier, level)))
+                .build());
+        Circuits.forEachComponent((component, tier, item) -> {
+            var texKey = tier.prefix.isEmpty() ? component : tier.prefix + "." + component;
+            var builder = DATA_GEN.item(item)
+                    .model(basicItem("metaitems/component." + texKey));
+            for (var tier1 : CircuitComponentTier.values()) {
+                if (tier1.rank <= tier.rank) {
+                    builder.tag(AllTags.circuitComponent(component, tier1));
+                }
+            }
+            builder.build();
+        });
+        for (var tier : CircuitTier.values()) {
+            DATA_GEN.item(Circuits.board(tier))
+                    .model(basicItem("metaitems/board." + tier.board))
+                    .build()
+                    .item(Circuits.circuitBoard(tier))
+                    .model(basicItem("metaitems/circuit_board." + tier.circuitBoard))
+                    .build();
+        }
     }
 
     private static void ulv() {

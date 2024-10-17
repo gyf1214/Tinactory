@@ -10,6 +10,7 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public enum Voltage {
     PRIMITIVE(0), ULV(1), LV(2), MV(3), HV(4), EV(5), IV(6),
+    LuV(7),
     MAXIMUM(15);
 
     public final int rank;

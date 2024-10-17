@@ -8,6 +8,9 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
+import org.shsts.tinactory.content.electric.CircuitLevel;
+import org.shsts.tinactory.content.electric.CircuitTier;
+import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.material.MaterialSet;
@@ -49,8 +52,22 @@ public final class AllItems {
     public static final Map<Voltage, RegistryEntry<BatteryItem>> BATTERY;
     public static final Map<Voltage, RegistryEntry<CableBlock>> CABLE;
     public static final Map<Voltage, RegistryEntry<SubnetBlock>> TRANSFORMER;
+
+    // circuits
     public static final RegistryEntry<Item> VACUUM_TUBE;
     public static final RegistryEntry<Item> ELECTRONIC_CIRCUIT;
+    public static final RegistryEntry<Item> GOOD_ELECTRONIC;
+    public static final RegistryEntry<Item> BASIC_INTEGRATED;
+    public static final RegistryEntry<Item> GOOD_INTEGRATED;
+    public static final RegistryEntry<Item> ADVANCED_INTEGRATED;
+
+    // circuit components
+    public static final Circuits.CircuitComponent RESISTOR;
+    public static final Circuits.CircuitComponent CAPACITOR;
+    public static final Circuits.CircuitComponent INDUCTOR;
+    public static final Circuits.CircuitComponent DIODE;
+    public static final Circuits.CircuitComponent TRANSISTOR;
+
     public static final RegistryEntry<Item> STICKY_RESIN;
     public static final RegistryEntry<SimpleFluid> STEAM;
     public static final RegistryEntry<Block> HEAT_PROOF_BLOCK;
@@ -62,9 +79,20 @@ public final class AllItems {
     static {
         DUMMY_ITEMS = new ArrayList<>();
 
-        VACUUM_TUBE = REGISTRATE.item("circuit/vacuum_tube", Item::new).register();
+        VACUUM_TUBE = Circuits.circuit(CircuitTier.ELECTRONIC, CircuitLevel.NORMAL, "vacuum_tube");
+        ELECTRONIC_CIRCUIT = Circuits.circuit(CircuitTier.ELECTRONIC, CircuitLevel.ASSEMBLY, "electronic");
+        GOOD_ELECTRONIC = Circuits.circuit(CircuitTier.ELECTRONIC, CircuitLevel.WORKSTATION, "good_electronic");
+        BASIC_INTEGRATED = Circuits.circuit(CircuitTier.INTEGRATED, CircuitLevel.NORMAL, "basic_integrated");
+        GOOD_INTEGRATED = Circuits.circuit(CircuitTier.INTEGRATED, CircuitLevel.ASSEMBLY, "good_integrated");
+        ADVANCED_INTEGRATED = Circuits.circuit(CircuitTier.INTEGRATED, CircuitLevel.WORKSTATION, "advanced_integrated");
 
-        ELECTRONIC_CIRCUIT = REGISTRATE.item("circuit/electronic", Item::new).register();
+        RESISTOR = Circuits.component("resistor");
+        CAPACITOR = Circuits.component("capacitor");
+        INDUCTOR = Circuits.component("inductor");
+        DIODE = Circuits.component("diode");
+        TRANSISTOR = Circuits.component("transistor");
+
+        Circuits.addBoards();
 
         STICKY_RESIN = REGISTRATE.item("rubber_tree/sticky_resin", Item::new).register();
 
