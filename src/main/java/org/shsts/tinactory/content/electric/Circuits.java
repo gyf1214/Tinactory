@@ -37,8 +37,42 @@ public final class Circuits {
             return COMPONENTS.get(new ComponentKey(component, tier));
         }
 
+        public Item getItem(CircuitComponentTier tier) {
+            return item(tier).get();
+        }
+
         public TagKey<Item> tag(CircuitComponentTier tier) {
             return AllTags.circuitComponent(component, tier);
+        }
+    }
+
+    public static class Circuit {
+        private final CircuitKey key;
+        private final RegistryEntry<Item> item;
+
+        private Circuit(CircuitKey key, RegistryEntry<Item> item) {
+            this.key = key;
+            this.item = item;
+        }
+
+        public RegistryEntry<Item> item() {
+            return item;
+        }
+
+        public Item getItem() {
+            return item.get();
+        }
+
+        public CircuitTier tier() {
+            return key.tier;
+        }
+
+        public CircuitLevel level() {
+            return key.level;
+        }
+
+        public RegistryEntry<Item> circuitBoard() {
+            return CIRCUIT_BOARDS.get(key.tier);
         }
     }
 
@@ -68,12 +102,12 @@ public final class Circuits {
         }
     }
 
-    public static RegistryEntry<Item> circuit(CircuitTier tier, CircuitLevel level, String id) {
+    public static Circuit circuit(CircuitTier tier, CircuitLevel level, String id) {
         var item = REGISTRATE.item("circuit/" + id, Item::new).register();
         var key = new CircuitKey(tier, level);
         assert !CIRCUITS.containsKey(key);
         CIRCUITS.put(key, item);
-        return item;
+        return new Circuit(key, item);
     }
 
     public static CircuitComponent component(String name) {

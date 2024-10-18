@@ -28,6 +28,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL_CRAFTING;
     public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH_BENCH;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CIRCUIT_ASSEMBLER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final RecipeTypeEntry<OreAnalyzerRecipe, OreAnalyzerRecipe.Builder> ORE_ANALYZER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MACERATOR;
@@ -61,6 +62,10 @@ public final class AllRecipes {
 
         ASSEMBLER = REGISTRATE.assemblyRecipeType("assembler")
                 .defaults($ -> $.amperage(0.375d))
+                .register();
+
+        CIRCUIT_ASSEMBLER = REGISTRATE.processingRecipeType("circuit_assembler")
+                .defaults($ -> $.amperage(0.25d))
                 .register();
 
         STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator")

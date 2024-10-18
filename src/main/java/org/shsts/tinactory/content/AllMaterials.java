@@ -31,6 +31,7 @@ public final class AllMaterials {
     public static MaterialSet MAGNESIUM;
     public static MaterialSet THORIUM;
     public static MaterialSet CHROME;
+    public static MaterialSet ANTIMONY;
     public static MaterialSet SILVER;
     public static MaterialSet VANADIUM;
     public static MaterialSet ALUMINIUM;
@@ -42,6 +43,7 @@ public final class AllMaterials {
     public static MaterialSet INVAR;
     public static MaterialSet CUPRONICKEL;
     public static MaterialSet STEEL;
+    public static MaterialSet RED_ALLOY;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;

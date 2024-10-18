@@ -53,6 +53,7 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 public final class AllBlockEntities {
     public static final ProcessingSet RESEARCH_BENCH;
     public static final ProcessingSet ASSEMBLER;
+    public static final ProcessingSet CIRCUIT_ASSEMBLER;
     public static final ProcessingSet STONE_GENERATOR;
     public static final ProcessingSet ORE_ANALYZER;
     public static final ProcessingSet MACERATOR;
@@ -111,6 +112,23 @@ public final class AllBlockEntities {
                 .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
                 .progressBar(Texture.PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE)
+                .build()
+                .buildObject();
+
+        var circuitAssembler = set(machine(AllRecipes.CIRCUIT_ASSEMBLER))
+                .voltages(Voltage.LV)
+                .layoutSet()
+                .port(ITEM_INPUT);
+        for (var i = 0; i < 2; i++) {
+            for (var j = 0; j < 3; j++) {
+                circuitAssembler.slot(SLOT_SIZE * j, 1 + SLOT_SIZE * i);
+            }
+        }
+        CIRCUIT_ASSEMBLER = circuitAssembler.port(FLUID_INPUT)
+                .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
+                .port(ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
 

@@ -8,6 +8,7 @@ import net.minecraftforge.common.Tags;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
 import static org.shsts.tinactory.content.AllMaterials.COBALT;
@@ -88,6 +89,11 @@ public final class Elements {
 
         CHROME = set("chrome")
                 .color(0xFFEAC4D8)
+                .dust()
+                .buildObject();
+
+        ANTIMONY = set("antimony")
+                .color(0xFFDCDCF0)
                 .dust()
                 .buildObject();
 

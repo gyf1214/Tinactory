@@ -35,6 +35,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX;
 import static org.shsts.tinactory.content.AllBlockEntities.BENDER;
 import static org.shsts.tinactory.content.AllBlockEntities.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
+import static org.shsts.tinactory.content.AllBlockEntities.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllBlockEntities.CUTTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
@@ -103,6 +104,7 @@ public final class Machines {
         primitiveMachine(ORE_WASHER, PRIMITIVE_ORE_WASHER, "machines/ore_washer");
         machine(RESEARCH_BENCH, "overlay/machine/overlay_screen");
         machine(AllBlockEntities.ASSEMBLER);
+        machine(CIRCUIT_ASSEMBLER, "machines/assembler");
         machine(MACERATOR);
         machine(CENTRIFUGE);
         machine(THERMAL_CENTRIFUGE);

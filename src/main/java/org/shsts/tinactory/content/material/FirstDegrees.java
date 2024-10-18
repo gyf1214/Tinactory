@@ -7,6 +7,7 @@ import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
+import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.set;
@@ -43,6 +44,11 @@ public final class FirstDegrees {
                 .color(0xFF808080)
                 .mechanicalSet().magnetic().pipe()
                 .toolSet(800, Tiers.IRON)
+                .buildObject();
+
+        RED_ALLOY = set("red_alloy")
+                .color(0xFFC80000)
+                .metalSet().wireAndPlate()
                 .buildObject();
     }
 

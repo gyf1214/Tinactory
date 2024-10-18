@@ -59,6 +59,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
@@ -172,18 +173,27 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     }
 
     public MaterialBuilder<P> alloy(Voltage voltage, Object... components) {
+        var alloyCount = 0;
         var totalCount = 0;
+        var i = 0;
+
+        if (components[0] instanceof Integer k) {
+            alloyCount = k;
+            i = 1;
+        }
 
         var builder = ALLOY_SMELTER.recipe(dataGen, material.loc("ingot"))
                 .voltage(voltage);
-
-        for (var i = 0; i < components.length; i += 2) {
+        for (; i < components.length; i += 2) {
             var component = (MaterialSet) components[i];
             var count = (int) components[i + 1];
             builder.inputItem(0, component.tag("dust"), count);
             totalCount += count;
         }
-        builder.outputItem(1, material.entry("ingot"), totalCount)
+        if (alloyCount == 0) {
+            alloyCount = totalCount;
+        }
+        builder.outputItem(1, material.entry("ingot"), alloyCount)
                 .workTicks(100L * totalCount)
                 .build();
         return this;
@@ -397,7 +407,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         }
 
         private void crush(String output, String input) {
-            MACERATOR.recipe(dataGen, material.loc(output))
+            MACERATOR.recipe(dataGen, suffix(material.loc(output), "_from_centrifuged"))
                     .inputItem(0, material.tag(input), 1)
                     .outputItem(1, material.entry(output), input.equals("raw") ? 2 * amount : 1)
                     .voltage(Voltage.LV)
@@ -408,7 +418,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         private void wash(String output, String input) {
             var loc = material.loc(output);
             if (input.equals("dust_pure")) {
-                loc = new ResourceLocation(loc.getNamespace(), loc.getPath() + "_from_pure");
+                loc = suffix(loc, "_from_pure");
             }
             var builder = ORE_WASHER.recipe(dataGen, loc)
                     .inputItem(0, material.tag(input), 1)

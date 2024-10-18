@@ -25,6 +25,7 @@ import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
 import static org.shsts.tinactory.content.AllItems.STEAM;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
@@ -51,6 +52,7 @@ import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
+import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
@@ -196,6 +198,7 @@ public final class Materials {
                 .material(MAGNESIUM, METALLIC).build()
                 .material(THORIUM, SHINY).build()
                 .material(CHROME, SHINY).build()
+                .material(ANTIMONY, SHINY).build()
                 .material(SILVER, SHINY).build()
                 .material(VANADIUM, METALLIC).build()
                 .material(ALUMINIUM, DULL)
@@ -229,6 +232,11 @@ public final class Materials {
                 .material(STEEL, METALLIC)
                 .machineProcess(Voltage.LV)
                 .toolProcess()
+                .build()
+                .material(RED_ALLOY, DULL)
+                .machineProcess(Voltage.LV)
+                .toolProcess()
+                .alloy(Voltage.ULV, 1, COPPER, 1, REDSTONE, 4)
                 .build();
     }
 

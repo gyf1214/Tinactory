@@ -4,8 +4,12 @@ package org.shsts.tinactory.datagen.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.CircuitComponentTier;
 import org.shsts.tinactory.content.electric.CircuitTier;
@@ -14,29 +18,37 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllItems.BATTERY;
 import static org.shsts.tinactory.content.AllItems.CABLE;
 import static org.shsts.tinactory.content.AllItems.CUPRONICKEL_COIL_BLOCK;
+import static org.shsts.tinactory.content.AllItems.DIODE;
 import static org.shsts.tinactory.content.AllItems.DUMMY_ITEMS;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
+import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
+import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
+import static org.shsts.tinactory.content.AllItems.RESISTOR;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
+import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
+import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
@@ -215,14 +227,114 @@ public final class Components {
                 .build();
     }
 
+    @SuppressWarnings("unchecked")
+    private static void circuitRecipe(Circuits.Circuit circuit, Object... args) {
+        var i = 0;
+        var output = 1;
+        if (args[0] instanceof Integer k) {
+            output = k;
+            i++;
+        }
+        var builder = CIRCUIT_ASSEMBLER.recipe(DATA_GEN, circuit.item())
+                .outputItem(2, circuit.item(), output)
+                .inputItem(0, circuit.circuitBoard(), 1);
+        for (; i < args.length; i++) {
+            var item = args[i];
+            var count = 1;
+            if (i + 1 < args.length && args[i + 1] instanceof Integer k) {
+                count = k;
+                i++;
+            }
+            if (item instanceof TagKey<?>) {
+                builder.inputItem(0, (TagKey<Item>) item, count);
+            } else if (item instanceof Circuits.CircuitComponent component) {
+                builder.inputItem(0, component.tag(circuit.tier().componentTier), count);
+            } else if (item instanceof Circuits.Circuit circuit1) {
+                builder.inputItem(0, circuit1.item(), count);
+            } else if (item instanceof ItemLike itemLike) {
+                builder.inputItem(0, () -> itemLike, count);
+            } else if (item instanceof Supplier<?>) {
+                builder.inputItem(0, (Supplier<? extends ItemLike>) item, count);
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+        var level = 1 + Math.max(0, circuit.level().voltageOffset);
+        var voltage = circuit.tier().baseVoltage;
+        if (voltage.rank < Voltage.LV.rank) {
+            voltage = Voltage.LV;
+        }
+        // TODO: soldering
+        builder.voltage(voltage)
+                .workTicks(200L * level)
+                .build();
+    }
+
     private static void circuitRecipes() {
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-                .shaped(VACUUM_TUBE.get())
+                .shaped(VACUUM_TUBE.getItem())
                 .pattern("BGB").pattern("WWW")
                 .define('G', Items.GLASS)
                 .define('W', COPPER.tag("wire"))
                 .define('B', IRON.tag("bolt"))
                 .unlockedBy("has_wire", has(COPPER.tag("wire"))));
+
+        ASSEMBLER.recipe(DATA_GEN, VACUUM_TUBE.item())
+                .outputItem(2, VACUUM_TUBE.item(), 1)
+                .inputItem(0, () -> Items.GLASS, 1)
+                .inputItem(0, COPPER.tag("wire"), 1)
+                .inputItem(0, IRON.tag("bolt"), 1)
+                .workTicks(40L)
+                .voltage(Voltage.ULV)
+                .build();
+
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(ELECTRONIC_CIRCUIT.getItem())
+                .pattern("RPR").pattern("TBT").pattern("WWW")
+                .define('R', RESISTOR.getItem(CircuitComponentTier.NORMAL))
+                .define('P', STEEL.tag("plate"))
+                .define('T', VACUUM_TUBE.getItem())
+                .define('B', Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
+                .define('W', RED_ALLOY.tag("wire"))
+                .unlockedBy("has_board", has(Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())));
+
+        circuitRecipe(ELECTRONIC_CIRCUIT, VACUUM_TUBE, 2, RESISTOR, 2, RED_ALLOY.tag("wire"), 2);
+
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(GOOD_ELECTRONIC.getItem())
+                .pattern("DPD").pattern("EBE").pattern("WEW")
+                .define('D', DIODE.getItem(CircuitComponentTier.NORMAL))
+                .define('P', STEEL.tag("plate"))
+                .define('E', ELECTRONIC_CIRCUIT.getItem())
+                .define('B', Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
+                .define('W', COPPER.tag("wire"))
+                .unlockedBy("has_circuit", has(ELECTRONIC_CIRCUIT.getItem())));
+
+        circuitRecipe(GOOD_ELECTRONIC, ELECTRONIC_CIRCUIT, 2, DIODE, 2, COPPER.tag("wire"), 2);
+
+        // circuit components
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(RESISTOR.getItem(CircuitComponentTier.NORMAL))
+                .pattern(" R ").pattern("WCW").pattern(" R ")
+                .define('R', STICKY_RESIN.get())
+                .define('W', COPPER.tag("wire"))
+                .define('C', COAL.tag("dust"))
+                .unlockedBy("has_resin", has(STICKY_RESIN.get())));
+
+        // boards
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(Circuits.board(CircuitTier.ELECTRONIC).get(), 3)
+                .pattern("SSS").pattern("WWW").pattern("SSS")
+                .define('S', STICKY_RESIN.get())
+                .define('W', ItemTags.PLANKS)
+                .unlockedBy("has_resin", has(STICKY_RESIN.get())));
+
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
+                .pattern("WWW").pattern("WBW").pattern("WWW")
+                .define('B', Circuits.board(CircuitTier.ELECTRONIC).get())
+                .define('W', COPPER.tag("wire"))
+                .unlockedBy("has_board", has(Circuits.board(CircuitTier.ELECTRONIC).get())));
     }
 
     private static void miscRecipes() {

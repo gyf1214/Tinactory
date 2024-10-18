@@ -54,12 +54,12 @@ public final class AllItems {
     public static final Map<Voltage, RegistryEntry<SubnetBlock>> TRANSFORMER;
 
     // circuits
-    public static final RegistryEntry<Item> VACUUM_TUBE;
-    public static final RegistryEntry<Item> ELECTRONIC_CIRCUIT;
-    public static final RegistryEntry<Item> GOOD_ELECTRONIC;
-    public static final RegistryEntry<Item> BASIC_INTEGRATED;
-    public static final RegistryEntry<Item> GOOD_INTEGRATED;
-    public static final RegistryEntry<Item> ADVANCED_INTEGRATED;
+    public static final Circuits.Circuit VACUUM_TUBE;
+    public static final Circuits.Circuit ELECTRONIC_CIRCUIT;
+    public static final Circuits.Circuit GOOD_ELECTRONIC;
+    public static final Circuits.Circuit BASIC_INTEGRATED;
+    public static final Circuits.Circuit GOOD_INTEGRATED;
+    public static final Circuits.Circuit ADVANCED_INTEGRATED;
 
     // circuit components
     public static final Circuits.CircuitComponent RESISTOR;
