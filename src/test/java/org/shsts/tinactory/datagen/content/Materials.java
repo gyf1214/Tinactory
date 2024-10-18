@@ -141,7 +141,7 @@ public final class Materials {
                 .define('#', ItemTags.PLANKS)
                 .toolTag(TOOL_SAW)
                 .build();
-        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.replaceVanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(Items.STICK, 2)
                 .define('#', ItemTags.PLANKS)
                 .pattern("#").pattern("#")
@@ -398,7 +398,7 @@ public final class Materials {
         DATA_GEN.nullRecipe(wood)
                 .nullRecipe(woodStripped)
                 // reduce vanilla recipe to 2 planks
-                .vanillaRecipe(() -> ShapelessRecipeBuilder
+                .replaceVanillaRecipe(() -> ShapelessRecipeBuilder
                         .shapeless(planks.get(), 2)
                         .requires(logTag)
                         .group("planks")

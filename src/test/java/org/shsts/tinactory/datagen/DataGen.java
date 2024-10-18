@@ -6,6 +6,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -141,19 +142,25 @@ public final class DataGen implements IRecipeDataConsumer {
         return this;
     }
 
-    public DataGen vanillaRecipe(Supplier<RecipeBuilder> recipe) {
+    public DataGen replaceVanillaRecipe(Supplier<RecipeBuilder> recipe) {
         recipeHandler.registerRecipe(cons -> recipe.get().save(cons));
         return this;
     }
 
-    public void vanillaRecipe(Supplier<RecipeBuilder> recipe, String suffix) {
+    public DataGen vanillaRecipe(Supplier<RecipeBuilder> recipe) {
+        return vanillaRecipe(recipe, "");
+    }
+
+    public DataGen vanillaRecipe(Supplier<RecipeBuilder> recipe, String suffix) {
         recipeHandler.registerRecipe(cons -> {
             var builder = recipe.get();
             var loc = builder.getResult().getRegistryName();
             assert loc != null;
-            var recipeLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + suffix);
+            var prefix = builder instanceof SimpleCookingRecipeBuilder ? "smelt" : "craft";
+            var recipeLoc = new ResourceLocation(modid, prefix + "/" + loc.getPath() + suffix);
             builder.save(cons, recipeLoc);
         });
+        return this;
     }
 
     public DataGen nullRecipe(ResourceLocation loc) {
