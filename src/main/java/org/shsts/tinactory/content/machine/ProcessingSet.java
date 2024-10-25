@@ -19,6 +19,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
+import org.shsts.tinactory.core.multiblock.client.MultiBlockInterfaceRenderer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
@@ -234,6 +235,7 @@ public class ProcessingSet extends MachineSet {
                 .title(ProcessingMenu::getTitle)
                 .plugin(MachinePlugin::multiBlock)
                 .build()
+                .renderer(() -> () -> MultiBlockInterfaceRenderer::new)
                 .build()
                 .translucent()
                 .buildObject();

@@ -49,6 +49,7 @@ import org.shsts.tinactory.registrate.handler.RecipeTypeHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
 import org.shsts.tinactory.registrate.handler.RenderTypeHandler;
+import org.shsts.tinactory.registrate.handler.RendererHandler;
 import org.shsts.tinactory.registrate.handler.TintHandler;
 import org.shsts.tinactory.registrate.tracking.TrackedObjects;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
@@ -86,6 +87,7 @@ public class Registrate {
     // Client
     public final RenderTypeHandler renderTypeHandler;
     public final MenuScreenHandler menuScreenHandler;
+    public final RendererHandler rendererHandler;
     public final TintHandler tintHandler;
 
     private final TrackedObjects trackedObjects;
@@ -106,6 +108,7 @@ public class Registrate {
 
         this.renderTypeHandler = new RenderTypeHandler();
         this.menuScreenHandler = new MenuScreenHandler();
+        this.rendererHandler = new RendererHandler();
         this.tintHandler = new TintHandler();
 
         this.trackedObjects = new TrackedObjects();
@@ -155,6 +158,7 @@ public class Registrate {
     public void registerClient(IEventBus modEventBus) {
         modEventBus.addListener(tintHandler::onRegisterBlockColors);
         modEventBus.addListener(tintHandler::onRegisterItemColors);
+        modEventBus.addListener(rendererHandler::onRegisterRenderers);
         modEventBus.addListener(this::onClientSetup);
     }
 

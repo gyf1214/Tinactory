@@ -4,6 +4,8 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class MenuScreenHandler {
 
     private final List<Entry<?, ?>> entries = new ArrayList<>();
 
+    @OnlyIn(Dist.CLIENT)
     public <M extends AbstractContainerMenu, U extends AbstractContainerScreen<M>>
     void setMenuScreen(MenuType<M> menuType, MenuScreens.ScreenConstructor<M, U> factory) {
         entries.add(new Entry<>(menuType, factory));

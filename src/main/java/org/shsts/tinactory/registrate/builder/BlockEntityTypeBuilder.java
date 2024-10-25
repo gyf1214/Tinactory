@@ -1,17 +1,20 @@
 package org.shsts.tinactory.registrate.builder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.common.DistLazy;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -116,6 +119,12 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
     public <C extends CapabilityProviderBuilder<? super U, BlockEntityTypeBuilder<U, P>>>
     BlockEntityTypeBuilder<U, P> simpleCapability(Function<BlockEntityTypeBuilder<U, P>, C> builderFactory) {
         return capability(builderFactory).build();
+    }
+
+    public BlockEntityTypeBuilder<U, P> renderer(DistLazy<BlockEntityRendererProvider<U>> renderer) {
+        onCreateObject(type -> renderer.runOnDist(Dist.CLIENT, () -> provider ->
+                registrate.rendererHandler.setBlockEntityRenderer(type, provider)));
+        return self();
     }
 
     @Override
