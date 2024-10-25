@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
@@ -28,6 +29,7 @@ public class SidedMachineBlock<T extends BlockEntity> extends MachineBlock<T> {
         builder.add(IO_FACING);
     }
 
+    @Nonnull
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return defaultBlockState().setValue(IO_FACING, ctx.getHorizontalDirection().getOpposite());

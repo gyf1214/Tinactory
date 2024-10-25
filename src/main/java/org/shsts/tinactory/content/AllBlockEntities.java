@@ -17,7 +17,6 @@ import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
-import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
@@ -72,7 +71,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet STEAM_TURBINE;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
-    public static final Map<Voltage, RegistryEntry<SidedMachineBlock<SmartBlockEntity>>> MULTI_BLOCK_INTERFACE;
+    public static final Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> MULTI_BLOCK_INTERFACE;
 
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;

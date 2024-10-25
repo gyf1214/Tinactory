@@ -12,7 +12,6 @@ import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
-import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -187,7 +186,7 @@ public class ProcessingSet extends MachineSet {
     public static MachineSet.Builder<?> batteryBox() {
         return new MachineSet.Builder<>(Unit.INSTANCE) {
             @Override
-            protected BlockEntityBuilder<SmartBlockEntity, SidedMachineBlock<SmartBlockEntity>, ?>
+            protected BlockEntityBuilder<SmartBlockEntity, ?, ?>
             getMachineBuilder(Voltage voltage) {
                 var id = "machine/" + voltage.id + "/battery_box";
                 var layout = getLayout(voltage);
@@ -224,9 +223,9 @@ public class ProcessingSet extends MachineSet {
         };
     }
 
-    public static RegistryEntry<SidedMachineBlock<SmartBlockEntity>> multiblockInterface(Voltage voltage) {
+    public static RegistryEntry<MachineBlock<SmartBlockEntity>> multiblockInterface(Voltage voltage) {
         var id = "multi_block/" + voltage.id + "/interface";
-        return REGISTRATE.blockEntity(id, MachineBlock.sided(voltage))
+        return REGISTRATE.blockEntity(id, MachineBlock.multiBlockInterface(voltage))
                 .blockEntity()
                 .eventManager()
                 .simpleCapability(MultiBlockInterface::basic)
