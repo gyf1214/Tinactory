@@ -26,6 +26,11 @@ public class BlastFurnace extends MultiBlock {
     }
 
     @Override
+    public BlockState getAppearanceBlock() {
+        return AllItems.HEAT_PROOF_BLOCK.get().defaultBlockState();
+    }
+
+    @Override
     protected boolean checkMultiBlock(Level world, int dx, int dy, int dz,
                                       BlockPos pos, BlockState blockState) {
         if (dy == 0 && checkInterface(world, pos)) {

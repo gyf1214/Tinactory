@@ -81,6 +81,7 @@ import static org.shsts.tinactory.core.util.LocHelper.prepend;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
+import static org.shsts.tinactory.datagen.content.Models.multiBlockInterface;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS;
 
@@ -150,7 +151,7 @@ public final class Machines {
                 .build();
 
         MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
-                .blockState(machineBlock(ME_BUS))
+                .blockState(multiBlockInterface(ME_BUS))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build());
 

@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -41,6 +42,8 @@ public abstract class MultiBlock extends MultiBlockBase {
         super(blockEntity);
         this.layout = layout;
     }
+
+    public abstract BlockState getAppearanceBlock();
 
     protected boolean checkInterface(Level world, BlockPos pos) {
         if (multiBlockInterface != null) {

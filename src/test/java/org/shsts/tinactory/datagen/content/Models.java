@@ -11,11 +11,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.network.CableBlock;
+import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
 import org.shsts.tinactory.datagen.content.model.CableModel;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
@@ -62,6 +66,14 @@ public final class Models {
             return 0;
         }
         return 90 * ((2 + dir.get2DDataValue()) % 4);
+    }
+
+    public static ConfiguredModel[] rotateModel(ModelFile model, Direction dir) {
+        return ConfiguredModel.builder()
+                .modelFile(model)
+                .rotationX(xRotation(dir))
+                .rotationY(yRotation(dir))
+                .build();
     }
 
     public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
@@ -204,6 +216,26 @@ public final class Models {
                 .overlay(overlay)
                 .buildObject();
         return model.blockState();
+    }
+
+    public static Consumer<RegistryDataContext<Block, MachineBlock<SmartBlockEntity>, BlockStateProvider>>
+    multiBlockInterface(String ioTex) {
+        return ctx -> {
+            var models = ctx.provider.models();
+            var model = MachineModel.builder()
+                    .overlay(ioTex).ioTex(ioTex)
+                    .buildObject();
+            var fullModel = model.blockModel(ctx.id, ctx.object, false, models);
+            var ioModel = model.ioModel(ctx.id, models)
+                    .texture("particle", extend(model.getCasing(ctx.object), "side"));
+            ctx.provider.getVariantBuilder(ctx.object)
+                    .forAllStates(state -> {
+                        var dir = state.getValue(MachineBlock.IO_FACING);
+                        var baseModel = state.getValue(MultiBlockInterfaceBlock.JOINED) ?
+                                ioModel : fullModel;
+                        return rotateModel(baseModel, dir);
+                    });
+        };
     }
 
     public static <U extends Item>

@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class MultiBlockInterfaceBlock extends SidedMachineBlock<SmartBlockEntity> {
-    public static final BooleanProperty JOINED_MULTIBLOCK = BooleanProperty.create("joined");
+    public static final BooleanProperty JOINED = BooleanProperty.create("joined");
 
     public MultiBlockInterfaceBlock(Properties properties,
                                     Supplier<SmartBlockEntityType<SmartBlockEntity>> entityType,
@@ -30,19 +30,19 @@ public class MultiBlockInterfaceBlock extends SidedMachineBlock<SmartBlockEntity
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(JOINED_MULTIBLOCK);
+        builder.add(JOINED);
     }
 
     @Nonnull
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return super.getStateForPlacement(ctx).setValue(JOINED_MULTIBLOCK, false);
+        return super.getStateForPlacement(ctx).setValue(JOINED, false);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return state.getValue(JOINED_MULTIBLOCK) ?
+        return state.getValue(JOINED) ?
                 RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
     }
 }

@@ -63,7 +63,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
     }
 
     public S translucent() {
-        return renderType(() -> RenderType::translucent);
+        return renderType(() -> RenderType::cutoutMipped);
     }
 
     public S tint(DistLazy<BlockColor> value) {

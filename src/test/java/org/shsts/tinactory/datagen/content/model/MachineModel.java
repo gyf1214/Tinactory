@@ -6,12 +6,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.network.MachineBlock;
@@ -39,6 +38,7 @@ import static org.shsts.tinactory.datagen.content.Models.DIR_TEX_KEYS;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
 import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
+import static org.shsts.tinactory.datagen.content.Models.rotateModel;
 import static org.shsts.tinactory.datagen.content.Models.xRotation;
 import static org.shsts.tinactory.datagen.content.Models.yRotation;
 
@@ -67,7 +67,7 @@ public class MachineModel {
         this.dirOverlay = dirOverlay;
     }
 
-    private ResourceLocation getCasing(Block block) {
+    public ResourceLocation getCasing(Block block) {
         if (casing != null) {
             return casing;
         }
@@ -143,12 +143,12 @@ public class MachineModel {
         applyOverlay(model, false, existingHelper);
     }
 
-    private ModelFile blockModel(String id, Block block, boolean working, BlockModelProvider prov) {
+    public BlockModelBuilder blockModel(String id, Block block, boolean working, BlockModelProvider prov) {
         var model = prov.withExistingParent(id, modLoc(CASING_MODEL));
         return applyTextures(model, block, working, prov.existingFileHelper);
     }
 
-    private ModelFile ioModel(String id, BlockModelProvider prov) {
+    public BlockModelBuilder ioModel(String id, BlockModelProvider prov) {
         return prov.withExistingParent(id + "_io", modLoc(IO_MODEL))
                 .texture("io_overlay", ioTex);
     }
@@ -162,11 +162,7 @@ public class MachineModel {
                 .forAllStates(state -> {
                     var dir = state.getValue(MachineBlock.FACING);
                     var working = state.getValue(MachineBlock.WORKING);
-                    return ConfiguredModel.builder()
-                            .modelFile(working ? workingModel : model)
-                            .rotationX(xRotation(dir))
-                            .rotationY(yRotation(dir))
-                            .build();
+                    return rotateModel(working ? workingModel : model, dir);
                 });
     }
 
@@ -175,11 +171,7 @@ public class MachineModel {
         ctx.provider.getVariantBuilder(ctx.object)
                 .forAllStates(state -> {
                     var dir = state.getValue(MachineBlock.IO_FACING);
-                    return ConfiguredModel.builder()
-                            .modelFile(model)
-                            .rotationX(xRotation(dir))
-                            .rotationY(yRotation(dir))
-                            .build();
+                    return rotateModel(model, dir);
                 });
     }
 

@@ -64,6 +64,18 @@ public class MultiBlockInterface extends Machine {
         sendUpdate(blockEntity);
     }
 
+    private void setJoined(Level world, boolean value) {
+        if (!world.isLoaded(blockEntity.getBlockPos())) {
+            return;
+        }
+        var state = blockEntity.getBlockState();
+        if (!world.getBlockState(blockEntity.getBlockPos()).is(state.getBlock())) {
+            return;
+        }
+        var newState = state.setValue(MultiBlockInterfaceBlock.JOINED, value);
+        world.setBlock(blockEntity.getBlockPos(), newState, 3);
+    }
+
     public void setMultiBlock(MultiBlock target) {
         if (multiBlock == target) {
             return;
@@ -75,6 +87,9 @@ public class MultiBlockInterface extends Machine {
         recipeType = processor instanceof RecipeProcessor<?> recipeProcessor ?
                 recipeProcessor.recipeType : null;
         container.setLayout(target.layout);
+        var world = blockEntity.getLevel();
+        assert world != null;
+        setJoined(world, true);
         onMultiBlockUpdate();
     }
 
@@ -86,6 +101,7 @@ public class MultiBlockInterface extends Machine {
         var world = blockEntity.getLevel();
         assert world != null;
         updateWorkBlock(world, false);
+        setJoined(world, false);
         multiBlock = null;
         processor = null;
         electricMachine = null;
@@ -161,6 +177,10 @@ public class MultiBlockInterface extends Machine {
 
     public Optional<RecipeType<?>> getRecipeType() {
         return Optional.ofNullable(recipeType);
+    }
+
+    public Optional<BlockState> getAppearanceBlock() {
+        return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.getAppearanceBlock());
     }
 
     @Override
