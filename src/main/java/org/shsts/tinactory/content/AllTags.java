@@ -37,6 +37,7 @@ public final class AllTags {
     public static final TagKey<Block> MINEABLE_WITH_CUTTER = modBlock("mineable/cutter");
 
     public static final TagKey<Item> MACHINE = modItem("machine");
+    public static final TagKey<Block> COIL = modBlock("coil");
 
     public static TagKey<Item>
     machineTag(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {

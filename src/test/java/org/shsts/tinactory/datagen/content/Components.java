@@ -51,6 +51,7 @@ import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
+import static org.shsts.tinactory.content.AllTags.COIL;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
@@ -169,6 +170,7 @@ public final class Components {
                 .build()
                 .block(CUPRONICKEL_COIL_BLOCK)
                 .blockState(solidBlock("casings/coils/machine_coil_cupronickel"))
+                .tag(COIL)
                 .build()
                 .item(STICKY_RESIN)
                 .model(basicItem("metaitems/rubber_drop"))
