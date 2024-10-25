@@ -29,13 +29,15 @@ public class UpdateHelper extends CapabilityProvider {
     private final Map<ResourceLocation, INBTUpdatable<?>> updatableCapability = new HashMap<>();
     private final Set<ResourceLocation> dirtyCapabilities = new HashSet<>();
 
-    public Tag getUpdateTag() {
+    public Tag getUpdateTag(boolean forceUpdate) {
         var listTag = new ListTag();
-        for (var loc : dirtyCapabilities) {
-            if (!updatableCapability.containsKey(loc)) {
+
+        for (var entry : updatableCapability.entrySet()) {
+            var loc = entry.getKey();
+            if (!forceUpdate && !dirtyCapabilities.contains(loc)) {
                 continue;
             }
-            var cap = updatableCapability.get(loc);
+            var cap = entry.getValue();
             var tag1 = new CompoundTag();
             tag1.putString("id", loc.toString());
             tag1.put("data", cap.serializeOnUpdate());

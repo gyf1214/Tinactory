@@ -104,25 +104,27 @@ public class SmartBlockEntity extends BlockEntity {
         level.sendBlockUpdated(getBlockPos(), state, state, Block.UPDATE_CLIENTS);
     }
 
-    @Override
-    public CompoundTag getUpdateTag() {
+    private CompoundTag getUpdateTag(boolean forceUpdate) {
         var tag = new CompoundTag();
-        if (shouldSendUpdate()) {
-            var caps = getUpdateHelper().getUpdateTag();
-            tag.put("ForgeCaps", caps);
-            if (isUpdateForced) {
-                serializeOnUpdate(tag);
-            }
-            resetShouldSendUpdate();
+        var caps = getUpdateHelper().getUpdateTag(forceUpdate);
+        tag.put("ForgeCaps", caps);
+        if (forceUpdate || isUpdateForced) {
+            serializeOnUpdate(tag);
         }
         return tag;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        return getUpdateTag(true);
     }
 
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         if (shouldSendUpdate()) {
-            var ret = ClientboundBlockEntityDataPacket.create(this);
+            var ret = ClientboundBlockEntityDataPacket.create(this, be ->
+                    ((SmartBlockEntity) be).getUpdateTag(false));
             resetShouldSendUpdate();
             return ret;
         }
