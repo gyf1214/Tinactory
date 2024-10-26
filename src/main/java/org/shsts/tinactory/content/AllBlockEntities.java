@@ -308,7 +308,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         MULTI_BLOCK_INTERFACE = ComponentBuilder.dummy(ProcessingSet::multiblockInterface)
-                .voltages(Voltage.LV, Voltage.IV)
+                .voltages(Voltage.ULV, Voltage.LuV)
                 .buildObject();
 
         var batteryBox = ProcessingSet.batteryBox()
