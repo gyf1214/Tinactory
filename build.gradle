@@ -99,6 +99,12 @@ repositories {
         name 'Progwml6 maven'
         url 'https://dvs1.progwml6.com/files/maven'
     }
+    maven {
+        url = "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
@@ -109,6 +115,8 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 
     compileOnly files("libs/gtceu_resources_2.8.7.zip")
+
+    runtimeOnly fg.deobf("curse.maven:ctm-267602:3933537")
 
     // optional Registrate
 //    jarJar(group: 'com.tterrag.registrate', name: 'Registrate', version: "[${registrate_version},)") {
