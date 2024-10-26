@@ -41,6 +41,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> BENDER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> LATHE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CUTTER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> COMPRESSOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
     public static final RecipeTypeEntry<GeneratorRecipe, GeneratorRecipe.Builder> STEAM_TURBINE;
@@ -119,6 +120,10 @@ public final class AllRecipes {
         CUTTER = REGISTRATE.processingRecipeType("cutter")
                 .defaults($ -> $.inputFluid(1, Fluids.WATER, 10)
                         .amperage(0.375d))
+                .register();
+
+        COMPRESSOR = REGISTRATE.processingRecipeType("compressor")
+                .defaults($ -> $.amperage(0.5d))
                 .register();
 
         EXTRACTOR = REGISTRATE.processingRecipeType("extractor")

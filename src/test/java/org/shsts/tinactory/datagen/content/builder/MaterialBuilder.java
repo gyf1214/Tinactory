@@ -101,11 +101,11 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         process("dust_tiny", 1, "nugget", TOOL_MORTAR);
         // plate
         process("plate", 1, "A\nA", "ingot", TOOL_HAMMER);
-        process("plate", 1, "A\nA", "bar", TOOL_HAMMER);
         // foil
         process("foil", 2, "plate", TOOL_HAMMER);
         // ring
         process("ring", 1, "plate", TOOL_WIRE_CUTTER);
+        process("ring", 1, "sheet", TOOL_WIRE_CUTTER);
         // stick
         process("stick", 1, "ingot", TOOL_FILE);
         // bolt
@@ -146,7 +146,6 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     public MaterialBuilder<P> simpleProcess(Voltage v) {
         process(WIREMILL, "wire", 2, "ingot", v, 48L);
         process(BENDER, "plate", 1, "ingot", v, 72L);
-        process(BENDER, "plate", 1, "bar", v, 72L);
         process(BENDER, "foil", 2, "plate", v, 64L);
         process(POLARIZER, "magnetic", 1, "stick", v, 40L);
         process(LATHE, "stick", 1, "ingot", v, 64L);

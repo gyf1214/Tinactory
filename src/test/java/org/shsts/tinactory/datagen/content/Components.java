@@ -155,7 +155,7 @@ public final class Components {
                 .result(CABLE.get(Voltage.LV), 1)
                 .pattern("WWR").pattern("WWR").pattern("RR ")
                 .define('W', TIN.tag("wire"))
-                .define('R', RUBBER.tag("plate"))
+                .define('R', RUBBER.tag("sheet"))
                 .toolTag(TOOL_WIRE_CUTTER)
                 .build();
 

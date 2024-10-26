@@ -66,6 +66,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet BENDER;
     public static final ProcessingSet LATHE;
     public static final ProcessingSet CUTTER;
+    public static final ProcessingSet COMPRESSOR;
     public static final ProcessingSet EXTRACTOR;
     public static final ProcessingSet FLUID_SOLIDIFIER;
     public static final ProcessingSet STEAM_TURBINE;
@@ -115,7 +116,6 @@ public final class AllBlockEntities {
                 .buildObject();
 
         var circuitAssembler = set(machine(AllRecipes.CIRCUIT_ASSEMBLER))
-                .voltages(Voltage.LV)
                 .layoutSet()
                 .port(ITEM_INPUT);
         for (var i = 0; i < 2; i++) {
@@ -261,7 +261,10 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
+        COMPRESSOR = simpleMachine(AllRecipes.COMPRESSOR, Texture.PROGRESS_COMPRESS);
+
         EXTRACTOR = set(machine(AllRecipes.EXTRACTOR))
+                .voltages(Voltage.MV)
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -274,6 +277,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         FLUID_SOLIDIFIER = set(machine(AllRecipes.FLUID_SOLIDIFIER))
+                .voltages(Voltage.MV)
                 .layoutSet()
                 .port(FLUID_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)

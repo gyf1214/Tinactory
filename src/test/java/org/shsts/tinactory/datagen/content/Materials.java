@@ -347,10 +347,10 @@ public final class Materials {
                 .toolTag(TOOL_MORTAR)
                 .build();
 
-        ALLOY_SMELTER.recipe(DATA_GEN, RUBBER.loc("bar"))
+        ALLOY_SMELTER.recipe(DATA_GEN, RUBBER.loc("sheet"))
                 .inputItem(0, RAW_RUBBER.entry("dust"), 3)
                 .inputItem(0, SULFUR.entry("dust"), 1)
-                .outputItem(1, RUBBER.entry("bar"), 3)
+                .outputItem(1, RUBBER.entry("sheet"), 3)
                 .workTicks(300)
                 .voltage(Voltage.ULV)
                 .build();

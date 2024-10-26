@@ -37,6 +37,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.BENDER;
 import static org.shsts.tinactory.content.AllBlockEntities.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.CIRCUIT_ASSEMBLER;
+import static org.shsts.tinactory.content.AllBlockEntities.COMPRESSOR;
 import static org.shsts.tinactory.content.AllBlockEntities.CUTTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
@@ -117,6 +118,7 @@ public final class Machines {
         machine(BENDER);
         machine(LATHE);
         machine(CUTTER);
+        machine(COMPRESSOR);
         machine(EXTRACTOR);
         machine(FLUID_SOLIDIFIER);
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
@@ -127,8 +129,8 @@ public final class Machines {
 
         DATA_GEN.block(NETWORK_CONTROLLER)
                 .blockState(MachineModel::builder, MachineModel::blockState)
-                .casing(Voltage.LV)
-                .overlay("overlay/machine/overlay_screen")
+                .casing("casings/computer/computer_casing")
+                .overlay("overlay/machine/hpca/computation")
                 .ioTex(ME_BUS)
                 .build()
                 .tag(MINEABLE_WITH_WRENCH)

@@ -288,7 +288,7 @@ public class MaterialSet {
         }
 
         public Builder<P> polymer() {
-            return dust().dummies("bar", "plate", "ring");
+            return dust().dummies("sheet", "ring");
         }
 
         public Builder<P> ore(OreVariant variant) {
