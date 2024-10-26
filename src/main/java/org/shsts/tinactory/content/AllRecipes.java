@@ -136,6 +136,7 @@ public final class AllRecipes {
                 .register();
 
         BLAST_FURNACE = REGISTRATE.processingRecipeType("blast_furnace")
+                .defaults($ -> $.amperage(4d))
                 .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.SERIALIZER)

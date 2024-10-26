@@ -359,9 +359,8 @@ public final class Materials {
         BLAST_FURNACE.recipe(DATA_GEN, STEEL.loc("ingot"))
                 .inputItem(0, IRON.tag("dust"), 1)
                 .outputItem(2, STEEL.entry("ingot"), 1)
-                .voltage(Voltage.LV)
-                .power(32)
-                .workTicks(200)
+                .voltage(Voltage.ULV)
+                .workTicks(400)
                 .build();
     }
 

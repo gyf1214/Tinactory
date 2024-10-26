@@ -5,9 +5,7 @@ import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
-import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
@@ -78,30 +76,22 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
         return null;
     }
 
-    @SuppressWarnings("deprecation")
     private Optional<IGuiClickableArea> processingClickable(MenuScreen<ProcessingMenu> screen) {
         var menu = screen.getMenu();
-        var holder = menu.blockEntity.getBlockState().getBlock().asItem().builtInRegistryHolder();
-        if (!holder.is(AllTags.MACHINE)) {
-            return Optional.empty();
-        }
-        var layout = menu.layout;
-        if (layout == null || layout.progressBar == null) {
-            return Optional.empty();
-        }
-        var rect = layout.progressBar.rect();
 
+        var category = menu.getRecipeType().flatMap(plugin::processingCategory);
+        var layout = menu.layout;
+        if (category.isEmpty() || layout == null || layout.progressBar == null) {
+            return Optional.empty();
+        }
+
+        var rect = layout.progressBar.rect();
         var x = rect.x() + layout.getXOffset() + MARGIN_HORIZONTAL;
         var y = rect.y() + MARGIN_TOP;
         var w = rect.width();
         var h = rect.height();
-        for (var set : AllBlockEntities.PROCESSING_SETS) {
-            if (holder.is(AllTags.machineTag(set.recipeType))) {
-                var category = plugin.processingCategory(set.recipeType).type;
-                return Optional.of(IGuiClickableArea.createBasic(x, y, w, h, category));
-            }
-        }
-        return Optional.empty();
+
+        return Optional.of(IGuiClickableArea.createBasic(x, y, w, h, category.get().type));
     }
 
     @Override

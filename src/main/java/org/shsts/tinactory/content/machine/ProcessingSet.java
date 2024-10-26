@@ -63,7 +63,7 @@ public class ProcessingSet extends MachineSet {
                     .eventManager()
                     .simpleCapability(Machine::builder)
                     .simpleCapability(StackProcessingContainer.builder(layout))
-                    .menu(ProcessingMenu.machine(layout))
+                    .menu(ProcessingMenu.machine(layout, recipeType))
                     .title(ProcessingMenu::getTitle)
                     .build()
                     .build()

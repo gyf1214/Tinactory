@@ -14,11 +14,16 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllBlockEntities;
+import org.shsts.tinactory.content.AllLayouts;
+import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
@@ -35,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -58,14 +64,21 @@ public class JEI implements IModPlugin {
         for (var set : AllBlockEntities.PROCESSING_SETS) {
             var layout = set.layout(Voltage.MAXIMUM);
             var icon = set.block(Voltage.LV);
-            var category = new ProcessingCategory(set.recipeType, layout, icon);
-            categories.add(category);
-            processingCategories.put(set.recipeType.get(), category);
+            addProcessingCategory(set.recipeType, layout, icon);
         }
+        addProcessingCategory(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE,
+                AllBlockEntities.BLAST_FURNACE.get());
     }
 
-    public RecipeCategory<?, ?> processingCategory(RecipeTypeEntry<?, ?> recipeType) {
-        return processingCategories.get(recipeType.get());
+    private void addProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
+                                       Layout layout, Block icon) {
+        var category = new ProcessingCategory(recipeType, layout, icon);
+        categories.add(category);
+        processingCategories.put(recipeType.get(), category);
+    }
+
+    public Optional<RecipeCategory<?, ?>> processingCategory(RecipeType<?> recipeType) {
+        return Optional.ofNullable(processingCategories.get(recipeType));
     }
 
     @Override

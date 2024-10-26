@@ -375,7 +375,7 @@ public final class AllBlockEntities {
                 .eventManager().ticking()
                 .simpleCapability(RecipeProcessor.machine(recipeType))
                 .simpleCapability(StackProcessingContainer.builder(layout))
-                .menu(ProcessingMenu.machine(layout))
+                .menu(ProcessingMenu.machine(layout, recipeType))
                 .title(ProcessingMenu::getTitle)
                 .build()
                 .build()

@@ -14,6 +14,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.content.AllBlockEntities;
+import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
@@ -148,6 +149,7 @@ public final class Machines {
                 .blockState(machineBlock("casings/solid/machine_casing_heatproof",
                         "multiblock/blast_furnace"))
                 .tag(MINEABLE_WITH_WRENCH)
+                .itemTag(machineTag(AllRecipes.BLAST_FURNACE))
                 .build();
 
         MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)

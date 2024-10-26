@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -20,15 +21,17 @@ import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
+public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
     @Nullable
     public final Layout layout;
     private final Map<Layout.SlotInfo, Integer> fluidSyncIndex = new HashMap<>();
@@ -73,6 +76,8 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
                 .orElse(true);
     }
 
+    public abstract Optional<RecipeType<?>> getRecipeType();
+
     @OnlyIn(Dist.CLIENT)
     @Override
     public MenuScreen<ProcessingMenu> createScreen(Inventory inventory, Component title) {
@@ -108,14 +113,34 @@ public class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
     }
 
     public static <T extends BlockEntity> Menu.Factory<T, ProcessingMenu> machine(Layout layout) {
-        return (type, id, inventory, be) -> new ProcessingMenu(type, id, inventory, be, layout);
+        return (type, id, inventory, be) -> new ProcessingMenu(type, id, inventory, be, layout) {
+            @Override
+            public Optional<RecipeType<?>> getRecipeType() {
+                return Optional.empty();
+            }
+        };
+    }
+
+    public static <T extends BlockEntity>
+    Menu.Factory<T, ProcessingMenu> machine(Layout layout, RecipeTypeEntry<?, ?> recipeType) {
+        return (type, id, inventory, be) -> new ProcessingMenu(type, id, inventory, be, layout) {
+            @Override
+            public Optional<RecipeType<?>> getRecipeType() {
+                return Optional.of(recipeType.get());
+            }
+        };
     }
 
     public static <T extends BlockEntity> Menu.Factory<T, ProcessingMenu> multiBlock() {
         return (type, id, inventory, be) -> {
             var multiBlockInterface = (MultiBlockInterface) AllCapabilities.MACHINE.get(be);
             return new ProcessingMenu(type, id, inventory, be,
-                    multiBlockInterface.getLayout().orElse(null));
+                    multiBlockInterface.getLayout().orElse(null)) {
+                @Override
+                public Optional<RecipeType<?>> getRecipeType() {
+                    return multiBlockInterface.getRecipeType();
+                }
+            };
         };
     }
 
