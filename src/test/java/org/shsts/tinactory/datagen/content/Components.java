@@ -286,7 +286,7 @@ public final class Components {
                 .inputItem(0, () -> Items.GLASS, 1)
                 .inputItem(0, COPPER.tag("wire"), 1)
                 .inputItem(0, IRON.tag("bolt"), 1)
-                .workTicks(40L)
+                .workTicks(120L)
                 .voltage(Voltage.ULV)
                 .build();
 

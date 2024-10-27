@@ -64,9 +64,9 @@ public final class AllBlockEntities {
     public static final ProcessingSet POLARIZER;
     public static final ProcessingSet WIREMILL;
     public static final ProcessingSet BENDER;
+    public static final ProcessingSet COMPRESSOR;
     public static final ProcessingSet LATHE;
     public static final ProcessingSet CUTTER;
-    public static final ProcessingSet COMPRESSOR;
     public static final ProcessingSet EXTRACTOR;
     public static final ProcessingSet FLUID_SOLIDIFIER;
     public static final ProcessingSet STEAM_TURBINE;
@@ -241,6 +241,7 @@ public final class AllBlockEntities {
         POLARIZER = simpleMachine(AllRecipes.POLARIZER, Texture.PROGRESS_MAGNETIC);
         WIREMILL = simpleMachine(AllRecipes.WIREMILL, Texture.PROCESS_WIREMILL);
         BENDER = simpleMachine(AllRecipes.BENDER, Texture.PROCESS_BENDING);
+        COMPRESSOR = simpleMachine(AllRecipes.COMPRESSOR, Texture.PROGRESS_COMPRESS);
 
         LATHE = set(machine(AllRecipes.LATHE))
                 .transform(simpleLayout(Texture.PROCESS_LATHE))
@@ -260,8 +261,6 @@ public final class AllBlockEntities {
                 .progressBar(Texture.PROCESS_SLICE, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
-
-        COMPRESSOR = simpleMachine(AllRecipes.COMPRESSOR, Texture.PROGRESS_COMPRESS);
 
         EXTRACTOR = set(machine(AllRecipes.EXTRACTOR))
                 .voltages(Voltage.MV)

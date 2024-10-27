@@ -68,9 +68,11 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.TRANSFORMER;
+import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
@@ -116,9 +118,9 @@ public final class Machines {
         machine(POLARIZER);
         machine(WIREMILL);
         machine(BENDER);
+        machine(COMPRESSOR);
         machine(LATHE);
         machine(CUTTER);
-        machine(COMPRESSOR);
         machine(EXTRACTOR);
         machine(FLUID_SOLIDIFIER);
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
@@ -258,12 +260,23 @@ public final class Machines {
                 .requireTech(Technologies.STEEL)
                 .voltage(Voltage.ULV)
                 .workTicks(ASSEMBLE_TICKS)
+                .build()
+                .recipe(DATA_GEN, MULTI_BLOCK_INTERFACE.get(Voltage.ULV))
+                .outputItem(2, MULTI_BLOCK_INTERFACE.get(Voltage.ULV), 1)
+                .inputItem(0, MACHINE_HULL.get(Voltage.ULV), 1)
+                .inputItem(0, circuit(Voltage.ULV), 2)
+                .inputItem(0, CABLE.get(Voltage.ULV), 2)
+                .inputItem(0, () -> Blocks.CHEST, 1)
+                .inputItem(0, () -> Blocks.GLASS, 1)
+                .requireTech(Technologies.STEEL)
+                .voltage(Voltage.ULV)
+                .workTicks(ASSEMBLE_TICKS)
                 .build();
     }
 
     private static void basic() {
-        machineRecipe(Voltage.LV, TIN);
-        machineRecipe(Voltage.MV, COPPER);
+        machineRecipe(Voltage.LV, STEEL, TIN);
+        machineRecipe(Voltage.MV, ALUMINIUM, COPPER);
     }
 
     private static void misc() {
@@ -410,13 +423,13 @@ public final class Machines {
         }
     }
 
-    private static void machineRecipe(Voltage v, MaterialSet polarizerMaterial) {
+    private static void machineRecipe(Voltage v, MaterialSet base, MaterialSet polarizer) {
         var factory = new MachineRecipeFactory(v);
 
         factory.recipe(POLARIZER)
                 .circuit(2)
                 .component(CABLE, 2)
-                .material(polarizerMaterial, "wire", 8 * (v.rank / 2))
+                .material(polarizer, "wire", 8 * (v.rank / 2))
                 .tech(Technologies.MOTOR)
                 .build()
                 .recipe(WIREMILL)
@@ -430,6 +443,13 @@ public final class Machines {
                 .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 2)
                 .component(ELECTRIC_PISTON, 2)
+                .material(base, "plate", 1)
+                .tech(Technologies.PUMP_AND_PISTON)
+                .build()
+                .recipe(COMPRESSOR)
+                .circuit(2)
+                .component(CABLE, 2)
+                .component(ELECTRIC_PISTON, 4)
                 .tech(Technologies.PUMP_AND_PISTON)
                 .build();
     }
