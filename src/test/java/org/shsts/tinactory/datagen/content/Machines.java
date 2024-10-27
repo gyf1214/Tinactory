@@ -132,7 +132,7 @@ public final class Machines {
         DATA_GEN.block(NETWORK_CONTROLLER)
                 .blockState(MachineModel::builder, MachineModel::blockState)
                 .casing("casings/computer/computer_casing")
-                .overlay("overlay/machine/hpca/computation")
+                .overlay("overlay/machine/overlay_maintenance_full_auto")
                 .ioTex(ME_BUS)
                 .build()
                 .tag(MINEABLE_WITH_WRENCH)
