@@ -179,7 +179,7 @@ public class NetworkBase {
     }
 
     protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
-        LOGGER.debug("{}: add block {} at {}:{}, subnet = {}", this, state,
+        LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
                 world.dimension(), pos, subnet);
     }
 

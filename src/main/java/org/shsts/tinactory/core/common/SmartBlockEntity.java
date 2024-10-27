@@ -24,6 +24,7 @@ import org.shsts.tinactory.core.logistics.ItemHelper;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 /**
  * workaround to <a href="https://github.com/MinecraftForge/MinecraftForge/issues/8302">MinecraftForge#8302</a>
@@ -55,6 +56,21 @@ public class SmartBlockEntity extends BlockEntity {
             onRemovedByChunk(level);
         }
         super.setRemoved();
+    }
+
+    /**
+     * deal with cases when blockState changes when this function is called.
+     */
+    public Optional<BlockState> getRealBlockState() {
+        assert level != null;
+        if (!level.isLoaded(worldPosition)) {
+            return Optional.empty();
+        }
+        var state = getBlockState();
+        if (!level.getBlockState(worldPosition).is(state.getBlock())) {
+            return Optional.empty();
+        }
+        return Optional.of(state);
     }
 
     public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T be) {

@@ -161,8 +161,8 @@ public class Machine extends UpdatableCapabilityProvider
         eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);
     }
 
-    protected Optional<BlockState> getWorkBlock() {
-        return Optional.of(blockEntity.getBlockState());
+    protected Optional<BlockState> getWorkBlock(Level world) {
+        return blockEntity.getRealBlockState();
     }
 
     protected void setWorkBlock(Level world, BlockState state) {
@@ -170,7 +170,7 @@ public class Machine extends UpdatableCapabilityProvider
     }
 
     protected void updateWorkBlock(Level world, boolean working) {
-        getWorkBlock()
+        getWorkBlock(world)
                 .filter(state -> state.hasProperty(WORKING) && state.getValue(WORKING) != working)
                 .ifPresent(state -> setWorkBlock(world, state.setValue(WORKING, working)));
     }

@@ -65,15 +65,10 @@ public class MultiBlockInterface extends Machine {
     }
 
     private void setJoined(Level world, boolean value) {
-        if (!world.isLoaded(blockEntity.getBlockPos())) {
-            return;
-        }
-        var state = blockEntity.getBlockState();
-        if (!world.getBlockState(blockEntity.getBlockPos()).is(state.getBlock())) {
-            return;
-        }
-        var newState = state.setValue(MultiBlockInterfaceBlock.JOINED, value);
-        world.setBlock(blockEntity.getBlockPos(), newState, 3);
+        blockEntity.getRealBlockState().ifPresent(state -> {
+            var newState = state.setValue(MultiBlockInterfaceBlock.JOINED, value);
+            world.setBlock(blockEntity.getBlockPos(), newState, 3);
+        });
     }
 
     public void setMultiBlock(MultiBlock target) {
@@ -141,11 +136,11 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    protected Optional<BlockState> getWorkBlock() {
+    protected Optional<BlockState> getWorkBlock(Level world) {
         if (multiBlock == null) {
             return Optional.empty();
         }
-        return Optional.of(multiBlock.blockEntity.getBlockState());
+        return multiBlock.blockEntity.getRealBlockState();
     }
 
     @Override
