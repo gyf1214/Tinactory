@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,6 +45,14 @@ public class MachineSet {
 
     public Layout layout(Voltage voltage) {
         return layoutSet.get(voltage);
+    }
+
+    public Block icon() {
+        var voltage = voltages.stream()
+                .filter(v -> v != Voltage.ULV)
+                .min(Comparator.comparingInt(v -> v.rank))
+                .orElseThrow();
+        return machines.get(voltage).get();
     }
 
     public static abstract class BuilderBase<T extends MachineSet, P, S extends BuilderBase<T, P, S>>
