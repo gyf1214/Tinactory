@@ -66,5 +66,9 @@
   "tinactory.technology.alloy_smelting": "Alloy Smelting",
   "tinactory.technology.alloy_smelting.details": "Allow you to smelt useful alloys.",
   "tinactory.technology.steel": "Steel",
-  "tinactory.technology.steel.details": "Steel is the basic material for LV machines. It is smelt from iron in the Electric Blast Furnace."
+  "tinactory.technology.steel.details": "Steel is the basic material for LV machines. It is smelt from iron in the Electric Blast Furnace.",
+  "tinactory.technology.motor": "Motors",
+  "tinactory.technology.motor.details": "Motors are needed for almost all machines.",
+  "tinactory.technology.pump_and_piston": "Pumps and Pistons",
+  "tinactory.technology.pump_and_piston.details": "With some modification, motors can also deal with liquids and metals."
 }
