@@ -108,7 +108,7 @@ public final class AllMaterials {
 
         GLOWSTONE = set("glowstone")
                 .color(0xFFFFFF00)
-                .existing("dust", Tags.Items.DUSTS_GLOWSTONE, Items.GLOWSTONE)
+                .existing("dust", Tags.Items.DUSTS_GLOWSTONE, Items.GLOWSTONE_DUST)
                 .buildObject();
 
         RARE_EARTH = set("rare_earth")

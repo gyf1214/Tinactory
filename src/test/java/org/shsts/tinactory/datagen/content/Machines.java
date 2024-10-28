@@ -47,6 +47,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.LATHE;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
+import static org.shsts.tinactory.content.AllBlockEntities.MIXER;
 import static org.shsts.tinactory.content.AllBlockEntities.MULTI_BLOCK_INTERFACE;
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER;
@@ -69,6 +70,7 @@ import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.TRANSFORMER;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
@@ -115,6 +117,7 @@ public final class Machines {
         machine(THERMAL_CENTRIFUGE);
         machine(ELECTRIC_FURNACE, "machines/electric_furnace");
         machine(ALLOY_SMELTER);
+        machine(MIXER);
         machine(POLARIZER);
         machine(WIREMILL);
         machine(BENDER);
@@ -275,8 +278,8 @@ public final class Machines {
     }
 
     private static void basic() {
-        machineRecipe(Voltage.LV, STEEL, TIN);
-        machineRecipe(Voltage.MV, ALUMINIUM, COPPER);
+        machineRecipe(Voltage.LV, STEEL, TIN, TIN);
+        machineRecipe(Voltage.MV, ALUMINIUM, COPPER, BRONZE);
     }
 
     private static void misc() {
@@ -423,7 +426,7 @@ public final class Machines {
         }
     }
 
-    private static void machineRecipe(Voltage v, MaterialSet base, MaterialSet polarizer) {
+    private static void machineRecipe(Voltage v, MaterialSet base, MaterialSet polarizer, MaterialSet rotor) {
         var factory = new MachineRecipeFactory(v);
 
         factory.recipe(POLARIZER)
@@ -451,6 +454,11 @@ public final class Machines {
                 .component(CABLE, 2)
                 .component(ELECTRIC_PISTON, 4)
                 .tech(Technologies.PUMP_AND_PISTON)
+                .build()
+                .recipe(MIXER)
+                .circuit(2)
+                .component(ELECTRIC_MOTOR, 1)
+                .material(rotor, "rotor", 1)
                 .build();
     }
 }

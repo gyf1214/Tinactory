@@ -61,6 +61,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet THERMAL_CENTRIFUGE;
     public static final MachineSet ELECTRIC_FURNACE;
     public static final ProcessingSet ALLOY_SMELTER;
+    public static final ProcessingSet MIXER;
     public static final ProcessingSet POLARIZER;
     public static final ProcessingSet WIREMILL;
     public static final ProcessingSet BENDER;
@@ -98,16 +99,13 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        var assembler = set(machine(AllRecipes.ASSEMBLER))
+        ASSEMBLER = set(machine(AllRecipes.ASSEMBLER))
                 .voltages(Voltage.ULV)
                 .layoutSet()
-                .port(ITEM_INPUT);
-        for (var i = 0; i < 3; i++) {
-            for (var j = 0; j < (i == 2 ? 2 : 3); j++) {
-                assembler.slot(SLOT_SIZE * j, 1 + SLOT_SIZE * i);
-            }
-        }
-        ASSEMBLER = assembler.port(FLUID_INPUT)
+                .port(ITEM_INPUT)
+                .slots(0, 1, 2, 3)
+                .slots(0, 1 + SLOT_SIZE * 2, 1, 2)
+                .port(FLUID_INPUT)
                 .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
                 .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
@@ -115,15 +113,11 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        var circuitAssembler = set(machine(AllRecipes.CIRCUIT_ASSEMBLER))
+        CIRCUIT_ASSEMBLER = set(machine(AllRecipes.CIRCUIT_ASSEMBLER))
                 .layoutSet()
-                .port(ITEM_INPUT);
-        for (var i = 0; i < 2; i++) {
-            for (var j = 0; j < 3; j++) {
-                circuitAssembler.slot(SLOT_SIZE * j, 1 + SLOT_SIZE * i);
-            }
-        }
-        CIRCUIT_ASSEMBLER = circuitAssembler.port(FLUID_INPUT)
+                .port(ITEM_INPUT)
+                .slots(0, 1, 2, 3)
+                .port(FLUID_INPUT)
                 .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
                 .port(ITEM_OUTPUT)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2)
@@ -200,10 +194,9 @@ public final class AllBlockEntities {
                 .port(FLUID_INPUT)
                 .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
                 .port(ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 4, 1).slot(SLOT_SIZE * 5, 1).slot(SLOT_SIZE * 6, 1)
+                .slots(SLOT_SIZE * 4, 1, 1, 3)
                 .port(FLUID_OUTPUT)
-                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE).slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
-                .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE)
+                .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 3)
                 .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
@@ -213,8 +206,7 @@ public final class AllBlockEntities {
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
                 .port(ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
+                .slots(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, 1, 2)
                 .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build()
                 .buildObject();
@@ -228,13 +220,27 @@ public final class AllBlockEntities {
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_INPUT)
-                .slot(0, 1 + SLOT_SIZE / 2)
-                .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
+                .slots(0, 1 + SLOT_SIZE / 2, 1, 3)
                 .port(ITEM_OUTPUT)
-                .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-                .port(FLUID_OUTPUT)
                 .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2)
-                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+                .port(FLUID_OUTPUT)
+                .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE / 2)
+                .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 3, SLOT_SIZE / 2)
+                .build()
+                .buildObject();
+
+        MIXER = set(machine(AllRecipes.MIXER))
+                .voltages(Voltage.LV)
+                .layoutSet()
+                .port(ITEM_INPUT)
+                .slots(0, 1, 2, 3)
+                .port(FLUID_INPUT)
+                .slots(SLOT_SIZE, 1 + SLOT_SIZE * 2, 1, 2)
+                .port(ITEM_OUTPUT)
+                .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
+                .port(FLUID_OUTPUT)
+                .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE)
+                .progressBar(Texture.PROGRESS_MIXER, 8 + SLOT_SIZE * 3, SLOT_SIZE)
                 .build()
                 .buildObject();
 

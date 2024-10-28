@@ -36,12 +36,13 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MIXER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> POLARIZER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> WIREMILL;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> BENDER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> COMPRESSOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> LATHE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CUTTER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> COMPRESSOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
     public static final RecipeTypeEntry<GeneratorRecipe, GeneratorRecipe.Builder> STEAM_TURBINE;
@@ -101,6 +102,10 @@ public final class AllRecipes {
                 .defaults($ -> $.amperage(0.75d))
                 .register();
 
+        MIXER = REGISTRATE.processingRecipeType("mixer")
+                .defaults($ -> $.amperage(0.5d))
+                .register();
+
         POLARIZER = REGISTRATE.processingRecipeType("polarizer")
                 .defaults($ -> $.amperage(0.25d))
                 .register();
@@ -113,6 +118,10 @@ public final class AllRecipes {
                 .defaults($ -> $.amperage(0.25d))
                 .register();
 
+        COMPRESSOR = REGISTRATE.processingRecipeType("compressor")
+                .defaults($ -> $.amperage(0.5d))
+                .register();
+
         LATHE = REGISTRATE.processingRecipeType("lathe")
                 .defaults($ -> $.amperage(0.375d))
                 .register();
@@ -120,10 +129,6 @@ public final class AllRecipes {
         CUTTER = REGISTRATE.processingRecipeType("cutter")
                 .defaults($ -> $.inputFluid(1, Fluids.WATER, 10)
                         .amperage(0.375d))
-                .register();
-
-        COMPRESSOR = REGISTRATE.processingRecipeType("compressor")
-                .defaults($ -> $.amperage(0.5d))
                 .register();
 
         EXTRACTOR = REGISTRATE.processingRecipeType("extractor")

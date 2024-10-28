@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
@@ -60,6 +62,19 @@ public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, La
 
     public LayoutSetBuilder<P> slot(int x, int y) {
         return slot(x, y, Arrays.asList(Voltage.values()));
+    }
+
+    public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns, Collection<Voltage> voltages) {
+        for (var i = 0; i < rows; i++) {
+            for (var j = 0; j < columns; j++) {
+                slot(x + j * SLOT_SIZE, y + i * SLOT_SIZE, voltages);
+            }
+        }
+        return this;
+    }
+
+    public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns) {
+        return slots(x, y, rows, columns, Arrays.asList(Voltage.values()));
     }
 
     public LayoutSetBuilder<P> image(Rect rect, Texture tex) {

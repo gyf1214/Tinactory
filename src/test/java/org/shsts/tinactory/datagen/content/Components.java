@@ -177,9 +177,9 @@ public final class Components {
                 .build();
     }
 
-    private static void componentRecipe(Voltage voltage, MaterialSet mainMaterial,
-                                        MaterialSet heatMaterial, MaterialSet pipeMaterial,
-                                        MaterialSet rotorMaterial, MaterialSet magneticMaterial) {
+    private static void componentRecipe(Voltage voltage, MaterialSet main,
+                                        MaterialSet heat, MaterialSet pipe,
+                                        MaterialSet rotor, MaterialSet magnetic) {
 
         var v = voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
         var ticks = ASSEMBLE_TICKS;
@@ -189,9 +189,9 @@ public final class Components {
 
         ASSEMBLER.recipe(DATA_GEN, motor)
                 .outputItem(2, motor, 1)
-                .inputItem(0, magneticMaterial.tag("magnetic"), 1)
-                .inputItem(0, mainMaterial.tag("stick"), 2)
-                .inputItem(0, heatMaterial.tag("wire"), 2 * v.rank)
+                .inputItem(0, magnetic.tag("magnetic"), 1)
+                .inputItem(0, main.tag("stick"), 2)
+                .inputItem(0, heat.tag("wire"), 2 * v.rank)
                 .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
@@ -200,9 +200,9 @@ public final class Components {
                 .recipe(DATA_GEN, ELECTRIC_PUMP.get(voltage))
                 .outputItem(2, ELECTRIC_PUMP.get(voltage), 1)
                 .inputItem(0, motor, 1)
-                .inputItem(0, pipeMaterial.tag("pipe"), 1)
-                .inputItem(0, rotorMaterial.tag("rotor"), 1)
-                .inputItem(0, rotorMaterial.tag("screw"), 3)
+                .inputItem(0, pipe.tag("pipe"), 1)
+                .inputItem(0, rotor.tag("rotor"), 1)
+                .inputItem(0, rotor.tag("screw"), 3)
                 .inputItem(0, RUBBER.tag("ring"), 2)
                 .inputItem(0, cable, 1)
                 .workTicks(ticks)
@@ -212,9 +212,9 @@ public final class Components {
                 .recipe(DATA_GEN, ELECTRIC_PISTON.get(voltage))
                 .outputItem(2, ELECTRIC_PISTON.get(voltage), 1)
                 .inputItem(0, motor, 1)
-                .inputItem(0, mainMaterial.tag("plate"), 3)
-                .inputItem(0, mainMaterial.tag("stick"), 2)
-                .inputItem(0, mainMaterial.tag("gear"), 1)
+                .inputItem(0, main.tag("plate"), 3)
+                .inputItem(0, main.tag("stick"), 2)
+                .inputItem(0, main.tag("gear"), 1)
                 .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)
@@ -222,7 +222,7 @@ public final class Components {
                 .build()
                 .recipe(DATA_GEN, MACHINE_HULL.get(voltage))
                 .outputItem(2, MACHINE_HULL.get(voltage), 1)
-                .inputItem(0, mainMaterial.tag("plate"), 8)
+                .inputItem(0, main.tag("plate"), 8)
                 .inputItem(0, cable, 2)
                 .workTicks(ticks)
                 .voltage(v)

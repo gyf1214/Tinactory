@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LanguageProcessor {
-    private static final String MISSING_TR = "<MISSING TR>";
+    private static final String MISSING_TR = "<MISSING TRANSLATE>";
 
     private record Processor(Pattern pattern, Function<Matcher, String> func) {}
 
