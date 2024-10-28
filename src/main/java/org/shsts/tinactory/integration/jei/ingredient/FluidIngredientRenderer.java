@@ -29,5 +29,24 @@ public class FluidIngredientRenderer implements IIngredientRenderer<FluidStack> 
         return ClientUtil.fluidTooltip(ingredient, true);
     }
 
+    private static class Rated extends FluidIngredientRenderer {
+        private final double rate;
+
+        public Rated(double rate) {
+            this.rate = rate;
+        }
+
+        @Override
+        public List<Component> getTooltip(FluidStack ingredient, TooltipFlag tooltipFlag) {
+            var ret = super.getTooltip(ingredient, tooltipFlag);
+            ret.add(RatedItemIngredientRenderer.formatRate(rate));
+            return ret;
+        }
+    }
+
     public static final FluidIngredientRenderer INSTANCE = new FluidIngredientRenderer();
+
+    public static FluidIngredientRenderer rated(double rate) {
+        return new Rated(rate);
+    }
 }

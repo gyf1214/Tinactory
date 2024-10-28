@@ -34,6 +34,8 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
+import static org.shsts.tinactory.core.util.ClientUtil.INTEGER_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -121,24 +123,24 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             stateLabel.setLine(1, tr("stateLabel", packet.getState()));
             var metric = packet.getElectricMetrics();
             stateLabel.setLine(2, tr("workFactorLabel",
-                    "%.0f%%".formatted(metric.workFactor() * 100d)));
+                    PERCENTAGE_FORMAT.format(metric.workFactor() * 100d)));
             stateLabel.setLine(3, tr("efficiencyLabel",
-                    "%.0f%%".formatted(metric.efficiency() * 100d)));
+                    PERCENTAGE_FORMAT.format(metric.efficiency() * 100d)));
             var comp = MathUtil.compare(metric.buffer());
             if (comp == 0) {
                 stateLabel.setLine(4, tr("powerLabel0",
-                        "%.0f".formatted(metric.workCons()),
-                        "%.0f".formatted(metric.gen())));
+                        INTEGER_FORMAT.format(metric.workCons()),
+                        INTEGER_FORMAT.format(metric.gen())));
             } else if (comp > 0) {
                 stateLabel.setLine(4, tr("powerLabel1",
-                        "%.0f".formatted(metric.workCons()),
-                        "%.0f".formatted(metric.buffer()),
-                        "%.0f".formatted(metric.gen())));
+                        INTEGER_FORMAT.format(metric.workCons()),
+                        INTEGER_FORMAT.format(metric.buffer()),
+                        INTEGER_FORMAT.format(metric.gen())));
             } else {
                 stateLabel.setLine(4, tr("powerLabel2",
-                        "%.0f".formatted(metric.workCons()),
-                        "%.0f".formatted(metric.gen()),
-                        "%.0f".formatted(-metric.buffer())));
+                        INTEGER_FORMAT.format(metric.workCons()),
+                        INTEGER_FORMAT.format(metric.gen()),
+                        INTEGER_FORMAT.format(-metric.buffer())));
             }
             welcomePanel.setActive(false);
             tabs.setActive(true);

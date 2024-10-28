@@ -15,6 +15,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,10 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class ClientUtil {
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
+    public static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
+    public static final NumberFormat DOUBLE_FORMAT = new DecimalFormat("0.00");
+    public static final NumberFormat INTEGER_FORMAT = new DecimalFormat("0");
+    public static final NumberFormat PERCENTAGE_FORMAT = new DecimalFormat("0%");
 
     public static RecipeManager getRecipeManager() {
         var connection = Minecraft.getInstance().getConnection();
@@ -52,6 +56,10 @@ public final class ClientUtil {
     public static List<Component> itemTooltip(ItemStack stack) {
         return stack.getTooltipLines(getPlayer(), Minecraft.getInstance().options.advancedItemTooltips ?
                 TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+    }
+
+    public static List<Component> itemTooltip(ItemStack stack, TooltipFlag tooltipFlag) {
+        return stack.getTooltipLines(getPlayer(), tooltipFlag);
     }
 
     public static String getFluidAmountString(int amount) {

@@ -39,6 +39,7 @@ import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
 import org.shsts.tinactory.integration.jei.ingredient.FluidIngredientRenderer;
+import org.shsts.tinactory.integration.jei.ingredient.RatedItemIngredientRenderer;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientRenderer;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -74,35 +75,46 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
     protected interface IIngredientBuilder {
         <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                                IIngredientType<I> type, List<I> ingredients);
+                                IIngredientType<I> type, List<I> ingredients, double rate);
 
-        default <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type, List<I> ingredients) {
+
+        default <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
+                                        IIngredientType<I> type, List<I> ingredients) {
+            addIngredients(slot, role, type, ingredients, 1d);
+        }
+
+        default <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type,
+                                        List<I> ingredients, double rate) {
             var role = switch (slot.type().direction) {
                 case INPUT -> RecipeIngredientRole.INPUT;
                 case OUTPUT -> RecipeIngredientRole.OUTPUT;
                 case NONE -> throw new IllegalArgumentException();
             };
-            addIngredients(slot, role, type, ingredients);
-        }
-
-        default <I> void addIngredient(Layout.SlotInfo slot, IIngredientType<I> type, I ingredient) {
-            addIngredients(slot, type, List.of(ingredient));
+            addIngredients(slot, role, type, ingredients, rate);
         }
 
         default void item(Layout.SlotInfo slot, ItemStack stack) {
-            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(stack));
+            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(stack), 1d);
+        }
+
+        default void ratedItem(Layout.SlotInfo slot, ItemStack stack, double rate) {
+            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(stack), rate);
         }
 
         default void items(Layout.SlotInfo slot, List<ItemStack> stacks) {
-            addIngredients(slot, VanillaTypes.ITEM_STACK, stacks);
+            addIngredients(slot, VanillaTypes.ITEM_STACK, stacks, 1d);
         }
 
         default void ingredient(Layout.SlotInfo slot, Ingredient ingredient) {
-            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(ingredient.getItems()));
+            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(ingredient.getItems()), 1d);
         }
 
         default void fluid(Layout.SlotInfo slot, FluidStack stack) {
-            addIngredient(slot, ForgeTypes.FLUID_STACK, stack);
+            addIngredients(slot, ForgeTypes.FLUID_STACK, List.of(stack), 1d);
+        }
+
+        default void ratedFluid(Layout.SlotInfo slot, FluidStack stack, double rate) {
+            addIngredients(slot, ForgeTypes.FLUID_STACK, List.of(stack), rate);
         }
     }
 
@@ -200,14 +212,22 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
             @Override
             public <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                                           IIngredientType<I> type, List<I> ingredients) {
+                                           IIngredientType<I> type, List<I> ingredients, double rate) {
                 var x = slot.x() + 1 + xOffset;
                 var y = slot.y() + 1;
                 var slotBuilder = builder.addSlot(role, x, y).addIngredients(type, ingredients);
-                if (type == ForgeTypes.FLUID_STACK) {
-                    slotBuilder.setCustomRenderer(ForgeTypes.FLUID_STACK, FluidIngredientRenderer.INSTANCE);
-                } else if (type == TechIngredientType.INSTANCE) {
-                    slotBuilder.setCustomRenderer(TechIngredientType.INSTANCE, TechIngredientRenderer.INSTANCE);
+                if (rate >= 1d) {
+                    if (type == ForgeTypes.FLUID_STACK) {
+                        slotBuilder.setCustomRenderer(ForgeTypes.FLUID_STACK, FluidIngredientRenderer.INSTANCE);
+                    } else if (type == TechIngredientType.INSTANCE) {
+                        slotBuilder.setCustomRenderer(TechIngredientType.INSTANCE, TechIngredientRenderer.INSTANCE);
+                    }
+                } else {
+                    if (type == VanillaTypes.ITEM_STACK) {
+                        slotBuilder.setCustomRenderer(VanillaTypes.ITEM_STACK, new RatedItemIngredientRenderer(rate));
+                    } else if (type == ForgeTypes.FLUID_STACK) {
+                        slotBuilder.setCustomRenderer(ForgeTypes.FLUID_STACK, FluidIngredientRenderer.rated(rate));
+                    }
                 }
             }
         }
@@ -288,7 +308,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
             @Override
             public <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                                           IIngredientType<I> type, List<I> ingredients) {
+                                           IIngredientType<I> type, List<I> ingredients, double rate) {
                 if (role != RecipeIngredientRole.INPUT) {
                     return;
                 }

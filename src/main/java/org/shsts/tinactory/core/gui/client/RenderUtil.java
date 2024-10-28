@@ -164,26 +164,35 @@ public final class RenderUtil {
         }
     }
 
+    public static PoseStack applyToModelViewStack(PoseStack poseStack) {
+        var poseStack1 = RenderSystem.getModelViewStack();
+        poseStack1.pushPose();
+        poseStack1.mulPoseMatrix(poseStack.last().pose());
+        return poseStack1;
+    }
+
+    public static void popModelViewStack(PoseStack poseStack) {
+        poseStack.popPose();
+        RenderSystem.applyModelViewMatrix();
+    }
+
     public static void renderItem(ItemStack stack, int x, int y) {
         ClientUtil.getItemRenderer().renderAndDecorateItem(stack, x, y);
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
     }
 
-    public static void renderItem(PoseStack poseStack, ItemStack stack, int x, int y) {
-        var poseStack1 = RenderSystem.getModelViewStack();
-        poseStack1.pushPose();
-        poseStack1.mulPoseMatrix(poseStack.last().pose());
-        ClientUtil.getItemRenderer().renderAndDecorateItem(stack, x, y);
-        RenderSystem.disableDepthTest();
-        RenderSystem.disableBlend();
-        poseStack1.popPose();
-        RenderSystem.applyModelViewMatrix();
-    }
-
     public static void renderItemWithDecoration(ItemStack stack, int x, int y, @Nullable String text) {
         var renderer = ClientUtil.getItemRenderer();
         renderer.renderAndDecorateItem(stack, x, y);
+        renderer.renderGuiItemDecorations(ClientUtil.getFont(), stack, x, y, text);
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableBlend();
+    }
+
+    public static void renderFakeItemWithDecoration(ItemStack stack, int x, int y, @Nullable String text) {
+        var renderer = ClientUtil.getItemRenderer();
+        renderer.renderAndDecorateFakeItem(stack, x, y);
         renderer.renderGuiItemDecorations(ClientUtil.getFont(), stack, x, y, text);
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();

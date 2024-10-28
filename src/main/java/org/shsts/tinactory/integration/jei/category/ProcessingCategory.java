@@ -36,8 +36,6 @@ import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,13 +43,13 @@ import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, ProcessingMenu> {
     private static final int EXTRA_HEIGHT = FONT_HEIGHT * 3 + SPACING * 2 + SLOT_SIZE / 2;
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
-    private static final NumberFormat DOUBLE_FORMAT = new DecimalFormat("0.00");
 
     public ProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
                               Layout layout, Block icon) {
@@ -125,9 +123,9 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
         } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
             builder.fluid(slot, fluid.fluid());
         } else if (ingredient instanceof ProcessingResults.ItemResult item) {
-            builder.item(slot, item.stack);
+            builder.ratedItem(slot, item.stack, item.rate);
         } else if (ingredient instanceof ProcessingResults.FluidResult fluid) {
-            builder.fluid(slot, fluid.stack);
+            builder.ratedFluid(slot, fluid.stack, fluid.rate);
         } else {
             throw new IllegalArgumentException("Unknown processing ingredient type %s"
                     .formatted(ingredient.getClass()));
