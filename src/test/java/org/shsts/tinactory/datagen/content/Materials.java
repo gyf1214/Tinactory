@@ -265,7 +265,7 @@ public final class Materials {
                 .siftingOreProcess(2, COAL, COAL, THORIUM)
                 .build()
                 .material(CASSITERITE, METALLIC)
-                .oreProcess(TIN).smelt(TIN)
+                .oreProcess(2, TIN).smelt(TIN)
                 .build()
                 .material(REDSTONE, DULL)
                 .oreProcess(5, GLOWSTONE, GLOWSTONE, RARE_EARTH)

@@ -446,7 +446,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             if (input.equals("crushed")) {
                 builder.inputFluid(1, Fluids.WATER, 1000)
                         .outputItem(3, STONE.entry("dust"), 1)
-                        .outputItem(4, byproduct0, 1, 0.1)
+                        .outputItem(4, byproduct0, 1, 0.3)
                         .workTicks(200);
             } else {
                 builder.inputFluid(1, Fluids.WATER, 100).workTicks(32);
@@ -478,7 +478,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             CENTRIFUGE.recipe(dataGen, material.loc("dust"))
                     .inputItem(0, material.tag("dust_pure"), 1)
                     .outputItem(2, material.entry("dust"), 1)
-                    .outputItem(2, byproduct1, 1, 0.1)
+                    .outputItem(2, byproduct1, 1, 0.3)
                     .voltage(Voltage.LV)
                     .workTicks(80)
                     .build();
@@ -486,7 +486,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             THERMAL_CENTRIFUGE.recipe(dataGen, material.loc("crushed_centrifuged"))
                     .inputItem(0, material.tag("crushed_purified"), 1)
                     .outputItem(1, material.entry("crushed_centrifuged"), 1)
-                    .outputItem(1, byproduct2, 1, 0.1)
+                    .outputItem(1, byproduct2, 1, 0.4)
                     .build();
 
             // TODO: sifting
