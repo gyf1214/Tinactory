@@ -198,25 +198,33 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
+    private OreRecipeBuilder oreBuilder(MaterialSet... byproduct) {
+        return new OreRecipeBuilder(byproduct);
+    }
+
     public MaterialBuilder<P>
     oreProcess(int amount, MaterialSet... byproduct) {
-        var builder = new OreRecipeBuilder(amount, false, byproduct);
-        builder.buildRecipes();
-        return this;
+        return oreBuilder(byproduct)
+                .amount(amount)
+                .build();
+    }
+
+    public MaterialBuilder<P>
+    siftingOreProcess(int amount, MaterialSet... byproduct) {
+        return oreBuilder(byproduct)
+                .sifting()
+                .amount(amount)
+                .build();
     }
 
     public MaterialBuilder<P>
     oreProcess(MaterialSet... byproduct) {
-        var builder = new OreRecipeBuilder(1, false, byproduct);
-        builder.buildRecipes();
-        return this;
+        return oreBuilder(byproduct).build();
     }
 
     public MaterialBuilder<P>
     primitiveOreProcess(MaterialSet... byproduct) {
-        var builder = new OreRecipeBuilder(1, true, byproduct);
-        builder.buildRecipes();
-        return this;
+        return oreBuilder(byproduct).primitive().build();
     }
 
     private <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>>
@@ -380,8 +388,9 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     }
 
     private class OreRecipeBuilder {
-        private final int amount;
-        private final boolean primitive;
+        private int amount = 1;
+        private boolean primitive = false;
+        private boolean sifting = material.hasItem("gem");
         private final OreVariant variant;
         private final Supplier<? extends Item> byproduct0, byproduct1, byproduct2;
 
@@ -395,14 +404,26 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             }
         }
 
-        public OreRecipeBuilder(int amount, boolean primitive, MaterialSet[] byproduct) {
-            this.amount = amount;
-            this.primitive = primitive;
-
+        public OreRecipeBuilder(MaterialSet[] byproduct) {
             this.byproduct0 = getByProduct(byproduct, 0);
             this.byproduct1 = getByProduct(byproduct, 1);
             this.byproduct2 = getByProduct(byproduct, 2);
             this.variant = material.oreVariant();
+        }
+
+        public OreRecipeBuilder amount(int value) {
+            this.amount = value;
+            return this;
+        }
+
+        public OreRecipeBuilder primitive() {
+            this.primitive = true;
+            return this;
+        }
+
+        public OreRecipeBuilder sifting() {
+            this.sifting = true;
+            return this;
         }
 
         private void crush(String output, String input) {
@@ -435,9 +456,13 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             builder.voltage(voltage).build();
         }
 
-        public void buildRecipes() {
+        public MaterialBuilder<P> build() {
             if (primitive || variant.voltage.rank <= Voltage.ULV.rank) {
-                process("crushed", amount, "raw", TOOL_HAMMER);
+                if (sifting) {
+                    process("primary", amount, "raw", TOOL_HAMMER);
+                } else {
+                    process("crushed", amount, "raw", TOOL_HAMMER);
+                }
                 process("dust_pure", 1, "crushed_purified", TOOL_HAMMER);
                 process("dust_impure", 1, "crushed", TOOL_HAMMER);
             }
@@ -463,6 +488,10 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                     .outputItem(1, material.entry("crushed_centrifuged"), 1)
                     .outputItem(1, byproduct2, 1, 0.1)
                     .build();
+
+            // TODO: sifting
+
+            return MaterialBuilder.this;
         }
     }
 

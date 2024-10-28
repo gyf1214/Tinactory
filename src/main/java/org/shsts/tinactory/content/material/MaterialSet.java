@@ -291,6 +291,10 @@ public class MaterialSet {
             return dust().dummies("sheet", "ring");
         }
 
+        public Builder<P> gem() {
+            return dummies("gem").alias("primary", "gem");
+        }
+
         public Builder<P> ore(OreVariant variant) {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {

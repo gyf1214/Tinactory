@@ -72,6 +72,7 @@ public final class Ores {
 
         RUBY = set("ruby")
                 .color(0xFFFF6464)
+                .gem()
                 .ore(OreVariant.STONE)
                 .buildObject();
 

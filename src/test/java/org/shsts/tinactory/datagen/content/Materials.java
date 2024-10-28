@@ -262,7 +262,7 @@ public final class Materials {
                 .smelt(NICKEL)
                 .build()
                 .material(COAL, DULL)
-                .oreProcess(2, COAL, COAL, THORIUM)
+                .siftingOreProcess(2, COAL, COAL, THORIUM)
                 .build()
                 .material(CASSITERITE, METALLIC)
                 .oreProcess(TIN).smelt(TIN)
