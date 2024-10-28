@@ -18,6 +18,8 @@ import org.shsts.tinactory.datagen.content.builder.MaterialBuilder;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
@@ -292,6 +294,11 @@ public final class Materials {
                 .material(GLOWSTONE, SHINY).build()
                 .material(RARE_EARTH, ROUGH).build();
 
+        // disable vanilla nugget
+        disableVanillaOres("iron");
+        disableVanillaOres("gold");
+        disableVanillaOres("copper");
+
         // smelt wrought iron nugget
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
                 .smelting(Ingredient.of(IRON.tag("nugget")), WROUGHT_IRON.item("nugget"), 0, 200)
@@ -362,6 +369,37 @@ public final class Materials {
                 .voltage(Voltage.ULV)
                 .workTicks(400)
                 .build();
+    }
+
+    private static void disableVanillaOres(String name) {
+        DATA_GEN.nullRecipe("raw_" + name)
+                .nullRecipe("raw_" + name + "_block")
+                .nullRecipe(name + "_block");
+
+        var methods = List.of("smelting", "blasting");
+
+        if (name.equals("copper")) {
+            DATA_GEN.nullRecipe("copper_ingot")
+                    .nullRecipe("copper_ingot_from_waxed_copper_block");
+        } else {
+            DATA_GEN.nullRecipe(name + "_ingot_from_" + name + "_block")
+                    .nullRecipe(name + "_ingot_from_nuggets")
+                    .nullRecipe(name + "_nugget");
+            for (var method : methods) {
+                DATA_GEN.nullRecipe(name + "_nugget_from_" + method);
+            }
+        }
+
+        var ores = new ArrayList<>(List.of("", "_deepslate"));
+        if (name.equals("gold")) {
+            ores.add("_nether");
+        }
+        for (var method : methods) {
+            for (var ore : ores) {
+                DATA_GEN.nullRecipe(name + "_ingot_from_" + method + ore + "_" + name + "_ore");
+            }
+            DATA_GEN.nullRecipe(name + "_ingot_from_" + method + "_raw_" + name);
+        }
     }
 
     private static void tags() {

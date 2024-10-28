@@ -26,7 +26,6 @@ public abstract class DataHandler<P extends DataProvider> {
     }
 
     protected void addCallback(Consumer<P> callback) {
-        LOGGER.debug("{} add callback", this);
         callbacks.add(callback);
     }
 
