@@ -10,6 +10,7 @@
   "block.tinactory.rubber_tree.sapling": "Rubber Tree Sapling",
   "item.tinactory.circuit.vacuum_tube": "Vacuum Tube",
   "item.tinactory.rubber_tree.sticky_resin": "Sticky Resin",
+  "fluid.tinactory.steam": "Steam",
   "tinactory.tooltip.openRecipeBook": "Open recipe book",
   "tinactory.tooltip.unselectRecipe": "Clear recipe",
   "tinactory.tooltip.openPortConfig": "Configure port",
