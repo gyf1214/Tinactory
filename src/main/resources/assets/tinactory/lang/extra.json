@@ -70,5 +70,6 @@
   "tinactory.technology.motor": "Motors",
   "tinactory.technology.motor.details": "Motors are needed for almost all machines.",
   "tinactory.technology.pump_and_piston": "Pumps and Pistons",
-  "tinactory.technology.pump_and_piston.details": "With some modification, motors can also deal with liquids and metals."
+  "tinactory.technology.pump_and_piston.details": "With some modification, motors can also deal with liquids and metals.",
+  "generator.tinactory.void": "Void"
 }

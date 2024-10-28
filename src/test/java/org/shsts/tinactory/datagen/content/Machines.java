@@ -453,6 +453,7 @@ public final class Machines {
                 .circuit(2)
                 .component(ELECTRIC_MOTOR, 1)
                 .material(rotor, "rotor", 1)
+                .tech(Technologies.PUMP_AND_PISTON)
                 .build();
     }
 }
