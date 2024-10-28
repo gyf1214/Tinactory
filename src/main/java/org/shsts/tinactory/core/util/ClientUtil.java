@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.util;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -11,13 +12,18 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class ClientUtil {
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
+
     public static RecipeManager getRecipeManager() {
         var connection = Minecraft.getInstance().getConnection();
         assert connection != null;
@@ -43,8 +49,28 @@ public final class ClientUtil {
         return player;
     }
 
-    public static List<Component> getTooltipsFromStack(ItemStack stack) {
+    public static List<Component> itemTooltip(ItemStack stack) {
         return stack.getTooltipLines(getPlayer(), Minecraft.getInstance().options.advancedItemTooltips ?
                 TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+    }
+
+    public static String getFluidAmountString(int amount) {
+        if (amount < 1000) {
+            return NUMBER_FORMAT.format(amount);
+        } else if (amount < 1000000) {
+            return NUMBER_FORMAT.format(amount / 1000) + "B";
+        } else {
+            return NUMBER_FORMAT.format(amount / 1000000) + "k";
+        }
+    }
+
+    public static List<Component> fluidTooltip(FluidStack stack, boolean showAmount) {
+        var tooltip = new ArrayList<Component>();
+        tooltip.add(stack.getDisplayName());
+        if (showAmount) {
+            var amountString = I18n.raw(NUMBER_FORMAT.format(stack.getAmount()) + " mB");
+            tooltip.add(amountString.withStyle(ChatFormatting.GRAY));
+        }
+        return tooltip;
     }
 }

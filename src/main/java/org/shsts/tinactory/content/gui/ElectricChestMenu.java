@@ -229,7 +229,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
             return Optional.of(getStack())
                     .filter(stack -> !stack.isEmpty())
                     .or(this::getFilter)
-                    .map(ClientUtil::getTooltipsFromStack);
+                    .map(ClientUtil::itemTooltip);
         }
 
         @Override

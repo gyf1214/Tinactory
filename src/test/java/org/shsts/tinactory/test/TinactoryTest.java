@@ -21,7 +21,7 @@ public class TinactoryTest {
     public TinactoryTest() {
         var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        DataGen.init(modEventBus);
+        DataGen.DATA_GEN.register(modEventBus);
 
         modEventBus.addListener(TinactoryTest::init);
         MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);

@@ -35,6 +35,7 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
 import org.shsts.tinactory.integration.jei.ingredient.FluidIngredientRenderer;
@@ -143,8 +144,12 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         return list;
     }
 
+    public static ResourceLocation categoryTitleId(ResourceLocation recipeTypeLoc) {
+        return prepend(recipeTypeLoc, "jei/category");
+    }
+
     protected Component categoryTitle() {
-        return iconItem.getDisplayName();
+        return I18n.tr(categoryTitleId(recipeType.loc));
     }
 
     private class Category implements IRecipeCategory<T>, IDrawHelper {

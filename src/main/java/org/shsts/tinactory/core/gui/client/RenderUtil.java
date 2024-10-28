@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -24,18 +23,12 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
-
-import static org.shsts.tinactory.core.gui.client.MenuWidget.NUMBER_FORMAT;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -160,33 +153,15 @@ public final class RenderUtil {
         renderFluid(poseStack, stack, new Rect(x, y, 16, 16), WHITE, zIndex);
     }
 
-    private static String getFluidAmountString(int amount) {
-        if (amount < 1000) {
-            return NUMBER_FORMAT.format(amount);
-        } else if (amount < 1000000) {
-            return NUMBER_FORMAT.format(amount / 1000) + "B";
-        } else {
-            return NUMBER_FORMAT.format(amount / 1000000) + "k";
-        }
-    }
-
     public static void renderFluidWithDecoration(PoseStack poseStack, FluidStack stack, Rect rect, int zIndex) {
         if (!stack.isEmpty()) {
             renderFluid(poseStack, stack, rect, zIndex);
-            var s = getFluidAmountString(stack.getAmount());
+            var s = ClientUtil.getFluidAmountString(stack.getAmount());
             var font = ClientUtil.getFont();
             var x = rect.endX() + 1 - font.width(s);
             var y = rect.endY() + 2 - font.lineHeight;
             font.drawShadow(poseStack, s, x, y, 0xFFFFFFFF);
         }
-    }
-
-    public static List<Component> fluidTooltip(FluidStack stack) {
-        var tooltip = new ArrayList<Component>();
-        tooltip.add(stack.getDisplayName());
-        var amountString = I18n.raw(NUMBER_FORMAT.format(stack.getAmount()) + " mB");
-        tooltip.add(amountString.withStyle(ChatFormatting.GRAY));
-        return tooltip;
     }
 
     public static void renderItem(ItemStack stack, int x, int y) {
@@ -226,22 +201,13 @@ public final class RenderUtil {
     public static void renderIngredient(IProcessingObject ingredient, Consumer<ItemStack> itemRenderer,
                                         Consumer<FluidStack> fluidRenderer) {
 
-        if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-            itemRenderer.accept(item.stack());
-        } else if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
-            var items = item.ingredient.getItems();
-            if (items.length > 0) {
+        ProcessingResults.consumeItemsOrFluid(ingredient, items -> {
+            if (items.size() > 0) {
                 var cycle = System.currentTimeMillis() / CYCLE_TIME;
-                var idx = (int) (cycle % items.length);
-                itemRenderer.accept(items[idx]);
+                var idx = (int) (cycle % items.size());
+                itemRenderer.accept(items.get(idx));
             }
-        } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-            fluidRenderer.accept(fluid.fluid());
-        } else if (ingredient instanceof ProcessingResults.ItemResult item) {
-            itemRenderer.accept(item.stack);
-        } else if (ingredient instanceof ProcessingResults.FluidResult fluid) {
-            fluidRenderer.accept(fluid.stack);
-        }
+        }, fluidRenderer);
     }
 
     public static void fill(PoseStack poseStack, Rect rect, int color) {

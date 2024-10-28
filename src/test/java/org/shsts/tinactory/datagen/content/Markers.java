@@ -4,15 +4,21 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.material.OreVariant;
+import org.shsts.tinactory.integration.jei.category.RecipeCategory;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 
+import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
+import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
+import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -44,6 +50,8 @@ public final class Markers {
                     .voltage(variant.voltage)
                     .build();
         }
+
+        trackJEICategory();
     }
 
     private static void markerCrush(String sub) {
@@ -59,5 +67,18 @@ public final class Markers {
                 .inputItem(0, AllMaterials.tag(sub))
                 .inputFluid(1, Fluids.WATER)
                 .build();
+    }
+
+    private static void trackJEICategory() {
+        var allTypes = new ArrayList<RecipeTypeEntry<?, ?>>();
+        for (var set : PROCESSING_SETS) {
+            allTypes.add(set.recipeType);
+        }
+        allTypes.add(TOOL_CRAFTING);
+        allTypes.add(BLAST_FURNACE);
+
+        for (var type : allTypes) {
+            DATA_GEN.trackLang(RecipeCategory.categoryTitleId(type.loc));
+        }
     }
 }

@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
+import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -47,7 +48,7 @@ public class FluidSlot extends MenuWidget {
         if (stack.isEmpty() || stack.getFluid() == null) {
             return Optional.empty();
         }
-        return Optional.of(RenderUtil.fluidTooltip(stack));
+        return Optional.of(ClientUtil.fluidTooltip(stack, true));
     }
 
     @Override

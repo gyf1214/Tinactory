@@ -26,7 +26,6 @@ import java.util.Map;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class ProcessingIngredients {
-
     public record ItemIngredient(ItemStack stack) implements IProcessingIngredient {
         private static final String CODEC_NAME = "item_ingredient";
 

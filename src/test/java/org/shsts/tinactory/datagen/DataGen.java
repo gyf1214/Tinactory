@@ -238,6 +238,7 @@ public final class DataGen implements IRecipeDataConsumer {
     }
 
     private void onGatherData(GatherDataEvent event) {
+        init();
         for (var handler : dataHandlers) {
             handler.onGatherData(event);
         }
@@ -264,7 +265,7 @@ public final class DataGen implements IRecipeDataConsumer {
 
     public static final DataGen DATA_GEN = new DataGen(Tinactory.REGISTRATE);
 
-    public static void init(IEventBus modEventBus) {
+    public static void init() {
         Models.init();
         Technologies.init();
         Materials.init();
@@ -272,7 +273,5 @@ public final class DataGen implements IRecipeDataConsumer {
         Machines.init();
         Veins.init();
         Markers.init();
-
-        DATA_GEN.register(modEventBus);
     }
 }

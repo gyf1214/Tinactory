@@ -15,7 +15,6 @@ import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +23,6 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public abstract class MenuWidget extends GuiComponent implements
         Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
-    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 
     protected final Menu<?, ?> menu;
     protected Rect rect;

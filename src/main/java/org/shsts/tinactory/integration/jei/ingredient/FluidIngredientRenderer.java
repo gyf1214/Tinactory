@@ -8,6 +8,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
+import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -25,7 +26,7 @@ public class FluidIngredientRenderer implements IIngredientRenderer<FluidStack> 
 
     @Override
     public List<Component> getTooltip(FluidStack ingredient, TooltipFlag tooltipFlag) {
-        return RenderUtil.fluidTooltip(ingredient);
+        return ClientUtil.fluidTooltip(ingredient, true);
     }
 
     public static final FluidIngredientRenderer INSTANCE = new FluidIngredientRenderer();

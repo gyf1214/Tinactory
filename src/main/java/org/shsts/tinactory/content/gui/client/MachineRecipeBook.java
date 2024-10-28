@@ -15,6 +15,7 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
 
@@ -86,8 +87,9 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
 
     @Override
     protected Optional<List<Component>> buttonToolTip(ProcessingRecipe recipe) {
-        // TODO
-        return recipe.getDescription().map(List::of);
+        return recipe.getDescription().map(List::of)
+                .or(() -> ProcessingResults.mapItemOrFluid(recipe.getDisplay(), ClientUtil::itemTooltip,
+                        fluid -> ClientUtil.fluidTooltip(fluid, false)));
     }
 
     @Override

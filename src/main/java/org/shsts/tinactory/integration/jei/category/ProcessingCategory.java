@@ -45,7 +45,6 @@ import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.util.LocHelper.prepend;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -58,11 +57,6 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
                               Layout layout, Block icon) {
         super(recipeType, layout, Ingredient.of(AllTags.machineTag(recipeType)),
                 new ItemStack(icon), ProcessingMenu.class);
-    }
-
-    @Override
-    protected Component categoryTitle() {
-        return I18n.tr(prepend(recipeType.loc, "jei/category"));
     }
 
     @Override
