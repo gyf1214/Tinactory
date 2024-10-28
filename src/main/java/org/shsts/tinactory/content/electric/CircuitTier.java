@@ -4,9 +4,9 @@ public enum CircuitTier {
     ELECTRONIC(Voltage.ULV, CircuitComponentTier.NORMAL, "coated", "basic"),
     INTEGRATED(Voltage.LV, CircuitComponentTier.NORMAL, "phenolic", "good"),
     CPU(Voltage.MV, CircuitComponentTier.SMD, "plastic", "plastic"),
-    NANO(Voltage.HV, CircuitComponentTier.SMD, "epoxy", "advanced"),
-    QUANTUM(Voltage.EV, CircuitComponentTier.SMD, "fiber_reinforced", "extreme"),
-    CRYSTAL(Voltage.IV, CircuitComponentTier.ADVANCED, "multilayer.fiber_reinforced", "elite"),
+    NANO(Voltage.HV, CircuitComponentTier.SMD, "advanced_plastic", "advanced"),
+    QUANTUM(Voltage.EV, CircuitComponentTier.SMD, "epoxy", "extreme"),
+    CRYSTAL(Voltage.IV, CircuitComponentTier.ADVANCED, "advanced_epoxy", "elite"),
     WETWARE(Voltage.LuV, CircuitComponentTier.ADVANCED, "wetware", "wetware");
 
     public final Voltage baseVoltage;

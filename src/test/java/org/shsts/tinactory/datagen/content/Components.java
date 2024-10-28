@@ -118,8 +118,15 @@ public final class Components {
             builder.build();
         });
         for (var tier : CircuitTier.values()) {
+            var boardName = switch (tier) {
+                case NANO -> "epoxy";
+                case QUANTUM -> "fiber_reinforced";
+                case CRYSTAL -> "multilayer.fiber_reinforced";
+                default -> tier.board;
+            };
+
             DATA_GEN.item(Circuits.board(tier))
-                    .model(basicItem("metaitems/board." + tier.board))
+                    .model(basicItem("metaitems/board." + boardName))
                     .build()
                     .item(Circuits.circuitBoard(tier))
                     .model(basicItem("metaitems/circuit_board." + tier.circuitBoard))

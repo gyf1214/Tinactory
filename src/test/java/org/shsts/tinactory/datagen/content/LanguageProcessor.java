@@ -70,6 +70,16 @@ public class LanguageProcessor {
                 fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
         pattern("item[.]tinactory[.]tool[.](.*)[.](.*)", matcher ->
                 fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]circuit[.](.*)", matcher ->
+                fmt("%s Circuit", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.](circuit_)?board[.](.*)", matcher ->
+                fmt("%s Circuit Board", normalize(matcher, 2)));
+        pattern("item[.]tinactory[.]circuit_component[.](.*).smd", matcher ->
+                fmt("SMD %s", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]circuit_component[.](.*).advanced_smd", matcher ->
+                fmt("Advanced SMD %s", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]circuit_component[.](.*)", matcher ->
+                fmt("%s", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]machine[.](.*)[.](.*)", matcher ->
                 fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("block[.]tinactory[.]primitive[.](.*)", matcher ->

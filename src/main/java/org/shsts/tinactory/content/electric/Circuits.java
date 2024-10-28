@@ -122,7 +122,7 @@ public final class Circuits {
 
     public static void addBoards() {
         for (var tier : CircuitTier.values()) {
-            var board = REGISTRATE.item("board/" + tier.board.replace('.', '_'), Item::new).register();
+            var board = REGISTRATE.item("board/" + tier.board, Item::new).register();
             BOARDS.put(tier, board);
         }
         for (var tier : CircuitTier.values()) {
