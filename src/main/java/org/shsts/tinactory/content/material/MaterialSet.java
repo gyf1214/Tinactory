@@ -7,6 +7,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
@@ -24,6 +25,7 @@ import java.util.function.Supplier;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -73,6 +75,8 @@ public class MaterialSet {
     private final Map<String, BlockEntry> blocks;
     @Nullable
     private final OreVariant oreVariant;
+    @Nullable
+    private final RegistryEntry<? extends Fluid> fluid;
 
     private MaterialSet(Builder<?> builder) {
         this.name = builder.name;
@@ -80,6 +84,7 @@ public class MaterialSet {
         this.items = builder.items;
         this.blocks = builder.blocks;
         this.oreVariant = builder.oreVariant;
+        this.fluid = builder.fluid;
     }
 
     public ResourceLocation loc(String sub) {
@@ -155,6 +160,8 @@ public class MaterialSet {
         private int color = 0xFFFFFFFF;
         @Nullable
         private OreVariant oreVariant = null;
+        @Nullable
+        private RegistryEntry<? extends Fluid> fluid = null;
 
         public Builder(P parent, String name) {
             super(parent);
@@ -263,12 +270,12 @@ public class MaterialSet {
         }
 
         public Builder<P> metalSetExt() {
-            return metalSet().dummies("plate", "stick");
+            return metalSet().dummies("plate", "stick", "dust_tiny");
         }
 
         public Builder<P> mechanicalSet() {
             return metalSetExt()
-                    .dummies("bolt", "screw", "gear", "rotor");
+                    .dummies("ring", "bolt", "screw", "gear", "rotor");
         }
 
         public Builder<P> pipe() {
@@ -288,11 +295,17 @@ public class MaterialSet {
         }
 
         public Builder<P> polymer() {
-            return dust().dummies("sheet", "ring");
+            return dust().dummies("sheet", "ring").alias("primary", "sheet");
         }
 
         public Builder<P> gem() {
             return dummies("gem").alias("primary", "gem");
+        }
+
+        public Builder<P> fluid() {
+            fluid = REGISTRATE.simpleFluid("material/molten/" + name,
+                    gregtech("blocks/material_sets/dull/fluid"));
+            return this;
         }
 
         public Builder<P> ore(OreVariant variant) {
@@ -367,5 +380,10 @@ public class MaterialSet {
         public ToolBuilder tool(int durability) {
             return new ToolBuilder(durability, null);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "MaterialSet{%s}".formatted(name);
     }
 }

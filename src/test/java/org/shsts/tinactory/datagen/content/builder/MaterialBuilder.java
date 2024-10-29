@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -26,6 +27,7 @@ import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -37,6 +39,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
+import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BENDER;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
@@ -68,6 +71,8 @@ import static org.shsts.tinactory.datagen.content.Models.oreBlock;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private static ResourceLocation toolTex(String sub) {
         return gregtech("items/tools/" + sub);
     }
@@ -84,6 +89,8 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     private final MaterialSet material;
     @Nullable
     private IconSet icon = null;
+    private boolean hasProcess = false;
+    private boolean hasOreProcess = false;
 
     public MaterialBuilder(DataGen dataGen, P parent, MaterialSet material) {
         super(dataGen, parent, material.name);
@@ -95,7 +102,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
-    public MaterialBuilder<P> toolProcess() {
+    public MaterialBuilder<P> toolProcess(double factor) {
         // grind dust
         process("dust", 1, "primary", TOOL_MORTAR);
         process("dust_tiny", 1, "nugget", TOOL_MORTAR);
@@ -104,7 +111,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         // foil
         process("foil", 2, "plate", TOOL_HAMMER);
         // ring
-        process("ring", 1, "plate", TOOL_WIRE_CUTTER);
+        process("ring", 1, "stick", TOOL_HAMMER);
         process("ring", 1, "sheet", TOOL_WIRE_CUTTER);
         // stick
         process("stick", 1, "ingot", TOOL_FILE);
@@ -121,41 +128,144 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         process("wire", 1, "plate", TOOL_WIRE_CUTTER);
         // pipe
         process("pipe", 1, "AAA", "plate", TOOL_HAMMER, TOOL_WRENCH);
-        return this;
+        return machineProcess(Voltage.LV, factor);
     }
 
-    private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
-                         String result, int count, String input, int outputPort,
-                         Voltage v, long workTicks) {
-        if (!material.hasItem(result) || !material.hasItem(input)) {
-            return;
+    public MaterialBuilder<P> toolProcess() {
+        return toolProcess(1d);
+    }
+
+    private class MachineProcessBuilder {
+        private final Voltage voltage;
+        private final double factor;
+
+        public MachineProcessBuilder(Voltage voltage, double factor) {
+            this.voltage = voltage;
+            this.factor = factor;
         }
-        recipeType.recipe(DATA_GEN, material.loc(result))
-                .outputItem(outputPort, material.entry(result), count)
-                .inputItem(0, material.tag(input), 1)
-                .voltage(v)
-                .workTicks(workTicks)
-                .build();
+
+        private long ticks(long ticks) {
+            return Math.round(ticks * factor);
+        }
+
+        private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
+                             String result, int count, String input, int outputPort, long workTicks) {
+            if (!material.hasItem(result) || !material.hasItem(input)) {
+                return;
+            }
+            recipeType.recipe(DATA_GEN, material.loc(result))
+                    .outputItem(outputPort, material.entry(result), count)
+                    .inputItem(0, material.tag(input), 1)
+                    .voltage(voltage)
+                    .workTicks(ticks(workTicks))
+                    .build();
+        }
+
+        private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
+                             String result, int count, String input, long workTicks) {
+            process(recipeType, result, count, input, 1, workTicks);
+        }
+
+        // TODO: soldering
+        private void assemble(String sub, long workTicks, Object... inputs) {
+            if (!material.hasItem(sub)) {
+                return;
+            }
+            for (var input : inputs) {
+                if (input instanceof String sub1 && !material.hasItem(sub1)) {
+                    return;
+                }
+            }
+
+            var i = 0;
+            var k = 1;
+            if (inputs.length > 0 && inputs[0] instanceof Integer k1) {
+                k = k1;
+                i = 1;
+            }
+            var builder = ASSEMBLER.recipe(DATA_GEN, material.loc(sub))
+                    .outputItem(2, material.entry(sub), k)
+                    .voltage(voltage)
+                    .workTicks(ticks(workTicks));
+
+            for (; i < inputs.length; i++) {
+                var sub1 = (String) inputs[i];
+                k = 1;
+                if (inputs.length > i + 1 && inputs[i + 1] instanceof Integer k1) {
+                    k = k1;
+                    i++;
+                }
+                builder.inputItem(0, material.tag(sub1), k);
+            }
+
+            builder.build();
+        }
+
+        private void macerate(String sub, String result, int amount) {
+            if (!material.hasItem(result) || !material.hasItem(sub)) {
+                return;
+            }
+            MACERATOR.recipe(DATA_GEN, suffix(material.loc(result), "_from_" + sub))
+                    .outputItem(1, material.entry(result), amount)
+                    .inputItem(0, material.entry(sub), 1)
+                    .voltage(voltage)
+                    .workTicks(ticks(128L))
+                    .build();
+        }
+
+        private void macerate(String sub) {
+            macerate(sub, "dust", 1);
+        }
+
+        private void macerateTiny(String sub, int amount) {
+            macerate(sub, "dust_tiny", amount);
+        }
+
+        private void macerate() {
+            macerate("primary");
+            macerateTiny("nugget", 1);
+            macerate("magnetic");
+            macerateTiny("wire", 3);
+            macerateTiny("ring", 2);
+            macerate("plate");
+            macerateTiny("foil", 3);
+            macerateTiny("stick", 3);
+            macerateTiny("screw", 1);
+            macerateTiny("bolt", 1);
+            macerate("gear");
+            macerate("rotor", "dust", 4);
+        }
+
+        public MaterialBuilder<P> build() {
+            hasProcess = true;
+
+            process(POLARIZER, "magnetic", 1, "stick", 40L);
+            process(WIREMILL, "wire", 2, "ingot", 48L);
+            process(WIREMILL, "ring", 1, "stick", 64L);
+            process(BENDER, "plate", 1, "ingot", 72L);
+            process(BENDER, "foil", 2, "plate", 40L);
+            process(LATHE, "stick", 1, "ingot", 64L);
+            process(LATHE, "screw", 1, "bolt", 16L);
+            process(CUTTER, "bolt", 4, "stick", 2, 128L);
+
+            assemble("gear", 128L, "plate", "stick", 2);
+            assemble("rotor", 160L, "plate", 4, "ring", 1);
+
+            macerate();
+            return MaterialBuilder.this;
+        }
     }
 
-    private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
-                         String result, int count, String input, Voltage v, long workTicks) {
-        process(recipeType, result, count, input, 1, v, workTicks);
+    private MachineProcessBuilder processBuilder(Voltage v, double factor) {
+        return new MachineProcessBuilder(v, factor);
     }
 
-    public MaterialBuilder<P> simpleProcess(Voltage v) {
-        process(WIREMILL, "wire", 2, "ingot", v, 48L);
-        process(BENDER, "plate", 1, "ingot", v, 72L);
-        process(BENDER, "foil", 2, "plate", v, 64L);
-        process(POLARIZER, "magnetic", 1, "stick", v, 40L);
-        process(LATHE, "stick", 1, "ingot", v, 64L);
-        process(LATHE, "screw", 1, "bolt", v, 16L);
-        process(CUTTER, "bolt", 4, "stick", 2, v, 128L);
-        return this;
+    public MaterialBuilder<P> machineProcess(Voltage v, double factor) {
+        return processBuilder(v, factor).build();
     }
 
     public MaterialBuilder<P> machineProcess(Voltage v) {
-        return simpleProcess(v);
+        return machineProcess(v, 1d);
     }
 
     public MaterialBuilder<P> smelt() {
@@ -491,6 +601,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
 
             // TODO: sifting
 
+            hasOreProcess = true;
             return MaterialBuilder.this;
         }
     }
@@ -526,5 +637,12 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                     .unlockedBy("has_dust_small", has(material.tag("dust_tiny"))));
         }
         toolRecipes();
+
+        if (material.hasItem("primary") && !hasProcess) {
+            LOGGER.warn("{} does not have process", material);
+        }
+        if (material.hasBlock("ore") && !hasOreProcess) {
+            LOGGER.warn("{} does not have ore process", material);
+        }
     }
 }

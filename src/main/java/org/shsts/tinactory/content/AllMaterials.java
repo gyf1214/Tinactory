@@ -92,7 +92,6 @@ public final class AllMaterials {
         FLINT = set("flint")
                 .color(0xFF002040)
                 .existing("primary", Items.FLINT)
-                .dust()
                 .tool(16).mortar().build()
                 .buildObject();
 

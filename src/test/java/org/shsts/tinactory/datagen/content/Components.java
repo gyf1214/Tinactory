@@ -270,6 +270,7 @@ public final class Components {
                 .component(ELECTRIC_MOTOR, 2)
                 .component(CABLE, 1)
                 // TODO: rubber liquid
+                .tech(Technologies.CONVEYOR_MODULE)
                 .build()
                 .recipe(MACHINE_HULL)
                 .material(main, "plate", 8)

@@ -269,7 +269,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         EXTRACTOR = set(machine(AllRecipes.EXTRACTOR))
-                .voltages(Voltage.MV)
+                .voltages(Voltage.LV)
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -282,7 +282,7 @@ public final class AllBlockEntities {
                 .buildObject();
 
         FLUID_SOLIDIFIER = set(machine(AllRecipes.FLUID_SOLIDIFIER))
-                .voltages(Voltage.MV)
+                .voltages(Voltage.LV)
                 .layoutSet()
                 .port(FLUID_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
