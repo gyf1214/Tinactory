@@ -151,6 +151,15 @@ public class MaterialSet {
         return blocks.containsKey(sub);
     }
 
+    public boolean hasFluid() {
+        return fluid != null;
+    }
+
+    public RegistryEntry<? extends Fluid> fluidEntry() {
+        assert fluid != null;
+        return fluid;
+    }
+
     public OreVariant oreVariant() {
         assert oreVariant != null;
         return oreVariant;
@@ -259,6 +268,10 @@ public class MaterialSet {
             return dummies("dust");
         }
 
+        public Builder<P> dustPrimary() {
+            return dust().alias("primary", "dust");
+        }
+
         public Builder<P> metal() {
             return dust().dummies("ingot")
                     .alias("primary", "ingot");
@@ -324,7 +337,7 @@ public class MaterialSet {
 
         public Builder<P> molten() {
             fluid = REGISTRATE.simpleFluid("material/molten/" + name,
-                    gregtech("blocks/material_sets/dull/fluid"));
+                    gregtech("blocks/material_sets/dull/liquid"), color);
             return this;
         }
 

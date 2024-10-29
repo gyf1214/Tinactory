@@ -196,7 +196,9 @@ public final class Materials {
                 .material(NICKEL, METALLIC)
                 .toolProcess(1.25d).smelt()
                 .build()
-                .material(MAGNESIUM, METALLIC).build()
+                .material(MAGNESIUM, METALLIC)
+                .machineProcess(Voltage.LV)
+                .build()
                 .material(THORIUM, SHINY).build()
                 // TODO
                 .material(CHROME, SHINY).build()

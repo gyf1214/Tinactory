@@ -43,6 +43,8 @@ import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BENDER;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
+import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
+import static org.shsts.tinactory.content.AllRecipes.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
@@ -205,12 +207,19 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             if (!material.hasItem(result) || !material.hasItem(sub)) {
                 return;
             }
+            if (material.loc(sub).equals(material.loc(result))) {
+                return;
+            }
             MACERATOR.recipe(DATA_GEN, suffix(material.loc(result), "_from_" + sub))
                     .outputItem(1, material.entry(result), amount)
-                    .inputItem(0, material.entry(sub), 1)
+                    .inputItem(0, material.tag(sub), 1)
                     .voltage(voltage)
                     .workTicks(ticks(128L))
                     .build();
+        }
+
+        private void macerate(String sub, int amount) {
+            macerate(sub, "dust", amount);
         }
 
         private void macerate(String sub) {
@@ -228,22 +237,62 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             macerateTiny("wire", 3);
             macerateTiny("ring", 2);
             macerate("plate");
-            macerateTiny("foil", 3);
+            macerateTiny("foil", 2);
             macerateTiny("stick", 3);
             macerateTiny("screw", 1);
             macerateTiny("bolt", 1);
             macerate("gear");
-            macerate("rotor", "dust", 4);
+            macerate("rotor", 4);
+            macerate("pipe", 3);
+        }
+
+        private void molten(String sub, Voltage v, int amount) {
+            if (!material.hasItem(sub) || !material.hasFluid()) {
+                return;
+            }
+            var fluid = material.fluidEntry();
+
+            EXTRACTOR.recipe(DATA_GEN, suffix(fluid.loc, "_from_" + sub))
+                    .outputFluid(1, fluid, amount)
+                    .inputItem(0, material.tag(sub), 1)
+                    .voltage(v)
+                    .workTicks(ticks(160L))
+                    .build();
+
+            if (!sub.equals("magnetic")) {
+                FLUID_SOLIDIFIER.recipe(DATA_GEN, material.loc(sub))
+                        .outputItem(1, material.entry(sub), 1)
+                        .inputFluid(0, fluid, amount)
+                        .voltage(v)
+                        .workTicks(ticks(80L))
+                        .build();
+            }
+        }
+
+        private void molten() {
+            var v = material.hasItem("sheet") ? voltage : Voltage.fromRank(voltage.rank + 1);
+
+            molten("primary", v, 144);
+            molten("nugget", v, 16);
+            molten("magnetic", v, 72);
+            molten("wire", v, 72);
+            molten("ring", v, 36);
+            molten("plate", v, 144);
+            molten("foil", v, 36);
+            molten("stick", v, 72);
+            molten("screw", v, 16);
+            molten("bolt", v, 18);
+            molten("gear", v, 288);
+            molten("rotor", v, 576);
+            molten("pipe", v, 432);
         }
 
         public MaterialBuilder<P> build() {
-            hasProcess = true;
-
             process(POLARIZER, "magnetic", 1, "stick", 40L);
             process(WIREMILL, "wire", 2, "ingot", 48L);
             process(WIREMILL, "ring", 1, "stick", 64L);
             process(BENDER, "plate", 1, "ingot", 72L);
-            process(BENDER, "foil", 2, "plate", 40L);
+            process(BENDER, "foil", 4, "plate", 40L);
             process(LATHE, "stick", 1, "ingot", 64L);
             process(LATHE, "screw", 1, "bolt", 16L);
             process(CUTTER, "bolt", 4, "stick", 2, 128L);
@@ -252,6 +301,9 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             assemble("rotor", 160L, "plate", 4, "ring", 1);
 
             macerate();
+            molten();
+
+            hasProcess = true;
             return MaterialBuilder.this;
         }
     }

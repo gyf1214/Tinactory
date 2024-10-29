@@ -32,7 +32,7 @@ public final class Elements {
                 .color(0xFFC8C8C8)
                 .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
-                .nugget().wire().rotor()
+                .nugget().wire().rotor().molten()
                 .buildObject();
 
         GOLD = set("gold")
@@ -40,19 +40,19 @@ public final class Elements {
                 .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
-                .nugget()
+                .nugget().molten()
                 .ore(OreVariant.DEEPSLATE)
                 .buildObject();
 
         COPPER = set("copper")
                 .color(0xFFFF6400)
                 .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
-                .foil().wireAndPlate().pipe()
+                .foil().wireAndPlate().pipe().molten()
                 .buildObject();
 
         TIN = set("tin")
                 .color(0xFFDCDCDC)
-                .wireAndPlate().rotor()
+                .wireAndPlate().rotor().molten()
                 .ore(OreVariant.STONE)
                 .buildObject();
 
@@ -74,12 +74,12 @@ public final class Elements {
 
         NICKEL = set("nickel")
                 .color(0xFFC8C8FA)
-                .metal()
+                .metal().molten()
                 .buildObject();
 
         MAGNESIUM = set("magnesium")
                 .color(0xFFFFC8C8)
-                .dust()
+                .dustPrimary().molten()
                 .buildObject();
 
         THORIUM = set("thorium")
@@ -89,7 +89,7 @@ public final class Elements {
 
         CHROME = set("chrome")
                 .color(0xFFEAC4D8)
-                .dust()
+                .dustPrimary().molten()
                 .buildObject();
 
         ANTIMONY = set("antimony")
@@ -99,17 +99,17 @@ public final class Elements {
 
         SILVER = set("silver")
                 .color(0xFFDCDCFF)
-                .foil().wire()
+                .foil().wire().molten()
                 .buildObject();
 
         VANADIUM = set("vanadium")
                 .color(0xFF323232)
-                .dust()
+                .dustPrimary().molten()
                 .buildObject();
 
         ALUMINIUM = set("aluminium")
                 .color(0xFF80C8F0)
-                .mechanical().gear()
+                .mechanical().gear().molten()
                 .buildObject();
     }
 

@@ -22,7 +22,7 @@ public final class FirstDegrees {
 
         BRONZE = set("bronze")
                 .color(0xFFFF8000)
-                .foil().pipe().rotor()
+                .foil().pipe().rotor().molten()
                 .buildObject();
 
         COBALTITE = set("cobaltite")
@@ -42,7 +42,7 @@ public final class FirstDegrees {
 
         STEEL = set("steel")
                 .color(0xFF808080)
-                .mechanical().magnetic().pipe().gear()
+                .mechanical().magnetic().pipe().gear().molten()
                 .toolSet(800, Tiers.IRON)
                 .buildObject();
 
