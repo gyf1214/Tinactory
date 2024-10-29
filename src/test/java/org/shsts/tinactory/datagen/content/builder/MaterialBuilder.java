@@ -253,7 +253,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             var fluid = material.fluidEntry();
 
             EXTRACTOR.recipe(DATA_GEN, suffix(fluid.loc, "_from_" + sub))
-                    .outputFluid(1, fluid, amount)
+                    .outputFluid(2, fluid, amount)
                     .inputItem(0, material.tag(sub), 1)
                     .voltage(v)
                     .workTicks(ticks(160L))

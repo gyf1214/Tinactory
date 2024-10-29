@@ -170,7 +170,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_WASHER = set(marker(AllRecipes.ORE_WASHER, false))
+        ORE_WASHER = set(marker(AllRecipes.ORE_WASHER, true))
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_INPUT)

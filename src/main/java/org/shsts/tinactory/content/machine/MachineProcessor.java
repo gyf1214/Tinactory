@@ -116,7 +116,7 @@ public class MachineProcessor<T extends ProcessingRecipe>
         });
     }
 
-    protected void calculateFactors(ProcessingRecipe recipe) {
+    protected void calculateFactors(T recipe) {
         var baseVoltage = recipe.voltage == 0 ? Voltage.ULV.value : recipe.voltage;
         var voltage = getVoltage();
         var voltageFactor = 1L;

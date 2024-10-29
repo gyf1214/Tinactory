@@ -12,7 +12,6 @@ import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
-import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
@@ -144,8 +143,8 @@ public class ProcessingSet extends MachineSet {
         };
     }
 
-    public static Builder<GeneratorRecipe, ?>
-    generator(RecipeTypeEntry<GeneratorRecipe, ?> recipeType) {
+    public static Builder<ProcessingRecipe, ?>
+    generator(RecipeTypeEntry<ProcessingRecipe, ?> recipeType) {
         return new Builder<>(recipeType, Unit.INSTANCE) {
             @Override
             protected BlockEntityBuilder<SmartBlockEntity, MachineBlock<SmartBlockEntity>, ?>

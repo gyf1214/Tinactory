@@ -9,13 +9,17 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
+import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
+import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -45,7 +49,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CUTTER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
-    public static final RecipeTypeEntry<GeneratorRecipe, GeneratorRecipe.Builder> STEAM_TURBINE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> BLAST_FURNACE;
     // Recipes only used to mark input for recipe book purpose
     public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
@@ -66,11 +70,11 @@ public final class AllRecipes {
                 .defaults($ -> $.amperage(0.375d))
                 .register();
 
-        CIRCUIT_ASSEMBLER = REGISTRATE.processingRecipeType("circuit_assembler")
+        CIRCUIT_ASSEMBLER = processing("circuit_assembler")
                 .defaults($ -> $.amperage(0.25d))
                 .register();
 
-        STONE_GENERATOR = REGISTRATE.processingRecipeType("stone_generator")
+        STONE_GENERATOR = processing("stone_generator")
                 .defaults($ -> $.amperage(0.125d).workTicks(20L))
                 .register();
 
@@ -80,72 +84,70 @@ public final class AllRecipes {
                 .defaults($ -> $.amperage(0.125d).workTicks(32L))
                 .register();
 
-        MACERATOR = REGISTRATE.processingRecipeType("macerator")
+        MACERATOR = processing("macerator", DisplayInputRecipe::builder)
                 .defaults($ -> $.amperage(0.25d))
                 .register();
 
-        ORE_WASHER = REGISTRATE.processingRecipeType("ore_washer")
+        ORE_WASHER = processing("ore_washer", DisplayInputRecipe::builder)
                 .defaults($ -> $.amperage(0.125d))
                 .register();
 
-        CENTRIFUGE = REGISTRATE.processingRecipeType("centrifuge")
+        CENTRIFUGE = processing("centrifuge", DisplayInputRecipe::builder)
                 .defaults($ -> $.amperage(0.5d))
                 .register();
 
-        THERMAL_CENTRIFUGE = REGISTRATE.processingRecipeType("thermal_centrifuge")
+        THERMAL_CENTRIFUGE = processing("thermal_centrifuge", DisplayInputRecipe::builder)
                 .defaults($ -> $.voltage(Voltage.LV)
                         .workTicks(400L)
                         .amperage(1d))
                 .register();
 
-        ALLOY_SMELTER = REGISTRATE.processingRecipeType("alloy_smelter")
+        ALLOY_SMELTER = processing("alloy_smelter")
                 .defaults($ -> $.amperage(0.75d))
                 .register();
 
-        MIXER = REGISTRATE.processingRecipeType("mixer")
+        MIXER = processing("mixer")
                 .defaults($ -> $.amperage(0.5d))
                 .register();
 
-        POLARIZER = REGISTRATE.processingRecipeType("polarizer")
+        POLARIZER = processing("polarizer")
                 .defaults($ -> $.amperage(0.25d))
                 .register();
 
-        WIREMILL = REGISTRATE.processingRecipeType("wiremill")
+        WIREMILL = processing("wiremill")
                 .defaults($ -> $.amperage(0.25d))
                 .register();
 
-        BENDER = REGISTRATE.processingRecipeType("bender")
+        BENDER = processing("bender")
                 .defaults($ -> $.amperage(0.25d))
                 .register();
 
-        COMPRESSOR = REGISTRATE.processingRecipeType("compressor")
+        COMPRESSOR = processing("compressor")
                 .defaults($ -> $.amperage(0.5d))
                 .register();
 
-        LATHE = REGISTRATE.processingRecipeType("lathe")
+        LATHE = processing("lathe")
                 .defaults($ -> $.amperage(0.375d))
                 .register();
 
-        CUTTER = REGISTRATE.processingRecipeType("cutter")
+        CUTTER = processing("cutter")
                 .defaults($ -> $.inputFluid(1, Fluids.WATER, 10)
                         .amperage(0.375d))
                 .register();
 
-        EXTRACTOR = REGISTRATE.processingRecipeType("extractor")
+        EXTRACTOR = processing("extractor", DisplayInputRecipe::builder)
                 .defaults($ -> $.amperage(0.5d))
                 .register();
 
-        FLUID_SOLIDIFIER = REGISTRATE.processingRecipeType("fluid_solidifier")
+        FLUID_SOLIDIFIER = processing("fluid_solidifier")
                 .defaults($ -> $.amperage(0.25d))
                 .register();
 
-        STEAM_TURBINE = REGISTRATE.recipeType("steam_turbine", GeneratorRecipe.SERIALIZER)
-                .clazz(GeneratorRecipe.class)
-                .builder(GeneratorRecipe.Builder::new)
+        STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)
                 .defaults($ -> $.autoVoid().amperage(1d).workTicks(100))
                 .register();
 
-        BLAST_FURNACE = REGISTRATE.processingRecipeType("blast_furnace")
+        BLAST_FURNACE = processing("blast_furnace")
                 .defaults($ -> $.amperage(4d))
                 .register();
 
@@ -167,6 +169,18 @@ public final class AllRecipes {
     private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {
         return new InventoryChangeTrigger.TriggerInstance(EntityPredicate.Composite.ANY,
                 MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
+    }
+
+    private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>
+    processing(String id) {
+        return processing(id, ProcessingRecipe.Builder::new);
+    }
+
+    private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>
+    processing(String id, SmartRecipeBuilder.Factory<ProcessingRecipe, ProcessingRecipe.Builder> builderFactory) {
+        return REGISTRATE.recipeType(id, ProcessingRecipe.SERIALIZER)
+                .clazz(ProcessingRecipe.class)
+                .builder(builderFactory);
     }
 
     public static void init() {}

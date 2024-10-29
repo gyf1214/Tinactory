@@ -4,15 +4,14 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.machine.MachineProcessor;
-import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class GeneratorProcessor extends MachineProcessor<GeneratorRecipe> {
-    public GeneratorProcessor(BlockEntity blockEntity, RecipeType<? extends GeneratorRecipe> recipeType,
+public class GeneratorProcessor extends MachineProcessor<ProcessingRecipe> {
+    public GeneratorProcessor(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe> recipeType,
                               Voltage voltage) {
         super(blockEntity, recipeType, voltage);
     }
@@ -24,7 +23,7 @@ public class GeneratorProcessor extends MachineProcessor<GeneratorRecipe> {
     }
 
     @Override
-    protected long onWorkProgress(GeneratorRecipe recipe, double partial) {
+    protected long onWorkProgress(ProcessingRecipe recipe, double partial) {
         return PROGRESS_PER_TICK;
     }
 

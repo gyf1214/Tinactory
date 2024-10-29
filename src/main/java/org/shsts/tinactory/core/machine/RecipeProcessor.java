@@ -27,7 +27,6 @@ import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.MultiBlockProcessor;
 import org.shsts.tinactory.content.network.MachineBlock;
-import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
@@ -304,7 +303,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    generator(RecipeTypeEntry<? extends GeneratorRecipe, ?> type) {
+    generator(RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         return CapabilityProviderBuilder.fromFactory(ID,
                 be -> new GeneratorProcessor(be, type.get(), getBlockVoltage(be)));
     }
