@@ -32,7 +32,7 @@ public final class Elements {
                 .color(0xFFC8C8C8)
                 .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
-                .mechanicalSet().nugget().wire()
+                .nugget().wire().rotor()
                 .buildObject();
 
         GOLD = set("gold")
@@ -40,19 +40,19 @@ public final class Elements {
                 .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
-                .metalSet().nugget()
+                .nugget()
                 .ore(OreVariant.DEEPSLATE)
                 .buildObject();
 
         COPPER = set("copper")
                 .color(0xFFFF6400)
                 .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
-                .metalSet().wireAndPlate().pipe().foil()
+                .foil().wireAndPlate().pipe()
                 .buildObject();
 
         TIN = set("tin")
                 .color(0xFFDCDCDC)
-                .mechanicalSet().wire()
+                .wireAndPlate().rotor()
                 .ore(OreVariant.STONE)
                 .buildObject();
 
@@ -63,7 +63,7 @@ public final class Elements {
 
         COBALT = set("cobalt")
                 .color(0xFF5050FA)
-                .metalSetExt()
+                .metalExt()
                 .toolSet(600, Tiers.IRON)
                 .buildObject();
 
@@ -74,7 +74,7 @@ public final class Elements {
 
         NICKEL = set("nickel")
                 .color(0xFFC8C8FA)
-                .metalSet()
+                .metal()
                 .buildObject();
 
         MAGNESIUM = set("magnesium")
@@ -99,7 +99,7 @@ public final class Elements {
 
         SILVER = set("silver")
                 .color(0xFFDCDCFF)
-                .metalSet().wire()
+                .foil().wire()
                 .buildObject();
 
         VANADIUM = set("vanadium")
@@ -109,7 +109,7 @@ public final class Elements {
 
         ALUMINIUM = set("aluminium")
                 .color(0xFF80C8F0)
-                .mechanicalSet()
+                .mechanical().gear()
                 .buildObject();
     }
 

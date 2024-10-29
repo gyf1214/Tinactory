@@ -16,13 +16,13 @@ public final class FirstDegrees {
     static {
         WROUGHT_IRON = set("wrought_iron")
                 .color(0xFFC8B4B4)
-                .metalSetExt().nugget()
+                .metalExt().nugget()
                 .toolSet(200, Tiers.IRON)
                 .buildObject();
 
         BRONZE = set("bronze")
                 .color(0xFFFF8000)
-                .mechanicalSet().pipe().foil()
+                .foil().pipe().rotor()
                 .buildObject();
 
         COBALTITE = set("cobaltite")
@@ -32,23 +32,23 @@ public final class FirstDegrees {
 
         INVAR = set("invar")
                 .color(0xFFB4B478)
-                .metalSetExt()
+                .metalExt()
                 .buildObject();
 
         CUPRONICKEL = set("cupronickel")
                 .color(0xFFE39680)
-                .metalSet().wireAndPlate()
+                .wireAndPlate()
                 .buildObject();
 
         STEEL = set("steel")
                 .color(0xFF808080)
-                .mechanicalSet().magnetic().pipe()
+                .mechanical().magnetic().pipe().gear()
                 .toolSet(800, Tiers.IRON)
                 .buildObject();
 
         RED_ALLOY = set("red_alloy")
                 .color(0xFFC80000)
-                .metalSet().wireAndPlate()
+                .wireAndPlate()
                 .buildObject();
     }
 

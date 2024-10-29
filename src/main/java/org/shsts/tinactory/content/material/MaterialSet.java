@@ -87,36 +87,37 @@ public class MaterialSet {
         this.fluid = builder.fluid;
     }
 
+    private ItemEntry safeItem(String sub) {
+        assert items.containsKey(sub) : "%s does not have item %s".formatted(this, sub);
+        return items.get(sub);
+    }
+
     public ResourceLocation loc(String sub) {
-        assert items.containsKey(sub);
-        return items.get(sub).loc;
+        return safeItem(sub).loc;
     }
 
     public TagKey<Item> tag(String sub) {
-        assert items.containsKey(sub);
-        return items.get(sub).tag;
+        return safeItem(sub).tag;
     }
 
     public Supplier<? extends Item> entry(String sub) {
-        assert items.containsKey(sub);
-        return items.get(sub).item();
+        return safeItem(sub).item();
     }
 
     public Item item(String sub) {
-        assert items.containsKey(sub);
-        return items.get(sub).getItem();
+        return safeItem(sub).getItem();
     }
 
     public boolean isAlias(String sub) {
-        return items.get(sub).isAlias;
+        return items.containsKey(sub) && items.get(sub).isAlias;
     }
 
     public boolean hasTarget(String sub) {
-        return items.get(sub).target != null;
+        return items.containsKey(sub) && items.get(sub).target != null;
     }
 
     public TagKey<Item> target(String sub) {
-        var ret = items.get(sub).target;
+        var ret = safeItem(sub).target;
         assert ret != null;
         return ret;
     }
@@ -129,19 +130,21 @@ public class MaterialSet {
         return items.keySet();
     }
 
+    private BlockEntry safeBlock(String sub) {
+        assert blocks.containsKey(sub) : "%s does not have block %s".formatted(this, sub);
+        return blocks.get(sub);
+    }
+
     public ResourceLocation blockLoc(String sub) {
-        assert blocks.containsKey(sub);
-        return blocks.get(sub).loc;
+        return safeBlock(sub).loc;
     }
 
     public Supplier<? extends Block> blockEntry(String sub) {
-        assert blocks.containsKey(sub);
-        return blocks.get(sub).getEntry();
+        return safeBlock(sub).getEntry();
     }
 
     public Block block(String sub) {
-        assert blocks.containsKey(sub);
-        return blocks.get(sub).getBlock();
+        return safeBlock(sub).getBlock();
     }
 
     public boolean hasBlock(String sub) {
@@ -256,53 +259,70 @@ public class MaterialSet {
             return dummies("dust");
         }
 
-        public Builder<P> metalSet() {
+        public Builder<P> metal() {
             return dust().dummies("ingot")
                     .alias("primary", "ingot");
         }
 
+        public Builder<P> plate() {
+            return metal().dummies("plate");
+        }
+
+        public Builder<P> stick() {
+            return metal().dummies("stick", "dust_tiny");
+        }
+
         public Builder<P> nugget() {
-            return dummies("dust_tiny", "nugget");
-        }
-
-        public Builder<P> foil() {
-            return dummies("foil");
-        }
-
-        public Builder<P> metalSetExt() {
-            return metalSet().dummies("plate", "stick", "dust_tiny");
-        }
-
-        public Builder<P> mechanicalSet() {
-            return metalSetExt()
-                    .dummies("ring", "bolt", "screw", "gear", "rotor");
-        }
-
-        public Builder<P> pipe() {
-            return dummies("pipe");
+            return metal().dummies("nugget", "dust_tiny");
         }
 
         public Builder<P> wire() {
-            return dummies("wire");
+            return metal().dummies("wire");
+        }
+
+        public Builder<P> metalExt() {
+            return metal().dummies("plate", "stick", "dust_tiny");
+        }
+
+        public Builder<P> foil() {
+            return plate().dummies("foil");
         }
 
         public Builder<P> wireAndPlate() {
-            return wire().dummies("plate");
+            return plate().dummies("wire");
+        }
+
+        public Builder<P> pipe() {
+            return plate().dummies("pipe");
         }
 
         public Builder<P> magnetic() {
-            return dummies("magnetic");
+            return stick().dummies("magnetic");
+        }
+
+        public Builder<P> gear() {
+            return metalExt().dummies("gear");
+        }
+
+        public Builder<P> mechanical() {
+            return metalExt().dummies("bolt", "screw");
+        }
+
+        public Builder<P> rotor() {
+            return mechanical().dummies("ring", "rotor");
         }
 
         public Builder<P> polymer() {
-            return dust().dummies("sheet", "ring").alias("primary", "sheet");
+            return dust().dummies("sheet", "ring")
+                    .alias("primary", "sheet")
+                    .molten();
         }
 
         public Builder<P> gem() {
             return dummies("gem").alias("primary", "gem");
         }
 
-        public Builder<P> fluid() {
+        public Builder<P> molten() {
             fluid = REGISTRATE.simpleFluid("material/molten/" + name,
                     gregtech("blocks/material_sets/dull/fluid"));
             return this;
