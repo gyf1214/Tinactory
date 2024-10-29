@@ -35,6 +35,10 @@ public class MachineSet {
         this.voltages = new HashSet<>(voltages);
     }
 
+    public boolean hasVoltage(Voltage voltage) {
+        return machines.containsKey(voltage);
+    }
+
     public RegistryEntry<? extends Block> entry(Voltage voltage) {
         return machines.get(voltage);
     }

@@ -25,6 +25,9 @@ public final class Technologies {
     public static ResourceLocation STEEL;
     public static ResourceLocation MOTOR;
     public static ResourceLocation PUMP_AND_PISTON;
+    public static ResourceLocation ELECTRIC_HEATING;
+    public static ResourceLocation MATERIAL_CUTTING;
+    public static ResourceLocation CONVEYOR_MODULE;
 
     public static void init() {
         var factory = new TechFactory();
@@ -51,14 +54,29 @@ public final class Technologies {
                 .displayItem(AllMaterials.STEEL.entry("ingot"))
                 .buildLoc();
 
+        ELECTRIC_HEATING = factory.tech("electric_heating")
+                .maxProgress(30L)
+                .displayItem(AllMaterials.COPPER.item("wire"))
+                .buildLoc();
+
         MOTOR = factory.child("motor")
                 .maxProgress(30L)
                 .displayItem(AllItems.ELECTRIC_MOTOR.get(Voltage.LV))
                 .buildLoc();
 
         PUMP_AND_PISTON = factory.tech("pump_and_piston")
-                .maxProgress(40L)
+                .maxProgress(35L)
                 .displayItem(AllItems.ELECTRIC_PISTON.get(Voltage.LV))
+                .buildLoc();
+
+        MATERIAL_CUTTING = factory.tech("material_cutting")
+                .maxProgress(35L)
+                .displayItem(AllItems.BASIC_BUZZSAW)
+                .buildLoc();
+
+        CONVEYOR_MODULE = factory.tech("conveyor_module")
+                .maxProgress(40L)
+                .displayItem(AllItems.CONVEYOR_MODULE.get(Voltage.LV))
                 .buildLoc();
     }
 

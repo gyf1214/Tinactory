@@ -50,6 +50,8 @@ public class LanguageProcessor {
                 fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("item[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
                 fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
+        pattern("item[.]tinactory[.]component[.](.*)[.](basic|good|advanced)", matcher ->
+                fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
         pattern("item[.]tinactory[.]component[.](.*)[.](.*)", matcher ->
                 fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("item[.]tinactory[.]material[.]dust_impure[.](.*)", matcher ->

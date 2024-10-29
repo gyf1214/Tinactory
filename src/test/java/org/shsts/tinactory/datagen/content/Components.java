@@ -16,12 +16,19 @@ import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllItems.ADVANCED_BUZZSAW;
+import static org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER;
+import static org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.BATTERY;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.CUPRONICKEL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllItems.DIODE;
 import static org.shsts.tinactory.content.AllItems.DUMMY_ITEMS;
@@ -29,7 +36,9 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
+import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
+import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
@@ -65,7 +74,8 @@ import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 @MethodsReturnNonnullByDefault
 public final class Components {
     private static final String RESEARCH_TEX = "metaitems/glass_vial/";
-    private static final int ASSEMBLE_TICKS = 100;
+    private static final String GRINDER_TEX = "metaitems/component.grinder";
+    private static final String BUZZSAW_TEX = "tools/buzzsaw";
 
     public static void init() {
         componentItems();
@@ -99,6 +109,20 @@ public final class Components {
                 .itemModel(Models::cableItem)
                 .tag(MINEABLE_WITH_CUTTER)
                 .build());
+
+        DATA_GEN.item(GOOD_GRINDER)
+                .model(basicItem(GRINDER_TEX + ".diamond"))
+                .build();
+
+        DATA_GEN.item(ADVANCED_GRINDER)
+                .model(basicItem(GRINDER_TEX + ".tungsten"))
+                .build();
+
+        for (var item : List.of(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW)) {
+            DATA_GEN.item(item)
+                    .model(basicItem(BUZZSAW_TEX))
+                    .build();
+        }
     }
 
     private static void circuits() {
@@ -184,55 +208,73 @@ public final class Components {
                 .build();
     }
 
+    private static class ComponentRecipeFactory {
+        private static final int TICKS = 100;
+
+        private final Voltage voltage;
+        private final Voltage baseVoltage;
+
+        public ComponentRecipeFactory(Voltage voltage) {
+            this.voltage = voltage;
+            this.baseVoltage = voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
+        }
+
+        public AssemblyRecipeBuilder<ComponentRecipeFactory>
+        recipe(Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> component, int count) {
+            if (!component.containsKey(voltage)) {
+                return new AssemblyRecipeBuilder<>(this);
+            }
+            var builder = ASSEMBLER.recipe(DATA_GEN, component.get(voltage))
+                    .outputItem(2, component.get(voltage), count)
+                    .voltage(baseVoltage)
+                    .workTicks(TICKS);
+            return new AssemblyRecipeBuilder<>(this, voltage, builder);
+        }
+
+        public AssemblyRecipeBuilder<ComponentRecipeFactory>
+        recipe(Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> component) {
+            return recipe(component, 1);
+        }
+    }
+
     private static void componentRecipe(Voltage voltage, MaterialSet main,
                                         MaterialSet heat, MaterialSet pipe,
                                         MaterialSet rotor, MaterialSet magnetic) {
+        var factory = new ComponentRecipeFactory(voltage);
 
-        var v = voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
-        var ticks = ASSEMBLE_TICKS;
-
-        var cable = CABLE.get(voltage);
-        var motor = ELECTRIC_MOTOR.get(voltage);
-
-        ASSEMBLER.recipe(DATA_GEN, motor)
-                .outputItem(2, motor, 1)
-                .inputItem(0, magnetic.tag("magnetic"), 1)
-                .inputItem(0, main.tag("stick"), 2)
-                .inputItem(0, heat.tag("wire"), 2 * v.rank)
-                .inputItem(0, cable, 2)
-                .workTicks(ticks)
-                .voltage(v)
-                .requireTech(Technologies.MOTOR)
+        factory.recipe(ELECTRIC_MOTOR)
+                .material(magnetic, "magnetic", 1)
+                .material(main, "stick", 1)
+                .material(heat, "wire", 2 * voltage.rank)
+                .component(CABLE, 2)
+                .tech(Technologies.MOTOR)
                 .build()
-                .recipe(DATA_GEN, ELECTRIC_PUMP.get(voltage))
-                .outputItem(2, ELECTRIC_PUMP.get(voltage), 1)
-                .inputItem(0, motor, 1)
-                .inputItem(0, pipe.tag("pipe"), 1)
-                .inputItem(0, rotor.tag("rotor"), 1)
-                .inputItem(0, rotor.tag("screw"), 3)
-                .inputItem(0, RUBBER.tag("ring"), 2)
-                .inputItem(0, cable, 1)
-                .workTicks(ticks)
-                .voltage(v)
-                .requireTech(Technologies.PUMP_AND_PISTON)
+                .recipe(ELECTRIC_PUMP)
+                .component(ELECTRIC_MOTOR, 1)
+                .material(pipe, "pipe", 1)
+                .material(rotor, "rotor", 1)
+                .material(rotor, "screw", 3)
+                .material(RUBBER, "ring", 2)
+                .component(CABLE, 1)
+                .tech(Technologies.PUMP_AND_PISTON)
                 .build()
-                .recipe(DATA_GEN, ELECTRIC_PISTON.get(voltage))
-                .outputItem(2, ELECTRIC_PISTON.get(voltage), 1)
-                .inputItem(0, motor, 1)
-                .inputItem(0, main.tag("plate"), 3)
-                .inputItem(0, main.tag("stick"), 2)
-                .inputItem(0, main.tag("gear"), 1)
-                .inputItem(0, cable, 2)
-                .workTicks(ticks)
-                .voltage(v)
-                .requireTech(Technologies.PUMP_AND_PISTON)
+                .recipe(ELECTRIC_PISTON)
+                .component(ELECTRIC_MOTOR, 1)
+                .material(main, "plate", 3)
+                .material(main, "stick", 2)
+                .material(main, "gear", 1)
+                .component(CABLE, 2)
+                .tech(Technologies.PUMP_AND_PISTON)
                 .build()
-                .recipe(DATA_GEN, MACHINE_HULL.get(voltage))
-                .outputItem(2, MACHINE_HULL.get(voltage), 1)
-                .inputItem(0, main.tag("plate"), 8)
-                .inputItem(0, cable, 2)
-                .workTicks(ticks)
-                .voltage(v)
+                .recipe(CONVEYOR_MODULE)
+                .component(ELECTRIC_MOTOR, 2)
+                .component(CABLE, 1)
+                // TODO: rubber liquid
+                .build()
+                .recipe(MACHINE_HULL)
+                .material(main, "plate", 8)
+                .component(CABLE, 2)
+                // TODO: plastic
                 .build();
     }
 

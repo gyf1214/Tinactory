@@ -3,6 +3,8 @@ package org.shsts.tinactory.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.SaplingBlock;
@@ -26,6 +28,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
@@ -52,6 +55,8 @@ public final class AllItems {
     public static final Map<Voltage, RegistryEntry<BatteryItem>> BATTERY;
     public static final Map<Voltage, RegistryEntry<CableBlock>> CABLE;
     public static final Map<Voltage, RegistryEntry<SubnetBlock>> TRANSFORMER;
+    public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
+    public static final Map<Voltage, Supplier<? extends ItemLike>> BUZZSAW;
 
     // circuits
     public static final Circuits.Circuit VACUUM_TUBE;
@@ -75,6 +80,11 @@ public final class AllItems {
     public static final RegistryEntry<RubberLogBlock> RUBBER_LOG;
     public static final RegistryEntry<LeavesBlock> RUBBER_LEAVES;
     public static final RegistryEntry<SaplingBlock> RUBBER_SAPLING;
+    public static final RegistryEntry<Item> GOOD_GRINDER;
+    public static final RegistryEntry<Item> ADVANCED_GRINDER;
+    public static final RegistryEntry<Item> BASIC_BUZZSAW;
+    public static final RegistryEntry<Item> GOOD_BUZZSAW;
+    public static final RegistryEntry<Item> ADVANCED_BUZZSAW;
 
     static {
         DUMMY_ITEMS = new ArrayList<>();
@@ -178,6 +188,16 @@ public final class AllItems {
                         .translucent().register())
                 .voltages(Voltage.LV, Voltage.IV)
                 .buildObject();
+
+        GOOD_GRINDER = REGISTRATE.item("component/grinder/good", Item::new).register();
+        ADVANCED_GRINDER = REGISTRATE.item("component/grinder/advanced", Item::new).register();
+        // TODO: tint
+        BASIC_BUZZSAW = REGISTRATE.item("component/buzzsaw/basic", Item::new).register();
+        GOOD_BUZZSAW = REGISTRATE.item("component/buzzsaw/good", Item::new).register();
+        ADVANCED_BUZZSAW = REGISTRATE.item("component/buzzsaw/advanced", Item::new).register();
+
+        GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
+        BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);
     }
 
     public static void init() {}
@@ -194,6 +214,13 @@ public final class AllItems {
                 .buildObject();
         DUMMY_ITEMS.addAll(ret.values());
         return ret;
+    }
+
+    private static Map<Voltage, Supplier<? extends ItemLike>>
+    set3(Supplier<? extends ItemLike> basic, Supplier<? extends ItemLike> good,
+         Supplier<? extends ItemLike> advanced) {
+        return Map.of(Voltage.LV, basic, Voltage.MV, basic,
+                Voltage.HV, good, Voltage.EV, good, Voltage.IV, advanced);
     }
 }
 

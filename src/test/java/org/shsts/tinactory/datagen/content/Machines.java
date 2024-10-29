@@ -3,11 +3,9 @@ package org.shsts.tinactory.datagen.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -20,14 +18,11 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.Transformer;
-import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -62,15 +57,19 @@ import static org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.WIREMILL;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
+import static org.shsts.tinactory.content.AllItems.BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
+import static org.shsts.tinactory.content.AllItems.GRINDER;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.TRANSFORMER;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
+import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
@@ -276,8 +275,8 @@ public final class Machines {
     }
 
     private static void basic() {
-        machineRecipe(Voltage.LV, STEEL, TIN, TIN);
-        machineRecipe(Voltage.MV, ALUMINIUM, COPPER, BRONZE);
+        machineRecipe(Voltage.LV, STEEL, TIN, TIN, COPPER);
+        machineRecipe(Voltage.MV, ALUMINIUM, COPPER, BRONZE, CUPRONICKEL);
     }
 
     private static void misc() {
@@ -356,55 +355,18 @@ public final class Machines {
         ulvMachine(set.entry(Voltage.ULV), primitive);
     }
 
-    private static class MachineRecipeBuilder<P> extends
-            SimpleBuilder<Unit, P, MachineRecipeBuilder<P>> {
-        private final Voltage voltage;
-        private final AssemblyRecipe.Builder builder;
-
-        public MachineRecipeBuilder(P parent, Voltage voltage, AssemblyRecipe.Builder builder) {
-            super(parent);
-            this.voltage = voltage;
-            this.builder = builder;
-        }
-
-        public MachineRecipeBuilder<P> circuit(int count) {
-            builder.inputItem(0, AllTags.circuit(voltage), count);
-            return this;
-        }
-
-        public MachineRecipeBuilder<P>
-        component(Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
-            builder.inputItem(0, component.get(voltage), count);
-            return this;
-        }
-
-        public MachineRecipeBuilder<P>
-        material(MaterialSet material, String sub, int count) {
-            builder.inputItem(0, material.tag(sub), count);
-            return this;
-        }
-
-        public MachineRecipeBuilder<P> tech(ResourceLocation... loc) {
-            builder.requireTech(loc);
-            return this;
-        }
-
-        @Override
-        protected Unit createObject() {
-            builder.build();
-            return Unit.INSTANCE;
-        }
-    }
-
-    private static class MachineRecipeFactory {
+    private static class RecipeFactory {
         private final Voltage voltage;
 
-        public MachineRecipeFactory(Voltage voltage) {
+        public RecipeFactory(Voltage voltage) {
             this.voltage = voltage;
         }
 
-        public MachineRecipeBuilder<MachineRecipeFactory>
+        public AssemblyRecipeBuilder<RecipeFactory>
         recipe(MachineSet machine, Voltage v1, boolean machineHull) {
+            if (!machine.hasVoltage(voltage)) {
+                return new AssemblyRecipeBuilder<>(this);
+            }
             var builder = ASSEMBLER.recipe(DATA_GEN, machine.entry(voltage))
                     .outputItem(2, machine.entry(voltage), 1)
                     .voltage(v1)
@@ -412,21 +374,70 @@ public final class Machines {
             if (machineHull) {
                 builder.inputItem(0, MACHINE_HULL.get(voltage), 1);
             }
-            return new MachineRecipeBuilder<>(this, voltage, builder);
+            return new AssemblyRecipeBuilder<>(this, voltage, builder);
         }
 
-        public MachineRecipeBuilder<MachineRecipeFactory> recipe(MachineSet machine) {
+        public AssemblyRecipeBuilder<RecipeFactory> recipe(MachineSet machine) {
             return recipe(machine, Voltage.fromRank(voltage.rank - 1), true);
         }
     }
 
-    private static void machineRecipe(Voltage v, MaterialSet base, MaterialSet polarizer, MaterialSet rotor) {
-        var factory = new MachineRecipeFactory(v);
+    private static void machineRecipe(Voltage v, MaterialSet base, MaterialSet polarizer, MaterialSet rotor,
+                                      MaterialSet heat) {
+        var factory = new RecipeFactory(v);
+        var wireNumber = 4 * v.rank;
 
-        factory.recipe(POLARIZER)
+        factory.recipe(MACERATOR)
+                .circuit(3)
+                .component(CABLE, 2)
+                .component(ELECTRIC_PISTON, 1)
+                .component(CONVEYOR_MODULE, 1)
+                .component(GRINDER, 1)
+                .tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
+                .build()
+                .recipe(ORE_WASHER)
                 .circuit(2)
                 .component(CABLE, 2)
-                .material(polarizer, "wire", 8 * (v.rank / 2))
+                .component(ELECTRIC_MOTOR, 1)
+                .material(rotor, "rotor", 2)
+                .item(() -> Blocks.GLASS, 1)
+                .build()
+                .recipe(CENTRIFUGE)
+                .circuit(4)
+                .component(CABLE, 2)
+                .component(ELECTRIC_MOTOR, 2)
+                .tech(Technologies.MOTOR)
+                .build()
+                .recipe(THERMAL_CENTRIFUGE)
+                .circuit(2)
+                .component(CABLE, 2)
+                .component(ELECTRIC_MOTOR, 2)
+                .material(heat, "wire", wireNumber)
+                .tech(Technologies.MOTOR, Technologies.ELECTRIC_HEATING)
+                .build()
+                .recipe(ELECTRIC_FURNACE)
+                .circuit(2)
+                .component(CABLE, 2)
+                .material(heat, "wire", wireNumber)
+                .material(base, "plate", 1)
+                .tech(Technologies.ELECTRIC_HEATING)
+                .build()
+                .recipe(ALLOY_SMELTER)
+                .circuit(4)
+                .material(heat, "wire", wireNumber * 2)
+                .tech(Technologies.ELECTRIC_HEATING)
+                .build()
+                .recipe(MIXER)
+                .circuit(2)
+                .component(ELECTRIC_MOTOR, 1)
+                .material(rotor, "rotor", 1)
+                .item(() -> Blocks.GLASS, 4)
+                .tech(Technologies.PUMP_AND_PISTON)
+                .build()
+                .recipe(POLARIZER)
+                .circuit(2)
+                .component(CABLE, 2)
+                .material(polarizer, "wire", wireNumber)
                 .tech(Technologies.MOTOR)
                 .build()
                 .recipe(WIREMILL)
@@ -449,11 +460,21 @@ public final class Machines {
                 .component(ELECTRIC_PISTON, 4)
                 .tech(Technologies.PUMP_AND_PISTON)
                 .build()
-                .recipe(MIXER)
-                .circuit(2)
+                .recipe(LATHE)
+                .circuit(3)
+                .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 1)
-                .material(rotor, "rotor", 1)
-                .tech(Technologies.PUMP_AND_PISTON)
+                .component(ELECTRIC_PISTON, 1)
+                .component(GRINDER, 1)
+                .tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
+                .build()
+                .recipe(CUTTER)
+                .circuit(3)
+                .component(CABLE, 2)
+                .component(ELECTRIC_MOTOR, 1)
+                .component(CONVEYOR_MODULE, 1)
+                .component(BUZZSAW, 1)
+                .tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
                 .build();
     }
 }
