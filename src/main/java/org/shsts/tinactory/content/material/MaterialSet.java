@@ -313,7 +313,7 @@ public class MaterialSet {
         }
 
         public Builder<P> polymer() {
-            return dust().dummies("sheet", "ring")
+            return dummies("sheet", "ring")
                     .alias("primary", "sheet")
                     .molten();
         }
