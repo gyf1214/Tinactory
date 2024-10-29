@@ -13,7 +13,6 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.core.util.I18n;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -57,15 +56,14 @@ public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe
 
     @Override
     protected Optional<List<Component>> buttonToolTip(SmeltingRecipe recipe) {
-        // TODO
-        return Optional.of(List.of(I18n.raw(recipe.getId().toString())));
+        return RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
+                .map(ClientUtil::itemTooltip);
     }
 
     @Override
     protected void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick,
                                 SmeltingRecipe recipe, Rect rect, int z) {
-        int x = rect.x() + 2;
-        int y = rect.y() + 2;
-        RenderUtil.renderItem(recipe.getResultItem(), x, y);
+        RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
+                .ifPresent(item -> RenderUtil.renderItem(item, rect.x() + 2, rect.y() + 2));
     }
 }

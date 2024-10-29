@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
@@ -28,6 +29,9 @@ import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
@@ -207,16 +211,26 @@ public final class RenderUtil {
         RenderSystem.disableBlend();
     }
 
+    public static Optional<ItemStack> selectItemFromItems(List<ItemStack> items) {
+        if (items.size() == 0) {
+            return Optional.empty();
+        }
+
+        var cycle = System.currentTimeMillis() / CYCLE_TIME;
+        var idx = (int) (cycle % items.size());
+        return Optional.of(items.get(idx));
+    }
+
+    public static Optional<ItemStack> selectItemFromItems(Ingredient ingredient) {
+        return selectItemFromItems(Arrays.asList(ingredient.getItems()));
+    }
+
     public static void renderIngredient(IProcessingObject ingredient, Consumer<ItemStack> itemRenderer,
                                         Consumer<FluidStack> fluidRenderer) {
 
-        ProcessingResults.consumeItemsOrFluid(ingredient, items -> {
-            if (items.size() > 0) {
-                var cycle = System.currentTimeMillis() / CYCLE_TIME;
-                var idx = (int) (cycle % items.size());
-                itemRenderer.accept(items.get(idx));
-            }
-        }, fluidRenderer);
+        ProcessingResults.consumeItemsOrFluid(ingredient,
+                items -> selectItemFromItems(items).ifPresent(itemRenderer),
+                fluidRenderer);
     }
 
     public static void fill(PoseStack poseStack, Rect rect, int color) {
