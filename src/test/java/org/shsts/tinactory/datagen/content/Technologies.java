@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -28,6 +29,7 @@ public final class Technologies {
     public static ResourceLocation ELECTRIC_HEATING;
     public static ResourceLocation MATERIAL_CUTTING;
     public static ResourceLocation CONVEYOR_MODULE;
+    public static ResourceLocation HOT_WORKING;
 
     public static void init() {
         var factory = new TechFactory();
@@ -78,6 +80,11 @@ public final class Technologies {
                 .maxProgress(40L)
                 .displayItem(AllItems.CONVEYOR_MODULE.get(Voltage.LV))
                 .buildLoc();
+
+        HOT_WORKING = factory.base(PUMP_AND_PISTON).tech("hot_working")
+                .maxProgress(40L)
+                .displayItem(Items.BLAZE_POWDER)
+                .buildLoc();
     }
 
     private static class TechFactory {
@@ -110,6 +117,11 @@ public final class Technologies {
 
         public TechFactory reset() {
             base = null;
+            return this;
+        }
+
+        public TechFactory base(ResourceLocation loc) {
+            base = loc;
             return this;
         }
     }

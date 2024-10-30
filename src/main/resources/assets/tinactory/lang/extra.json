@@ -79,5 +79,7 @@
   "tinactory.technology.material_cutting.details": "Precision technology for slicing and shaping raw materials into desired forms, enhancing manufacturing speed and allowing for complex designs.",
   "tinactory.technology.conveyor_module": "Conveyor Module",
   "tinactory.technology.conveyor_module.details": "An automated transport system designed to move resources efficiently between production lines, streamlining workflow and boosting productivity in your facilities.",
+  "tinactory.technology.hot_working": "Hot Working",
+  "tinactory.technology.hot_working.details": "A metal-forming technique that involves shaping materials at high temperatures, increasing their ductility and strength while allowing for complex designs and structural refinements.",
   "generator.tinactory.void": "Void"
 }

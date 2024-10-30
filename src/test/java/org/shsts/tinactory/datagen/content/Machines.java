@@ -6,6 +6,7 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -23,6 +24,7 @@ import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -62,6 +64,7 @@ import static org.shsts.tinactory.content.AllItems.CABLE;
 import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
+import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.GRINDER;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
@@ -275,8 +278,8 @@ public final class Machines {
     }
 
     private static void basic() {
-        machineRecipe(Voltage.LV, STEEL, TIN, TIN, COPPER);
-        machineRecipe(Voltage.MV, ALUMINIUM, COPPER, BRONZE, CUPRONICKEL);
+        machineRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, TIN);
+        machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, STEEL, BRONZE, COPPER);
     }
 
     private static void misc() {
@@ -362,34 +365,78 @@ public final class Machines {
             this.voltage = voltage;
         }
 
-        public AssemblyRecipeBuilder<RecipeFactory>
-        recipe(MachineSet machine, Voltage v1, boolean machineHull) {
-            if (!machine.hasVoltage(voltage)) {
-                return new AssemblyRecipeBuilder<>(this);
-            }
-            var builder = ASSEMBLER.recipe(DATA_GEN, machine.entry(voltage))
-                    .outputItem(2, machine.entry(voltage), 1)
+        private AssemblyRecipeBuilder<RecipeFactory>
+        recipe(RegistryEntry<? extends ItemLike> item, Voltage v1) {
+            var builder = ASSEMBLER.recipe(DATA_GEN, item)
+                    .outputItem(2, item, 1)
                     .voltage(v1)
-                    .workTicks(ASSEMBLE_TICKS);
-            if (machineHull) {
-                builder.inputItem(0, MACHINE_HULL.get(voltage), 1);
-            }
-            return new AssemblyRecipeBuilder<>(this, voltage, builder);
+                    .workTicks(ASSEMBLE_TICKS)
+                    .inputItem(0, MACHINE_HULL.get(voltage), 1);
+            return new AssemblyRecipeBuilder<>(this, voltage, builder) {
+                private int components = 0;
+                private boolean hasCable = false;
+
+                @Override
+                public AssemblyRecipeBuilder<RecipeFactory>
+                component(Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
+                    if (component != CABLE) {
+                        components += count;
+                    } else {
+                        hasCable = true;
+                    }
+                    return super.component(component, count);
+                }
+
+                @Override
+                protected Unit createObject() {
+                    if (!hasCable && components > 0) {
+                        component(CABLE, components);
+                    }
+                    return super.createObject();
+                }
+            };
         }
 
-        public AssemblyRecipeBuilder<RecipeFactory> recipe(MachineSet machine) {
-            return recipe(machine, Voltage.fromRank(voltage.rank - 1), true);
+        public AssemblyRecipeBuilder<RecipeFactory> recipe(MachineSet set, Voltage v1) {
+            if (!set.hasVoltage(voltage)) {
+                return new AssemblyRecipeBuilder<>(this);
+            }
+            return recipe(set.entry(voltage), v1);
+        }
+
+        public AssemblyRecipeBuilder<RecipeFactory>
+        recipe(Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> set, Voltage v1) {
+            if (!set.containsKey(voltage)) {
+                return new AssemblyRecipeBuilder<>(this);
+            }
+            return recipe(set.get(voltage), v1);
+        }
+
+        public AssemblyRecipeBuilder<RecipeFactory> recipe(MachineSet set) {
+            return recipe(set, Voltage.fromRank(voltage.rank - 1));
+        }
+
+        public AssemblyRecipeBuilder<RecipeFactory>
+        recipe(Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> set) {
+            return recipe(set, Voltage.fromRank(voltage.rank - 1));
         }
     }
 
-    private static void machineRecipe(Voltage v, MaterialSet base, MaterialSet polarizer, MaterialSet rotor,
-                                      MaterialSet heat) {
+    private static void machineRecipe(Voltage v, MaterialSet main, MaterialSet heat,
+                                      MaterialSet pipe, MaterialSet rotor, MaterialSet polarizer) {
         var factory = new RecipeFactory(v);
         var wireNumber = 4 * v.rank;
 
-        factory.recipe(MACERATOR)
+        factory.recipe(STONE_GENERATOR)
+                .circuit(2)
+                .component(ELECTRIC_MOTOR, 1)
+                .component(ELECTRIC_PISTON, 1)
+                .component(GRINDER, 1)
+                .item(() -> Blocks.GLASS, 1)
+                .tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
+                .build()
+                .recipe(MACERATOR)
                 .circuit(3)
-                .component(CABLE, 2)
                 .component(ELECTRIC_PISTON, 1)
                 .component(CONVEYOR_MODULE, 1)
                 .component(GRINDER, 1)
@@ -397,7 +444,6 @@ public final class Machines {
                 .build()
                 .recipe(ORE_WASHER)
                 .circuit(2)
-                .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 1)
                 .material(rotor, "rotor", 2)
                 .item(() -> Blocks.GLASS, 1)
@@ -405,22 +451,19 @@ public final class Machines {
                 .build()
                 .recipe(CENTRIFUGE)
                 .circuit(4)
-                .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 2)
                 .tech(Technologies.MOTOR)
                 .build()
                 .recipe(THERMAL_CENTRIFUGE)
                 .circuit(2)
-                .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 2)
                 .material(heat, "wire", wireNumber)
                 .tech(Technologies.MOTOR, Technologies.ELECTRIC_HEATING)
                 .build()
                 .recipe(ELECTRIC_FURNACE)
                 .circuit(2)
-                .component(CABLE, 2)
                 .material(heat, "wire", wireNumber)
-                .material(base, "plate", 1)
+                .material(main, "plate", 1)
                 .tech(Technologies.ELECTRIC_HEATING)
                 .build()
                 .recipe(ALLOY_SMELTER)
@@ -437,33 +480,28 @@ public final class Machines {
                 .build()
                 .recipe(POLARIZER)
                 .circuit(2)
-                .component(CABLE, 2)
                 .material(polarizer, "wire", wireNumber)
                 .tech(Technologies.MOTOR)
                 .build()
                 .recipe(WIREMILL)
                 .circuit(2)
-                .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 4)
                 .tech(Technologies.MOTOR)
                 .build()
                 .recipe(BENDER)
                 .circuit(2)
-                .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 2)
                 .component(ELECTRIC_PISTON, 2)
-                .material(base, "plate", 1)
+                .material(main, "plate", 1)
                 .tech(Technologies.PUMP_AND_PISTON)
                 .build()
                 .recipe(COMPRESSOR)
                 .circuit(2)
-                .component(CABLE, 2)
                 .component(ELECTRIC_PISTON, 4)
                 .tech(Technologies.PUMP_AND_PISTON)
                 .build()
                 .recipe(LATHE)
                 .circuit(3)
-                .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 1)
                 .component(ELECTRIC_PISTON, 1)
                 .component(GRINDER, 1)
@@ -471,11 +509,46 @@ public final class Machines {
                 .build()
                 .recipe(CUTTER)
                 .circuit(3)
-                .component(CABLE, 2)
                 .component(ELECTRIC_MOTOR, 1)
                 .component(CONVEYOR_MODULE, 1)
                 .component(BUZZSAW, 1)
                 .tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
+                .build()
+                .recipe(EXTRACTOR)
+                .circuit(2)
+                .component(ELECTRIC_PISTON, 1)
+                .component(ELECTRIC_PUMP, 1)
+                .material(heat, "wire", wireNumber)
+                .item(() -> Items.GLASS, 2)
+                .tech(Technologies.HOT_WORKING)
+                .build()
+                .recipe(FLUID_SOLIDIFIER)
+                .circuit(2)
+                .component(ELECTRIC_PUMP, 2)
+                .item(() -> Items.GLASS, 2)
+                .tech(Technologies.HOT_WORKING)
+                .build()
+                .recipe(STEAM_TURBINE)
+                .circuit(2)
+                .component(ELECTRIC_MOTOR, 2)
+                .material(rotor, "rotor", 2)
+                .material(pipe, "pipe", 2)
+                .tech(Technologies.MOTOR)
+                .build()
+                .recipe(ELECTRIC_CHEST)
+                .circuit(4)
+                .component(CONVEYOR_MODULE, 1)
+                .material(main, "plate", 2)
+                .item(() -> Items.CHEST, 1)
+                .tech(Technologies.CONVEYOR_MODULE)
+                .build()
+                .recipe(MULTI_BLOCK_INTERFACE)
+                .circuit(2)
+                .component(CONVEYOR_MODULE, 1)
+                .component(ELECTRIC_PUMP, 1)
+                .item(() -> Items.CHEST, 1)
+                .item(() -> Items.GLASS, 1)
+                .tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
                 .build();
     }
 }
