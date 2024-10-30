@@ -30,6 +30,7 @@ public final class Technologies {
     public static ResourceLocation MATERIAL_CUTTING;
     public static ResourceLocation CONVEYOR_MODULE;
     public static ResourceLocation HOT_WORKING;
+    public static ResourceLocation BATTERY;
 
     public static void init() {
         var factory = new TechFactory();
@@ -79,6 +80,11 @@ public final class Technologies {
         CONVEYOR_MODULE = factory.tech("conveyor_module")
                 .maxProgress(40L)
                 .displayItem(AllItems.CONVEYOR_MODULE.get(Voltage.LV))
+                .buildLoc();
+
+        BATTERY = factory.tech("battery")
+                .maxProgress(40L)
+                .displayItem(AllItems.BATTERY.get(Voltage.LV))
                 .buildLoc();
 
         HOT_WORKING = factory.base(PUMP_AND_PISTON).tech("hot_working")

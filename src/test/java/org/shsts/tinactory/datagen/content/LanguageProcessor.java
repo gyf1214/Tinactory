@@ -98,6 +98,8 @@ public class LanguageProcessor {
                 fmt("Unlock ores from %s.", normalize(matcher, 1)));
         pattern("tinactory[.]technology[.]ore_base[.](.*)", matcher ->
                 fmt("%s Ores", normalize(matcher, 1)));
+        pattern("tinactory[.]technology[.]([^.]*)", matcher ->
+                fmt("%s", normalize(matcher, 1)));
         pattern("tinactory[.]jei[.]category[.](.*)", matcher ->
                 normalize(matcher, 1));
     }
