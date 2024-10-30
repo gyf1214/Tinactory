@@ -13,6 +13,7 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.datagen.content.builder.MaterialBuilder;
 import org.shsts.tinactory.datagen.content.model.IconSet;
@@ -250,6 +251,20 @@ public final class Materials {
     }
 
     private static void ores() {
+        // stone generator
+        for (var variant : OreVariant.values()) {
+            STONE_GENERATOR.recipe(DATA_GEN, variant.baseItem)
+                    .outputItem(0, variant.baseItem, 1)
+                    .voltage(variant == OreVariant.STONE ? Voltage.PRIMITIVE : variant.voltage)
+                    .build();
+        }
+        // generate water
+        STONE_GENERATOR
+                .recipe(DATA_GEN, Fluids.WATER)
+                .outputFluid(1, Fluids.WATER, 1000)
+                .voltage(Voltage.ULV)
+                .build();
+
         FACTORY.material(CHALCOPYRITE, DULL)
                 .primitiveOreProcess(SULFUR, COBALTITE, SULFUR)
                 .smelt(COPPER)
@@ -311,17 +326,6 @@ public final class Materials {
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
                 .smelting(Ingredient.of(IRON.tag("nugget")), WROUGHT_IRON.item("nugget"), 0, 200)
                 .unlockedBy("has_material", has(IRON.tag("nugget"))), "_from_iron");
-
-        // generate cobblestone
-        STONE_GENERATOR.recipe(DATA_GEN, Items.COBBLESTONE)
-                .outputItem(0, Items.COBBLESTONE, 1)
-                .primitive()
-                .build()
-                // generate water
-                .recipe(DATA_GEN, Fluids.WATER)
-                .outputFluid(1, Fluids.WATER, 1000)
-                .voltage(Voltage.ULV)
-                .build();
 
         // stone -> gravel
         TOOL_CRAFTING.recipe(DATA_GEN, Items.GRAVEL)
