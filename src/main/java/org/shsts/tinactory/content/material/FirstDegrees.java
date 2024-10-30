@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.world.item.Tiers;
 
+import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
@@ -49,6 +50,11 @@ public final class FirstDegrees {
         RED_ALLOY = set("red_alloy")
                 .color(0xFFC80000)
                 .wireAndPlate()
+                .buildObject();
+
+        BATTERY_ALLOY = set("battery_alloy")
+                .color(0xFF9C7CA0)
+                .plate()
                 .buildObject();
     }
 

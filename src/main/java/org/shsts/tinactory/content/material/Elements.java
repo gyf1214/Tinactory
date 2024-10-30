@@ -15,6 +15,7 @@ import static org.shsts.tinactory.content.AllMaterials.COBALT;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
@@ -110,6 +111,11 @@ public final class Elements {
         ALUMINIUM = set("aluminium")
                 .color(0xFF80C8F0)
                 .mechanical().gear().molten()
+                .buildObject();
+
+        LEAD = set("lead")
+                .color(0xFF8C648C)
+                .metal()
                 .buildObject();
     }
 

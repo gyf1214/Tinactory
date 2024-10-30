@@ -29,6 +29,7 @@ import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
+import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
@@ -46,6 +47,7 @@ import static org.shsts.tinactory.content.AllMaterials.GLOWSTONE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
@@ -204,11 +206,14 @@ public final class Materials {
                 .material(CHROME, SHINY).build()
                 .material(ANTIMONY, SHINY).build()
                 .material(SILVER, SHINY)
-                .machineProcess(Voltage.LV)
+                .machineProcess(Voltage.LV).smelt()
                 .build()
                 .material(VANADIUM, METALLIC).build()
                 .material(ALUMINIUM, DULL)
                 .machineProcess(Voltage.LV)
+                .build()
+                .material(LEAD, DULL)
+                .machineProcess(Voltage.LV).smelt()
                 .build();
     }
 
@@ -235,8 +240,12 @@ public final class Materials {
                 .toolProcess(1.5d)
                 .build()
                 .material(RED_ALLOY, DULL)
-                .toolProcess(0.5d)
+                .toolProcess(0.5d).smelt()
                 .alloy(Voltage.ULV, 1, COPPER, 1, REDSTONE, 4)
+                .build()
+                .material(BATTERY_ALLOY, DULL)
+                .machineProcess(Voltage.LV).smelt()
+                .alloy(Voltage.LV, LEAD, 4, ANTIMONY, 1)
                 .build();
     }
 

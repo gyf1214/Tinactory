@@ -35,6 +35,7 @@ public final class AllMaterials {
     public static MaterialSet SILVER;
     public static MaterialSet VANADIUM;
     public static MaterialSet ALUMINIUM;
+    public static MaterialSet LEAD;
 
     // First Degree
     public static MaterialSet WROUGHT_IRON;
@@ -44,6 +45,7 @@ public final class AllMaterials {
     public static MaterialSet CUPRONICKEL;
     public static MaterialSet STEEL;
     public static MaterialSet RED_ALLOY;
+    public static MaterialSet BATTERY_ALLOY;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
