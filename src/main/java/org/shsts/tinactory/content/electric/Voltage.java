@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -39,8 +40,11 @@ public enum Voltage {
     }
 
     public static Voltage fromRank(int rank) {
-        return Arrays.stream(Voltage.values())
-                .filter(v -> v.rank == rank)
-                .findAny().orElseThrow();
+        for (var voltage : Voltage.values()) {
+            if (voltage.rank == rank) {
+                return voltage;
+            }
+        }
+        throw new NoSuchElementException();
     }
 }

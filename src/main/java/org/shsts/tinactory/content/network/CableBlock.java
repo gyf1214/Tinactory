@@ -25,6 +25,7 @@ import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.core.common.Transformer;
@@ -58,14 +59,16 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     public final Voltage voltage;
     private final double resistance;
     private final Map<BlockState, VoxelShape> shapes;
+    public final MaterialSet material;
 
-    public CableBlock(Properties properties, int radius, Voltage voltage) {
+    public CableBlock(Properties properties, int radius, Voltage voltage, MaterialSet mat) {
         super(properties.strength(2f).requiresCorrectToolForDrops());
         this.radius = radius;
         this.voltage = voltage;
         this.resistance = (double) voltage.rank *
                 TinactoryConfig.INSTANCE.cableResistanceFactor.get();
         this.shapes = makeShapes();
+        this.material = mat;
 
         var defaultState = stateDefinition.any()
                 .setValue(NORTH, false)
@@ -77,9 +80,9 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         registerDefaultState(defaultState);
     }
 
-    public static Function<Properties, CableBlock> cable(Voltage voltage) {
+    public static Function<Properties, CableBlock> cable(Voltage voltage, MaterialSet mat) {
         var radius = voltage == Voltage.ULV ? WIRE_RADIUS : RADIUS;
-        return prop -> new CableBlock(prop, radius, voltage);
+        return prop -> new CableBlock(prop, radius, voltage, mat);
     }
 
     public static <S extends BlockBuilder<?, ?, S>>

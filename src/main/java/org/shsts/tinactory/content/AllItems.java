@@ -172,7 +172,7 @@ public final class AllItems {
                 .buildObject();
 
         CABLE = ComponentBuilder.<CableBlock, MaterialSet>builder((v, mat) -> REGISTRATE
-                        .block("network/" + v.id + "/cable", CableBlock.cable(v))
+                        .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
                         .transform(CableBlock.tint(v, mat.color))
                         .translucent()
                         .register())

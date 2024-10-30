@@ -16,6 +16,7 @@ import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -189,6 +190,19 @@ public final class Components {
                 .define('R', RUBBER.tag("sheet"))
                 .toolTag(TOOL_WIRE_CUTTER)
                 .build();
+
+        CABLE.forEach((v, cable) -> {
+            if (v != Voltage.ULV) {
+                ASSEMBLER.recipe(DATA_GEN, cable)
+                        .outputItem(2, cable, 1)
+                        .input(0, () -> new ProcessingIngredients.TagIngredient(cable.get().material.tag("wire"), 4))
+                        .inputFluid(1, RUBBER.fluidEntry(), 288)
+                        .voltage(v == Voltage.LV ? Voltage.ULV : Voltage.LV)
+                        .requireTech(Technologies.HOT_WORKING)
+                        .workTicks(100L)
+                        .build();
+            }
+        });
 
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL);
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, STEEL, BRONZE, STEEL);

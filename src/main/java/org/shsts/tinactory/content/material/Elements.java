@@ -41,7 +41,7 @@ public final class Elements {
                 .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
                 .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
                 .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
-                .nugget().molten()
+                .nugget().wire().molten()
                 .ore(OreVariant.DEEPSLATE)
                 .buildObject();
 
@@ -110,7 +110,7 @@ public final class Elements {
 
         ALUMINIUM = set("aluminium")
                 .color(0xFF80C8F0)
-                .mechanical().gear().molten()
+                .mechanical().gear().wire().molten()
                 .buildObject();
 
         LEAD = set("lead")
