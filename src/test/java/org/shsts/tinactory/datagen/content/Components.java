@@ -47,7 +47,9 @@ import static org.shsts.tinactory.content.AllItems.RESISTOR;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
+import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
@@ -78,6 +80,7 @@ public final class Components {
     private static final String RESEARCH_TEX = "metaitems/glass_vial/";
     private static final String GRINDER_TEX = "metaitems/component.grinder";
     private static final String BUZZSAW_TEX = "tools/buzzsaw";
+    private static final int ASSEMBLY_TICKS = 100;
 
     public static void init() {
         componentItems();
@@ -207,6 +210,8 @@ public final class Components {
 
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL);
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, STEEL, BRONZE, STEEL);
+
+        batteryRecipe(Voltage.LV, CADMIUM);
     }
 
     private static void misc() {
@@ -224,7 +229,6 @@ public final class Components {
     }
 
     private static class ComponentRecipeFactory {
-        private static final int TICKS = 100;
 
         private final Voltage voltage;
         private final Voltage baseVoltage;
@@ -242,7 +246,7 @@ public final class Components {
             var builder = ASSEMBLER.recipe(DATA_GEN, component.get(voltage))
                     .outputItem(2, component.get(voltage), count)
                     .voltage(baseVoltage)
-                    .workTicks(TICKS);
+                    .workTicks(ASSEMBLY_TICKS);
             return new AssemblyRecipeBuilder<>(this, voltage, builder);
         }
 
@@ -291,6 +295,21 @@ public final class Components {
                 .material(main, "plate", 8)
                 .component(CABLE, 2)
                 // TODO: plastic
+                .build();
+    }
+
+    private static void batteryRecipe(Voltage voltage, MaterialSet material) {
+        var wires = voltage.rank - 1;
+        var plates = wires * wires;
+
+        ASSEMBLER.recipe(DATA_GEN, BATTERY.get(voltage))
+                .outputItem(2, BATTERY.get(voltage), 1)
+                .inputItem(0, CABLE.get(voltage), wires)
+                .inputItem(0, BATTERY_ALLOY.tag("plate"), plates)
+                .inputItem(0, material.tag("dust"), plates)
+                .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(wires))
+                .voltage(Voltage.LV)
+                .workTicks(ASSEMBLY_TICKS)
                 .build();
     }
 
