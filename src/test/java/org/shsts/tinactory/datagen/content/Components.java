@@ -212,6 +212,10 @@ public final class Components {
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, STEEL, BRONZE, STEEL);
 
         batteryRecipe(Voltage.LV, CADMIUM);
+        // TODO: Na
+        batteryRecipe(Voltage.MV, CADMIUM);
+        // TODO: Li
+        batteryRecipe(Voltage.HV, CADMIUM);
     }
 
     private static void misc() {
@@ -302,9 +306,12 @@ public final class Components {
         var wires = voltage.rank - 1;
         var plates = wires * wires;
 
-        ASSEMBLER.recipe(DATA_GEN, BATTERY.get(voltage))
-                .outputItem(2, BATTERY.get(voltage), 1)
-                .inputItem(0, CABLE.get(voltage), wires)
+        var builder = ASSEMBLER.recipe(DATA_GEN, BATTERY.get(voltage))
+                .outputItem(2, BATTERY.get(voltage), 1);
+        if (voltage.rank > Voltage.LV.rank) {
+            builder.inputItem(0, BATTERY.get(Voltage.fromRank(voltage.rank - 1)), 2);
+        }
+        builder.inputItem(0, CABLE.get(voltage), wires)
                 .inputItem(0, BATTERY_ALLOY.tag("plate"), plates)
                 .inputItem(0, material.tag("dust"), plates)
                 .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(wires))
