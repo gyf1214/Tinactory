@@ -46,6 +46,7 @@ public final class AllMaterials {
     public static MaterialSet STEEL;
     public static MaterialSet RED_ALLOY;
     public static MaterialSet BATTERY_ALLOY;
+    public static MaterialSet SOLDERING_ALLOY;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;

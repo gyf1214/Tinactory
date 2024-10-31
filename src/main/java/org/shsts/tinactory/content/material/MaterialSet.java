@@ -77,6 +77,7 @@ public class MaterialSet {
     private final OreVariant oreVariant;
     @Nullable
     private final RegistryEntry<? extends Fluid> fluid;
+    public final int fluidBaseAmount;
 
     private MaterialSet(Builder<?> builder) {
         this.name = builder.name;
@@ -85,6 +86,7 @@ public class MaterialSet {
         this.blocks = builder.blocks;
         this.oreVariant = builder.oreVariant;
         this.fluid = builder.fluid;
+        this.fluidBaseAmount = builder.fluidBaseAmount;
     }
 
     private ItemEntry safeItem(String sub) {
@@ -160,6 +162,10 @@ public class MaterialSet {
         return fluid;
     }
 
+    public int fluidAmount(float count) {
+        return Math.round(count * fluidBaseAmount);
+    }
+
     public OreVariant oreVariant() {
         assert oreVariant != null;
         return oreVariant;
@@ -174,6 +180,7 @@ public class MaterialSet {
         private OreVariant oreVariant = null;
         @Nullable
         private RegistryEntry<? extends Fluid> fluid = null;
+        private int fluidBaseAmount = 0;
 
         public Builder(P parent, String name) {
             super(parent);
@@ -335,10 +342,15 @@ public class MaterialSet {
             return dummies("gem").alias("primary", "gem");
         }
 
-        public Builder<P> molten() {
-            fluid = REGISTRATE.simpleFluid("material/molten/" + name,
+        public Builder<P> fluid(String sub, int baseAmount) {
+            fluid = REGISTRATE.simpleFluid("material/" + sub + "/" + name,
                     gregtech("blocks/material_sets/dull/liquid"), color);
+            fluidBaseAmount = baseAmount;
             return this;
+        }
+
+        public Builder<P> molten() {
+            return fluid("molten", 144);
         }
 
         public Builder<P> ore(OreVariant variant) {

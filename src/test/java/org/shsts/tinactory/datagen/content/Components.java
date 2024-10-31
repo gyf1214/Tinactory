@@ -55,6 +55,7 @@ import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
+import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
@@ -283,7 +284,7 @@ public final class Components {
                 .recipe(CONVEYOR_MODULE)
                 .component(ELECTRIC_MOTOR, 2)
                 .component(CABLE, 1)
-                // TODO: rubber liquid
+                .materialFluid(RUBBER, 6)
                 .tech(Technologies.CONVEYOR_MODULE)
                 .build()
                 .recipe(MACHINE_HULL)
@@ -330,8 +331,9 @@ public final class Components {
         if (voltage.rank < Voltage.LV.rank) {
             voltage = Voltage.LV;
         }
-        // TODO: soldering
         builder.voltage(voltage)
+                .inputFluid(1, SOLDERING_ALLOY.fluidEntry(),
+                        SOLDERING_ALLOY.fluidAmount((1 << (level - 1)) / 2f))
                 .workTicks(200L * level)
                 .build();
     }

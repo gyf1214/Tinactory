@@ -336,6 +336,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     public MaterialBuilder<P> alloy(Voltage voltage, Object... components) {
         var alloyCount = 0;
         var totalCount = 0;
+        var isFluid = !material.hasItem("primary");
         var i = 0;
 
         if (components[0] instanceof Integer k) {
@@ -343,7 +344,8 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             i = 1;
         }
 
-        var builder = ALLOY_SMELTER.recipe(dataGen, material.loc("ingot"))
+        var loc = isFluid ? material.fluidEntry().loc : material.loc("primary");
+        var builder = ALLOY_SMELTER.recipe(dataGen, loc)
                 .voltage(voltage);
         for (; i < components.length; i += 2) {
             var component = (MaterialSet) components[i];
@@ -354,8 +356,12 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         if (alloyCount == 0) {
             alloyCount = totalCount;
         }
-        builder.outputItem(1, material.entry("ingot"), alloyCount)
-                .workTicks(100L * totalCount)
+        if (isFluid) {
+            builder.outputFluid(2, material.fluidEntry(), material.fluidAmount(alloyCount));
+        } else {
+            builder.outputItem(1, material.entry("primary"), alloyCount);
+        }
+        builder.workTicks(40L * totalCount)
                 .build();
         return this;
     }

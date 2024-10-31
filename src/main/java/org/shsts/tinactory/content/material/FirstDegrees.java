@@ -9,6 +9,7 @@ import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.set;
@@ -55,6 +56,11 @@ public final class FirstDegrees {
         BATTERY_ALLOY = set("battery_alloy")
                 .color(0xFF9C7CA0)
                 .plate()
+                .buildObject();
+
+        SOLDERING_ALLOY = set("soldering_alloy")
+                .color(0xFF9696A0)
+                .molten()
                 .buildObject();
     }
 

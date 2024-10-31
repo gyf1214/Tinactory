@@ -57,6 +57,14 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
         return this;
     }
 
+    public AssemblyRecipeBuilder<P>
+    materialFluid(MaterialSet material, float count) {
+        if (builder != null) {
+            builder.inputFluid(0, material.fluidEntry(), material.fluidAmount(count));
+        }
+        return this;
+    }
+
     public AssemblyRecipeBuilder<P> tech(ResourceLocation... loc) {
         if (builder != null) {
             builder.requireTech(loc);

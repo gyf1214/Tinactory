@@ -61,6 +61,7 @@ import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
+import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
@@ -247,6 +248,9 @@ public final class Materials {
                 .material(BATTERY_ALLOY, DULL)
                 .machineProcess(Voltage.LV).smelt()
                 .alloy(Voltage.LV, LEAD, 4, ANTIMONY, 1)
+                .build()
+                .material(SOLDERING_ALLOY, DULL)
+                .alloy(Voltage.LV, TIN, 6, LEAD, 3, ANTIMONY, 1)
                 .build();
     }
 
