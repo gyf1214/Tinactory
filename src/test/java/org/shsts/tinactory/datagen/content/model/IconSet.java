@@ -31,6 +31,7 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     public static final IconSet METALLIC = new IconSet("metallic");
     public static final IconSet SHINY = new IconSet("shiny");
     public static final IconSet RUBY = new IconSet("ruby", SHINY);
+    public static final IconSet DIAMOND = new IconSet("diamond", SHINY);
 
     private IconSet() {
         this("dull", null);

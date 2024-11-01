@@ -297,19 +297,19 @@ public class MaterialSet {
         }
 
         public Builder<P> wire() {
-            return metal().dummies("wire");
+            return metal().dummies("wire", "dust_tiny");
         }
 
         public Builder<P> metalExt() {
-            return metal().dummies("plate", "stick", "dust_tiny");
+            return metal().plate().stick();
         }
 
         public Builder<P> foil() {
-            return plate().dummies("foil");
+            return plate().dummies("foil", "dust_tiny");
         }
 
         public Builder<P> wireAndPlate() {
-            return plate().dummies("wire");
+            return plate().wire();
         }
 
         public Builder<P> pipe() {

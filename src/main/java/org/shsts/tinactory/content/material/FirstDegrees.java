@@ -9,6 +9,7 @@ import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
@@ -61,6 +62,11 @@ public final class FirstDegrees {
         SOLDERING_ALLOY = set("soldering_alloy")
                 .color(0xFF9696A0)
                 .molten()
+                .buildObject();
+
+        RUTILE = set("rutile")
+                .color(0xFFD40D5C)
+                .dust()
                 .buildObject();
     }
 

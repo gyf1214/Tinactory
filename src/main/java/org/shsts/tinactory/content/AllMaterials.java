@@ -36,6 +36,10 @@ public final class AllMaterials {
     public static MaterialSet VANADIUM;
     public static MaterialSet ALUMINIUM;
     public static MaterialSet LEAD;
+    public static MaterialSet ZINC;
+    public static MaterialSet GALLIUM;
+    public static MaterialSet CARBON;
+    public static MaterialSet MANGANESE;
 
     // First Degree
     public static MaterialSet WROUGHT_IRON;
@@ -47,6 +51,7 @@ public final class AllMaterials {
     public static MaterialSet RED_ALLOY;
     public static MaterialSet BATTERY_ALLOY;
     public static MaterialSet SOLDERING_ALLOY;
+    public static MaterialSet RUTILE;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
@@ -60,6 +65,12 @@ public final class AllMaterials {
     public static MaterialSet CINNABAR;
     public static MaterialSet RUBY;
     public static MaterialSet MAGNETITE;
+    public static MaterialSet GALENA;
+    public static MaterialSet SPHALERITE;
+    public static MaterialSet GRAPHITE;
+    public static MaterialSet DIAMOND;
+    public static MaterialSet BAUXITE;
+    public static MaterialSet ILMENITE;
 
     public static MaterialSet TEST;
     public static MaterialSet STONE;

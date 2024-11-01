@@ -10,19 +10,23 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
+import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
 import static org.shsts.tinactory.content.AllMaterials.COBALT;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
+import static org.shsts.tinactory.content.AllMaterials.GALLIUM;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
+import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
+import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
 @ParametersAreNonnullByDefault
@@ -101,6 +105,7 @@ public final class Elements {
         SILVER = set("silver")
                 .color(0xFFDCDCFF)
                 .foil().wire().molten()
+                .ore(OreVariant.DEEPSLATE)
                 .buildObject();
 
         VANADIUM = set("vanadium")
@@ -115,7 +120,27 @@ public final class Elements {
 
         LEAD = set("lead")
                 .color(0xFF8C648C)
-                .metal()
+                .metal().molten()
+                .buildObject();
+
+        ZINC = set("zinc")
+                .color(0xFFEBEBFA)
+                .metal().foil().molten()
+                .buildObject();
+
+        GALLIUM = set("gallium")
+                .color(0xFFDCDCFF)
+                .metal().foil().molten()
+                .buildObject();
+
+        CARBON = set("carbon")
+                .color(0xFF141414)
+                .dustPrimary().molten()
+                .buildObject();
+
+        MANGANESE = set("manganese")
+                .color(0xFFCDE1B9)
+                .dust()
                 .buildObject();
     }
 

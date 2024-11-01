@@ -7,16 +7,22 @@ import net.minecraftforge.common.Tags;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
+import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
+import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
+import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
+import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
+import static org.shsts.tinactory.content.AllMaterials.ILMENITE;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
+import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
 @ParametersAreNonnullByDefault
@@ -78,6 +84,38 @@ public final class Ores {
 
         MAGNETITE = set("magnetite")
                 .color(0xFF1E1E1E)
+                .ore(OreVariant.DEEPSLATE)
+                .buildObject();
+
+        GALENA = set("galena")
+                .color(0xFF643C64)
+                .ore(OreVariant.DEEPSLATE)
+                .buildObject();
+
+        SPHALERITE = set("sphalerite")
+                .color(0xFFFFFFFF)
+                .ore(OreVariant.DEEPSLATE)
+                .buildObject();
+
+        GRAPHITE = set("graphite")
+                .color(0xFF808080)
+                .ore(OreVariant.DEEPSLATE)
+                .buildObject();
+
+        DIAMOND = set("diamond")
+                .color(0xFFC8FFFF)
+                .existing("gem", Tags.Items.GEMS_DIAMOND, Items.DIAMOND)
+                .gem()
+                .ore(OreVariant.DEEPSLATE)
+                .buildObject();
+
+        BAUXITE = set("bauxite")
+                .color(0xFFC86400)
+                .ore(OreVariant.DEEPSLATE)
+                .buildObject();
+
+        ILMENITE = set("ilmenite")
+                .color(0xFF463732)
                 .ore(OreVariant.DEEPSLATE)
                 .buildObject();
     }

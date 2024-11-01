@@ -31,8 +31,10 @@ import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
+import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
@@ -42,16 +44,22 @@ import static org.shsts.tinactory.content.AllMaterials.COBALT;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
+import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
+import static org.shsts.tinactory.content.AllMaterials.GALENA;
+import static org.shsts.tinactory.content.AllMaterials.GALLIUM;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.GLOWSTONE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
+import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
+import static org.shsts.tinactory.content.AllMaterials.ILMENITE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
+import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
@@ -60,8 +68,10 @@ import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
+import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
@@ -70,6 +80,7 @@ import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
+import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
@@ -209,6 +220,7 @@ public final class Materials {
                 .material(ANTIMONY, SHINY).build()
                 .material(SILVER, SHINY)
                 .machineProcess(Voltage.LV).smelt()
+                .oreProcess(ANTIMONY, ANTIMONY, GALLIUM)
                 .build()
                 .material(VANADIUM, METALLIC).build()
                 .material(ALUMINIUM, DULL)
@@ -216,6 +228,17 @@ public final class Materials {
                 .build()
                 .material(LEAD, DULL)
                 .machineProcess(Voltage.LV).smelt()
+                .build()
+                .material(ZINC, METALLIC)
+                .machineProcess(Voltage.LV).smelt()
+                .build()
+                .material(GALLIUM, SHINY)
+                .machineProcess(Voltage.LV).smelt()
+                .build()
+                .material(CARBON, DULL)
+                .machineProcess(Voltage.HV)
+                .build()
+                .material(MANGANESE, DULL)
                 .build();
     }
 
@@ -251,6 +274,8 @@ public final class Materials {
                 .build()
                 .material(SOLDERING_ALLOY, DULL)
                 .alloy(Voltage.LV, TIN, 6, LEAD, 3, ANTIMONY, 1)
+                .build()
+                .material(RUTILE, SHINY)
                 .build();
     }
 
@@ -274,14 +299,14 @@ public final class Materials {
                 .smelt(COPPER)
                 .build()
                 .material(PYRITE, ROUGH)
-                .primitiveOreProcess(SULFUR, SULFUR, CADMIUM)
+                .primitiveOreProcess(SULFUR, COPPER, CADMIUM)
                 .smelt(IRON)
                 .build()
                 .material(LIMONITE, METALLIC)
-                .oreProcess(NICKEL).smelt(IRON)
+                .oreProcess(NICKEL, COPPER, NICKEL).smelt(IRON)
                 .build()
                 .material(BANDED_IRON, DULL)
-                .oreProcess(NICKEL).smelt(IRON)
+                .oreProcess(NICKEL, COPPER, NICKEL).smelt(IRON)
                 .build()
                 .material(GARNIERITE, METALLIC)
                 .oreProcess(MAGNESIUM, MAGNESIUM, NICKEL)
@@ -289,7 +314,8 @@ public final class Materials {
                 .build()
                 .material(COAL, DULL)
                 .toolProcess()
-                .siftingOreProcess(2, COAL, COAL, THORIUM)
+                .oreBuilder(COAL, COAL, THORIUM)
+                .amount(2).siftAndHammer().build()
                 .build()
                 .material(CASSITERITE, METALLIC)
                 .oreProcess(2, TIN).smelt(TIN)
@@ -305,8 +331,29 @@ public final class Materials {
                 .oreProcess(CHROME, RUBY, CHROME)
                 .build()
                 .material(MAGNETITE, METALLIC)
-                .oreProcess(GOLD, VANADIUM, GOLD)
+                .oreProcess(GOLD, VANADIUM, COPPER)
                 .smelt(IRON)
+                .build()
+                .material(GALENA, DULL)
+                .oreProcess(SULFUR, ANTIMONY, SILVER)
+                .smelt(LEAD)
+                .build()
+                .material(SPHALERITE, DULL)
+                .oreProcess(SULFUR, SILVER, GALLIUM)
+                .smelt(ZINC)
+                .build()
+                .material(GRAPHITE, DULL)
+                .oreProcess(CARBON)
+                .build()
+                .material(DIAMOND, IconSet.DIAMOND)
+                .oreBuilder(CARBON).siftAndHammer().build()
+                .machineProcess(Voltage.LV, 2)
+                .build()
+                .material(BAUXITE, DULL)
+                .oreProcess(ALUMINIUM, GALLIUM, RUTILE)
+                .build()
+                .material(ILMENITE, METALLIC)
+                .oreProcess(MANGANESE, MANGANESE, RUTILE)
                 .build();
     }
 
@@ -325,6 +372,9 @@ public final class Materials {
         disableVanillaOres("iron");
         disableVanillaOres("gold");
         disableVanillaOres("copper");
+        disableVanillaOres("diamond", "");
+        disableVanillaOres("redstone", "");
+        disableVanillaOres("lapis", "lazuli");
 
         // smelt wrought iron nugget
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
@@ -387,35 +437,48 @@ public final class Materials {
                 .build();
     }
 
-    private static void disableVanillaOres(String name) {
-        DATA_GEN.nullRecipe("raw_" + name)
-                .nullRecipe("raw_" + name + "_block")
-                .nullRecipe(name + "_block");
+    private static final String[] VANILLA_METHODS = new String[]{"smelting", "blasting"};
 
-        var methods = List.of("smelting", "blasting");
+    private static void disableVanillaOres(String name, String suffix) {
+        var fullName = name + (suffix.isEmpty() ? "" : "_" + suffix);
 
-        if (name.equals("copper")) {
-            DATA_GEN.nullRecipe("copper_ingot")
-                    .nullRecipe("copper_ingot_from_waxed_copper_block");
-        } else {
-            DATA_GEN.nullRecipe(name + "_ingot_from_" + name + "_block")
-                    .nullRecipe(name + "_ingot_from_nuggets")
-                    .nullRecipe(name + "_nugget");
-            for (var method : methods) {
-                DATA_GEN.nullRecipe(name + "_nugget_from_" + method);
+        DATA_GEN.nullRecipe(name + "_block");
+
+        if (suffix.equals("ingot")) {
+            DATA_GEN.nullRecipe("raw_" + name)
+                    .nullRecipe("raw_" + name + "_block");
+            if (name.equals("copper")) {
+                DATA_GEN.nullRecipe(fullName)
+                        .nullRecipe(fullName + "_from_waxed_copper_block");
+            } else {
+                DATA_GEN.nullRecipe(fullName + "_from_" + name + "_block")
+                        .nullRecipe(fullName + "_from_nuggets")
+                        .nullRecipe(name + "_nugget");
+                for (var method : VANILLA_METHODS) {
+                    DATA_GEN.nullRecipe(name + "_nugget_from_" + method);
+                }
             }
+        } else {
+            DATA_GEN.nullRecipe(fullName);
         }
 
         var ores = new ArrayList<>(List.of("", "_deepslate"));
         if (name.equals("gold")) {
             ores.add("_nether");
         }
-        for (var method : methods) {
+
+        for (var method : VANILLA_METHODS) {
             for (var ore : ores) {
-                DATA_GEN.nullRecipe(name + "_ingot_from_" + method + ore + "_" + name + "_ore");
+                DATA_GEN.nullRecipe(fullName + "_from_" + method + ore + "_" + name + "_ore");
             }
-            DATA_GEN.nullRecipe(name + "_ingot_from_" + method + "_raw_" + name);
+            if (suffix.equals("ingot")) {
+                DATA_GEN.nullRecipe(fullName + "_from_" + method + "_raw_" + name);
+            }
         }
+    }
+
+    private static void disableVanillaOres(String name) {
+        disableVanillaOres(name, "ingot");
     }
 
     private static void tags() {

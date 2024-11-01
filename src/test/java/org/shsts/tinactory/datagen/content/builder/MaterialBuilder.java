@@ -366,21 +366,13 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
-    private OreRecipeBuilder oreBuilder(MaterialSet... byproduct) {
+    public OreRecipeBuilder oreBuilder(MaterialSet... byproduct) {
         return new OreRecipeBuilder(byproduct);
     }
 
     public MaterialBuilder<P>
     oreProcess(int amount, MaterialSet... byproduct) {
         return oreBuilder(byproduct)
-                .amount(amount)
-                .build();
-    }
-
-    public MaterialBuilder<P>
-    siftingOreProcess(int amount, MaterialSet... byproduct) {
-        return oreBuilder(byproduct)
-                .sifting()
                 .amount(amount)
                 .build();
     }
@@ -555,10 +547,10 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         process("tool/" + sub, 1, pattern, args);
     }
 
-    private class OreRecipeBuilder {
+    public class OreRecipeBuilder {
         private int amount = 1;
         private boolean primitive = false;
-        private boolean sifting = material.hasItem("gem");
+        private boolean hammerPrimary = false;
         private final OreVariant variant;
         private final Supplier<? extends Item> byproduct0, byproduct1, byproduct2;
 
@@ -589,8 +581,9 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             return this;
         }
 
-        public OreRecipeBuilder sifting() {
-            this.sifting = true;
+        public OreRecipeBuilder siftAndHammer() {
+            this.hammerPrimary = true;
+            // TODO: sifting
             return this;
         }
 
@@ -626,13 +619,17 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
 
         public MaterialBuilder<P> build() {
             if (primitive || variant.voltage.rank <= Voltage.ULV.rank) {
-                if (sifting) {
-                    process("primary", amount, "raw", TOOL_HAMMER);
-                } else {
+                if (material.hasItem("gem")) {
+                    hammerPrimary = true;
+                } else if (!hammerPrimary) {
                     process("crushed", amount, "raw", TOOL_HAMMER);
                 }
                 process("dust_pure", 1, "crushed_purified", TOOL_HAMMER);
                 process("dust_impure", 1, "crushed", TOOL_HAMMER);
+            }
+
+            if (hammerPrimary) {
+                process("primary", amount, "raw", TOOL_HAMMER);
             }
 
             crush("crushed", "raw");
