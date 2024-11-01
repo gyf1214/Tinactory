@@ -2,14 +2,17 @@ package org.shsts.tinactory.content;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.BoilerPlugin;
+import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
+import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
-import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveMachine;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -40,10 +43,8 @@ import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
-import static org.shsts.tinactory.content.machine.ProcessingSet.generator;
-import static org.shsts.tinactory.content.machine.ProcessingSet.machine;
+import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
-import static org.shsts.tinactory.content.machine.ProcessingSet.research;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
@@ -89,7 +90,11 @@ public final class AllBlockEntities {
     static {
         PROCESSING_SETS = new HashSet<>();
 
-        RESEARCH_BENCH = set(research())
+        var set = new SetFactory();
+
+        RESEARCH_BENCH = set.processing(AllRecipes.RESEARCH_BENCH)
+                .processingPlugin(MachinePlugin::processing)
+                .processingPlugin(r -> ResearchBenchPlugin.builder())
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_INPUT)
@@ -99,7 +104,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ASSEMBLER = set(machine(AllRecipes.ASSEMBLER))
+        ASSEMBLER = set.processing(AllRecipes.ASSEMBLER)
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_INPUT)
@@ -113,7 +118,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        CIRCUIT_ASSEMBLER = set(machine(AllRecipes.CIRCUIT_ASSEMBLER))
+        CIRCUIT_ASSEMBLER = set.processing(AllRecipes.CIRCUIT_ASSEMBLER)
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slots(0, 1, 2, 3)
@@ -125,7 +130,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        STONE_GENERATOR = set(machine(AllRecipes.STONE_GENERATOR))
+        STONE_GENERATOR = set.processing(AllRecipes.STONE_GENERATOR)
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_OUTPUT)
@@ -136,22 +141,27 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        var oreAnalyzer = set(ProcessingSet.oreAnalyzer())
+        ORE_ANALYZER = set.processing(AllRecipes.ORE_ANALYZER)
+                .processor(r -> RecipeProcessor::oreProcessor)
+                .transform(marker(false))
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
-                .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2);
-        for (var i = 3; i < 6; i++) {
-            var startVoltage = i == 5 ? Voltage.LV : Voltage.PRIMITIVE;
-            oreAnalyzer.port(ITEM_OUTPUT)
-                    .slot(SLOT_SIZE * i, 1 + SLOT_SIZE / 2, startVoltage, Voltage.MV)
-                    .slot(SLOT_SIZE * i, 1, Voltage.HV)
-                    .slot(SLOT_SIZE * i, 1 + SLOT_SIZE, Voltage.HV);
-        }
-        ORE_ANALYZER = oreAnalyzer.build().buildObject();
+                .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+                .transform($ -> {
+                    for (var i = 3; i < 6; i++) {
+                        var startVoltage = i == 5 ? Voltage.LV : Voltage.PRIMITIVE;
+                        $.port(ITEM_OUTPUT)
+                                .slot(SLOT_SIZE * i, 1 + SLOT_SIZE / 2, startVoltage, Voltage.MV)
+                                .slot(SLOT_SIZE * i, 1, Voltage.HV)
+                                .slot(SLOT_SIZE * i, 1 + SLOT_SIZE, Voltage.HV);
+                    }
+                    return $;
+                }).build().buildObject();
 
-        MACERATOR = set(marker(AllRecipes.MACERATOR, true))
+        MACERATOR = set.processing(AllRecipes.MACERATOR)
+                .transform(marker(true))
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -170,7 +180,8 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ORE_WASHER = set(marker(AllRecipes.ORE_WASHER, true))
+        ORE_WASHER = set.processing(AllRecipes.ORE_WASHER)
+                .transform(marker(true))
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_INPUT)
@@ -187,7 +198,8 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        CENTRIFUGE = set(marker(AllRecipes.CENTRIFUGE, true))
+        CENTRIFUGE = set.processing(AllRecipes.CENTRIFUGE)
+                .transform(marker(true))
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -201,7 +213,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        THERMAL_CENTRIFUGE = set(machine(AllRecipes.THERMAL_CENTRIFUGE))
+        THERMAL_CENTRIFUGE = set.processing(AllRecipes.THERMAL_CENTRIFUGE)
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -211,12 +223,17 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        ELECTRIC_FURNACE = ProcessingSet.electricFurnace()
+        ELECTRIC_FURNACE = set.machine()
+                .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::sided)
+                .layoutCapability(StackProcessingContainer::builder)
+                .capability(RecipeProcessor::electricFurnace)
+                .layoutMenu(ProcessingMenu::machine)
+                .layoutPlugin(MachinePlugin::electricFurnace)
                 .voltages(Voltage.ULV)
                 .transform(simpleLayout(Texture.PROGRESS_ARROW))
                 .buildObject();
 
-        ALLOY_SMELTER = set(machine(AllRecipes.ALLOY_SMELTER))
+        ALLOY_SMELTER = set.processing(AllRecipes.ALLOY_SMELTER)
                 .voltages(Voltage.ULV)
                 .layoutSet()
                 .port(ITEM_INPUT)
@@ -229,7 +246,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        MIXER = set(machine(AllRecipes.MIXER))
+        MIXER = set.processing(AllRecipes.MIXER)
                 .voltages(Voltage.LV)
                 .layoutSet()
                 .port(ITEM_INPUT)
@@ -244,19 +261,19 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        POLARIZER = simpleMachine(AllRecipes.POLARIZER, Texture.PROGRESS_MAGNETIC);
-        WIREMILL = simpleMachine(AllRecipes.WIREMILL, Texture.PROCESS_WIREMILL);
-        BENDER = simpleMachine(AllRecipes.BENDER, Texture.PROCESS_BENDING);
-        COMPRESSOR = simpleMachine(AllRecipes.COMPRESSOR, Texture.PROGRESS_COMPRESS);
+        POLARIZER = set.simpleMachine(AllRecipes.POLARIZER, Texture.PROGRESS_MAGNETIC);
+        WIREMILL = set.simpleMachine(AllRecipes.WIREMILL, Texture.PROCESS_WIREMILL);
+        BENDER = set.simpleMachine(AllRecipes.BENDER, Texture.PROCESS_BENDING);
+        COMPRESSOR = set.simpleMachine(AllRecipes.COMPRESSOR, Texture.PROGRESS_COMPRESS);
 
-        LATHE = set(machine(AllRecipes.LATHE))
+        LATHE = set.processing(AllRecipes.LATHE)
                 .transform(simpleLayout(Texture.PROCESS_LATHE))
                 .layoutSet()
                 .image(28 + SLOT_SIZE, 1 + SLOT_SIZE / 2, Texture.PROGRESS_LATH_BASE)
                 .build()
                 .buildObject();
 
-        CUTTER = set(machine(AllRecipes.CUTTER))
+        CUTTER = set.processing(AllRecipes.CUTTER)
                 .layoutSet()
                 .port(ITEM_INPUT)
                 .slot(0, 1 + SLOT_SIZE / 2)
@@ -268,7 +285,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        EXTRACTOR = set(machine(AllRecipes.EXTRACTOR))
+        EXTRACTOR = set.processing(AllRecipes.EXTRACTOR)
                 .voltages(Voltage.LV)
                 .layoutSet()
                 .port(ITEM_INPUT)
@@ -281,7 +298,7 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        FLUID_SOLIDIFIER = set(machine(AllRecipes.FLUID_SOLIDIFIER))
+        FLUID_SOLIDIFIER = set.processing(AllRecipes.FLUID_SOLIDIFIER)
                 .voltages(Voltage.LV)
                 .layoutSet()
                 .port(FLUID_INPUT)
@@ -292,7 +309,8 @@ public final class AllBlockEntities {
                 .build()
                 .buildObject();
 
-        STEAM_TURBINE = set(generator(AllRecipes.STEAM_TURBINE))
+        STEAM_TURBINE = set.processing(AllRecipes.STEAM_TURBINE)
+                .processor(RecipeProcessor::generator)
                 .voltages(Voltage.ULV, Voltage.HV)
                 .layoutSet()
                 .port(FLUID_INPUT)
@@ -320,28 +338,39 @@ public final class AllBlockEntities {
                 .voltages(Voltage.ULV, Voltage.LuV)
                 .buildObject();
 
-        var batteryBox = ProcessingSet.batteryBox()
+        BATTERY_BOX = set.machine()
+                .machine(v -> "machine/" + v.id + "/battery_box", MachineBlock::sided)
+                .capability(BatteryBox::builder)
+                .layoutMenu(ProcessingMenu::machine)
                 .voltages(Voltage.LV, Voltage.HV)
                 .layoutSet()
-                .port(ITEM_INPUT);
-        for (var i = 0; i < 4; i++) {
-            for (var j = 0; j < 4; j++) {
-                batteryBox.slot(j * SLOT_SIZE, i * SLOT_SIZE, Voltage.fromRank(1 + Math.max(i, j)));
-            }
-        }
-        BATTERY_BOX = batteryBox.build().buildObject();
+                .port(ITEM_INPUT)
+                .transform($ -> {
+                    for (var i = 0; i < 4; i++) {
+                        for (var j = 0; j < 4; j++) {
+                            $.slot(j * SLOT_SIZE, i * SLOT_SIZE, Voltage.fromRank(1 + Math.max(i, j)));
+                        }
+                    }
+                    return $;
+                }).build()
+                .buildObject();
 
-        var electricChest = ProcessingSet.electricChest()
+        ELECTRIC_CHEST = set.machine()
+                .machine(v -> "machine/" + v.id + "/electric_chest", MachineBlock::factory)
+                .layoutCapability(ElectricChest::builder)
+                .layoutMenu(ElectricChestMenu::factory)
                 .voltages(Voltage.ULV, Voltage.HV)
                 .layoutSet()
-                .port(SlotType.NONE);
-        for (var i = 0; i < 2; i++) {
-            for (var j = 0; j < 8; j++) {
-                var voltage = Voltage.fromValue(8 * (j + 1) * (j + 1));
-                electricChest.slot(j * (SLOT_SIZE + 2), 1 + i * 2 * (SLOT_SIZE + MARGIN_VERTICAL), voltage);
-            }
-        }
-        ELECTRIC_CHEST = electricChest.build().buildObject();
+                .port(SlotType.NONE)
+                .transform($ -> {
+                    for (var i = 0; i < 2; i++) {
+                        for (var j = 0; j < 8; j++) {
+                            var voltage = Voltage.fromValue(8 * (j + 1) * (j + 1));
+                            $.slot(j * (SLOT_SIZE + 2), 1 + i * 2 * (SLOT_SIZE + MARGIN_VERTICAL), voltage);
+                        }
+                    }
+                    return $;
+                }).build().buildObject();
 
         NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",
                         NetworkController::new,
@@ -372,6 +401,29 @@ public final class AllBlockEntities {
 
     public static void init() {}
 
+    public static Set<ProcessingSet> getProcessingSets() {
+        return PROCESSING_SETS;
+    }
+
+    private static class SetFactory {
+        public <T extends ProcessingRecipe> ProcessingSet.Builder<T, SetFactory>
+        processing(RecipeTypeEntry<T, ?> recipeType) {
+            return (new ProcessingSet.Builder<>(REGISTRATE, recipeType, this))
+                    .onCreateObject(PROCESSING_SETS::add);
+        }
+
+        public <T extends ProcessingRecipe> ProcessingSet
+        simpleMachine(RecipeTypeEntry<T, ?> recipeType, Texture progress) {
+            return processing(recipeType)
+                    .transform(simpleLayout(progress))
+                    .buildObject();
+        }
+
+        public MachineSet.Builder<SetFactory> machine() {
+            return new MachineSet.Builder<>(REGISTRATE, this);
+        }
+    }
+
     private static RegistryEntry<PrimitiveBlock<PrimitiveMachine>>
     primitive(ProcessingSet set) {
         var recipeType = set.recipeType;
@@ -392,28 +444,20 @@ public final class AllBlockEntities {
                 .buildObject();
     }
 
-    private static <T extends ProcessingRecipe> ProcessingSet.Builder<T, ?>
-    set(ProcessingSet.Builder<T, ?> builder) {
-        return builder.onCreateObject(PROCESSING_SETS::add);
-    }
-
     private static RegistryEntry<MachineBlock<SmartBlockEntity>>
     boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;
         return REGISTRATE.blockEntity(id, MachineBlock.factory(Voltage.PRIMITIVE))
                 .blockEntity()
-                .eventManager()
-                .simpleCapability(Machine::builder)
                 .simpleCapability(Boiler.builder(burnSpeed))
                 .simpleCapability(StackProcessingContainer.builder(layout))
                 .menu(ProcessingMenu.machine(layout))
-                .title(ProcessingMenu::getTitle)
                 .plugin(MachinePlugin::noBook)
                 .plugin(BoilerPlugin::new)
                 .build()
                 .build()
-                .translucent()
+                .transform(baseMachine())
                 .buildObject();
     }
 
@@ -426,12 +470,5 @@ public final class AllBlockEntities {
                 .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
                 .progressBar(progress, 8 + SLOT_SIZE, SLOT_SIZE / 2)
                 .build();
-    }
-
-    private static <T extends ProcessingRecipe> ProcessingSet
-    simpleMachine(RecipeTypeEntry<T, ?> recipeType, Texture progress) {
-        return set(machine(recipeType))
-                .transform(simpleLayout(progress))
-                .buildObject();
     }
 }

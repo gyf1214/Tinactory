@@ -61,7 +61,7 @@ public class JEI implements IModPlugin {
 
         this.toolCategory = new ToolCategory();
         categories.add(toolCategory);
-        for (var set : AllBlockEntities.PROCESSING_SETS) {
+        for (var set : AllBlockEntities.getProcessingSets()) {
             var layout = set.layout(Voltage.MAXIMUM);
             var icon = set.icon();
             addProcessingCategory(set.recipeType, layout, icon);
