@@ -32,6 +32,7 @@ import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
+import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
@@ -266,16 +267,20 @@ public final class Materials {
                 .build()
                 .material(RED_ALLOY, DULL)
                 .toolProcess(0.5d).smelt()
-                .alloy(Voltage.ULV, 1, COPPER, 1, REDSTONE, 4)
+                .alloyOnly(Voltage.ULV, 1, COPPER, 1, REDSTONE, 4)
                 .build()
                 .material(BATTERY_ALLOY, DULL)
                 .machineProcess(Voltage.LV).smelt()
                 .alloy(Voltage.LV, LEAD, 4, ANTIMONY, 1)
                 .build()
                 .material(SOLDERING_ALLOY, DULL)
-                .alloy(Voltage.LV, TIN, 6, LEAD, 3, ANTIMONY, 1)
+                .fluidAlloy(Voltage.LV, TIN, 6, LEAD, 3, ANTIMONY, 1)
                 .build()
                 .material(RUTILE, SHINY)
+                .build()
+                .material(BRASS, METALLIC)
+                .machineProcess(Voltage.LV, 0.75d).smelt()
+                .alloy(Voltage.LV, ZINC, 1, COPPER, 3)
                 .build();
     }
 

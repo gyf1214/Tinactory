@@ -4,6 +4,7 @@ package org.shsts.tinactory.content.material;
 import net.minecraft.world.item.Tiers;
 
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
@@ -45,7 +46,7 @@ public final class FirstDegrees {
 
         STEEL = set("steel")
                 .color(0xFF808080)
-                .mechanical().magnetic().pipe().gear().molten()
+                .mechanical().magnetic().gear().molten()
                 .toolSet(800, Tiers.IRON)
                 .buildObject();
 
@@ -67,6 +68,11 @@ public final class FirstDegrees {
         RUTILE = set("rutile")
                 .color(0xFFD40D5C)
                 .dust()
+                .buildObject();
+
+        BRASS = set("brass")
+                .color(0xFFFFB400)
+                .metal().pipe()
                 .buildObject();
     }
 

@@ -48,6 +48,7 @@ import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
@@ -210,7 +211,7 @@ public final class Components {
         });
 
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL);
-        componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, STEEL, BRONZE, STEEL);
+        componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL);
 
         batteryRecipe(Voltage.LV, CADMIUM);
         // TODO: Na

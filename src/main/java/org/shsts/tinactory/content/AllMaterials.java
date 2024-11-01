@@ -52,6 +52,7 @@ public final class AllMaterials {
     public static MaterialSet BATTERY_ALLOY;
     public static MaterialSet SOLDERING_ALLOY;
     public static MaterialSet RUTILE;
+    public static MaterialSet BRASS;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;

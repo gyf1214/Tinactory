@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
@@ -47,6 +48,7 @@ import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
 import static org.shsts.tinactory.content.AllRecipes.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
+import static org.shsts.tinactory.content.AllRecipes.MIXER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
 import static org.shsts.tinactory.content.AllRecipes.POLARIZER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
@@ -187,6 +189,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             }
             var builder = ASSEMBLER.recipe(DATA_GEN, material.loc(sub))
                     .outputItem(2, material.entry(sub), k)
+                    .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(0.5f))
                     .voltage(voltage)
                     .workTicks(ticks(workTicks));
 
@@ -299,6 +302,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
 
             assemble("gear", 128L, "plate", "stick", 2);
             assemble("rotor", 160L, "plate", 4, "ring", 1);
+            assemble("pipe", 120L, "plate", 3);
 
             macerate();
             molten();
@@ -333,10 +337,13 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
-    public MaterialBuilder<P> alloy(Voltage voltage, Object... components) {
+    private <U extends ProcessingRecipe, B extends ProcessingRecipe.BuilderBase<U, B>>
+    void compose(Voltage v, RecipeTypeEntry<U, B> recipeType, int outputPort,
+                 boolean decompose, long workTicks, String output, Object... components) {
+        var loc = output.equals("fluid") ? material.fluidEntry().loc : material.loc(output);
+
         var alloyCount = 0;
         var totalCount = 0;
-        var isFluid = !material.hasItem("primary");
         var i = 0;
 
         if (components[0] instanceof Integer k) {
@@ -344,25 +351,73 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             i = 1;
         }
 
-        var loc = isFluid ? material.fluidEntry().loc : material.loc("primary");
-        var builder = ALLOY_SMELTER.recipe(dataGen, loc)
-                .voltage(voltage);
+        var builder = recipeType.recipe(dataGen, loc)
+                .voltage(v);
+
         for (; i < components.length; i += 2) {
             var component = (MaterialSet) components[i];
+            var sub = component.hasItem("dust") ? "dust" : "fluid";
+            if (components[i] instanceof String sub1) {
+                sub = sub1;
+                i++;
+            }
             var count = (int) components[i + 1];
-            builder.inputItem(0, component.tag("dust"), count);
+
+            if (sub.equals("fluid")) {
+                if (decompose) {
+                    builder.outputFluid(outputPort + 1, component.fluidEntry(), component.fluidAmount(count));
+                } else {
+                    builder.inputFluid(1, component.fluidEntry(), component.fluidAmount(count));
+                }
+            } else {
+                if (decompose) {
+                    builder.outputItem(outputPort, component.item(sub), count);
+                } else {
+                    builder.inputItem(0, component.tag(sub), count);
+                }
+
+            }
+
             totalCount += count;
         }
         if (alloyCount == 0) {
             alloyCount = totalCount;
         }
-        if (isFluid) {
-            builder.outputFluid(2, material.fluidEntry(), material.fluidAmount(alloyCount));
+
+        if (output.equals("fluid")) {
+            if (decompose) {
+                builder.inputFluid(1, material.fluidEntry(), material.fluidAmount(alloyCount));
+            } else {
+                builder.outputFluid(outputPort + 1, material.fluidEntry(), material.fluidAmount(alloyCount));
+            }
         } else {
-            builder.outputItem(1, material.entry("primary"), alloyCount);
+            if (decompose) {
+                builder.inputItem(0, material.tag(output), alloyCount);
+            } else {
+                builder.outputItem(outputPort, material.entry(output), alloyCount);
+            }
         }
-        builder.workTicks(40L * totalCount)
-                .build();
+
+        builder.workTicks(workTicks * totalCount).build();
+    }
+
+    public MaterialBuilder<P> mix(Voltage voltage, Object... components) {
+        compose(voltage, MIXER, 2, false, 20L, "dust", components);
+        compose(voltage, CENTRIFUGE, 2, true, 60L, "dust", components);
+        return this;
+    }
+
+    public MaterialBuilder<P> alloyOnly(Voltage voltage, Object... components) {
+        compose(voltage, ALLOY_SMELTER, 1, false, 40L, "ingot", components);
+        return this;
+    }
+
+    public MaterialBuilder<P> alloy(Voltage voltage, Object... components) {
+        return alloyOnly(voltage, components).mix(voltage, components);
+    }
+
+    public MaterialBuilder<P> fluidAlloy(Voltage voltage, Object... components) {
+        compose(voltage, ALLOY_SMELTER, 1, false, 40L, "fluid", components);
         return this;
     }
 
@@ -640,7 +695,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             wash("dust", "dust_impure");
             wash("dust", "dust_pure");
 
-            CENTRIFUGE.recipe(dataGen, material.loc("dust"))
+            CENTRIFUGE.recipe(dataGen, material.loc("dust_pure"))
                     .inputItem(0, material.tag("dust_pure"), 1)
                     .outputItem(2, material.entry("dust"), 1)
                     .outputItem(2, byproduct1, 1, 0.3)

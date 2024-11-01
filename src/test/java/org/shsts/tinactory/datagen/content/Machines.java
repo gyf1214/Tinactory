@@ -70,6 +70,7 @@ import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.TRANSFORMER;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
@@ -278,8 +279,8 @@ public final class Machines {
     }
 
     private static void basic() {
-        machineRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, TIN);
-        machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, STEEL, BRONZE, COPPER);
+        machineRecipe(Voltage.LV, STEEL, COPPER, TIN, BRONZE, TIN);
+        machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
     }
 
     private static void misc() {
@@ -422,8 +423,9 @@ public final class Machines {
         }
     }
 
-    private static void machineRecipe(Voltage v, MaterialSet main, MaterialSet heat,
-                                      MaterialSet pipe, MaterialSet rotor, MaterialSet polarizer) {
+    private static void machineRecipe(Voltage v, MaterialSet main,
+                                      MaterialSet heat, MaterialSet electric,
+                                      MaterialSet pipe, MaterialSet rotor) {
         var factory = new RecipeFactory(v);
         var wireNumber = 4 * v.rank;
 
@@ -480,7 +482,7 @@ public final class Machines {
                 .build()
                 .recipe(POLARIZER)
                 .circuit(2)
-                .material(polarizer, "wire", wireNumber)
+                .material(electric, "wire", wireNumber)
                 .tech(Technologies.MOTOR)
                 .build()
                 .recipe(WIREMILL)
