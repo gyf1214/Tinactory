@@ -72,7 +72,7 @@ public final class FirstDegrees {
 
         BRASS = set("brass")
                 .color(0xFFFFB400)
-                .metal().pipe()
+                .metal().stick().pipe()
                 .buildObject();
     }
 

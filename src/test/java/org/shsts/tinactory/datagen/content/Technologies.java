@@ -29,6 +29,7 @@ public final class Technologies {
     public static ResourceLocation ELECTRIC_HEATING;
     public static ResourceLocation MATERIAL_CUTTING;
     public static ResourceLocation CONVEYOR_MODULE;
+    public static ResourceLocation SENSOR_AND_EMITTER;
     public static ResourceLocation HOT_WORKING;
     public static ResourceLocation BATTERY;
 
@@ -85,6 +86,11 @@ public final class Technologies {
         BATTERY = factory.tech("battery")
                 .maxProgress(40L)
                 .displayItem(AllItems.BATTERY.get(Voltage.LV))
+                .buildLoc();
+
+        SENSOR_AND_EMITTER = factory.tech("sensor_and_emitter")
+                .maxProgress(40L)
+                .displayItem(AllItems.EMITTER.get(Voltage.LV))
                 .buildLoc();
 
         HOT_WORKING = factory.base(PUMP_AND_PISTON).tech("hot_working")

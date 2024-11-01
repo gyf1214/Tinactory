@@ -413,7 +413,8 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     }
 
     public MaterialBuilder<P> alloy(Voltage voltage, Object... components) {
-        return alloyOnly(voltage, components).mix(voltage, components);
+        return alloyOnly(voltage, components)
+                .mix(voltage.rank < Voltage.LV.rank ? Voltage.LV : voltage, components);
     }
 
     public MaterialBuilder<P> fluidAlloy(Voltage voltage, Object... components) {

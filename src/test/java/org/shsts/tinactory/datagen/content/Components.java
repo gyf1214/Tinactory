@@ -37,6 +37,7 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
+import static org.shsts.tinactory.content.AllItems.EMITTER;
 import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
@@ -44,6 +45,7 @@ import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllItems.RESISTOR;
+import static org.shsts.tinactory.content.AllItems.SENSOR;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
@@ -58,6 +60,7 @@ import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
+import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
@@ -210,8 +213,10 @@ public final class Components {
             }
         });
 
-        componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL);
-        componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL);
+        // TODO: quartz should be Glass
+        componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, RUBY);
+        // TODO: sensor and quartz should be Electrum and Emerald
+        componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, BRASS, RUBY);
 
         batteryRecipe(Voltage.LV, CADMIUM);
         // TODO: Na
@@ -264,7 +269,8 @@ public final class Components {
 
     private static void componentRecipe(Voltage voltage, MaterialSet main,
                                         MaterialSet heat, MaterialSet pipe,
-                                        MaterialSet rotor, MaterialSet magnetic) {
+                                        MaterialSet rotor, MaterialSet magnetic,
+                                        MaterialSet sensor, MaterialSet quartz) {
         var factory = new ComponentRecipeFactory(voltage);
 
         factory.recipe(ELECTRIC_MOTOR)
@@ -296,6 +302,20 @@ public final class Components {
                 .component(CABLE, 1)
                 .materialFluid(RUBBER, 6)
                 .tech(Technologies.CONVEYOR_MODULE)
+                .build()
+                .recipe(SENSOR)
+                .material(quartz, "gem", 1)
+                .circuit(1)
+                .material(sensor, "stick", 1)
+                .material(main, "plate", 4)
+                .tech(Technologies.SENSOR_AND_EMITTER)
+                .build()
+                .recipe(EMITTER)
+                .material(quartz, "gem", 1)
+                .circuit(2)
+                .component(CABLE, 2)
+                .material(sensor, "stick", 4)
+                .tech(Technologies.SENSOR_AND_EMITTER)
                 .build()
                 .recipe(MACHINE_HULL)
                 .material(main, "plate", 8)

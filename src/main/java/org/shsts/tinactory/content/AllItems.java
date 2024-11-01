@@ -49,6 +49,7 @@ public final class AllItems {
     public static final Map<Voltage, RegistryEntry<Item>> CONVEYOR_MODULE;
     public static final Map<Voltage, RegistryEntry<Item>> ROBOT_ARM;
     public static final Map<Voltage, RegistryEntry<Item>> SENSOR;
+    public static final Map<Voltage, RegistryEntry<Item>> EMITTER;
     public static final Map<Voltage, RegistryEntry<Item>> FIELD_GENERATOR;
     public static final Map<Voltage, RegistryEntry<Item>> MACHINE_HULL;
     public static final Map<Voltage, RegistryEntry<Item>> RESEARCH_EQUIPMENT;
@@ -146,6 +147,7 @@ public final class AllItems {
         CONVEYOR_MODULE = dummyItem("conveyor_module");
         ROBOT_ARM = dummyItem("robot_arm");
         SENSOR = dummyItem("sensor");
+        EMITTER = dummyItem("emitter");
         FIELD_GENERATOR = dummyItem("field_generator");
         MACHINE_HULL = dummyBuilder("machine_hull")
                 .voltages(Voltage.ULV, Voltage.IV)
