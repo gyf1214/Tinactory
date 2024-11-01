@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -22,6 +23,7 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
@@ -164,6 +166,14 @@ public class MultiBlockInterface extends Machine {
     @Override
     public Optional<IElectricMachine> getElectric() {
         return Optional.ofNullable(electricMachine);
+    }
+
+    @Override
+    public Optional<Component> getTitle() {
+        if (multiBlock == null) {
+            return Optional.empty();
+        }
+        return Optional.of(I18n.name(multiBlock.blockEntity.getBlockState().getBlock()));
     }
 
     public Optional<Layout> getLayout() {
