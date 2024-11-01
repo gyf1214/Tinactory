@@ -48,6 +48,10 @@ public final class AllTags {
         return modItem("circuit/" + v.id);
     }
 
+    public static TagKey<Item> battery(Voltage v) {
+        return modItem("battery/" + v.id);
+    }
+
     public static TagKey<Item> circuitComponent(String component, CircuitComponentTier tier) {
         return modItem(tier.getName(component));
     }

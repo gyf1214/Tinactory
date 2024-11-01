@@ -99,6 +99,7 @@ public final class Components {
 
         BATTERY.forEach((v, entry) -> DATA_GEN.item(entry)
                 .model(Models::batteryItem)
+                .tag(AllTags.battery(v))
                 .build());
 
         MACHINE_HULL.forEach((v, entry) -> DATA_GEN.item(entry)
@@ -309,7 +310,8 @@ public final class Components {
         var builder = ASSEMBLER.recipe(DATA_GEN, BATTERY.get(voltage))
                 .outputItem(2, BATTERY.get(voltage), 1);
         if (voltage.rank > Voltage.LV.rank) {
-            builder.inputItem(0, BATTERY.get(Voltage.fromRank(voltage.rank - 1)), 2);
+            var bat1 = AllTags.battery(Voltage.fromRank(voltage.rank - 1));
+            builder.inputItem(0, bat1, 2);
         }
         builder.inputItem(0, CABLE.get(voltage), wires)
                 .inputItem(0, BATTERY_ALLOY.tag("plate"), plates)
