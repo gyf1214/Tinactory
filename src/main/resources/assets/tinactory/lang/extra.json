@@ -74,5 +74,6 @@
   "tinactory.technology.conveyor_module.details": "An automated transport system designed to move resources efficiently between production lines, streamlining workflow and boosting productivity in your facilities.",
   "tinactory.technology.hot_working.details": "A metal-forming technique that involves shaping materials at high temperatures, increasing their ductility and strength while allowing for complex designs and structural refinements.",
   "tinactory.technology.battery.details": "A compact energy storage unit that provides a reliable power source for machinery, electronics, and backup systems, essential for maintaining continuous operation and energy efficiency.",
+  "tinactory.technology.sensor_and_emitter.details": "A precision pairing where sensors detect environmental changes or objects, while emitters send out signals or energy, enabling automated control, tracking, and safety monitoring across complex systems.",
   "generator.tinactory.void": "Void"
 }
