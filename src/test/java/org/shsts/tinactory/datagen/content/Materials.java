@@ -372,6 +372,7 @@ public final class Materials {
         disableVanillaOres("iron");
         disableVanillaOres("gold");
         disableVanillaOres("copper");
+        disableVanillaOres("coal", "");
         disableVanillaOres("diamond", "");
         disableVanillaOres("redstone", "");
         disableVanillaOres("lapis", "lazuli");
