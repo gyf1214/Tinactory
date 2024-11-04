@@ -8,6 +8,7 @@ import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
+import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
@@ -73,6 +74,11 @@ public final class FirstDegrees {
         BRASS = set("brass")
                 .color(0xFFFFB400)
                 .metal().stick().pipe()
+                .buildObject();
+
+        GALLIUM_ARSENIDE = set("gallium_arsenide")
+                .color(0xFFA0A0A0)
+                .dust()
                 .buildObject();
     }
 

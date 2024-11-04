@@ -29,6 +29,7 @@ import static org.shsts.tinactory.content.AllItems.STEAM;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
+import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
@@ -49,6 +50,7 @@ import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM;
+import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.GLOWSTONE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
@@ -70,6 +72,7 @@ import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
+import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
@@ -239,8 +242,9 @@ public final class Materials {
                 .material(CARBON, DULL)
                 .machineProcess(Voltage.HV)
                 .build()
-                .material(MANGANESE, DULL)
-                .build();
+                .material(MANGANESE, DULL).build()
+                .material(ARSENIC, DULL).build()
+                .material(SILICON, METALLIC).build();
     }
 
     private static void firstDegrees() {
@@ -253,6 +257,7 @@ public final class Materials {
                 .build()
                 .material(COBALTITE, METALLIC)
                 .smelt(COBALT)
+                .decompose(Voltage.LV, COBALT, 1, ARSENIC, 1, SULFUR, 1)
                 .build()
                 .material(INVAR, METALLIC)
                 .toolProcess(1.25d).smelt()
@@ -281,6 +286,9 @@ public final class Materials {
                 .material(BRASS, METALLIC)
                 .machineProcess(Voltage.LV, 0.75d).smelt()
                 .alloy(Voltage.LV, ZINC, 1, COPPER, 3)
+                .build()
+                .material(GALLIUM_ARSENIDE, DULL)
+                .mix(Voltage.LV, GALLIUM, 1, ARSENIC, 1)
                 .build();
     }
 
@@ -327,6 +335,7 @@ public final class Materials {
                 .build()
                 .material(REDSTONE, DULL)
                 .oreProcess(5, GLOWSTONE, GLOWSTONE, RARE_EARTH)
+                .decompose(Voltage.LV, PYRITE, 6, RUBY, 3, SILICON, 1)
                 .build()
                 .material(CINNABAR, SHINY)
                 .oreProcess(RARE_EARTH, GLOWSTONE, RARE_EARTH)

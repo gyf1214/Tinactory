@@ -40,6 +40,8 @@ public final class AllMaterials {
     public static MaterialSet GALLIUM;
     public static MaterialSet CARBON;
     public static MaterialSet MANGANESE;
+    public static MaterialSet ARSENIC;
+    public static MaterialSet SILICON;
 
     // First Degree
     public static MaterialSet WROUGHT_IRON;
@@ -53,6 +55,7 @@ public final class AllMaterials {
     public static MaterialSet SOLDERING_ALLOY;
     public static MaterialSet RUTILE;
     public static MaterialSet BRASS;
+    public static MaterialSet GALLIUM_ARSENIDE;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;

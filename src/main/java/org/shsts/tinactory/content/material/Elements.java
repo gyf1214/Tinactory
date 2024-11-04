@@ -9,6 +9,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
+import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
@@ -21,6 +22,7 @@ import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
+import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
@@ -141,6 +143,16 @@ public final class Elements {
         MANGANESE = set("manganese")
                 .color(0xFFCDE1B9)
                 .dust()
+                .buildObject();
+
+        ARSENIC = set("arsenic")
+                .color(0xFF676756)
+                .dust()
+                .buildObject();
+
+        SILICON = set("silicon")
+                .color(0xFF3C3C50)
+                .dustPrimary().molten()
                 .buildObject();
     }
 

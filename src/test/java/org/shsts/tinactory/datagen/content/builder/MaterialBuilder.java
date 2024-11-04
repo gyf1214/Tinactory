@@ -401,10 +401,14 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         builder.workTicks(workTicks * totalCount).build();
     }
 
-    public MaterialBuilder<P> mix(Voltage voltage, Object... components) {
-        compose(voltage, MIXER, 2, false, 20L, "dust", components);
+    public MaterialBuilder<P> decompose(Voltage voltage, Object... components) {
         compose(voltage, CENTRIFUGE, 2, true, 60L, "dust", components);
         return this;
+    }
+
+    public MaterialBuilder<P> mix(Voltage voltage, Object... components) {
+        compose(voltage, MIXER, 2, false, 20L, "dust", components);
+        return decompose(voltage, components);
     }
 
     public MaterialBuilder<P> alloyOnly(Voltage voltage, Object... components) {
