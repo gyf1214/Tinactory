@@ -21,6 +21,7 @@ import org.shsts.tinactory.content.material.RubberTreeGrower;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.core.common.CellItem;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
@@ -86,6 +87,7 @@ public final class AllItems {
     public static final RegistryEntry<Item> BASIC_BUZZSAW;
     public static final RegistryEntry<Item> GOOD_BUZZSAW;
     public static final RegistryEntry<Item> ADVANCED_BUZZSAW;
+    public static final Map<Voltage, RegistryEntry<CellItem>> FLUID_CELL;
 
     static {
         DUMMY_ITEMS = new ArrayList<>();
@@ -200,6 +202,15 @@ public final class AllItems {
 
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
         BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);
+
+
+        FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> REGISTRATE
+                        .item("fluid_cell/" + mat.name, CellItem.factory(mat, 1 << (v.rank - 2)))
+                        .tint(() -> () -> CellItem::getTint)
+                        .register())
+                .voltage(Voltage.LV, STEEL)
+                .voltage(Voltage.MV, ALUMINIUM)
+                .buildObject();
     }
 
     public static void init() {}

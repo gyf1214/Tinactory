@@ -38,6 +38,7 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
 import static org.shsts.tinactory.content.AllItems.EMITTER;
+import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
 import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
@@ -237,6 +238,13 @@ public final class Components {
                 .item(STICKY_RESIN)
                 .model(basicItem("metaitems/rubber_drop"))
                 .build();
+
+        FLUID_CELL.forEach((v, item) -> {
+            var texBase = "metaitems/large_fluid_cell." + item.get().material.name;
+            DATA_GEN.item(item)
+                    .model(basicItem(texBase + "/base", texBase + "/overlay"))
+                    .build();
+        });
     }
 
     private static class ComponentRecipeFactory {
