@@ -78,5 +78,7 @@
   "tinactory.technology.hot_working.details": "A metal-forming technique that involves shaping materials at high temperatures, increasing their ductility and strength while allowing for complex designs and structural refinements.",
   "tinactory.technology.battery.details": "A compact energy storage unit that provides a reliable power source for machinery, electronics, and backup systems, essential for maintaining continuous operation and energy efficiency.",
   "tinactory.technology.sensor_and_emitter.details": "A precision pairing where sensors detect environmental changes or objects, while emitters send out signals or energy, enabling automated control, tracking, and safety monitoring across complex systems.",
+  "tinactory.technology.integrated_circuit.details": "A compact, multi-functional chip that combines numerous electronic components, streamlining processing power and control for advanced machinery and automation systems.",
+  "tinactory.technology.robot_arm.details": "A versatile, programmable mechanical arm designed for precise movements, ideal for tasks such as assembly, welding, and material handling in high-efficiency production lines.",
   "generator.tinactory.void": "Void"
 }
