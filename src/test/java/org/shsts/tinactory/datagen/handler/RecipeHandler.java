@@ -33,8 +33,7 @@ public class RecipeHandler extends DataHandler<RecipeProvider> {
         }
 
         public void addRecipe(SmartRecipe<?> recipe) {
-            recipe.getDescriptionId().ifPresent(key ->
-                    dataGen.langTrackedCtx.trackExtra(key, key));
+            recipe.getDescriptionId().ifPresent(dataGen::trackLang);
             addRecipe(recipe.toFinished());
         }
 

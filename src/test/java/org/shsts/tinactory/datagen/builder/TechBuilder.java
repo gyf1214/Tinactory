@@ -82,8 +82,8 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
         dataGen.techHandler.addTech(this);
         var description = ITechnology.getDescriptionId(loc);
         var details = ITechnology.getDetailsId(loc);
-        dataGen.langTrackedCtx.trackExtra(description, description);
-        dataGen.langTrackedCtx.trackExtra(details, details);
+        dataGen.trackLang(description);
+        dataGen.trackLang(details);
 
         if (researchVoltage != null) {
             RESEARCH_BENCH.recipe(DATA_GEN, loc)

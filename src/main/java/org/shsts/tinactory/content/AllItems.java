@@ -203,9 +203,8 @@ public final class AllItems {
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
         BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);
 
-
         FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> REGISTRATE
-                        .item("fluid_cell/" + mat.name, CellItem.factory(mat, 1 << (v.rank - 2)))
+                        .item("tool/fluid_cell/" + mat.name, CellItem.factory(1 << (v.rank - 2)))
                         .tint(() -> () -> CellItem::getTint)
                         .register())
                 .voltage(Voltage.LV, STEEL)

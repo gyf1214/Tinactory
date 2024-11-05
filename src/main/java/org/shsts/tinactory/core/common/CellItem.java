@@ -10,13 +10,11 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.core.util.ClientUtil;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
@@ -24,24 +22,22 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CellItem extends CapabilityItem {
-    public final MaterialSet material;
     private final int capacity;
 
-    public CellItem(Properties properties, MaterialSet material, int capacity) {
+    public CellItem(Properties properties, int capacity) {
         super(properties);
-        this.material = material;
         this.capacity = capacity;
     }
 
-    public static Function<Properties, CellItem> factory(MaterialSet material, int capacityFactor) {
-        return prop -> new CellItem(prop, material,
+    public static Function<Properties, CellItem> factory(int capacityFactor) {
+        return prop -> new CellItem(prop,
                 capacityFactor * TinactoryConfig.INSTANCE.baseFluidCellSize.get());
     }
 
     private static FluidStack getFluid(ItemStack item) {
         return item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
-                .orElseThrow(NoSuchElementException::new)
-                .getFluidInTank(0);
+                .map(fluidHandler -> fluidHandler.getFluidInTank(0))
+                .orElse(FluidStack.EMPTY);
     }
 
     public static int getTint(ItemStack item, int index) {

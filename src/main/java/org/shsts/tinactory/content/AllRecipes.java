@@ -66,7 +66,9 @@ public final class AllRecipes {
                 .defaults($ -> $.amperage(0.25d).workTicks(200L))
                 .register();
 
-        ASSEMBLER = REGISTRATE.assemblyRecipeType("assembler")
+        ASSEMBLER = REGISTRATE.recipeType("assembler", AssemblyRecipe.SERIALIZER)
+                .clazz(AssemblyRecipe.class)
+                .builder(AssemblyRecipe.Builder::new)
                 .defaults($ -> $.amperage(0.375d))
                 .register();
 
@@ -84,19 +86,19 @@ public final class AllRecipes {
                 .defaults($ -> $.amperage(0.125d).workTicks(32L))
                 .register();
 
-        MACERATOR = processing("macerator", DisplayInputRecipe::builder)
+        MACERATOR = displayInput("macerator")
                 .defaults($ -> $.amperage(0.25d))
                 .register();
 
-        ORE_WASHER = processing("ore_washer", DisplayInputRecipe::builder)
+        ORE_WASHER = displayInput("ore_washer")
                 .defaults($ -> $.amperage(0.125d))
                 .register();
 
-        CENTRIFUGE = processing("centrifuge", DisplayInputRecipe::builder)
+        CENTRIFUGE = displayInput("centrifuge")
                 .defaults($ -> $.amperage(0.5d))
                 .register();
 
-        THERMAL_CENTRIFUGE = processing("thermal_centrifuge", DisplayInputRecipe::builder)
+        THERMAL_CENTRIFUGE = displayInput("thermal_centrifuge")
                 .defaults($ -> $.voltage(Voltage.LV)
                         .workTicks(400L)
                         .amperage(1d))
@@ -135,7 +137,7 @@ public final class AllRecipes {
                         .amperage(0.375d))
                 .register();
 
-        EXTRACTOR = processing("extractor", DisplayInputRecipe::builder)
+        EXTRACTOR = displayInput("extractor")
                 .defaults($ -> $.amperage(0.5d))
                 .register();
 
@@ -174,6 +176,11 @@ public final class AllRecipes {
     private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>
     processing(String id) {
         return processing(id, ProcessingRecipe.Builder::new);
+    }
+
+    private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>
+    displayInput(String id) {
+        return processing(id, DisplayInputRecipe::builder);
     }
 
     private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>

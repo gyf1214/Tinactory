@@ -28,8 +28,6 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.NetworkComponent;
-import org.shsts.tinactory.core.recipe.AssemblyRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
@@ -292,7 +290,9 @@ public class Registrate {
     }
 
     public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex, int color) {
-        return registryEntry(id, fluidHandler, () -> new SimpleFluid(tex, color));
+        var builder = new SimpleRegistryEntryBuilder<>(fluidHandler, id, () -> new SimpleFluid(tex, color));
+        builder.onCreateObject(fluid -> trackTranslation(fluid.getAttributes().getTranslationKey()));
+        return builder.register();
     }
 
     public RegistryEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex) {
@@ -324,20 +324,6 @@ public class Registrate {
     public <T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
     RecipeTypeBuilder<T, B, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
-    }
-
-    public RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate>
-    processingRecipeType(String id) {
-        return recipeType(id, ProcessingRecipe.SERIALIZER)
-                .clazz(ProcessingRecipe.class)
-                .builder(ProcessingRecipe.Builder::new);
-    }
-
-    public RecipeTypeBuilder<AssemblyRecipe, AssemblyRecipe.Builder, Registrate>
-    assemblyRecipeType(String id) {
-        return recipeType(id, AssemblyRecipe.SERIALIZER)
-                .clazz(AssemblyRecipe.class)
-                .builder(AssemblyRecipe.Builder::new);
     }
 
     public void biome(String... ids) {

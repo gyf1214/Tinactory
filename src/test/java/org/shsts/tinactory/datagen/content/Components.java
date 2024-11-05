@@ -240,7 +240,8 @@ public final class Components {
                 .build();
 
         FLUID_CELL.forEach((v, item) -> {
-            var texBase = "metaitems/large_fluid_cell." + item.get().material.name;
+            var names = item.id.split("/");
+            var texBase = "metaitems/large_fluid_cell." + names[names.length - 1];
             DATA_GEN.item(item)
                     .model(basicItem(texBase + "/base", texBase + "/overlay"))
                     .build();
@@ -329,6 +330,10 @@ public final class Components {
                 .material(main, "plate", 8)
                 .component(CABLE, 2)
                 // TODO: plastic
+                .build()
+                .recipe(FLUID_CELL)
+                .material(main, "plate", voltage.rank * 2)
+                .material(rotor, "ring", voltage.rank)
                 .build();
     }
 
