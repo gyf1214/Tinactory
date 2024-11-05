@@ -8,6 +8,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.core.common.SimpleBuilder;
+import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 
 import javax.annotation.Nullable;
@@ -60,7 +61,7 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
     public AssemblyRecipeBuilder<P>
     materialFluid(MaterialSet material, float count) {
         if (builder != null) {
-            builder.inputFluid(0, material.fluidEntry(), material.fluidAmount(count));
+            builder.inputFluid(1, material.fluidEntry(), material.fluidAmount(count));
         }
         return this;
     }
@@ -75,6 +76,13 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
     public AssemblyRecipeBuilder<P> item(Supplier<? extends ItemLike> item, int count) {
         if (builder != null) {
             builder.inputItem(0, item, count);
+        }
+        return this;
+    }
+
+    public AssemblyRecipeBuilder<P> transformBuilder(Transformer<AssemblyRecipe.Builder> trans) {
+        if (builder != null) {
+            builder.transform(trans);
         }
         return this;
     }

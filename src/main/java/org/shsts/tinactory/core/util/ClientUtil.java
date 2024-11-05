@@ -8,6 +8,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -72,12 +73,23 @@ public final class ClientUtil {
         }
     }
 
+    public static MutableComponent fluidName(FluidStack stack) {
+        return stack.isEmpty() ? I18n.tr("tinactory.gui.emptyFluid") : (MutableComponent) stack.getDisplayName();
+    }
+
+    public static MutableComponent fluidAmount(int amount) {
+        return I18n.tr("tinactory.gui.fluidAmount", NUMBER_FORMAT.format(amount));
+    }
+
+    public static MutableComponent fluidAmount(FluidStack stack) {
+        return fluidAmount(stack.getAmount());
+    }
+
     public static List<Component> fluidTooltip(FluidStack stack, boolean showAmount) {
         var tooltip = new ArrayList<Component>();
-        tooltip.add(stack.getDisplayName());
+        tooltip.add(fluidName(stack));
         if (showAmount) {
-            var amountString = I18n.raw(NUMBER_FORMAT.format(stack.getAmount()) + " mB");
-            tooltip.add(amountString.withStyle(ChatFormatting.GRAY));
+            tooltip.add(fluidAmount(stack).withStyle(ChatFormatting.GRAY));
         }
         return tooltip;
     }

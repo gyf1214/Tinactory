@@ -206,7 +206,7 @@ public final class Components {
                 ASSEMBLER.recipe(DATA_GEN, cable)
                         .outputItem(2, cable, 1)
                         .input(0, () -> new ProcessingIngredients.TagIngredient(cable.get().material.tag("wire"), 4))
-                        .inputFluid(1, RUBBER.fluidEntry(), 288)
+                        .inputFluid(1, RUBBER.fluidEntry(), RUBBER.fluidAmount(2))
                         .voltage(v == Voltage.LV ? Voltage.ULV : Voltage.LV)
                         .requireTech(Technologies.HOT_WORKING)
                         .workTicks(100L)
@@ -334,6 +334,8 @@ public final class Components {
                 .recipe(FLUID_CELL)
                 .material(main, "plate", voltage.rank * 2)
                 .material(rotor, "ring", voltage.rank)
+                .materialFluid(SOLDERING_ALLOY, voltage.rank)
+                .transformBuilder($ -> $.voltage(Voltage.LV))
                 .build();
     }
 

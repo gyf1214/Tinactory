@@ -249,14 +249,14 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             macerate("pipe", 3);
         }
 
-        private void molten(String sub, Voltage v, int amount) {
+        private void molten(String sub, Voltage v, float amount) {
             if (!material.hasItem(sub) || !material.hasFluid()) {
                 return;
             }
             var fluid = material.fluidEntry();
 
             EXTRACTOR.recipe(DATA_GEN, suffix(fluid.loc, "_from_" + sub))
-                    .outputFluid(2, fluid, amount)
+                    .outputFluid(2, fluid, material.fluidAmount(amount))
                     .inputItem(0, material.tag(sub), 1)
                     .voltage(v)
                     .workTicks(ticks(160L))
@@ -265,7 +265,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             if (!sub.equals("magnetic")) {
                 FLUID_SOLIDIFIER.recipe(DATA_GEN, material.loc(sub))
                         .outputItem(1, material.entry(sub), 1)
-                        .inputFluid(0, fluid, amount)
+                        .inputFluid(0, fluid, material.fluidAmount(amount))
                         .voltage(v)
                         .workTicks(ticks(80L))
                         .build();
@@ -275,19 +275,19 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         private void molten() {
             var v = material.hasItem("sheet") ? voltage : Voltage.fromRank(voltage.rank + 1);
 
-            molten("primary", v, 144);
-            molten("nugget", v, 16);
-            molten("magnetic", v, 72);
-            molten("wire", v, 72);
-            molten("ring", v, 36);
-            molten("plate", v, 144);
-            molten("foil", v, 36);
-            molten("stick", v, 72);
-            molten("screw", v, 16);
-            molten("bolt", v, 18);
-            molten("gear", v, 288);
-            molten("rotor", v, 576);
-            molten("pipe", v, 432);
+            molten("primary", v, 1f);
+            molten("nugget", v, 1f / 9f);
+            molten("magnetic", v, 0.5f);
+            molten("wire", v, 0.5f);
+            molten("ring", v, 0.25f);
+            molten("plate", v, 1f);
+            molten("foil", v, 0.25f);
+            molten("stick", v, 0.5f);
+            molten("screw", v, 1f / 9f);
+            molten("bolt", v, 0.125f);
+            molten("gear", v, 2f);
+            molten("rotor", v, 4f);
+            molten("pipe", v, 3f);
         }
 
         public MaterialBuilder<P> build() {
