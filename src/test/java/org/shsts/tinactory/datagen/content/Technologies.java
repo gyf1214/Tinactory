@@ -29,9 +29,11 @@ public final class Technologies {
     public static ResourceLocation ELECTRIC_HEATING;
     public static ResourceLocation MATERIAL_CUTTING;
     public static ResourceLocation CONVEYOR_MODULE;
+    public static ResourceLocation BATTERY;
     public static ResourceLocation SENSOR_AND_EMITTER;
     public static ResourceLocation HOT_WORKING;
-    public static ResourceLocation BATTERY;
+    public static ResourceLocation ROBOT_ARM;
+    public static ResourceLocation INTEGRATED_CIRCUIT;
 
     public static void init() {
         var factory = new TechFactory();
@@ -96,6 +98,19 @@ public final class Technologies {
         HOT_WORKING = factory.base(PUMP_AND_PISTON).tech("hot_working")
                 .maxProgress(40L)
                 .displayItem(Items.BLAZE_POWDER)
+                .buildLoc();
+
+        ROBOT_ARM = factory.child("robot_arm")
+                .maxProgress(50L)
+                .displayItem(AllItems.ROBOT_ARM.get(Voltage.LV))
+                .buildLoc();
+
+        factory.voltage(Voltage.LV);
+
+        INTEGRATED_CIRCUIT = factory.tech("integrated_circuit")
+                .maxProgress(20L)
+                .displayItem(AllItems.GOOD_INTEGRATED.item())
+                .depends(CONVEYOR_MODULE, SENSOR_AND_EMITTER, MATERIAL_CUTTING)
                 .buildLoc();
     }
 

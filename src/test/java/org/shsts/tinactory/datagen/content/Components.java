@@ -16,6 +16,7 @@ import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
@@ -46,6 +47,7 @@ import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllItems.RESISTOR;
+import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
 import static org.shsts.tinactory.content.AllItems.SENSOR;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
@@ -90,8 +92,8 @@ public final class Components {
     public static void init() {
         componentItems();
         circuits();
-        ulv();
         misc();
+        ulvRecipes();
         componentRecipes();
         circuitRecipes();
         miscRecipes();
@@ -169,7 +171,29 @@ public final class Components {
         }
     }
 
-    private static void ulv() {
+    private static void misc() {
+        DATA_GEN.block(HEAT_PROOF_BLOCK)
+                .blockState(solidBlock("casings/solid/machine_casing_heatproof"))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build()
+                .block(CUPRONICKEL_COIL_BLOCK)
+                .blockState(solidBlock("casings/coils/machine_coil_cupronickel"))
+                .tag(COIL)
+                .build()
+                .item(STICKY_RESIN)
+                .model(basicItem("metaitems/rubber_drop"))
+                .build();
+
+        FLUID_CELL.forEach((v, item) -> {
+            var names = item.id.split("/");
+            var texBase = "metaitems/large_fluid_cell." + names[names.length - 1];
+            DATA_GEN.item(item)
+                    .model(basicItem(texBase + "/base", texBase + "/overlay"))
+                    .build();
+        });
+    }
+
+    private static void ulvRecipes() {
         DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(CABLE.get(Voltage.ULV).get())
                 .requires(Ingredient.of(IRON.tag("wire")), 4)
@@ -181,14 +205,6 @@ public final class Components {
                 .define('#', IRON.tag("plate"))
                 .define('W', CABLE.get(Voltage.ULV))
                 .toolTag(AllTags.TOOL_WRENCH)
-                .build();
-
-        ASSEMBLER.recipe(DATA_GEN, RESEARCH_EQUIPMENT.get(Voltage.ULV))
-                .outputItem(2, RESEARCH_EQUIPMENT.get(Voltage.ULV), 1)
-                .inputItem(0, IRON.tag("plate"), 1)
-                .inputItem(0, COPPER.tag("wire"), 1)
-                .workTicks(200)
-                .voltage(Voltage.ULV)
                 .build();
     }
 
@@ -224,28 +240,16 @@ public final class Components {
         batteryRecipe(Voltage.MV, CADMIUM);
         // TODO: Li
         batteryRecipe(Voltage.HV, CADMIUM);
-    }
 
-    private static void misc() {
-        DATA_GEN.block(HEAT_PROOF_BLOCK)
-                .blockState(solidBlock("casings/solid/machine_casing_heatproof"))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(CUPRONICKEL_COIL_BLOCK)
-                .blockState(solidBlock("casings/coils/machine_coil_cupronickel"))
-                .tag(COIL)
-                .build()
-                .item(STICKY_RESIN)
-                .model(basicItem("metaitems/rubber_drop"))
+        researchRecipe(Voltage.ULV)
+                .inputItem(0, IRON.tag("plate"), 1)
+                .inputItem(0, COPPER.tag("wire"), 1)
                 .build();
 
-        FLUID_CELL.forEach((v, item) -> {
-            var names = item.id.split("/");
-            var texBase = "metaitems/large_fluid_cell." + names[names.length - 1];
-            DATA_GEN.item(item)
-                    .model(basicItem(texBase + "/base", texBase + "/overlay"))
-                    .build();
-        });
+        researchRecipe(Voltage.LV)
+                .inputItem(0, ELECTRIC_MOTOR.get(Voltage.LV), 1)
+                .inputItem(0, STEEL.tag("gear"), 1)
+                .build();
     }
 
     private static class ComponentRecipeFactory {
@@ -326,6 +330,14 @@ public final class Components {
                 .material(sensor, "stick", 4)
                 .tech(Technologies.SENSOR_AND_EMITTER)
                 .build()
+                .recipe(ROBOT_ARM)
+                .circuit(1)
+                .component(CABLE, 3)
+                .component(ELECTRIC_MOTOR, 2)
+                .component(ELECTRIC_PISTON, 1)
+                .material(main, "stick", 2)
+                .tech(Technologies.ROBOT_ARM)
+                .build()
                 .recipe(MACHINE_HULL)
                 .material(main, "plate", 8)
                 .component(CABLE, 2)
@@ -358,48 +370,11 @@ public final class Components {
                 .build();
     }
 
-    @SuppressWarnings("unchecked")
-    private static void circuitRecipe(Circuits.Circuit circuit, Object... args) {
-        var i = 0;
-        var output = 1;
-        if (args[0] instanceof Integer k) {
-            output = k;
-            i++;
-        }
-        var builder = CIRCUIT_ASSEMBLER.recipe(DATA_GEN, circuit.item())
-                .outputItem(2, circuit.item(), output)
-                .inputItem(0, circuit.circuitBoard(), 1);
-        for (; i < args.length; i++) {
-            var item = args[i];
-            var count = 1;
-            if (i + 1 < args.length && args[i + 1] instanceof Integer k) {
-                count = k;
-                i++;
-            }
-            if (item instanceof TagKey<?>) {
-                builder.inputItem(0, (TagKey<Item>) item, count);
-            } else if (item instanceof Circuits.CircuitComponent component) {
-                builder.inputItem(0, component.tag(circuit.tier().componentTier), count);
-            } else if (item instanceof Circuits.Circuit circuit1) {
-                builder.inputItem(0, circuit1.item(), count);
-            } else if (item instanceof ItemLike itemLike) {
-                builder.inputItem(0, () -> itemLike, count);
-            } else if (item instanceof Supplier<?>) {
-                builder.inputItem(0, (Supplier<? extends ItemLike>) item, count);
-            } else {
-                throw new IllegalArgumentException();
-            }
-        }
-        var level = 1 + Math.max(0, circuit.level().voltageOffset);
-        var voltage = circuit.tier().baseVoltage;
-        if (voltage.rank < Voltage.LV.rank) {
-            voltage = Voltage.LV;
-        }
-        builder.voltage(voltage)
-                .inputFluid(1, SOLDERING_ALLOY.fluidEntry(),
-                        SOLDERING_ALLOY.fluidAmount((1 << (level - 1)) / 2f))
-                .workTicks(200L * level)
-                .build();
+    private static AssemblyRecipe.Builder researchRecipe(Voltage voltage) {
+        return ASSEMBLER.recipe(DATA_GEN, RESEARCH_EQUIPMENT.get(voltage))
+                .outputItem(2, RESEARCH_EQUIPMENT.get(voltage), 1)
+                .workTicks(200L)
+                .voltage(voltage);
     }
 
     private static void circuitRecipes() {
@@ -467,6 +442,50 @@ public final class Components {
                 .define('B', Circuits.board(CircuitTier.ELECTRONIC).get())
                 .define('W', COPPER.tag("wire"))
                 .unlockedBy("has_board", has(Circuits.board(CircuitTier.ELECTRONIC).get())));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void circuitRecipe(Circuits.Circuit circuit, Object... args) {
+        var i = 0;
+        var output = 1;
+        if (args[0] instanceof Integer k) {
+            output = k;
+            i++;
+        }
+        var builder = CIRCUIT_ASSEMBLER.recipe(DATA_GEN, circuit.item())
+                .outputItem(2, circuit.item(), output)
+                .inputItem(0, circuit.circuitBoard(), 1);
+        for (; i < args.length; i++) {
+            var item = args[i];
+            var count = 1;
+            if (i + 1 < args.length && args[i + 1] instanceof Integer k) {
+                count = k;
+                i++;
+            }
+            if (item instanceof TagKey<?>) {
+                builder.inputItem(0, (TagKey<Item>) item, count);
+            } else if (item instanceof Circuits.CircuitComponent component) {
+                builder.inputItem(0, component.tag(circuit.tier().componentTier), count);
+            } else if (item instanceof Circuits.Circuit circuit1) {
+                builder.inputItem(0, circuit1.item(), count);
+            } else if (item instanceof ItemLike itemLike) {
+                builder.inputItem(0, () -> itemLike, count);
+            } else if (item instanceof Supplier<?>) {
+                builder.inputItem(0, (Supplier<? extends ItemLike>) item, count);
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+        var level = 1 + Math.max(0, circuit.level().voltageOffset);
+        var voltage = circuit.tier().baseVoltage;
+        if (voltage.rank < Voltage.LV.rank) {
+            voltage = Voltage.LV;
+        }
+        builder.voltage(voltage)
+                .inputFluid(1, SOLDERING_ALLOY.fluidEntry(),
+                        SOLDERING_ALLOY.fluidAmount((1 << (level - 1)) / 2f))
+                .workTicks(200L * level)
+                .build();
     }
 
     private static void miscRecipes() {

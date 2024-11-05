@@ -65,9 +65,12 @@ import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
+import static org.shsts.tinactory.content.AllItems.EMITTER;
 import static org.shsts.tinactory.content.AllItems.GRINDER;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
+import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
+import static org.shsts.tinactory.content.AllItems.SENSOR;
 import static org.shsts.tinactory.content.AllItems.TRANSFORMER;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
@@ -100,10 +103,10 @@ public final class Machines {
 
     public static void init() {
         machineItems();
-        primitive();
-        ulv();
-        basic();
-        misc();
+        primitiveRecipes();
+        ulvRecipes();
+        basicRecipes();
+        miscRecipes();
     }
 
     private static void machineItems() {
@@ -174,7 +177,7 @@ public final class Machines {
                 .build());
     }
 
-    private static void primitive() {
+    private static void primitiveRecipes() {
         // workbench
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
                         .shaped(WORKBENCH.get())
@@ -216,7 +219,7 @@ public final class Machines {
                         .unlockedBy("has_water_bucket", has(Items.WATER_BUCKET)));
     }
 
-    private static void ulv() {
+    private static void ulvRecipes() {
         ulvFromPrimitive(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR);
         ulvFromPrimitive(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER);
         ulvFromPrimitive(ORE_WASHER, PRIMITIVE_ORE_WASHER);
@@ -278,12 +281,12 @@ public final class Machines {
                 .build();
     }
 
-    private static void basic() {
+    private static void basicRecipes() {
         machineRecipe(Voltage.LV, STEEL, COPPER, TIN, BRONZE, TIN);
         machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
     }
 
-    private static void misc() {
+    private static void miscRecipes() {
         TOOL_CRAFTING.recipe(DATA_GEN, LOW_PRESSURE_BOILER)
                 .result(LOW_PRESSURE_BOILER, 1)
                 .pattern("PPP").pattern("PWP").pattern("VFV")
@@ -429,7 +432,26 @@ public final class Machines {
         var factory = new RecipeFactory(v);
         var wireNumber = 4 * v.rank;
 
-        factory.recipe(STONE_GENERATOR)
+        factory.recipe(RESEARCH_BENCH)
+                .circuit(2)
+                .component(SENSOR, 1)
+                .component(EMITTER, 1)
+                .tech(Technologies.SENSOR_AND_EMITTER)
+                .build()
+                .recipe(AllBlockEntities.ASSEMBLER)
+                .circuit(2)
+                .component(ROBOT_ARM, 2)
+                .component(CONVEYOR_MODULE, 2)
+                .tech(Technologies.ROBOT_ARM, Technologies.CONVEYOR_MODULE)
+                .build()
+                .recipe(CIRCUIT_ASSEMBLER)
+                .circuit(Voltage.fromRank(v.rank + 1), 4)
+                .component(ROBOT_ARM, 1)
+                .component(EMITTER, 1)
+                .component(CONVEYOR_MODULE, 2)
+                .tech(Technologies.INTEGRATED_CIRCUIT)
+                .build()
+                .recipe(STONE_GENERATOR)
                 .circuit(2)
                 .component(ELECTRIC_MOTOR, 1)
                 .component(ELECTRIC_PISTON, 1)
