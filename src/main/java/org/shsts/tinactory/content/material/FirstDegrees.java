@@ -10,6 +10,7 @@ import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
+import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
@@ -79,6 +80,11 @@ public final class FirstDegrees {
         GALLIUM_ARSENIDE = set("gallium_arsenide")
                 .color(0xFFA0A0A0)
                 .dust()
+                .buildObject();
+
+        KANTHAL = set("kanthal")
+                .color(0xFFC2D2DF)
+                .wire()
                 .buildObject();
     }
 

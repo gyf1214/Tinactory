@@ -58,6 +58,7 @@ import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
 import static org.shsts.tinactory.content.AllMaterials.ILMENITE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
@@ -289,6 +290,10 @@ public final class Materials {
                 .build()
                 .material(GALLIUM_ARSENIDE, DULL)
                 .mix(Voltage.LV, GALLIUM, 1, ARSENIC, 1)
+                .build()
+                .material(KANTHAL, METALLIC)
+                .mix(Voltage.LV, IRON, 1, ALUMINIUM, 1, CHROME, 1)
+                .machineProcess(Voltage.LV)
                 .build();
     }
 
