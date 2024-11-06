@@ -33,6 +33,7 @@ public final class Technologies {
     public static ResourceLocation SENSOR_AND_EMITTER;
     public static ResourceLocation HOT_WORKING;
     public static ResourceLocation ROBOT_ARM;
+    public static ResourceLocation KANTHAL;
     public static ResourceLocation INTEGRATED_CIRCUIT;
 
     public static void init() {
@@ -106,6 +107,11 @@ public final class Technologies {
                 .buildLoc();
 
         factory.voltage(Voltage.LV);
+
+        KANTHAL = factory.tech("kanthal")
+                .maxProgress(10L)
+                .displayItem(AllItems.KANTHAL_COIL_BLOCK)
+                .buildLoc();
 
         INTEGRATED_CIRCUIT = factory.tech("integrated_circuit")
                 .maxProgress(20L)

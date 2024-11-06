@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllLayouts;
@@ -25,7 +24,7 @@ public class BlastFurnace extends MultiBlock {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Nullable
-    private Block coilBlock = null;
+    private CoilBlock coilBlock = null;
 
     public BlastFurnace(SmartBlockEntity blockEntity) {
         super(blockEntity, AllLayouts.BLAST_FURNACE);
@@ -44,11 +43,11 @@ public class BlastFurnace extends MultiBlock {
         } else if (dy > 0 && dy < 3 && dx == 1 && dz == 1) {
             return blockState.isAir();
         } else if (dy > 0 && dy < 3) {
-            if (!blockState.is(AllTags.COIL)) {
+            if (!blockState.is(AllTags.COIL) || !(blockState.getBlock() instanceof CoilBlock coil)) {
                 return false;
             }
             if (coilBlock == null) {
-                coilBlock = blockState.getBlock();
+                coilBlock = coil;
                 return true;
             } else {
                 return blockState.is(coilBlock);

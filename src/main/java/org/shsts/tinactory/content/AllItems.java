@@ -18,6 +18,7 @@ import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.content.material.RubberTreeGrower;
+import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
@@ -27,8 +28,10 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -75,10 +78,14 @@ public final class AllItems {
     public static final Circuits.CircuitComponent DIODE;
     public static final Circuits.CircuitComponent TRANSISTOR;
 
+    // coil blocks
+    public static final Set<RegistryEntry<CoilBlock>> COIL_BLOCKS;
+    public static final RegistryEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
+    public static final RegistryEntry<CoilBlock> KANTHAL_COIL_BLOCK;
+
     public static final RegistryEntry<Item> STICKY_RESIN;
     public static final RegistryEntry<SimpleFluid> STEAM;
     public static final RegistryEntry<Block> HEAT_PROOF_BLOCK;
-    public static final RegistryEntry<Block> CUPRONICKEL_COIL_BLOCK;
     public static final RegistryEntry<RubberLogBlock> RUBBER_LOG;
     public static final RegistryEntry<LeavesBlock> RUBBER_LEAVES;
     public static final RegistryEntry<SaplingBlock> RUBBER_SAPLING;
@@ -139,9 +146,9 @@ public final class AllItems {
                 .properties($ -> $.strength(2f, 8f))
                 .register();
 
-        CUPRONICKEL_COIL_BLOCK = REGISTRATE.block("multi_block/coil/cupronickel", Block::new)
-                .properties($ -> $.strength(2f, 8f))
-                .register();
+        COIL_BLOCKS = new HashSet<>();
+        CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
+        KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
 
         ELECTRIC_MOTOR = dummyItem("electric_motor");
         ELECTRIC_PUMP = dummyItem("electric_pump");
@@ -233,6 +240,14 @@ public final class AllItems {
          Supplier<? extends ItemLike> advanced) {
         return Map.of(Voltage.LV, basic, Voltage.MV, basic,
                 Voltage.HV, good, Voltage.EV, good, Voltage.IV, advanced);
+    }
+
+    private static RegistryEntry<CoilBlock> coil(String name, int temperature) {
+        var ret = REGISTRATE.block("multi_block/coil/" + name, CoilBlock.factory(temperature))
+                .properties($ -> $.strength(2f, 8f))
+                .register();
+        COIL_BLOCKS.add(ret);
+        return ret;
     }
 }
 

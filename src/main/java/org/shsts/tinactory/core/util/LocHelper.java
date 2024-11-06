@@ -39,4 +39,13 @@ public final class LocHelper {
         }
         return new ResourceLocation(loc.getNamespace(), prefix + "/" + loc.getPath());
     }
+
+    public static String name(String id, int index) {
+        var names = id.split("/");
+        if (index >= 0) {
+            return names[index];
+        } else {
+            return names[names.length + index];
+        }
+    }
 }

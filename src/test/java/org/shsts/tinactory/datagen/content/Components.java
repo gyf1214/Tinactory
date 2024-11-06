@@ -4,6 +4,7 @@ package org.shsts.tinactory.datagen.content;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -16,6 +17,7 @@ import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -30,6 +32,7 @@ import static org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER;
 import static org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.BATTERY;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.CUPRONICKEL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllItems.DIODE;
@@ -44,6 +47,7 @@ import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
 import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
+import static org.shsts.tinactory.content.AllItems.KANTHAL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllItems.RESISTOR;
@@ -61,9 +65,11 @@ import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
+import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
@@ -75,6 +81,7 @@ import static org.shsts.tinactory.content.AllTags.COIL;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
+import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
@@ -176,17 +183,17 @@ public final class Components {
                 .blockState(solidBlock("casings/solid/machine_casing_heatproof"))
                 .tag(MINEABLE_WITH_WRENCH)
                 .build()
-                .block(CUPRONICKEL_COIL_BLOCK)
-                .blockState(solidBlock("casings/coils/machine_coil_cupronickel"))
-                .tag(COIL)
-                .build()
                 .item(STICKY_RESIN)
                 .model(basicItem("metaitems/rubber_drop"))
                 .build();
 
+        COIL_BLOCKS.forEach(coil -> DATA_GEN.block(coil)
+                .blockState(solidBlock("casings/coils/machine_coil_" + name(coil.id, -1)))
+                .tag(COIL)
+                .build());
+
         FLUID_CELL.forEach((v, item) -> {
-            var names = item.id.split("/");
-            var texBase = "metaitems/large_fluid_cell." + names[names.length - 1];
+            var texBase = "metaitems/large_fluid_cell." + name(item.id, -1);
             DATA_GEN.item(item)
                     .model(basicItem(texBase + "/base", texBase + "/overlay"))
                     .build();
@@ -496,14 +503,21 @@ public final class Components {
                 .workTicks(82L)
                 .voltage(Voltage.ULV)
                 .requireTech(Technologies.STEEL)
-                .build()
-                .recipe(DATA_GEN, CUPRONICKEL_COIL_BLOCK)
-                .outputItem(2, CUPRONICKEL_COIL_BLOCK, 1)
-                .inputItem(0, CUPRONICKEL.entry("wire"), 8)
-                .inputItem(0, BRONZE.entry("foil"), 8)
+                .build();
+
+        coilRecipe(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, CUPRONICKEL, BRONZE, Technologies.STEEL);
+        coilRecipe(KANTHAL_COIL_BLOCK, Voltage.LV, KANTHAL, SILVER, Technologies.KANTHAL);
+    }
+
+    private static void coilRecipe(RegistryEntry<CoilBlock> coil, Voltage v,
+                                   MaterialSet wire, MaterialSet foil, ResourceLocation tech) {
+        ASSEMBLER.recipe(DATA_GEN, coil)
+                .outputItem(2, coil, 1)
+                .inputItem(0, wire.entry("wire"), 8 * v.rank)
+                .inputItem(0, foil.entry("foil"), 8 * v.rank)
                 .workTicks(200L)
-                .voltage(Voltage.ULV)
-                .requireTech(Technologies.STEEL)
+                .voltage(v)
+                .requireTech(tech)
                 .build();
     }
 }

@@ -33,6 +33,7 @@ import static org.shsts.tinactory.core.util.LocHelper.extend;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.prepend;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 
@@ -98,11 +99,7 @@ public final class Models {
 
     public static <U extends Item> void
     componentItem(RegistryDataContext<Item, U, ItemModelProvider> ctx) {
-        var names = ctx.id.split("/");
-        var name = names[names.length - 1];
-        var voltage = names[names.length - 2];
-
-        var tex = "items/metaitems/" + name.replace('_', '.') + "." + voltage;
+        var tex = "items/metaitems/" + name(ctx.id, -1).replace('_', '.') + "." + name(ctx.id, -2);
         ctx.provider.withExistingParent(ctx.id, "item/generated")
                 .texture("layer0", gregtech(tex));
     }
