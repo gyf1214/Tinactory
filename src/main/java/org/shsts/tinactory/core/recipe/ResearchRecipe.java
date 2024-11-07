@@ -107,8 +107,8 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
     }
 
-    public static class Serializer extends SmartRecipeSerializer<ResearchRecipe, Builder> {
-        protected Serializer(RecipeTypeEntry<ResearchRecipe, Builder> type) {
+    private static class Serializer extends SmartRecipeSerializer<ResearchRecipe, Builder> {
+        private Serializer(RecipeTypeEntry<ResearchRecipe, Builder> type) {
             super(type);
         }
 

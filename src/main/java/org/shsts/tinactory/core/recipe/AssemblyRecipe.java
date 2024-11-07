@@ -60,7 +60,7 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
     }
 
-    public static class Serializer<T extends AssemblyRecipe, B extends BuilderBase<T, B>> extends
+    protected static class Serializer<T extends AssemblyRecipe, B extends BuilderBase<T, B>> extends
             ProcessingRecipe.Serializer<T, B> {
         protected Serializer(RecipeTypeEntry<T, B> type) {
             super(type);

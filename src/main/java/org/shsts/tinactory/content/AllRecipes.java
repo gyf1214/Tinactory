@@ -9,6 +9,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
@@ -50,7 +51,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STEAM_TURBINE;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> BLAST_FURNACE;
+    public static final RecipeTypeEntry<BlastFurnaceRecipe, BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     // Recipes only used to mark input for recipe book purpose
     public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
 
@@ -149,7 +150,9 @@ public final class AllRecipes {
                 .defaults($ -> $.autoVoid().amperage(1d).workTicks(100))
                 .register();
 
-        BLAST_FURNACE = processing("blast_furnace")
+        BLAST_FURNACE = REGISTRATE.recipeType("blast_furnace", BlastFurnaceRecipe.SERIALIZER)
+                .clazz(BlastFurnaceRecipe.class)
+                .builder(BlastFurnaceRecipe.Builder::new)
                 .defaults($ -> $.amperage(4d))
                 .register();
 

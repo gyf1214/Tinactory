@@ -260,7 +260,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
     protected static class Serializer<T extends ProcessingRecipe, B extends BuilderBase<T, B>>
             extends SmartRecipeSerializer<T, B> {
-        public Serializer(RecipeTypeEntry<T, B> type) {
+        protected Serializer(RecipeTypeEntry<T, B> type) {
             super(type);
         }
 

@@ -66,8 +66,8 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         }
     }
 
-    public static class Serializer extends AssemblyRecipe.Serializer<OreAnalyzerRecipe, Builder> {
-        protected Serializer(RecipeTypeEntry<OreAnalyzerRecipe, Builder> type) {
+    private static class Serializer extends AssemblyRecipe.Serializer<OreAnalyzerRecipe, Builder> {
+        private Serializer(RecipeTypeEntry<OreAnalyzerRecipe, Builder> type) {
             super(type);
         }
 

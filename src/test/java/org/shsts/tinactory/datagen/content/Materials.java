@@ -454,6 +454,7 @@ public final class Materials {
                 .outputItem(2, STEEL.entry("ingot"), 1)
                 .voltage(Voltage.ULV)
                 .workTicks(400)
+                .temperature(1000)
                 .build();
     }
 

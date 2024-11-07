@@ -78,7 +78,7 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     private static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
-        public Serializer(RecipeTypeEntry<MarkerRecipe, Builder> type) {
+        private Serializer(RecipeTypeEntry<MarkerRecipe, Builder> type) {
             super(type);
         }
 
