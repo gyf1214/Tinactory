@@ -122,7 +122,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         }
     }
 
-    protected abstract boolean allowTargetRecipe(Recipe<?> recipe);
+    public abstract boolean allowTargetRecipe(Recipe<?> recipe);
 
     protected abstract void doSetTargetRecipe(Recipe<?> recipe);
 

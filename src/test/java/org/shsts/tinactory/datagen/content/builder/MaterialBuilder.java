@@ -42,6 +42,7 @@ import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BENDER;
+import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
@@ -334,6 +335,17 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         dataGen.vanillaRecipe(() -> SimpleCookingRecipeBuilder
                 .smelting(Ingredient.of(material.tag("dust")), to.item("ingot"), 0, 200)
                 .unlockedBy("has_material", has(material.tag("dust"))), "_from_" + material.name);
+        return this;
+    }
+
+    public MaterialBuilder<P> blast(Voltage v, int temperature, long ticks) {
+        BLAST_FURNACE.recipe(dataGen, material.loc("ingot"))
+                .outputItem(2, material.entry("ingot"), 1)
+                .inputItem(0, material.tag("dust"), 1)
+                .voltage(v)
+                .temperature(temperature)
+                .workTicks(ticks)
+                .build();
         return this;
     }
 

@@ -3,6 +3,9 @@ package org.shsts.tinactory.content.multiblock;
 import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.AllItems;
@@ -17,6 +20,9 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalInt;
+
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -68,8 +74,29 @@ public class BlastFurnace extends MultiBlock {
         return checkMultiBlock(start, 3, 4, 3);
     }
 
-    public int getTemperature() {
-        assert coilBlock != null;
-        return coilBlock.temperature;
+    public OptionalInt getTemperature() {
+        return coilBlock == null ? OptionalInt.empty() : OptionalInt.of(coilBlock.temperature);
+    }
+
+    @Override
+    public CompoundTag serializeOnUpdate() {
+        var tag = super.serializeOnUpdate();
+        if (coilBlock != null && coilBlock.getRegistryName() != null) {
+            tag.putString("coilBlock", coilBlock.getRegistryName().toString());
+        }
+        return tag;
+    }
+
+    @Override
+    public void deserializeOnUpdate(CompoundTag tag) {
+        coilBlock = null;
+        if (tag.contains("coilBlock", Tag.TAG_STRING)) {
+            var loc = new ResourceLocation(tag.getString("coilBlock"));
+            var block = REGISTRATE.blockHandler.getEntry(loc).get();
+            if (block instanceof CoilBlock coilBlock1) {
+                coilBlock = coilBlock1;
+            }
+        }
+        super.deserializeOnUpdate(tag);
     }
 }

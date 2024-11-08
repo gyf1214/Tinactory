@@ -24,9 +24,8 @@ public class MarkerRecipeBook extends MachineRecipeBook {
 
     @Override
     protected void doRefreshRecipes() {
-        var voltage = getMachineVoltage();
         for (var recipe : ClientUtil.getRecipeManager().getAllRecipesFor(AllRecipes.MARKER.get())) {
-            if (recipe.baseType != recipeType || !recipe.canCraftInVoltage(voltage)) {
+            if (recipe.baseType != recipeType || !canCraft(recipe)) {
                 continue;
             }
             recipes.put(recipe.getId(), recipe);

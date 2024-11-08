@@ -47,28 +47,29 @@ public class MachineProcessor<T extends ProcessingRecipe>
         this.voltage = voltage;
     }
 
-    protected boolean matchesExtra(Level world, T recipe, IContainer container) {
+    protected boolean matchesRecipe(T recipe) {
         return recipe.canCraftInVoltage(getVoltage());
     }
 
     @Override
     protected boolean matches(Level world, T recipe, IContainer container) {
-        return recipe.matches(container, world) && matchesExtra(world, recipe, container);
+        return matchesRecipe(recipe) && recipe.matches(container, world);
     }
 
     @Override
     protected Stream<? extends T> getMatchedRecipes(Level world, IContainer container) {
         return SmartRecipe.getRecipesFor(recipeType, container, world)
-                .stream().filter(r -> matchesExtra(world, r, container));
+                .stream().filter(this::matchesRecipe);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected boolean allowTargetRecipe(Recipe<?> recipe) {
+    public boolean allowTargetRecipe(Recipe<?> recipe) {
         var type = recipe.getType();
         if (type == MARKER.get()) {
             return ((MarkerRecipe) recipe).baseType == recipeType;
         }
-        return type == recipeType;
+        return type == recipeType && matchesRecipe((T) recipe);
     }
 
     @SuppressWarnings("unchecked")

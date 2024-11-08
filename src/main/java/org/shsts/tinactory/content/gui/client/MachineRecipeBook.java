@@ -3,11 +3,13 @@ package org.shsts.tinactory.content.gui.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -53,8 +55,11 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
         TechManager.client().removeProgressChangeListener(onTechChange);
     }
 
-    protected long getMachineVoltage() {
-        return RecipeProcessor.getBlockVoltage(blockEntity).value;
+    protected boolean canCraft(Recipe<?> recipe) {
+        return Machine.getProcessor(blockEntity)
+                .flatMap(p -> p instanceof RecipeProcessor<?> p1 ? Optional.of(p1) : Optional.empty())
+                .map(p -> p.allowTargetRecipe(recipe))
+                .orElse(false);
     }
 
     @Override
@@ -63,9 +68,8 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
             return;
         }
         var container = AllCapabilities.CONTAINER.get(blockEntity);
-        var voltage = getMachineVoltage();
         for (var recipe : ClientUtil.getRecipeManager().getAllRecipesFor(recipeType)) {
-            if (!recipe.canCraftIn(container) || !recipe.canCraftInVoltage(voltage)) {
+            if (!recipe.canCraftIn(container) || !canCraft(recipe)) {
                 continue;
             }
             recipes.put(recipe.getId(), recipe);

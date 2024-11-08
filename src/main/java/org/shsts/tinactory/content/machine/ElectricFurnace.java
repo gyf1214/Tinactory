@@ -70,7 +70,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     }
 
     @Override
-    protected boolean allowTargetRecipe(Recipe<?> recipe) {
+    public boolean allowTargetRecipe(Recipe<?> recipe) {
         return recipe.getType() == RecipeType.SMELTING;
     }
 

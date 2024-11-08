@@ -1,10 +1,8 @@
 package org.shsts.tinactory.content.multiblock;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 
@@ -23,12 +21,12 @@ public class BlastFurnaceProcessor extends MultiBlockProcessor<BlastFurnaceRecip
     }
 
     private int getTemperature() {
-        return getMultiBlock().getTemperature();
+        return getMultiBlock().getTemperature().orElse(0);
     }
 
     @Override
-    protected boolean matchesExtra(Level world, BlastFurnaceRecipe recipe, IContainer container) {
-        return super.matchesExtra(world, recipe, container) && recipe.temperature <= getTemperature();
+    protected boolean matchesRecipe(BlastFurnaceRecipe recipe) {
+        return super.matchesRecipe(recipe) && recipe.temperature <= getTemperature();
     }
 
     @Override

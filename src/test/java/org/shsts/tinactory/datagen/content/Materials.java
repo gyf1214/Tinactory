@@ -9,7 +9,6 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
@@ -22,6 +21,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
@@ -104,6 +104,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_SHEARS;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
@@ -269,7 +270,7 @@ public final class Materials {
                 .alloy(Voltage.ULV, COPPER, 1, NICKEL, 1)
                 .build()
                 .material(STEEL, METALLIC)
-                .toolProcess(1.5d)
+                .toolProcess(1.5d).blast(Voltage.ULV, 2000, 240)
                 .build()
                 .material(RED_ALLOY, DULL)
                 .toolProcess(0.5d).smelt()
@@ -293,7 +294,7 @@ public final class Materials {
                 .build()
                 .material(KANTHAL, METALLIC)
                 .mix(Voltage.LV, IRON, 1, ALUMINIUM, 1, CHROME, 1)
-                .machineProcess(Voltage.LV)
+                .machineProcess(Voltage.LV).blast(Voltage.LV, 1800, 240)
                 .build();
     }
 
@@ -448,8 +449,8 @@ public final class Materials {
                 .voltage(Voltage.ULV)
                 .build();
 
-        // TEST
-        BLAST_FURNACE.recipe(DATA_GEN, STEEL.loc("ingot"))
+        // iron -> steel
+        BLAST_FURNACE.recipe(DATA_GEN, suffix(STEEL.loc("ingot"), "_from_iron"))
                 .inputItem(0, IRON.tag("dust"), 1)
                 .outputItem(2, STEEL.entry("ingot"), 1)
                 .voltage(Voltage.ULV)
@@ -519,7 +520,7 @@ public final class Materials {
     private static void woodRecipes(String prefix) {
         var nether = prefix.equals("crimson") || prefix.equals("warped");
 
-        var planks = Tinactory.REGISTRATE.itemHandler.getEntry(prefix + "_planks");
+        var planks = REGISTRATE.itemHandler.getEntry(prefix + "_planks");
         var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;
