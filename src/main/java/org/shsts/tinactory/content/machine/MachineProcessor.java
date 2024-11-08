@@ -26,9 +26,9 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
 
@@ -47,16 +47,19 @@ public class MachineProcessor<T extends ProcessingRecipe>
         this.voltage = voltage;
     }
 
-    @Override
-    protected boolean matches(Level world, T recipe, IContainer container) {
-        return recipe.matches(container, world) && recipe.canCraftInVoltage(getVoltage());
+    protected boolean matchesExtra(Level world, T recipe, IContainer container) {
+        return recipe.canCraftInVoltage(getVoltage());
     }
 
     @Override
-    protected List<? extends T> getMatchedRecipes(Level world, IContainer container) {
+    protected boolean matches(Level world, T recipe, IContainer container) {
+        return recipe.matches(container, world) && matchesExtra(world, recipe, container);
+    }
+
+    @Override
+    protected Stream<? extends T> getMatchedRecipes(Level world, IContainer container) {
         return SmartRecipe.getRecipesFor(recipeType, container, world)
-                .stream().filter(r -> r.canCraftInVoltage(getVoltage()))
-                .toList();
+                .stream().filter(r -> matchesExtra(world, r, container));
     }
 
     @Override

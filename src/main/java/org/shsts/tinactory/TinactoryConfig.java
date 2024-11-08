@@ -20,6 +20,8 @@ public final class TinactoryConfig {
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<Double> machineResistanceFactor;
     public final ConfigValue<Double> cableResistanceFactor;
+    public final ConfigValue<Double> workFactorExponent;
+    public final ConfigValue<Double> blastFurnaceTempFactor;
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
 
@@ -49,6 +51,10 @@ public final class TinactoryConfig {
                 .defineInRange("machine_resistance_factor", 0.1d, 0d, Double.MAX_VALUE);
         cableResistanceFactor = builder.comment("Cable resistance factor")
                 .defineInRange("cable_resistance_factor", 0.01d, 0d, Double.MAX_VALUE);
+        workFactorExponent = builder.comment("Work factor exponent")
+                .defineInRange("work_factor_exponent", 2d, 0d, Double.MAX_VALUE);
+        blastFurnaceTempFactor = builder.comment("Temperature factor for blast furnace")
+                .defineInRange("blast_furnace_temp_factor", 1e-4, 0d, Double.MAX_VALUE);
         builder.pop();
 
         builder.push("network");

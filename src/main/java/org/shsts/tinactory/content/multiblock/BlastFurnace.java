@@ -67,4 +67,9 @@ public class BlastFurnace extends MultiBlock {
 
         return checkMultiBlock(start, 3, 4, 3);
     }
+
+    public int getTemperature() {
+        assert coilBlock != null;
+        return coilBlock.temperature;
+    }
 }

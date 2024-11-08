@@ -25,6 +25,7 @@ import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
+import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
 import org.shsts.tinactory.content.multiblock.MultiBlockProcessor;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.common.CapabilityProvider;
@@ -40,11 +41,11 @@ import org.slf4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -83,7 +84,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     protected abstract boolean matches(Level world, T recipe, IContainer container);
 
-    protected abstract List<? extends T> getMatchedRecipes(Level world, IContainer container);
+    protected abstract Stream<? extends T> getMatchedRecipes(Level world, IContainer container);
 
     protected Optional<T> getNewRecipe(Level world, IContainer container) {
         if (targetRecipe != null) {
@@ -91,7 +92,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
                 return Optional.of(targetRecipe);
             }
         } else {
-            var matches = getMatchedRecipes(world, container);
+            var matches = getMatchedRecipes(world, container).toList();
             if (matches.size() == 1) {
                 return Optional.of(matches.get(0));
             }
@@ -318,5 +319,10 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     multiBlock(RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         return CapabilityProviderBuilder.fromFactory(ID,
                 be -> new MultiBlockProcessor<>(be, type.get()));
+    }
+
+    public static <P> CapabilityProviderBuilder<BlockEntity, P>
+    blastFurnace(P parent) {
+        return CapabilityProviderBuilder.fromFactory(parent, ID, BlastFurnaceProcessor::new);
     }
 }

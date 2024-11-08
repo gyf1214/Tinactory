@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -206,8 +207,9 @@ public class Machine extends UpdatableCapabilityProvider
     private void onWork(Level world, Network network) {
         assert this.network == network;
         var workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
+        var workFactor1 = Math.pow(workFactor, TinactoryConfig.INSTANCE.workFactorExponent.get());
         getProcessor().ifPresent(processor -> {
-            processor.onWorkTick(workFactor);
+            processor.onWorkTick(workFactor1);
             updateWorkBlock(world, processor.getProgress() > 0d);
         });
     }

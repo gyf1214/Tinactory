@@ -329,7 +329,7 @@ public final class AllBlockEntities {
                 .blockEntity()
                 .eventManager().ticking()
                 .simpleCapability(MultiBlock::blastFurnace)
-                .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.BLAST_FURNACE))
+                .simpleCapability(RecipeProcessor::blastFurnace)
                 .build()
                 .translucent()
                 .buildObject();

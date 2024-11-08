@@ -23,7 +23,7 @@ public class OreAnalyzerProcessor extends MachineProcessor<OreAnalyzerRecipe> {
 
     @Override
     protected Optional<OreAnalyzerRecipe> getNewRecipe(Level world, IContainer container) {
-        var matches = getMatchedRecipes(world, container);
+        var matches = getMatchedRecipes(world, container).toList();
         var size = matches.size();
         if (size == 0) {
             return Optional.empty();
