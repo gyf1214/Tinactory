@@ -19,6 +19,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineProcessor;
+import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
@@ -65,6 +66,8 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
             extraHeight += BUTTON_SIZE + SPACING;
         } else if (ResearchRecipe.class.isAssignableFrom(recipeType.clazz)) {
             extraHeight += BUTTON_SIZE + FONT_HEIGHT + SPACING * 2;
+        } else if (BlastFurnaceRecipe.class.isAssignableFrom(recipeType.clazz)) {
+            extraHeight += FONT_HEIGHT + SPACING;
         }
         return super.buildBackground(builder, helper, xOffset)
                 .add(helper.createBlankDrawable(WIDTH, extraHeight), 0, layout.rect.endY());
@@ -106,6 +109,10 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
                         NUMBER_FORMAT.format(tech.get().maxProgress));
                 y = drawTextLine(stack, text, y);
             }
+        } else if (recipe instanceof BlastFurnaceRecipe recipe1) {
+            var text = I18n.tr("tinactory.jei.processing.temperature",
+                    NUMBER_FORMAT.format(recipe1.temperature));
+            y = drawTextLine(stack, text, y);
         }
         y = drawTextLine(stack, I18n.tr("tinactory.jei.processing.total", total), y);
         y = drawTextLine(stack, I18n.tr("tinactory.jei.processing.power", recipe.power, voltage), y);

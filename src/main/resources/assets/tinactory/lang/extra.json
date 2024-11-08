@@ -46,6 +46,7 @@
   "tinactory.jei.processing.duration": "Duration: %s secs",
   "tinactory.jei.processing.progress": "Progress: %s / %s",
   "tinactory.jei.processing.requiredTech": "Requires:",
+  "tinactory.jei.processing.temperature": "Temperature: %d K",
   "tinactory.jei.rate": "Chance: %s",
   "tinactory.chat.createTeam.success": "Create team %s for %s successfully.",
   "tinactory.chat.addPlayerToTeam.success": "Add player %s to team %s successfully.",
