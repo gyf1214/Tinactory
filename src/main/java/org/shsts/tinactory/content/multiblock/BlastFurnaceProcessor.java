@@ -33,9 +33,8 @@ public class BlastFurnaceProcessor extends MultiBlockProcessor<BlastFurnaceRecip
     protected void calculateFactors(BlastFurnaceRecipe recipe) {
         super.calculateFactors(recipe);
         var temp = getTemperature();
-        if (recipe.temperature < temp) {
-            energyFactor /= Math.exp(TinactoryConfig.INSTANCE.blastFurnaceTempFactor.get() *
-                    (temp - recipe.temperature));
-        }
+        var factor = Math.max(1d, (temp - recipe.temperature) /
+                TinactoryConfig.INSTANCE.blastFurnaceTempFactor.get());
+        energyFactor /= factor;
     }
 }
