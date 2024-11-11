@@ -62,7 +62,7 @@ public class ComponentBuilder<U, T, P> extends SimpleBuilder<Map<Voltage, Regist
     }
 
     public static <U> DummyBuilder<U, ?>
-    dummy(Function<Voltage, RegistryEntry<U>> factory) {
+    simple(Function<Voltage, RegistryEntry<U>> factory) {
         return new DummyBuilder<>(Unit.INSTANCE, factory);
     }
 }

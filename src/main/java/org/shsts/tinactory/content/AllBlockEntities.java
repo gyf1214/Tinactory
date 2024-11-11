@@ -322,7 +322,7 @@ public final class AllBlockEntities {
         LOW_PRESSURE_BOILER = boiler("low", 5d);
         HIGH_PRESSURE_BOILER = boiler("high", 17d);
 
-        MULTI_BLOCK_INTERFACE = ComponentBuilder.dummy(ProcessingSet::multiblockInterface)
+        MULTI_BLOCK_INTERFACE = ComponentBuilder.simple(ProcessingSet::multiblockInterface)
                 .voltages(Voltage.ULV, Voltage.LuV)
                 .buildObject();
 

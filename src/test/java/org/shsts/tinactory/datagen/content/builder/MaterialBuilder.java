@@ -154,24 +154,18 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         }
 
         private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
-                             String result, int count, String input, int outputPort, long workTicks) {
+                             String result, int count, String input, long workTicks) {
             if (!material.hasItem(result) || !material.hasItem(input)) {
                 return;
             }
             recipeType.recipe(DATA_GEN, material.loc(result))
-                    .outputItem(outputPort, material.entry(result), count)
+                    .outputItem(1, material.entry(result), count)
                     .inputItem(0, material.tag(input), 1)
                     .voltage(voltage)
                     .workTicks(ticks(workTicks))
                     .build();
         }
 
-        private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
-                             String result, int count, String input, long workTicks) {
-            process(recipeType, result, count, input, 1, workTicks);
-        }
-
-        // TODO: soldering
         private void assemble(String sub, long workTicks, Object... inputs) {
             if (!material.hasItem(sub)) {
                 return;
@@ -299,7 +293,16 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             process(BENDER, "foil", 4, "plate", 40L);
             process(LATHE, "stick", 1, "ingot", 64L);
             process(LATHE, "screw", 1, "bolt", 16L);
-            process(CUTTER, "bolt", 4, "stick", 2, 128L);
+
+            if (material.hasItem("bolt") && material.hasItem("stick")) {
+                CUTTER.recipe(DATA_GEN, material.loc("bolt"))
+                        .outputItem(2, material.entry("bolt"), 4)
+                        .inputItem(0, material.tag("stick"), 1)
+                        .inputFluid(1, Fluids.WATER, 5)
+                        .voltage(voltage)
+                        .workTicks(128L)
+                        .build();
+            }
 
             assemble("gear", 128L, "plate", "stick", 2);
             assemble("rotor", 160L, "plate", 4, "ring", 1);

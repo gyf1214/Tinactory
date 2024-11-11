@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.CircuitComponentTier;
 import org.shsts.tinactory.content.electric.CircuitTier;
@@ -26,15 +27,18 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static org.shsts.tinactory.content.AllItems.ADVANCED_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER;
 import static org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.BATTERY;
+import static org.shsts.tinactory.content.AllItems.BOULES;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.CHIPS;
+import static org.shsts.tinactory.content.AllItems.COMPONENT_ITEMS;
 import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.DIODE;
-import static org.shsts.tinactory.content.AllItems.DUMMY_ITEMS;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
@@ -45,12 +49,14 @@ import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
+import static org.shsts.tinactory.content.AllItems.RAW_WAFERS;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllItems.RESISTOR;
 import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
 import static org.shsts.tinactory.content.AllItems.SENSOR;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
+import static org.shsts.tinactory.content.AllItems.WAFERS;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
@@ -76,6 +82,7 @@ import static org.shsts.tinactory.content.AllMultiBlocks.KANTHAL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
+import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.COIL;
@@ -108,7 +115,7 @@ public final class Components {
     }
 
     private static void componentItems() {
-        DUMMY_ITEMS.forEach(entry -> DATA_GEN.item(entry)
+        COMPONENT_ITEMS.forEach(entry -> DATA_GEN.item(entry)
                 .model(Models::componentItem)
                 .build());
 
@@ -144,6 +151,36 @@ public final class Components {
                     .model(basicItem(BUZZSAW_TEX))
                     .build();
         }
+
+        Stream.concat(BOULES.stream(), RAW_WAFERS.stream()).forEach(entry -> DATA_GEN.item(entry)
+                .model(basicItem("metaitems/" + entry.id
+                        .replace('/', '.')
+                        .replace("wafer_raw.", "wafer.")
+                        .replace("glowstone", "phosphorus")))
+                .build());
+
+        chip("integrated_circuit", "integrated_logic_circuit");
+        chip("cpu", "central_processing_unit");
+        chip("nano_cpu", "nano_central_processing_unit");
+        chip("qbit_cpu", "qbit_central_processing_unit");
+        chip("ram", "random_access_memory");
+        chip("nand", "nand_memory_chip");
+        chip("nor", "nor_memory_chip");
+        chip("simple_soc", "simple_system_on_chip");
+        chip("soc", "system_on_chip");
+        chip("advanced_soc", "advanced_system_on_chip");
+        chip("low_pic", "low_power_integrated_circuit");
+        chip("pic", "power_integrated_circuit");
+        chip("high_pic", "high_power_integrated_circuit");
+    }
+
+    private static void chip(String name, String tex) {
+        List.of(WAFERS.get(name), CHIPS.get(name)).forEach(entry -> DATA_GEN.item(entry)
+                .model(basicItem("metaitems/" + entry.id
+                        .replace('/', '.')
+                        .replace("chip.", "plate.")
+                        .replace(name, tex)))
+                .build());
     }
 
     private static void circuits() {
@@ -451,6 +488,18 @@ public final class Components {
                 .define('B', Circuits.board(CircuitTier.ELECTRONIC).get())
                 .define('W', COPPER.tag("wire"))
                 .unlockedBy("has_board", has(Circuits.board(CircuitTier.ELECTRONIC).get())));
+
+        for (var i = 0; i < RAW_WAFERS.size(); i++) {
+            var boule = BOULES.get(i);
+            var wafer = RAW_WAFERS.get(i);
+            CUTTER.recipe(DATA_GEN, wafer.loc)
+                    .outputItem(2, wafer, 8 << i)
+                    .inputItem(0, boule, 1)
+                    .inputFluid(1, Fluids.WATER, 1000 << i)
+                    .voltage(Voltage.fromRank(2 + 2 * i))
+                    .workTicks(400L << i)
+                    .build();
+        }
     }
 
     @SuppressWarnings("unchecked")

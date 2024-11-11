@@ -7,6 +7,7 @@ import net.minecraftforge.common.data.LanguageProvider;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,16 +24,26 @@ public class LanguageProcessor {
 
     private record Processor(Pattern pattern, Function<Matcher, String> func) {}
 
+    private final Set<String> abbreviates = new HashSet<>();
     private final List<Processor> processors = new ArrayList<>();
 
     private void pattern(String pattern, Function<Matcher, String> func) {
         processors.add(new Processor(Pattern.compile("^" + pattern + "$"), func));
     }
 
+    private void abbreviate(String... vals) {
+        Arrays.stream(vals).map(String::toLowerCase).forEach(abbreviates::add);
+    }
+
     private String normalize(Matcher matcher, int group) {
         return Arrays.stream(matcher.group(group).split("_"))
-                .map(str -> str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase())
-                .collect(Collectors.joining(" "));
+                .map(str -> {
+                    if (abbreviates.contains(str.toLowerCase())) {
+                        return str.toUpperCase();
+                    } else {
+                        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+                    }
+                }).collect(Collectors.joining(" "));
     }
 
     private String capitalize(Matcher matcher, int group) {
@@ -44,6 +55,8 @@ public class LanguageProcessor {
     }
 
     public LanguageProcessor() {
+        abbreviate("cpu", "ram", "nand", "nor", "soc", "pic");
+
         pattern("block[.]tinactory[.]material[.]ore[.](.*)", matcher ->
                 fmt("%s Ore", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
@@ -82,6 +95,14 @@ public class LanguageProcessor {
                 fmt("Advanced SMD %s", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]circuit_component[.](.*)", matcher ->
                 fmt("%s", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]boule[.](.*)", matcher ->
+                fmt("%s-doped Monocrystalline Silicon Boule", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]wafer_raw[.](.*)", matcher ->
+                fmt("%s-doped Wafer", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]wafer[.](.*)", matcher ->
+                fmt("%s Wafer", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]chip[.](.*)", matcher ->
+                fmt("%s Chip", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]machine[.](.*)[.](.*)", matcher ->
                 fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("block[.]tinactory[.]primitive[.](.*)", matcher ->

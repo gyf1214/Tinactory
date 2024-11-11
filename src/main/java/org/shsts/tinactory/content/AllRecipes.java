@@ -7,7 +7,6 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.DisplayInputRecipe;
@@ -134,8 +133,7 @@ public final class AllRecipes {
                 .register();
 
         CUTTER = processing("cutter")
-                .defaults($ -> $.inputFluid(1, Fluids.WATER, 10)
-                        .amperage(0.375d))
+                .defaults($ -> $.amperage(0.375d))
                 .register();
 
         EXTRACTOR = displayInput("extractor")
