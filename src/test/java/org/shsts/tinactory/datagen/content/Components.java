@@ -65,12 +65,14 @@ import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
+import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
+import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
@@ -81,6 +83,7 @@ import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.KANTHAL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
+import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
@@ -500,6 +503,15 @@ public final class Components {
                     .workTicks(400L << i)
                     .build();
         }
+
+        BLAST_FURNACE.recipe(DATA_GEN, BOULES.get(0))
+                .outputItem(2, BOULES.get(0), 1)
+                .inputItem(0, SILICON.tag("dust"), 32)
+                .inputItem(0, GALLIUM_ARSENIDE.tag("dust"), 1)
+                .voltage(Voltage.LV)
+                .workTicks(6400)
+                .temperature(2100)
+                .build();
     }
 
     @SuppressWarnings("unchecked")
