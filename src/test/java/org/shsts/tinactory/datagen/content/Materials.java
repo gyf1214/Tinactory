@@ -87,7 +87,6 @@ import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
-import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
@@ -104,7 +103,6 @@ import static org.shsts.tinactory.content.AllTags.TOOL_SHEARS;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
-import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
@@ -231,6 +229,7 @@ public final class Materials {
                 .material(VANADIUM, METALLIC).build()
                 .material(ALUMINIUM, DULL)
                 .machineProcess(Voltage.LV)
+                .blast(Voltage.LV, 1500, 400)
                 .build()
                 .material(LEAD, DULL)
                 .machineProcess(Voltage.LV).smelt()
@@ -270,7 +269,9 @@ public final class Materials {
                 .alloy(Voltage.ULV, COPPER, 1, NICKEL, 1)
                 .build()
                 .material(STEEL, METALLIC)
-                .toolProcess(1.5d).blast(Voltage.ULV, 2000, 240)
+                .toolProcess(1.5d)
+                .blast(Voltage.ULV, 1000, 800)
+                .blast(Voltage.ULV, 1000, 1000, IRON)
                 .build()
                 .material(RED_ALLOY, DULL)
                 .toolProcess(0.5d).smelt()
@@ -294,7 +295,8 @@ public final class Materials {
                 .build()
                 .material(KANTHAL, METALLIC)
                 .mix(Voltage.LV, IRON, 1, ALUMINIUM, 1, CHROME, 1)
-                .machineProcess(Voltage.LV).blast(Voltage.LV, 1800, 240)
+                .machineProcess(Voltage.LV)
+                .blast(Voltage.LV, 1800, 1000)
                 .build();
     }
 
@@ -447,15 +449,6 @@ public final class Materials {
                 .outputItem(1, RUBBER.entry("sheet"), 3)
                 .workTicks(300)
                 .voltage(Voltage.ULV)
-                .build();
-
-        // iron -> steel
-        BLAST_FURNACE.recipe(DATA_GEN, suffix(STEEL.loc("ingot"), "_from_iron"))
-                .inputItem(0, IRON.tag("dust"), 1)
-                .outputItem(2, STEEL.entry("ingot"), 1)
-                .voltage(Voltage.ULV)
-                .workTicks(400)
-                .temperature(1000)
                 .build();
     }
 

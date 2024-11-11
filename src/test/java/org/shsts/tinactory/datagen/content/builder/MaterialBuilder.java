@@ -338,10 +338,16 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
-    public MaterialBuilder<P> blast(Voltage v, int temperature, long ticks) {
-        BLAST_FURNACE.recipe(dataGen, material.loc("ingot"))
+    public MaterialBuilder<P> blast(Voltage v, int temperature, long ticks, Object... extra) {
+        var source = material;
+        var suffix = "";
+        if (extra.length > 0 && extra[0] instanceof MaterialSet mat) {
+            source = mat;
+            suffix = "_from_" + source.name;
+        }
+        BLAST_FURNACE.recipe(dataGen, suffix(material.loc("ingot"), suffix))
                 .outputItem(2, material.entry("ingot"), 1)
-                .inputItem(0, material.tag("dust"), 1)
+                .inputItem(0, source.tag("dust"), 1)
                 .voltage(v)
                 .temperature(temperature)
                 .workTicks(ticks)
