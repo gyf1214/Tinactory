@@ -17,6 +17,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
+import org.shsts.tinactory.content.AllMultiBlocks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -67,7 +68,7 @@ public class JEI implements IModPlugin {
             addProcessingCategory(set.recipeType, layout, icon);
         }
         addProcessingCategory(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE,
-                AllBlockEntities.BLAST_FURNACE.get());
+                AllMultiBlocks.BLAST_FURNACE.get());
     }
 
     private void addProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,

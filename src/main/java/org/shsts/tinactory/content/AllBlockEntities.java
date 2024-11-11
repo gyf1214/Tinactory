@@ -26,7 +26,6 @@ import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
-import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -83,7 +82,6 @@ public final class AllBlockEntities {
     public static final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> PRIMITIVE_ORE_WASHER;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
-    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
 
     public static final Set<ProcessingSet> PROCESSING_SETS;
 
@@ -323,37 +321,6 @@ public final class AllBlockEntities {
 
         LOW_PRESSURE_BOILER = boiler("low", 5d);
         HIGH_PRESSURE_BOILER = boiler("high", 17d);
-
-        BLAST_FURNACE = REGISTRATE.blockEntity("multi_block/blast_furnace",
-                        PrimitiveBlock<SmartBlockEntity>::new)
-                .blockEntity()
-                .eventManager().ticking()
-                .capability(MultiBlock::blastFurnace)
-                .layout(AllLayouts.BLAST_FURNACE)
-                .appearanceBlock(AllItems.HEAT_PROOF_BLOCK)
-                .spec()
-                .layer()
-                .row("BBB")
-                .row("BBB")
-                .row("B$B").build()
-                .layer().height(2)
-                .row("CCC")
-                .row("CAC")
-                .row("CCC").build()
-                .layer()
-                .row("TTT")
-                .row("TTT")
-                .row("TTT")
-                .build()
-                .blockOrInterface('B', AllItems.HEAT_PROOF_BLOCK)
-                .sameBlockWithTag('C', "coil", AllTags.COIL).air('A')
-                .block('T', AllItems.HEAT_PROOF_BLOCK)
-                .build()
-                .build()
-                .simpleCapability(RecipeProcessor::blastFurnace)
-                .build()
-                .translucent()
-                .buildObject();
 
         MULTI_BLOCK_INTERFACE = ComponentBuilder.dummy(ProcessingSet::multiblockInterface)
                 .voltages(Voltage.ULV, Voltage.LuV)

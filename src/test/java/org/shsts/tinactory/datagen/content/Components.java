@@ -32,9 +32,7 @@ import static org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER;
 import static org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.BATTERY;
 import static org.shsts.tinactory.content.AllItems.CABLE;
-import static org.shsts.tinactory.content.AllItems.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
-import static org.shsts.tinactory.content.AllItems.CUPRONICKEL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllItems.DIODE;
 import static org.shsts.tinactory.content.AllItems.DUMMY_ITEMS;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
@@ -46,8 +44,6 @@ import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
 import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
-import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
-import static org.shsts.tinactory.content.AllItems.KANTHAL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllItems.RESISTOR;
@@ -73,6 +69,11 @@ import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMultiBlocks.COIL_BLOCKS;
+import static org.shsts.tinactory.content.AllMultiBlocks.CUPRONICKEL_COIL_BLOCK;
+import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
+import static org.shsts.tinactory.content.AllMultiBlocks.KANTHAL_COIL_BLOCK;
+import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
@@ -179,17 +180,18 @@ public final class Components {
     }
 
     private static void misc() {
-        DATA_GEN.block(HEAT_PROOF_BLOCK)
-                .blockState(solidBlock("casings/solid/machine_casing_heatproof"))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .item(STICKY_RESIN)
+        DATA_GEN.item(STICKY_RESIN)
                 .model(basicItem("metaitems/rubber_drop"))
                 .build();
 
+        SOLID_CASING.forEach(block -> DATA_GEN.block(block)
+                .blockState(solidBlock("casings/solid/machine_casing_" + name(block.id, -1)))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build());
+
         COIL_BLOCKS.forEach(coil -> DATA_GEN.block(coil)
                 .blockState(solidBlock("casings/coils/machine_coil_" + name(coil.id, -1)))
-                .tag(COIL)
+                .tag(COIL, MINEABLE_WITH_WRENCH)
                 .build());
 
         FLUID_CELL.forEach((v, item) -> {
@@ -496,8 +498,8 @@ public final class Components {
     }
 
     private static void miscRecipes() {
-        ASSEMBLER.recipe(DATA_GEN, HEAT_PROOF_BLOCK)
-                .outputItem(2, HEAT_PROOF_BLOCK, 1)
+        ASSEMBLER.recipe(DATA_GEN, HEATPROOF_CASING)
+                .outputItem(2, HEATPROOF_CASING, 1)
                 .inputItem(0, INVAR.entry("plate"), 3)
                 .inputItem(0, INVAR.entry("stick"), 2)
                 .workTicks(82L)

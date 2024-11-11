@@ -25,6 +25,7 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllForgeEvents;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
+import org.shsts.tinactory.content.AllMultiBlocks;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllWorldGens;
@@ -106,6 +107,7 @@ public class Tinactory {
         AllMaterials.init();
         AllItems.init();
         AllBlockEntities.init();
+        AllMultiBlocks.init();
 
         TechManager.init();
         AllWorldGens.init();

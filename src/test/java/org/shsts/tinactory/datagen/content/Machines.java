@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX;
 import static org.shsts.tinactory.content.AllBlockEntities.BENDER;
-import static org.shsts.tinactory.content.AllBlockEntities.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllBlockEntities.COMPRESSOR;
@@ -67,7 +66,6 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.EMITTER;
 import static org.shsts.tinactory.content.AllItems.GRINDER;
-import static org.shsts.tinactory.content.AllItems.HEAT_PROOF_BLOCK;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
 import static org.shsts.tinactory.content.AllItems.SENSOR;
@@ -82,6 +80,8 @@ import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMultiBlocks.BLAST_FURNACE;
+import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
@@ -260,7 +260,7 @@ public final class Machines {
                 .build()
                 .recipe(DATA_GEN, BLAST_FURNACE)
                 .outputItem(2, BLAST_FURNACE, 1)
-                .inputItem(0, HEAT_PROOF_BLOCK, 1)
+                .inputItem(0, HEATPROOF_CASING, 1)
                 .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 3)
                 .inputItem(0, circuit(Voltage.ULV), 3)
                 .inputItem(0, CABLE.get(Voltage.ULV), 2)

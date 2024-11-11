@@ -4,7 +4,6 @@
   "block.tinactory.network.controller": "Network Controller",
   "block.tinactory.primitive.workbench": "Workbench",
   "block.tinactory.multi_block.blast_furnace": "Electric Blast Furnace",
-  "block.tinactory.multi_block.solid.heat_proof": "Heat Proof Solid Block",
   "block.tinactory.rubber_tree.leaves": "Rubber Tree Leaves",
   "block.tinactory.rubber_tree.log": "Rubber Tree Log",
   "block.tinactory.rubber_tree.sapling": "Rubber Tree Sapling",
@@ -81,5 +80,6 @@
   "tinactory.technology.sensor_and_emitter.details": "A precision pairing where sensors detect environmental changes or objects, while emitters send out signals or energy, enabling automated control, tracking, and safety monitoring across complex systems.",
   "tinactory.technology.integrated_circuit.details": "A compact, multi-functional chip that combines numerous electronic components, streamlining processing power and control for advanced machinery and automation systems.",
   "tinactory.technology.robot_arm.details": "A versatile, programmable mechanical arm designed for precise movements, ideal for tasks such as assembly, welding, and material handling in high-efficiency production lines.",
+  "tinactory.technology.kanthal.details": "A high-resistance metal alloy known for its durability and ability to withstand extreme temperatures, commonly used in heating elements and industrial furnaces for efficient, long-lasting performance.",
   "generator.tinactory.void": "Void"
 }
