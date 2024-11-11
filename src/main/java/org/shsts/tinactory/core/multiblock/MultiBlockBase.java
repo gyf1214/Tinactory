@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -43,35 +41,6 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider impleme
         } else {
             map.put(key, ref);
         }
-    }
-
-    protected abstract boolean checkMultiBlock(Level world, int dx, int dy, int dz,
-                                               BlockPos pos, BlockState blockState);
-
-    protected Optional<Collection<BlockPos>> checkMultiBlock(BlockPos start, int tx, int ty, int tz) {
-        var world = blockEntity.getLevel();
-        if (world == null) {
-            return Optional.empty();
-        }
-        var myPos = blockEntity.getBlockPos();
-        var list = new ArrayList<BlockPos>();
-        for (var dy = 0; dy < ty; dy++) {
-            for (var dx = 0; dx < tx; dx++) {
-                for (var dz = 0; dz < tz; dz++) {
-                    var pos = start.offset(dx, dy, dz);
-                    if (!world.isLoaded(pos)) {
-                        return Optional.empty();
-                    } else if (pos.equals(myPos)) {
-                        continue;
-                    }
-                    if (!checkMultiBlock(world, dx, dy, dz, pos, world.getBlockState(pos))) {
-                        return Optional.empty();
-                    }
-                    list.add(pos);
-                }
-            }
-        }
-        return Optional.of(list);
     }
 
     protected abstract Optional<Collection<BlockPos>> checkMultiBlock();
