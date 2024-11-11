@@ -298,6 +298,7 @@ public final class Machines {
         machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
 
         ASSEMBLER.recipe(DATA_GEN, SIFTER)
+                .outputItem(2, SIFTER, 1)
                 .inputItem(0, SOLID_STEEL_CASING, 1)
                 .inputItem(0, circuit(Voltage.MV), 3)
                 .inputItem(0, ELECTRIC_PISTON.get(Voltage.LV), 4)

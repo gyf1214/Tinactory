@@ -52,6 +52,7 @@ import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.MIXER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
 import static org.shsts.tinactory.content.AllRecipes.POLARIZER;
+import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.WIREMILL;
@@ -242,6 +243,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             macerate("gear");
             macerate("rotor", 4);
             macerate("pipe", 3);
+            macerate("gem_exquisite", 8);
         }
 
         private void molten(String sub, Voltage v, float amount) {
@@ -301,6 +303,16 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                         .inputFluid(1, Fluids.WATER, 5)
                         .voltage(voltage)
                         .workTicks(128L)
+                        .build();
+            }
+
+            if (material.hasItem("gem_exquisite") && material.hasItem("gem")) {
+                CUTTER.recipe(DATA_GEN, material.loc("gem"))
+                        .outputItem(2, material.entry("gem"), 8)
+                        .inputItem(0, material.tag("gem_exquisite"), 1)
+                        .inputFluid(1, Fluids.WATER, 80)
+                        .voltage(voltage)
+                        .workTicks(480L)
                         .build();
             }
 
@@ -664,7 +676,6 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
 
         public OreRecipeBuilder siftAndHammer() {
             this.hammerPrimary = true;
-            // TODO: sifting
             return this;
         }
 
@@ -724,7 +735,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             CENTRIFUGE.recipe(dataGen, material.loc("dust_pure"))
                     .inputItem(0, material.tag("dust_pure"), 1)
                     .outputItem(2, material.entry("dust"), 1)
-                    .outputItem(2, byproduct1, 1, 0.3)
+                    .outputItem(2, byproduct1, 1, 0.3d)
                     .voltage(Voltage.LV)
                     .workTicks(80)
                     .build();
@@ -732,10 +743,28 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             THERMAL_CENTRIFUGE.recipe(dataGen, material.loc("crushed_centrifuged"))
                     .inputItem(0, material.tag("crushed_purified"), 1)
                     .outputItem(1, material.entry("crushed_centrifuged"), 1)
-                    .outputItem(1, byproduct2, 1, 0.4)
+                    .outputItem(1, byproduct2, 1, 0.4d)
                     .build();
 
-            // TODO: sifting
+            if (material.hasItem("gem")) {
+                SIFTER.recipe(dataGen, material.loc("crushed_purified"))
+                        .inputItem(0, material.tag("crushed_purified"), 1)
+                        .outputItem(1, material.entry("gem_exquisite"), 1, 0.1d)
+                        .outputItem(1, material.entry("gem"), 1, 0.35d)
+                        .outputItem(1, material.entry("dust_pure"), 1, 0.65d)
+                        .voltage(Voltage.LV)
+                        .workTicks(600L)
+                        .build();
+            } else if (hammerPrimary) {
+                SIFTER.recipe(dataGen, material.loc("crushed_purified"))
+                        .inputItem(0, material.tag("crushed_purified"), 1)
+                        .outputItem(1, material.entry("primary"), 1, 0.8d)
+                        .outputItem(1, material.entry("primary"), 1, 0.35d)
+                        .outputItem(1, material.entry("dust_pure"), 1, 0.65d)
+                        .voltage(Voltage.LV)
+                        .workTicks(400L)
+                        .build();
+            }
 
             hasOreProcess = true;
             return MaterialBuilder.this;

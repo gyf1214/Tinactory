@@ -128,7 +128,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
             y += layer.height;
         }
         y = 0;
-        for (var i = 0; i < centerLayerIdx; i++) {
+        for (var i = centerLayerIdx - 1; i >= 0; i--) {
             var layer = layers.get(i);
             y -= layer.height;
             for (var h = 0; h < layer.height; h++) {
