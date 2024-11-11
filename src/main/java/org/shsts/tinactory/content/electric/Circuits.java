@@ -110,7 +110,7 @@ public final class Circuits {
         return new Circuit(key, item);
     }
 
-    public static CircuitComponent component(String name) {
+    public static CircuitComponent circuitComponent(String name) {
         for (var tier : CircuitComponentTier.values()) {
             var item = REGISTRATE.item(tier.getName(name), Item::new).register();
             var key = new ComponentKey(name, tier);

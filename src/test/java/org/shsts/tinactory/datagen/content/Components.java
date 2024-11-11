@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.CircuitComponentTier;
@@ -48,6 +49,7 @@ import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
 import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
+import static org.shsts.tinactory.content.AllItems.ITEM_FILTER;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RAW_WAFERS;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
@@ -77,11 +79,14 @@ import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMultiBlocks.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllMultiBlocks.CUPRONICKEL_COIL_BLOCK;
+import static org.shsts.tinactory.content.AllMultiBlocks.GRATE_MACHINE_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.KANTHAL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_CASING;
+import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
@@ -108,7 +113,7 @@ public final class Components {
     private static final int ASSEMBLY_TICKS = 100;
 
     public static void init() {
-        componentItems();
+        components();
         circuits();
         misc();
         ulvRecipes();
@@ -117,7 +122,7 @@ public final class Components {
         miscRecipes();
     }
 
-    private static void componentItems() {
+    private static void components() {
         COMPONENT_ITEMS.forEach(entry -> DATA_GEN.item(entry)
                 .model(Models::componentItem)
                 .build());
@@ -143,9 +148,8 @@ public final class Components {
 
         DATA_GEN.item(GOOD_GRINDER)
                 .model(basicItem(GRINDER_TEX + ".diamond"))
-                .build();
-
-        DATA_GEN.item(ADVANCED_GRINDER)
+                .build()
+                .item(ADVANCED_GRINDER)
                 .model(basicItem(GRINDER_TEX + ".tungsten"))
                 .build();
 
@@ -175,6 +179,10 @@ public final class Components {
         chip("low_pic", "low_power_integrated_circuit");
         chip("pic", "power_integrated_circuit");
         chip("high_pic", "high_power_integrated_circuit");
+
+        DATA_GEN.item(ITEM_FILTER)
+                .model(Models::simpleItem)
+                .build();
     }
 
     private static void chip(String name, String tex) {
@@ -233,6 +241,11 @@ public final class Components {
                 .blockState(solidBlock("casings/coils/machine_coil_" + name(coil.id, -1)))
                 .tag(COIL, MINEABLE_WITH_WRENCH)
                 .build());
+
+        DATA_GEN.block(GRATE_MACHINE_CASING)
+                .blockState(solidBlock("casings/pipe/grate_steel_front/top"))
+                .tag(MINEABLE_WITH_WRENCH)
+                .build();
 
         FLUID_CELL.forEach((v, item) -> {
             var texBase = "metaitems/large_fluid_cell." + name(item.id, -1);
@@ -302,7 +315,6 @@ public final class Components {
     }
 
     private static class ComponentRecipeFactory {
-
         private final Voltage voltage;
         private final Voltage baseVoltage;
 
@@ -559,17 +571,45 @@ public final class Components {
     }
 
     private static void miscRecipes() {
-        ASSEMBLER.recipe(DATA_GEN, HEATPROOF_CASING)
-                .outputItem(2, HEATPROOF_CASING, 1)
-                .inputItem(0, INVAR.entry("plate"), 3)
-                .inputItem(0, INVAR.entry("stick"), 2)
-                .workTicks(82L)
-                .voltage(Voltage.ULV)
-                .requireTech(Technologies.STEEL)
-                .build();
+        solidRecipe(HEATPROOF_CASING, Voltage.ULV, INVAR, Technologies.STEEL);
+        solidRecipe(SOLID_STEEL_CASING, Voltage.LV, STEEL, Technologies.STEEL);
 
         coilRecipe(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, CUPRONICKEL, BRONZE, Technologies.STEEL);
         coilRecipe(KANTHAL_COIL_BLOCK, Voltage.LV, KANTHAL, SILVER, Technologies.KANTHAL);
+
+        ASSEMBLER.recipe(DATA_GEN, ITEM_FILTER)
+                .outputItem(2, ITEM_FILTER, 1)
+                .inputItem(0, STEEL.tag("plate"), 1)
+                .inputItem(0, ZINC.tag("foil"), 8)
+                .voltage(Voltage.LV)
+                .workTicks(ASSEMBLY_TICKS)
+                .requireTech(Technologies.SIFTING)
+                .build()
+                .recipe(DATA_GEN, GRATE_MACHINE_CASING)
+                .outputItem(2, GRATE_MACHINE_CASING, 2)
+                .inputItem(0, STEEL.tag("stick"), 4)
+                .inputItem(0, ELECTRIC_MOTOR.get(Voltage.LV), 1)
+                .inputItem(0, TIN.tag("rotor"), 1)
+                .inputItem(0, ITEM_FILTER, 6)
+                .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(2))
+                .voltage(Voltage.LV)
+                .workTicks(140L)
+                .requireTech(Technologies.SIFTING)
+                .build();
+    }
+
+    private static void solidRecipe(RegistryEntry<Block> block, Voltage v, MaterialSet mat,
+                                    ResourceLocation tech) {
+        ASSEMBLER.recipe(DATA_GEN, block)
+                .outputItem(2, block, 1)
+                .inputItem(0, mat.entry("plate"), 3)
+                .inputItem(0, mat.entry("stick"), 2)
+                .workTicks(140L)
+                .voltage(v)
+                .transform($ -> v != Voltage.ULV ?
+                        $.inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(2)) : $)
+                .requireTech(tech)
+                .build();
     }
 
     private static void coilRecipe(RegistryEntry<CoilBlock> coil, Voltage v,

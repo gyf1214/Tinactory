@@ -20,7 +20,9 @@ import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
+import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -66,6 +68,7 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.EMITTER;
 import static org.shsts.tinactory.content.AllItems.GRINDER;
+import static org.shsts.tinactory.content.AllItems.ITEM_FILTER;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
 import static org.shsts.tinactory.content.AllItems.SENSOR;
@@ -82,6 +85,8 @@ import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMultiBlocks.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
+import static org.shsts.tinactory.content.AllMultiBlocks.SIFTER;
+import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
@@ -91,6 +96,7 @@ import static org.shsts.tinactory.content.AllTags.machineTag;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
+import static org.shsts.tinactory.datagen.content.Models.multiBlock;
 import static org.shsts.tinactory.datagen.content.Models.multiBlockInterface;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS;
@@ -155,13 +161,10 @@ public final class Machines {
                 .block(HIGH_PRESSURE_BOILER)
                 .blockState(machineBlock(Voltage.MV, BOILER_TEX))
                 .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(BLAST_FURNACE)
-                .blockState(machineBlock("casings/solid/machine_casing_heatproof",
-                        "multiblock/blast_furnace"))
-                .tag(MINEABLE_WITH_WRENCH)
-                .itemTag(machineTag(AllRecipes.BLAST_FURNACE))
                 .build();
+
+        multiBlockItem(BLAST_FURNACE, "heatproof", AllRecipes.BLAST_FURNACE);
+        multiBlockItem(SIFTER, "solid_steel", AllRecipes.SIFTER);
 
         MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
                 .blockState(multiBlockInterface(ME_BUS))
@@ -175,6 +178,15 @@ public final class Machines {
                 .build()
                 .tag(MINEABLE_WITH_WRENCH)
                 .build());
+    }
+
+    private static void multiBlockItem(RegistryEntry<? extends Block> block, String casing,
+                                       RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        DATA_GEN.block(block)
+                .blockState(multiBlock(casing))
+                .tag(MINEABLE_WITH_WRENCH)
+                .itemTag(machineTag(type))
+                .build();
     }
 
     private static void primitiveRecipes() {
@@ -275,15 +287,27 @@ public final class Machines {
                 .inputItem(0, CABLE.get(Voltage.ULV), 2)
                 .inputItem(0, () -> Blocks.CHEST, 1)
                 .inputItem(0, () -> Blocks.GLASS, 1)
-                .requireTech(Technologies.STEEL)
                 .voltage(Voltage.ULV)
                 .workTicks(ASSEMBLE_TICKS)
+                .requireTech(Technologies.STEEL)
                 .build();
     }
 
     private static void basicRecipes() {
         machineRecipe(Voltage.LV, STEEL, COPPER, TIN, BRONZE, TIN);
         machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
+
+        ASSEMBLER.recipe(DATA_GEN, SIFTER)
+                .inputItem(0, SOLID_STEEL_CASING, 1)
+                .inputItem(0, circuit(Voltage.MV), 3)
+                .inputItem(0, ELECTRIC_PISTON.get(Voltage.LV), 4)
+                .inputItem(0, CABLE.get(Voltage.LV), 4)
+                .inputItem(0, ITEM_FILTER, 4)
+                .inputItem(0, STEEL.tag("plate"), 4)
+                .voltage(Voltage.LV)
+                .workTicks(ASSEMBLE_TICKS)
+                .requireTech(Technologies.SIFTING)
+                .build();
     }
 
     private static void miscRecipes() {

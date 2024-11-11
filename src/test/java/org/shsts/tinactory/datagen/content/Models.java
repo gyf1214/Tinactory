@@ -104,6 +104,13 @@ public final class Models {
                 .texture("layer0", gregtech(tex));
     }
 
+    public static <U extends Item> void
+    simpleItem(RegistryDataContext<Item, U, ItemModelProvider> ctx) {
+        var tex = "items/metaitems/" + name(ctx.id, -1);
+        ctx.provider.withExistingParent(ctx.id, "item/generated")
+                .texture("layer0", gregtech(tex));
+    }
+
     public static <U extends BatteryItem> void
     batteryItem(RegistryDataContext<Item, U, ItemModelProvider> ctx) {
         var voltage = ctx.object.voltage;
@@ -213,6 +220,18 @@ public final class Models {
                 .overlay(overlay)
                 .buildObject();
         return model.blockState();
+    }
+
+    public static <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
+    multiBlock(String casing, String overlay) {
+        return machineBlock("casings/solid/machine_casing_" + casing, "multiblock/" + overlay);
+    }
+
+    public static <U extends Block>
+    Consumer<RegistryDataContext<Block, U, BlockStateProvider>>
+    multiBlock(String casing) {
+        return multiBlock(casing, "blast_furnace");
     }
 
     public static Consumer<RegistryDataContext<Block, MachineBlock<SmartBlockEntity>, BlockStateProvider>>

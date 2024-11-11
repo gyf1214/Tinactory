@@ -40,6 +40,8 @@ import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.electric.Circuits.circuit;
+import static org.shsts.tinactory.content.electric.Circuits.circuitComponent;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
@@ -93,22 +95,23 @@ public final class AllItems {
     public static final Map<String, RegistryEntry<Item>> CHIPS;
 
     public static final Map<Voltage, RegistryEntry<CellItem>> FLUID_CELL;
+    public static final RegistryEntry<Item> ITEM_FILTER;
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
 
-        VACUUM_TUBE = Circuits.circuit(CircuitTier.ELECTRONIC, CircuitLevel.NORMAL, "vacuum_tube");
-        ELECTRONIC_CIRCUIT = Circuits.circuit(CircuitTier.ELECTRONIC, CircuitLevel.ASSEMBLY, "electronic");
-        GOOD_ELECTRONIC = Circuits.circuit(CircuitTier.ELECTRONIC, CircuitLevel.WORKSTATION, "good_electronic");
-        BASIC_INTEGRATED = Circuits.circuit(CircuitTier.INTEGRATED, CircuitLevel.NORMAL, "basic_integrated");
-        GOOD_INTEGRATED = Circuits.circuit(CircuitTier.INTEGRATED, CircuitLevel.ASSEMBLY, "good_integrated");
-        ADVANCED_INTEGRATED = Circuits.circuit(CircuitTier.INTEGRATED, CircuitLevel.WORKSTATION, "advanced_integrated");
+        VACUUM_TUBE = circuit(CircuitTier.ELECTRONIC, CircuitLevel.NORMAL, "vacuum_tube");
+        ELECTRONIC_CIRCUIT = circuit(CircuitTier.ELECTRONIC, CircuitLevel.ASSEMBLY, "electronic");
+        GOOD_ELECTRONIC = circuit(CircuitTier.ELECTRONIC, CircuitLevel.WORKSTATION, "good_electronic");
+        BASIC_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.NORMAL, "basic_integrated");
+        GOOD_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.ASSEMBLY, "good_integrated");
+        ADVANCED_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.WORKSTATION, "advanced_integrated");
 
-        RESISTOR = Circuits.component("resistor");
-        CAPACITOR = Circuits.component("capacitor");
-        INDUCTOR = Circuits.component("inductor");
-        DIODE = Circuits.component("diode");
-        TRANSISTOR = Circuits.component("transistor");
+        RESISTOR = circuitComponent("resistor");
+        CAPACITOR = circuitComponent("capacitor");
+        INDUCTOR = circuitComponent("inductor");
+        DIODE = circuitComponent("diode");
+        TRANSISTOR = circuitComponent("transistor");
 
         Circuits.addBoards();
 
@@ -217,6 +220,8 @@ public final class AllItems {
                 .voltage(Voltage.LV, STEEL)
                 .voltage(Voltage.MV, ALUMINIUM)
                 .buildObject();
+
+        ITEM_FILTER = simple("component/item_filter");
     }
 
     public static void init() {}

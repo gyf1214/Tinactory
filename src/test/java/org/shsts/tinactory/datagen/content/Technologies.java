@@ -35,6 +35,7 @@ public final class Technologies {
     public static ResourceLocation HOT_WORKING;
     public static ResourceLocation ROBOT_ARM;
     public static ResourceLocation KANTHAL;
+    public static ResourceLocation SIFTING;
     public static ResourceLocation INTEGRATED_CIRCUIT;
 
     public static void init() {
@@ -105,6 +106,7 @@ public final class Technologies {
         ROBOT_ARM = factory.child("robot_arm")
                 .maxProgress(50L)
                 .displayItem(AllItems.ROBOT_ARM.get(Voltage.LV))
+                .depends(CONVEYOR_MODULE)
                 .buildLoc();
 
         factory.voltage(Voltage.LV);
@@ -114,10 +116,15 @@ public final class Technologies {
                 .displayItem(AllMultiBlocks.KANTHAL_COIL_BLOCK)
                 .buildLoc();
 
+        SIFTING = factory.tech("sifting")
+                .maxProgress(10L)
+                .displayItem(AllItems.ITEM_FILTER)
+                .buildLoc();
+
         INTEGRATED_CIRCUIT = factory.tech("integrated_circuit")
                 .maxProgress(20L)
                 .displayItem(AllItems.GOOD_INTEGRATED.item())
-                .depends(CONVEYOR_MODULE, SENSOR_AND_EMITTER, MATERIAL_CUTTING)
+                .depends(SENSOR_AND_EMITTER, MATERIAL_CUTTING)
                 .buildLoc();
     }
 

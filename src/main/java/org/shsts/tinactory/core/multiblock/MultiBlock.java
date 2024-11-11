@@ -18,7 +18,6 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.MultiBlockSpec;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -271,7 +270,12 @@ public class MultiBlock extends MultiBlockBase {
         }
     }
 
-    public static <P> Builder<P> blastFurnace(P parent) {
-        return new Builder<>(parent, BlastFurnace::new);
+    public static <P> Function<P, Builder<P>>
+    builder(BiFunction<SmartBlockEntity, Builder<?>, MultiBlock> factory) {
+        return p -> new Builder<>(p, factory);
+    }
+
+    public static <P> Builder<P> simple(P parent) {
+        return new Builder<>(parent, MultiBlock::new);
     }
 }

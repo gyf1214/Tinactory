@@ -69,6 +69,7 @@ public class JEI implements IModPlugin {
         }
         addProcessingCategory(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE,
                 AllMultiBlocks.BLAST_FURNACE.get());
+        addProcessingCategory(AllRecipes.SIFTER, AllLayouts.SIFTER, AllMultiBlocks.SIFTER.get());
     }
 
     private void addProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,

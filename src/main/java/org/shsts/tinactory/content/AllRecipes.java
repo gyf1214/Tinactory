@@ -39,6 +39,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ORE_WASHER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CENTRIFUGE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> SIFTER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MIXER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> POLARIZER;
@@ -102,6 +103,10 @@ public final class AllRecipes {
                 .defaults($ -> $.voltage(Voltage.LV)
                         .workTicks(400L)
                         .amperage(1d))
+                .register();
+
+        SIFTER = displayInput("sifter")
+                .defaults($ -> $.amperage(0.25d))
                 .register();
 
         ALLOY_SMELTER = processing("alloy_smelter")
