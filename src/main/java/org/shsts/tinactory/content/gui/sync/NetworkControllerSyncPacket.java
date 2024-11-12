@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.gui.sync;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.content.AllNetworks;
@@ -8,7 +9,6 @@ import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.network.NetworkBase;
 import org.shsts.tinactory.core.network.NetworkController;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 
 @ParametersAreNonnullByDefault
@@ -27,7 +27,7 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
             var network = be.getNetwork().get();
             this.state = network.getState();
             this.electricMetrics = network.getComponent(AllNetworks.ELECTRIC_COMPONENT)
-                    .getMetrics();
+                .getMetrics();
         }
     }
 
@@ -66,15 +66,21 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof NetworkControllerSyncPacket that)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NetworkControllerSyncPacket that)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         if (!Objects.equals(present, that.present)) {
             return false;
         }
         if (present) {
             return Objects.equals(state, that.state) &&
-                    Objects.equals(electricMetrics, that.electricMetrics);
+                Objects.equals(electricMetrics, that.electricMetrics);
         } else {
             return true;
         }

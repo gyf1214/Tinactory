@@ -1,17 +1,16 @@
 package org.shsts.tinactory.core.recipe;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class SmartRecipeBuilder<U extends SmartRecipe<?>, S extends SmartRecipeBuilder<U, S>>
-        extends BuilderBase<U, RecipeTypeEntry<U, S>, S> {
+    extends BuilderBase<U, RecipeTypeEntry<U, S>, S> {
     public final ResourceLocation loc;
 
     @FunctionalInterface

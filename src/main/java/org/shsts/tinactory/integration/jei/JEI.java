@@ -1,5 +1,6 @@
 package org.shsts.tinactory.integration.jei;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
@@ -35,7 +36,6 @@ import org.shsts.tinactory.integration.jei.ingredient.TechIngredientHelper;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,12 +68,12 @@ public class JEI implements IModPlugin {
             addProcessingCategory(set.recipeType, layout, icon);
         }
         addProcessingCategory(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE,
-                AllMultiBlocks.BLAST_FURNACE.get());
+            AllMultiBlocks.BLAST_FURNACE.get());
         addProcessingCategory(AllRecipes.SIFTER, AllLayouts.SIFTER, AllMultiBlocks.SIFTER.get());
     }
 
     private void addProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
-                                       Layout layout, Block icon) {
+        Layout layout, Block icon) {
         var category = new ProcessingCategory(recipeType, layout, icon);
         categories.add(category);
         processingCategories.put(recipeType.get(), category);
@@ -91,7 +91,7 @@ public class JEI implements IModPlugin {
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
         registration.register(TechIngredientType.INSTANCE, Collections.emptyList(),
-                new TechIngredientHelper(), EmptyRenderer.instance());
+            new TechIngredientHelper(), EmptyRenderer.instance());
     }
 
     @Override

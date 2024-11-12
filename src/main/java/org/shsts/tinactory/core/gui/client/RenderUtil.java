@@ -7,6 +7,8 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -27,8 +29,6 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -91,7 +91,7 @@ public final class RenderUtil {
     }
 
     public static void blitAtlas(PoseStack poseStack, ResourceLocation atlas, TextureAtlasSprite sprite,
-                                 int color, int zIndex, Rect dstRect) {
+        int color, int zIndex, Rect dstRect) {
 
         var mat = poseStack.last().pose();
         var sx = (float) dstRect.x();
@@ -226,11 +226,11 @@ public final class RenderUtil {
     }
 
     public static void renderIngredient(IProcessingObject ingredient, Consumer<ItemStack> itemRenderer,
-                                        Consumer<FluidStack> fluidRenderer) {
+        Consumer<FluidStack> fluidRenderer) {
 
         ProcessingResults.consumeItemsOrFluid(ingredient,
-                items -> selectItemFromItems(items).ifPresent(itemRenderer),
-                fluidRenderer);
+            items -> selectItemFromItems(items).ifPresent(itemRenderer),
+            fluidRenderer);
     }
 
     public static void fill(PoseStack poseStack, Rect rect, int color) {

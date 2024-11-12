@@ -1,10 +1,10 @@
 package org.shsts.tinactory.registrate.handler;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.Block;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 

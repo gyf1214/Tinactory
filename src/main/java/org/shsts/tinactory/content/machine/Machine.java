@@ -1,6 +1,9 @@
 package org.shsts.tinactory.content.machine;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -36,9 +39,6 @@ import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
@@ -46,7 +46,7 @@ import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class Machine extends UpdatableCapabilityProvider
-        implements IEventSubscriber, INBTSerializable<CompoundTag> {
+    implements IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final SmartBlockEntity blockEntity;
@@ -109,8 +109,8 @@ public class Machine extends UpdatableCapabilityProvider
         var size = container.portSize();
         for (var i = 0; i < size; i++) {
             if (!container.hasPort(i) || config.getPortConfig("portConfig_" + i) !=
-                    MachineConfig.PortConfig.ACTIVE ||
-                    container.portDirection(i) != PortDirection.OUTPUT) {
+                MachineConfig.PortConfig.ACTIVE ||
+                container.portDirection(i) != PortDirection.OUTPUT) {
                 continue;
             }
             var port = container.getPort(i, false);
@@ -152,7 +152,7 @@ public class Machine extends UpdatableCapabilityProvider
 
     public Optional<Component> getTitle() {
         return config.getString("name")
-                .map(Component.Serializer::fromJson);
+            .map(Component.Serializer::fromJson);
     }
 
     @Override
@@ -172,8 +172,8 @@ public class Machine extends UpdatableCapabilityProvider
 
     protected void updateWorkBlock(Level world, boolean working) {
         getWorkBlock(world)
-                .filter(state -> state.hasProperty(WORKING) && state.getValue(WORKING) != working)
-                .ifPresent(state -> setWorkBlock(world, state.setValue(WORKING, working)));
+            .filter(state -> state.hasProperty(WORKING) && state.getValue(WORKING) != working)
+            .ifPresent(state -> setWorkBlock(world, state.setValue(WORKING, working)));
     }
 
     /**

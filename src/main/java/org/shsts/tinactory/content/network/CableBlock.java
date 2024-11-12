@@ -1,6 +1,8 @@
 package org.shsts.tinactory.content.network;
 
 import com.google.common.collect.ImmutableMap;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -33,8 +35,6 @@ import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -66,17 +66,17 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         this.radius = radius;
         this.voltage = voltage;
         this.resistance = (double) voltage.rank *
-                TinactoryConfig.INSTANCE.cableResistanceFactor.get();
+            TinactoryConfig.INSTANCE.cableResistanceFactor.get();
         this.shapes = makeShapes();
         this.material = mat;
 
         var defaultState = stateDefinition.any()
-                .setValue(NORTH, false)
-                .setValue(EAST, false)
-                .setValue(SOUTH, false)
-                .setValue(WEST, false)
-                .setValue(UP, false)
-                .setValue(DOWN, false);
+            .setValue(NORTH, false)
+            .setValue(EAST, false)
+            .setValue(SOUTH, false)
+            .setValue(WEST, false)
+            .setValue(UP, false)
+            .setValue(DOWN, false);
         registerDefaultState(defaultState);
     }
 
@@ -85,8 +85,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         return prop -> new CableBlock(prop, radius, voltage, mat);
     }
 
-    public static <S extends BlockBuilder<?, ?, S>>
-    Transformer<S> tint(Voltage voltage, int color) {
+    public static <S extends BlockBuilder<?, ?, S>> Transformer<S> tint(Voltage voltage, int color) {
         if (voltage == Voltage.ULV) {
             return $ -> $.tint(color);
         } else {
@@ -105,8 +104,8 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
             var stepY = 8d + (double) dir.getStepY() * 8d;
             var stepZ = 8d + (double) dir.getStepZ() * 8d;
             dirShapes.put(dir, Block.box(
-                    Math.min(st, stepX), Math.min(st, stepY), Math.min(st, stepZ),
-                    Math.max(ed, stepX), Math.max(ed, stepY), Math.max(ed, stepZ)));
+                Math.min(st, stepX), Math.min(st, stepY), Math.min(st, stepZ),
+                Math.max(ed, stepX), Math.max(ed, stepY), Math.max(ed, stepZ)));
         }
 
         var builder = ImmutableMap.<BlockState, VoxelShape>builder();
@@ -134,9 +133,9 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     private boolean shouldRenderOverlay(CollisionContext ctx) {
         return ctx instanceof EntityCollisionContext collision &&
-                collision.getEntity() instanceof LocalPlayer player &&
-                player.getMainHandItem().getItem() instanceof UsableToolItem &&
-                canWrenchWith(player.getMainHandItem());
+            collision.getEntity() instanceof LocalPlayer player &&
+            player.getMainHandItem().getItem() instanceof UsableToolItem &&
+            canWrenchWith(player.getMainHandItem());
     }
 
     private VoxelShape getRenderShape(BlockState state, CollisionContext ctx) {
@@ -167,7 +166,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     }
 
     private BlockState setConnected(Level world, BlockPos pos, BlockState state,
-                                    Direction dir, boolean connected) {
+        Direction dir, boolean connected) {
         var property = PROPERTY_BY_DIRECTION.get(dir);
         if (state.getValue(property) == connected) {
             return state;
@@ -181,12 +180,12 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     @Override
     public void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool,
-                             Direction dir, boolean sneaky) {
+        Direction dir, boolean sneaky) {
         var property = PROPERTY_BY_DIRECTION.get(dir);
         if (state.getValue(property)) {
             setConnected(world, pos, state, dir, false);
         } else if (allowConnectWith(world, pos, state, dir) &&
-                IConnector.allowConnectWith(world, pos.relative(dir), dir.getOpposite())) {
+            IConnector.allowConnectWith(world, pos.relative(dir), dir.getOpposite())) {
             setConnected(world, pos, state, dir, true);
         }
     }
@@ -208,10 +207,10 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     @Override
     public boolean allowConnectWith(Level world, BlockPos pos, BlockState state,
-                                    Direction dir, BlockState state1) {
+        Direction dir, BlockState state1) {
         var block1 = state1.getBlock();
         return block1 instanceof IConnector &&
-                (!(block1 instanceof CableBlock cableBlock) || cableBlock.voltage == voltage);
+            (!(block1 instanceof CableBlock cableBlock) || cableBlock.voltage == voltage);
     }
 
     @Override
@@ -223,7 +222,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         var pos1 = pos.relative(dir);
         var dir1 = ctx.getClickedFace();
         if (autoConnectWith(world, pos, state, dir) &&
-                IConnector.autoConnectWith(world, pos1, dir1, state)) {
+            IConnector.autoConnectWith(world, pos1, dir1, state)) {
             return state.setValue(PROPERTY_BY_DIRECTION.get(dir), true);
         }
         return state;
@@ -231,7 +230,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state,
-                            @Nullable LivingEntity placer, ItemStack stack) {
+        @Nullable LivingEntity placer, ItemStack stack) {
         NetworkManager.tryGet(world).ifPresent(manager -> {
             manager.invalidatePos(pos);
             for (var dir : Direction.values()) {
@@ -245,16 +244,16 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     @SuppressWarnings("deprecation")
     @Override
     public BlockState updateShape(BlockState state, Direction dir, BlockState state1,
-                                  LevelAccessor levelAccessor, BlockPos pos, BlockPos pos1) {
+        LevelAccessor levelAccessor, BlockPos pos, BlockPos pos1) {
         var world = (Level) levelAccessor;
         var dir1 = dir.getOpposite();
 
         var old = isConnected(world, pos, state, dir);
         if (!old && autoConnectWith(world, pos, state, dir, state1) &&
-                IConnector.isConnectedInWorld(world, pos1, state1, dir1)) {
+            IConnector.isConnectedInWorld(world, pos1, state1, dir1)) {
             return setConnected(world, pos, state, dir, true);
         } else if (old && (!allowConnectWith(world, pos, state, dir, state1) ||
-                !IConnector.isConnectedInWorld(world, pos1, state1, dir1))) {
+            !IConnector.isConnectedInWorld(world, pos1, state1, dir1))) {
             return setConnected(world, pos, state, dir, false);
         }
         return state;

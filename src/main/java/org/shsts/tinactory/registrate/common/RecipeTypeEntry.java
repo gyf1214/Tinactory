@@ -1,5 +1,7 @@
 package org.shsts.tinactory.registrate.common;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -12,14 +14,12 @@ import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.Registrate;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
-        extends RegistryEntry<RecipeType<T>> {
+    extends RegistryEntry<RecipeType<T>> {
     private final SmartRecipeBuilder.Factory<T, B> builderFactory;
     @Nullable
     private SmartRecipeSerializer<T, B> serializer;
@@ -28,8 +28,8 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, 
     public final Class<T> clazz;
 
     public RecipeTypeEntry(Registrate registrate, String id, Supplier<RecipeType<T>> supplier,
-                           SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix, Class<T> clazz,
-                           Transformer<B> defaults) {
+        SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix, Class<T> clazz,
+        Transformer<B> defaults) {
         super(registrate.modid, id, supplier);
         this.builderFactory = builderFactory;
         this.prefix = prefix;

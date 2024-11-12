@@ -1,5 +1,7 @@
 package org.shsts.tinactory.datagen.builder;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -15,8 +17,6 @@ import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 import org.shsts.tinactory.datagen.handler.LootTableHandler;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BlockDataBuilder<U extends Block, P> extends
-        TrackedDataBuilder<Block, U, P, BlockDataBuilder<U, P>> {
+    TrackedDataBuilder<Block, U, P, BlockDataBuilder<U, P>> {
     @Nullable
     private Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockState = null;
     @Nullable
@@ -35,22 +35,21 @@ public class BlockDataBuilder<U extends Block, P> extends
         super(dataGen, parent, loc, dataGen.blockTrackedCtx, object);
     }
 
-    public BlockDataBuilder<U, P>
-    blockState(Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
+    public BlockDataBuilder<U, P> blockState(Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
         this.blockState = cons;
         return this;
     }
 
-    public <R, S extends BuilderBase<R, BlockDataBuilder<U, P>, S>>
-    S blockState(Function<BlockDataBuilder<U, P>, S> builderFactory,
-                 Function<R, Consumer<RegistryDataContext<Block, U, BlockStateProvider>>> consFunction) {
+    public <R, S extends BuilderBase<R, BlockDataBuilder<U, P>, S>> S blockState(
+        Function<BlockDataBuilder<U, P>, S> builderFactory,
+        Function<R, Consumer<RegistryDataContext<Block, U, BlockStateProvider>>> consFunction) {
         var childBuilder = builderFactory.apply(this);
         childBuilder.onCreateObject(model -> this.blockState = consFunction.apply(model));
         return childBuilder;
     }
 
-    public <U1 extends BlockItem> BlockDataBuilder<U, P>
-    itemModel(Consumer<RegistryDataContext<Item, U1, ItemModelProvider>> cons) {
+    public <U1 extends BlockItem> BlockDataBuilder<U, P> itemModel(
+        Consumer<RegistryDataContext<Item, U1, ItemModelProvider>> cons) {
         this.itemModel = ctx -> cons.accept(ctx.convert());
         return this;
     }
@@ -83,7 +82,7 @@ public class BlockDataBuilder<U extends Block, P> extends
     }
 
     public BlockDataBuilder<U, P> dropOnState(Supplier<? extends ItemLike> item,
-                                              BooleanProperty prop, boolean value) {
+        BooleanProperty prop, boolean value) {
         getDrop().dropOnState(loc, item, object, prop, value);
         dropSet = true;
         return self();
@@ -104,7 +103,7 @@ public class BlockDataBuilder<U extends Block, P> extends
         assert blockState != null;
         if (itemModel == null) {
             itemModel = ctx -> ctx.provider.withExistingParent(ctx.id,
-                    new ResourceLocation(ctx.modid, "block/" + ctx.id));
+                new ResourceLocation(ctx.modid, "block/" + ctx.id));
         }
         if (!dropSet) {
             dropSelf();

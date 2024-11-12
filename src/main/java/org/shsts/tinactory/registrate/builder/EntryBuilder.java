@@ -1,12 +1,12 @@
 package org.shsts.tinactory.registrate.builder;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.registrate.Registrate;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;

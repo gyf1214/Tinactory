@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.handler;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.data.tags.TagsProvider;
@@ -7,7 +8,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.datagen.DataGen;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -23,7 +23,7 @@ public class TagsHandler<T> extends DataHandler<TagsProvider<T>> {
     private class Provider extends TagsProvider<T> {
         public Provider(GatherDataEvent event) {
             super(event.getGenerator(), TagsHandler.this.registry,
-                    dataGen.modid, event.getExistingFileHelper());
+                dataGen.modid, event.getExistingFileHelper());
         }
 
         public void addTag(TagKey<T> key, T object) {

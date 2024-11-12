@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.handler;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +15,6 @@ import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -110,11 +110,10 @@ public class BlockStateHandler extends DataHandler<BlockStateProvider> {
         return new Provider(event);
     }
 
-    public <U extends Block> void
-    addBlockStateCallback(ResourceLocation loc, Supplier<U> block,
-                          Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
+    public <U extends Block> void addBlockStateCallback(ResourceLocation loc, Supplier<U> block,
+        Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
         addCallback(prov -> cons.accept(new RegistryDataContext<>(dataGen.modid, prov,
-                loc.getPath(), block.get())));
+            loc.getPath(), block.get())));
     }
 
     public void addBlockModelCallback(Consumer<DataContext<BlockModelProvider>> cons) {

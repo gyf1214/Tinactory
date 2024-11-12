@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.gui.client;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,8 +82,8 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
         children.add(new Child(anchor, offset, widget));
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-    void addVanillaWidget(Rect offset, T widget) {
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addVanillaWidget(
+        Rect offset, T widget) {
         addGuiComponent(RectD.ZERO, offset, widget);
     }
 

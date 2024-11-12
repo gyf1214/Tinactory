@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Widget;
@@ -14,7 +15,6 @@ import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MenuWidget extends GuiComponent implements
-        Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
+    Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
 
     protected final Menu<?, ?> menu;
     protected Rect rect;

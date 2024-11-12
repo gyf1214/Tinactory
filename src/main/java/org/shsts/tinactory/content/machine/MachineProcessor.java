@@ -1,6 +1,9 @@
 package org.shsts.tinactory.content.machine;
 
 import com.google.common.collect.ArrayListMultimap;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -23,9 +26,6 @@ import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -35,7 +35,7 @@ import static org.shsts.tinactory.content.AllRecipes.MARKER;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineProcessor<T extends ProcessingRecipe>
-        extends RecipeProcessor<T> implements IElectricMachine {
+    extends RecipeProcessor<T> implements IElectricMachine {
 
     protected final Voltage voltage;
 
@@ -59,7 +59,7 @@ public class MachineProcessor<T extends ProcessingRecipe>
     @Override
     protected Stream<? extends T> getMatchedRecipes(Level world, IContainer container) {
         return SmartRecipe.getRecipesFor(recipeType, container, world)
-                .stream().filter(this::matchesRecipe);
+            .stream().filter(this::matchesRecipe);
     }
 
     @SuppressWarnings("unchecked")

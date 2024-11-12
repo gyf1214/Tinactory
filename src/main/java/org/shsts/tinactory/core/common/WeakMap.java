@@ -1,9 +1,9 @@
 package org.shsts.tinactory.core.common;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
-
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

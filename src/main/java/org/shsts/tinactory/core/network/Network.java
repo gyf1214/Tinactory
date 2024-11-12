@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.network;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -15,7 +16,6 @@ import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.util.BiKeyHashMap;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -28,7 +28,7 @@ public class Network extends NetworkBase {
     private final Map<ComponentType<?>, NetworkComponent> components = new HashMap<>();
     private final Multimap<BlockPos, Machine> machines = ArrayListMultimap.create();
     private final BiKeyHashMap<IScheduling, ComponentType<?>, NetworkComponent.Ticker> componentSchedulings =
-            new BiKeyHashMap<>();
+        new BiKeyHashMap<>();
     private final Multimap<IScheduling, NetworkComponent.Ticker> machineSchedulings = ArrayListMultimap.create();
 
     public Network(Level world, BlockPos center, TeamProfile team) {
@@ -46,7 +46,7 @@ public class Network extends NetworkBase {
         var component = type.create(this);
         components.put(type, component);
         component.buildSchedulings(((scheduling, ticker) ->
-                componentSchedulings.put(scheduling.get(), type, ticker)));
+            componentSchedulings.put(scheduling.get(), type, ticker)));
     }
 
     protected void attachComponents() {
@@ -70,8 +70,8 @@ public class Network extends NetworkBase {
         }
         if (state.getBlock() instanceof SmartEntityBlock<?> entityBlock) {
             entityBlock.getBlockEntity(world, pos)
-                    .flatMap(AllCapabilities.MACHINE::tryGet)
-                    .ifPresent(machine -> putMachine(subnet, machine));
+                .flatMap(AllCapabilities.MACHINE::tryGet)
+                .ifPresent(machine -> putMachine(subnet, machine));
         }
     }
 
@@ -86,7 +86,7 @@ public class Network extends NetworkBase {
         }
         for (var machine : machines.values()) {
             machine.buildSchedulings((scheduling, ticker) ->
-                    machineSchedulings.put(scheduling.get(), ticker));
+                machineSchedulings.put(scheduling.get(), ticker));
         }
     }
 

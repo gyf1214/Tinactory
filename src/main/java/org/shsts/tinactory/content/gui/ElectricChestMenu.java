@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,7 +36,6 @@ import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -130,7 +130,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
     }
 
     public ElectricChestMenu(SmartMenuType<?, ?> type, int id, Inventory inventory,
-                             BlockEntity blockEntity, Layout layout) {
+        BlockEntity blockEntity, Layout layout) {
         super(type, id, inventory, blockEntity);
         var machine = AllCapabilities.MACHINE.get(blockEntity);
         this.machineConfig = machine.config;
@@ -160,14 +160,14 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
 
     private SyncPacketFactory<BlockEntity, ChestItemSyncPacket> itemSyncPacket(int slot) {
         return (containerId, index, $) -> new ChestItemSyncPacket(containerId, index,
-                chest.getStackInSlot(slot), chest.getFilter(slot).orElse(null));
+            chest.getStackInSlot(slot), chest.getFilter(slot).orElse(null));
     }
 
     private Consumer<ChestItemSyncPacket> onItemSync(int slot) {
         return p -> {
             chest.setStackInSlot(slot, p.getStack());
             p.getFilter().ifPresentOrElse(stack -> chest.setFilter(slot, stack),
-                    () -> chest.resetFilter(slot));
+                () -> chest.resetFilter(slot));
         };
     }
 
@@ -206,7 +206,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
             var stack = getStack();
             if (stack.isEmpty()) {
                 getFilter().ifPresent(stack1 ->
-                        RenderUtil.renderGhostItem(poseStack, stack1, rect.x(), rect.y()));
+                    RenderUtil.renderGhostItem(poseStack, stack1, rect.x(), rect.y()));
             } else {
                 var s = String.valueOf(stack.getCount());
                 RenderUtil.renderItemWithDecoration(stack, rect.x(), rect.y(), s);
@@ -227,9 +227,9 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
             return Optional.of(getStack())
-                    .filter(stack -> !stack.isEmpty())
-                    .or(this::getFilter)
-                    .map(ClientUtil::itemTooltip);
+                .filter(stack -> !stack.isEmpty())
+                .or(this::getFilter)
+                .map(ClientUtil::itemTooltip);
         }
 
         @Override
@@ -240,14 +240,14 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             triggerEvent(MenuEventHandler.CHEST_SLOT_CLICK, (containerId, eventId) ->
-                    new SlotEventPacket(containerId, eventId, slot, button));
+                new SlotEventPacket(containerId, eventId, slot, button));
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     private class LockButton extends Button {
         private static final Texture TEX = new Texture(
-                gregtech("gui/widget/button_public_private"), 18, 36);
+            gregtech("gui/widget/button_public_private"), 18, 36);
 
         public LockButton() {
             super(ElectricChestMenu.this);
@@ -262,7 +262,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
             var component = machineConfig.getBoolean("unlockChest") ?
-                    tr("tinactory.tooltip.chestUnlock") : tr("tinactory.tooltip.chestLock");
+                tr("tinactory.tooltip.chestUnlock") : tr("tinactory.tooltip.chestLock");
             return Optional.of(List.of(component));
         }
 
@@ -270,7 +270,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             var val = !machineConfig.getBoolean("unlockChest");
             triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, SetMachineConfigPacket.builder()
-                    .set("unlockChest", val));
+                .set("unlockChest", val));
         }
     }
 
@@ -295,9 +295,9 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
         screen.addWidget(anchor, offset, new LockButton());
         screen.addWidget(anchor, offset.offset(-SLOT_SIZE - SPACING, 0), new PortConfigButton(
-                ElectricChestMenu.this, machineConfig, "chestOutput", PortDirection.OUTPUT));
+            ElectricChestMenu.this, machineConfig, "chestOutput", PortDirection.OUTPUT));
         screen.addWidget(anchor, offset.offset(-(SLOT_SIZE + SPACING) * 2, 0), new PortConfigButton(
-                ElectricChestMenu.this, machineConfig, "chestInput", PortDirection.INPUT));
+            ElectricChestMenu.this, machineConfig, "chestInput", PortDirection.INPUT));
 
         return screen;
     }

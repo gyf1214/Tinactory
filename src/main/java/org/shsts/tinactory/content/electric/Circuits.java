@@ -1,12 +1,12 @@
 package org.shsts.tinactory.content.electric;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 

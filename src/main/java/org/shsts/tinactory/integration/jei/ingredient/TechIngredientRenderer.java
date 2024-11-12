@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.jei.ingredient;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
@@ -11,7 +12,6 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_SIZE;

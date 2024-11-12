@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.handler;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -13,7 +14,6 @@ import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -58,16 +58,14 @@ public class ItemModelHandler extends DataHandler<ItemModelProvider> {
         return new Provider(event);
     }
 
-    public <U extends Item> void
-    addModelCallback(ResourceLocation loc, Supplier<U> item,
-                     Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
+    public <U extends Item> void addModelCallback(ResourceLocation loc, Supplier<U> item,
+        Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
         addCallback(prov -> cons.accept(new RegistryDataContext<>(dataGen.modid, prov,
-                loc.getPath(), item.get())));
+            loc.getPath(), item.get())));
     }
 
-    public <U extends Block> void
-    addBlockItemCallback(ResourceLocation loc, Supplier<U> block,
-                         Consumer<RegistryDataContext<Item, ? super BlockItem, ItemModelProvider>> cons) {
+    public <U extends Block> void addBlockItemCallback(ResourceLocation loc, Supplier<U> block,
+        Consumer<RegistryDataContext<Item, ? super BlockItem, ItemModelProvider>> cons) {
         addCallback(prov -> {
             if (block.get().asItem() instanceof BlockItem blockItem) {
                 cons.accept(new RegistryDataContext<>(dataGen.modid, prov, loc.getPath(), blockItem));

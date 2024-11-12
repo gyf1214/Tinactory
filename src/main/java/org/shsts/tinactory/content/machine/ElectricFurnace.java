@@ -1,5 +1,8 @@
 package org.shsts.tinactory.content.machine;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.crafting.Recipe;
@@ -20,9 +23,6 @@ import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -47,7 +47,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
 
     private RecipeWrapper getInputWrapper(IContainer container) {
         return new RecipeWrapper((IItemHandlerModifiable)
-                ((ItemHandlerCollection) getInputPort(container)).itemHandler);
+            ((ItemHandlerCollection) getInputPort(container)).itemHandler);
     }
 
     private boolean canOutput(SmeltingRecipe recipe, IContainer container) {
@@ -59,14 +59,14 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     @Override
     protected boolean matches(Level world, SmeltingRecipe recipe, IContainer container) {
         return recipe.matches(getInputWrapper(container), world) &&
-                canOutput(recipe, container);
+            canOutput(recipe, container);
     }
 
     @Override
     protected Stream<? extends SmeltingRecipe> getMatchedRecipes(Level world, IContainer container) {
         return world.getRecipeManager().getRecipeFor(recipeType, getInputWrapper(container), world)
-                .filter(recipe -> canOutput(recipe, container))
-                .stream();
+            .filter(recipe -> canOutput(recipe, container))
+            .stream();
     }
 
     @Override
@@ -78,8 +78,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     protected void doSetTargetRecipe(Recipe<?> recipe) {
         targetRecipe = (SmeltingRecipe) recipe;
         getContainer().ifPresent(container -> {
-            if (container.hasPort(0) && container.getPort(0, false)
-                    instanceof IItemCollection itemPort) {
+            if (container.hasPort(0) && container.getPort(0, false) instanceof IItemCollection itemPort) {
                 itemPort.setItemFilter(targetRecipe.getIngredients());
             }
         });

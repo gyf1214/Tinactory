@@ -1,11 +1,11 @@
 package org.shsts.tinactory.integration.jei.gui;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 @FunctionalInterface

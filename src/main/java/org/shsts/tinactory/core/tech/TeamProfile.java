@@ -1,6 +1,8 @@
 package org.shsts.tinactory.core.tech;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -14,8 +16,6 @@ import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

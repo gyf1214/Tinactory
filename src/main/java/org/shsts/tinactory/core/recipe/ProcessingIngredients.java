@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.recipe;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
@@ -19,7 +20,6 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.util.CodecHelper;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,13 +42,12 @@ public final class ProcessingIngredients {
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IItemCollection itemCollection && itemCollection.acceptOutput() &&
-                    itemCollection.extractItem(stack, simulate).getCount() >= stack.getCount();
+                itemCollection.extractItem(stack, simulate).getCount() >= stack.getCount();
         }
 
         private static final Codec<ItemIngredient> CODEC =
-                ItemStack.CODEC.xmap(ItemIngredient::new, ItemIngredient::stack);
+            ItemStack.CODEC.xmap(ItemIngredient::new, ItemIngredient::stack);
     }
-
 
     public abstract static class ItemsIngredientBase implements IProcessingIngredient {
         public final Ingredient ingredient;
@@ -67,7 +66,7 @@ public final class ProcessingIngredients {
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IItemCollection itemCollection &&
-                    ItemHelper.consumeItemCollection(itemCollection, ingredient, amount, simulate);
+                ItemHelper.consumeItemCollection(itemCollection, ingredient, amount, simulate);
         }
 
         /**
@@ -99,8 +98,8 @@ public final class ProcessingIngredients {
         }
 
         private static final Codec<TagIngredient> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                TagKey.codec(Registry.ITEM_REGISTRY).fieldOf("tag").forGetter($ -> $.tag),
-                Codec.INT.fieldOf("amount").forGetter($ -> $.amount)
+            TagKey.codec(Registry.ITEM_REGISTRY).fieldOf("tag").forGetter($ -> $.tag),
+            Codec.INT.fieldOf("amount").forGetter($ -> $.amount)
         ).apply(instance, TagIngredient::new));
     }
 
@@ -120,11 +119,11 @@ public final class ProcessingIngredients {
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
             return port instanceof IFluidCollection fluidCollection && fluidCollection.acceptOutput() &&
-                    fluidCollection.drain(fluid, simulate).getAmount() >= fluid.getAmount();
+                fluidCollection.drain(fluid, simulate).getAmount() >= fluid.getAmount();
         }
 
         private static final Codec<FluidIngredient> CODEC =
-                FluidStack.CODEC.xmap(FluidIngredient::new, FluidIngredient::fluid);
+            FluidStack.CODEC.xmap(FluidIngredient::new, FluidIngredient::fluid);
     }
 
     private static final Map<String, Codec<? extends IProcessingIngredient>> CODECS;
@@ -137,7 +136,7 @@ public final class ProcessingIngredients {
     }
 
     public static final Codec<IProcessingIngredient> CODEC =
-            Codec.STRING.dispatch(IProcessingObject::codecName, CODECS::get);
+        Codec.STRING.dispatch(IProcessingObject::codecName, CODECS::get);
 
     public static IProcessingIngredient fromJson(JsonElement je) {
         return CodecHelper.parseJson(CODEC, je);

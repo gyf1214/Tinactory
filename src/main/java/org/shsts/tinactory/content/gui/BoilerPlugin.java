@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.gui;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -14,8 +15,6 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @ParametersAreNonnullByDefault
@@ -28,9 +27,9 @@ public class BoilerPlugin implements IMenuPlugin<ProcessingMenu> {
 
     public BoilerPlugin(ProcessingMenu menu) {
         this.burnSlot = menu.addSyncSlot(MenuSyncPacket.Double::new,
-                be -> Machine.getProcessor(be).map(IProcessor::getProgress).orElse(0d));
+            be -> Machine.getProcessor(be).map(IProcessor::getProgress).orElse(0d));
         this.heatSlot = menu.addSyncSlot(MenuSyncPacket.Double::new,
-                be -> Machine.getProcessor(be).map($ -> ((Boiler) $).getHeat() / MAX_HEAT).orElse(0d));
+            be -> Machine.getProcessor(be).map($ -> ((Boiler) $).getHeat() / MAX_HEAT).orElse(0d));
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -1,5 +1,7 @@
 package org.shsts.tinactory.core.common;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -22,8 +24,6 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 /**
@@ -140,7 +140,7 @@ public class SmartBlockEntity extends BlockEntity {
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         if (shouldSendUpdate()) {
             var ret = ClientboundBlockEntityDataPacket.create(this, be ->
-                    ((SmartBlockEntity) be).getUpdateTag(false));
+                ((SmartBlockEntity) be).getUpdateTag(false));
             resetShouldSendUpdate();
             return ret;
         }
@@ -179,7 +179,7 @@ public class SmartBlockEntity extends BlockEntity {
     protected void onRemovedInWorld(Level world) {
         EventManager.invoke(this, AllEvents.REMOVED_IN_WORLD, world);
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                .ifPresent(itemHandler -> ItemHelper.dropItemHandler(world, worldPosition, itemHandler));
+            .ifPresent(itemHandler -> ItemHelper.dropItemHandler(world, worldPosition, itemHandler));
     }
 
     /**
@@ -239,6 +239,6 @@ public class SmartBlockEntity extends BlockEntity {
     @Override
     public String toString() {
         return "%s(%s)@%s:%s".formatted(getClass().getSimpleName(),
-                getType().getRegistryName(), level, worldPosition);
+            getType().getRegistryName(), level, worldPosition);
     }
 }

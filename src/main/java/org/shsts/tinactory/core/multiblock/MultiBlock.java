@@ -1,6 +1,9 @@
 package org.shsts.tinactory.core.multiblock;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,9 +29,6 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -146,7 +146,7 @@ public class MultiBlock extends MultiBlockBase {
         var context = new CheckContext(world, blockEntity.getBlockPos());
         doCheckMultiBlock(context);
         var ok = !context.failed && context.hasProperty("interface") &&
-                (multiBlockInterface == null || context.getProperty("interface") == multiBlockInterface);
+            (multiBlockInterface == null || context.getProperty("interface") == multiBlockInterface);
         if (ok) {
             multiBlockInterface = (MultiBlockInterface) context.getProperty("interface");
             return Optional.of(context.blocks);
@@ -221,7 +221,7 @@ public class MultiBlock extends MultiBlockBase {
                 return;
             }
             AllCapabilities.MACHINE.tryGet(be1).ifPresent(machine ->
-                    multiBlockInterface = (MultiBlockInterface) machine);
+                multiBlockInterface = (MultiBlockInterface) machine);
         } else {
             multiBlockInterface = null;
         }
@@ -263,15 +263,14 @@ public class MultiBlock extends MultiBlockBase {
             return builder1;
         }
 
-
         @Override
         protected Function<SmartBlockEntity, ICapabilityProvider> createObject() {
             return be -> factory.apply(be, this);
         }
     }
 
-    public static <P> Function<P, Builder<P>>
-    builder(BiFunction<SmartBlockEntity, Builder<?>, MultiBlock> factory) {
+    public static <P> Function<P, Builder<P>> builder(
+        BiFunction<SmartBlockEntity, Builder<?>, MultiBlock> factory) {
         return p -> new Builder<>(p, factory);
     }
 

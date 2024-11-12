@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.gui;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,13 +21,11 @@ import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.CraftingSlot;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WorkbenchMenu extends Menu<SmartBlockEntity, WorkbenchMenu> {
     public WorkbenchMenu(SmartMenuType<SmartBlockEntity, ?> type, int id,
-                         Inventory inventory, SmartBlockEntity blockEntity) {
+        Inventory inventory, SmartBlockEntity blockEntity) {
         super(type, id, inventory, blockEntity);
 
         var layout = AllLayouts.WORKBENCH;

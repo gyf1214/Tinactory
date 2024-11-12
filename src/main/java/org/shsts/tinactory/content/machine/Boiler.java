@@ -1,5 +1,8 @@
 package org.shsts.tinactory.content.machine;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -23,9 +26,6 @@ import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.function.Function;
 
@@ -34,7 +34,7 @@ import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Boiler extends CapabilityProvider implements
-        IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
+    IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final double BASE_HEAT = 20d;
     private static final double BURN_HEAT = 100d;
     private static final double BASE_DECAY = 0.0002d;
@@ -161,8 +161,7 @@ public class Boiler extends CapabilityProvider implements
         leftSteam = tag.getDouble("leftSteam");
     }
 
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    builder(double burnSpeed) {
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(double burnSpeed) {
         return CapabilityProviderBuilder.fromFactory("machine/boiler", be -> new Boiler(be, burnSpeed));
     }
 }

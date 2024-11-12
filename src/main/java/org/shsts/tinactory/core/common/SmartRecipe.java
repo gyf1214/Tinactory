@@ -1,6 +1,8 @@
 package org.shsts.tinactory.core.common;
 
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -15,8 +17,6 @@ import org.shsts.tinactory.core.logistics.NullContainer;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,13 +103,13 @@ public abstract class SmartRecipe<C> implements Recipe<SmartRecipe.ContainerWrap
         return NonNullList.create();
     }
 
-    public static <C1, T1 extends SmartRecipe<C1>> Optional<T1>
-    getRecipeFor(RecipeType<T1> type, C1 container, Level world) {
+    public static <C1, T1 extends SmartRecipe<C1>> Optional<T1> getRecipeFor(
+        RecipeType<T1> type, C1 container, Level world) {
         return world.getRecipeManager().getRecipeFor(type, new ContainerWrapper<>(container), world);
     }
 
-    public static <C1, T1 extends SmartRecipe<C1>> List<T1>
-    getRecipesFor(RecipeType<T1> type, C1 container, Level world) {
+    public static <C1, T1 extends SmartRecipe<C1>> List<T1> getRecipesFor(
+        RecipeType<T1> type, C1 container, Level world) {
         return world.getRecipeManager().getRecipesFor(type, new ContainerWrapper<>(container), world);
     }
 

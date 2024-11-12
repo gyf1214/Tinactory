@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -18,7 +19,6 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.util.I18n;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
@@ -34,20 +34,19 @@ import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 @MethodsReturnNonnullByDefault
 public class PortConfigPanel extends Panel {
     private static final Rect LABEL_RECT =
-            new Rect(PANEL_BORDER + SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
-                    -(PANEL_BORDER + SPACING) * 2 - SLOT_SIZE, SLOT_SIZE);
+        new Rect(PANEL_BORDER + SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
+            -(PANEL_BORDER + SPACING) * 2 - SLOT_SIZE, SLOT_SIZE);
     private static final Rect BUTTON_RECT =
-            new Rect(-PANEL_BORDER - SLOT_SIZE - SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
-                    SLOT_SIZE, SLOT_SIZE);
+        new Rect(-PANEL_BORDER - SLOT_SIZE - SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
+            SLOT_SIZE, SLOT_SIZE);
     private static final int TEXT_COLOR = 0xFFFFAA00;
     private static final int OVERLAY_COLOR = 0x80FFAA00;
-
 
     private class ConfigButton extends PortConfigButton {
         private final List<Layout.SlotInfo> slots;
 
         public ConfigButton(Menu<?, ?> menu, int port, PortDirection direction,
-                            List<Layout.SlotInfo> slots) {
+            List<Layout.SlotInfo> slots) {
             super(menu, machineConfig, "portConfig_" + port, direction);
             this.slots = slots;
         }

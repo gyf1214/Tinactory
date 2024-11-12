@@ -1,6 +1,8 @@
 package org.shsts.tinactory.core.tech;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -10,8 +12,6 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.scores.PlayerTeam;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +29,8 @@ public class TinactorySavedData extends SavedData {
     public CompoundTag save(CompoundTag tag) {
         var teamsTag = new ListTag();
         teams.values().stream()
-                .map(TeamProfile::serializeNBT)
-                .forEach(teamsTag::add);
+            .map(TeamProfile::serializeNBT)
+            .forEach(teamsTag::add);
         tag.put("teams", teamsTag);
         return tag;
     }
@@ -38,8 +38,8 @@ public class TinactorySavedData extends SavedData {
     private void load(CompoundTag tag) {
         teams.clear();
         tag.getList("teams", Tag.TAG_COMPOUND).stream()
-                .flatMap(tag1 -> TeamProfile.fromTag(tag1).stream())
-                .forEach(team -> teams.put(team.getName(), team));
+            .flatMap(tag1 -> TeamProfile.fromTag(tag1).stream())
+            .forEach(team -> teams.put(team.getName(), team));
     }
 
     public TeamProfile getTeamProfile(PlayerTeam playerTeam) {
@@ -72,7 +72,7 @@ public class TinactorySavedData extends SavedData {
 
     public static void load(ServerLevel overworld) {
         data = overworld.getDataStorage()
-                .computeIfAbsent(TinactorySavedData::fromTag, TinactorySavedData::new, NAME);
+            .computeIfAbsent(TinactorySavedData::fromTag, TinactorySavedData::new, NAME);
         LOGGER.debug("load server saved data {}", data);
     }
 

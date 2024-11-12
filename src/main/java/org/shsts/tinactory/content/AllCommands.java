@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -17,19 +18,17 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllCommands {
     private static final SimpleCommandExceptionType PLAYER_HAS_TEAM = new SimpleCommandExceptionType(
-            I18n.tr("tinactory.chat.exception.hasTeam"));
+        I18n.tr("tinactory.chat.exception.hasTeam"));
     private static final SimpleCommandExceptionType PLAYER_NO_TEAM = new SimpleCommandExceptionType(
-            I18n.tr("tinactory.chat.exception.noTeam"));
+        I18n.tr("tinactory.chat.exception.noTeam"));
     private static final DynamicCommandExceptionType TEAM_ALREADY_EXISTS = new DynamicCommandExceptionType(
-            t -> I18n.tr("tinactory.chat.exception.teamExists", t));
+        t -> I18n.tr("tinactory.chat.exception.teamExists", t));
     private static final DynamicCommandExceptionType TECH_NOT_FOUND = new DynamicCommandExceptionType(
-            t -> I18n.tr("tinactory.chat.exception.noTech", t));
+        t -> I18n.tr("tinactory.chat.exception.noTech", t));
 
     private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
@@ -44,7 +43,7 @@ public final class AllCommands {
         }
         manager.newTeam(player, name);
         player.sendMessage(I18n.tr("tinactory.chat.createTeam.success",
-                name, player.getDisplayName()), Util.NIL_UUID);
+            name, player.getDisplayName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -60,7 +59,7 @@ public final class AllCommands {
 
         manager.addPlayerToTeam(player2, team);
         player.sendMessage(I18n.tr("tinactory.chat.addPlayerToTeam.success",
-                player2.getDisplayName(), team.getName()), Util.NIL_UUID);
+            player2.getDisplayName(), team.getName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -71,7 +70,7 @@ public final class AllCommands {
 
         manager.leaveTeam(player);
         player.sendMessage(I18n.tr("tinactory.chat.leaveTeam.success",
-                player.getDisplayName(), team.getName()), Util.NIL_UUID);
+            player.getDisplayName(), team.getName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -84,7 +83,7 @@ public final class AllCommands {
 
         team.setTargetTech(tech);
         player.sendMessage(I18n.tr("tinactory.chat.setTargetTech.success", team.getName(),
-                I18n.tr(tech.getDescriptionId())), Util.NIL_UUID);
+            I18n.tr(tech.getDescriptionId())), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -95,23 +94,23 @@ public final class AllCommands {
 
         team.resetTargetTech();
         player.sendMessage(I18n.tr("tinactory.chat.resetTargetTech.success", team.getName()),
-                Util.NIL_UUID);
+            Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var builder = Commands.literal(Tinactory.ID)
-                .then(Commands.literal("createTeam")
-                        .then(Commands.argument("name", StringArgumentType.string())
-                                .executes(AllCommands::createTeam)))
-                .then(Commands.literal("addPlayerToTeam")
-                        .then(Commands.argument("player", EntityArgument.player())
-                                .executes(AllCommands::addPlayerToTeam)))
-                .then(Commands.literal("leaveTeam").executes(AllCommands::leaveTeam))
-                .then(Commands.literal("setTargetTech")
-                        .then(Commands.argument("tech", ResourceLocationArgument.id())
-                                .executes(AllCommands::setTargetTech))
-                        .executes(AllCommands::resetTargetTech));
+            .then(Commands.literal("createTeam")
+                .then(Commands.argument("name", StringArgumentType.string())
+                    .executes(AllCommands::createTeam)))
+            .then(Commands.literal("addPlayerToTeam")
+                .then(Commands.argument("player", EntityArgument.player())
+                    .executes(AllCommands::addPlayerToTeam)))
+            .then(Commands.literal("leaveTeam").executes(AllCommands::leaveTeam))
+            .then(Commands.literal("setTargetTech")
+                .then(Commands.argument("tech", ResourceLocationArgument.id())
+                    .executes(AllCommands::setTargetTech))
+                .executes(AllCommands::resetTargetTech));
 
         dispatcher.register(builder);
     }

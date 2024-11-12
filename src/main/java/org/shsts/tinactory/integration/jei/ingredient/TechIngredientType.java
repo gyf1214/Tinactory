@@ -1,9 +1,8 @@
 package org.shsts.tinactory.integration.jei.ingredient;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
-import mezz.jei.api.ingredients.IIngredientType;
-
 import javax.annotation.ParametersAreNonnullByDefault;
+import mezz.jei.api.ingredients.IIngredientType;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

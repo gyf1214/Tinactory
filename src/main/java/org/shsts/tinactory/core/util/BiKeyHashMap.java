@@ -1,8 +1,8 @@
 package org.shsts.tinactory.core.util;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,17 +22,17 @@ public class BiKeyHashMap<K1, K2, V> {
 
     public Optional<V> get(K1 k1, K2 k2) {
         return Optional.ofNullable(primaryMap.get(k1)).flatMap(
-                map -> Optional.ofNullable(map.get(k2)));
+            map -> Optional.ofNullable(map.get(k2)));
     }
 
     public Set<Map.Entry<K2, V>> getPrimary(K1 k1) {
         return primaryMap.getOrDefault(k1, Collections.emptyMap())
-                .entrySet();
+            .entrySet();
     }
 
     public Set<Map.Entry<K1, V>> getSecondary(K2 k2) {
         return secondaryMap.getOrDefault(k2, Collections.emptyMap())
-                .entrySet();
+            .entrySet();
     }
 
     public void remove(K1 k1, K2 k2) {

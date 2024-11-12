@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.recipe;
 
 import com.google.gson.JsonObject;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 
 @ParametersAreNonnullByDefault
@@ -46,7 +46,7 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         public double rate = 0d;
 
         public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<OreAnalyzerRecipe, Builder> parent,
-                       ResourceLocation loc) {
+            ResourceLocation loc) {
             super(consumer, parent, loc);
         }
 
@@ -74,7 +74,7 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         @Override
         protected Builder buildFromJson(ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(loc, jo)
-                    .rate(GsonHelper.getAsDouble(jo, "rate"));
+                .rate(GsonHelper.getAsDouble(jo, "rate"));
         }
 
         @Override
@@ -85,5 +85,5 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
     }
 
     public static final SmartRecipeSerializer.Factory<OreAnalyzerRecipe, OreAnalyzerRecipe.Builder>
-            SERIALIZER = Serializer::new;
+        SERIALIZER = Serializer::new;
 }

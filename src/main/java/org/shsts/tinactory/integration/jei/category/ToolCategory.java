@@ -1,5 +1,6 @@
 package org.shsts.tinactory.integration.jei.category;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -13,7 +14,6 @@ import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -22,7 +22,7 @@ import java.util.Collections;
 public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchMenu> {
     private ToolCategory(Block workbench) {
         super(AllRecipes.TOOL_CRAFTING, AllLayouts.WORKBENCH, Ingredient.of(workbench),
-                new ItemStack(workbench), WorkbenchMenu.class);
+            new ItemStack(workbench), WorkbenchMenu.class);
     }
 
     public ToolCategory() {
@@ -40,7 +40,7 @@ public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchMenu> {
         for (var toolIngredient : recipe.toolIngredients) {
             var items = Arrays.asList(toolIngredient.getItems());
             builder.addIngredients(slots.get(1 + k), RecipeIngredientRole.CATALYST,
-                    VanillaTypes.ITEM_STACK, items);
+                VanillaTypes.ITEM_STACK, items);
             if (++k >= 9) {
                 break;
             }

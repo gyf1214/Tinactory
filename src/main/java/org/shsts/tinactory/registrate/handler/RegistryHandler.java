@@ -1,5 +1,6 @@
 package org.shsts.tinactory.registrate.handler;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.NewRegistryEvent;
@@ -7,7 +8,6 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +21,8 @@ public class RegistryHandler {
         this.registrate = registrate;
     }
 
-    public <T extends IForgeRegistryEntry<T>> SmartRegistry<T>
-    register(RegistryBuilderWrapper<T, ?> builder) {
+    public <T extends IForgeRegistryEntry<T>> SmartRegistry<T> register(
+        RegistryBuilderWrapper<T, ?> builder) {
         builders.add(builder);
         return new SmartRegistry<>(registrate.modid, builder.id);
     }

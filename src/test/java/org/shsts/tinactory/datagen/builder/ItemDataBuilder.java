@@ -1,5 +1,7 @@
 package org.shsts.tinactory.datagen.builder;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -8,15 +10,13 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemDataBuilder<U extends Item, P> extends
-        TrackedDataBuilder<Item, U, P, ItemDataBuilder<U, P>> {
+    TrackedDataBuilder<Item, U, P, ItemDataBuilder<U, P>> {
     @Nullable
     private Consumer<RegistryDataContext<Item, U, ItemModelProvider>> model = null;
 

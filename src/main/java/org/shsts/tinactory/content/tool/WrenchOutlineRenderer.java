@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -13,8 +14,6 @@ import net.minecraft.core.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.util.MathUtil;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -27,38 +26,38 @@ public final class WrenchOutlineRenderer {
         norm.sub(pos1);
         norm.normalize();
         vb.vertex(pose.pose(), pos1.x(), pos1.y(), pos1.z())
-                .color(COLOR.x(), COLOR.y(), COLOR.z(), COLOR.w())
-                .normal(pose.normal(), -norm.x(), -norm.y(), -norm.z())
-                .endVertex();
+            .color(COLOR.x(), COLOR.y(), COLOR.z(), COLOR.w())
+            .normal(pose.normal(), -norm.x(), -norm.y(), -norm.z())
+            .endVertex();
         vb.vertex(pose.pose(), pos2.x(), pos2.y(), pos2.z())
-                .color(COLOR.x(), COLOR.y(), COLOR.z(), COLOR.w())
-                .normal(pose.normal(), norm.x(), norm.y(), norm.z())
-                .endVertex();
+            .color(COLOR.x(), COLOR.y(), COLOR.z(), COLOR.w())
+            .normal(pose.normal(), norm.x(), norm.y(), norm.z())
+            .endVertex();
     }
 
     private static void renderFaceOutline(VertexConsumer vb, PoseStack.Pose pose,
-                                          Direction face, Direction dirU, Direction dirV) {
+        Direction face, Direction dirU, Direction dirV) {
         var center = MathUtil.mulVecf(face.step(), 0.5f);
         var u = dirU.step();
         var v = dirV.step();
         var radius = (float) UsableToolItem.WRENCH_RADIUS_NORM;
         renderLine(vb, pose, MathUtil.addVecf(center, MathUtil.mulVecf(u, -0.5f), MathUtil.mulVecf(v, -radius)),
-                MathUtil.addVecf(center, MathUtil.mulVecf(u, 0.5f), MathUtil.mulVecf(v, -radius)));
+            MathUtil.addVecf(center, MathUtil.mulVecf(u, 0.5f), MathUtil.mulVecf(v, -radius)));
         renderLine(vb, pose, MathUtil.addVecf(center, MathUtil.mulVecf(u, -0.5f), MathUtil.mulVecf(v, radius)),
-                MathUtil.addVecf(center, MathUtil.mulVecf(u, 0.5f), MathUtil.mulVecf(v, radius)));
+            MathUtil.addVecf(center, MathUtil.mulVecf(u, 0.5f), MathUtil.mulVecf(v, radius)));
         renderLine(vb, pose, MathUtil.addVecf(center, MathUtil.mulVecf(v, -0.5f), MathUtil.mulVecf(u, -radius)),
-                MathUtil.addVecf(center, MathUtil.mulVecf(v, 0.5f), MathUtil.mulVecf(u, -radius)));
+            MathUtil.addVecf(center, MathUtil.mulVecf(v, 0.5f), MathUtil.mulVecf(u, -radius)));
         renderLine(vb, pose, MathUtil.addVecf(center, MathUtil.mulVecf(v, -0.5f), MathUtil.mulVecf(u, radius)),
-                MathUtil.addVecf(center, MathUtil.mulVecf(v, 0.5f), MathUtil.mulVecf(u, radius)));
+            MathUtil.addVecf(center, MathUtil.mulVecf(v, 0.5f), MathUtil.mulVecf(u, radius)));
     }
 
     public static void renderOutlines(PoseStack ms, MultiBufferSource bs,
-                                      Camera camera, BlockPos pos, Direction face) {
+        Camera camera, BlockPos pos, Direction face) {
         ms.pushPose();
         var camPos = camera.getPosition();
         ms.translate((double) pos.getX() - camPos.x + 0.5,
-                (double) pos.getY() - camPos.y + 0.5,
-                (double) pos.getZ() - camPos.z + 0.5);
+            (double) pos.getY() - camPos.y + 0.5,
+            (double) pos.getZ() - camPos.z + 0.5);
         var vb = bs.getBuffer(RenderType.LINES);
         var pose = ms.last();
         switch (face.getAxis()) {

@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui.sync;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.network.NetworkEvent;
@@ -9,7 +10,6 @@ import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Menu;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -17,17 +17,15 @@ import java.util.function.Supplier;
 public final class MenuSyncHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static <P extends MenuSyncPacket>
-    void handle(P packet, NetworkEvent.Context ctx) {
+    private static <P extends MenuSyncPacket> void handle(P packet, NetworkEvent.Context ctx) {
         var player = Minecraft.getInstance().player;
         if (player != null && player.containerMenu instanceof Menu<?, ?> menu &&
-                menu.containerId == packet.getContainerId()) {
+            menu.containerId == packet.getContainerId()) {
             menu.handleSyncPacket(packet.getIndex(), packet);
         }
     }
 
-    private static <P extends MenuSyncPacket>
-    void register(Class<P> clazz, Supplier<P> constructor) {
+    private static <P extends MenuSyncPacket> void register(Class<P> clazz, Supplier<P> constructor) {
         LOGGER.debug("register container sync packet {}", clazz.getSimpleName());
         Tinactory.registryClientPacket(clazz, constructor, MenuSyncHandler::handle);
     }

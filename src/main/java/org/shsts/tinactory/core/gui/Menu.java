@@ -1,5 +1,7 @@
 package org.shsts.tinactory.core.gui;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,8 +35,6 @@ import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,9 +124,9 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         assert blockEntity.getLevel() != null;
         this.isClientSide = blockEntity.getLevel().isClientSide;
         this.container = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                .resolve().orElse(null);
+            .resolve().orElse(null);
         this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
-                .resolve().orElse(null);
+            .resolve().orElse(null);
         onEventPacket(MenuEventHandler.FLUID_SLOT_CLICK, p -> clickFluidSlot(p.getIndex(), p.getButton()));
         this.height = 0;
     }
@@ -137,9 +137,9 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         var level = be.getLevel();
         var pos = be.getBlockPos();
         return player == this.player &&
-                level == player.getLevel() &&
-                level.getBlockEntity(pos) == be &&
-                player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64.0;
+            level == player.getLevel() &&
+            level.getBlockEntity(pos) == be &&
+            player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64.0;
     }
 
     @Override
@@ -158,7 +158,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 9; j++) {
                 addSlot(new Slot(inventory, 9 + i * 9 + j,
-                        MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, y + i * SLOT_SIZE + 1));
+                    MARGIN_HORIZONTAL + j * SLOT_SIZE + 1, y + i * SLOT_SIZE + 1));
             }
         }
         return barY + SLOT_SIZE + MARGIN_VERTICAL;
@@ -271,8 +271,8 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         return index;
     }
 
-    public <P extends MenuSyncPacket, R>
-    int addSyncSlot(SyncPacketFactory<R, P> factory, Function<T, R> getter) {
+    public <P extends MenuSyncPacket, R> int addSyncSlot(
+        SyncPacketFactory<R, P> factory, Function<T, R> getter) {
         return addSyncSlot((containerId, index, be) -> factory.create(containerId, index, getter.apply(be)));
     }
 
@@ -292,7 +292,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     }
 
     protected FluidClickResult doClickFluidSlot(ItemStack item, IFluidTank tank,
-                                                boolean mayDrain, boolean mayFill) {
+        boolean mayDrain, boolean mayFill) {
         var cap = FluidUtil.getFluidHandler(item).resolve();
         if (cap.isEmpty()) {
             return new FluidClickResult();
@@ -396,8 +396,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     /**
      * Callback added by server.
      */
-    public <P extends MenuEventPacket>
-    void onEventPacket(MenuEventHandler.Event<P> event, Consumer<P> handler) {
+    public <P extends MenuEventPacket> void onEventPacket(MenuEventHandler.Event<P> event, Consumer<P> handler) {
         assert !eventHandlers.containsKey(event.id());
         eventHandlers.put(event.id(), new EventHandler<>(event.clazz(), handler));
     }
@@ -405,8 +404,8 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     /**
      * Called on client to trigger event on server.
      */
-    public <P extends MenuEventPacket>
-    void triggerEvent(MenuEventHandler.Event<P> event, MenuEventPacket.Factory<P> factory) {
+    public <P extends MenuEventPacket> void triggerEvent(MenuEventHandler.Event<P> event,
+        MenuEventPacket.Factory<P> factory) {
         Tinactory.sendToServer(factory.create(containerId, event.id()));
     }
 

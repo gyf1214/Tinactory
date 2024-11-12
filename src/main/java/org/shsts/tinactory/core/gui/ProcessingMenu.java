@@ -1,5 +1,7 @@
 package org.shsts.tinactory.core.gui;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -23,8 +25,6 @@ import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +38,7 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
     private final int progressBarIndex;
 
     public ProcessingMenu(SmartMenuType<?, ?> type, int id, Inventory inventory,
-                          BlockEntity blockEntity, @Nullable Layout layout) {
+        BlockEntity blockEntity, @Nullable Layout layout) {
         super(type, id, inventory, blockEntity);
         var isPrimitive = blockEntity.getBlockState().getBlock() instanceof PrimitiveBlock<?>;
 
@@ -55,9 +55,9 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
             }
             if (layout.progressBar != null) {
                 this.progressBarIndex = addSyncSlot(MenuSyncPacket.Double::new,
-                        be -> Machine.getProcessor(be)
-                                .map(IProcessor::getProgress)
-                                .orElse(0d));
+                    be -> Machine.getProcessor(be)
+                        .map(IProcessor::getProgress)
+                        .orElse(0d));
             } else {
                 this.progressBarIndex = -1;
             }
@@ -72,8 +72,8 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
     @Override
     public boolean stillValid(Player player) {
         return super.stillValid(player) && AllCapabilities.MACHINE.tryGet(blockEntity)
-                .map(m -> m.canPlayerInteract(player))
-                .orElse(true);
+            .map(m -> m.canPlayerInteract(player))
+            .orElse(true);
     }
 
     public abstract Optional<RecipeType<?>> getRecipeType();
@@ -121,8 +121,8 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
         };
     }
 
-    public static <T extends BlockEntity>
-    Menu.Factory<T, ProcessingMenu> machine(Layout layout, RecipeTypeEntry<?, ?> recipeType) {
+    public static <T extends BlockEntity> Menu.Factory<T, ProcessingMenu> machine(
+        Layout layout, RecipeTypeEntry<?, ?> recipeType) {
         return (type, id, inventory, be) -> new ProcessingMenu(type, id, inventory, be, layout) {
             @Override
             public Optional<RecipeType<?>> getRecipeType() {
@@ -135,7 +135,7 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
         return (type, id, inventory, be) -> {
             var multiBlockInterface = (MultiBlockInterface) AllCapabilities.MACHINE.get(be);
             return new ProcessingMenu(type, id, inventory, be,
-                    multiBlockInterface.getLayout().orElse(null)) {
+                multiBlockInterface.getLayout().orElse(null)) {
                 @Override
                 public Optional<RecipeType<?>> getRecipeType() {
                     return multiBlockInterface.getRecipeType();
@@ -146,7 +146,7 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
 
     public static Component getTitle(BlockEntity be) {
         return AllCapabilities.MACHINE.tryGet(be)
-                .flatMap(Machine::getTitle)
-                .orElseGet(() -> I18n.name(be.getBlockState().getBlock()));
+            .flatMap(Machine::getTitle)
+            .orElseGet(() -> I18n.name(be.getBlockState().getBlock()));
     }
 }

@@ -1,5 +1,7 @@
 package org.shsts.tinactory.datagen.content;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
@@ -10,8 +12,6 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,88 +44,88 @@ public final class Technologies {
         BASE_ORE = new HashMap<>();
         for (var variant : OreVariant.values()) {
             var tech = factory.child("ore_base/" + variant.name().toLowerCase())
-                    .maxProgress(20L * (1L << (long) variant.rank))
-                    .displayItem(variant.baseItem)
-                    .researchVoltage(variant.voltage)
-                    .buildLoc();
+                .maxProgress(20L * (1L << (long) variant.rank))
+                .displayItem(variant.baseItem)
+                .researchVoltage(variant.voltage)
+                .buildLoc();
             BASE_ORE.put(variant, tech);
         }
 
         factory.reset().voltage(Voltage.ULV);
 
         ALLOY_SMELTING = factory.child("alloy_smelting")
-                .maxProgress(20L)
-                .displayItem(ALLOY_SMELTER.entry(Voltage.ULV))
-                .buildLoc();
+            .maxProgress(20L)
+            .displayItem(ALLOY_SMELTER.entry(Voltage.ULV))
+            .buildLoc();
 
         STEEL = factory.child("steel")
-                .maxProgress(30L)
-                .displayItem(AllMaterials.STEEL.entry("ingot"))
-                .buildLoc();
+            .maxProgress(30L)
+            .displayItem(AllMaterials.STEEL.entry("ingot"))
+            .buildLoc();
 
         ELECTRIC_HEATING = factory.tech("electric_heating")
-                .maxProgress(30L)
-                .displayItem(AllMaterials.COPPER.item("wire"))
-                .buildLoc();
+            .maxProgress(30L)
+            .displayItem(AllMaterials.COPPER.item("wire"))
+            .buildLoc();
 
         MOTOR = factory.child("motor")
-                .maxProgress(30L)
-                .displayItem(AllItems.ELECTRIC_MOTOR.get(Voltage.LV))
-                .buildLoc();
+            .maxProgress(30L)
+            .displayItem(AllItems.ELECTRIC_MOTOR.get(Voltage.LV))
+            .buildLoc();
 
         PUMP_AND_PISTON = factory.tech("pump_and_piston")
-                .maxProgress(35L)
-                .displayItem(AllItems.ELECTRIC_PISTON.get(Voltage.LV))
-                .buildLoc();
+            .maxProgress(35L)
+            .displayItem(AllItems.ELECTRIC_PISTON.get(Voltage.LV))
+            .buildLoc();
 
         MATERIAL_CUTTING = factory.tech("material_cutting")
-                .maxProgress(35L)
-                .displayItem(AllItems.BASIC_BUZZSAW)
-                .buildLoc();
+            .maxProgress(35L)
+            .displayItem(AllItems.BASIC_BUZZSAW)
+            .buildLoc();
 
         CONVEYOR_MODULE = factory.tech("conveyor_module")
-                .maxProgress(40L)
-                .displayItem(AllItems.CONVEYOR_MODULE.get(Voltage.LV))
-                .buildLoc();
+            .maxProgress(40L)
+            .displayItem(AllItems.CONVEYOR_MODULE.get(Voltage.LV))
+            .buildLoc();
 
         BATTERY = factory.tech("battery")
-                .maxProgress(40L)
-                .displayItem(AllItems.BATTERY.get(Voltage.LV))
-                .buildLoc();
+            .maxProgress(40L)
+            .displayItem(AllItems.BATTERY.get(Voltage.LV))
+            .buildLoc();
 
         SENSOR_AND_EMITTER = factory.tech("sensor_and_emitter")
-                .maxProgress(40L)
-                .displayItem(AllItems.EMITTER.get(Voltage.LV))
-                .buildLoc();
+            .maxProgress(40L)
+            .displayItem(AllItems.EMITTER.get(Voltage.LV))
+            .buildLoc();
 
         HOT_WORKING = factory.base(PUMP_AND_PISTON).tech("hot_working")
-                .maxProgress(40L)
-                .displayItem(Items.BLAZE_POWDER)
-                .buildLoc();
+            .maxProgress(40L)
+            .displayItem(Items.BLAZE_POWDER)
+            .buildLoc();
 
         ROBOT_ARM = factory.child("robot_arm")
-                .maxProgress(50L)
-                .displayItem(AllItems.ROBOT_ARM.get(Voltage.LV))
-                .depends(CONVEYOR_MODULE)
-                .buildLoc();
+            .maxProgress(50L)
+            .displayItem(AllItems.ROBOT_ARM.get(Voltage.LV))
+            .depends(CONVEYOR_MODULE)
+            .buildLoc();
 
         factory.voltage(Voltage.LV);
 
         KANTHAL = factory.tech("kanthal")
-                .maxProgress(10L)
-                .displayItem(AllMultiBlocks.KANTHAL_COIL_BLOCK)
-                .buildLoc();
+            .maxProgress(10L)
+            .displayItem(AllMultiBlocks.KANTHAL_COIL_BLOCK)
+            .buildLoc();
 
         SIFTING = factory.tech("sifting")
-                .maxProgress(10L)
-                .displayItem(AllItems.ITEM_FILTER)
-                .buildLoc();
+            .maxProgress(10L)
+            .displayItem(AllItems.ITEM_FILTER)
+            .buildLoc();
 
         INTEGRATED_CIRCUIT = factory.tech("integrated_circuit")
-                .maxProgress(20L)
-                .displayItem(AllItems.GOOD_INTEGRATED.item())
-                .depends(SENSOR_AND_EMITTER, MATERIAL_CUTTING)
-                .buildLoc();
+            .maxProgress(20L)
+            .displayItem(AllItems.GOOD_INTEGRATED.item())
+            .depends(SENSOR_AND_EMITTER, MATERIAL_CUTTING)
+            .buildLoc();
     }
 
     private static class TechFactory {

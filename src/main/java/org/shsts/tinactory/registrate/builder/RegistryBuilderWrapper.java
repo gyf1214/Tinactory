@@ -1,6 +1,8 @@
 package org.shsts.tinactory.registrate.builder;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -12,13 +14,10 @@ import org.shsts.tinactory.registrate.common.SmartRegistry;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
-        extends EntryBuilder<RegistryBuilder<T>, SmartRegistry<T>, P, RegistryBuilderWrapper<T, P>> {
+    extends EntryBuilder<RegistryBuilder<T>, SmartRegistry<T>, P, RegistryBuilderWrapper<T, P>> {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 

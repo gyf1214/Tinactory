@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -17,7 +18,6 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,8 +59,8 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         rootPanel.addGuiComponent(anchor, offset, widget);
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-    void addWidgetToScreen(T widget) {
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidgetToScreen(
+        T widget) {
         addRenderableWidget(widget);
         hoverables.add(widget);
     }
@@ -73,7 +73,7 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
 
     protected void initRect() {
         var rect = new Rect(leftPos + MARGIN_HORIZONTAL, topPos + MARGIN_TOP,
-                imageWidth - MARGIN_HORIZONTAL * 2, imageHeight - MARGIN_TOP - MARGIN_VERTICAL);
+            imageWidth - MARGIN_HORIZONTAL * 2, imageHeight - MARGIN_TOP - MARGIN_VERTICAL);
         rootPanel.init(rect);
     }
 
@@ -130,7 +130,7 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         getHovered(mouseX, mouseY).ifPresent(hoverable -> {
             if (hoverable instanceof MenuWidget widget) {
                 widget.getTooltip(mouseX, mouseY).ifPresent(tooltip ->
-                        renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
+                    renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
             } else if (hoverable instanceof AbstractWidget widget) {
                 widget.renderToolTip(poseStack, mouseX, mouseY);
             }

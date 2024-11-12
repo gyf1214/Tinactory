@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.gui;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -23,9 +25,6 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_ANCHOR;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_OFFSET;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
@@ -47,7 +46,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         menu.setHeight(buttonY + SLOT_SIZE);
 
         menu.onEventPacket(SET_MACHINE_CONFIG, p ->
-                AllCapabilities.MACHINE.get(menu.blockEntity).setConfig(p));
+            AllCapabilities.MACHINE.get(menu.blockEntity).setConfig(p));
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -63,7 +62,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         }
         var portConfigPanel = new PortConfigPanel(screen, menu.layout);
         var button = new SimpleButton(menu, Texture.SWITCH_BUTTON,
-                I18n.tr("tinactory.tooltip.openPortConfig"), 0, 0, 0, 0) {
+            I18n.tr("tinactory.tooltip.openPortConfig"), 0, 0, 0, 0) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
                 super.onMouseClicked(mouseX, mouseY, button);
@@ -85,7 +84,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         recipeBook = createRecipeBook(screen);
         if (recipeBook != null) {
             var recipeBookButton = new SimpleButton(menu, RECIPE_BOOK_BUTTON,
-                    I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 19) {
+                I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 19) {
                 @Override
                 public void onMouseClicked(double mouseX, double mouseY, int button) {
                     super.onMouseClicked(mouseX, mouseY, button);
@@ -108,8 +107,8 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         }
     }
 
-    public static IMenuPlugin.Factory<ProcessingMenu>
-    processing(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
+    public static IMenuPlugin.Factory<ProcessingMenu> processing(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
         return menu -> new MachinePlugin(menu) {
             @OnlyIn(Dist.CLIENT)
             @Override
@@ -119,8 +118,8 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         };
     }
 
-    public static IMenuPlugin.Factory<ProcessingMenu>
-    marker(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType, boolean includeNormal) {
+    public static IMenuPlugin.Factory<ProcessingMenu> marker(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType, boolean includeNormal) {
         return menu -> new MachinePlugin(menu) {
             @OnlyIn(Dist.CLIENT)
             @Override

@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
@@ -9,7 +10,6 @@ import net.minecraft.util.FormattedCharSequence;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,13 +52,13 @@ public class Label extends MenuWidget {
     private void updateSize() {
         if (formattedLines.isEmpty()) {
             cacheWidth = lines.stream()
-                    .mapToInt(font::width)
-                    .max().orElse(0);
+                .mapToInt(font::width)
+                .max().orElse(0);
             cacheHeight = lines.size() * (FONT_HEIGHT + spacing) - spacing;
         } else {
             cacheWidth = formattedLines.stream()
-                    .mapToInt(font::width)
-                    .max().orElse(0);
+                .mapToInt(font::width)
+                .max().orElse(0);
             cacheHeight = formattedLines.size() * (FONT_HEIGHT + spacing) - spacing;
         }
     }

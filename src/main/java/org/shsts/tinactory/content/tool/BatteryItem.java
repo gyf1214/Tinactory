@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.tool;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -9,7 +10,6 @@ import net.minecraftforge.client.IItemRenderProperties;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.util.MathUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
@@ -31,7 +31,7 @@ public class BatteryItem extends Item {
     @Override
     public void initializeClient(Consumer<IItemRenderProperties> consumer) {
         ItemProperties.register(this, ITEM_PROPERTY, (stack, $1, $2, $3) ->
-                (float) getPowerLevel(stack) / capacity);
+            (float) getPowerLevel(stack) / capacity);
     }
 
     public long getPowerLevel(ItemStack stack) {

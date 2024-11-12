@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -14,7 +15,6 @@ import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,18 +27,18 @@ public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe
     public ElectricFurnaceRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, Layout layout) {
         super(screen, layout.getXOffset());
         this.inputSlot = layout.slots.stream()
-                .filter(slot -> slot.port() == 0)
-                .findFirst().orElseThrow();
+            .filter(slot -> slot.port() == 0)
+            .findFirst().orElseThrow();
         this.outputSlot = layout.slots.stream()
-                .filter(slot -> slot.port() == 1)
-                .findFirst().orElseThrow();
+            .filter(slot -> slot.port() == 1)
+            .findFirst().orElseThrow();
     }
 
     @Override
     protected void doRefreshRecipes() {
         var recipeManager = ClientUtil.getRecipeManager();
         recipeManager.getAllRecipesFor(RecipeType.SMELTING)
-                .forEach(r -> recipes.put(r.getId(), r));
+            .forEach(r -> recipes.put(r.getId(), r));
     }
 
     @Override
@@ -57,13 +57,13 @@ public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe
     @Override
     protected Optional<List<Component>> buttonToolTip(SmeltingRecipe recipe) {
         return RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
-                .map(ClientUtil::itemTooltip);
+            .map(ClientUtil::itemTooltip);
     }
 
     @Override
     protected void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick,
-                                SmeltingRecipe recipe, Rect rect, int z) {
+        SmeltingRecipe recipe, Rect rect, int z) {
         RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
-                .ifPresent(item -> RenderUtil.renderItem(item, rect.x() + 2, rect.y() + 2));
+            .ifPresent(item -> RenderUtil.renderItem(item, rect.x() + 2, rect.y() + 2));
     }
 }

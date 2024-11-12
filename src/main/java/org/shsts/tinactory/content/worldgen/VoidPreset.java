@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.worldgen;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
@@ -7,7 +8,6 @@ import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import org.shsts.tinactory.content.AllWorldGens;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault

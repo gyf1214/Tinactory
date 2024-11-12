@@ -1,12 +1,11 @@
 package org.shsts.tinactory.datagen.builder;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.datagen.DataGen;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

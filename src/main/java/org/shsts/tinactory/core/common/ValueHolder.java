@@ -1,9 +1,9 @@
 package org.shsts.tinactory.core.common;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault

@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.network;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,8 +15,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -37,7 +37,7 @@ public class SidedMachineBlock<T extends BlockEntity> extends MachineBlock<T> {
 
     @Override
     public void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool,
-                             Direction dir, boolean sneaky) {
+        Direction dir, boolean sneaky) {
         if (!sneaky) {
             setIOFacing(world, pos, state, dir);
         }

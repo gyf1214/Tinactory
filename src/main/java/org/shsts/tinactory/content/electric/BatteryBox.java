@@ -1,5 +1,8 @@
 package org.shsts.tinactory.content.electric;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -27,14 +30,10 @@ import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
-        IProcessor, IElectricMachine, INBTSerializable<CompoundTag> {
+    IProcessor, IElectricMachine, INBTSerializable<CompoundTag> {
     private final BlockEntity blockEntity;
     private final Voltage voltage;
     private Machine machine;
@@ -54,7 +53,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     private boolean allowItem(ItemStack stack) {
         return stack.getItem() instanceof BatteryItem batteryItem &&
-                batteryItem.voltage == voltage;
+            batteryItem.voltage == voltage;
     }
 
     @Override
@@ -63,8 +62,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     @Override
     public void onWorkTick(double partial) {
         var factor = machine.getNetwork().orElseThrow()
-                .getComponent(AllNetworks.ELECTRIC_COMPONENT)
-                .getBufferFactor();
+            .getComponent(AllNetworks.ELECTRIC_COMPONENT)
+            .getBufferFactor();
         var sign = MathUtil.compare(factor);
         if (sign == 0) {
             return;
@@ -75,8 +74,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
                 continue;
             }
             var cap = Math.min(voltage.value, sign > 0 ?
-                    battery.capacity - battery.getPowerLevel(stack) :
-                    battery.getPowerLevel(stack));
+                battery.capacity - battery.getPowerLevel(stack) :
+                battery.getPowerLevel(stack));
             battery.charge(stack, (long) Math.floor(cap * factor));
         }
     }
@@ -123,14 +122,14 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     @Override
     public void subscribeEvents(EventManager eventManager) {
         eventManager.subscribe(AllEvents.SERVER_LOAD,
-                $ -> machine = AllCapabilities.MACHINE.get(blockEntity));
+            $ -> machine = AllCapabilities.MACHINE.get(blockEntity));
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.ELECTRIC_MACHINE.get() ||
-                cap == AllCapabilities.PROCESSOR.get()) {
+            cap == AllCapabilities.PROCESSOR.get()) {
             return myself();
         } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return itemHandlerCap.cast();
@@ -148,8 +147,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         ItemHelper.deserializeItemHandler(handler, tag);
     }
 
-    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P>
-    builder(P parent) {
+    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, "battery_box", BatteryBox::new);
     }
 }

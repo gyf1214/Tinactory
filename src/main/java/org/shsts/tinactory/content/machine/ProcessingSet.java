@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.machine;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -21,7 +22,6 @@ import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
@@ -34,14 +34,14 @@ public class ProcessingSet extends MachineSet {
     public final RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType;
 
     private ProcessingSet(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
-                          Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                          Map<Voltage, RegistryEntry<? extends Block>> machines) {
+        Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+        Map<Voltage, RegistryEntry<? extends Block>> machines) {
         super(voltages, layoutSet, machines);
         this.recipeType = recipeType;
     }
 
     public static class Builder<T extends ProcessingRecipe, P> extends
-            BuilderBase<ProcessingSet, P, Builder<T, P>> {
+        BuilderBase<ProcessingSet, P, Builder<T, P>> {
         public final RecipeTypeEntry<T, ?> recipeType;
         private boolean hasProcessor = false;
         private boolean hasPlugin = false;
@@ -52,22 +52,21 @@ public class ProcessingSet extends MachineSet {
 
             machine(v -> "machine/" + v.id + "/" + recipeType.id, MachineBlock::factory);
             machine(v -> $ -> $.blockEntity()
-                    .simpleCapability(StackProcessingContainer.builder(getLayout(v)))
-                    .menu(ProcessingMenu.machine(getLayout(v), recipeType))
-                    .title(ProcessingMenu::getTitle)
-                    .build()
-                    .build());
+                .simpleCapability(StackProcessingContainer.builder(getLayout(v)))
+                .menu(ProcessingMenu.machine(getLayout(v), recipeType))
+                .title(ProcessingMenu::getTitle)
+                .build()
+                .build());
         }
 
-        public <B> Builder<T, P>
-        processor(Function<RecipeTypeEntry<? extends ProcessingRecipe, ?>, Function<B,
-                ? extends CapabilityProviderBuilder<? super SmartBlockEntity, B>>> factory) {
+        public <B> Builder<T, P> processor(Function<RecipeTypeEntry<? extends ProcessingRecipe, ?>,
+            Function<B, ? extends CapabilityProviderBuilder<? super SmartBlockEntity, B>>> factory) {
             hasProcessor = true;
             return capability(factory.apply(recipeType));
         }
 
         public Builder<T, P> processingPlugin(Function<RecipeTypeEntry<? extends ProcessingRecipe, ?>,
-                IMenuPlugin.Factory<?>> factory) {
+            IMenuPlugin.Factory<?>> factory) {
             hasPlugin = true;
             return plugin(factory.apply(recipeType));
         }
@@ -85,30 +84,29 @@ public class ProcessingSet extends MachineSet {
 
         @Override
         protected ProcessingSet createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                                          Map<Voltage, RegistryEntry<? extends Block>> machines) {
+            Map<Voltage, RegistryEntry<? extends Block>> machines) {
             return new ProcessingSet(recipeType, voltages, layoutSet, machines);
         }
     }
 
-    public static <T extends ProcessingRecipe, P> Transformer<Builder<T, P>>
-    marker(boolean includeNormal) {
+    public static <T extends ProcessingRecipe, P> Transformer<Builder<T, P>> marker(boolean includeNormal) {
         return $ -> $.processingPlugin(r -> MachinePlugin.marker(r, includeNormal));
     }
 
     public static RegistryEntry<MachineBlock<SmartBlockEntity>> multiblockInterface(Voltage voltage) {
         var id = "multi_block/" + voltage.id + "/interface";
         return REGISTRATE.blockEntity(id, MachineBlock.multiBlockInterface(voltage))
-                .blockEntity()
-                .eventManager()
-                .simpleCapability(MultiBlockInterface::basic)
-                .simpleCapability(FlexibleStackContainer::builder)
-                .menu(ProcessingMenu.multiBlock())
-                .title(ProcessingMenu::getTitle)
-                .plugin(MachinePlugin::multiBlock)
-                .build()
-                .renderer(() -> () -> MultiBlockInterfaceRenderer::new)
-                .build()
-                .translucent()
-                .buildObject();
+            .blockEntity()
+            .eventManager()
+            .simpleCapability(MultiBlockInterface::basic)
+            .simpleCapability(FlexibleStackContainer::builder)
+            .menu(ProcessingMenu.multiBlock())
+            .title(ProcessingMenu::getTitle)
+            .plugin(MachinePlugin::multiBlock)
+            .build()
+            .renderer(() -> () -> MultiBlockInterfaceRenderer::new)
+            .build()
+            .translucent()
+            .buildObject();
     }
 }

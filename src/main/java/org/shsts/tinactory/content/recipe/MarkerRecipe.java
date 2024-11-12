@@ -1,6 +1,8 @@
 package org.shsts.tinactory.content.recipe;
 
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -15,8 +17,6 @@ import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -39,7 +39,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         private ResourceLocation baseType;
 
         public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<MarkerRecipe, Builder> parent,
-                       ResourceLocation loc) {
+            ResourceLocation loc) {
             super(consumer, parent, loc);
         }
 
@@ -85,7 +85,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         @Override
         protected Builder buildFromJson(ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(loc, jo)
-                    .baseType(new ResourceLocation(GsonHelper.getAsString(jo, "base_type")));
+                .baseType(new ResourceLocation(GsonHelper.getAsString(jo, "base_type")));
         }
 
         @Override
@@ -96,5 +96,5 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     public static final SmartRecipeSerializer.Factory<MarkerRecipe, MarkerRecipe.Builder>
-            SERIALIZER = Serializer::new;
+        SERIALIZER = Serializer::new;
 }

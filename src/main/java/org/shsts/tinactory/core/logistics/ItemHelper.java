@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.logistics;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -15,7 +16,6 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -70,7 +70,7 @@ public final class ItemHelper {
             buf.writeVarInt(Item.getId(item));
             buf.writeVarInt(stack.getCount());
             var tag = item.isDamageable(stack) || item.shouldOverrideMultiplayerNbt() ?
-                    stack.getShareTag() : null;
+                stack.getShareTag() : null;
             buf.writeNbt(tag);
         }
     }
@@ -91,8 +91,8 @@ public final class ItemHelper {
      */
     public static boolean canItemsStack(ItemStack a, ItemStack b) {
         return !a.isEmpty() && !b.isEmpty() && a.sameItem(b) && a.hasTag() == b.hasTag() &&
-                (!a.hasTag() || Objects.equals(a.getTag(), b.getTag())) &&
-                a.areCapsCompatible(b);
+            (!a.hasTag() || Objects.equals(a.getTag(), b.getTag())) &&
+            a.areCapsCompatible(b);
     }
 
     public static boolean itemStackEqual(ItemStack a, ItemStack b) {
@@ -110,7 +110,7 @@ public final class ItemHelper {
      * Return whether the requirements are met.
      */
     public static boolean consumeItemCollection(IItemCollection collection, Predicate<ItemStack> ingredient,
-                                                int amount, boolean simulate) {
+        int amount, boolean simulate) {
         if (!collection.acceptOutput()) {
             return false;
         }
@@ -143,7 +143,7 @@ public final class ItemHelper {
             return Optional.of(item1);
         }
         if (ItemHandlerHelper.canItemStacksStack(item1, item2) &&
-                item1.getCount() + item2.getCount() <= item1.getMaxStackSize()) {
+            item1.getCount() + item2.getCount() <= item1.getMaxStackSize()) {
             return Optional.of(ItemHandlerHelper.copyStackWithSize(item1, item1.getCount() + item2.getCount()));
         }
         return Optional.empty();

@@ -1,8 +1,9 @@
 package org.shsts.tinactory.content.gui.client;
 
-
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -27,8 +28,6 @@ import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -119,7 +118,7 @@ public class TechPanel extends Panel {
 
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-                                    float partialTick, Rect rect, int index) {
+            float partialTick, Rect rect, int index) {
             renderTechButton(poseStack, getBlitOffset(), rect, getTech(index), true);
         }
 
@@ -203,7 +202,7 @@ public class TechPanel extends Panel {
                 return Optional.empty();
             }
             return Optional.of(List.of(tr("researchProgress",
-                    team.getTechProgress(selectedTech), selectedTech.getMaxProgress())));
+                team.getTechProgress(selectedTech), selectedTech.getMaxProgress())));
         }
     }
 
@@ -235,7 +234,7 @@ public class TechPanel extends Panel {
         var label3 = new Label(menu, tr("techRequirementsLabel"));
         label3.verticalAlign = Label.Alignment.MIDDLE;
         this.startResearchButton = Widgets.simpleButton(menu, tr("startResearchButton"),
-                null, this::startResearch);
+            null, this::startResearch);
         var y = 0;
         var offset7 = Rect.corners(0, y - Widgets.BUTTON_HEIGHT, 0, y);
         y -= Widgets.BUTTON_HEIGHT + MARGIN_VERTICAL;
@@ -255,7 +254,7 @@ public class TechPanel extends Panel {
     }
 
     public static void renderTechButton(PoseStack poseStack, int z, Rect rect, @Nullable ITeamProfile team,
-                                        ITechnology technology, boolean pressed) {
+        ITechnology technology, boolean pressed) {
         int color;
         if (team == null) {
             color = INVALID_COLOR;
@@ -284,7 +283,7 @@ public class TechPanel extends Panel {
     }
 
     private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,
-                                  boolean renderPressed) {
+        boolean renderPressed) {
         if (team == null) {
             return;
         }
@@ -339,9 +338,9 @@ public class TechPanel extends Panel {
 
         availableTechs.clear();
         availableTechs.addAll(techManager.allTechs().stream()
-                .sorted(Comparator.comparing(tech -> team.canResearch(tech) ? 0 :
-                        (team.isTechFinished(tech) ? 2 : 1)))
-                .toList());
+            .sorted(Comparator.comparing(tech -> team.canResearch(tech) ? 0 :
+                (team.isTechFinished(tech) ? 2 : 1)))
+            .toList());
         availableTechPanel.refresh();
     }
 
@@ -352,9 +351,9 @@ public class TechPanel extends Panel {
 
     public static boolean isHoveringTech(GuiComponent component) {
         return component instanceof TechButton ||
-                component instanceof RequiredTechButtons ||
-                (component instanceof ButtonPanel.ItemButton itemButton &&
-                        itemButton.getParent() instanceof TechButtonPanel);
+            component instanceof RequiredTechButtons ||
+            (component instanceof ButtonPanel.ItemButton itemButton &&
+                itemButton.getParent() instanceof TechButtonPanel);
     }
 
     public static Optional<ITechnology> getHoveredTech(GuiComponent component, double mouseX) {
@@ -363,7 +362,7 @@ public class TechPanel extends Panel {
         } else if (component instanceof RequiredTechButtons buttons) {
             return buttons.getSelectedTech(mouseX);
         } else if (component instanceof ButtonPanel.ItemButton itemButton &&
-                itemButton.getParent() instanceof TechButtonPanel buttonPanel) {
+            itemButton.getParent() instanceof TechButtonPanel buttonPanel) {
             return Optional.of(buttonPanel.getTech(itemButton.getIndex()));
         }
         return Optional.empty();

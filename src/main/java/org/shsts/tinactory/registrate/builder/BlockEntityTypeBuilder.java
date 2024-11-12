@@ -1,5 +1,7 @@
 package org.shsts.tinactory.registrate.builder;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -16,8 +18,6 @@ import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
-        RegistryEntryBuilder<BlockEntityType<?>, SmartBlockEntityType<U>, P, BlockEntityTypeBuilder<U, P>> {
+    RegistryEntryBuilder<BlockEntityType<?>, SmartBlockEntityType<U>, P, BlockEntityTypeBuilder<U, P>> {
 
     @FunctionalInterface
     public interface Factory<U1 extends SmartBlockEntity> {
@@ -44,7 +44,7 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
     @Nullable
     private Class<U> entityClass = null;
     private final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>>
-            capabilities = new HashMap<>();
+        capabilities = new HashMap<>();
     @Nullable
     private ChildMenuBuilder<?> menuBuilder = null;
     @Nullable
@@ -88,7 +88,8 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
         menu = value;
     }
 
-    private class ChildMenuBuilder<M extends Menu<? super U, M>> extends MenuBuilder<U, M, BlockEntityTypeBuilder<U, P>> {
+    private class ChildMenuBuilder<M extends Menu<? super U, M>>
+        extends MenuBuilder<U, M, BlockEntityTypeBuilder<U, P>> {
         public ChildMenuBuilder(Registrate registrate, String id, Menu.Factory<U, M> factory) {
             super(registrate, id, BlockEntityTypeBuilder.this, factory);
             onCreateEntry.add(entry -> parent.setMenu(entry::get));
@@ -96,8 +97,8 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
         }
     }
 
-    public <M extends Menu<? super U, M>> MenuBuilder<U, M, BlockEntityTypeBuilder<U, P>>
-    menu(Menu.Factory<U, M> factory) {
+    public <M extends Menu<? super U, M>> MenuBuilder<U, M, BlockEntityTypeBuilder<U, P>> menu(
+        Menu.Factory<U, M> factory) {
         assert menuBuilder == null;
         var builder = new ChildMenuBuilder<>(registrate, id, factory);
         menuBuilder = builder;
@@ -109,21 +110,22 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
         return menuBuilder;
     }
 
-    public <C extends CapabilityProviderBuilder<? super U, BlockEntityTypeBuilder<U, P>>>
-    C capability(Function<BlockEntityTypeBuilder<U, P>, C> builderFactory) {
+    public <C extends CapabilityProviderBuilder<? super U, BlockEntityTypeBuilder<U, P>>> C capability(
+        Function<BlockEntityTypeBuilder<U, P>, C> builderFactory) {
         var ret = builderFactory.apply(this);
         ret.onCreateObject(factory -> capabilities.put(ret.loc, factory));
         return ret;
     }
 
-    public <C extends CapabilityProviderBuilder<? super U, BlockEntityTypeBuilder<U, P>>>
-    BlockEntityTypeBuilder<U, P> simpleCapability(Function<BlockEntityTypeBuilder<U, P>, C> builderFactory) {
+    public <C extends CapabilityProviderBuilder<? super U,
+        BlockEntityTypeBuilder<U, P>>> BlockEntityTypeBuilder<U, P> simpleCapability(
+        Function<BlockEntityTypeBuilder<U, P>, C> builderFactory) {
         return capability(builderFactory).build();
     }
 
     public BlockEntityTypeBuilder<U, P> renderer(DistLazy<BlockEntityRendererProvider<U>> renderer) {
         onCreateObject(type -> renderer.runOnDist(Dist.CLIENT, () -> provider ->
-                registrate.rendererHandler.setBlockEntityRenderer(type, provider)));
+            registrate.rendererHandler.setBlockEntityRenderer(type, provider)));
         return self();
     }
 
@@ -134,7 +136,7 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
         assert entry != null;
         assert entityClass != null;
         return new SmartBlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state),
-                validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()),
-                entityClass, ticking, eventManager, this.capabilities, menu);
+            validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()),
+            entityClass, ticking, eventManager, this.capabilities, menu);
     }
 }

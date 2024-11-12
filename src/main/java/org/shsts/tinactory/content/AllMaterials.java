@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.content.material.FirstDegrees;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.Ores;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,54 +92,54 @@ public final class AllMaterials {
         Ores.init();
 
         TEST = set("test")
-                .toolSet(12800000, Tiers.NETHERITE)
-                .buildObject();
+            .toolSet(12800000, Tiers.NETHERITE)
+            .buildObject();
 
         STONE = set("stone")
-                .color(0xFFCDCDCD)
-                .existing("block", Items.COBBLESTONE)
-                .existing("tool/pickaxe", Items.STONE_PICKAXE)
-                .existing("tool/shovel", Items.STONE_SHOVEL)
-                .existing("tool/hoe", Items.STONE_HOE)
-                .existing("tool/axe", Items.STONE_AXE)
-                .existing("tool/sword", Items.STONE_SWORD)
-                .alias("primary", "block")
-                .dust()
-                .tool(16).hammer().build()
-                .buildObject();
+            .color(0xFFCDCDCD)
+            .existing("block", Items.COBBLESTONE)
+            .existing("tool/pickaxe", Items.STONE_PICKAXE)
+            .existing("tool/shovel", Items.STONE_SHOVEL)
+            .existing("tool/hoe", Items.STONE_HOE)
+            .existing("tool/axe", Items.STONE_AXE)
+            .existing("tool/sword", Items.STONE_SWORD)
+            .alias("primary", "block")
+            .dust()
+            .tool(16).hammer().build()
+            .buildObject();
 
         FLINT = set("flint")
-                .color(0xFF002040)
-                .existing("primary", Items.FLINT)
-                .tool(16).mortar().build()
-                .buildObject();
+            .color(0xFF002040)
+            .existing("primary", Items.FLINT)
+            .tool(16).mortar().build()
+            .buildObject();
 
         RAW_RUBBER = set("raw_rubber")
-                .color(0xFFCCC789)
-                .dust()
-                .buildObject();
+            .color(0xFFCCC789)
+            .dust()
+            .buildObject();
 
         RUBBER = set("rubber")
-                .color(0xFF000000)
-                .polymer()
-                .buildObject();
+            .color(0xFF000000)
+            .polymer()
+            .buildObject();
 
         GLOWSTONE = set("glowstone")
-                .color(0xFFFFFF00)
-                .existing("dust", Tags.Items.DUSTS_GLOWSTONE, Items.GLOWSTONE_DUST)
-                .buildObject();
+            .color(0xFFFFFF00)
+            .existing("dust", Tags.Items.DUSTS_GLOWSTONE, Items.GLOWSTONE_DUST)
+            .buildObject();
 
         RARE_EARTH = set("rare_earth")
-                .color(0xFF808064)
-                .dust()
-                .buildObject();
+            .color(0xFF808064)
+            .dust()
+            .buildObject();
     }
 
     public static final Map<String, MaterialSet> SET;
 
     public static MaterialSet.Builder<?> set(String id) {
         return (new MaterialSet.Builder<>(Unit.INSTANCE, id))
-                .onCreateObject(mat -> SET.put(mat.name, mat));
+            .onCreateObject(mat -> SET.put(mat.name, mat));
     }
 
     public static TagKey<Item> tag(String sub) {

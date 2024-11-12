@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.material;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -8,8 +10,6 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import org.shsts.tinactory.content.AllWorldGens;
 import org.shsts.tinactory.core.util.ServerUtil;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 
 @ParametersAreNonnullByDefault

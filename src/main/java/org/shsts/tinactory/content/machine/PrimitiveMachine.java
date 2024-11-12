@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.machine;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -8,8 +9,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 

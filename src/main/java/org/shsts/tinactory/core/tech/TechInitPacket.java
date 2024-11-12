@@ -2,12 +2,12 @@ package org.shsts.tinactory.core.tech;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.core.common.IPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
 

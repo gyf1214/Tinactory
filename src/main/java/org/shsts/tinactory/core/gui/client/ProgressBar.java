@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -9,8 +10,6 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.util.MathUtil;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -40,7 +39,7 @@ public class ProgressBar extends MenuWidget {
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         var progress = MathUtil.clamp(menu.getSyncPacket(syncIndex, MenuSyncPacket.Double.class)
-                .map(MenuSyncPacket.Double::getData).orElse(0d), 0d, 1d);
+            .map(MenuSyncPacket.Double::getData).orElse(0d), 0d, 1d);
         var z = getBlitOffset();
         var h = rect.height();
 

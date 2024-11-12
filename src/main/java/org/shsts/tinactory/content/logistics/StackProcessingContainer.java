@@ -1,5 +1,8 @@
 package org.shsts.tinactory.content.logistics;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -31,9 +34,6 @@ import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,9 +42,9 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StackProcessingContainer extends CapabilityProvider
-        implements IContainer, INBTSerializable<CompoundTag> {
+    implements IContainer, INBTSerializable<CompoundTag> {
     private record PortInfo(int startSlot, int endSlot, SlotType type,
-                            IPort port, IPort internalPort) {}
+        IPort port, IPort internalPort) {}
 
     private final BlockEntity blockEntity;
     private final IItemHandlerModifiable combinedItems;
@@ -65,7 +65,7 @@ public class StackProcessingContainer extends CapabilityProvider
             var type = port.type();
             if (port.slots() <= 0 || type == SlotType.NONE) {
                 ports.add(new PortInfo(slotIdx, slotIdx, SlotType.NONE,
-                        IPort.EMPTY, IPort.EMPTY));
+                    IPort.EMPTY, IPort.EMPTY));
                 continue;
             }
             switch (type) {
@@ -76,7 +76,7 @@ public class StackProcessingContainer extends CapabilityProvider
 
                     var collection = new ItemHandlerCollection(view);
                     ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
-                            collection, collection));
+                        collection, collection));
                 }
                 case ITEM_OUTPUT -> {
                     var inner = new WrapperItemHandler(port.slots());
@@ -87,7 +87,7 @@ public class StackProcessingContainer extends CapabilityProvider
                     items.add(view);
 
                     ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
-                            new ItemHandlerCollection(view), new ItemHandlerCollection(inner)));
+                        new ItemHandlerCollection(view), new ItemHandlerCollection(inner)));
                 }
                 case FLUID_INPUT -> {
                     var views = new WrapperFluidTank[port.slots()];
@@ -101,7 +101,7 @@ public class StackProcessingContainer extends CapabilityProvider
 
                     var collection = new CombinedFluidTank(views);
                     ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
-                            collection, collection));
+                        collection, collection));
                 }
                 case FLUID_OUTPUT -> {
                     var inners = new WrapperFluidTank[port.slots()];
@@ -119,7 +119,7 @@ public class StackProcessingContainer extends CapabilityProvider
                     }
 
                     ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
-                            new CombinedFluidTank(views), new CombinedFluidTank(inners)));
+                        new CombinedFluidTank(views), new CombinedFluidTank(inners)));
                 }
             }
             slotIdx += port.slots();
@@ -144,7 +144,7 @@ public class StackProcessingContainer extends CapabilityProvider
             return TechManager.localTeam();
         } else {
             return AllCapabilities.MACHINE.tryGet(blockEntity)
-                    .flatMap(Machine::getOwnerTeam);
+                .flatMap(Machine::getOwnerTeam);
         }
     }
 
@@ -156,7 +156,7 @@ public class StackProcessingContainer extends CapabilityProvider
     @Override
     public boolean hasPort(int port) {
         return port >= 0 && port < ports.size() &&
-                ports.get(port).type != SlotType.NONE;
+            ports.get(port).type != SlotType.NONE;
     }
 
     @Override

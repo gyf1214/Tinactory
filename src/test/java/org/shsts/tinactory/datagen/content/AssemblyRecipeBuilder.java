@@ -1,5 +1,7 @@
 package org.shsts.tinactory.datagen.content;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
@@ -11,8 +13,6 @@ import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -46,24 +46,22 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
         return circuit(voltage, count);
     }
 
-    public AssemblyRecipeBuilder<P>
-    component(Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
+    public AssemblyRecipeBuilder<P> component(
+        Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
         if (builder != null) {
             builder.inputItem(0, component.get(voltage), count);
         }
         return this;
     }
 
-    public AssemblyRecipeBuilder<P>
-    material(MaterialSet material, String sub, int count) {
+    public AssemblyRecipeBuilder<P> material(MaterialSet material, String sub, int count) {
         if (builder != null) {
             builder.inputItem(0, material.tag(sub), count);
         }
         return this;
     }
 
-    public AssemblyRecipeBuilder<P>
-    materialFluid(MaterialSet material, float count) {
+    public AssemblyRecipeBuilder<P> materialFluid(MaterialSet material, float count) {
         if (builder != null) {
             builder.inputFluid(1, material.fluidEntry(), material.fluidAmount(count));
         }

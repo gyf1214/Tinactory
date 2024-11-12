@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.tool;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,8 +18,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.TierSortingRegistry;
 import org.shsts.tinactory.core.util.MathUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class UsableToolItem extends ToolItem {
@@ -35,7 +34,7 @@ public class UsableToolItem extends ToolItem {
 
     private static Direction wrenchedDirection(BlockPos pos, Direction clickFace, Vec3 clickLoc) {
         var faceCenter = MathUtil.blockCenter(pos)
-                .add(MathUtil.dirNormal(clickFace).scale(0.5));
+            .add(MathUtil.dirNormal(clickFace).scale(0.5));
         var clickRel = clickLoc.subtract(faceCenter);
         var dx = MathUtil.compare(clickRel.x, WRENCH_RADIUS_NORM);
         var dy = MathUtil.compare(clickRel.y, WRENCH_RADIUS_NORM);
@@ -63,7 +62,7 @@ public class UsableToolItem extends ToolItem {
             var tool = ctx.getItemInHand();
 
             if (state.getBlock() instanceof IWrenchable wrenchable &&
-                    wrenchable.canWrenchWith(tool)) {
+                wrenchable.canWrenchWith(tool)) {
                 var sneaking = ctx.getPlayer() != null && ctx.getPlayer().isShiftKeyDown();
                 var dir = wrenchedDirection(pos, ctx.getClickedFace(), ctx.getClickLocation());
                 wrenchable.onWrenchWith(ctx.getLevel(), pos, state, tool, dir, sneaking);

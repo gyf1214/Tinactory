@@ -1,8 +1,8 @@
 package org.shsts.tinactory.datagen.handler;
 
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -12,7 +12,6 @@ import net.minecraft.server.packs.PackType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +23,7 @@ import java.util.Objects;
 @MethodsReturnNonnullByDefault
 public abstract class TechProvider implements DataProvider {
     public static final ExistingFileHelper.ResourceType RESOURCE_TYPE =
-            new ExistingFileHelper.ResourceType(PackType.SERVER_DATA, ".json", "technologies");
+        new ExistingFileHelper.ResourceType(PackType.SERVER_DATA, ".json", "technologies");
 
     private final DataGenerator generator;
     private final String modid;
@@ -47,8 +46,8 @@ public abstract class TechProvider implements DataProvider {
     protected abstract void addTechs();
 
     private Path getPath(ResourceLocation loc) {
-        return generator.getOutputFolder().resolve("data/" + loc.getNamespace() + "/technologies/"
-                + loc.getPath() + ".json");
+        return generator.getOutputFolder()
+            .resolve("data/" + loc.getNamespace() + "/technologies/" + loc.getPath() + ".json");
     }
 
     @Override

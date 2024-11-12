@@ -1,8 +1,8 @@
 package org.shsts.tinactory.datagen.handler;
 
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.HashCache;
@@ -15,7 +15,6 @@ import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.content.LanguageProcessor;
 import org.shsts.tinactory.datagen.context.TrackedContext;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
@@ -47,7 +46,7 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
             assert existingFileHelper.exists(loc, PackType.CLIENT_RESOURCES);
             var resource = existingFileHelper.getResource(loc, PackType.CLIENT_RESOURCES);
             try (var is = resource.getInputStream();
-                 var br = new InputStreamReader(is)) {
+                var br = new InputStreamReader(is)) {
                 return gson.fromJson(br, JsonObject.class);
             }
         }

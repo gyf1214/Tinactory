@@ -15,11 +15,11 @@ public final class AllRegistries {
 
     static {
         SCHEDULING_REGISTRY = REGISTRATE.registry("scheduling", IScheduling.class)
-                .onBake(SchedulingManager::onBake)
-                .register();
+            .onBake(SchedulingManager::onBake)
+            .register();
         COMPONENT_TYPE_REGISTRY = REGISTRATE.<ComponentType<?>>genericRegistry("component_type", ComponentType.class)
-                .onBake((registry, stage) -> ComponentType.onBake(registry))
-                .register();
+            .onBake((registry, stage) -> ComponentType.onBake(registry))
+            .register();
         EVENT = REGISTRATE.simpleRegistry("event", Event.class);
     }
 

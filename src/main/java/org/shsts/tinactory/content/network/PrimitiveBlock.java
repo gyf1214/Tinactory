@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.network;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
@@ -11,7 +12,6 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
@@ -36,7 +36,7 @@ public class PrimitiveBlock<T extends BlockEntity> extends SmartEntityBlock<T> {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return defaultBlockState()
-                .setValue(FACING, context.getHorizontalDirection().getOpposite())
-                .setValue(WORKING, false);
+            .setValue(FACING, context.getHorizontalDirection().getOpposite())
+            .setValue(WORKING, false);
     }
 }

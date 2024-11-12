@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.SlotType;
@@ -11,7 +12,6 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +31,8 @@ public class GhostRecipe extends MenuWidget {
 
     private void renderIngredient(PoseStack poseStack, IProcessingObject ingredient, int x, int y) {
         RenderUtil.renderIngredient(ingredient,
-                stack -> RenderUtil.renderGhostItem(poseStack, stack, x, y),
-                stack -> renderFluid(poseStack, stack, x, y));
+            stack -> RenderUtil.renderGhostItem(poseStack, stack, x, y),
+            stack -> renderFluid(poseStack, stack, x, y));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.Item;
@@ -24,7 +25,6 @@ import org.shsts.tinactory.core.common.CellItem;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,28 +118,28 @@ public final class AllItems {
         STICKY_RESIN = simple("rubber_tree/sticky_resin");
 
         RUBBER_LOG = REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
-                .material(Material.WOOD)
-                .properties(p -> p.sound(SoundType.WOOD))
-                .register();
+            .material(Material.WOOD)
+            .properties(p -> p.sound(SoundType.WOOD))
+            .register();
 
         RUBBER_LEAVES = REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
-                .material(Material.LEAVES)
-                .properties(p -> p.strength(0.2f).randomTicks()
-                        .sound(SoundType.GRASS).noOcclusion()
-                        .isValidSpawn(($1, $2, $3, $4) -> false)
-                        .isSuffocating(($1, $2, $3) -> false)
-                        .isViewBlocking(($1, $2, $3) -> false))
-                .renderType(() -> RenderType::cutout)
-                .tint(0xFF55FF55)
-                .register();
+            .material(Material.LEAVES)
+            .properties(p -> p.strength(0.2f).randomTicks()
+                .sound(SoundType.GRASS).noOcclusion()
+                .isValidSpawn(($1, $2, $3, $4) -> false)
+                .isSuffocating(($1, $2, $3) -> false)
+                .isViewBlocking(($1, $2, $3) -> false))
+            .renderType(() -> RenderType::cutout)
+            .tint(0xFF55FF55)
+            .register();
 
         RUBBER_SAPLING = REGISTRATE.block("rubber_tree/sapling",
-                        prop -> new SaplingBlock(new RubberTreeGrower(), prop))
-                .material(Material.PLANT)
-                .properties(p -> p.noCollission().randomTicks()
-                        .instabreak().sound(SoundType.GRASS))
-                .renderType(() -> RenderType::cutout)
-                .register();
+                prop -> new SaplingBlock(new RubberTreeGrower(), prop))
+            .material(Material.PLANT)
+            .properties(p -> p.noCollission().randomTicks()
+                .instabreak().sound(SoundType.GRASS))
+            .renderType(() -> RenderType::cutout)
+            .register();
 
         STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
 
@@ -152,46 +152,46 @@ public final class AllItems {
         EMITTER = component("emitter");
         FIELD_GENERATOR = component("field_generator");
         MACHINE_HULL = componentBuilder("machine_hull")
-                .voltages(Voltage.ULV, Voltage.IV)
-                .buildObject();
+            .voltages(Voltage.ULV, Voltage.IV)
+            .buildObject();
 
         RESEARCH_EQUIPMENT = ComponentBuilder.<Item, MaterialSet>builder((v, mat) -> REGISTRATE
-                        .item("component/" + v.id + "/research_equipment", Item::new)
-                        .tint(0xFFFFFFFF, mat.color)
-                        .register())
-                .voltage(Voltage.ULV, IRON)
-                .voltage(Voltage.LV, STEEL)
-                .voltage(Voltage.MV, ALUMINIUM)
-                // TODO
-                .voltage(Voltage.HV, IRON)
-                // TODO
-                .voltage(Voltage.EV, IRON)
-                .buildObject();
+                .item("component/" + v.id + "/research_equipment", Item::new)
+                .tint(0xFFFFFFFF, mat.color)
+                .register())
+            .voltage(Voltage.ULV, IRON)
+            .voltage(Voltage.LV, STEEL)
+            .voltage(Voltage.MV, ALUMINIUM)
+            // TODO
+            .voltage(Voltage.HV, IRON)
+            // TODO
+            .voltage(Voltage.EV, IRON)
+            .buildObject();
 
         BATTERY = ComponentBuilder.simple(v -> REGISTRATE
-                        .item("network/" + v.id + "/battery", prop ->
-                                new BatteryItem(prop, v, 12000 * v.value))
-                        .register())
-                .voltages(Voltage.LV, Voltage.HV)
-                .buildObject();
+                .item("network/" + v.id + "/battery", prop ->
+                    new BatteryItem(prop, v, 12000 * v.value))
+                .register())
+            .voltages(Voltage.LV, Voltage.HV)
+            .buildObject();
 
         CABLE = ComponentBuilder.<CableBlock, MaterialSet>builder((v, mat) -> REGISTRATE
-                        .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
-                        .transform(CableBlock.tint(v, mat.color))
-                        .translucent()
-                        .register())
-                .voltage(Voltage.ULV, IRON)
-                .voltage(Voltage.LV, TIN)
-                .voltage(Voltage.MV, COPPER)
-                .voltage(Voltage.HV, GOLD)
-                .voltage(Voltage.EV, ALUMINIUM)
-                .buildObject();
+                .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
+                .transform(CableBlock.tint(v, mat.color))
+                .translucent()
+                .register())
+            .voltage(Voltage.ULV, IRON)
+            .voltage(Voltage.LV, TIN)
+            .voltage(Voltage.MV, COPPER)
+            .voltage(Voltage.HV, GOLD)
+            .voltage(Voltage.EV, ALUMINIUM)
+            .buildObject();
 
         TRANSFORMER = ComponentBuilder.simple(v -> REGISTRATE
-                        .block("network/" + v.id + "/transformer", SubnetBlock.transformer(v))
-                        .translucent().register())
-                .voltages(Voltage.LV, Voltage.IV)
-                .buildObject();
+                .block("network/" + v.id + "/transformer", SubnetBlock.transformer(v))
+                .translucent().register())
+            .voltages(Voltage.LV, Voltage.IV)
+            .buildObject();
 
         GOOD_GRINDER = simple("component/grinder/good");
         ADVANCED_GRINDER = simple("component/grinder/advanced");
@@ -209,17 +209,17 @@ public final class AllItems {
         CHIPS = new HashMap<>();
         boules("silicon", "glowstone", "naquadah", "neutronium");
         wafers("integrated_circuit", "cpu", "nano_cpu", "qbit_cpu",
-                "ram", "nand", "nor",
-                "simple_soc", "soc", "advanced_soc",
-                "low_pic", "pic", "high_pic");
+            "ram", "nand", "nor",
+            "simple_soc", "soc", "advanced_soc",
+            "low_pic", "pic", "high_pic");
 
         FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> REGISTRATE
-                        .item("tool/fluid_cell/" + mat.name, CellItem.factory(1 << (v.rank - 2)))
-                        .tint(() -> () -> CellItem::getTint)
-                        .register())
-                .voltage(Voltage.LV, STEEL)
-                .voltage(Voltage.MV, ALUMINIUM)
-                .buildObject();
+                .item("tool/fluid_cell/" + mat.name, CellItem.factory(1 << (v.rank - 2)))
+                .tint(() -> () -> CellItem::getTint)
+                .register())
+            .voltage(Voltage.LV, STEEL)
+            .voltage(Voltage.MV, ALUMINIUM)
+            .buildObject();
 
         ITEM_FILTER = simple("component/item_filter");
     }
@@ -232,8 +232,8 @@ public final class AllItems {
 
     private static Map<Voltage, RegistryEntry<Item>> component(String name) {
         var ret = componentBuilder(name)
-                .voltages(Voltage.LV, Voltage.IV)
-                .buildObject();
+            .voltages(Voltage.LV, Voltage.IV)
+            .buildObject();
         COMPONENT_ITEMS.addAll(ret.values());
         return ret;
     }
@@ -256,12 +256,12 @@ public final class AllItems {
         }
     }
 
-    private static Map<Voltage, Supplier<? extends ItemLike>>
-    set3(Supplier<? extends ItemLike> basic, Supplier<? extends ItemLike> good,
-         Supplier<? extends ItemLike> advanced) {
+    private static Map<Voltage, Supplier<? extends ItemLike>> set3(
+        Supplier<? extends ItemLike> basic,
+        Supplier<? extends ItemLike> good,
+        Supplier<? extends ItemLike> advanced) {
         return Map.of(Voltage.LV, basic, Voltage.MV, basic,
-                Voltage.HV, good, Voltage.EV, good, Voltage.IV, advanced);
+            Voltage.HV, good, Voltage.EV, good, Voltage.IV, advanced);
     }
-
 }
 

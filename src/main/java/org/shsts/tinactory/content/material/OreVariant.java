@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.material;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
@@ -10,8 +11,6 @@ import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.content.electric.Voltage;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -30,7 +29,7 @@ public enum OreVariant implements StringRepresentable {
     public final float explodeResistance;
 
     OreVariant(int rank, Block baseBlock, Tier mineTier, Voltage voltage,
-               float destroyTime, float explodeResistance) {
+        float destroyTime, float explodeResistance) {
         this.rank = rank;
         this.mineTier = mineTier;
         this.voltage = voltage;

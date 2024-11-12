@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.player.LocalPlayer;
@@ -25,7 +26,6 @@ import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
@@ -45,7 +45,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private static final int WELCOME_BUTTON_WIDTH = 72;
     private static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
     private static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + FONT_HEIGHT +
-            MARGIN_VERTICAL * 3 + MARGIN_TOP;
+        MARGIN_VERTICAL * 3 + MARGIN_TOP;
 
     private final Panel welcomePanel;
     private final EditBox welcomeEdit;
@@ -59,7 +59,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     }
 
     public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
-                                   Component title, int syncSlot) {
+        Component title, int syncSlot) {
         super(menu, inventory, title);
 
         this.welcomePanel = new Panel(this);
@@ -69,7 +69,8 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         var welcomeButton = Widgets.simpleButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
         welcomePanel.addWidget(welcomeLabel);
         welcomePanel.addVanillaWidget(new Rect(0, -1, 64, EDIT_BOX_LINE_HEIGHT), welcomeEdit);
-        welcomePanel.addWidget(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT), welcomeButton);
+        welcomePanel.addWidget(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
+            welcomeButton);
 
         var statePanel = new Panel(this);
         this.stateLabel = new Label(menu);
@@ -123,24 +124,24 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             stateLabel.setLine(1, tr("stateLabel", packet.getState()));
             var metric = packet.getElectricMetrics();
             stateLabel.setLine(2, tr("workFactorLabel",
-                    PERCENTAGE_FORMAT.format(metric.workFactor())));
+                PERCENTAGE_FORMAT.format(metric.workFactor())));
             stateLabel.setLine(3, tr("efficiencyLabel",
-                    PERCENTAGE_FORMAT.format(metric.efficiency())));
+                PERCENTAGE_FORMAT.format(metric.efficiency())));
             var comp = MathUtil.compare(metric.buffer());
             if (comp == 0) {
                 stateLabel.setLine(4, tr("powerLabel0",
-                        INTEGER_FORMAT.format(metric.workCons()),
-                        INTEGER_FORMAT.format(metric.gen())));
+                    INTEGER_FORMAT.format(metric.workCons()),
+                    INTEGER_FORMAT.format(metric.gen())));
             } else if (comp > 0) {
                 stateLabel.setLine(4, tr("powerLabel1",
-                        INTEGER_FORMAT.format(metric.workCons()),
-                        INTEGER_FORMAT.format(metric.buffer()),
-                        INTEGER_FORMAT.format(metric.gen())));
+                    INTEGER_FORMAT.format(metric.workCons()),
+                    INTEGER_FORMAT.format(metric.buffer()),
+                    INTEGER_FORMAT.format(metric.gen())));
             } else {
                 stateLabel.setLine(4, tr("powerLabel2",
-                        INTEGER_FORMAT.format(metric.workCons()),
-                        INTEGER_FORMAT.format(metric.gen()),
-                        INTEGER_FORMAT.format(-metric.buffer())));
+                    INTEGER_FORMAT.format(metric.workCons()),
+                    INTEGER_FORMAT.format(metric.gen()),
+                    INTEGER_FORMAT.format(-metric.buffer())));
             }
             welcomePanel.setActive(false);
             tabs.setActive(true);

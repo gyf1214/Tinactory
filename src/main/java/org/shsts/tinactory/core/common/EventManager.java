@@ -2,6 +2,9 @@ package org.shsts.tinactory.core.common;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -11,9 +14,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.content.AllCapabilities;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -61,19 +61,19 @@ public class EventManager extends CapabilityProvider {
 
     public static <A> void invoke(BlockEntity be, Supplier<Event<A>> event, A arg) {
         AllCapabilities.EVENT_MANAGER.tryGet(be)
-                .ifPresent(eventManager -> eventManager.invoke(event.get(), arg));
+            .ifPresent(eventManager -> eventManager.invoke(event.get(), arg));
     }
 
     public static void invoke(BlockEntity be, Supplier<Event<Unit>> event) {
         AllCapabilities.EVENT_MANAGER.tryGet(be)
-                .ifPresent(eventManager -> eventManager.invoke(event.get()));
+            .ifPresent(eventManager -> eventManager.invoke(event.get()));
     }
 
     public static <A, R> R invokeReturn(BlockEntity be, Supplier<ReturnEvent<A, R>> event, A arg) {
         var e = event.get();
         return AllCapabilities.EVENT_MANAGER.tryGet(be)
-                .map(eventManager -> eventManager.invoke(e, arg))
-                .orElse(e.getDefaultReturn());
+            .map(eventManager -> eventManager.invoke(e, arg))
+            .orElse(e.getDefaultReturn());
     }
 
     @Nonnull

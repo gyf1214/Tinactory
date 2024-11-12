@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.gui.client;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.content.AllRecipes;
@@ -8,16 +9,14 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MarkerRecipeBook extends MachineRecipeBook {
     private final boolean includeNormal;
 
     public MarkerRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
-                            RecipeType<? extends ProcessingRecipe> recipeType,
-                            boolean includeNormal) {
+        RecipeType<? extends ProcessingRecipe> recipeType,
+        boolean includeNormal) {
         super(screen, recipeType);
         this.includeNormal = includeNormal;
     }

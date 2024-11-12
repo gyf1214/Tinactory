@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.recipe;
 
 import com.google.gson.JsonObject;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -8,8 +9,6 @@ import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -25,8 +24,8 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
         private int temperature = 0;
 
         public Builder(IRecipeDataConsumer consumer,
-                       RecipeTypeEntry<BlastFurnaceRecipe, Builder> parent,
-                       ResourceLocation loc) {
+            RecipeTypeEntry<BlastFurnaceRecipe, Builder> parent,
+            ResourceLocation loc) {
             super(consumer, parent, loc);
         }
 
@@ -42,7 +41,7 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
     }
 
     private static class Serializer extends
-            ProcessingRecipe.Serializer<BlastFurnaceRecipe, BlastFurnaceRecipe.Builder> {
+        ProcessingRecipe.Serializer<BlastFurnaceRecipe, BlastFurnaceRecipe.Builder> {
         private Serializer(RecipeTypeEntry<BlastFurnaceRecipe, Builder> type) {
             super(type);
         }
@@ -50,7 +49,7 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
         @Override
         protected Builder buildFromJson(ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(loc, jo)
-                    .temperature(GsonHelper.getAsInt(jo, "temperature"));
+                .temperature(GsonHelper.getAsInt(jo, "temperature"));
         }
 
         @Override
@@ -61,5 +60,5 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
     }
 
     public static final SmartRecipeSerializer.Factory<BlastFurnaceRecipe, Builder> SERIALIZER =
-            Serializer::new;
+        Serializer::new;
 }

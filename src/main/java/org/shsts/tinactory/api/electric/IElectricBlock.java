@@ -1,9 +1,8 @@
 package org.shsts.tinactory.api.electric;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.state.BlockState;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -18,6 +17,6 @@ public interface IElectricBlock {
 
     static boolean canVoltagesConnect(long voltage, BlockState state) {
         return state.getBlock() instanceof IElectricBlock electricBlock &&
-                canVoltagesConnect(voltage, electricBlock.getVoltage(state));
+            canVoltagesConnect(voltage, electricBlock.getVoltage(state));
     }
 }

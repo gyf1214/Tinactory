@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -11,8 +12,6 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -39,8 +38,7 @@ public final class AllTags {
     public static final TagKey<Item> MACHINE = modItem("machine");
     public static final TagKey<Block> COIL = modBlock("coil");
 
-    public static TagKey<Item>
-    machineTag(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
+    public static TagKey<Item> machineTag(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
         return extend(MACHINE, recipeType.id);
     }
 

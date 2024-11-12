@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -22,7 +23,6 @@ import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TinactorySavedData;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 
 @ParametersAreNonnullByDefault
@@ -55,7 +55,7 @@ public final class AllForgeEvents {
                 return;
             }
             AllWorldGens.PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
-                    world.getChunkSource().getGenerator(), new Random(), spawn);
+                world.getChunkSource().getGenerator(), new Random(), spawn);
             event.getSettings().setSpawn(spawn, 0f);
             event.setCanceled(true);
         }

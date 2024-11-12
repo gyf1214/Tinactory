@@ -1,5 +1,7 @@
 package org.shsts.tinactory.registrate.builder;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.world.item.CreativeModeTab;
@@ -10,14 +12,12 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
-        extends RegistryEntryBuilder<Item, U, P, S> {
+    extends RegistryEntryBuilder<Item, U, P, S> {
 
     protected final Function<Item.Properties, U> factory;
     protected Transformer<Item.Properties> properties = $ -> $.tab(CreativeModeTab.TAB_MISC);
@@ -25,7 +25,7 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
     protected DistLazy<ItemColor> tint = null;
 
     public ItemBuilder(Registrate registrate, String id, P parent,
-                       Function<Item.Properties, U> factory) {
+        Function<Item.Properties, U> factory) {
         super(registrate, registrate.itemHandler, id, parent);
         this.factory = factory;
     }
@@ -49,7 +49,7 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
         var tint = this.tint;
         if (tint != null) {
             onCreateObject.add(item -> tint.runOnDist(Dist.CLIENT, () -> itemColor ->
-                    registrate.tintHandler.addItemColor(item, itemColor)));
+                registrate.tintHandler.addItemColor(item, itemColor)));
         }
         return super.createEntry();
     }

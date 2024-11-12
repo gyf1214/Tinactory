@@ -1,6 +1,8 @@
 package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.Recipe;
@@ -21,8 +23,6 @@ import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -38,8 +38,8 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     private final Layout layout;
 
     private MachineRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
-                              @Nullable RecipeType<? extends ProcessingRecipe> recipeType,
-                              @Nullable Layout layout) {
+        @Nullable RecipeType<? extends ProcessingRecipe> recipeType,
+        @Nullable Layout layout) {
         super(screen, layout == null ? 0 : layout.getXOffset());
         this.recipeType = recipeType;
         this.layout = layout;
@@ -47,7 +47,7 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     }
 
     public MachineRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
-                             @Nullable RecipeType<? extends ProcessingRecipe> recipeType) {
+        @Nullable RecipeType<? extends ProcessingRecipe> recipeType) {
         this(screen, recipeType, screen.getMenu().layout);
     }
 
@@ -57,9 +57,9 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
 
     protected boolean canCraft(Recipe<?> recipe) {
         return Machine.getProcessor(blockEntity)
-                .flatMap(p -> p instanceof RecipeProcessor<?> p1 ? Optional.of(p1) : Optional.empty())
-                .map(p -> p.allowTargetRecipe(recipe))
-                .orElse(false);
+            .flatMap(p -> p instanceof RecipeProcessor<?> p1 ? Optional.of(p1) : Optional.empty())
+            .map(p -> p.allowTargetRecipe(recipe))
+            .orElse(false);
     }
 
     @Override
@@ -92,19 +92,19 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     @Override
     protected Optional<List<Component>> buttonToolTip(ProcessingRecipe recipe) {
         return recipe.getDescription().map(List::of)
-                .or(() -> ProcessingResults.mapItemOrFluid(recipe.getDisplay(), ClientUtil::itemTooltip,
-                        fluid -> ClientUtil.fluidTooltip(fluid, false)));
+            .or(() -> ProcessingResults.mapItemOrFluid(recipe.getDisplay(), ClientUtil::itemTooltip,
+                fluid -> ClientUtil.fluidTooltip(fluid, false)));
     }
 
     @Override
     protected void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick,
-                                ProcessingRecipe recipe, Rect rect, int z) {
+        ProcessingRecipe recipe, Rect rect, int z) {
         var x = rect.x() + 2;
         var y = rect.y() + 2;
         var output = recipe.getDisplay();
         RenderUtil.renderIngredient(output,
-                stack -> RenderUtil.renderItem(stack, x, y),
-                stack -> RenderUtil.renderFluid(poseStack, stack, x, y, z));
+            stack -> RenderUtil.renderItem(stack, x, y),
+            stack -> RenderUtil.renderFluid(poseStack, stack, x, y, z));
     }
 
     private void onTechChange() {

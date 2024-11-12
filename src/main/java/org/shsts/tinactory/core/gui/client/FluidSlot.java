@@ -2,6 +2,7 @@ package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -13,7 +14,6 @@ import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +34,7 @@ public class FluidSlot extends MenuWidget {
 
     public FluidStack getFluidStack() {
         return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
-                .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
+            .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class FluidSlot extends MenuWidget {
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
         menu.triggerEvent(MenuEventHandler.FLUID_SLOT_CLICK, (containerId, eventId) ->
-                new SlotEventPacket(containerId, eventId, tank, button));
+            new SlotEventPacket(containerId, eventId, tank, button));
     }
 
     @Override

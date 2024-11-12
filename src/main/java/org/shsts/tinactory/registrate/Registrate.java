@@ -1,5 +1,6 @@
 package org.shsts.tinactory.registrate;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
@@ -52,7 +53,6 @@ import org.shsts.tinactory.registrate.handler.TintHandler;
 import org.shsts.tinactory.registrate.tracking.TrackedObjects;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -112,28 +112,27 @@ public class Registrate {
         this.trackedObjects = new TrackedObjects();
     }
 
-    public <T extends IForgeRegistryEntry<T>>
-    void putHandler(ResourceLocation loc, RegistryEntryHandler<T> handler) {
+    public <T extends IForgeRegistryEntry<T>> void putHandler(ResourceLocation loc,
+        RegistryEntryHandler<T> handler) {
         registryEntryHandlers.put(loc, handler);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IForgeRegistryEntry<T>>
-    RegistryEntryHandler<T> forgeHandler(IForgeRegistry<T> registry) {
+    public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T> forgeHandler(IForgeRegistry<T> registry) {
         return (RegistryEntryHandler<T>) registryEntryHandlers.computeIfAbsent(
-                registry.getRegistryName(),
-                loc -> RegistryEntryHandler.forge(registry));
+            registry.getRegistryName(),
+            loc -> RegistryEntryHandler.forge(registry));
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>
-    forgeHandler(ResourceLocation loc, Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
+    public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T> forgeHandler(ResourceLocation loc,
+        Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
         return (RegistryEntryHandler<T>) registryEntryHandlers.computeIfAbsent(loc,
-                $ -> RegistryEntryHandler.forge(entryClass, registry));
+            $ -> RegistryEntryHandler.forge(entryClass, registry));
     }
 
-    public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T>
-    forgeHandler(ResourceKey<Registry<T>> key, Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
+    public <T extends IForgeRegistryEntry<T>> RegistryEntryHandler<T> forgeHandler(ResourceKey<Registry<T>> key,
+        Class<T> entryClass, Supplier<IForgeRegistry<T>> registry) {
         return forgeHandler(key.location(), entryClass, registry);
     }
 
@@ -163,25 +162,24 @@ public class Registrate {
     // builders
 
     private class SimpleBlockBuilder<U extends Block>
-            extends BlockBuilder<U, Registrate, SimpleBlockBuilder<U>> {
+        extends BlockBuilder<U, Registrate, SimpleBlockBuilder<U>> {
         public SimpleBlockBuilder(String id, Function<BlockBehaviour.Properties, U> factory) {
             super(Registrate.this, id, Registrate.this, factory);
         }
     }
 
-    public <U extends Block> BlockBuilder<U, Registrate, ?>
-    block(String id, Function<BlockBehaviour.Properties, U> factory) {
+    public <U extends Block> BlockBuilder<U, Registrate, ?> block(String id,
+        Function<BlockBehaviour.Properties, U> factory) {
         return new SimpleBlockBuilder<>(id, factory);
     }
 
-    public <T extends SmartBlockEntity, P, U extends SmartEntityBlock<T>>
-    EntityBlockBuilder<T, U, P>
-    entityBlock(P parent, String id, EntityBlockBuilder.Factory<T, U> factory) {
+    public <T extends SmartBlockEntity, P, U extends SmartEntityBlock<T>> EntityBlockBuilder<T, U, P> entityBlock(
+        P parent, String id, EntityBlockBuilder.Factory<T, U> factory) {
         return new EntityBlockBuilder<>(this, id, parent, factory);
     }
 
     private class SimpleItemBuilder<U extends Item>
-            extends ItemBuilder<U, Registrate, SimpleItemBuilder<U>> {
+        extends ItemBuilder<U, Registrate, SimpleItemBuilder<U>> {
 
         protected SimpleItemBuilder(String id, Function<Item.Properties, U> factory) {
             super(Registrate.this, id, Registrate.this, factory);
@@ -189,25 +187,25 @@ public class Registrate {
         }
     }
 
-    public <U extends Item> ItemBuilder<U, Registrate, ?>
-    item(String id, Function<Item.Properties, U> factory) {
+    public <U extends Item> ItemBuilder<U, Registrate, ?> item(String id,
+        Function<Item.Properties, U> factory) {
         return new SimpleItemBuilder<>(id, factory);
     }
 
-    public <U extends SmartBlockEntity, P> BlockEntityTypeBuilder<U, P>
-    blockEntityType(P parent, String id, BlockEntityTypeBuilder.Factory<U> factory) {
+    public <U extends SmartBlockEntity, P> BlockEntityTypeBuilder<U, P> blockEntityType(P parent, String id,
+        BlockEntityTypeBuilder.Factory<U> factory) {
         return new BlockEntityTypeBuilder<>(this, id, parent, factory);
     }
 
     private class SimpleBlockEntityBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-            extends BlockEntityBuilder<T, U, Registrate> {
+        extends BlockEntityBuilder<T, U, Registrate> {
         private final String id;
         private final BlockEntityTypeBuilder.Factory<T> blockEntityFactory;
         private final EntityBlockBuilder.Factory<T, U> blockFactory;
 
         private SimpleBlockEntityBuilder(String id,
-                                         BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
-                                         EntityBlockBuilder.Factory<T, U> blockFactory) {
+            BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
+            EntityBlockBuilder.Factory<T, U> blockFactory) {
             super(Registrate.this);
             this.id = id;
             this.blockEntityFactory = blockEntityFactory;
@@ -215,57 +213,54 @@ public class Registrate {
         }
 
         @Override
-        protected BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U, Registrate>>
-        createBlockEntityBuilder() {
+        protected BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U, Registrate>> createBlockEntityBuilder() {
             return Registrate.this.blockEntityType(this, id, blockEntityFactory);
         }
 
         @Override
-        protected EntityBlockBuilder<T, U, BlockEntityBuilder<T, U, Registrate>>
-        createBlockBuilder() {
+        protected EntityBlockBuilder<T, U, BlockEntityBuilder<T, U, Registrate>> createBlockBuilder() {
             return Registrate.this.entityBlock(this, id, blockFactory);
         }
     }
 
-    public <T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-    BlockEntityBuilder<T, U, Registrate>
-    blockEntity(String id, BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
-                EntityBlockBuilder.Factory<T, U> blockFactory) {
+    public <T extends SmartBlockEntity,
+        U extends SmartEntityBlock<T>> BlockEntityBuilder<T, U, Registrate> blockEntity(
+        String id, BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
+        EntityBlockBuilder.Factory<T, U> blockFactory) {
         return new SimpleBlockEntityBuilder<>(id, blockEntityFactory, blockFactory);
     }
 
-    public <U extends SmartEntityBlock<SmartBlockEntity>>
-    BlockEntityBuilder<SmartBlockEntity, U, Registrate>
-    blockEntity(String id, EntityBlockBuilder.Factory<SmartBlockEntity, U> blockFactory) {
+    public <U extends SmartEntityBlock<
+        SmartBlockEntity>> BlockEntityBuilder<SmartBlockEntity, U, Registrate> blockEntity(
+        String id, EntityBlockBuilder.Factory<SmartBlockEntity, U> blockFactory) {
         return (new SimpleBlockEntityBuilder<>(id, SmartBlockEntity::new, blockFactory))
-                .entityClass(SmartBlockEntity.class);
+            .entityClass(SmartBlockEntity.class);
     }
 
-    public <T extends IForgeRegistryEntry<T>>
-    RegistryBuilderWrapper<T, Registrate> registry(String id, Class<T> clazz) {
+    public <T extends IForgeRegistryEntry<T>> RegistryBuilderWrapper<T, Registrate> registry(
+        String id, Class<T> clazz) {
         return new RegistryBuilderWrapper<>(this, id, clazz, this);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IForgeRegistryEntry<T>>
-    RegistryBuilderWrapper<T, Registrate> genericRegistry(String id, Class<?> clazz) {
+    public <T extends IForgeRegistryEntry<T>> RegistryBuilderWrapper<T, Registrate> genericRegistry(
+        String id, Class<?> clazz) {
         return new RegistryBuilderWrapper<>(this, id, (Class<T>) clazz, this);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IForgeRegistryEntry<T>>
-    SmartRegistry<T> simpleRegistry(String id, Class<?> clazz) {
+    public <T extends IForgeRegistryEntry<T>> SmartRegistry<T> simpleRegistry(String id, Class<?> clazz) {
         return (new RegistryBuilderWrapper<>(this, id, (Class<T>) clazz, this)).register();
     }
 
-    public <T extends IForgeRegistryEntry<T>, B extends RegistryEntryBuilder<T, ?, Registrate, B>>
-    B registryEntry(String id, SmartRegistry<T> registry,
-                    RegistryEntryBuilder.BuilderFactory<T, Registrate, B> builderFactory) {
+    public <T extends IForgeRegistryEntry<T>, B extends RegistryEntryBuilder<T, ?, Registrate, B>> B registryEntry(
+        String id, SmartRegistry<T> registry,
+        RegistryEntryBuilder.BuilderFactory<T, Registrate, B> builderFactory) {
         return builderFactory.create(this, registry.getHandler(), id, this);
     }
 
     private class SimpleRegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U extends T>
-            extends RegistryEntryBuilder<T, U, Registrate, SimpleRegistryEntryBuilder<T, U>> {
+        extends RegistryEntryBuilder<T, U, Registrate, SimpleRegistryEntryBuilder<T, U>> {
         private final Supplier<U> factory;
 
         public SimpleRegistryEntryBuilder(RegistryEntryHandler<T> handler, String id, Supplier<U> factory) {
@@ -279,13 +274,13 @@ public class Registrate {
         }
     }
 
-    public <T extends IForgeRegistryEntry<T>, U extends T>
-    RegistryEntry<U> registryEntry(String id, SmartRegistry<T> registry, Supplier<U> factory) {
+    public <T extends IForgeRegistryEntry<T>, U extends T> RegistryEntry<U> registryEntry(
+        String id, SmartRegistry<T> registry, Supplier<U> factory) {
         return (new SimpleRegistryEntryBuilder<>(registry.getHandler(), id, factory)).register();
     }
 
-    public <T extends IForgeRegistryEntry<T>, U extends T>
-    RegistryEntry<U> registryEntry(String id, RegistryEntryHandler<T> handler, Supplier<U> factory) {
+    public <T extends IForgeRegistryEntry<T>, U extends T> RegistryEntry<U> registryEntry(
+        String id, RegistryEntryHandler<T> handler, Supplier<U> factory) {
         return (new SimpleRegistryEntryBuilder<>(handler, id, factory)).register();
     }
 
@@ -307,10 +302,10 @@ public class Registrate {
         return registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
     }
 
-    public <T extends NetworkComponent>
-    RegistryEntry<ComponentType<T>> componentType(String id, Class<T> clazz, NetworkComponent.Factory<T> factory) {
+    public <T extends NetworkComponent> RegistryEntry<ComponentType<T>> componentType(
+        String id, Class<T> clazz, NetworkComponent.Factory<T> factory) {
         return registryEntry(id, AllRegistries.COMPONENT_TYPE_REGISTRY,
-                () -> new ComponentType<>(clazz, factory));
+            () -> new ComponentType<>(clazz, factory));
     }
 
     public <A> RegistryEntry<Event<A>> event(String id) {
@@ -321,8 +316,9 @@ public class Registrate {
         return registryEntry(id, AllRegistries.EVENT, () -> new ReturnEvent<>(defaultRet));
     }
 
-    public <T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
-    RecipeTypeBuilder<T, B, Registrate> recipeType(String id, SmartRecipeSerializer.Factory<T, B> serializer) {
+    public <T extends SmartRecipe<?>,
+        B extends BuilderBase<?, ?, B>> RecipeTypeBuilder<T, B, Registrate> recipeType(
+        String id, SmartRecipeSerializer.Factory<T, B> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
 

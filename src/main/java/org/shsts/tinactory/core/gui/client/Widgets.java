@@ -1,6 +1,8 @@
 package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
@@ -13,9 +15,6 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
 import static org.shsts.tinactory.core.gui.Texture.VANILLA_WIDGETS;
 
 @OnlyIn(Dist.CLIENT)
@@ -26,7 +25,7 @@ public final class Widgets {
     public static final int BUTTON_HEIGHT = 20;
 
     public static Button simpleButton(Menu<?, ?> menu, Component label,
-                                      @Nullable Component tooltip, Runnable onPress) {
+        @Nullable Component tooltip, Runnable onPress) {
         return new Button(menu, tooltip) {
             private final Texture texture = VANILLA_WIDGETS;
             private final Font font = ClientUtil.getFont();
@@ -41,8 +40,8 @@ public final class Widgets {
                 RenderUtil.blit(poseStack, texture, getBlitOffset(), rect1.offset(w, 0), 200 - w, y);
 
                 font.drawShadow(poseStack, label, rect.x() + w - (float) textWidth / 2,
-                        rect.y() + (float) (rect.height() - font.lineHeight) / 2,
-                        RenderUtil.WHITE);
+                    rect.y() + (float) (rect.height() - font.lineHeight) / 2,
+                    RenderUtil.WHITE);
             }
 
             @Override
@@ -59,7 +58,7 @@ public final class Widgets {
             public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
                 // solve the bug
                 return super.keyPressed(keyCode, scanCode, modifiers) ||
-                        (canConsumeInput() && keyCode != 256 && keyCode != 258);
+                    (canConsumeInput() && keyCode != 256 && keyCode != 258);
             }
         };
     }

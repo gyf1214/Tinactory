@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.logistics;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -9,7 +10,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -162,9 +162,9 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
     @Override
     public Collection<FluidStack> getAllFluids() {
         return Arrays.stream(tanks)
-                .map(WrapperFluidTank::getFluid)
-                .filter(f -> !f.isEmpty())
-                .toList();
+            .map(WrapperFluidTank::getFluid)
+            .filter(f -> !f.isEmpty())
+            .toList();
     }
 
     @Override

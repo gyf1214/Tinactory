@@ -1,6 +1,8 @@
 package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -21,8 +23,6 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.util.I18n;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,10 +47,10 @@ public abstract class AbstractRecipeBook<T> extends Panel {
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
     public static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
     public static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_HORIZONTAL - PANEL_WIDTH,
-            -MARGIN_TOP, -MARGIN_HORIZONTAL, MARGIN_VERTICAL);
+        -MARGIN_TOP, -MARGIN_HORIZONTAL, MARGIN_VERTICAL);
     public static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
     private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER, PANEL_BORDER + BUTTON_TOP_MARGIN,
-            -PANEL_BORDER, -PANEL_BORDER);
+        -PANEL_BORDER, -PANEL_BORDER);
 
     private class RecipeButtonPanel extends ButtonPanel {
         public RecipeButtonPanel() {
@@ -79,7 +79,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
 
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-                                    float partialTick, Rect rect, int index) {
+            float partialTick, Rect rect, int index) {
             var loc = getLoc(index);
             var recipe = getRecipe(loc);
             var z = getBlitOffset();
@@ -172,16 +172,16 @@ public abstract class AbstractRecipeBook<T> extends Panel {
     protected abstract Optional<List<Component>> buttonToolTip(T recipe);
 
     protected abstract void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick,
-                                         T recipe, Rect rect, int z);
+        T recipe, Rect rect, int z);
 
     protected void refreshRecipes() {
         recipes.clear();
         doRefreshRecipes();
         recipeList.clear();
         recipeList.addAll(recipes.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(this::compareRecipes))
-                .map(Map.Entry::getKey)
-                .toList());
+            .sorted(Map.Entry.comparingByValue(this::compareRecipes))
+            .map(Map.Entry::getKey)
+            .toList());
     }
 
     public void setBookActive(boolean value) {

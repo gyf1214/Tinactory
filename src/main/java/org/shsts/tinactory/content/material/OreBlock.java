@@ -1,9 +1,9 @@
 package org.shsts.tinactory.content.material;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault

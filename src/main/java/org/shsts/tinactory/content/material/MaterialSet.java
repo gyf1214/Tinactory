@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.material;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -14,8 +16,6 @@ import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -34,15 +34,15 @@ public class MaterialSet {
     public final int color;
 
     private record ItemEntry(ResourceLocation loc, TagKey<Item> tag,
-                             Supplier<? extends Item> item,
-                             @Nullable TagKey<Item> target, boolean isAlias) {
+        Supplier<? extends Item> item,
+        @Nullable TagKey<Item> target, boolean isAlias) {
         public ItemEntry(ResourceLocation loc, TagKey<Item> tag,
-                         Supplier<? extends Item> item) {
+            Supplier<? extends Item> item) {
             this(loc, tag, item, null, false);
         }
 
         public ItemEntry(ResourceLocation loc, TagKey<Item> tag,
-                         Supplier<? extends Item> item, TagKey<Item> target) {
+            Supplier<? extends Item> item, TagKey<Item> target) {
             this(loc, tag, item, target, false);
         }
 
@@ -260,8 +260,8 @@ public class MaterialSet {
 
         private void dummy(String sub) {
             put(sub, () -> REGISTRATE.item(newId(sub), Item::new)
-                    .tint(color)
-                    .register());
+                .tint(color)
+                .register());
         }
 
         private Builder<P> dummies(String... subs) {
@@ -281,7 +281,7 @@ public class MaterialSet {
 
         public Builder<P> metal() {
             return dust().dummies("ingot")
-                    .alias("primary", "ingot");
+                .alias("primary", "ingot");
         }
 
         public Builder<P> plate() {
@@ -334,8 +334,8 @@ public class MaterialSet {
 
         public Builder<P> polymer() {
             return dummies("sheet", "ring")
-                    .alias("primary", "sheet")
-                    .molten();
+                .alias("primary", "sheet")
+                .molten();
         }
 
         public Builder<P> gem() {
@@ -344,7 +344,7 @@ public class MaterialSet {
 
         public Builder<P> fluid(String sub, int baseAmount) {
             fluid = REGISTRATE.simpleFluid("material/" + sub + "/" + name,
-                    gregtech("blocks/material_sets/dull/liquid"), color);
+                gregtech("blocks/material_sets/dull/liquid"), color);
             fluidBaseAmount = baseAmount;
             return this;
         }
@@ -357,16 +357,16 @@ public class MaterialSet {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
-                        .material(variant.baseBlock.defaultBlockState().getMaterial())
-                        .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
-                        .translucent()
-                        .tint(color)
-                        .noBlockItem()
-                        .register();
+                    .material(variant.baseBlock.defaultBlockState().getMaterial())
+                    .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
+                    .translucent()
+                    .tint(color)
+                    .noBlockItem()
+                    .register();
                 blocks.put("ore", new BlockEntry(ore.loc, ore));
             }
             return dummies("raw", "crushed", "crushed_centrifuged", "crushed_purified")
-                    .dummies("dust_impure", "dust_pure").dust();
+                .dummies("dust_impure", "dust_pure").dust();
         }
 
         public class ToolBuilder extends SimpleBuilder<Unit, Builder<P>, ToolBuilder> {
@@ -383,8 +383,8 @@ public class MaterialSet {
             private ToolBuilder item(String category, Function<Item.Properties, ToolItem> factory) {
                 var sub = "tool/" + category;
                 put(sub, () -> REGISTRATE.item(newId(sub), factory)
-                        .tint(0xFFFFFFFF, color)
-                        .register());
+                    .tint(0xFFFFFFFF, color)
+                    .register());
                 return this;
             }
 
@@ -407,9 +407,9 @@ public class MaterialSet {
 
             public ToolBuilder basic() {
                 return hammer().mortar().toolItem("file")
-                        .toolItem("saw").toolItem("screwdriver")
-                        .usableItem("wrench", MINEABLE_WITH_WRENCH)
-                        .usableItem("wire_cutter", MINEABLE_WITH_CUTTER);
+                    .toolItem("saw").toolItem("screwdriver")
+                    .usableItem("wrench", MINEABLE_WITH_WRENCH)
+                    .usableItem("wire_cutter", MINEABLE_WITH_CUTTER);
             }
 
             @Override

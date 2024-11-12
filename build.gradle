@@ -13,6 +13,7 @@ buildscript {
 plugins {
     id 'eclipse'
     id 'maven-publish'
+    id 'checkstyle'
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
@@ -128,6 +129,10 @@ dependencies {
 sourceSets.main.resources {
     srcDir 'src/generated/resources'
     exclude '.cache/'
+}
+
+checkstyle {
+    toolVersion = "10.20.1"
 }
 
 tasks.withType(JavaCompile).configureEach {

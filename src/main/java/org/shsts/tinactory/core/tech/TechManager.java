@@ -3,6 +3,8 @@ package org.shsts.tinactory.core.tech;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,8 +27,6 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -114,20 +114,20 @@ public class TechManager implements ITechManager {
 
             @Override
             public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager manager,
-                                                  ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
-                                                  Executor backgroundExecutor, Executor gameExecutor) {
+                ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
+                Executor backgroundExecutor, Executor gameExecutor) {
 
                 LOGGER.debug("tech manager reload resources");
                 return stage.wait(Unit.INSTANCE)
-                        .thenApplyAsync($ -> listResources(manager).stream()
-                                .flatMap(loc -> loadResource(manager, loc).stream())
-                                .toList(), backgroundExecutor)
-                        .thenAcceptAsync(techs -> {
-                            technologies.clear();
-                            techs.forEach(tech -> technologies.put(tech.getLoc(), tech));
-                            LOGGER.debug("reload {} techs", technologies.size());
-                            techs.forEach(tech -> tech.resolve(Server.this));
-                        }, backgroundExecutor);
+                    .thenApplyAsync($ -> listResources(manager).stream()
+                        .flatMap(loc -> loadResource(manager, loc).stream())
+                        .toList(), backgroundExecutor)
+                    .thenAcceptAsync(techs -> {
+                        technologies.clear();
+                        techs.forEach(tech -> technologies.put(tech.getLoc(), tech));
+                        LOGGER.debug("reload {} techs", technologies.size());
+                        techs.forEach(tech -> tech.resolve(Server.this));
+                    }, backgroundExecutor);
             }
         }
 
@@ -247,9 +247,9 @@ public class TechManager implements ITechManager {
                 var oldProgress = team.technologies.getOrDefault(progress.getKey(), 0L);
                 team.technologies.put(progress.getKey(), progress.getValue());
                 techByKey(progress.getKey())
-                        .filter(tech -> oldProgress < tech.maxProgress &&
-                                progress.getValue() >= tech.maxProgress)
-                        .ifPresent(team::onTechComplete);
+                    .filter(tech -> oldProgress < tech.maxProgress &&
+                        progress.getValue() >= tech.maxProgress)
+                    .ifPresent(team::onTechComplete);
             }
 
             LOGGER.debug("update {} techs for team {}", p.getProgress().size(), team.getName());

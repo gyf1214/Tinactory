@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -16,8 +17,6 @@ import org.shsts.tinactory.content.worldgen.VoidPreset;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -29,7 +28,7 @@ public final class AllWorldGens {
     private static final RegistryEntryHandler<Feature<?>> FEATURE_HANDLER;
     public static final RegistryEntry<PlayerStartFeature> PLAYER_START_FEATURE;
     public static final ResourceKey<ConfiguredFeature<?, ?>> RUBBER_TREE_GROWER =
-            ResourceKey.create(Registry.CONFIGURED_FEATURE_REGISTRY, modLoc("rubber_tree"));
+        ResourceKey.create(Registry.CONFIGURED_FEATURE_REGISTRY, modLoc("rubber_tree"));
 
     private static final RegistryEntryHandler<ForgeWorldPreset> WORLD_TYPE_HANDLER;
     public static final RegistryEntry<VoidPreset> VOID_PRESET;
@@ -42,11 +41,11 @@ public final class AllWorldGens {
         PLAYER_START_FEATURE = REGISTRATE.registryEntry("player_start", FEATURE_HANDLER, PlayerStartFeature::new);
 
         BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_FEATURE,
-                RUBBER_TREE_GROWER, new ConfiguredFeature<>(Feature.NO_OP, NoneFeatureConfiguration.INSTANCE));
+            RUBBER_TREE_GROWER, new ConfiguredFeature<>(Feature.NO_OP, NoneFeatureConfiguration.INSTANCE));
 
         // world types
         WORLD_TYPE_HANDLER = REGISTRATE.forgeHandler(
-                ForgeRegistries.Keys.WORLD_TYPES, ForgeWorldPreset.class, ForgeRegistries.WORLD_TYPES);
+            ForgeRegistries.Keys.WORLD_TYPES, ForgeWorldPreset.class, ForgeRegistries.WORLD_TYPES);
         VOID_PRESET = REGISTRATE.registryEntry("void", WORLD_TYPE_HANDLER, VoidPreset::new);
     }
 

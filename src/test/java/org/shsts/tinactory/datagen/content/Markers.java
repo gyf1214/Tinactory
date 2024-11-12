@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllMaterials;
@@ -7,7 +8,6 @@ import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 
 import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
@@ -34,21 +34,21 @@ public final class Markers {
         markerWash("dust_pure");
 
         MARKER.recipe(DATA_GEN, "centrifuge_dust_pure")
-                .baseType(CENTRIFUGE)
-                .inputItem(0, AllMaterials.tag("dust_pure"))
-                .build();
+            .baseType(CENTRIFUGE)
+            .inputItem(0, AllMaterials.tag("dust_pure"))
+            .build();
 
         MARKER.recipe(DATA_GEN, "thermal_centrifuge_crushed_purified")
-                .baseType(THERMAL_CENTRIFUGE)
-                .inputItem(0, AllMaterials.tag("crushed_purified"))
-                .build();
+            .baseType(THERMAL_CENTRIFUGE)
+            .inputItem(0, AllMaterials.tag("crushed_purified"))
+            .build();
 
         for (var variant : OreVariant.values()) {
             MARKER.recipe(DATA_GEN, "analyze_" + variant.getName())
-                    .baseType(ORE_ANALYZER)
-                    .inputItem(0, variant.baseItem)
-                    .voltage(variant.voltage)
-                    .build();
+                .baseType(ORE_ANALYZER)
+                .inputItem(0, variant.baseItem)
+                .voltage(variant.voltage)
+                .build();
         }
 
         trackJEICategory();
@@ -56,17 +56,17 @@ public final class Markers {
 
     private static void markerCrush(String sub) {
         MARKER.recipe(DATA_GEN, "crush_" + sub)
-                .baseType(MACERATOR)
-                .inputItem(0, AllMaterials.tag(sub))
-                .build();
+            .baseType(MACERATOR)
+            .inputItem(0, AllMaterials.tag(sub))
+            .build();
     }
 
     private static void markerWash(String sub) {
         MARKER.recipe(DATA_GEN, "wash_" + sub)
-                .baseType(ORE_WASHER)
-                .inputItem(0, AllMaterials.tag(sub))
-                .inputFluid(1, Fluids.WATER)
-                .build();
+            .baseType(ORE_WASHER)
+            .inputItem(0, AllMaterials.tag(sub))
+            .inputFluid(1, Fluids.WATER)
+            .build();
     }
 
     private static void trackJEICategory() {

@@ -1,5 +1,7 @@
 package org.shsts.tinactory.core.common;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -8,8 +10,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.shsts.tinactory.core.gui.SmartMenuType;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -27,9 +27,9 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
 
     @SuppressWarnings("ConstantConditions")
     public SmartBlockEntityType(BlockEntitySupplier<? extends T> factory, Set<Block> validBlocks,
-                                Class<T> entityClass, boolean ticking, boolean eventManager,
-                                Map<ResourceLocation, Function<? super T, ? extends ICapabilityProvider>> capabilities,
-                                @Nullable Supplier<SmartMenuType<T, ?>> menu) {
+        Class<T> entityClass, boolean ticking, boolean eventManager,
+        Map<ResourceLocation, Function<? super T, ? extends ICapabilityProvider>> capabilities,
+        @Nullable Supplier<SmartMenuType<T, ?>> menu) {
         super(factory, validBlocks, null);
         this.entityClass = entityClass;
         this.ticking = ticking;
@@ -43,7 +43,7 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
     }
 
     private static void attachCapability(AttachCapabilitiesEvent<BlockEntity> e, UpdateHelper helper,
-                                         ResourceLocation loc, ICapabilityProvider provider) {
+        ResourceLocation loc, ICapabilityProvider provider) {
         e.addCapability(loc, provider);
         helper.attachCapability(loc, provider);
     }

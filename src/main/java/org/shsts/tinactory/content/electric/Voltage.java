@@ -1,8 +1,8 @@
 package org.shsts.tinactory.content.electric;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,8 +29,8 @@ public enum Voltage {
 
     public static List<Voltage> between(Voltage from, Voltage to) {
         return Arrays.stream(Voltage.values())
-                .filter(x -> x.rank >= from.rank && x.rank <= to.rank)
-                .toList();
+            .filter(x -> x.rank >= from.rank && x.rank <= to.rank)
+            .toList();
     }
 
     public static Voltage fromValue(long value) {

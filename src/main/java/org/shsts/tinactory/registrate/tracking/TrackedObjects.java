@@ -1,8 +1,8 @@
 package org.shsts.tinactory.registrate.tracking;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ public class TrackedObjects {
 
     public TrackedObjects() {
         this.objects = TrackedType.ALL_TYPES.stream()
-                .collect(Collectors.toMap($ -> $, $ -> new HashMap<>()));
+            .collect(Collectors.toMap($ -> $, $ -> new HashMap<>()));
     }
 
     @SuppressWarnings("unchecked")

@@ -1,6 +1,9 @@
 package org.shsts.tinactory.core.machine;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -38,9 +41,6 @@ import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.slf4j.Logger;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -50,7 +50,7 @@ import java.util.stream.Stream;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityProvider implements
-        IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
+    IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final long PROGRESS_PER_TICK = 256;
 
@@ -159,10 +159,10 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     private void updateTargetRecipe() {
         var recipe = AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
-                .flatMap(MultiBlock::getInterface)
-                .map($ -> (Machine) $)
-                .or(() -> AllCapabilities.MACHINE.tryGet(blockEntity))
-                .flatMap($ -> $.config.getLoc("targetRecipe"));
+            .flatMap(MultiBlock::getInterface)
+            .map($ -> (Machine) $)
+            .or(() -> AllCapabilities.MACHINE.tryGet(blockEntity))
+            .flatMap($ -> $.config.getLoc("targetRecipe"));
 
         recipe.ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
     }
@@ -214,17 +214,17 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     protected Optional<IContainer> getContainer() {
         return AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
-                .flatMap(MultiBlock::getContainer)
-                .or(() -> AllCapabilities.CONTAINER.tryGet(blockEntity));
+            .flatMap(MultiBlock::getContainer)
+            .or(() -> AllCapabilities.CONTAINER.tryGet(blockEntity));
     }
 
     @SuppressWarnings("unchecked")
     public void onServerLoad(Level world) {
         var recipeManager = world.getRecipeManager();
         currentRecipe = (T) Optional.ofNullable(currentRecipeLoc)
-                .flatMap(recipeManager::byKey)
-                .filter(r -> r.getType() == recipeType)
-                .orElse(null);
+            .flatMap(recipeManager::byKey)
+            .filter(r -> r.getType() == recipeType)
+            .orElse(null);
         currentRecipeLoc = null;
         if (currentRecipe != null) {
             onWorkContinue(currentRecipe);
@@ -289,40 +289,38 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     public static Voltage getBlockVoltage(BlockEntity be) {
         return be.getBlockState().getBlock() instanceof MachineBlock<?> machineBlock ?
-                machineBlock.voltage : Voltage.PRIMITIVE;
+            machineBlock.voltage : Voltage.PRIMITIVE;
     }
 
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    machine(RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> machine(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         return CapabilityProviderBuilder.fromFactory(ID,
-                be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be)));
+            be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be)));
     }
 
     public static <P> CapabilityProviderBuilder<BlockEntity, P> oreProcessor(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, ID,
-                be -> new OreAnalyzerProcessor(be, getBlockVoltage(be)));
+            be -> new OreAnalyzerProcessor(be, getBlockVoltage(be)));
     }
 
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    generator(RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> generator(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         return CapabilityProviderBuilder.fromFactory(ID,
-                be -> new GeneratorProcessor(be, type.get(), getBlockVoltage(be)));
+            be -> new GeneratorProcessor(be, type.get(), getBlockVoltage(be)));
     }
 
-    public static <P> CapabilityProviderBuilder<BlockEntity, P>
-    electricFurnace(P parent) {
+    public static <P> CapabilityProviderBuilder<BlockEntity, P> electricFurnace(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, ID,
-                be -> new ElectricFurnace(be, getBlockVoltage(be)));
+            be -> new ElectricFurnace(be, getBlockVoltage(be)));
     }
 
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    multiBlock(RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> multiBlock(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         return CapabilityProviderBuilder.fromFactory(ID,
-                be -> new MultiBlockProcessor<>(be, type.get()));
+            be -> new MultiBlockProcessor<>(be, type.get()));
     }
 
-    public static <P> CapabilityProviderBuilder<BlockEntity, P>
-    blastFurnace(P parent) {
+    public static <P> CapabilityProviderBuilder<BlockEntity, P> blastFurnace(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, ID, BlastFurnaceProcessor::new);
     }
 }

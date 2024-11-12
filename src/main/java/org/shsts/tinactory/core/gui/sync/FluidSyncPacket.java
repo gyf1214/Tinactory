@@ -1,10 +1,10 @@
 package org.shsts.tinactory.core.gui.sync;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fluids.FluidStack;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 
 @ParametersAreNonnullByDefault
@@ -33,9 +33,15 @@ public class FluidSyncPacket extends MenuSyncPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FluidSyncPacket that)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof FluidSyncPacket that)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         return fluidStack.isFluidStackIdentical(that.fluidStack);
     }
 

@@ -1,12 +1,12 @@
 package org.shsts.tinactory.core.gui.sync;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -52,11 +52,17 @@ public class ChestItemSyncPacket extends MenuSyncPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChestItemSyncPacket that)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ChestItemSyncPacket that)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         return ItemHelper.itemStackEqual(stack, that.stack) &&
-                filterEqual(that);
+            filterEqual(that);
     }
 
     @Override

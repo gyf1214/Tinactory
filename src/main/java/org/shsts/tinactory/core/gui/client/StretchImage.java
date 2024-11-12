@@ -1,14 +1,13 @@
 package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -31,12 +30,12 @@ public class StretchImage extends MenuWidget {
     }
 
     public static void render(PoseStack poseStack, Texture texture, int zIndex,
-                              Rect rect, Rect texRect, int border) {
+        Rect rect, Rect texRect, int border) {
         render(poseStack, texture, zIndex, RenderUtil.WHITE, rect, texRect, border);
     }
 
     public static void render(PoseStack poseStack, Texture texture, int zIndex,
-                              int color, Rect rect, Rect texRect, int border) {
+        int color, Rect rect, Rect texRect, int border) {
         var w = rect.width() - border;
         var h = rect.height() - border;
         var tw = texRect.width() - border;

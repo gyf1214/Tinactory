@@ -1,14 +1,13 @@
 package org.shsts.tinactory.core.common;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class UpdatableCapabilityProvider extends CapabilityProvider
-        implements INBTUpdatable<CompoundTag> {
+    implements INBTUpdatable<CompoundTag> {
     private boolean isUpdateForced = true;
 
     protected void sendUpdate(SmartBlockEntity be) {

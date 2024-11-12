@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.util;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
@@ -15,7 +16,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.fluids.FluidStack;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public final class ClientUtil {
 
     public static List<Component> itemTooltip(ItemStack stack) {
         return stack.getTooltipLines(getPlayer(), Minecraft.getInstance().options.advancedItemTooltips ?
-                TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+            TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
     }
 
     public static List<Component> itemTooltip(ItemStack stack, TooltipFlag tooltipFlag) {

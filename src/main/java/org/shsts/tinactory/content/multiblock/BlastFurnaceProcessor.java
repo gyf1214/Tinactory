@@ -1,12 +1,11 @@
 package org.shsts.tinactory.content.multiblock;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -34,7 +33,7 @@ public class BlastFurnaceProcessor extends MultiBlockProcessor<BlastFurnaceRecip
         super.calculateFactors(recipe);
         var temp = getTemperature();
         var factor = Math.max(1d, (temp - recipe.temperature) /
-                TinactoryConfig.INSTANCE.blastFurnaceTempFactor.get());
+            TinactoryConfig.INSTANCE.blastFurnaceTempFactor.get());
         energyFactor /= factor;
     }
 }

@@ -1,13 +1,13 @@
 package org.shsts.tinactory.core.tech;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.common.IPacket;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ public class TechUpdatePacket implements IPacket {
     public TechUpdatePacket() {}
 
     private TechUpdatePacket(Map<ResourceLocation, Long> progress, boolean updateTarget,
-                             @Nullable ITechnology targetTech) {
+        @Nullable ITechnology targetTech) {
         this.progress = progress;
         this.updateTarget = updateTarget;
         this.targetTech = targetTech == null ? null : targetTech.getLoc();
@@ -41,7 +41,7 @@ public class TechUpdatePacket implements IPacket {
     }
 
     public static TechUpdatePacket full(Map<ResourceLocation, Long> progress,
-                                        @Nullable ITechnology targetTech) {
+        @Nullable ITechnology targetTech) {
         return new TechUpdatePacket(progress, true, targetTech);
     }
 

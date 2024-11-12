@@ -1,5 +1,7 @@
 package org.shsts.tinactory.registrate.builder;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
@@ -15,14 +17,12 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
-        extends RegistryEntryBuilder<Block, U, P, S> {
+    extends RegistryEntryBuilder<Block, U, P, S> {
     @Nullable
     protected Function<BlockBehaviour.Properties, U> factory = null;
     protected Material material = Material.STONE;
@@ -35,7 +35,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
     protected DistLazy<BlockColor> tint = null;
 
     public BlockBuilder(Registrate registrate, String id, P parent,
-                        Function<BlockBehaviour.Properties, U> factory) {
+        Function<BlockBehaviour.Properties, U> factory) {
         super(registrate, registrate.blockHandler, id, parent);
         this.factory = factory;
         onCreateObject.add(registrate::trackBlock);
@@ -58,7 +58,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
 
     public S renderType(DistLazy<RenderType> renderType) {
         onCreateObject.add(block -> renderType.runOnDist(Dist.CLIENT, () -> type ->
-                registrate.renderTypeHandler.setRenderType(block, type)));
+            registrate.renderTypeHandler.setRenderType(block, type)));
         return self();
     }
 
@@ -111,8 +111,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         }
     }
 
-    public <U1 extends BlockItem> BlockItemBuilder<U1>
-    blockItem(BlockItemBuilder.Factory<U1> factory) {
+    public <U1 extends BlockItem> BlockItemBuilder<U1> blockItem(BlockItemBuilder.Factory<U1> factory) {
         assert blockItemBuilder == null;
         var builder = new BlockItemBuilder<>(factory);
         blockItemBuilder = builder;
@@ -133,7 +132,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         var tint = this.tint;
         if (tint != null) {
             onCreateObject.add(block -> tint.runOnDist(Dist.CLIENT, () -> blockColor ->
-                    registrate.tintHandler.addBlockColor(block, blockColor)));
+                registrate.tintHandler.addBlockColor(block, blockColor)));
         }
         if (blockItemBuilder == null && !noBlockItem) {
             blockItem().build();

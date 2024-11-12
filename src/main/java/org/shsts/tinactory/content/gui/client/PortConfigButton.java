@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -16,7 +17,6 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.util.I18n;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class PortConfigButton extends Button {
     protected final PortDirection direction;
 
     public PortConfigButton(Menu<?, ?> menu, MachineConfig machineConfig,
-                            String key, PortDirection direction) {
+        String key, PortDirection direction) {
         super(menu);
         this.machineConfig = machineConfig;
         this.key = key;
@@ -62,8 +62,8 @@ public class PortConfigButton extends Button {
             RenderUtil.blit(poseStack, Texture.SWITCH_BUTTON, z, rect);
 
             var uv = direction == PortDirection.INPUT ?
-                    Rect.corners(rect.width(), rect.height(), 0, 0) :
-                    new Rect(0, 0, rect.width(), rect.height());
+                Rect.corners(rect.width(), rect.height(), 0, 0) :
+                new Rect(0, 0, rect.width(), rect.height());
             var color = config == MachineConfig.PortConfig.PASSIVE ? 0xFF5555FF : 0xFFFFAA00;
             RenderUtil.blit(poseStack, Texture.IMPORT_EXPORT_BUTTON, z, color, rect, uv);
         }

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.gui;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,15 +14,13 @@ import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.network.NetworkController;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class NetworkControllerMenu extends Menu<NetworkController, NetworkControllerMenu> {
     private final int syncSlot;
 
     public NetworkControllerMenu(SmartMenuType<NetworkController, ?> type, int id,
-                                 Inventory inventory, NetworkController blockEntity) {
+        Inventory inventory, NetworkController blockEntity) {
         super(type, id, inventory, blockEntity);
         this.syncSlot = addSyncSlot(NetworkControllerSyncPacket::new);
     }

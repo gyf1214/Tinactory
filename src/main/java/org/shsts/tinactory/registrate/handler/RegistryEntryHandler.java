@@ -1,6 +1,7 @@
 package org.shsts.tinactory.registrate.handler;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -74,16 +74,15 @@ public abstract class RegistryEntryHandler<T extends IForgeRegistryEntry<T>> {
         public Class<T1> getEntryClass() {
             return entryClass;
         }
-
     }
 
-    public static <T1 extends IForgeRegistryEntry<T1>> RegistryEntryHandler<T1>
-    forge(IForgeRegistry<T1> forgeRegistry) {
+    public static <T1 extends IForgeRegistryEntry<T1>> RegistryEntryHandler<T1> forge(
+        IForgeRegistry<T1> forgeRegistry) {
         return new Forge<>(forgeRegistry);
     }
 
-    public static <T1 extends IForgeRegistryEntry<T1>> RegistryEntryHandler<T1>
-    forge(Class<T1> entryClass, Supplier<IForgeRegistry<T1>> forgeRegistry) {
+    public static <T1 extends IForgeRegistryEntry<T1>> RegistryEntryHandler<T1> forge(
+        Class<T1> entryClass, Supplier<IForgeRegistry<T1>> forgeRegistry) {
         return new Forge<>(entryClass, forgeRegistry);
     }
 }

@@ -1,10 +1,10 @@
 package org.shsts.tinactory.core.network;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault

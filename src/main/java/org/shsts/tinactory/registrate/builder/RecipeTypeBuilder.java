@@ -1,6 +1,8 @@
 package org.shsts.tinactory.registrate.builder;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -14,13 +16,10 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>, P>
-        extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, P>> {
+    extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final SmartRecipeSerializer.Factory<T, B> serializerFactory;
@@ -31,7 +30,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends BuilderBase<?
     private Transformer<B> defaults = $ -> $;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
-                             SmartRecipeSerializer.Factory<T, B> serializerFactory) {
+        SmartRecipeSerializer.Factory<T, B> serializerFactory) {
         super(registrate, id, parent);
         this.serializerFactory = serializerFactory;
     }

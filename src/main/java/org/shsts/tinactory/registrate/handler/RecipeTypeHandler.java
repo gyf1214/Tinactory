@@ -1,5 +1,6 @@
 package org.shsts.tinactory.registrate.handler;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,13 +27,13 @@ public class RecipeTypeHandler {
         this.recipeTypeRegister = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, registrate.modid);
     }
 
-    public <T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
-    RecipeTypeEntry<T, B> register(RecipeTypeBuilder<T, B, ?> builder) {
+    public <T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>> RecipeTypeEntry<T, B> register(
+        RecipeTypeBuilder<T, B, ?> builder) {
         builders.add(builder);
         var recipeType = recipeTypeRegister.register(builder.id, builder::buildObject);
         return new RecipeTypeEntry<>(registrate, builder.id, recipeType,
-                builder.getBuilderFactory(), builder.getPrefix(), builder.getClazz(),
-                builder.getDefaults());
+            builder.getBuilderFactory(), builder.getPrefix(), builder.getClazz(),
+            builder.getDefaults());
     }
 
     public void onRegisterSerializer(RegistryEvent.Register<RecipeSerializer<?>> event) {

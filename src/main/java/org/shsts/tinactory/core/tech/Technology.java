@@ -2,6 +2,8 @@ package org.shsts.tinactory.core.tech;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -10,8 +12,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +30,7 @@ public class Technology implements ITechnology {
     public final Item displayItem;
 
     public Technology(List<ResourceLocation> dependIds, long maxProgress, Map<String, Integer> modifiers,
-                      Item displayItem) {
+        Item displayItem) {
         this.dependIds = dependIds;
         this.modifiers = modifiers;
         this.maxProgress = maxProgress;
@@ -50,8 +50,8 @@ public class Technology implements ITechnology {
     public void resolve(ITechManager manager) {
         depends.clear();
         dependIds.stream()
-                .flatMap(loc -> manager.techByKey(loc).stream())
-                .forEach(depends::add);
+            .flatMap(loc -> manager.techByKey(loc).stream())
+            .forEach(depends::add);
     }
 
     @Override
@@ -76,8 +76,12 @@ public class Technology implements ITechnology {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Technology that = (Technology) o;
         return Objects.equals(loc, that.loc);
     }
@@ -93,10 +97,10 @@ public class Technology implements ITechnology {
     }
 
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResourceLocation.CODEC.listOf().optionalFieldOf("depends", Collections.emptyList())
-                    .forGetter(tech -> tech.dependIds),
-            Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
-            Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("modifiers").forGetter(tech -> tech.modifiers),
-            ForgeRegistries.ITEMS.getCodec().fieldOf("display_item").forGetter(tech -> tech.displayItem)
+        ResourceLocation.CODEC.listOf().optionalFieldOf("depends", Collections.emptyList())
+            .forGetter(tech -> tech.dependIds),
+        Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
+        Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("modifiers").forGetter(tech -> tech.modifiers),
+        ForgeRegistries.ITEMS.getCodec().fieldOf("display_item").forGetter(tech -> tech.displayItem)
     ).apply(instance, Technology::new));
 }

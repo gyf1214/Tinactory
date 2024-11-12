@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -27,7 +28,6 @@ import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.util.RandomList;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -39,8 +39,8 @@ public class LogisticsComponent extends NetworkComponent {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private record Request(PortDirection dir, IPort port,
-                           ILogisticsTypeWrapper type,
-                           ILogisticsContentWrapper content) {}
+        ILogisticsTypeWrapper type,
+        ILogisticsContentWrapper content) {}
 
     private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
     private final RandomList<Request> activeRequestList = new RandomList<>();
@@ -108,7 +108,7 @@ public class LogisticsComponent extends NetworkComponent {
      * Return remaining items.
      */
     private ILogisticsContentWrapper transmitItem(IPort from, IPort to,
-                                                  ILogisticsContentWrapper content, boolean simulate) {
+        ILogisticsContentWrapper content, boolean simulate) {
         var extracted = content.extractFrom(from, simulate);
         var notExtracted = content.getCount() - extracted.getCount();
         if (ILogisticsContentWrapper.canStack(extracted, content)) {
@@ -127,7 +127,7 @@ public class LogisticsComponent extends NetworkComponent {
      * Return remaining items.
      */
     private ILogisticsContentWrapper transmitItem(IPort from, IPort to,
-                                                  ILogisticsContentWrapper content, int limit) {
+        ILogisticsContentWrapper content, int limit) {
 
         var contentCopy = content.copyWithAmount(limit);
         var remaining = transmitItem(from, to, contentCopy, true);
@@ -149,7 +149,7 @@ public class LogisticsComponent extends NetworkComponent {
     }
 
     private ILogisticsContentWrapper transmitItem(Request req, IPort otherPort,
-                                                  ILogisticsContentWrapper item, int limit) {
+        ILogisticsContentWrapper item, int limit) {
         return switch (req.dir) {
             case NONE -> throw new IllegalArgumentException();
             case INPUT -> transmitItem(otherPort, req.port, item, limit);

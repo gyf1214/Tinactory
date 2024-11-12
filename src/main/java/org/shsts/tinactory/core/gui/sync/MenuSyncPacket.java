@@ -1,12 +1,12 @@
 package org.shsts.tinactory.core.gui.sync;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.common.IPacket;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -37,8 +37,12 @@ public abstract class MenuSyncPacket implements IPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MenuSyncPacket that = (MenuSyncPacket) o;
         return containerId == that.containerId && index == that.index;
     }
@@ -80,9 +84,15 @@ public abstract class MenuSyncPacket implements IPacket {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Boolean that)) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Boolean that)) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             return value == that.value;
         }
 
@@ -120,9 +130,15 @@ public abstract class MenuSyncPacket implements IPacket {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Double that)) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Double that)) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             return java.lang.Double.compare(that.data, data) == 0;
         }
 
@@ -160,9 +176,15 @@ public abstract class MenuSyncPacket implements IPacket {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Long that)) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Long that)) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             return data == that.data;
         }
 
@@ -176,7 +198,7 @@ public abstract class MenuSyncPacket implements IPacket {
         }
     }
 
-    public static abstract class Holder<T> extends MenuSyncPacket {
+    public abstract static class Holder<T> extends MenuSyncPacket {
         @Nullable
         private T data;
 
@@ -209,9 +231,15 @@ public abstract class MenuSyncPacket implements IPacket {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Holder<?> other)) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Holder<?> other)) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             return Objects.equals(data, other.data);
         }
 

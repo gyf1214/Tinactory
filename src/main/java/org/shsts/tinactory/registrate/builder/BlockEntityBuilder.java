@@ -1,5 +1,7 @@
 package org.shsts.tinactory.registrate.builder;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -8,17 +10,15 @@ import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.ValueHolder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class BlockEntityBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>, P>
-        extends SimpleBuilder<RegistryEntry<U>, P, BlockEntityBuilder<T, U, P>> {
+    extends SimpleBuilder<RegistryEntry<U>, P, BlockEntityBuilder<T, U, P>> {
     private final ValueHolder<Supplier<U>> blockHolder = ValueHolder.create();
     private final ValueHolder<Supplier<SmartBlockEntityType<T>>> typeHolder =
-            ValueHolder.create();
+        ValueHolder.create();
 
     @Nullable
     private BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U, P>> typeBuilder = null;
@@ -37,7 +37,7 @@ public abstract class BlockEntityBuilder<T extends SmartBlockEntity, U extends S
         if (typeBuilder == null) {
             var blockHolder = this.blockHolder;
             typeBuilder = this.createBlockEntityBuilder()
-                    .validBlock(() -> blockHolder.get().get());
+                .validBlock(() -> blockHolder.get().get());
         }
         return typeBuilder;
     }

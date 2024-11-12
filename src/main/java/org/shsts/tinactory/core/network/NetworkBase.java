@@ -1,6 +1,8 @@
 package org.shsts.tinactory.core.network;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,8 +13,6 @@ import org.shsts.tinactory.core.common.WeakMap;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +73,7 @@ public class NetworkBase {
             var info = visited.get(pos);
             assert info != null;
             var subnet = IConnector.isSubnetInWorld(world, pos, info.state) ?
-                    pos : info.subnet;
+                pos : info.subnet;
             for (var dir : Direction.values()) {
                 var pos1 = pos.relative(dir);
 
@@ -180,7 +180,7 @@ public class NetworkBase {
 
     protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
         LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
-                world.dimension(), pos, subnet);
+            world.dimension(), pos, subnet);
     }
 
     private boolean connectNextBlock() {

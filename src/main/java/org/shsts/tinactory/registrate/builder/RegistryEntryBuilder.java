@@ -1,6 +1,7 @@
 package org.shsts.tinactory.registrate.builder;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -9,13 +10,11 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U extends T, P,
-        S extends RegistryEntryBuilder<T, U, P, S>>
-        extends EntryBuilder<U, RegistryEntry<U>, P, S> {
+    S extends RegistryEntryBuilder<T, U, P, S>>
+    extends EntryBuilder<U, RegistryEntry<U>, P, S> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final RegistryEntryHandler<T> handler;
@@ -45,7 +44,7 @@ public abstract class RegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U e
 
     @FunctionalInterface
     public interface BuilderFactory<T1 extends IForgeRegistryEntry<T1>, P1,
-            B extends RegistryEntryBuilder<T1, ?, P1, B>> {
+        B extends RegistryEntryBuilder<T1, ?, P1, B>> {
         B create(Registrate registrate, RegistryEntryHandler<T1> handler, String id, P1 parent);
     }
 }

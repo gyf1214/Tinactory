@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.multiblock;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -7,8 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.OptionalInt;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;

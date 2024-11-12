@@ -1,5 +1,7 @@
 package org.shsts.tinactory.core.gui;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.logistics.SlotType;
@@ -7,8 +9,6 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,8 +81,8 @@ public class Layout {
 
     public record SlotWith<X>(SlotInfo slot, X val) {}
 
-    private <S, T> List<SlotWith<T>>
-    getSlotWithInfo(List<S> source, ToIntFunction<S> getPort, Function<S, T> getResult) {
+    private <S, T> List<SlotWith<T>> getSlotWithInfo(List<S> source,
+        ToIntFunction<S> getPort, Function<S, T> getResult) {
         var currentSlotIndex = new HashMap<Integer, Integer>();
         var ret = new ArrayList<SlotWith<T>>();
 

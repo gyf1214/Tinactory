@@ -1,5 +1,7 @@
 package org.shsts.tinactory.datagen.content.model;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -9,8 +11,6 @@ import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -54,28 +54,28 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         return Optional.empty();
     }
 
-    public <U extends Item, P extends ItemModelProvider>
-    Consumer<RegistryDataContext<Item, U, P>> itemModel(String sub) {
+    public <U extends Item, P extends ItemModelProvider> Consumer<RegistryDataContext<Item, U, P>> itemModel(
+        String sub) {
         return ctx -> {
             var helper = ctx.provider.existingFileHelper;
 
             var sub1 = sub.equals("sheet") ? "plate" : sub;
             var baseSub = sub1.equals("magnetic") ? "stick" : sub1;
             var base = getTex(ITEM_LOC, helper, baseSub).orElseThrow(() -> new IllegalArgumentException(
-                    "No icon %s for icon set %s".formatted(baseSub, subfolder)));
+                "No icon %s for icon set %s".formatted(baseSub, subfolder)));
             var overlay = getTex(ITEM_LOC, helper, sub1 + "_overlay");
 
             var model = ctx.provider.withExistingParent(ctx.id, "item/generated")
-                    .texture("layer0", base);
+                .texture("layer0", base);
             overlay.ifPresent(loc -> model.texture("layer1", loc));
         };
     }
 
     public <T extends ModelBuilder<T>> T blockOverlay(ModelProvider<T> prov, String id, String sub) {
         var tex = getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() ->
-                new IllegalArgumentException("No block overlay %s for icon set %s"
-                        .formatted(sub, subfolder)));
+            new IllegalArgumentException("No block overlay %s for icon set %s"
+                .formatted(sub, subfolder)));
         return prov.withExistingParent(id + "_overlay", modLoc("block/cube_tint"))
-                .texture("all", tex);
+            .texture("all", tex);
     }
 }

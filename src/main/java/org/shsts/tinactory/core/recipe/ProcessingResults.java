@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.recipe;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +16,6 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.util.CodecHelper;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.function.Function;
 public final class ProcessingResults {
     public static final IProcessingResult EMPTY = new ItemResult(0d, ItemStack.EMPTY);
 
-    public static abstract class RatedResult<T extends IPort> implements IProcessingResult {
+    public abstract static class RatedResult<T extends IPort> implements IProcessingResult {
         public final double rate;
         private final PortType portType;
         private final Class<T> portClazz;
@@ -86,8 +86,8 @@ public final class ProcessingResults {
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
-                ItemStack.CODEC.fieldOf("item").forGetter($ -> $.stack)
+            Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
+            ItemStack.CODEC.fieldOf("item").forGetter($ -> $.stack)
         ).apply(instance, ItemResult::new));
     }
 
@@ -107,8 +107,8 @@ public final class ProcessingResults {
         }
 
         private static final Codec<FluidResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
-                FluidStack.CODEC.fieldOf("fluid").forGetter($ -> $.stack)
+            Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
+            FluidStack.CODEC.fieldOf("fluid").forGetter($ -> $.stack)
         ).apply(instance, FluidResult::new));
     }
 
@@ -121,7 +121,7 @@ public final class ProcessingResults {
     }
 
     public static final Codec<IProcessingResult> CODEC =
-            Codec.STRING.dispatch(IProcessingObject::codecName, CODECS::get);
+        Codec.STRING.dispatch(IProcessingObject::codecName, CODECS::get);
 
     public static IProcessingResult fromJson(JsonElement je) {
         return CodecHelper.parseJson(CODEC, je);
@@ -132,7 +132,7 @@ public final class ProcessingResults {
     }
 
     public static <V> Optional<V> mapItemsOrFluid(IProcessingObject obj, Function<List<ItemStack>, V> itemsMapper,
-                                                  Function<FluidStack, V> fluidMapper) {
+        Function<FluidStack, V> fluidMapper) {
 
         if (obj instanceof ProcessingIngredients.ItemIngredient item) {
             return Optional.of(itemsMapper.apply(List.of(item.stack())));
@@ -149,7 +149,7 @@ public final class ProcessingResults {
     }
 
     public static void consumeItemsOrFluid(IProcessingObject obj, Consumer<List<ItemStack>> itemsConsumer,
-                                           Consumer<FluidStack> fluidConsumer) {
+        Consumer<FluidStack> fluidConsumer) {
         mapItemsOrFluid(obj, items -> {
             itemsConsumer.accept(items);
             return Unit.INSTANCE;
@@ -160,7 +160,7 @@ public final class ProcessingResults {
     }
 
     public static <V> Optional<V> mapItemOrFluid(IProcessingObject obj, Function<ItemStack, V> itemsMapper,
-                                                 Function<FluidStack, V> fluidMapper) {
+        Function<FluidStack, V> fluidMapper) {
 
         if (obj instanceof ProcessingIngredients.ItemIngredient item) {
             return Optional.of(itemsMapper.apply(item.stack()));

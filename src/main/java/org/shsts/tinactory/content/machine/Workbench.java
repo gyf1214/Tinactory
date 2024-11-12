@@ -1,6 +1,9 @@
 package org.shsts.tinactory.content.machine;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -33,9 +36,6 @@ import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
@@ -100,7 +100,7 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         this.toolStorage = new ToolItemHandler(9);
 
         this.itemView = new WrapperItemHandler(
-                new CombinedInvWrapper(toolStorage, craftingView));
+            new CombinedInvWrapper(toolStorage, craftingView));
         this.itemView.onUpdate(this::onUpdate);
 
         this.itemHandlerCap = LazyOptional.of(() -> itemView);
@@ -112,8 +112,7 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     }
 
     @SuppressWarnings("unchecked")
-    private <C extends Container, R extends Recipe<C>, V>
-    V applyRecipeFunc(RecipeFunction<C, R, V> func) {
+    private <C extends Container, R extends Recipe<C>, V> V applyRecipeFunc(RecipeFunction<C, R, V> func) {
         if (currentRecipe instanceof CraftingRecipe) {
             return func.apply((R) currentRecipe, (C) craftingStack);
         } else if (currentRecipe instanceof ToolRecipe) {
@@ -133,9 +132,9 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         var recipeManager = world.getRecipeManager();
 
         currentRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL_CRAFTING.get(), this, world)
-                .map($ -> (Recipe) $)
-                .or(() -> recipeManager.getRecipeFor(RecipeType.CRAFTING, craftingStack, world))
-                .orElse(null);
+            .map($ -> (Recipe) $)
+            .or(() -> recipeManager.getRecipeFor(RecipeType.CRAFTING, craftingStack, world))
+            .orElse(null);
 
         if (currentRecipe != null) {
             output = applyRecipeFunc(Recipe::assemble);

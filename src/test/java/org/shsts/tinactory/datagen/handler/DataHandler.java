@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.handler;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -9,7 +10,6 @@ import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.datagen.DataGen;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -57,7 +57,7 @@ public abstract class DataHandler<P extends DataProvider> {
         var loc = path.contains(":") ? new ResourceLocation(path) : new ResourceLocation(modid, path);
         var newPath = loc.getPath();
         if (!newPath.startsWith(ModelProvider.BLOCK_FOLDER + "/") &&
-                !newPath.startsWith(ModelProvider.ITEM_FOLDER + "/")) {
+            !newPath.startsWith(ModelProvider.ITEM_FOLDER + "/")) {
             newPath = folder + "/" + newPath;
         }
         return (new ResourceLocation(loc.getNamespace(), newPath)).toString();

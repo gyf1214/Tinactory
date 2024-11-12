@@ -1,5 +1,6 @@
 package org.shsts.tinactory.registrate.builder;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.network.chat.Component;
@@ -15,7 +16,6 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.Registrate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -23,13 +23,12 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<? super T, M>, P>
-        extends RegistryEntryBuilder<MenuType<?>, SmartMenuType<T, M>, P, MenuBuilder<T, M, P>> {
+    extends RegistryEntryBuilder<MenuType<?>, SmartMenuType<T, M>, P, MenuBuilder<T, M, P>> {
     private final Menu.Factory<T, M> factory;
     private Function<T, Component> title = be -> I18n.name(be.getBlockState().getBlock());
     private boolean showInventory = true;
 
     private final List<IMenuPlugin.Factory<?>> plugins = new ArrayList<>();
-
 
     public MenuBuilder(Registrate registrate, String id, P parent, Menu.Factory<T, M> factory) {
         super(registrate, registrate.menuTypeHandler, id, parent);
@@ -83,7 +82,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<? super T, M
     protected SmartMenuType<T, M> createObject() {
         var menuType = new SmartMenuType<>(getFactory(), title);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                registrate.menuScreenHandler.setMenuScreen(menuType, getScreenFactory()));
+            registrate.menuScreenHandler.setMenuScreen(menuType, getScreenFactory()));
         return menuType;
     }
 }

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
@@ -45,7 +46,6 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -100,23 +100,19 @@ public final class DataGen implements IRecipeDataConsumer {
         this.languageHandler = handler(new LanguageHandler(this, langTrackedCtx));
     }
 
-    public <U extends Block> BlockDataBuilder<U, DataGen>
-    block(ResourceLocation loc, Supplier<U> block) {
+    public <U extends Block> BlockDataBuilder<U, DataGen> block(ResourceLocation loc, Supplier<U> block) {
         return new BlockDataBuilder<>(this, this, loc, block);
     }
 
-    public <U extends Block> BlockDataBuilder<U, DataGen>
-    block(RegistryEntry<U> entry) {
+    public <U extends Block> BlockDataBuilder<U, DataGen> block(RegistryEntry<U> entry) {
         return new BlockDataBuilder<>(this, this, entry.loc, entry);
     }
 
-    public <U extends Item> ItemDataBuilder<U, DataGen>
-    item(ResourceLocation loc, Supplier<U> item) {
+    public <U extends Item> ItemDataBuilder<U, DataGen> item(ResourceLocation loc, Supplier<U> item) {
         return new ItemDataBuilder<>(this, this, loc, item);
     }
 
-    public <U extends Item> ItemDataBuilder<U, DataGen>
-    item(RegistryEntry<U> item) {
+    public <U extends Item> ItemDataBuilder<U, DataGen> item(RegistryEntry<U> item) {
         return new ItemDataBuilder<>(this, this, item.loc, item);
     }
 

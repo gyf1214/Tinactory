@@ -2,6 +2,7 @@ package org.shsts.tinactory.core.common;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -10,12 +11,10 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class SmartRecipeSerializer<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
-        extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
+    extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
 
     protected final Gson gson = new Gson();
 

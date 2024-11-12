@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.model;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +15,6 @@ import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,8 +34,8 @@ import static org.shsts.tinactory.datagen.content.Models.yRotation;
 @MethodsReturnNonnullByDefault
 public final class CableModel {
     private static final Set<Direction> OPEN_FACES = Arrays.stream(Direction.values())
-            .filter(dir -> dir != FRONT_FACING.getOpposite())
-            .collect(Collectors.toUnmodifiableSet());
+        .filter(dir -> dir != FRONT_FACING.getOpposite())
+        .collect(Collectors.toUnmodifiableSet());
 
     private static final String OPEN_MODEL = "block/network/cable/open";
     private static final String OPEN_WIRE_MODEL = "block/network/cable/open_wire";
@@ -51,13 +51,12 @@ public final class CableModel {
     private static final ResourceLocation PIPE_SIDE_TEX = gregtech("blocks/pipe/pipe_side");
     private static final ResourceLocation PIPE_IN_TEX = gregtech("blocks/pipe/pipe_normal_in");
 
-
     private static BlockModelBuilder genOpenEnd(BlockModelProvider prov, String id, int radius, boolean insulation) {
         var model = prov.withExistingParent(id, prov.mcLoc("block/block"))
-                .texture("particle", "#base");
+            .texture("particle", "#base");
         var element = model.element()
-                .from(8 - radius, 8 - radius, 0)
-                .to(8 + radius, 8 + radius, 8 - radius);
+            .from(8 - radius, 8 - radius, 0)
+            .to(8 + radius, 8 + radius, 8 - radius);
         for (var dir : OPEN_FACES) {
             var face = element.face(dir);
             if (dir == FRONT_FACING) {
@@ -68,78 +67,78 @@ public final class CableModel {
         }
         if (insulation) {
             return model.element()
-                    .from(8 - radius, 8 - radius, 0)
-                    .to(8 + radius, 8 + radius, 8 - radius)
-                    .face(FRONT_FACING)
-                    .cullface(FRONT_FACING).texture("#insulation").tintindex(0)
-                    .end().end();
+                .from(8 - radius, 8 - radius, 0)
+                .to(8 + radius, 8 + radius, 8 - radius)
+                .face(FRONT_FACING)
+                .cullface(FRONT_FACING).texture("#insulation").tintindex(0)
+                .end().end();
         }
         return model;
     }
 
     private static BlockModelBuilder genClosedEnd(BlockModelProvider prov, String id, int radius) {
         return prov.withExistingParent(id, prov.mcLoc("block/block"))
-                .texture("particle", "#base")
-                .element()
-                .from(8 - radius, 8 - radius, 8 - radius)
-                .to(8 + radius, 8 + radius, 8 - radius)
-                .face(FRONT_FACING).texture("#base").tintindex(0).end()
-                .end();
+            .texture("particle", "#base")
+            .element()
+            .from(8 - radius, 8 - radius, 8 - radius)
+            .to(8 + radius, 8 + radius, 8 - radius)
+            .face(FRONT_FACING).texture("#base").tintindex(0).end()
+            .end();
     }
 
     private static ItemModelBuilder genItem(ItemModelProvider prov, String id,
-                                            int radius, boolean insulation) {
+        int radius, boolean insulation) {
         var model = prov.withExistingParent(id, prov.mcLoc("block/block"))
-                .element()
-                .from(0, 8 - radius, 8 - radius)
-                .to(16, 8 + radius, 8 + radius)
-                .allFaces((dir, face) -> {
-                    if (dir.getAxis() == Direction.Axis.X) {
-                        face.texture("#wire").cullface(dir).tintindex(insulation ? 1 : 0);
-                    } else {
-                        face.texture("#base").tintindex(0);
-                    }
-                }).end();
+            .element()
+            .from(0, 8 - radius, 8 - radius)
+            .to(16, 8 + radius, 8 + radius)
+            .allFaces((dir, face) -> {
+                if (dir.getAxis() == Direction.Axis.X) {
+                    face.texture("#wire").cullface(dir).tintindex(insulation ? 1 : 0);
+                } else {
+                    face.texture("#base").tintindex(0);
+                }
+            }).end();
         if (insulation) {
             return model.element()
-                    .from(0, 8 - radius, 8 - radius)
-                    .to(16, 8 + radius, 8 + radius)
-                    .face(Direction.EAST).end().face(Direction.WEST).end()
-                    .faces((dir, face) -> face.texture("#insulation").tintindex(0).cullface(dir))
-                    .end();
+                .from(0, 8 - radius, 8 - radius)
+                .to(16, 8 + radius, 8 + radius)
+                .face(Direction.EAST).end().face(Direction.WEST).end()
+                .faces((dir, face) -> face.texture("#insulation").tintindex(0).cullface(dir))
+                .end();
         }
         return model;
     }
 
     public static void genBlockModels(DataContext<BlockModelProvider> ctx) {
         genOpenEnd(ctx.provider, OPEN_MODEL, RADIUS, true)
-                .texture("base", INSULATION_TEX)
-                .texture("insulation", INSULATION_OPEN_TEX)
-                .texture("wire", WIRE_TEX);
+            .texture("base", INSULATION_TEX)
+            .texture("insulation", INSULATION_OPEN_TEX)
+            .texture("wire", WIRE_TEX);
         genOpenEnd(ctx.provider, OPEN_WIRE_MODEL, WIRE_RADIUS, false)
-                .texture("base", WHITE_TEX)
-                .texture("wire", WIRE_TEX);
+            .texture("base", WHITE_TEX)
+            .texture("wire", WIRE_TEX);
         genClosedEnd(ctx.provider, CLOSED_MODEL, RADIUS)
-                .texture("base", INSULATION_TEX);
+            .texture("base", INSULATION_TEX);
         genClosedEnd(ctx.provider, CLOSED_WIRE_MODEL, WIRE_RADIUS)
-                .texture("base", WHITE_TEX);
+            .texture("base", WHITE_TEX);
     }
 
     public static void genItemModels(DataContext<ItemModelProvider> ctx) {
         genItem(ctx.provider, ITEM_MODEL, RADIUS, true)
-                .texture("base", INSULATION_TEX)
-                .texture("insulation", INSULATION_OPEN_TEX)
-                .texture("wire", WIRE_TEX);
+            .texture("base", INSULATION_TEX)
+            .texture("insulation", INSULATION_OPEN_TEX)
+            .texture("wire", WIRE_TEX);
         genItem(ctx.provider, ITEM_WIRE_MODEL, SMALL_WIRE_RADIUS, false)
-                .texture("base", WIRE_TEX)
-                .texture("wire", WIRE_TEX);
+            .texture("base", WIRE_TEX)
+            .texture("wire", WIRE_TEX);
         genItem(ctx.provider, ITEM_PIPE_MODEL, PIPE_RADIUS, false)
-                .texture("base", PIPE_SIDE_TEX)
-                .texture("wire", PIPE_IN_TEX);
+            .texture("base", PIPE_SIDE_TEX)
+            .texture("wire", PIPE_IN_TEX);
     }
 
     public static void blockState(RegistryDataContext<Block, ? extends CableBlock, BlockStateProvider> ctx,
-                                  boolean wire) {
+        boolean wire) {
         var prov = ctx.provider;
         var models = prov.models();
         var multipart = prov.getMultipartBuilder(ctx.object);
@@ -151,16 +150,16 @@ public final class CableModel {
             var yRot = yRotation(dir);
             var property = CableBlock.PROPERTY_BY_DIRECTION.get(dir);
             multipart.part()
-                    // open end
-                    .modelFile(models.getExistingFile(modLoc(openModel)))
-                    .rotationX(xRot).rotationY(yRot).addModel()
-                    .condition(property, true)
-                    .end().part()
-                    // closed end
-                    .modelFile(models.getExistingFile(modLoc(closedModel)))
-                    .rotationX(xRot).rotationY(yRot).addModel()
-                    .condition(property, false)
-                    .end();
+                // open end
+                .modelFile(models.getExistingFile(modLoc(openModel)))
+                .rotationX(xRot).rotationY(yRot).addModel()
+                .condition(property, true)
+                .end().part()
+                // closed end
+                .modelFile(models.getExistingFile(modLoc(closedModel)))
+                .rotationX(xRot).rotationY(yRot).addModel()
+                .condition(property, false)
+                .end();
         }
     }
 
@@ -174,8 +173,8 @@ public final class CableModel {
 
     public static void ulvCable(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         genItem(ctx.provider, ctx.id, WIRE_RADIUS, false)
-                .texture("base", WIRE_TEX)
-                .texture("wire", "#base");
+            .texture("base", WIRE_TEX)
+            .texture("wire", "#base");
     }
 
     public static void pipe(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {

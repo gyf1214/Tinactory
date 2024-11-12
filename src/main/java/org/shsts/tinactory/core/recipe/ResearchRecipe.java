@@ -3,6 +3,8 @@ package org.shsts.tinactory.core.recipe;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -19,8 +21,6 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -38,21 +38,21 @@ public class ResearchRecipe extends ProcessingRecipe {
 
     private boolean canResearch(ITeamProfile team) {
         return team.canResearch(target) && team.getTargetTech()
-                .filter(tech -> tech.getLoc().equals(target))
-                .isPresent();
+            .filter(tech -> tech.getLoc().equals(target))
+            .isPresent();
     }
 
     @Override
     public boolean canCraftIn(IContainer container) {
         return container.getOwnerTeam()
-                .map(this::canResearch)
-                .orElse(false);
+            .map(this::canResearch)
+            .orElse(false);
     }
 
     @Override
     public void insertOutputs(IContainer container, Random random) {
         container.getOwnerTeam()
-                .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress));
+            .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress));
     }
 
     public static class Builder extends ProcessingRecipe.BuilderBase<ResearchRecipe, Builder> {
@@ -61,7 +61,7 @@ public class ResearchRecipe extends ProcessingRecipe {
         private long progress = 1;
 
         public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<ResearchRecipe, Builder> parent,
-                       ResourceLocation loc) {
+            ResourceLocation loc) {
             super(consumer, parent, loc);
         }
 
@@ -116,22 +116,22 @@ public class ResearchRecipe extends ProcessingRecipe {
         public ResearchRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
             var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
-                    .map(je -> ProcessingIngredients.fromJson(je.getAsJsonObject()))
-                    .forEach(builder::input);
+                .map(je -> ProcessingIngredients.fromJson(je.getAsJsonObject()))
+                .forEach(builder::input);
             return builder.target(new ResourceLocation(GsonHelper.getAsString(jo, "target")))
-                    .progress(GsonHelper.getAsLong(jo, "progress"))
-                    .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
-                    .voltage(GsonHelper.getAsLong(jo, "voltage"))
-                    .power(GsonHelper.getAsLong(jo, "power"))
-                    .buildObject();
+                .progress(GsonHelper.getAsLong(jo, "progress"))
+                .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
+                .voltage(GsonHelper.getAsLong(jo, "voltage"))
+                .power(GsonHelper.getAsLong(jo, "power"))
+                .buildObject();
         }
 
         @Override
         public void toJson(JsonObject jo, ResearchRecipe recipe) {
             var inputs = new JsonArray();
             recipe.inputs.stream()
-                    .map(input -> ProcessingIngredients.toJson(input.ingredient()))
-                    .forEach(inputs::add);
+                .map(input -> ProcessingIngredients.toJson(input.ingredient()))
+                .forEach(inputs::add);
             jo.add("inputs", inputs);
             jo.addProperty("target", recipe.target.toString());
             jo.addProperty("progress", recipe.progress);
@@ -142,5 +142,5 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     public static final SmartRecipeSerializer.Factory<ResearchRecipe, ResearchRecipe.Builder>
-            SERIALIZER = ResearchRecipe.Serializer::new;
+        SERIALIZER = ResearchRecipe.Serializer::new;
 }

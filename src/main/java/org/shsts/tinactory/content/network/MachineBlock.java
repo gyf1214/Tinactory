@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.network;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,13 +29,12 @@ import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
-        implements IWrenchable, IConnector, IElectricBlock {
+    implements IWrenchable, IConnector, IElectricBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final DirectionProperty IO_FACING = DirectionProperty.create("io_facing");
     public static final BooleanProperty WORKING = BooleanProperty.create("working");
@@ -46,21 +46,21 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
         super(properties.strength(2f, 6f).requiresCorrectToolForDrops(), entityType);
         this.voltage = voltage;
         this.resistance = Math.sqrt((double) voltage.value / 2d) *
-                TinactoryConfig.INSTANCE.machineResistanceFactor.get();
+            TinactoryConfig.INSTANCE.machineResistanceFactor.get();
     }
 
-    public static <T extends SmartBlockEntity>
-    EntityBlockBuilder.Factory<T, MachineBlock<T>> factory(Voltage voltage) {
+    public static <T extends SmartBlockEntity> EntityBlockBuilder.Factory<T, MachineBlock<T>> factory(
+        Voltage voltage) {
         return (properties, entityType) -> new MachineBlock<>(properties, entityType, voltage);
     }
 
-    public static <T extends SmartBlockEntity>
-    EntityBlockBuilder.Factory<T, MachineBlock<T>> sided(Voltage voltage) {
+    public static <T extends SmartBlockEntity> EntityBlockBuilder.Factory<T, MachineBlock<T>> sided(
+        Voltage voltage) {
         return (properties, entityType) -> new SidedMachineBlock<>(properties, entityType, voltage);
     }
 
-    public static EntityBlockBuilder.Factory<SmartBlockEntity, MachineBlock<SmartBlockEntity>>
-    multiBlockInterface(Voltage voltage) {
+    public static EntityBlockBuilder.Factory<SmartBlockEntity, MachineBlock<SmartBlockEntity>> multiBlockInterface(
+        Voltage voltage) {
         return (properties, entityType) -> new MultiBlockInterfaceBlock(properties, entityType, voltage);
     }
 
@@ -72,8 +72,8 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite())
-                .setValue(IO_FACING, ctx.getHorizontalDirection())
-                .setValue(WORKING, false);
+            .setValue(IO_FACING, ctx.getHorizontalDirection())
+            .setValue(WORKING, false);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
 
     @Override
     public void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool,
-                             Direction dir, boolean sneaky) {
+        Direction dir, boolean sneaky) {
         if (!sneaky && dir != state.getValue(FACING)) {
             setIOFacing(world, pos, state, dir);
         }
@@ -116,14 +116,14 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
 
     @Override
     public boolean allowConnectWith(Level world, BlockPos pos, BlockState state,
-                                    Direction dir, BlockState state1) {
+        Direction dir, BlockState state1) {
         return dir == state.getValue(IO_FACING) &&
-                IElectricBlock.canVoltagesConnect(voltage.value, state1);
+            IElectricBlock.canVoltagesConnect(voltage.value, state1);
     }
 
     protected void onDestroy(Level world, BlockPos pos, BlockState state) {
         NetworkManager.tryGet(world).ifPresent(manager ->
-                manager.invalidatePosDir(pos, state.getValue(IO_FACING)));
+            manager.invalidatePosDir(pos, state.getValue(IO_FACING)));
     }
 
     @Override

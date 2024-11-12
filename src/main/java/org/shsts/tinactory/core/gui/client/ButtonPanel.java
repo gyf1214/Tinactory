@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.MathUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +74,7 @@ public abstract class ButtonPanel extends Panel {
 
         public PageButton(int texX, int pageChange) {
             super(ButtonPanel.this.menu, Texture.RECIPE_BOOK_BG, null, texX, TEX_Y,
-                    texX, TEX_Y + PAGE_OFFSET.height());
+                texX, TEX_Y + PAGE_OFFSET.height());
             this.pageChange = pageChange;
         }
 
@@ -106,7 +106,7 @@ public abstract class ButtonPanel extends Panel {
     protected void setRect(Rect rect) {
         var columns = Math.max(1, rect.width() / buttonWidth);
         var rows = Math.max(1, (rect.height() + verticalSpacing - BOTTOM_MARGIN) /
-                (buttonHeight + verticalSpacing));
+            (buttonHeight + verticalSpacing));
         int horizontalSpacing = columns > 1 ? (rect.width() - columns * buttonWidth) / (columns - 1) : 0;
         var buttonCount = rows * columns;
 
@@ -139,7 +139,7 @@ public abstract class ButtonPanel extends Panel {
     protected abstract int getItemCount();
 
     protected abstract void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-                                         float partialTick, Rect rect, int index);
+        float partialTick, Rect rect, int index);
 
     protected abstract void onSelect(int index);
 

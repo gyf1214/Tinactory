@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.builder;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.OreVariant;
@@ -7,7 +8,6 @@ import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.builder.DataBuilder;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -69,22 +69,22 @@ public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
         var baseProgress = 50L * (1L << (long) variant.rank);
         if (!baseOre) {
             tech = dataGen.tech("ore/" + id)
-                    .maxProgress(baseProgress)
-                    .displayItem(ores.get(0).loc("raw"))
-                    .depends(tech).buildLoc();
+                .maxProgress(baseProgress)
+                .displayItem(ores.get(0).loc("raw"))
+                .depends(tech).buildLoc();
 
             RESEARCH_BENCH.recipe(dataGen, tech)
-                    .target(tech)
-                    .defaultInput(variant.voltage)
-                    .build();
+                .target(tech)
+                .defaultInput(variant.voltage)
+                .build();
         }
 
         for (var ore : new HashSet<>(ores)) {
             RESEARCH_BENCH.recipe(dataGen, tech.getPath() + "_from_" + ore.name)
-                    .target(tech)
-                    .inputItem(ore.tag("raw"))
-                    .voltage(variant.voltage)
-                    .build();
+                .target(tech)
+                .inputItem(ore.tag("raw"))
+                .voltage(variant.voltage)
+                .build();
         }
 
         if (!primitive) {

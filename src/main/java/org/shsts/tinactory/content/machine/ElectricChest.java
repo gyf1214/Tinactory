@@ -1,5 +1,8 @@
 package org.shsts.tinactory.content.machine;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -27,9 +30,6 @@ import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
@@ -37,7 +37,7 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricChest extends CapabilityProvider
-        implements IEventSubscriber, IProcessor, INBTSerializable<CompoundTag> {
+    implements IEventSubscriber, IProcessor, INBTSerializable<CompoundTag> {
     public final int capacity;
     private final BlockEntity blockEntity;
     private Machine machine;
@@ -106,7 +106,7 @@ public class ElectricChest extends CapabilityProvider
         }
         var stack1 = itemHandler.getStackInSlot(slot);
         return (stack1.isEmpty() && machineConfig.getBoolean("unlockChest")) ||
-                ItemHelper.canItemsStack(stack, stack1);
+            ItemHelper.canItemsStack(stack, stack1);
     }
 
     private void onLoad() {
@@ -136,8 +136,8 @@ public class ElectricChest extends CapabilityProvider
     public void onPreWork() {
         if (machineConfig.getPortConfig("chestOutput") == MachineConfig.PortConfig.ACTIVE) {
             machine.getNetwork()
-                    .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
-                    .ifPresent(logistics -> logistics.addActiveItem(PortDirection.OUTPUT, port));
+                .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
+                .ifPresent(logistics -> logistics.addActiveItem(PortDirection.OUTPUT, port));
         }
     }
 
@@ -153,7 +153,7 @@ public class ElectricChest extends CapabilityProvider
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.ELECTRIC_CHEST.get() ||
-                cap == AllCapabilities.PROCESSOR.get()) {
+            cap == AllCapabilities.PROCESSOR.get()) {
             return myself();
         }
         return LazyOptional.empty();
@@ -189,8 +189,7 @@ public class ElectricChest extends CapabilityProvider
         }
     }
 
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>>
-    builder(Layout layout) {
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Layout layout) {
         return CapabilityProviderBuilder.fromFactory("machine/chest", be -> new ElectricChest(be, layout));
     }
 }

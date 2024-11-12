@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -13,7 +14,6 @@ import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,104 +50,103 @@ public final class AllMultiBlocks {
         KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
 
         GRATE_MACHINE_CASING = REGISTRATE.block("multi_block/grate_machine_casing", Block::new)
-                .properties(CASING_PROPERTY)
-                .register();
+            .properties(CASING_PROPERTY)
+            .register();
 
         BLAST_FURNACE = multiBlock("blast_furnace")
-                .blockEntity()
-                .capability(MultiBlock.builder(BlastFurnace::new))
-                .layout(AllLayouts.BLAST_FURNACE)
-                .appearanceBlock(HEATPROOF_CASING)
-                .spec()
-                .layer()
-                .row("BBB")
-                .row("BBB")
-                .row("B$B").build()
-                .layer().height(2)
-                .row("CCC")
-                .row("CAC")
-                .row("CCC").build()
-                .layer()
-                .row("TTT")
-                .row("TTT")
-                .row("TTT").build()
-                .blockOrInterface('B', HEATPROOF_CASING)
-                .sameBlockWithTag('C', "coil", AllTags.COIL).air('A')
-                .block('T', HEATPROOF_CASING)
-                .build()
-                .build()
-                .simpleCapability(RecipeProcessor::blastFurnace)
-                .build()
-                .buildObject();
+            .blockEntity()
+            .capability(MultiBlock.builder(BlastFurnace::new))
+            .layout(AllLayouts.BLAST_FURNACE)
+            .appearanceBlock(HEATPROOF_CASING)
+            .spec()
+            .layer()
+            .row("BBB")
+            .row("BBB")
+            .row("B$B").build()
+            .layer().height(2)
+            .row("CCC")
+            .row("CAC")
+            .row("CCC").build()
+            .layer()
+            .row("TTT")
+            .row("TTT")
+            .row("TTT").build()
+            .blockOrInterface('B', HEATPROOF_CASING)
+            .sameBlockWithTag('C', "coil", AllTags.COIL).air('A')
+            .block('T', HEATPROOF_CASING)
+            .build()
+            .build()
+            .simpleCapability(RecipeProcessor::blastFurnace)
+            .build()
+            .buildObject();
 
         SIFTER = multiBlock("sifter")
-                .blockEntity()
-                .capability(MultiBlock::simple)
-                .layout(AllLayouts.SIFTER)
-                .appearanceBlock(SOLID_STEEL_CASING)
-                .spec()
-                .layer()
-                .empty()
-                .row(" BBB ")
-                .row(" BBB ")
-                .row(" BBB ")
-                .empty().build()
-                .layer()
-                .empty()
-                .row(" CCC ")
-                .row(" CAC ")
-                .row(" CCC ")
-                .empty().build()
-                .layer()
-                .row(" CCC ")
-                .row("CAAAC")
-                .row("CAAAC")
-                .row("CAAAC")
-                .row(" CCC ").build()
-                .layer()
-                .row(" CCC ")
-                .row("CGGGC")
-                .row("CGGGC")
-                .row("CGGGC")
-                .row(" C$C ").build()
-                .layer()
-                .row(" CCC ")
-                .row("CGGGC")
-                .row("CGGGC")
-                .row("CGGGC")
-                .row(" CCC ").build()
-                .blockOrInterface('B', SOLID_STEEL_CASING)
-                .block('C', SOLID_STEEL_CASING)
-                .block('G', GRATE_MACHINE_CASING)
-                .air('A')
-                .build()
-                .build()
-                .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.SIFTER))
-                .build()
-                .buildObject();
+            .blockEntity()
+            .capability(MultiBlock::simple)
+            .layout(AllLayouts.SIFTER)
+            .appearanceBlock(SOLID_STEEL_CASING)
+            .spec()
+            .layer()
+            .empty()
+            .row(" BBB ")
+            .row(" BBB ")
+            .row(" BBB ")
+            .empty().build()
+            .layer()
+            .empty()
+            .row(" CCC ")
+            .row(" CAC ")
+            .row(" CCC ")
+            .empty().build()
+            .layer()
+            .row(" CCC ")
+            .row("CAAAC")
+            .row("CAAAC")
+            .row("CAAAC")
+            .row(" CCC ").build()
+            .layer()
+            .row(" CCC ")
+            .row("CGGGC")
+            .row("CGGGC")
+            .row("CGGGC")
+            .row(" C$C ").build()
+            .layer()
+            .row(" CCC ")
+            .row("CGGGC")
+            .row("CGGGC")
+            .row("CGGGC")
+            .row(" CCC ").build()
+            .blockOrInterface('B', SOLID_STEEL_CASING)
+            .block('C', SOLID_STEEL_CASING)
+            .block('G', GRATE_MACHINE_CASING)
+            .air('A')
+            .build()
+            .build()
+            .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.SIFTER))
+            .build()
+            .buildObject();
     }
 
-    private static BlockEntityBuilder<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>, ?>
-    multiBlock(String name) {
+    private static BlockEntityBuilder<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>, ?> multiBlock(String name) {
         return REGISTRATE.blockEntity("multi_block/" + name, PrimitiveBlock<SmartBlockEntity>::new)
-                .blockEntity()
-                .eventManager().ticking()
-                .build()
-                .translucent();
+            .blockEntity()
+            .eventManager().ticking()
+            .build()
+            .translucent();
     }
 
     private static RegistryEntry<Block> solid(String name) {
         var ret = REGISTRATE.block("multi_block/solid/" + name, Block::new)
-                .properties(CASING_PROPERTY)
-                .register();
+            .properties(CASING_PROPERTY)
+            .register();
         SOLID_CASING.add(ret);
         return ret;
     }
 
     private static RegistryEntry<CoilBlock> coil(String name, int temperature) {
         var ret = REGISTRATE.block("multi_block/coil/" + name, CoilBlock.factory(temperature))
-                .properties(CASING_PROPERTY)
-                .register();
+            .properties(CASING_PROPERTY)
+            .register();
         COIL_BLOCKS.add(ret);
         return ret;
     }

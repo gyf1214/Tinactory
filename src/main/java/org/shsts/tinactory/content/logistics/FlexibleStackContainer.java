@@ -1,5 +1,8 @@
 package org.shsts.tinactory.content.logistics;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -28,9 +31,6 @@ import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +38,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FlexibleStackContainer extends CapabilityProvider
-        implements IFlexibleContainer, INBTSerializable<CompoundTag> {
+    implements IFlexibleContainer, INBTSerializable<CompoundTag> {
     private final BlockEntity blockEntity;
     private final WrapperItemHandler items;
     private final WrapperItemHandler internalItems;
@@ -203,6 +203,6 @@ public class FlexibleStackContainer extends CapabilityProvider
 
     public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
         return CapabilityProviderBuilder.fromFactory(parent, "logistics/stack_container",
-                be -> new FlexibleStackContainer(be, 16, 8));
+            be -> new FlexibleStackContainer(be, 16, 8));
     }
 }

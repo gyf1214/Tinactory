@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.multiblock;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -8,7 +9,6 @@ import net.minecraft.world.level.Level;
 import org.shsts.tinactory.core.common.WeakMap;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

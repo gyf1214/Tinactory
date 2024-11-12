@@ -1,11 +1,10 @@
 package org.shsts.tinactory.registrate.builder;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.registrate.Registrate;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

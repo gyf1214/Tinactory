@@ -1,12 +1,12 @@
 package org.shsts.tinactory.registrate.builder;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.network.Scheduling;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +37,6 @@ public class SchedulingBuilder<P> extends RegistryEntryBuilder<IScheduling, ISch
     @Override
     protected IScheduling createObject() {
         return new Scheduling(befores.stream().map(Supplier::get).toList(),
-                afters.stream().map(Supplier::get).toList());
+            afters.stream().map(Supplier::get).toList());
     }
 }

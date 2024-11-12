@@ -1,5 +1,6 @@
 package org.shsts.tinactory.integration.jei.gui;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -18,7 +19,6 @@ import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.integration.jei.JEI;
 import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,13 +44,13 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
         var x = rect.x() + layout.getXOffset() + MARGIN_HORIZONTAL;
         var y = rect.y() + MARGIN_TOP;
         var workbenchArea = IGuiClickableArea.createBasic(x, y,
-                rect.width(), rect.height(), plugin.toolCategory.type);
+            rect.width(), rect.height(), plugin.toolCategory.type);
 
         clickableHandler(WorkbenchMenu.class, screen -> Optional.of(workbenchArea));
     }
 
-    private <M extends Menu<?, M>>
-    void clickableHandler(Class<M> clazz, IMenuScreenClickableProvider<M> handler) {
+    private <M extends Menu<?, M>> void clickableHandler(Class<M> clazz,
+        IMenuScreenClickableProvider<M> handler) {
         clickableHandlers.put(clazz, handler);
     }
 
@@ -65,13 +65,13 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
             return stack.isEmpty() ? null : stack;
         } else if (ResearchBenchPlugin.isHoveringTech(hovered.get())) {
             return TechManager.localTeam()
-                    .flatMap(ITeamProfile::getTargetTech)
-                    .map(tech -> new TechWrapper(tech.getLoc()))
-                    .orElse(null);
+                .flatMap(ITeamProfile::getTargetTech)
+                .map(tech -> new TechWrapper(tech.getLoc()))
+                .orElse(null);
         } else if (screen instanceof NetworkControllerScreen && TechPanel.isHoveringTech(hovered.get())) {
             return TechPanel.getHoveredTech(hovered.get(), mouseX)
-                    .map(tech -> new TechWrapper(tech.getLoc()))
-                    .orElse(null);
+                .map(tech -> new TechWrapper(tech.getLoc()))
+                .orElse(null);
         }
         return null;
     }
@@ -95,8 +95,8 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
     }
 
     @Override
-    public Collection<IGuiClickableArea>
-    getGuiClickableAreas(MenuScreen<?> screen, double mouseX, double mouseY) {
+    public Collection<IGuiClickableArea> getGuiClickableAreas(MenuScreen<?> screen,
+        double mouseX, double mouseY) {
         var ret = new ArrayList<IGuiClickableArea>();
         var menu = screen.getMenu();
         for (var entry : clickableHandlers.entrySet()) {

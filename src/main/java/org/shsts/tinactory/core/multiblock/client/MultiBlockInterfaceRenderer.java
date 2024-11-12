@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.multiblock.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -15,7 +16,6 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 
 @ParametersAreNonnullByDefault
@@ -31,7 +31,7 @@ public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<SmartBlo
 
     @Override
     public void render(SmartBlockEntity sbe, float partialTick, PoseStack poseStack,
-                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         var blockState = sbe.getBlockState();
         if (!blockState.getValue(MultiBlockInterfaceBlock.JOINED)) {
             return;
@@ -48,7 +48,7 @@ public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<SmartBlo
         var random = world.getRandom();
         var seed = blockState.getSeed(pos);
         var modelData = Objects.requireNonNullElse(ModelDataManager.getModelData(world, pos),
-                EmptyModelData.INSTANCE);
+            EmptyModelData.INSTANCE);
         var vertexConsumer = bufferSource.getBuffer(RenderType.cutoutMipped());
 
         if (appearanceBlock.isPresent()) {
@@ -56,15 +56,15 @@ public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<SmartBlo
             var overlayModel = blockRenderDispatcher.getBlockModel(blockState);
 
             blockRenderer.tesselateBlock(world, appearanceModel, appearanceBlock.get(), pos,
-                    poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);
+                poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);
             blockRenderer.tesselateBlock(world, overlayModel, blockState, pos,
-                    poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);
+                poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);
         } else {
             var model = blockRenderDispatcher.getBlockModel(
-                    blockState.setValue(MultiBlockInterfaceBlock.JOINED, false));
+                blockState.setValue(MultiBlockInterfaceBlock.JOINED, false));
 
             blockRenderer.tesselateBlock(world, model, blockState, pos,
-                    poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);
+                poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);
         }
     }
 }

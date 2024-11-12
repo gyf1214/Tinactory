@@ -1,5 +1,7 @@
 package org.shsts.tinactory.core.multiblock;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
@@ -12,8 +14,6 @@ import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
@@ -22,8 +22,8 @@ public class MultiBlockInterfaceBlock extends SidedMachineBlock<SmartBlockEntity
     public static final BooleanProperty JOINED = BooleanProperty.create("joined");
 
     public MultiBlockInterfaceBlock(Properties properties,
-                                    Supplier<SmartBlockEntityType<SmartBlockEntity>> entityType,
-                                    Voltage voltage) {
+        Supplier<SmartBlockEntityType<SmartBlockEntity>> entityType,
+        Voltage voltage) {
         super(properties, entityType, voltage);
     }
 
@@ -43,6 +43,6 @@ public class MultiBlockInterfaceBlock extends SidedMachineBlock<SmartBlockEntity
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return state.getValue(JOINED) ?
-                RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
+            RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
     }
 }

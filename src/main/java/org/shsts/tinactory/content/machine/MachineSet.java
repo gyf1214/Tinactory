@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.machine;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -18,8 +20,6 @@ import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -39,7 +39,7 @@ public class MachineSet {
     protected final Map<Voltage, RegistryEntry<? extends Block>> machines;
 
     public MachineSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                      Map<Voltage, RegistryEntry<? extends Block>> machines) {
+        Map<Voltage, RegistryEntry<? extends Block>> machines) {
         this.layoutSet = layoutSet;
         this.machines = machines;
         this.voltages = new HashSet<>(voltages);
@@ -63,14 +63,14 @@ public class MachineSet {
 
     public Block icon() {
         var voltage = voltages.stream()
-                .filter(v -> v != Voltage.ULV)
-                .min(Comparator.comparingInt(v -> v.rank))
-                .orElseThrow();
+            .filter(v -> v != Voltage.ULV)
+            .min(Comparator.comparingInt(v -> v.rank))
+            .orElseThrow();
         return machines.get(voltage).get();
     }
 
-    public static abstract class BuilderBase<T extends MachineSet, P, S extends BuilderBase<T, P, S>>
-            extends SimpleBuilder<T, P, S> {
+    public abstract static class BuilderBase<T extends MachineSet, P, S extends BuilderBase<T, P, S>>
+        extends SimpleBuilder<T, P, S> {
         protected final Registrate registrate;
         protected final List<Voltage> voltages = new ArrayList<>();
         @Nullable
@@ -108,76 +108,73 @@ public class MachineSet {
         }
 
         public S machine(Function<Voltage, String> id,
-                         Function<Voltage, EntityBlockBuilder.Factory<SmartBlockEntity, ?>> blockFactory) {
+            Function<Voltage, EntityBlockBuilder.Factory<SmartBlockEntity, ?>> blockFactory) {
             assert blockEntityBuilder == null;
             blockEntityBuilder = (v, $) -> registrate.blockEntity(id.apply(v), blockFactory.apply(v));
             return self();
         }
 
-        public <V extends BlockEntityBuilder<SmartBlockEntity, ?, ?>>
-        S machine(BiFunction<Voltage, S, Transformer<V>> trans) {
+        public <V extends BlockEntityBuilder<SmartBlockEntity, ?, ?>> S machine(
+            BiFunction<Voltage, S, Transformer<V>> trans) {
             assert blockEntityBuilder != null;
             var old = blockEntityBuilder;
             blockEntityBuilder = (v, $) -> old.apply(v, $)
-                    .transform(trans.apply(v, $).cast());
+                .transform(trans.apply(v, $).cast());
             return self();
         }
 
-        public <V extends BlockEntityBuilder<SmartBlockEntity, ?, ?>>
-        S machine(Function<Voltage, Transformer<V>> trans) {
+        public <V extends BlockEntityBuilder<SmartBlockEntity, ?, ?>> S machine(
+            Function<Voltage, Transformer<V>> trans) {
             return machine((v, $) -> trans.apply(v));
         }
 
-
         @SuppressWarnings("unchecked")
-        protected static <B> Function<B, CapabilityProviderBuilder<? super SmartBlockEntity, B>>
-        cast(Function<?, ? extends CapabilityProviderBuilder<? super SmartBlockEntity, ?>> from) {
+        protected static <B> Function<B, CapabilityProviderBuilder<? super SmartBlockEntity, B>> cast(
+            Function<?, ? extends CapabilityProviderBuilder<? super SmartBlockEntity, ?>> from) {
             return (Function<B, CapabilityProviderBuilder<? super SmartBlockEntity, B>>) from;
         }
 
         public <B> S capability(Function<B, ? extends
-                CapabilityProviderBuilder<? super SmartBlockEntity, B>> factory) {
+            CapabilityProviderBuilder<? super SmartBlockEntity, B>> factory) {
             return machine(v -> $ -> $.blockEntity()
-                    .simpleCapability(cast(factory))
-                    .build());
+                .simpleCapability(cast(factory))
+                .build());
         }
 
         public <B> S layoutCapability(Function<Layout, Function<B, ? extends
-                CapabilityProviderBuilder<? super SmartBlockEntity, B>>> factory) {
+            CapabilityProviderBuilder<? super SmartBlockEntity, B>>> factory) {
             return machine(v -> $ -> $.blockEntity()
-                    .simpleCapability(cast(factory.apply(getLayout(v))))
-                    .build());
+                .simpleCapability(cast(factory.apply(getLayout(v))))
+                .build());
         }
 
         public S layoutMenu(Function<Layout, Menu.Factory<SmartBlockEntity, ?>> factory) {
             return machine(v -> $ -> $.blockEntity()
-                    .menu(factory.apply(getLayout(v))).build()
-                    .build());
+                .menu(factory.apply(getLayout(v))).build()
+                .build());
         }
 
         public S plugin(IMenuPlugin.Factory<?> factory) {
             return machine(v -> $ -> $.blockEntity()
-                    .menu().plugin(factory).build()
-                    .build());
+                .menu().plugin(factory).build()
+                .build());
         }
 
         public S layoutPlugin(Function<Layout, IMenuPlugin.Factory<?>> factory) {
             return machine(v -> $ -> $.blockEntity()
-                    .menu().plugin(factory.apply(getLayout(v))).build()
-                    .build());
+                .menu().plugin(factory.apply(getLayout(v))).build()
+                .build());
         }
 
-        protected RegistryEntry<? extends Block>
-        createMachine(Voltage voltage) {
+        protected RegistryEntry<? extends Block> createMachine(Voltage voltage) {
             assert blockEntityBuilder != null;
             return blockEntityBuilder.apply(voltage, self())
-                    .transform(baseMachine())
-                    .buildObject();
+                .transform(baseMachine())
+                .buildObject();
         }
 
-        protected abstract T
-        createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                  Map<Voltage, RegistryEntry<? extends Block>> machines);
+        protected abstract T createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+            Map<Voltage, RegistryEntry<? extends Block>> machines);
 
         @Override
         protected T createObject() {
@@ -199,18 +196,18 @@ public class MachineSet {
 
         @Override
         protected MachineSet createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-                                       Map<Voltage, RegistryEntry<? extends Block>> machines) {
+            Map<Voltage, RegistryEntry<? extends Block>> machines) {
             return new MachineSet(voltages, layoutSet, machines);
         }
     }
 
-    public static <T extends SmartBlockEntity, U extends SmartEntityBlock<T>, P>
-    Transformer<BlockEntityBuilder<T, U, P>> baseMachine() {
+    public static <T extends SmartBlockEntity,
+        U extends SmartEntityBlock<T>, P> Transformer<BlockEntityBuilder<T, U, P>> baseMachine() {
         return $ -> $.blockEntity()
-                .eventManager()
-                .simpleCapability(Machine::builder)
-                .menu().title(ProcessingMenu::getTitle).build()
-                .build()
-                .translucent();
+            .eventManager()
+            .simpleCapability(Machine::builder)
+            .menu().title(ProcessingMenu::getTitle).build()
+            .build()
+            .translucent();
     }
 }

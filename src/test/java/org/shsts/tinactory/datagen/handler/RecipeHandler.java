@@ -1,5 +1,7 @@
 package org.shsts.tinactory.datagen.handler;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -7,8 +9,6 @@ import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.datagen.DataGen;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 

@@ -23,10 +23,10 @@ public final class AllClientEvents {
         var itemStack = mc.player.getMainHandItem();
 
         if (state.getBlock() instanceof IWrenchable wrenchable &&
-                itemStack.getItem() instanceof UsableToolItem &&
-                wrenchable.canWrenchWith(itemStack)) {
+            itemStack.getItem() instanceof UsableToolItem &&
+            wrenchable.canWrenchWith(itemStack)) {
             WrenchOutlineRenderer.renderOutlines(event.getPoseStack(), event.getMultiBufferSource(),
-                    event.getCamera(), pos, target.getDirection());
+                event.getCamera(), pos, target.getDirection());
         }
     }
 }

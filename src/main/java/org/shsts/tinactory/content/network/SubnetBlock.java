@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.network;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,7 +20,6 @@ import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.content.network.MachineBlock.IO_FACING;
@@ -36,7 +36,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
         this.voltage = voltage;
         this.subVoltage = subVoltage;
         this.resistance = Math.sqrt((double) voltage.value / 2d) *
-                TinactoryConfig.INSTANCE.machineResistanceFactor.get();
+            TinactoryConfig.INSTANCE.machineResistanceFactor.get();
     }
 
     public static Function<Properties, SubnetBlock> transformer(Voltage voltage) {
@@ -83,7 +83,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
 
     @Override
     public void onWrenchWith(Level world, BlockPos pos, BlockState state, ItemStack tool,
-                             Direction dir, boolean sneaky) {
+        Direction dir, boolean sneaky) {
         if (!sneaky) {
             setIOFacing(world, pos, state, dir);
         }
@@ -97,7 +97,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
 
     @Override
     public boolean allowConnectWith(Level world, BlockPos pos, BlockState state,
-                                    Direction dir, BlockState state1) {
+        Direction dir, BlockState state1) {
         var myDir = state.getValue(IO_FACING);
         if (dir == myDir) {
             return IElectricBlock.canVoltagesConnect(voltage.value, state1);

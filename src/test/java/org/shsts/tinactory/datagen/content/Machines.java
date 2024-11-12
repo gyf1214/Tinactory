@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -25,7 +26,6 @@ import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -137,98 +137,98 @@ public final class Machines {
         machine(EXTRACTOR);
         machine(FLUID_SOLIDIFIER);
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
-                .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
-                .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
+            .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
+            .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
         machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
         machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest", ME_BUS);
 
         DATA_GEN.block(NETWORK_CONTROLLER)
-                .blockState(MachineModel::builder, MachineModel::blockState)
-                .casing("casings/computer/computer_casing")
-                .overlay("overlay/machine/overlay_maintenance_full_auto")
-                .ioTex(ME_BUS)
-                .build()
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(WORKBENCH)
-                .blockState(cubeBlock("casings/crafting_table"))
-                .tag(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH)
-                .build()
-                .block(LOW_PRESSURE_BOILER)
-                .blockState(machineBlock(Voltage.ULV, BOILER_TEX))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build()
-                .block(HIGH_PRESSURE_BOILER)
-                .blockState(machineBlock(Voltage.MV, BOILER_TEX))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build();
+            .blockState(MachineModel::builder, MachineModel::blockState)
+            .casing("casings/computer/computer_casing")
+            .overlay("overlay/machine/overlay_maintenance_full_auto")
+            .ioTex(ME_BUS)
+            .build()
+            .tag(MINEABLE_WITH_WRENCH)
+            .build()
+            .block(WORKBENCH)
+            .blockState(cubeBlock("casings/crafting_table"))
+            .tag(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH)
+            .build()
+            .block(LOW_PRESSURE_BOILER)
+            .blockState(machineBlock(Voltage.ULV, BOILER_TEX))
+            .tag(MINEABLE_WITH_WRENCH)
+            .build()
+            .block(HIGH_PRESSURE_BOILER)
+            .blockState(machineBlock(Voltage.MV, BOILER_TEX))
+            .tag(MINEABLE_WITH_WRENCH)
+            .build();
 
         multiBlockItem(BLAST_FURNACE, "heatproof", AllRecipes.BLAST_FURNACE);
         multiBlockItem(SIFTER, "solid_steel", AllRecipes.SIFTER);
 
         MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
-                .blockState(multiBlockInterface(ME_BUS))
-                .tag(MINEABLE_WITH_WRENCH)
-                .build());
+            .blockState(multiBlockInterface(ME_BUS))
+            .tag(MINEABLE_WITH_WRENCH)
+            .build());
 
         TRANSFORMER.values().forEach(b -> DATA_GEN.block(b)
-                .blockState(MachineModel::builder, MachineModel::blockState)
-                .overlay(Direction.NORTH, IO_TEX)
-                .overlay(Direction.SOUTH, "overlay/machine/overlay_energy_out_multi")
-                .build()
-                .tag(MINEABLE_WITH_WRENCH)
-                .build());
+            .blockState(MachineModel::builder, MachineModel::blockState)
+            .overlay(Direction.NORTH, IO_TEX)
+            .overlay(Direction.SOUTH, "overlay/machine/overlay_energy_out_multi")
+            .build()
+            .tag(MINEABLE_WITH_WRENCH)
+            .build());
     }
 
     private static void multiBlockItem(RegistryEntry<? extends Block> block, String casing,
-                                       RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         DATA_GEN.block(block)
-                .blockState(multiBlock(casing))
-                .tag(MINEABLE_WITH_WRENCH)
-                .itemTag(machineTag(type))
-                .build();
+            .blockState(multiBlock(casing))
+            .tag(MINEABLE_WITH_WRENCH)
+            .itemTag(machineTag(type))
+            .build();
     }
 
     private static void primitiveRecipes() {
         // workbench
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(WORKBENCH.get())
-                        .pattern("WSW")
-                        .pattern("SCS")
-                        .pattern("WSW")
-                        .define('S', STONE.tag("block"))
-                        .define('W', Items.STICK)
-                        .define('C', Blocks.CRAFTING_TABLE)
-                        .unlockedBy("has_cobblestone", has(STONE.tag("block"))))
-                // primitive stone generator
-                .vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(PRIMITIVE_STONE_GENERATOR.get())
-                        .pattern("WLW")
-                        .pattern("L L")
-                        .pattern("WLW")
-                        .define('W', ItemTags.PLANKS)
-                        .define('L', ItemTags.LOGS)
-                        .unlockedBy("has_planks", has(ItemTags.PLANKS)))
-                // primitive ore analyzer
-                .vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(PRIMITIVE_ORE_ANALYZER.get())
-                        .pattern("WLW")
-                        .pattern("LFL")
-                        .pattern("WLW")
-                        .define('W', ItemTags.PLANKS)
-                        .define('L', ItemTags.LOGS)
-                        .define('F', FLINT.tag("primary"))
-                        .unlockedBy("has_flint", has(FLINT.tag("primary"))))
-                // primitive ore washer
-                .vanillaRecipe(() -> ShapedRecipeBuilder
-                        .shaped(PRIMITIVE_ORE_WASHER.get())
-                        .pattern("WLW")
-                        .pattern("LFL")
-                        .pattern("WLW")
-                        .define('W', ItemTags.PLANKS)
-                        .define('L', ItemTags.LOGS)
-                        .define('F', Items.WATER_BUCKET)
-                        .unlockedBy("has_water_bucket", has(Items.WATER_BUCKET)));
+                .shaped(WORKBENCH.get())
+                .pattern("WSW")
+                .pattern("SCS")
+                .pattern("WSW")
+                .define('S', STONE.tag("block"))
+                .define('W', Items.STICK)
+                .define('C', Blocks.CRAFTING_TABLE)
+                .unlockedBy("has_cobblestone", has(STONE.tag("block"))))
+            // primitive stone generator
+            .vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(PRIMITIVE_STONE_GENERATOR.get())
+                .pattern("WLW")
+                .pattern("L L")
+                .pattern("WLW")
+                .define('W', ItemTags.PLANKS)
+                .define('L', ItemTags.LOGS)
+                .unlockedBy("has_planks", has(ItemTags.PLANKS)))
+            // primitive ore analyzer
+            .vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(PRIMITIVE_ORE_ANALYZER.get())
+                .pattern("WLW")
+                .pattern("LFL")
+                .pattern("WLW")
+                .define('W', ItemTags.PLANKS)
+                .define('L', ItemTags.LOGS)
+                .define('F', FLINT.tag("primary"))
+                .unlockedBy("has_flint", has(FLINT.tag("primary"))))
+            // primitive ore washer
+            .vanillaRecipe(() -> ShapedRecipeBuilder
+                .shaped(PRIMITIVE_ORE_WASHER.get())
+                .pattern("WLW")
+                .pattern("LFL")
+                .pattern("WLW")
+                .define('W', ItemTags.PLANKS)
+                .define('L', ItemTags.LOGS)
+                .define('F', Items.WATER_BUCKET)
+                .unlockedBy("has_water_bucket", has(Items.WATER_BUCKET)));
     }
 
     private static void ulvRecipes() {
@@ -241,56 +241,56 @@ public final class Machines {
         ulvMachine(ELECTRIC_CHEST.entry(Voltage.ULV), () -> Blocks.CHEST);
 
         TOOL_CRAFTING.recipe(DATA_GEN, NETWORK_CONTROLLER)
-                .result(NETWORK_CONTROLLER, 1)
-                .pattern("BBB").pattern("VHV").pattern("WVW")
-                .define('B', circuit(Voltage.ULV))
-                .define('W', CABLE.get(Voltage.ULV))
-                .define('H', MACHINE_HULL.get(Voltage.ULV))
-                .define('V', circuit(Voltage.ULV))
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
+            .result(NETWORK_CONTROLLER, 1)
+            .pattern("BBB").pattern("VHV").pattern("WVW")
+            .define('B', circuit(Voltage.ULV))
+            .define('W', CABLE.get(Voltage.ULV))
+            .define('H', MACHINE_HULL.get(Voltage.ULV))
+            .define('V', circuit(Voltage.ULV))
+            .toolTag(AllTags.TOOL_WRENCH)
+            .build();
 
         TOOL_CRAFTING.recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
-                .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
-                .pattern("PVP").pattern("RHR").pattern("WVW")
-                .define('P', COPPER.tag("pipe"))
-                .define('R', IRON.tag("rotor"))
-                .define('W', CABLE.get(Voltage.ULV))
-                .define('H', MACHINE_HULL.get(Voltage.ULV))
-                .define('V', circuit(Voltage.ULV))
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
+            .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
+            .pattern("PVP").pattern("RHR").pattern("WVW")
+            .define('P', COPPER.tag("pipe"))
+            .define('R', IRON.tag("rotor"))
+            .define('W', CABLE.get(Voltage.ULV))
+            .define('H', MACHINE_HULL.get(Voltage.ULV))
+            .define('V', circuit(Voltage.ULV))
+            .toolTag(AllTags.TOOL_WRENCH)
+            .build();
 
         ASSEMBLER.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
-                .outputItem(2, ALLOY_SMELTER.entry(Voltage.ULV), 1)
-                .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 1)
-                .inputItem(0, circuit(Voltage.ULV), 2)
-                .inputItem(0, CABLE.get(Voltage.ULV), 4)
-                .requireTech(Technologies.ALLOY_SMELTING)
-                .voltage(Voltage.ULV)
-                .workTicks(ASSEMBLE_TICKS)
-                .build()
-                .recipe(DATA_GEN, BLAST_FURNACE)
-                .outputItem(2, BLAST_FURNACE, 1)
-                .inputItem(0, HEATPROOF_CASING, 1)
-                .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 3)
-                .inputItem(0, circuit(Voltage.ULV), 3)
-                .inputItem(0, CABLE.get(Voltage.ULV), 2)
-                .requireTech(Technologies.STEEL)
-                .voltage(Voltage.ULV)
-                .workTicks(ASSEMBLE_TICKS)
-                .build()
-                .recipe(DATA_GEN, MULTI_BLOCK_INTERFACE.get(Voltage.ULV))
-                .outputItem(2, MULTI_BLOCK_INTERFACE.get(Voltage.ULV), 1)
-                .inputItem(0, MACHINE_HULL.get(Voltage.ULV), 1)
-                .inputItem(0, circuit(Voltage.ULV), 2)
-                .inputItem(0, CABLE.get(Voltage.ULV), 2)
-                .inputItem(0, () -> Blocks.CHEST, 1)
-                .inputItem(0, () -> Blocks.GLASS, 1)
-                .voltage(Voltage.ULV)
-                .workTicks(ASSEMBLE_TICKS)
-                .requireTech(Technologies.STEEL)
-                .build();
+            .outputItem(2, ALLOY_SMELTER.entry(Voltage.ULV), 1)
+            .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 1)
+            .inputItem(0, circuit(Voltage.ULV), 2)
+            .inputItem(0, CABLE.get(Voltage.ULV), 4)
+            .requireTech(Technologies.ALLOY_SMELTING)
+            .voltage(Voltage.ULV)
+            .workTicks(ASSEMBLE_TICKS)
+            .build()
+            .recipe(DATA_GEN, BLAST_FURNACE)
+            .outputItem(2, BLAST_FURNACE, 1)
+            .inputItem(0, HEATPROOF_CASING, 1)
+            .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 3)
+            .inputItem(0, circuit(Voltage.ULV), 3)
+            .inputItem(0, CABLE.get(Voltage.ULV), 2)
+            .requireTech(Technologies.STEEL)
+            .voltage(Voltage.ULV)
+            .workTicks(ASSEMBLE_TICKS)
+            .build()
+            .recipe(DATA_GEN, MULTI_BLOCK_INTERFACE.get(Voltage.ULV))
+            .outputItem(2, MULTI_BLOCK_INTERFACE.get(Voltage.ULV), 1)
+            .inputItem(0, MACHINE_HULL.get(Voltage.ULV), 1)
+            .inputItem(0, circuit(Voltage.ULV), 2)
+            .inputItem(0, CABLE.get(Voltage.ULV), 2)
+            .inputItem(0, () -> Blocks.CHEST, 1)
+            .inputItem(0, () -> Blocks.GLASS, 1)
+            .voltage(Voltage.ULV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.STEEL)
+            .build();
     }
 
     private static void basicRecipes() {
@@ -298,29 +298,29 @@ public final class Machines {
         machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
 
         ASSEMBLER.recipe(DATA_GEN, SIFTER)
-                .outputItem(2, SIFTER, 1)
-                .inputItem(0, SOLID_STEEL_CASING, 1)
-                .inputItem(0, circuit(Voltage.MV), 3)
-                .inputItem(0, ELECTRIC_PISTON.get(Voltage.LV), 4)
-                .inputItem(0, CABLE.get(Voltage.LV), 4)
-                .inputItem(0, ITEM_FILTER, 4)
-                .inputItem(0, STEEL.tag("plate"), 4)
-                .voltage(Voltage.LV)
-                .workTicks(ASSEMBLE_TICKS)
-                .requireTech(Technologies.SIFTING)
-                .build();
+            .outputItem(2, SIFTER, 1)
+            .inputItem(0, SOLID_STEEL_CASING, 1)
+            .inputItem(0, circuit(Voltage.MV), 3)
+            .inputItem(0, ELECTRIC_PISTON.get(Voltage.LV), 4)
+            .inputItem(0, CABLE.get(Voltage.LV), 4)
+            .inputItem(0, ITEM_FILTER, 4)
+            .inputItem(0, STEEL.tag("plate"), 4)
+            .voltage(Voltage.LV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.SIFTING)
+            .build();
     }
 
     private static void miscRecipes() {
         TOOL_CRAFTING.recipe(DATA_GEN, LOW_PRESSURE_BOILER)
-                .result(LOW_PRESSURE_BOILER, 1)
-                .pattern("PPP").pattern("PWP").pattern("VFV")
-                .define('P', IRON.tag("plate"))
-                .define('W', CABLE.get(Voltage.ULV))
-                .define('V', circuit(Voltage.ULV))
-                .define('F', Blocks.FURNACE.asItem())
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
+            .result(LOW_PRESSURE_BOILER, 1)
+            .pattern("PPP").pattern("PWP").pattern("VFV")
+            .define('P', IRON.tag("plate"))
+            .define('W', CABLE.get(Voltage.ULV))
+            .define('V', circuit(Voltage.ULV))
+            .define('F', Blocks.FURNACE.asItem())
+            .toolTag(AllTags.TOOL_WRENCH)
+            .build();
     }
 
     private static Optional<TagKey<Item>> getMachineTag(MachineSet set) {
@@ -337,10 +337,10 @@ public final class Machines {
         tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
         for (var voltage : set.voltages) {
             var builder = DATA_GEN.block(set.entry(voltage))
-                    .blockState(MachineModel::builder, MachineModel::blockState)
-                    .transform(model.cast())
-                    .build()
-                    .tag(MINEABLE_WITH_WRENCH);
+                .blockState(MachineModel::builder, MachineModel::blockState)
+                .transform(model.cast())
+                .build()
+                .tag(MINEABLE_WITH_WRENCH);
             tag.ifPresent(builder::itemTag);
             builder.build();
         }
@@ -359,28 +359,28 @@ public final class Machines {
     }
 
     private static void primitiveMachine(MachineSet set, RegistryEntry<? extends Block> primitive,
-                                         String overlay) {
+        String overlay) {
         machine(set, overlay);
         var tag = getMachineTag(set);
         var builder = DATA_GEN.block(primitive)
-                .blockState(machineBlock(overlay))
-                .tag(MINEABLE_WITH_WRENCH)
-                .tag(BlockTags.MINEABLE_WITH_AXE);
+            .blockState(machineBlock(overlay))
+            .tag(MINEABLE_WITH_WRENCH)
+            .tag(BlockTags.MINEABLE_WITH_AXE);
         tag.ifPresent(builder::itemTag);
         builder.build();
     }
 
     private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
-                                   Supplier<? extends ItemLike> base) {
+        Supplier<? extends ItemLike> base) {
         TOOL_CRAFTING.recipe(DATA_GEN, result)
-                .result(result, 1)
-                .pattern("BBB").pattern("VHV").pattern("WVW")
-                .define('B', base)
-                .define('W', CABLE.get(Voltage.ULV))
-                .define('H', MACHINE_HULL.get(Voltage.ULV))
-                .define('V', circuit(Voltage.ULV))
-                .toolTag(AllTags.TOOL_WRENCH)
-                .build();
+            .result(result, 1)
+            .pattern("BBB").pattern("VHV").pattern("WVW")
+            .define('B', base)
+            .define('W', CABLE.get(Voltage.ULV))
+            .define('H', MACHINE_HULL.get(Voltage.ULV))
+            .define('V', circuit(Voltage.ULV))
+            .toolTag(AllTags.TOOL_WRENCH)
+            .build();
     }
 
     private static void ulvFromPrimitive(MachineSet set, RegistryEntry<? extends Block> primitive) {
@@ -394,20 +394,19 @@ public final class Machines {
             this.voltage = voltage;
         }
 
-        private AssemblyRecipeBuilder<RecipeFactory>
-        recipe(RegistryEntry<? extends ItemLike> item, Voltage v1) {
+        private AssemblyRecipeBuilder<RecipeFactory> recipe(RegistryEntry<? extends ItemLike> item, Voltage v1) {
             var builder = ASSEMBLER.recipe(DATA_GEN, item)
-                    .outputItem(2, item, 1)
-                    .voltage(v1)
-                    .workTicks(ASSEMBLE_TICKS)
-                    .inputItem(0, MACHINE_HULL.get(voltage), 1);
+                .outputItem(2, item, 1)
+                .voltage(v1)
+                .workTicks(ASSEMBLE_TICKS)
+                .inputItem(0, MACHINE_HULL.get(voltage), 1);
             return new AssemblyRecipeBuilder<>(this, voltage, builder) {
                 private int components = 0;
                 private boolean hasCable = false;
 
                 @Override
-                public AssemblyRecipeBuilder<RecipeFactory>
-                component(Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
+                public AssemblyRecipeBuilder<RecipeFactory> component(
+                    Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
                     if (component != CABLE) {
                         components += count;
                     } else {
@@ -433,8 +432,8 @@ public final class Machines {
             return recipe(set.entry(voltage), v1);
         }
 
-        public AssemblyRecipeBuilder<RecipeFactory>
-        recipe(Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> set, Voltage v1) {
+        public AssemblyRecipeBuilder<RecipeFactory> recipe(
+            Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> set, Voltage v1) {
             if (!set.containsKey(voltage)) {
                 return new AssemblyRecipeBuilder<>(this);
             }
@@ -445,171 +444,171 @@ public final class Machines {
             return recipe(set, Voltage.fromRank(voltage.rank - 1));
         }
 
-        public AssemblyRecipeBuilder<RecipeFactory>
-        recipe(Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> set) {
+        public AssemblyRecipeBuilder<RecipeFactory> recipe(
+            Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> set) {
             return recipe(set, Voltage.fromRank(voltage.rank - 1));
         }
     }
 
     private static void machineRecipe(Voltage v, MaterialSet main,
-                                      MaterialSet heat, MaterialSet electric,
-                                      MaterialSet pipe, MaterialSet rotor) {
+        MaterialSet heat, MaterialSet electric,
+        MaterialSet pipe, MaterialSet rotor) {
         var factory = new RecipeFactory(v);
         var wireNumber = 4 * v.rank;
 
         factory.recipe(RESEARCH_BENCH)
-                .circuit(2)
-                .component(SENSOR, 1)
-                .component(EMITTER, 1)
-                .tech(Technologies.SENSOR_AND_EMITTER)
-                .build()
-                .recipe(AllBlockEntities.ASSEMBLER)
-                .circuit(2)
-                .component(ROBOT_ARM, 2)
-                .component(CONVEYOR_MODULE, 2)
-                .tech(Technologies.ROBOT_ARM, Technologies.CONVEYOR_MODULE)
-                .build()
-                .recipe(CIRCUIT_ASSEMBLER)
-                .circuit(Voltage.fromRank(v.rank + 1), 4)
-                .component(ROBOT_ARM, 1)
-                .component(EMITTER, 1)
-                .component(CONVEYOR_MODULE, 2)
-                .tech(Technologies.INTEGRATED_CIRCUIT)
-                .build()
-                .recipe(STONE_GENERATOR)
-                .circuit(2)
-                .component(ELECTRIC_MOTOR, 1)
-                .component(ELECTRIC_PISTON, 1)
-                .component(GRINDER, 1)
-                .item(() -> Blocks.GLASS, 1)
-                .tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
-                .build()
-                .recipe(ORE_ANALYZER)
-                .circuit(2)
-                .component(ELECTRIC_MOTOR, 3)
-                .component(SENSOR, 1)
-                .tech(Technologies.SENSOR_AND_EMITTER)
-                .build()
-                .recipe(MACERATOR)
-                .circuit(3)
-                .component(ELECTRIC_PISTON, 1)
-                .component(CONVEYOR_MODULE, 1)
-                .component(GRINDER, 1)
-                .tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
-                .build()
-                .recipe(ORE_WASHER)
-                .circuit(2)
-                .component(ELECTRIC_MOTOR, 1)
-                .material(rotor, "rotor", 2)
-                .item(() -> Blocks.GLASS, 1)
-                .tech(Technologies.MOTOR)
-                .build()
-                .recipe(CENTRIFUGE)
-                .circuit(4)
-                .component(ELECTRIC_MOTOR, 2)
-                .tech(Technologies.MOTOR)
-                .build()
-                .recipe(THERMAL_CENTRIFUGE)
-                .circuit(2)
-                .component(ELECTRIC_MOTOR, 2)
-                .material(heat, "wire", wireNumber)
-                .tech(Technologies.MOTOR, Technologies.ELECTRIC_HEATING)
-                .build()
-                .recipe(ELECTRIC_FURNACE)
-                .circuit(2)
-                .material(heat, "wire", wireNumber)
-                .material(main, "plate", 1)
-                .tech(Technologies.ELECTRIC_HEATING)
-                .build()
-                .recipe(ALLOY_SMELTER)
-                .circuit(4)
-                .material(heat, "wire", wireNumber * 2)
-                .tech(Technologies.ELECTRIC_HEATING)
-                .build()
-                .recipe(MIXER)
-                .circuit(2)
-                .component(ELECTRIC_MOTOR, 1)
-                .material(rotor, "rotor", 1)
-                .item(() -> Blocks.GLASS, 4)
-                .tech(Technologies.MOTOR)
-                .build()
-                .recipe(POLARIZER)
-                .circuit(2)
-                .material(electric, "wire", wireNumber)
-                .tech(Technologies.MOTOR)
-                .build()
-                .recipe(WIREMILL)
-                .circuit(2)
-                .component(ELECTRIC_MOTOR, 4)
-                .tech(Technologies.MOTOR)
-                .build()
-                .recipe(BENDER)
-                .circuit(2)
-                .component(ELECTRIC_MOTOR, 2)
-                .component(ELECTRIC_PISTON, 2)
-                .material(main, "plate", 1)
-                .tech(Technologies.PUMP_AND_PISTON)
-                .build()
-                .recipe(COMPRESSOR)
-                .circuit(2)
-                .component(ELECTRIC_PISTON, 4)
-                .tech(Technologies.PUMP_AND_PISTON)
-                .build()
-                .recipe(LATHE)
-                .circuit(3)
-                .component(ELECTRIC_MOTOR, 1)
-                .component(ELECTRIC_PISTON, 1)
-                .component(GRINDER, 1)
-                .tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
-                .build()
-                .recipe(CUTTER)
-                .circuit(3)
-                .component(ELECTRIC_MOTOR, 1)
-                .component(CONVEYOR_MODULE, 1)
-                .component(BUZZSAW, 1)
-                .tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
-                .build()
-                .recipe(EXTRACTOR)
-                .circuit(2)
-                .component(ELECTRIC_PISTON, 1)
-                .component(ELECTRIC_PUMP, 1)
-                .material(heat, "wire", wireNumber)
-                .item(() -> Items.GLASS, 2)
-                .tech(Technologies.HOT_WORKING)
-                .build()
-                .recipe(FLUID_SOLIDIFIER)
-                .circuit(2)
-                .component(ELECTRIC_PUMP, 2)
-                .item(() -> Items.GLASS, 2)
-                .tech(Technologies.HOT_WORKING)
-                .build()
-                .recipe(STEAM_TURBINE)
-                .circuit(2)
-                .component(ELECTRIC_MOTOR, 2)
-                .material(rotor, "rotor", 2)
-                .material(pipe, "pipe", 2)
-                .tech(Technologies.MOTOR)
-                .build()
-                .recipe(ELECTRIC_CHEST)
-                .circuit(4)
-                .component(CONVEYOR_MODULE, 1)
-                .material(main, "plate", 2)
-                .item(() -> Items.CHEST, 1)
-                .tech(Technologies.CONVEYOR_MODULE)
-                .build()
-                .recipe(BATTERY_BOX)
-                .circuit(2)
-                .component(CABLE, 4)
-                .item(() -> Items.CHEST, 1)
-                .tech(Technologies.BATTERY)
-                .build()
-                .recipe(MULTI_BLOCK_INTERFACE)
-                .circuit(2)
-                .component(CONVEYOR_MODULE, 1)
-                .component(ELECTRIC_PUMP, 1)
-                .item(() -> Items.CHEST, 1)
-                .item(() -> Items.GLASS, 1)
-                .tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
-                .build();
+            .circuit(2)
+            .component(SENSOR, 1)
+            .component(EMITTER, 1)
+            .tech(Technologies.SENSOR_AND_EMITTER)
+            .build()
+            .recipe(AllBlockEntities.ASSEMBLER)
+            .circuit(2)
+            .component(ROBOT_ARM, 2)
+            .component(CONVEYOR_MODULE, 2)
+            .tech(Technologies.ROBOT_ARM, Technologies.CONVEYOR_MODULE)
+            .build()
+            .recipe(CIRCUIT_ASSEMBLER)
+            .circuit(Voltage.fromRank(v.rank + 1), 4)
+            .component(ROBOT_ARM, 1)
+            .component(EMITTER, 1)
+            .component(CONVEYOR_MODULE, 2)
+            .tech(Technologies.INTEGRATED_CIRCUIT)
+            .build()
+            .recipe(STONE_GENERATOR)
+            .circuit(2)
+            .component(ELECTRIC_MOTOR, 1)
+            .component(ELECTRIC_PISTON, 1)
+            .component(GRINDER, 1)
+            .item(() -> Blocks.GLASS, 1)
+            .tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
+            .build()
+            .recipe(ORE_ANALYZER)
+            .circuit(2)
+            .component(ELECTRIC_MOTOR, 3)
+            .component(SENSOR, 1)
+            .tech(Technologies.SENSOR_AND_EMITTER)
+            .build()
+            .recipe(MACERATOR)
+            .circuit(3)
+            .component(ELECTRIC_PISTON, 1)
+            .component(CONVEYOR_MODULE, 1)
+            .component(GRINDER, 1)
+            .tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
+            .build()
+            .recipe(ORE_WASHER)
+            .circuit(2)
+            .component(ELECTRIC_MOTOR, 1)
+            .material(rotor, "rotor", 2)
+            .item(() -> Blocks.GLASS, 1)
+            .tech(Technologies.MOTOR)
+            .build()
+            .recipe(CENTRIFUGE)
+            .circuit(4)
+            .component(ELECTRIC_MOTOR, 2)
+            .tech(Technologies.MOTOR)
+            .build()
+            .recipe(THERMAL_CENTRIFUGE)
+            .circuit(2)
+            .component(ELECTRIC_MOTOR, 2)
+            .material(heat, "wire", wireNumber)
+            .tech(Technologies.MOTOR, Technologies.ELECTRIC_HEATING)
+            .build()
+            .recipe(ELECTRIC_FURNACE)
+            .circuit(2)
+            .material(heat, "wire", wireNumber)
+            .material(main, "plate", 1)
+            .tech(Technologies.ELECTRIC_HEATING)
+            .build()
+            .recipe(ALLOY_SMELTER)
+            .circuit(4)
+            .material(heat, "wire", wireNumber * 2)
+            .tech(Technologies.ELECTRIC_HEATING)
+            .build()
+            .recipe(MIXER)
+            .circuit(2)
+            .component(ELECTRIC_MOTOR, 1)
+            .material(rotor, "rotor", 1)
+            .item(() -> Blocks.GLASS, 4)
+            .tech(Technologies.MOTOR)
+            .build()
+            .recipe(POLARIZER)
+            .circuit(2)
+            .material(electric, "wire", wireNumber)
+            .tech(Technologies.MOTOR)
+            .build()
+            .recipe(WIREMILL)
+            .circuit(2)
+            .component(ELECTRIC_MOTOR, 4)
+            .tech(Technologies.MOTOR)
+            .build()
+            .recipe(BENDER)
+            .circuit(2)
+            .component(ELECTRIC_MOTOR, 2)
+            .component(ELECTRIC_PISTON, 2)
+            .material(main, "plate", 1)
+            .tech(Technologies.PUMP_AND_PISTON)
+            .build()
+            .recipe(COMPRESSOR)
+            .circuit(2)
+            .component(ELECTRIC_PISTON, 4)
+            .tech(Technologies.PUMP_AND_PISTON)
+            .build()
+            .recipe(LATHE)
+            .circuit(3)
+            .component(ELECTRIC_MOTOR, 1)
+            .component(ELECTRIC_PISTON, 1)
+            .component(GRINDER, 1)
+            .tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
+            .build()
+            .recipe(CUTTER)
+            .circuit(3)
+            .component(ELECTRIC_MOTOR, 1)
+            .component(CONVEYOR_MODULE, 1)
+            .component(BUZZSAW, 1)
+            .tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
+            .build()
+            .recipe(EXTRACTOR)
+            .circuit(2)
+            .component(ELECTRIC_PISTON, 1)
+            .component(ELECTRIC_PUMP, 1)
+            .material(heat, "wire", wireNumber)
+            .item(() -> Items.GLASS, 2)
+            .tech(Technologies.HOT_WORKING)
+            .build()
+            .recipe(FLUID_SOLIDIFIER)
+            .circuit(2)
+            .component(ELECTRIC_PUMP, 2)
+            .item(() -> Items.GLASS, 2)
+            .tech(Technologies.HOT_WORKING)
+            .build()
+            .recipe(STEAM_TURBINE)
+            .circuit(2)
+            .component(ELECTRIC_MOTOR, 2)
+            .material(rotor, "rotor", 2)
+            .material(pipe, "pipe", 2)
+            .tech(Technologies.MOTOR)
+            .build()
+            .recipe(ELECTRIC_CHEST)
+            .circuit(4)
+            .component(CONVEYOR_MODULE, 1)
+            .material(main, "plate", 2)
+            .item(() -> Items.CHEST, 1)
+            .tech(Technologies.CONVEYOR_MODULE)
+            .build()
+            .recipe(BATTERY_BOX)
+            .circuit(2)
+            .component(CABLE, 4)
+            .item(() -> Items.CHEST, 1)
+            .tech(Technologies.BATTERY)
+            .build()
+            .recipe(MULTI_BLOCK_INTERFACE)
+            .circuit(2)
+            .component(CONVEYOR_MODULE, 1)
+            .component(ELECTRIC_PUMP, 1)
+            .item(() -> Items.CHEST, 1)
+            .item(() -> Items.GLASS, 1)
+            .tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
+            .build();
     }
 }

@@ -1,8 +1,7 @@
 package org.shsts.tinactory.core.common;
 
-import net.minecraft.network.FriendlyByteBuf;
-
 import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.network.FriendlyByteBuf;
 
 @ParametersAreNonnullByDefault
 public interface IPacket {

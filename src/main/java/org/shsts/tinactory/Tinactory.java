@@ -1,6 +1,7 @@
 package org.shsts.tinactory;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,7 +38,6 @@ import org.shsts.tinactory.registrate.AllRegistries;
 import org.shsts.tinactory.registrate.Registrate;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -53,31 +53,29 @@ public class Tinactory {
     private static final String CHANNEL_VERSION = "1";
     private static final AtomicInteger MSG_ID = new AtomicInteger(0);
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(ID, "channel"),
-            () -> CHANNEL_VERSION,
-            CHANNEL_VERSION::equals,
-            CHANNEL_VERSION::equals);
+        new ResourceLocation(ID, "channel"),
+        () -> CHANNEL_VERSION,
+        CHANNEL_VERSION::equals,
+        CHANNEL_VERSION::equals);
 
-    public static <T extends IPacket>
-    void registryPacket(Class<T> clazz, Supplier<T> constructor,
-                        BiConsumer<T, NetworkEvent.Context> handler) {
+    public static <T extends IPacket> void registryPacket(Class<T> clazz, Supplier<T> constructor,
+        BiConsumer<T, NetworkEvent.Context> handler) {
         CHANNEL.registerMessage(MSG_ID.getAndIncrement(), clazz, IPacket::serializeToBuf,
-                (buf) -> {
-                    var p = constructor.get();
-                    p.deserializeFromBuf(buf);
-                    return p;
-                }, (msg, ctxSupp) -> {
-                    var ctx = ctxSupp.get();
-                    ctx.enqueueWork(() -> handler.accept(msg, ctx));
-                    ctx.setPacketHandled(true);
-                });
+            (buf) -> {
+                var p = constructor.get();
+                p.deserializeFromBuf(buf);
+                return p;
+            }, (msg, ctxSupp) -> {
+                var ctx = ctxSupp.get();
+                ctx.enqueueWork(() -> handler.accept(msg, ctx));
+                ctx.setPacketHandled(true);
+            });
     }
 
-    public static <T extends IPacket>
-    void registryClientPacket(Class<T> clazz, Supplier<T> constructor,
-                              BiConsumer<T, NetworkEvent.Context> handler) {
+    public static <T extends IPacket> void registryClientPacket(Class<T> clazz, Supplier<T> constructor,
+        BiConsumer<T, NetworkEvent.Context> handler) {
         registryPacket(clazz, constructor, (msg, ctx) ->
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handler.accept(msg, ctx)));
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handler.accept(msg, ctx)));
     }
 
     public static <P extends IPacket> void sendToServer(P packet) {

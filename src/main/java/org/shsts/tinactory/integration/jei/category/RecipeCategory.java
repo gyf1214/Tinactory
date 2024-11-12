@@ -4,6 +4,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -44,8 +46,6 @@ import org.shsts.tinactory.integration.jei.ingredient.TechIngredientRenderer;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +64,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     protected final Class<M> menuClazz;
 
     protected RecipeCategory(RecipeTypeEntry<? extends T, ?> recipeType, Layout layout, Ingredient catalyst,
-                             ItemStack iconItem, Class<M> menuClazz) {
+        ItemStack iconItem, Class<M> menuClazz) {
         this.recipeType = recipeType;
         this.type = new RecipeType<>(prepend(recipeType.loc, "jei/category"), recipeType.clazz);
         this.layout = layout;
@@ -75,16 +75,15 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
     protected interface IIngredientBuilder {
         <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                                IIngredientType<I> type, List<I> ingredients, double rate);
-
+            IIngredientType<I> type, List<I> ingredients, double rate);
 
         default <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                                        IIngredientType<I> type, List<I> ingredients) {
+            IIngredientType<I> type, List<I> ingredients) {
             addIngredients(slot, role, type, ingredients, 1d);
         }
 
         default <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type,
-                                        List<I> ingredients, double rate) {
+            List<I> ingredients, double rate) {
             var role = switch (slot.type().direction) {
                 case INPUT -> RecipeIngredientRole.INPUT;
                 case OUTPUT -> RecipeIngredientRole.OUTPUT;
@@ -125,7 +124,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     }
 
     protected ComposeDrawable.Builder buildBackground(ComposeDrawable.Builder builder,
-                                                      IGuiHelper helper, int xOffset) {
+        IGuiHelper helper, int xOffset) {
         builder.add(helper.createBlankDrawable(WIDTH, layout.rect.height()));
         for (var slot : layout.slots) {
             builder.add(helper.getSlotDrawable(), xOffset + slot.x(), slot.y());
@@ -141,7 +140,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     protected abstract void addRecipe(T recipe, IIngredientBuilder builder);
 
     protected void drawExtra(T recipe, IDrawHelper helper, IRecipeSlotsView recipeSlotsView,
-                             PoseStack stack, double mouseX, double mouseY) {}
+        PoseStack stack, double mouseX, double mouseY) {}
 
     protected boolean canTransfer(M menu, T recipe) {
         return true;
@@ -185,13 +184,13 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
                 var texture = layout.progressBar.texture();
                 this.progressBarRect = layout.progressBar.rect().offset(xOffset, 0);
                 this.cachedProgressBar = CacheBuilder.newBuilder()
-                        .maximumSize(25)
-                        .build(new CacheLoader<>() {
-                            @Override
-                            public IDrawable load(Integer key) {
-                                return DrawableHelper.createProgressBar(guiHelper, texture, key);
-                            }
-                        });
+                    .maximumSize(25)
+                    .build(new CacheLoader<>() {
+                        @Override
+                        public IDrawable load(Integer key) {
+                            return DrawableHelper.createProgressBar(guiHelper, texture, key);
+                        }
+                    });
             } else {
                 this.cachedProgressBar = null;
                 this.progressBarRect = null;
@@ -212,7 +211,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
             @Override
             public <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                                           IIngredientType<I> type, List<I> ingredients, double rate) {
+                IIngredientType<I> type, List<I> ingredients, double rate) {
                 var x = slot.x() + 1 + xOffset;
                 var y = slot.y() + 1;
                 var slotBuilder = builder.addSlot(role, x, y).addIngredients(type, ingredients);
@@ -308,7 +307,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
             @Override
             public <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                                           IIngredientType<I> type, List<I> ingredients, double rate) {
+                IIngredientType<I> type, List<I> ingredients, double rate) {
                 if (role != RecipeIngredientRole.INPUT) {
                     return;
                 }
@@ -364,8 +363,8 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
     public void registerRecipes(IRecipeRegistration registration, RecipeManager recipeManager) {
         var list = recipeManager.getAllRecipesFor(recipeType.get()).stream()
-                .map($ -> (T) $)
-                .toList();
+            .map($ -> (T) $)
+            .toList();
         registration.addRecipes(type, list);
     }
 

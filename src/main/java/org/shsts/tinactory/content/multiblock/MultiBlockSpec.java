@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.multiblock;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.multiblock.MultiBlockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +87,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
     }
 
     private boolean checkLayer(MultiBlockCheckCtx ctx, Layer layer, BlockPos base,
-                               int y, Direction dirW, Direction dirD) {
+        int y, Direction dirW, Direction dirD) {
         for (var d = 0; d < depth; d++) {
             for (var w = 0; w < width; w++) {
                 if (w == centerW && d == centerD && layer == centerLayer) {

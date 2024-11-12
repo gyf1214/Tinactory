@@ -1,5 +1,7 @@
 package org.shsts.tinactory.core.common;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,8 +19,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -44,14 +44,14 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
         if (world.isLoaded(pos)) {
             var clazz = getEntityClass();
             return world.getBlockEntity(pos, getEntityType())
-                    .flatMap(be -> clazz.isInstance(be) ? Optional.of(clazz.cast(be)) : Optional.empty());
+                .flatMap(be -> clazz.isInstance(be) ? Optional.of(clazz.cast(be)) : Optional.empty());
         }
         return Optional.empty();
     }
 
     public <T1> Optional<T1> getBlockEntity(Level world, BlockPos pos, Class<T1> clazz) {
         return clazz.isAssignableFrom(getEntityClass()) ?
-                getBlockEntity(world, pos).map(clazz::cast) : Optional.empty();
+            getBlockEntity(world, pos).map(clazz::cast) : Optional.empty();
     }
 
     @Override
@@ -61,15 +61,15 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
 
     @Nullable
     @Override
-    public <T1 extends BlockEntity> BlockEntityTicker<T1>
-    getTicker(Level world, BlockState state, BlockEntityType<T1> type) {
+    public <T1 extends BlockEntity> BlockEntityTicker<T1> getTicker(
+        Level world, BlockState state, BlockEntityType<T1> type) {
         return type == getEntityType() && getEntityType().ticking ? SmartBlockEntity::ticker : null;
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
-                                 InteractionHand hand, BlockHitResult hitResult) {
+        InteractionHand hand, BlockHitResult hitResult) {
         var be = getBlockEntity(world, pos);
         if (be.isEmpty()) {
             return InteractionResult.PASS;

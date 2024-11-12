@@ -2,11 +2,10 @@ package org.shsts.tinactory.core.util;
 
 import com.mojang.math.MethodsReturnNonnullByDefault;
 import com.mojang.math.Vector3f;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -49,7 +48,7 @@ public final class MathUtil {
 
     public static Vec3 blockCenter(BlockPos pos) {
         return (new Vec3(pos.getX(), pos.getY(), pos.getZ()))
-                .add(0.5, 0.5, 0.5);
+            .add(0.5, 0.5, 0.5);
     }
 
     public static Vec3 dirNormal(Direction dir) {

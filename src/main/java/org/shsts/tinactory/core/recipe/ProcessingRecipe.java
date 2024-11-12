@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -24,7 +25,6 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
     protected boolean consumeInput(IContainer container, Input input, boolean simulate) {
         return container.hasPort(input.port) &&
-                input.ingredient.consumePort(container.getPort(input.port, true), simulate);
+            input.ingredient.consumePort(container.getPort(input.port, true), simulate);
     }
 
     protected boolean insertOutput(IContainer container, Output output, Random random, boolean simulate) {
@@ -66,8 +66,8 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     @Override
     public boolean matches(IContainer container, Level world) {
         return canCraftIn(container) &&
-                inputs.stream().allMatch(input -> consumeInput(container, input, true)) &&
-                outputs.stream().allMatch(output -> insertOutput(container, output, world.random, true));
+            inputs.stream().allMatch(input -> consumeInput(container, input, true)) &&
+            outputs.stream().allMatch(output -> insertOutput(container, output, world.random, true));
     }
 
     public boolean canCraftInVoltage(long voltage) {
@@ -99,17 +99,17 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     public IProcessingObject getDisplay() {
         if (!outputs.isEmpty()) {
             return outputs.stream().min(Comparator.comparingInt(Output::port))
-                    .get().result;
+                .get().result;
         } else if (!inputs.isEmpty()) {
             return inputs.stream().min(Comparator.comparingInt(Input::port))
-                    .get().ingredient;
+                .get().ingredient;
         } else {
             return ProcessingResults.EMPTY;
         }
     }
 
     public abstract static class BuilderBase<U extends ProcessingRecipe, S extends BuilderBase<U, S>>
-            extends SmartRecipeBuilder<U, S> {
+        extends SmartRecipeBuilder<U, S> {
         protected final List<Supplier<Input>> inputs = new ArrayList<>();
         protected final List<Supplier<Output>> outputs = new ArrayList<>();
         protected long workTicks = 0;
@@ -136,7 +136,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         public S inputItem(int port, Supplier<? extends ItemLike> item, int amount) {
             return input(port, () -> new ProcessingIngredients.ItemIngredient(
-                    new ItemStack(item.get(), amount)));
+                new ItemStack(item.get(), amount)));
         }
 
         public S inputItem(int port, TagKey<Item> tag, int amount) {
@@ -145,12 +145,12 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         public S inputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
             return input(port, () -> new ProcessingIngredients.FluidIngredient(
-                    new FluidStack(fluid.get(), amount)));
+                new FluidStack(fluid.get(), amount)));
         }
 
         public S inputFluid(int port, Fluid fluid, int amount) {
             return input(port, new ProcessingIngredients.FluidIngredient(
-                    new FluidStack(fluid, amount)));
+                new FluidStack(fluid, amount)));
         }
 
         public S output(int port, Supplier<IProcessingResult> result) {
@@ -164,7 +164,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         public S outputItem(int port, Supplier<? extends ItemLike> item, int amount, double rate) {
             return output(port, () ->
-                    new ProcessingResults.ItemResult(rate, new ItemStack(item.get(), amount)));
+                new ProcessingResults.ItemResult(rate, new ItemStack(item.get(), amount)));
         }
 
         public S outputItem(int port, Supplier<? extends ItemLike> item, int amount) {
@@ -177,7 +177,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
         public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount, double rate) {
             return output(port, () -> new ProcessingResults.FluidResult(
-                    rate, new FluidStack(fluid.get(), amount)));
+                rate, new FluidStack(fluid.get(), amount)));
         }
 
         public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
@@ -248,7 +248,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
 
     public static class Builder extends BuilderBase<ProcessingRecipe, Builder> {
         public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<ProcessingRecipe, Builder> parent,
-                       ResourceLocation loc) {
+            ResourceLocation loc) {
             super(consumer, parent, loc);
         }
 
@@ -259,7 +259,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     }
 
     protected static class Serializer<T extends ProcessingRecipe, B extends BuilderBase<T, B>>
-            extends SmartRecipeSerializer<T, B> {
+        extends SmartRecipeSerializer<T, B> {
         protected Serializer(RecipeTypeEntry<T, B> type) {
             super(type);
         }
@@ -267,19 +267,19 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
             var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
-                    .map(JsonElement::getAsJsonObject)
-                    .forEach(je -> builder.input(
-                            GsonHelper.getAsInt(je, "port"),
-                            ProcessingIngredients.fromJson(GsonHelper.getAsJsonObject(je, "ingredient"))));
+                .map(JsonElement::getAsJsonObject)
+                .forEach(je -> builder.input(
+                    GsonHelper.getAsInt(je, "port"),
+                    ProcessingIngredients.fromJson(GsonHelper.getAsJsonObject(je, "ingredient"))));
             Streams.stream(GsonHelper.getAsJsonArray(jo, "outputs"))
-                    .map(JsonElement::getAsJsonObject)
-                    .forEach(je -> builder.output(
-                            GsonHelper.getAsInt(je, "port"),
-                            ProcessingResults.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
+                .map(JsonElement::getAsJsonObject)
+                .forEach(je -> builder.output(
+                    GsonHelper.getAsInt(je, "port"),
+                    ProcessingResults.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
             return builder
-                    .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
-                    .voltage(GsonHelper.getAsLong(jo, "voltage"))
-                    .power(GsonHelper.getAsLong(jo, "power"));
+                .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
+                .voltage(GsonHelper.getAsLong(jo, "voltage"))
+                .power(GsonHelper.getAsLong(jo, "power"));
         }
 
         @Override
@@ -291,20 +291,20 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         public void toJson(JsonObject jo, T recipe) {
             var inputs = new JsonArray();
             recipe.inputs.stream()
-                    .map(input -> {
-                        var je = new JsonObject();
-                        je.addProperty("port", input.port);
-                        je.add("ingredient", ProcessingIngredients.toJson(input.ingredient));
-                        return je;
-                    }).forEach(inputs::add);
+                .map(input -> {
+                    var je = new JsonObject();
+                    je.addProperty("port", input.port);
+                    je.add("ingredient", ProcessingIngredients.toJson(input.ingredient));
+                    return je;
+                }).forEach(inputs::add);
             var outputs = new JsonArray();
             recipe.outputs.stream()
-                    .map(output -> {
-                        var je = new JsonObject();
-                        je.addProperty("port", output.port);
-                        je.add("result", ProcessingResults.toJson(output.result));
-                        return je;
-                    }).forEach(outputs::add);
+                .map(output -> {
+                    var je = new JsonObject();
+                    je.addProperty("port", output.port);
+                    je.add("result", ProcessingResults.toJson(output.result));
+                    return je;
+                }).forEach(outputs::add);
             jo.add("inputs", inputs);
             jo.add("outputs", outputs);
             jo.addProperty("work_ticks", recipe.workTicks);
@@ -314,5 +314,5 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     }
 
     public static final SmartRecipeSerializer.Factory<ProcessingRecipe, Builder>
-            SERIALIZER = Serializer::new;
+        SERIALIZER = Serializer::new;
 }

@@ -1,6 +1,8 @@
 package org.shsts.tinactory.core.multiblock;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -27,8 +29,6 @@ import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -82,7 +82,7 @@ public class MultiBlockInterface extends Machine {
         processor = target.getProcessor();
         electricMachine = target.getElectric();
         recipeType = processor instanceof RecipeProcessor<?> recipeProcessor ?
-                recipeProcessor.recipeType : null;
+            recipeProcessor.recipeType : null;
         container.setLayout(target.layout);
         var world = blockEntity.getLevel();
         assert world != null;
@@ -211,7 +211,7 @@ public class MultiBlockInterface extends Machine {
                 return;
             }
             AllCapabilities.MULTI_BLOCK.tryGet(be1)
-                    .ifPresentOrElse(this::setMultiBlock, this::resetMultiBlock);
+                .ifPresentOrElse(this::setMultiBlock, this::resetMultiBlock);
         } else {
             resetMultiBlock();
         }

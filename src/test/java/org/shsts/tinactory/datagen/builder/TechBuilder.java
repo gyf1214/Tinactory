@@ -2,6 +2,8 @@ package org.shsts.tinactory.datagen.builder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
@@ -12,8 +14,6 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.handler.TechProvider;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,9 +87,9 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
 
         if (researchVoltage != null) {
             RESEARCH_BENCH.recipe(DATA_GEN, loc)
-                    .target(loc)
-                    .defaultInput(researchVoltage)
-                    .build();
+                .target(loc)
+                .defaultInput(researchVoltage)
+                .build();
         }
     }
 

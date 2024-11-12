@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.electric;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -14,7 +15,6 @@ import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,9 +54,9 @@ public class ElectricComponent extends NetworkComponent {
 
         public void solve(double wFactor, double bFactor, boolean isBGen) {
             var tGen = gen + children.stream().mapToDouble(sub -> sub.pCons).sum() +
-                    (isBGen ? bGen * bFactor : 0d);
+                (isBGen ? bGen * bFactor : 0d);
             var tCons = cons * wFactor + children.stream().mapToDouble(sub -> sub.pGen).sum() +
-                    (isBGen ? 0d : bCons * bFactor);
+                (isBGen ? 0d : bCons * bFactor);
 
             var diff = tGen - tCons - lossFactor * tCons * tCons;
             var comp = MathUtil.compare(diff);

@@ -15,7 +15,7 @@ public enum CircuitTier {
     public final String circuitBoard;
 
     CircuitTier(Voltage baseVoltage, CircuitComponentTier componentTier,
-                String board, String circuitBoard) {
+        String board, String circuitBoard) {
         this.baseVoltage = baseVoltage;
         this.componentTier = componentTier;
         this.board = board;

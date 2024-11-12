@@ -1,12 +1,12 @@
 package org.shsts.tinactory.content.material;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ComponentBuilder<U, T, P> extends SimpleBuilder<Map<Voltage, RegistryEntry<U>>,
-        P, ComponentBuilder<U, T, P>> {
+    P, ComponentBuilder<U, T, P>> {
     protected record Pair<T>(Voltage voltage, T parameter) {}
 
     protected final List<Pair<T>> voltages = new ArrayList<>();
@@ -33,11 +33,10 @@ public class ComponentBuilder<U, T, P> extends SimpleBuilder<Map<Voltage, Regist
         return this;
     }
 
-
     @Override
     protected Map<Voltage, RegistryEntry<U>> createObject() {
         return voltages.stream().collect(Collectors.toMap(Pair::voltage,
-                $ -> factory.apply($.voltage, $.parameter)));
+            $ -> factory.apply($.voltage, $.parameter)));
     }
 
     public static class DummyBuilder<U, P> extends ComponentBuilder<U, Unit, P> {
@@ -56,13 +55,11 @@ public class ComponentBuilder<U, T, P> extends SimpleBuilder<Map<Voltage, Regist
         }
     }
 
-    public static <U, T> ComponentBuilder<U, T, ?>
-    builder(BiFunction<Voltage, T, RegistryEntry<U>> factory) {
+    public static <U, T> ComponentBuilder<U, T, ?> builder(BiFunction<Voltage, T, RegistryEntry<U>> factory) {
         return new ComponentBuilder<>(Unit.INSTANCE, factory);
     }
 
-    public static <U> DummyBuilder<U, ?>
-    simple(Function<Voltage, RegistryEntry<U>> factory) {
+    public static <U> DummyBuilder<U, ?> simple(Function<Voltage, RegistryEntry<U>> factory) {
         return new DummyBuilder<>(Unit.INSTANCE, factory);
     }
 }

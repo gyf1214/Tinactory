@@ -1,5 +1,8 @@
 package org.shsts.tinactory.core.logistics;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -9,9 +12,6 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
@@ -32,7 +32,7 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
 
     public WrapperFluidTank(IFluidTank tank) {
         assert tank instanceof FluidTank ||
-                (tank instanceof INBTSerializable<?> && tank instanceof IFluidTankModifiable);
+            (tank instanceof INBTSerializable<?> && tank instanceof IFluidTankModifiable);
         this.tank = tank;
     }
 
@@ -129,8 +129,8 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
     }
 
     @SuppressWarnings("unchecked")
-    private static <T1 extends Tag, T2 extends Tag>
-    void deserializeNBT(INBTSerializable<T1> serializable, T2 tag) {
+    private static <T1 extends Tag, T2 extends Tag> void deserializeNBT(
+        INBTSerializable<T1> serializable, T2 tag) {
         serializable.deserializeNBT((T1) tag);
     }
 

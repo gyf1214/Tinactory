@@ -1,11 +1,10 @@
 package org.shsts.tinactory.integration.jei.ingredient;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.I18n;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
