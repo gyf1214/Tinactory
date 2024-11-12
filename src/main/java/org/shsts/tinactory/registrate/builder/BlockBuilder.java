@@ -18,6 +18,7 @@ import org.shsts.tinactory.registrate.common.DistLazy;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -69,6 +70,10 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
     public S tint(DistLazy<BlockColor> value) {
         tint = value;
         return self();
+    }
+
+    public S tint(IntUnaryOperator func) {
+        return tint(() -> () -> ($1, $2, $3, i) -> func.applyAsInt(i));
     }
 
     public S tint(int... colors) {

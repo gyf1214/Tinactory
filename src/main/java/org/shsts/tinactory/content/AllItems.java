@@ -189,7 +189,9 @@ public final class AllItems {
 
         TRANSFORMER = ComponentBuilder.simple(v -> REGISTRATE
                 .block("network/" + v.id + "/transformer", SubnetBlock.transformer(v))
-                .translucent().register())
+                .translucent()
+                .tint(i -> i == 0 ? v.color : (i == 1 ? Voltage.fromRank(v.rank - 1).color : 0xFFFFFFFF))
+                .register())
             .voltages(Voltage.LV, Voltage.IV)
             .buildObject();
 

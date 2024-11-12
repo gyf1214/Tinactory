@@ -65,6 +65,14 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     }
 
     @Override
+    protected BlockState createDefaultBlockState() {
+        return super.createDefaultBlockState()
+            .setValue(FACING, Direction.NORTH)
+            .setValue(IO_FACING, Direction.SOUTH)
+            .setValue(WORKING, false);
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, IO_FACING, WORKING);
     }

@@ -18,6 +18,7 @@ public class RubberLogBlock extends RotatedPillarBlock {
 
     public RubberLogBlock(Properties prop) {
         super(prop.strength(2f));
+        registerDefaultState(defaultBlockState().setValue(HAS_RUBBER, false));
     }
 
     @Override

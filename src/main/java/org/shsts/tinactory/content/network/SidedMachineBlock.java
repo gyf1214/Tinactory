@@ -25,6 +25,11 @@ public class SidedMachineBlock<T extends BlockEntity> extends MachineBlock<T> {
     }
 
     @Override
+    protected BlockState createDefaultBlockState() {
+        return stateDefinition.any().setValue(IO_FACING, Direction.NORTH);
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(IO_FACING);
     }

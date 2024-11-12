@@ -28,6 +28,11 @@ public class MultiBlockInterfaceBlock extends SidedMachineBlock<SmartBlockEntity
     }
 
     @Override
+    protected BlockState createDefaultBlockState() {
+        return super.createDefaultBlockState().setValue(JOINED, false);
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(JOINED);
@@ -44,5 +49,10 @@ public class MultiBlockInterfaceBlock extends SidedMachineBlock<SmartBlockEntity
     public RenderShape getRenderShape(BlockState state) {
         return state.getValue(JOINED) ?
             RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
+    }
+
+    public static int tint(Voltage v, BlockState state, int index) {
+        var target = state.getValue(JOINED) ? 2 : 0;
+        return index == target ? v.color : 0xFFFFFFFF;
     }
 }

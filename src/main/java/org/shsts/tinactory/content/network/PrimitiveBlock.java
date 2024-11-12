@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.network;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,6 +27,13 @@ public class PrimitiveBlock<T extends BlockEntity> extends SmartEntityBlock<T> {
 
     public PrimitiveBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType) {
         super(properties.strength(2f, 6f), entityType);
+    }
+
+    @Override
+    protected BlockState createDefaultBlockState() {
+        return super.createDefaultBlockState()
+            .setValue(FACING, Direction.NORTH)
+            .setValue(WORKING, false);
     }
 
     @Override

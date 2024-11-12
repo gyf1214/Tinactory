@@ -70,14 +70,13 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         this.shapes = makeShapes();
         this.material = mat;
 
-        var defaultState = stateDefinition.any()
+        registerDefaultState(stateDefinition.any()
             .setValue(NORTH, false)
             .setValue(EAST, false)
             .setValue(SOUTH, false)
             .setValue(WEST, false)
             .setValue(UP, false)
-            .setValue(DOWN, false);
-        registerDefaultState(defaultState);
+            .setValue(DOWN, false));
     }
 
     public static Function<Properties, CableBlock> cable(Voltage voltage, MaterialSet mat) {

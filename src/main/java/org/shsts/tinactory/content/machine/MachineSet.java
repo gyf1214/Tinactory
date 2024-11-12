@@ -166,6 +166,10 @@ public class MachineSet {
                 .build());
         }
 
+        public S tintVoltage(int index) {
+            return machine(v -> $ -> $.block().tint(i -> i == index ? v.color : 0xFFFFFFFF).build());
+        }
+
         protected RegistryEntry<? extends Block> createMachine(Voltage voltage) {
             assert blockEntityBuilder != null;
             return blockEntityBuilder.apply(voltage, self())

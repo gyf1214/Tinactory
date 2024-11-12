@@ -30,6 +30,11 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
     protected SmartEntityBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType) {
         super(properties);
         this.entityType = Lazy.of(entityType);
+        registerDefaultState(createDefaultBlockState());
+    }
+
+    protected BlockState createDefaultBlockState() {
+        return stateDefinition.any();
     }
 
     public Class<T> getEntityClass() {

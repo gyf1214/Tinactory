@@ -320,7 +320,14 @@ public class MachineModel {
                 default -> "#side";
             })).end()
             .element().from(0, 0, 0).to(16, 16, 16)
-            .allFaces((d, f) -> f.cullface(d).texture("#" + DIR_TEX_KEYS.get(d) + "_overlay"))
+            .allFaces((d, f) -> {
+                f.cullface(d).texture("#" + DIR_TEX_KEYS.get(d) + "_overlay");
+                if (d == Direction.NORTH) {
+                    f.tintindex(0);
+                } else if (d == Direction.SOUTH) {
+                    f.tintindex(1);
+                }
+            })
             .end();
         for (var texKey : DIR_TEX_KEYS.values()) {
             model.texture(texKey + "_overlay", VOID_TEX);
@@ -333,6 +340,7 @@ public class MachineModel {
             .face(FRONT_FACING)
             .cullface(FRONT_FACING)
             .texture("#io_overlay")
+            .tintindex(2)
             .end().end();
     }
 

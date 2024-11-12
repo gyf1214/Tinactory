@@ -222,11 +222,12 @@ public final class AllBlockEntities {
             .buildObject();
 
         ELECTRIC_FURNACE = set.machine()
-            .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::sided)
+            .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::factory)
             .layoutCapability(StackProcessingContainer::builder)
             .capability(RecipeProcessor::electricFurnace)
             .layoutMenu(ProcessingMenu::machine)
             .layoutPlugin(MachinePlugin::electricFurnace)
+            .tintVoltage(2)
             .voltages(Voltage.ULV)
             .transform(simpleLayout(Texture.PROGRESS_ARROW))
             .buildObject();
@@ -341,6 +342,7 @@ public final class AllBlockEntities {
                 }
                 return $;
             }).build()
+            .tintVoltage(0)
             .buildObject();
 
         ELECTRIC_CHEST = set.machine()
@@ -358,7 +360,9 @@ public final class AllBlockEntities {
                     }
                 }
                 return $;
-            }).build().buildObject();
+            }).build()
+            .tintVoltage(0)
+            .buildObject();
 
         NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",
                 NetworkController::new,
@@ -397,6 +401,7 @@ public final class AllBlockEntities {
         public <T extends ProcessingRecipe> ProcessingSet.Builder<T, SetFactory> processing(
             RecipeTypeEntry<T, ?> recipeType) {
             return (new ProcessingSet.Builder<>(REGISTRATE, recipeType, this))
+                .tintVoltage(2)
                 .onCreateObject(PROCESSING_SETS::add);
         }
 

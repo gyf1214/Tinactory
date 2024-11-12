@@ -37,6 +37,8 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
         this.subVoltage = subVoltage;
         this.resistance = Math.sqrt((double) voltage.value / 2d) *
             TinactoryConfig.INSTANCE.machineResistanceFactor.get();
+
+        registerDefaultState(stateDefinition.any().setValue(IO_FACING, Direction.NORTH));
     }
 
     public static Function<Properties, SubnetBlock> transformer(Voltage voltage) {

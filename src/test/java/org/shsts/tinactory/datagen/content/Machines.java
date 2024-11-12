@@ -140,7 +140,7 @@ public final class Machines {
             .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
             .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
         machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
-        machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest", ME_BUS);
+        machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest");
 
         DATA_GEN.block(NETWORK_CONTROLLER)
             .blockState(MachineModel::builder, MachineModel::blockState)
@@ -155,11 +155,15 @@ public final class Machines {
             .tag(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH)
             .build()
             .block(LOW_PRESSURE_BOILER)
-            .blockState(machineBlock(Voltage.ULV, BOILER_TEX))
+            .blockState(MachineModel::builder, MachineModel::blockState)
+            .casing(Voltage.ULV).overlay(BOILER_TEX).ioTex(ME_BUS)
+            .build()
             .tag(MINEABLE_WITH_WRENCH)
             .build()
             .block(HIGH_PRESSURE_BOILER)
-            .blockState(machineBlock(Voltage.MV, BOILER_TEX))
+            .blockState(MachineModel::builder, MachineModel::blockState)
+            .casing(Voltage.MV).overlay(BOILER_TEX).ioTex(ME_BUS)
+            .build()
             .tag(MINEABLE_WITH_WRENCH)
             .build();
 
@@ -167,7 +171,7 @@ public final class Machines {
         multiBlockItem(SIFTER, "solid_steel", AllRecipes.SIFTER);
 
         MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
-            .blockState(multiBlockInterface(ME_BUS))
+            .blockState(multiBlockInterface(IO_TEX))
             .tag(MINEABLE_WITH_WRENCH)
             .build());
 
