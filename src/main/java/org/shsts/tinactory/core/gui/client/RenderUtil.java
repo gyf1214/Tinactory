@@ -168,6 +168,10 @@ public final class RenderUtil {
         }
     }
 
+    public static void renderGhostFluid(PoseStack poseStack, FluidStack stack, Rect rect, int zIndex) {
+        renderFluid(poseStack, stack, rect, 0x55FFFFFF, zIndex);
+    }
+
     public static PoseStack applyToModelViewStack(PoseStack poseStack) {
         var poseStack1 = RenderSystem.getModelViewStack();
         poseStack1.pushPose();
@@ -212,7 +216,7 @@ public final class RenderUtil {
     }
 
     public static Optional<ItemStack> selectItemFromItems(List<ItemStack> items) {
-        if (items.size() == 0) {
+        if (items.isEmpty()) {
             return Optional.empty();
         }
 

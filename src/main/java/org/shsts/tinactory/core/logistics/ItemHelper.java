@@ -11,6 +11,8 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -147,5 +149,12 @@ public final class ItemHelper {
             return Optional.of(ItemHandlerHelper.copyStackWithSize(item1, item1.getCount() + item2.getCount()));
         }
         return Optional.empty();
+    }
+
+    public static Optional<IFluidHandlerItem> getFluidHandlerFromItem(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return Optional.empty();
+        }
+        return FluidUtil.getFluidHandler(stack).resolve();
     }
 }

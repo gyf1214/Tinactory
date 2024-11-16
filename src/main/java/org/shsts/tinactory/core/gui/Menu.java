@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -293,7 +292,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
 
     protected FluidClickResult doClickFluidSlot(ItemStack item, IFluidTank tank,
         boolean mayDrain, boolean mayFill) {
-        var cap = FluidUtil.getFluidHandler(item).resolve();
+        var cap = ItemHelper.getFluidHandlerFromItem(item);
         if (cap.isEmpty()) {
             return new FluidClickResult();
         }

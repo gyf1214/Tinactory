@@ -154,7 +154,7 @@ public class MachineSet {
                 .build());
         }
 
-        public S plugin(IMenuPlugin.Factory<?> factory) {
+        public <M extends Menu<?, M>> S plugin(IMenuPlugin.Factory<M> factory) {
             return machine(v -> $ -> $.blockEntity()
                 .menu().plugin(factory).build()
                 .build());

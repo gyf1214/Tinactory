@@ -39,6 +39,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.COMPRESSOR;
 import static org.shsts.tinactory.content.AllBlockEntities.CUTTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
+import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_TANK;
 import static org.shsts.tinactory.content.AllBlockEntities.EXTRACTOR;
 import static org.shsts.tinactory.content.AllBlockEntities.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
@@ -141,6 +142,7 @@ public final class Machines {
             .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
         machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
         machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest");
+        machine(ELECTRIC_TANK, "overlay/machine/overlay_qtank");
 
         DATA_GEN.block(NETWORK_CONTROLLER)
             .blockState(MachineModel::builder, MachineModel::blockState)

@@ -7,6 +7,8 @@ import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.BoilerPlugin;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
+import org.shsts.tinactory.content.gui.ElectricStoragePlugin;
+import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
@@ -14,6 +16,7 @@ import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.ElectricChest;
+import org.shsts.tinactory.content.machine.ElectricTank;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveMachine;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -73,6 +76,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet STEAM_TURBINE;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
+    public static final MachineSet ELECTRIC_TANK;
     public static final Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> MULTI_BLOCK_INTERFACE;
 
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
@@ -349,6 +353,7 @@ public final class AllBlockEntities {
             .machine(v -> "machine/" + v.id + "/electric_chest", MachineBlock::factory)
             .layoutCapability(ElectricChest::builder)
             .layoutMenu(ElectricChestMenu::factory)
+            .<ElectricChestMenu>plugin(ElectricStoragePlugin::new)
             .voltages(Voltage.ULV, Voltage.HV)
             .layoutSet()
             .port(SlotType.NONE)
@@ -361,7 +366,25 @@ public final class AllBlockEntities {
                 }
                 return $;
             }).build()
-            .tintVoltage(0)
+            .tintVoltage(1)
+            .buildObject();
+
+        ELECTRIC_TANK = set.machine()
+            .machine(v -> "machine/" + v.id + "/electric_tank", MachineBlock::factory)
+            .layoutCapability(ElectricTank::builder)
+            .layoutMenu(ElectricTankMenu::factory)
+            .<ElectricTankMenu>plugin(ElectricStoragePlugin::new)
+            .voltages(Voltage.ULV, Voltage.HV)
+            .layoutSet()
+            .port(FLUID_INPUT)
+            .transform($ -> {
+                for (var i = 0; i < 8; i++) {
+                    var voltage = Voltage.fromValue(8 * (i + 1) * (i + 1));
+                    $.slot(i * (SLOT_SIZE + 2), 1, voltage);
+                }
+                return $;
+            }).build()
+            .tintVoltage(1)
             .buildObject();
 
         NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",

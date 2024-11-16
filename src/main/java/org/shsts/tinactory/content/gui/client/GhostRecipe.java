@@ -25,8 +25,7 @@ public class GhostRecipe extends MenuWidget {
     }
 
     private void renderFluid(PoseStack poseStack, FluidStack stack, int x, int y) {
-        var rect = new Rect(x, y, 16, 16);
-        RenderUtil.renderFluid(poseStack, stack, rect, 0x55FFFFFF, getBlitOffset());
+        RenderUtil.renderGhostFluid(poseStack, stack, new Rect(x, y, 16, 16), getBlitOffset());
     }
 
     private void renderIngredient(PoseStack poseStack, IProcessingObject ingredient, int x, int y) {

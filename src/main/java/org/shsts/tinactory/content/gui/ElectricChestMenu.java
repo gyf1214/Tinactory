@@ -12,20 +12,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.gui.client.PortConfigButton;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.SmartMenuType;
-import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.Panel;
@@ -41,16 +34,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.gui.client.FluidSlot.HIGHLIGHT_COLOR;
-import static org.shsts.tinactory.core.util.I18n.tr;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
-    private final MachineConfig machineConfig;
     private final ElectricChest chest;
     private final Layout layout;
-    private final int buttonY;
 
     private class InputSlot extends Slot {
         private final int slot;
@@ -132,9 +121,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
     public ElectricChestMenu(SmartMenuType<?, ?> type, int id, Inventory inventory,
         BlockEntity blockEntity, Layout layout) {
         super(type, id, inventory, blockEntity);
-        var machine = AllCapabilities.MACHINE.get(blockEntity);
-        this.machineConfig = machine.config;
-        this.chest = AllCapabilities.ELECTRIC_CHEST.get(blockEntity);
+        this.chest = (ElectricChest) AllCapabilities.PROCESSOR.get(blockEntity);
         this.layout = layout;
 
         var size = layout.slots.size() / 2;
@@ -150,10 +137,8 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
             var slot = i < size ? new InputSlot(i, x, y) : new OutputSlot(i - size, x, y);
             addSlot(slot);
         }
-        this.buttonY = layout.rect.endY() + MARGIN_VERTICAL;
-        this.height = buttonY + SLOT_SIZE;
+        this.height = layout.rect.endY();
         onEventPacket(MenuEventHandler.CHEST_SLOT_CLICK, this::onClickSlot);
-        onEventPacket(MenuEventHandler.SET_MACHINE_CONFIG, machine::setConfig);
 
         AllCapabilities.MACHINE.tryGet(blockEntity).ifPresent(Machine::sendUpdate);
     }
@@ -245,42 +230,11 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private class LockButton extends Button {
-        private static final Texture TEX = new Texture(
-            gregtech("gui/widget/button_public_private"), 18, 36);
-
-        public LockButton() {
-            super(ElectricChestMenu.this);
-        }
-
-        @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            var uy = machineConfig.getBoolean("unlockChest") ? 0 : TEX.height() / 2;
-            RenderUtil.blit(poseStack, TEX, getBlitOffset(), rect, 0, uy);
-        }
-
-        @Override
-        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            var component = machineConfig.getBoolean("unlockChest") ?
-                tr("tinactory.tooltip.chestUnlock") : tr("tinactory.tooltip.chestLock");
-            return Optional.of(List.of(component));
-        }
-
-        @Override
-        public void onMouseClicked(double mouseX, double mouseY, int button) {
-            var val = !machineConfig.getBoolean("unlockChest");
-            triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, SetMachineConfigPacket.builder()
-                .set("unlockChest", val));
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
     @Override
     public MenuScreen<ElectricChestMenu> createScreen(Inventory inventory, Component title) {
         var screen = super.createScreen(inventory, title);
 
         var layoutPanel = new Panel(screen);
-
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {
             var slot = layout.slots.get(i);
@@ -290,14 +244,6 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
             layoutPanel.addWidget(new Rect(x, y, SLOT_SIZE - 2, SLOT_SIZE - 2), new ItemSlot(i));
         }
         screen.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
-
-        var offset = new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE);
-        var anchor = RectD.corners(1d, 0d, 1d, 0d);
-        screen.addWidget(anchor, offset, new LockButton());
-        screen.addWidget(anchor, offset.offset(-SLOT_SIZE - SPACING, 0), new PortConfigButton(
-            ElectricChestMenu.this, machineConfig, "chestOutput", PortDirection.OUTPUT));
-        screen.addWidget(anchor, offset.offset(-(SLOT_SIZE + SPACING) * 2, 0), new PortConfigButton(
-            ElectricChestMenu.this, machineConfig, "chestInput", PortDirection.INPUT));
 
         return screen;
     }

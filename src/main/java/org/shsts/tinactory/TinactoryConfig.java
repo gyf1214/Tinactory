@@ -13,6 +13,8 @@ import java.util.function.Predicate;
 public final class TinactoryConfig {
     public final ConfigValue<Integer> fluidSlotSize;
     public final ConfigValue<Integer> baseFluidCellSize;
+    public final ConfigValue<Integer> chestSize;
+    public final ConfigValue<Integer> tankSize;
     public final ConfigValue<List<? extends Integer>> workerSize;
     public final ConfigValue<List<? extends Integer>> workerDelay;
     public final ConfigValue<List<? extends Integer>> workerStack;
@@ -29,9 +31,12 @@ public final class TinactoryConfig {
         builder.push("logistics");
         fluidSlotSize = builder.comment("Default size of a fluid slot.")
             .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
-
         baseFluidCellSize = builder.comment("Size of the base fluid cell.")
             .defineInRange("base_fluid_cell_size", 8000, 0, Integer.MAX_VALUE);
+        chestSize = builder.comment("Size of the electric chest")
+            .defineInRange("chest_size", 1024, 1, Integer.MAX_VALUE);
+        tankSize = builder.comment("Size of the electric tank")
+            .defineInRange("tank_size", 256000, 1, Integer.MAX_VALUE);
 
         Predicate<Object> validator = i -> (int) i > 0;
         workerSize = builder.comment("Worker sizes for logistics component")

@@ -1,28 +1,18 @@
 package org.shsts.tinactory.content.machine;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.PortDirection;
-import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.logistics.ItemSlotHandler;
-import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
@@ -36,12 +26,8 @@ import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricChest extends CapabilityProvider
-    implements IEventSubscriber, IProcessor, INBTSerializable<CompoundTag> {
+public class ElectricChest extends ElectricStorage implements INBTSerializable<CompoundTag> {
     public final int capacity;
-    private final BlockEntity blockEntity;
-    private Machine machine;
-    private MachineConfig machineConfig;
     private final int size;
     private final WrapperItemHandler itemHandler;
     private final WrapperItemHandler view;
@@ -49,9 +35,9 @@ public class ElectricChest extends CapabilityProvider
     private final ItemStack[] filters;
 
     public ElectricChest(BlockEntity blockEntity, Layout layout) {
-        this.blockEntity = blockEntity;
+        super(blockEntity);
         this.size = layout.slots.size() / 2;
-        this.capacity = 1024;
+        this.capacity = TinactoryConfig.INSTANCE.chestSize.get();
 
         var inner = new ItemSlotHandler(size, capacity);
         this.itemHandler = new WrapperItemHandler(inner);
@@ -96,40 +82,25 @@ public class ElectricChest extends CapabilityProvider
         blockEntity.setChanged();
     }
 
-    private void onSlotChange() {
-        blockEntity.setChanged();
-    }
-
     public boolean allowStackInSlot(int slot, ItemStack stack) {
         if (filters[slot] != null) {
             return ItemHelper.canItemsStack(stack, filters[slot]);
         }
         var stack1 = itemHandler.getStackInSlot(slot);
-        return (stack1.isEmpty() && machineConfig.getBoolean("unlockChest")) ||
-            ItemHelper.canItemsStack(stack, stack1);
+        return (stack1.isEmpty() && isUnlocked()) || ItemHelper.canItemsStack(stack, stack1);
     }
 
-    private void onLoad() {
-        machine = AllCapabilities.MACHINE.get(blockEntity);
-        machineConfig = machine.config;
-    }
-
-    private void onConnect(Network network) {
+    @Override
+    protected void onConnect(Network network) {
+        super.onConnect(network);
         var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
         logistics.addStorage(port);
     }
 
-    private void onMachineConfig() {
+    @Override
+    protected void onMachineConfig() {
         view.allowInput = machineConfig.getPortConfig("chestInput") != MachineConfig.PortConfig.NONE;
         view.allowOutput = machineConfig.getPortConfig("chestOutput") != MachineConfig.PortConfig.NONE;
-    }
-
-    @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CONNECT, this::onConnect);
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
     }
 
     @Override
@@ -139,24 +110,6 @@ public class ElectricChest extends CapabilityProvider
                 .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
                 .ifPresent(logistics -> logistics.addActiveItem(PortDirection.OUTPUT, port));
         }
-    }
-
-    @Override
-    public void onWorkTick(double partial) {}
-
-    @Override
-    public double getProgress() {
-        return 0d;
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.ELECTRIC_CHEST.get() ||
-            cap == AllCapabilities.PROCESSOR.get()) {
-            return myself();
-        }
-        return LazyOptional.empty();
     }
 
     @Override
