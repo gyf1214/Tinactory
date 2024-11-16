@@ -11,14 +11,10 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class EmptyRenderer<V> implements IIngredientRenderer<V> {
-    private EmptyRenderer() {}
+    public EmptyRenderer() {}
 
     @Override
     public List<Component> getTooltip(V ingredient, TooltipFlag tooltipFlag) {
         return List.of();
-    }
-
-    public static <V> IIngredientRenderer<V> instance() {
-        return new EmptyRenderer<>();
     }
 }

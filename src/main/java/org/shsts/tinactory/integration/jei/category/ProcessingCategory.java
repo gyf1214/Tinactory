@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.jei.category;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -13,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.items.ItemHandlerHelper;
-import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.content.AllCapabilities;
@@ -33,6 +33,7 @@ import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
+import org.shsts.tinactory.integration.jei.ingredient.TechIngredientRenderer;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
 import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -121,18 +122,22 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
 
     private void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
         if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-            builder.item(slot, item.stack());
+            builder.itemInput(slot, item.stack());
         } else if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
-            var items = Arrays.stream(item.ingredient.getItems())
-                .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, item.amount))
-                .toList();
-            builder.items(slot, items);
+            if (item.amount <= 0) {
+                builder.itemNotConsumedInput(slot, List.of(item.ingredient.getItems()));
+            } else {
+                var items = Arrays.stream(item.ingredient.getItems())
+                    .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, item.amount))
+                    .toList();
+                builder.itemInput(slot, items);
+            }
         } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-            builder.fluid(slot, fluid.fluid());
+            builder.fluidInput(slot, fluid.fluid());
         } else if (ingredient instanceof ProcessingResults.ItemResult item) {
-            builder.ratedItem(slot, item.stack, item.rate);
+            builder.itemOutput(slot, item.stack, item.rate);
         } else if (ingredient instanceof ProcessingResults.FluidResult fluid) {
-            builder.ratedFluid(slot, fluid.stack, fluid.rate);
+            builder.fluidOutput(slot, fluid.stack, fluid.rate);
         } else {
             throw new IllegalArgumentException("Unknown processing ingredient type %s"
                 .formatted(ingredient.getClass()));
@@ -140,7 +145,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
     }
 
     @Override
-    protected void addRecipe(ProcessingRecipe recipe, IIngredientBuilder builder) {
+    protected void setRecipe(ProcessingRecipe recipe, IIngredientBuilder builder) {
         var inputs = layout.getProcessingInputs(recipe);
         var outputs = layout.getProcessingOutputs(recipe);
 
@@ -150,12 +155,20 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
         for (var output : outputs) {
             addIngredient(builder, output.slot(), output.val());
         }
+    }
 
+    private void addTechIngredient(IRecipeLayoutBuilder builder, RecipeIngredientRole role,
+        int x, int y, ResourceLocation loc) {
+        builder.addSlot(role, x + 1 + xOffset, y + 1)
+            .addIngredient(TechIngredientType.INSTANCE, new TechWrapper(loc))
+            .setCustomRenderer(TechIngredientType.INSTANCE, TechIngredientRenderer.INSTANCE);
+    }
+
+    @Override
+    protected void extraLayout(ProcessingRecipe recipe, IRecipeLayoutBuilder builder) {
         if (recipe instanceof ResearchRecipe recipe1) {
             var rect = layout.images.get(0).rect();
-            var slot = new Layout.SlotInfo(0, rect.x(), rect.y(), 0, SlotType.NONE);
-            builder.addIngredients(slot, RecipeIngredientRole.OUTPUT, TechIngredientType.INSTANCE,
-                List.of(new TechWrapper(recipe1.target)));
+            addTechIngredient(builder, RecipeIngredientRole.OUTPUT, rect.x(), rect.y(), recipe1.target);
         }
         List<?> requiredTech = List.of();
         if (recipe instanceof AssemblyRecipe recipe1) {
@@ -178,9 +191,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
             } else {
                 throw new IllegalStateException();
             }
-            var slot = new Layout.SlotInfo(0, x, y, 0, SlotType.NONE);
-            builder.addIngredients(slot, RecipeIngredientRole.INPUT, TechIngredientType.INSTANCE,
-                List.of(new TechWrapper(loc)));
+            addTechIngredient(builder, RecipeIngredientRole.OUTPUT, x, y, loc);
             x += BUTTON_SIZE;
         }
     }

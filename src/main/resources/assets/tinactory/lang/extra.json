@@ -50,6 +50,7 @@
   "tinactory.jei.processing.requiredTech": "Requires:",
   "tinactory.jei.processing.temperature": "Temperature: %d K",
   "tinactory.jei.rate": "Chance: %s",
+  "tinactory.jei.not_consumed": "Does not get consumed in the process",
   "tinactory.chat.createTeam.success": "Create team %s for %s successfully.",
   "tinactory.chat.addPlayerToTeam.success": "Add player %s to team %s successfully.",
   "tinactory.chat.leaveTeam.success": "%s leaves team %s successfully.",

@@ -31,7 +31,7 @@ import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
-import org.shsts.tinactory.integration.jei.ingredient.EmptyRenderer;
+import org.shsts.tinactory.integration.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientHelper;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -91,7 +91,7 @@ public class JEI implements IModPlugin {
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
         registration.register(TechIngredientType.INSTANCE, Collections.emptyList(),
-            new TechIngredientHelper(), EmptyRenderer.instance());
+            new TechIngredientHelper(), IngredientRenderers.empty());
     }
 
     @Override

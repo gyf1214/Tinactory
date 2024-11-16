@@ -9,10 +9,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
@@ -30,8 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.gui.Layout;
@@ -40,10 +38,7 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
-import org.shsts.tinactory.integration.jei.ingredient.FluidIngredientRenderer;
-import org.shsts.tinactory.integration.jei.ingredient.RatedItemIngredientRenderer;
-import org.shsts.tinactory.integration.jei.ingredient.TechIngredientRenderer;
-import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
+import org.shsts.tinactory.integration.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import java.util.ArrayList;
@@ -59,6 +54,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     protected final RecipeTypeEntry<? extends T, ?> recipeType;
     public final RecipeType<T> type;
     protected final Layout layout;
+    protected final int xOffset;
     protected final Ingredient catalyst;
     protected final ItemStack iconItem;
     protected final Class<M> menuClazz;
@@ -68,52 +64,49 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         this.recipeType = recipeType;
         this.type = new RecipeType<>(prepend(recipeType.loc, "jei/category"), recipeType.clazz);
         this.layout = layout;
+        this.xOffset = (WIDTH - layout.rect.width()) / 2;
         this.catalyst = catalyst;
         this.iconItem = iconItem;
         this.menuClazz = menuClazz;
     }
 
     protected interface IIngredientBuilder {
-        <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-            IIngredientType<I> type, List<I> ingredients, double rate);
+        void itemInput(Layout.SlotInfo slot, List<ItemStack> item);
 
-        default <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-            IIngredientType<I> type, List<I> ingredients) {
-            addIngredients(slot, role, type, ingredients, 1d);
+        default void itemInput(Layout.SlotInfo slot, ItemStack item) {
+            itemInput(slot, List.of(item));
         }
 
-        default <I> void addIngredients(Layout.SlotInfo slot, IIngredientType<I> type,
-            List<I> ingredients, double rate) {
-            var role = switch (slot.type().direction) {
-                case INPUT -> RecipeIngredientRole.INPUT;
-                case OUTPUT -> RecipeIngredientRole.OUTPUT;
-                case NONE -> throw new IllegalArgumentException();
-            };
-            addIngredients(slot, role, type, ingredients, rate);
+        default void ingredientInput(Layout.SlotInfo slot, Ingredient ingredient) {
+            itemInput(slot, List.of(ingredient.getItems()));
         }
 
-        default void item(Layout.SlotInfo slot, ItemStack stack) {
-            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(stack), 1d);
+        void itemNotConsumedInput(Layout.SlotInfo slot, List<ItemStack> item);
+
+        void fluidInput(Layout.SlotInfo slot, FluidStack fluid);
+
+        void itemOutput(Layout.SlotInfo slot, ItemStack item);
+
+        void ratedItemOutput(Layout.SlotInfo slot, ItemStack item, double rate);
+
+        default void itemOutput(Layout.SlotInfo slot, ItemStack item, double rate) {
+            if (rate >= 1d) {
+                itemOutput(slot, item);
+            } else {
+                ratedItemOutput(slot, item, rate);
+            }
         }
 
-        default void ratedItem(Layout.SlotInfo slot, ItemStack stack, double rate) {
-            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(stack), rate);
-        }
+        void fluidOutput(Layout.SlotInfo slot, FluidStack fluid);
 
-        default void items(Layout.SlotInfo slot, List<ItemStack> stacks) {
-            addIngredients(slot, VanillaTypes.ITEM_STACK, stacks, 1d);
-        }
+        void ratedFluidOutput(Layout.SlotInfo slot, FluidStack fluid, double rate);
 
-        default void ingredient(Layout.SlotInfo slot, Ingredient ingredient) {
-            addIngredients(slot, VanillaTypes.ITEM_STACK, List.of(ingredient.getItems()), 1d);
-        }
-
-        default void fluid(Layout.SlotInfo slot, FluidStack stack) {
-            addIngredients(slot, ForgeTypes.FLUID_STACK, List.of(stack), 1d);
-        }
-
-        default void ratedFluid(Layout.SlotInfo slot, FluidStack stack, double rate) {
-            addIngredients(slot, ForgeTypes.FLUID_STACK, List.of(stack), rate);
+        default void fluidOutput(Layout.SlotInfo slot, FluidStack fluid, double rate) {
+            if (rate >= 1d) {
+                fluidOutput(slot, fluid);
+            } else {
+                ratedFluidOutput(slot, fluid, rate);
+            }
         }
     }
 
@@ -137,7 +130,9 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         return builder;
     }
 
-    protected abstract void addRecipe(T recipe, IIngredientBuilder builder);
+    protected abstract void setRecipe(T recipe, IIngredientBuilder builder);
+
+    protected void extraLayout(T recipe, IRecipeLayoutBuilder builder) {}
 
     protected void drawExtra(T recipe, IDrawHelper helper, IRecipeSlotsView recipeSlotsView,
         PoseStack stack, double mouseX, double mouseY) {}
@@ -167,7 +162,6 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         private final Component title;
         private final IDrawable icon;
         private final IDrawable background;
-        private final int xOffset;
 
         @Nullable
         private final LoadingCache<Integer, IDrawable> cachedProgressBar;
@@ -177,7 +171,6 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
         private Category(IGuiHelper guiHelper) {
             this.title = categoryTitle();
             this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, iconItem);
-            this.xOffset = (WIDTH - layout.rect.width()) / 2;
             this.background = createBackground(guiHelper, xOffset);
 
             if (layout.progressBar != null) {
@@ -209,32 +202,65 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
                 this.builder = builder;
             }
 
-            @Override
-            public <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                IIngredientType<I> type, List<I> ingredients, double rate) {
+            private IRecipeSlotBuilder addSlot(Layout.SlotInfo slot, RecipeIngredientRole role) {
                 var x = slot.x() + 1 + xOffset;
                 var y = slot.y() + 1;
-                var slotBuilder = builder.addSlot(role, x, y).addIngredients(type, ingredients);
-                if (rate >= 1d) {
-                    if (type == ForgeTypes.FLUID_STACK) {
-                        slotBuilder.setCustomRenderer(ForgeTypes.FLUID_STACK, FluidIngredientRenderer.INSTANCE);
-                    } else if (type == TechIngredientType.INSTANCE) {
-                        slotBuilder.setCustomRenderer(TechIngredientType.INSTANCE, TechIngredientRenderer.INSTANCE);
-                    }
-                } else {
-                    if (type == VanillaTypes.ITEM_STACK) {
-                        slotBuilder.setCustomRenderer(VanillaTypes.ITEM_STACK, new RatedItemIngredientRenderer(rate));
-                    } else if (type == ForgeTypes.FLUID_STACK) {
-                        slotBuilder.setCustomRenderer(ForgeTypes.FLUID_STACK, FluidIngredientRenderer.rated(rate));
-                    }
-                }
+                return builder.addSlot(role, x, y);
+            }
+
+            @Override
+            public void itemInput(Layout.SlotInfo slot, List<ItemStack> item) {
+                addSlot(slot, RecipeIngredientRole.INPUT)
+                    .addIngredients(VanillaTypes.ITEM_STACK, item);
+            }
+
+            @Override
+            public void itemNotConsumedInput(Layout.SlotInfo slot, List<ItemStack> item) {
+                addSlot(slot, RecipeIngredientRole.INPUT)
+                    .addIngredients(VanillaTypes.ITEM_STACK, item)
+                    .setCustomRenderer(VanillaTypes.ITEM_STACK, IngredientRenderers.ITEM_NOT_CONSUMED);
+            }
+
+            @Override
+            public void fluidInput(Layout.SlotInfo slot, FluidStack fluid) {
+                addSlot(slot, RecipeIngredientRole.INPUT)
+                    .addIngredient(ForgeTypes.FLUID_STACK, fluid)
+                    .setCustomRenderer(ForgeTypes.FLUID_STACK, IngredientRenderers.FLUID);
+            }
+
+            @Override
+            public void itemOutput(Layout.SlotInfo slot, ItemStack item) {
+                addSlot(slot, RecipeIngredientRole.OUTPUT)
+                    .addIngredient(VanillaTypes.ITEM_STACK, item);
+            }
+
+            @Override
+            public void ratedItemOutput(Layout.SlotInfo slot, ItemStack item, double rate) {
+                addSlot(slot, RecipeIngredientRole.OUTPUT)
+                    .addIngredient(VanillaTypes.ITEM_STACK, item)
+                    .setCustomRenderer(VanillaTypes.ITEM_STACK, IngredientRenderers.ratedItem(rate));
+            }
+
+            @Override
+            public void fluidOutput(Layout.SlotInfo slot, FluidStack fluid) {
+                addSlot(slot, RecipeIngredientRole.OUTPUT)
+                    .addIngredient(ForgeTypes.FLUID_STACK, fluid)
+                    .setCustomRenderer(ForgeTypes.FLUID_STACK, IngredientRenderers.FLUID);
+            }
+
+            @Override
+            public void ratedFluidOutput(Layout.SlotInfo slot, FluidStack fluid, double rate) {
+                addSlot(slot, RecipeIngredientRole.OUTPUT)
+                    .addIngredient(ForgeTypes.FLUID_STACK, fluid)
+                    .setCustomRenderer(ForgeTypes.FLUID_STACK, IngredientRenderers.ratedFluid(rate));
             }
         }
 
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, T recipe, IFocusGroup focuses) {
             var ingredientBuilder = new IngredientBuilder(builder);
-            addRecipe(recipe, ingredientBuilder);
+            RecipeCategory.this.setRecipe(recipe, ingredientBuilder);
+            extraLayout(recipe, builder);
             builder.moveRecipeTransferButton(WIDTH - Menu.SLOT_SIZE, 0);
         }
 
@@ -285,8 +311,6 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
     }
 
     private class TransferInfo implements IRecipeTransferInfo<M, T> {
-        private static final Slot EMPTY_SLOT = new SlotItemHandler(EmptyHandler.INSTANCE, 0, 0, 0);
-
         @Override
         public Class<M> getContainerClass() {
             return menuClazz;
@@ -305,24 +329,40 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
                 this.container = container;
             }
 
-            @Override
-            public <I> void addIngredients(Layout.SlotInfo slot, RecipeIngredientRole role,
-                IIngredientType<I> type, List<I> ingredients, double rate) {
-                if (role != RecipeIngredientRole.INPUT) {
-                    return;
-                }
-                if (slot.type() == SlotType.ITEM_INPUT) {
-                    slots.add(container.getSlot(slot.index()));
-                } else if (slot.type() == SlotType.FLUID_INPUT) {
-                    slots.add(EMPTY_SLOT);
-                }
+            private void itemInput(Layout.SlotInfo slot) {
+                slots.add(container.getSlot(slot.index()));
             }
+
+            @Override
+            public void itemInput(Layout.SlotInfo slot, List<ItemStack> item) {
+                itemInput(slot);
+            }
+
+            @Override
+            public void itemNotConsumedInput(Layout.SlotInfo slot, List<ItemStack> item) {
+                itemInput(slot);
+            }
+
+            @Override
+            public void fluidInput(Layout.SlotInfo slot, FluidStack fluid) {}
+
+            @Override
+            public void itemOutput(Layout.SlotInfo slot, ItemStack item) {}
+
+            @Override
+            public void ratedItemOutput(Layout.SlotInfo slot, ItemStack item, double rate) {}
+
+            @Override
+            public void fluidOutput(Layout.SlotInfo slot, FluidStack fluid) {}
+
+            @Override
+            public void ratedFluidOutput(Layout.SlotInfo slot, FluidStack fluid, double rate) {}
         }
 
         @Override
         public List<Slot> getRecipeSlots(M container, T recipe) {
             var builder = new IngredientBuilder(container);
-            addRecipe(recipe, builder);
+            setRecipe(recipe, builder);
             return builder.slots;
         }
 

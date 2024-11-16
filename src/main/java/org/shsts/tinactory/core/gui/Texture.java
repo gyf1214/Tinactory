@@ -31,10 +31,10 @@ public record Texture(ResourceLocation loc, int width, int height) {
     public static final Texture PROGRESS_CIRCUIT = progressBar("circuit");
     public static final Texture PROGRESS_GAS = progressBar("gas_collector");
     public static final Texture PROGRESS_MULTIPLE = progressBar("arrow_multiple");
-    public static final Texture PROCESS_BENDING = progressBar("bending");
-    public static final Texture PROCESS_WIREMILL = progressBar("wiremill");
-    public static final Texture PROCESS_LATHE = progressBar("lathe");
-    public static final Texture PROCESS_SLICE = progressBar("slice");
+    public static final Texture PROGRESS_BENDING = progressBar("bending");
+    public static final Texture PROGRESS_WIREMILL = progressBar("wiremill");
+    public static final Texture PROGRESS_LATHE = progressBar("lathe");
+    public static final Texture PROGRESS_SLICE = progressBar("slice");
     public static final Texture PROGRESS_MAGNETIC = progressBar("magnet");
     public static final Texture PROGRESS_COMPRESS = progressBar("compress");
     public static final Texture PROGRESS_MIXER = progressBar("mixer");

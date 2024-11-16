@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.jei.category;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
@@ -14,8 +15,8 @@ import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -30,30 +31,37 @@ public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchMenu> {
     }
 
     @Override
-    protected void addRecipe(ToolRecipe recipe, IIngredientBuilder builder) {
+    protected void setRecipe(ToolRecipe recipe, IIngredientBuilder builder) {
         var shaped = recipe.shapedRecipe;
         var slots = layout.slots;
 
-        builder.item(slots.get(0).setType(SlotType.ITEM_OUTPUT), shaped.getResultItem());
-
-        var k = 0;
-        for (var toolIngredient : recipe.toolIngredients) {
-            var items = Arrays.asList(toolIngredient.getItems());
-            builder.addIngredients(slots.get(1 + k), RecipeIngredientRole.CATALYST,
-                VanillaTypes.ITEM_STACK, items);
-            if (++k >= 9) {
-                break;
-            }
-        }
+        builder.itemOutput(slots.get(0).setType(SlotType.ITEM_OUTPUT), shaped.getResultItem());
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
                 var slot = slots.get(10 + i * 3 + j);
                 if (i < shaped.getHeight() && j < shaped.getWidth()) {
                     var ingredient = recipe.shapedRecipe.getIngredients().get(i * shaped.getWidth() + j);
-                    builder.ingredient(slot, ingredient);
+                    builder.ingredientInput(slot, ingredient);
                 } else {
-                    builder.items(slot, Collections.emptyList());
+                    builder.itemInput(slot, Collections.emptyList());
                 }
+            }
+        }
+    }
+
+    @Override
+    protected void extraLayout(ToolRecipe recipe, IRecipeLayoutBuilder builder) {
+        var k = 0;
+        for (var toolIngredient : recipe.toolIngredients) {
+            var slot = layout.slots.get(1 + k);
+            var x = slot.x() + 1 + xOffset;
+            var y = slot.y() + 1;
+
+            builder.addSlot(RecipeIngredientRole.CATALYST, x, y)
+                .addIngredients(VanillaTypes.ITEM_STACK, List.of(toolIngredient.getItems()));
+
+            if (++k >= 9) {
+                break;
             }
         }
     }

@@ -108,6 +108,18 @@ public final class ItemHelper {
         return ItemHandlerHelper.copyStackWithSize(stack, count);
     }
 
+    public static boolean hasItem(IItemCollection collection, Predicate<ItemStack> ingredient) {
+        if (!collection.acceptOutput()) {
+            return false;
+        }
+        for (var itemStack : collection.getAllItems()) {
+            if (ingredient.test(itemStack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Return whether the requirements are met.
      */

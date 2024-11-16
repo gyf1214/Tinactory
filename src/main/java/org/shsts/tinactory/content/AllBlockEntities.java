@@ -55,6 +55,7 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 public final class AllBlockEntities {
     public static final ProcessingSet RESEARCH_BENCH;
     public static final ProcessingSet ASSEMBLER;
+    public static final ProcessingSet LASER_ENGRAVER;
     public static final ProcessingSet CIRCUIT_ASSEMBLER;
     public static final ProcessingSet STONE_GENERATOR;
     public static final ProcessingSet ORE_ANALYZER;
@@ -117,6 +118,18 @@ public final class AllBlockEntities {
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
             .progressBar(Texture.PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE)
+            .build()
+            .buildObject();
+
+        LASER_ENGRAVER = set.processing(AllRecipes.LASER_ENGRAVER)
+            .layoutSet()
+            .port(ITEM_INPUT)
+            .slot(0, 1 + SLOT_SIZE / 2)
+            .port(ITEM_INPUT)
+            .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
+            .port(ITEM_OUTPUT)
+            .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
+            .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -265,12 +278,12 @@ public final class AllBlockEntities {
             .buildObject();
 
         POLARIZER = set.simpleMachine(AllRecipes.POLARIZER, Texture.PROGRESS_MAGNETIC);
-        WIREMILL = set.simpleMachine(AllRecipes.WIREMILL, Texture.PROCESS_WIREMILL);
-        BENDER = set.simpleMachine(AllRecipes.BENDER, Texture.PROCESS_BENDING);
+        WIREMILL = set.simpleMachine(AllRecipes.WIREMILL, Texture.PROGRESS_WIREMILL);
+        BENDER = set.simpleMachine(AllRecipes.BENDER, Texture.PROGRESS_BENDING);
         COMPRESSOR = set.simpleMachine(AllRecipes.COMPRESSOR, Texture.PROGRESS_COMPRESS);
 
         LATHE = set.processing(AllRecipes.LATHE)
-            .transform(simpleLayout(Texture.PROCESS_LATHE))
+            .transform(simpleLayout(Texture.PROGRESS_LATHE))
             .layoutSet()
             .image(28 + SLOT_SIZE, 1 + SLOT_SIZE / 2, Texture.PROGRESS_LATH_BASE)
             .build()
@@ -284,7 +297,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROCESS_SLICE, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .progressBar(Texture.PROGRESS_SLICE, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 

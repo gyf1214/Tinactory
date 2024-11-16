@@ -16,18 +16,9 @@ import org.shsts.tinactory.core.util.ClientUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
-import static org.shsts.tinactory.core.util.I18n.tr;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RatedItemIngredientRenderer implements IIngredientRenderer<ItemStack> {
-    private final double rate;
-
-    public RatedItemIngredientRenderer(double rate) {
-        this.rate = rate;
-    }
-
+public class ItemIngredientRenderer implements IIngredientRenderer<ItemStack> {
     @Override
     public void render(PoseStack poseStack, ItemStack ingredient) {
         var poseStack1 = RenderUtil.applyToModelViewStack(poseStack);
@@ -37,9 +28,7 @@ public class RatedItemIngredientRenderer implements IIngredientRenderer<ItemStac
 
     @Override
     public List<Component> getTooltip(ItemStack ingredient, TooltipFlag tooltipFlag) {
-        var lines = new ArrayList<>(ClientUtil.itemTooltip(ingredient, tooltipFlag));
-        lines.add(formatRate(rate));
-        return lines;
+        return new ArrayList<>(ClientUtil.itemTooltip(ingredient, tooltipFlag));
     }
 
     @Override
@@ -50,9 +39,5 @@ public class RatedItemIngredientRenderer implements IIngredientRenderer<ItemStac
             return font;
         }
         return minecraft.font;
-    }
-
-    public static Component formatRate(double rate) {
-        return tr("tinactory.jei.rate", PERCENTAGE_FORMAT.format(rate));
     }
 }

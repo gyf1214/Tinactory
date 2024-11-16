@@ -143,6 +143,10 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
             return input(port, () -> new ProcessingIngredients.TagIngredient(tag, amount));
         }
 
+        public S inputItemNotConsumed(int port, TagKey<Item> tag) {
+            return input(port, () -> new ProcessingIngredients.TagIngredient(tag, 0));
+        }
+
         public S inputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
             return input(port, () -> new ProcessingIngredients.FluidIngredient(
                 new FluidStack(fluid.get(), amount)));

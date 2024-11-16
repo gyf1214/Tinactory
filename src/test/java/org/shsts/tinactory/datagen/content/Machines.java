@@ -43,6 +43,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_TANK;
 import static org.shsts.tinactory.content.AllBlockEntities.EXTRACTOR;
 import static org.shsts.tinactory.content.AllBlockEntities.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
+import static org.shsts.tinactory.content.AllBlockEntities.LASER_ENGRAVER;
 import static org.shsts.tinactory.content.AllBlockEntities.LATHE;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
@@ -122,6 +123,7 @@ public final class Machines {
         primitiveMachine(ORE_WASHER, PRIMITIVE_ORE_WASHER, "machines/ore_washer");
         machine(RESEARCH_BENCH, "overlay/machine/overlay_screen");
         machine(AllBlockEntities.ASSEMBLER);
+        machine(LASER_ENGRAVER);
         machine(CIRCUIT_ASSEMBLER, "machines/assembler");
         machine(MACERATOR);
         machine(CENTRIFUGE);
@@ -473,6 +475,12 @@ public final class Machines {
             .component(ROBOT_ARM, 2)
             .component(CONVEYOR_MODULE, 2)
             .tech(Technologies.ROBOT_ARM, Technologies.CONVEYOR_MODULE)
+            .build()
+            .recipe(LASER_ENGRAVER)
+            .circuit(3)
+            .component(ELECTRIC_PISTON, 2)
+            .component(EMITTER, 1)
+            .tech(Technologies.INTEGRATED_CIRCUIT)
             .build()
             .recipe(CIRCUIT_ASSEMBLER)
             .circuit(Voltage.fromRank(v.rank + 1), 4)

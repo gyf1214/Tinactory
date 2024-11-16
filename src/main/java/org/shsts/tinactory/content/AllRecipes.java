@@ -31,6 +31,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL_CRAFTING;
     public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH_BENCH;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> LASER_ENGRAVER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CIRCUIT_ASSEMBLER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final RecipeTypeEntry<OreAnalyzerRecipe, OreAnalyzerRecipe.Builder> ORE_ANALYZER;
@@ -70,6 +71,10 @@ public final class AllRecipes {
             .clazz(AssemblyRecipe.class)
             .builder(AssemblyRecipe.Builder::new)
             .defaults($ -> $.amperage(0.375d))
+            .register();
+
+        LASER_ENGRAVER = processing("laser_engraver")
+            .defaults($ -> $.amperage(0.625d))
             .register();
 
         CIRCUIT_ASSEMBLER = processing("circuit_assembler")

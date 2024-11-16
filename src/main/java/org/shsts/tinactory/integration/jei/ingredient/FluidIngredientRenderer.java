@@ -16,8 +16,6 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FluidIngredientRenderer implements IIngredientRenderer<FluidStack> {
-    private FluidIngredientRenderer() {}
-
     @Override
     public void render(PoseStack poseStack, FluidStack ingredient) {
         var rect = new Rect(0, 0, 16, 16);
@@ -27,26 +25,5 @@ public class FluidIngredientRenderer implements IIngredientRenderer<FluidStack> 
     @Override
     public List<Component> getTooltip(FluidStack ingredient, TooltipFlag tooltipFlag) {
         return ClientUtil.fluidTooltip(ingredient, true);
-    }
-
-    private static class Rated extends FluidIngredientRenderer {
-        private final double rate;
-
-        public Rated(double rate) {
-            this.rate = rate;
-        }
-
-        @Override
-        public List<Component> getTooltip(FluidStack ingredient, TooltipFlag tooltipFlag) {
-            var ret = super.getTooltip(ingredient, tooltipFlag);
-            ret.add(RatedItemIngredientRenderer.formatRate(rate));
-            return ret;
-        }
-    }
-
-    public static final FluidIngredientRenderer INSTANCE = new FluidIngredientRenderer();
-
-    public static FluidIngredientRenderer rated(double rate) {
-        return new Rated(rate);
     }
 }

@@ -66,6 +66,7 @@ import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
+import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
@@ -90,6 +91,7 @@ import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
+import static org.shsts.tinactory.content.AllRecipes.LASER_ENGRAVER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.COIL;
@@ -97,6 +99,7 @@ import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.core.util.LocHelper.name;
+import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
@@ -496,6 +499,7 @@ public final class Components {
             .define('W', ItemTags.PLANKS)
             .unlockedBy("has_resin", has(STICKY_RESIN.get())));
 
+        // circuit boards
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
             .pattern("WWW").pattern("WBW").pattern("WWW")
@@ -503,18 +507,7 @@ public final class Components {
             .define('W', COPPER.tag("wire"))
             .unlockedBy("has_board", has(Circuits.board(CircuitTier.ELECTRONIC).get())));
 
-        for (var i = 0; i < RAW_WAFERS.size(); i++) {
-            var boule = BOULES.get(i);
-            var wafer = RAW_WAFERS.get(i);
-            CUTTER.recipe(DATA_GEN, wafer.loc)
-                .outputItem(2, wafer, 8 << i)
-                .inputItem(0, boule, 1)
-                .inputFluid(1, Fluids.WATER, 1000 << i)
-                .voltage(Voltage.fromRank(2 + 2 * i))
-                .workTicks(400L << i)
-                .build();
-        }
-
+        // boules
         BLAST_FURNACE.recipe(DATA_GEN, BOULES.get(0))
             .outputItem(2, BOULES.get(0), 1)
             .inputItem(0, SILICON.tag("dust"), 32)
@@ -523,6 +516,54 @@ public final class Components {
             .workTicks(6400)
             .temperature(2100)
             .build();
+
+        // raw wafers
+        for (var i = 0; i < RAW_WAFERS.size(); i++) {
+            var boule = BOULES.get(i);
+            var wafer = RAW_WAFERS.get(i);
+            CUTTER.recipe(DATA_GEN, wafer)
+                .outputItem(2, wafer, 8 << i)
+                .inputItem(0, boule, 1)
+                .inputFluid(1, Fluids.WATER, 1000 << i)
+                .voltage(Voltage.fromRank(2 + 2 * i))
+                .workTicks(400L << i)
+                .build();
+        }
+
+        // engraving
+        engravingRecipe("integrated_circuit", RUBY, 0, Voltage.LV);
+        engravingRecipe("cpu", DIAMOND, 0, Voltage.LV);
+
+        // chips
+        for (var entry : CHIPS.entrySet()) {
+            var wafer = WAFERS.get(entry.getKey());
+            var chip = entry.getValue();
+            CUTTER.recipe(DATA_GEN, chip)
+                .outputItem(2, chip, 6)
+                .inputItem(0, wafer, 1)
+                .inputFluid(1, Fluids.WATER, 750)
+                .voltage(Voltage.LV)
+                .workTicks(300L)
+                .build();
+        }
+    }
+
+    private static void engravingRecipe(String name, MaterialSet lens, int level, Voltage voltage) {
+        var wafer = WAFERS.get(name);
+        for (var i = 0; i < RAW_WAFERS.size(); i++) {
+            if (i < level) {
+                continue;
+            }
+            var j = i - level;
+            var raw = RAW_WAFERS.get(i);
+            LASER_ENGRAVER.recipe(DATA_GEN, suffix(wafer.loc, "_from_" + name(raw.id, -1)))
+                .outputItem(2, wafer, 1 << j)
+                .inputItem(0, raw, 1)
+                .inputItemNotConsumed(1, lens.tag("lens"))
+                .voltage(Voltage.fromRank(voltage.rank + j * 2))
+                .workTicks(1000L << level)
+                .build();
+        }
     }
 
     @SuppressWarnings("unchecked")

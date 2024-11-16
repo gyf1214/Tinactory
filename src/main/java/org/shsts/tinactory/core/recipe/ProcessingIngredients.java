@@ -65,8 +65,14 @@ public final class ProcessingIngredients {
 
         @Override
         public boolean consumePort(IPort port, boolean simulate) {
-            return port instanceof IItemCollection itemCollection &&
-                ItemHelper.consumeItemCollection(itemCollection, ingredient, amount, simulate);
+            if (!(port instanceof IItemCollection collection)) {
+                return false;
+            }
+            if (amount <= 0) {
+                return !simulate || ItemHelper.hasItem(collection, ingredient);
+            } else {
+                return ItemHelper.consumeItemCollection(collection, ingredient, amount, simulate);
+            }
         }
 
         /**
