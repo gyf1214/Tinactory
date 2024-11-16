@@ -82,7 +82,11 @@ public class LanguageProcessor {
         pattern("item[.]tinactory[.]material[.]raw[.](.*)", matcher ->
             fmt("Raw %s Ore", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]material[.]magnetic[.](.*)", matcher ->
-            fmt("Magnetic %s Stick", normalize(matcher, 1)));
+            fmt("Raw %s Ore", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]material[.]gem[.](.*)", matcher ->
+            fmt("%s", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]material[.]gem_(.*)[.](.*)", matcher ->
+            fmt("%s %s", normalize(matcher, 1), normalize(matcher, 2)));
         pattern("item[.]tinactory[.]material[.](.*)[.](.*)", matcher ->
             fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
         pattern("item[.]tinactory[.]tool[.](.*)[.](.*)", matcher ->

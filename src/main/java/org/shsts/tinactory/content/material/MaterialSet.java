@@ -339,7 +339,8 @@ public class MaterialSet {
         }
 
         public Builder<P> gem() {
-            return dummies("gem", "gem_exquisite").alias("primary", "gem");
+            return dummies("gem", "gem_flawless", "gem_exquisite", "lens")
+                .alias("primary", "gem");
         }
 
         public Builder<P> fluid(String sub, int baseAmount) {

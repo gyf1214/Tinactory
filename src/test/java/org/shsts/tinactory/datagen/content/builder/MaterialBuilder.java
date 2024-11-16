@@ -167,7 +167,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                 .build();
         }
 
-        private void assemble(String sub, long workTicks, Object... inputs) {
+        private void assemble(String sub, long workTicks, boolean soldering, Object... inputs) {
             if (!material.hasItem(sub)) {
                 return;
             }
@@ -185,9 +185,12 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             }
             var builder = ASSEMBLER.recipe(DATA_GEN, material.loc(sub))
                 .outputItem(2, material.entry(sub), k)
-                .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(0.5f))
                 .voltage(voltage)
                 .workTicks(ticks(workTicks));
+
+            if (soldering) {
+                builder.inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(0.5f));
+            }
 
             for (; i < inputs.length; i++) {
                 var sub1 = (String) inputs[i];
@@ -243,7 +246,8 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             macerate("gear");
             macerate("rotor", 4);
             macerate("pipe", 3);
-            macerate("gem_exquisite", 8);
+            macerate("gem_flawless", 8);
+            macerate("gem_exquisite", 16);
         }
 
         private void molten(String sub, Voltage v, float amount) {
@@ -295,6 +299,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             process(BENDER, "foil", 4, "plate", 40L);
             process(LATHE, "stick", 1, "ingot", 64L);
             process(LATHE, "screw", 1, "bolt", 16L);
+            process(LATHE, "lens", 1, "gem_exquisite", 600L);
 
             if (material.hasItem("bolt") && material.hasItem("stick")) {
                 CUTTER.recipe(DATA_GEN, material.loc("bolt"))
@@ -306,19 +311,20 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                     .build();
             }
 
-            if (material.hasItem("gem_exquisite") && material.hasItem("gem")) {
+            if (material.hasItem("gem_flawless") && material.hasItem("gem")) {
                 CUTTER.recipe(DATA_GEN, material.loc("gem"))
                     .outputItem(2, material.entry("gem"), 8)
-                    .inputItem(0, material.tag("gem_exquisite"), 1)
+                    .inputItem(0, material.tag("gem_flawless"), 1)
                     .inputFluid(1, Fluids.WATER, 80)
                     .voltage(voltage)
                     .workTicks(480L)
                     .build();
             }
 
-            assemble("gear", 128L, "plate", "stick", 2);
-            assemble("rotor", 160L, "plate", 4, "ring", 1);
-            assemble("pipe", 120L, "plate", 3);
+            assemble("gear", 128L, true, "plate", "stick", 2);
+            assemble("rotor", 160L, true, "plate", 4, "ring", 1);
+            assemble("pipe", 120L, true, "plate", 3);
+            assemble("gem_exquisite", 400L, false, "gem_flawless", "gem", 4, "dust", 4);
 
             macerate();
             molten();
@@ -744,7 +750,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             if (material.hasItem("gem")) {
                 SIFTER.recipe(dataGen, material.loc("crushed_purified"))
                     .inputItem(0, material.tag("crushed_purified"), 1)
-                    .outputItem(1, material.entry("gem_exquisite"), 1, 0.1d)
+                    .outputItem(1, material.entry("gem_flawless"), 1, 0.1d)
                     .outputItem(1, material.entry("gem"), 1, 0.35d)
                     .outputItem(1, material.entry("dust_pure"), 1, 0.65d)
                     .voltage(Voltage.LV)
