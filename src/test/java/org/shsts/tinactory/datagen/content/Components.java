@@ -104,6 +104,7 @@ import static org.shsts.tinactory.content.AllTags.COIL;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
+import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
@@ -274,7 +275,7 @@ public final class Components {
             .pattern("###").pattern("#W#").pattern("###")
             .define('#', IRON.tag("plate"))
             .define('W', CABLE.get(Voltage.ULV))
-            .toolTag(AllTags.TOOL_WRENCH)
+            .toolTag(TOOL_WRENCH)
             .build();
     }
 

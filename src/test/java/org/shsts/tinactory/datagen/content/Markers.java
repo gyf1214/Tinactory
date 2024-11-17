@@ -17,6 +17,7 @@ import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
+import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
@@ -76,6 +77,7 @@ public final class Markers {
         }
         allTypes.add(TOOL_CRAFTING);
         allTypes.add(BLAST_FURNACE);
+        allTypes.add(SIFTER);
 
         for (var type : allTypes) {
             DATA_GEN.trackLang(RecipeCategory.categoryTitleId(type.loc));

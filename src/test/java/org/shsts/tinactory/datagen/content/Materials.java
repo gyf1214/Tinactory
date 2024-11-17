@@ -321,7 +321,7 @@ public final class Materials {
             .build();
 
         FACTORY.material(CHALCOPYRITE, DULL)
-            .primitiveOreProcess(SULFUR, COBALTITE, SULFUR)
+            .primitiveOreProcess(SULFUR, COBALTITE, ZINC)
             .smelt(COPPER)
             .build()
             .material(PYRITE, ROUGH)

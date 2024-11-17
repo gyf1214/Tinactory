@@ -208,8 +208,12 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
             return self();
         }
 
-        public Builder toolTag(TagKey<Item> toolTag) {
-            return tool(() -> Ingredient.of(toolTag));
+        @SafeVarargs
+        public final Builder toolTag(TagKey<Item>... toolTags) {
+            for (var tag : toolTags) {
+                tool(() -> Ingredient.of(tag));
+            }
+            return self();
         }
 
         @Override

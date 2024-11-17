@@ -94,6 +94,8 @@ import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
+import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
+import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.content.AllTags.circuit;
 import static org.shsts.tinactory.content.AllTags.machineTag;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
@@ -256,7 +258,7 @@ public final class Machines {
             .define('W', CABLE.get(Voltage.ULV))
             .define('H', MACHINE_HULL.get(Voltage.ULV))
             .define('V', circuit(Voltage.ULV))
-            .toolTag(AllTags.TOOL_WRENCH)
+            .toolTag(TOOL_WRENCH)
             .build();
 
         TOOL_CRAFTING.recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
@@ -267,7 +269,7 @@ public final class Machines {
             .define('W', CABLE.get(Voltage.ULV))
             .define('H', MACHINE_HULL.get(Voltage.ULV))
             .define('V', circuit(Voltage.ULV))
-            .toolTag(AllTags.TOOL_WRENCH)
+            .toolTag(TOOL_WRENCH)
             .build();
 
         ASSEMBLER.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
@@ -328,7 +330,7 @@ public final class Machines {
             .define('W', CABLE.get(Voltage.ULV))
             .define('V', circuit(Voltage.ULV))
             .define('F', Blocks.FURNACE.asItem())
-            .toolTag(AllTags.TOOL_WRENCH)
+            .toolTag(TOOL_WRENCH)
             .build();
 
         // disable vanilla recipes
@@ -377,6 +379,14 @@ public final class Machines {
             .nullRecipe(Items.POWERED_RAIL)
             .nullRecipe(Items.DETECTOR_RAIL)
             .nullRecipe(Items.ACTIVATOR_RAIL);
+
+        TOOL_CRAFTING.recipe(DATA_GEN, Items.HOPPER)
+            .result(Items.HOPPER, 1)
+            .pattern("P P").pattern("PCP").pattern(" P ")
+            .define('P', IRON.tag("plate"))
+            .define('C', Items.CHEST)
+            .toolTag(TOOL_WRENCH, TOOL_HAMMER)
+            .build();
     }
 
     private static Optional<TagKey<Item>> getMachineTag(MachineSet set) {
@@ -435,7 +445,7 @@ public final class Machines {
             .define('W', CABLE.get(Voltage.ULV))
             .define('H', MACHINE_HULL.get(Voltage.ULV))
             .define('V', circuit(Voltage.ULV))
-            .toolTag(AllTags.TOOL_WRENCH)
+            .toolTag(TOOL_WRENCH)
             .build();
     }
 
