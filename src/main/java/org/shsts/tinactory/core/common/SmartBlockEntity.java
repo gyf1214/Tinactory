@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.items.CapabilityItemHandler;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.logistics.ItemHelper;
@@ -178,7 +177,7 @@ public class SmartBlockEntity extends BlockEntity {
      */
     protected void onRemovedInWorld(Level world) {
         EventManager.invoke(this, AllEvents.REMOVED_IN_WORLD, world);
-        getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        AllCapabilities.MENU_ITEM_HANDLER.tryGet(this)
             .ifPresent(itemHandler -> ItemHelper.dropItemHandler(world, worldPosition, itemHandler));
     }
 

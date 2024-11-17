@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content;
 
 import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -22,6 +23,7 @@ public final class AllCapabilities {
     public static final CapabilityEntry<IElectricMachine> ELECTRIC_MACHINE;
     public static final CapabilityEntry<IWorkbench> WORKBENCH;
     public static final CapabilityEntry<IFluidStackHandler> FLUID_STACK_HANDLER;
+    public static final CapabilityEntry<IItemHandlerModifiable> MENU_ITEM_HANDLER;
 
     public static final CapabilityEntry<Machine> MACHINE;
     public static final CapabilityEntry<MultiBlock> MULTI_BLOCK;
@@ -34,6 +36,7 @@ public final class AllCapabilities {
         ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
         WORKBENCH = REGISTRATE.capability(IWorkbench.class, new CapabilityToken<>() {});
         FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
+        MENU_ITEM_HANDLER = REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
 
         MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
         MULTI_BLOCK = REGISTRATE.capability(MultiBlock.class, new CapabilityToken<>() {});

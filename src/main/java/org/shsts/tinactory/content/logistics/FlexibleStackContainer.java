@@ -11,7 +11,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -24,7 +23,6 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
-import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
@@ -40,22 +38,25 @@ import java.util.Optional;
 public class FlexibleStackContainer extends CapabilityProvider
     implements IFlexibleContainer, INBTSerializable<CompoundTag> {
     private final BlockEntity blockEntity;
-    private final WrapperItemHandler items;
     private final WrapperItemHandler internalItems;
-    private final WrapperFluidTank[] fluids;
+    private final WrapperItemHandler items;
+    private final WrapperItemHandler externalItems;
     private final WrapperFluidTank[] internalFluids;
+    private final WrapperFluidTank[] fluids;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports = new ArrayList<>();
-    private final LazyOptional<IItemHandler> itemHandlerCap;
-    private final LazyOptional<IFluidStackHandler> fluidHandlerCap;
+    private final LazyOptional<?> itemHandlerCap;
+    private final LazyOptional<?> menuItemHandlerCap;
+    private final LazyOptional<?> fluidHandlerCap;
 
     public FlexibleStackContainer(BlockEntity blockEntity, int maxItemSlots, int maxFluidSlots) {
         this.blockEntity = blockEntity;
 
         this.internalItems = new WrapperItemHandler(maxItemSlots);
         this.items = new WrapperItemHandler(internalItems);
+        this.externalItems = new WrapperItemHandler(items);
         for (var i = 0; i < maxItemSlots; i++) {
-            items.setFilter(i, $ -> false);
+            items.disallowInput(i);
         }
         internalItems.onUpdate(this::onUpdate);
 
@@ -70,7 +71,9 @@ public class FlexibleStackContainer extends CapabilityProvider
         }
 
         this.combinedFluids = new CombinedFluidTank(fluids);
-        this.itemHandlerCap = LazyOptional.of(() -> items);
+
+        this.itemHandlerCap = LazyOptional.of(() -> externalItems);
+        this.menuItemHandlerCap = LazyOptional.of(() -> items);
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
@@ -87,6 +90,7 @@ public class FlexibleStackContainer extends CapabilityProvider
         if (type == SlotType.ITEM_INPUT) {
             for (var i = minSlot; i < maxSlot; i++) {
                 items.resetFilter(i);
+                externalItems.setAllowOutput(i, false);
             }
         }
 
@@ -134,7 +138,8 @@ public class FlexibleStackContainer extends CapabilityProvider
     @Override
     public void resetLayout() {
         for (var i = 0; i < items.getSlots(); i++) {
-            items.setFilter(i, $ -> false);
+            items.disallowInput(i);
+            externalItems.setAllowOutput(i, true);
         }
         for (var fluid : fluids) {
             fluid.allowInput = false;
@@ -183,6 +188,8 @@ public class FlexibleStackContainer extends CapabilityProvider
             return fluidHandlerCap.cast();
         } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return itemHandlerCap.cast();
+        } else if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
+            return menuItemHandlerCap.cast();
         }
         return LazyOptional.empty();
     }
@@ -190,14 +197,14 @@ public class FlexibleStackContainer extends CapabilityProvider
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.put("stack", ItemHelper.serializeItemHandler(items));
+        tag.put("stack", ItemHelper.serializeItemHandler(internalItems));
         tag.put("fluid", combinedFluids.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(items, tag.getCompound("stack"));
+        ItemHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 

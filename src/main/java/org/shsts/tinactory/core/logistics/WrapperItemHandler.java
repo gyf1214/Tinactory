@@ -10,30 +10,33 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WrapperItemHandler implements IItemHandlerModifiable {
     private static final Predicate<ItemStack> TRUE = $ -> true;
+    private static final Predicate<ItemStack> FALSE = $ -> false;
 
     private final IItemHandlerModifiable compose;
     @Nullable
     private Runnable updateListener = null;
-    public boolean allowInput = true;
-    public boolean allowOutput = true;
-    private final List<Predicate<ItemStack>> filters;
+    private final Predicate<ItemStack>[] filters;
+    private final boolean[] allowOutputs;
 
     public WrapperItemHandler(int size) {
         this(new ItemStackHandler(size));
     }
 
+    @SuppressWarnings("unchecked")
     public WrapperItemHandler(IItemHandlerModifiable compose) {
+        var size = compose.getSlots();
         this.compose = compose;
-        this.filters = new ArrayList<>(Collections.nCopies(compose.getSlots(), TRUE));
+        this.filters = new Predicate[size];
+        this.allowOutputs = new boolean[size];
+        Arrays.fill(filters, TRUE);
+        Arrays.fill(allowOutputs, true);
     }
 
     public WrapperItemHandler(Container inv) {
@@ -41,11 +44,19 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
     }
 
     public void setFilter(int idx, Predicate<ItemStack> sth) {
-        filters.set(idx, sth);
+        filters[idx] = sth;
+    }
+
+    public void disallowInput(int idx) {
+        filters[idx] = FALSE;
     }
 
     public void resetFilter(int idx) {
-        filters.set(idx, TRUE);
+        filters[idx] = TRUE;
+    }
+
+    public void setAllowOutput(int idx, boolean value) {
+        allowOutputs[idx] = value;
     }
 
     public void onUpdate(Runnable cons) {
@@ -95,7 +106,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
     @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (!allowOutput) {
+        if (!allowOutputs[slot]) {
             return ItemStack.EMPTY;
         }
         var extracted = compose.extractItem(slot, amount, simulate);
@@ -112,6 +123,6 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
 
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
-        return allowInput && filters.get(slot).test(stack) && compose.isItemValid(slot, stack);
+        return filters[slot].test(stack) && compose.isItemValid(slot, stack);
     }
 }

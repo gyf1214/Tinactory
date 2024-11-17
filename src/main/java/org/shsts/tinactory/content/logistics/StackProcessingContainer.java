@@ -12,12 +12,11 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
@@ -43,91 +42,95 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class StackProcessingContainer extends CapabilityProvider
     implements IContainer, INBTSerializable<CompoundTag> {
-    private record PortInfo(int startSlot, int endSlot, SlotType type,
-        IPort port, IPort internalPort) {}
+    private record PortInfo(SlotType type, IPort port, IPort internalPort) {
+        public static final PortInfo EMPTY = new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
+    }
 
     private final BlockEntity blockEntity;
-    private final IItemHandlerModifiable combinedItems;
+    private final WrapperItemHandler internalItems;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports;
 
     private final LazyOptional<?> itemHandlerCap;
+    private final LazyOptional<?> menuItemHandlerCap;
     private final LazyOptional<?> fluidHandlerCap;
 
     private StackProcessingContainer(BlockEntity blockEntity, List<Layout.PortInfo> portInfo) {
         this.blockEntity = blockEntity;
         this.ports = new ArrayList<>(portInfo.size());
 
-        var items = new ArrayList<WrapperItemHandler>(portInfo.size());
-        var fluids = new ArrayList<WrapperFluidTank>();
-        var slotIdx = 0;
+        var itemSlots = 0;
+        var fluidSlots = 0;
+        for (var port : portInfo) {
+            switch (port.type().portType) {
+                case ITEM -> itemSlots += port.slots();
+                case FLUID -> fluidSlots += port.slots();
+            }
+        }
+
+        this.internalItems = new WrapperItemHandler(itemSlots);
+        var items = new WrapperItemHandler(internalItems);
+        var externalItems = new WrapperItemHandler(items);
+        var allFluids = new WrapperFluidTank[fluidSlots];
+        internalItems.onUpdate(this::onUpdate);
+
+        var itemIdx = 0;
+        var fluidIdx = 0;
+
         for (var port : portInfo) {
             var type = port.type();
             if (port.slots() <= 0 || type == SlotType.NONE) {
-                ports.add(new PortInfo(slotIdx, slotIdx, SlotType.NONE,
-                    IPort.EMPTY, IPort.EMPTY));
+                ports.add(PortInfo.EMPTY);
                 continue;
             }
-            switch (type) {
-                case ITEM_INPUT -> {
-                    var view = new WrapperItemHandler(port.slots());
-                    view.onUpdate(this::onUpdate);
-                    items.add(view);
 
-                    var collection = new ItemHandlerCollection(view);
-                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
-                        collection, collection));
+            if (type.portType == PortType.ITEM) {
+                var endIdx = itemIdx + port.slots();
+
+                for (var i = itemIdx; i < endIdx; i++) {
+                    if (type.direction == PortDirection.INPUT) {
+                        externalItems.setAllowOutput(i, false);
+                    } else {
+                        items.disallowInput(i);
+                    }
                 }
-                case ITEM_OUTPUT -> {
-                    var inner = new WrapperItemHandler(port.slots());
-                    inner.onUpdate(this::onUpdate);
 
-                    var view = new WrapperItemHandler(inner);
-                    view.allowInput = false;
-                    items.add(view);
+                var internalPort = new ItemHandlerCollection(internalItems, itemIdx, endIdx);
+                var port1 = new ItemHandlerCollection(items, itemIdx, endIdx);
+                ports.add(new PortInfo(type, port1, internalPort));
 
-                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
-                        new ItemHandlerCollection(view), new ItemHandlerCollection(inner)));
-                }
-                case FLUID_INPUT -> {
-                    var views = new WrapperFluidTank[port.slots()];
-                    for (var i = 0; i < port.slots(); i++) {
-                        var view = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
-                        view.onUpdate(this::onUpdate);
+                itemIdx = endIdx;
+            } else {
+                var slots = port.slots();
+                var internalFluids = new WrapperFluidTank[slots];
+                var fluids = new WrapperFluidTank[slots];
 
-                        views[i] = view;
-                        fluids.add(view);
+                for (var i = 0; i < slots; i++) {
+                    internalFluids[i] = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
+                    internalFluids[i].onUpdate(this::onUpdate);
+
+                    if (type.direction == PortDirection.INPUT) {
+                        fluids[i] = internalFluids[i];
+                    } else {
+                        fluids[i] = new WrapperFluidTank(internalFluids[i]);
+                        fluids[i].allowInput = false;
                     }
 
-                    var collection = new CombinedFluidTank(views);
-                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
-                        collection, collection));
+                    allFluids[fluidIdx + i] = fluids[i];
                 }
-                case FLUID_OUTPUT -> {
-                    var inners = new WrapperFluidTank[port.slots()];
-                    var views = new WrapperFluidTank[port.slots()];
 
-                    for (var i = 0; i < port.slots(); i++) {
-                        var inner = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
-                        inner.onUpdate(this::onUpdate);
-                        inners[i] = inner;
+                var internalPort = new CombinedFluidTank(internalFluids);
+                var port1 = new CombinedFluidTank(fluids);
+                ports.add(new PortInfo(type, port1, internalPort));
 
-                        var view = new WrapperFluidTank(inner);
-                        view.allowInput = false;
-                        views[i] = view;
-                        fluids.add(view);
-                    }
-
-                    ports.add(new PortInfo(slotIdx, slotIdx + port.slots(), type,
-                        new CombinedFluidTank(views), new CombinedFluidTank(inners)));
-                }
+                fluidIdx += slots;
             }
-            slotIdx += port.slots();
         }
-        this.combinedItems = new CombinedInvWrapper(items.toArray(IItemHandlerModifiable[]::new));
-        this.combinedFluids = new CombinedFluidTank(fluids.toArray(WrapperFluidTank[]::new));
 
-        this.itemHandlerCap = LazyOptional.of(() -> combinedItems);
+        this.combinedFluids = new CombinedFluidTank(allFluids);
+
+        this.itemHandlerCap = LazyOptional.of(() -> externalItems);
+        this.menuItemHandlerCap = LazyOptional.of(() -> items);
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
@@ -176,12 +179,14 @@ public class StackProcessingContainer extends CapabilityProvider
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return itemHandlerCap.cast();
+        if (cap == AllCapabilities.CONTAINER.get()) {
+            return myself();
         } else if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
             return fluidHandlerCap.cast();
-        } else if (cap == AllCapabilities.CONTAINER.get()) {
-            return myself();
+        } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return itemHandlerCap.cast();
+        } else if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
+            return menuItemHandlerCap.cast();
         }
         return LazyOptional.empty();
     }
@@ -189,14 +194,14 @@ public class StackProcessingContainer extends CapabilityProvider
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.put("stack", ItemHelper.serializeItemHandler(combinedItems));
+        tag.put("stack", ItemHelper.serializeItemHandler(internalItems));
         tag.put("fluid", combinedFluids.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(combinedItems, tag.getCompound("stack"));
+        ItemHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 

@@ -18,7 +18,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.SlotItemHandler;
@@ -122,10 +121,8 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         this.blockEntity = blockEntity;
         assert blockEntity.getLevel() != null;
         this.isClientSide = blockEntity.getLevel().isClientSide;
-        this.container = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            .resolve().orElse(null);
-        this.fluidContainer = blockEntity.getCapability(AllCapabilities.FLUID_STACK_HANDLER.get())
-            .resolve().orElse(null);
+        this.container = AllCapabilities.MENU_ITEM_HANDLER.tryGet(blockEntity).orElse(null);
+        this.fluidContainer = AllCapabilities.FLUID_STACK_HANDLER.tryGet(blockEntity).orElse(null);
         onEventPacket(MenuEventHandler.FLUID_SLOT_CLICK, p -> clickFluidSlot(p.getIndex(), p.getButton()));
         this.height = 0;
     }

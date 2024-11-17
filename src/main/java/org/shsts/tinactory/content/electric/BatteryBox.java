@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -131,7 +130,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         if (cap == AllCapabilities.ELECTRIC_MACHINE.get() ||
             cap == AllCapabilities.PROCESSOR.get()) {
             return myself();
-        } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        } else if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
         }
         return LazyOptional.empty();
