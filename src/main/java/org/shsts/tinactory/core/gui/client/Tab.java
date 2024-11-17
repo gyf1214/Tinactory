@@ -3,10 +3,14 @@ package org.shsts.tinactory.core.gui.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.registrate.common.RegistryEntry;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
@@ -18,14 +22,18 @@ public class Tab extends Panel {
         gregtech("gui/tab/tabs_top"), 84, 64);
     private static final int BUTTON_WIDTH = 28;
     private static final int BUTTON_HEIGHT = 32;
+    private static final int ICON_X_OFFSET = (BUTTON_WIDTH - 16) / 2;
+    private static final int ICON_Y_OFFSET = ICON_X_OFFSET + 2;
     public static final int BUTTON_OFFSET = BUTTON_HEIGHT - 4;
 
     private class TabButton extends Button {
         private final int index;
+        private final ItemStack icon;
 
-        public TabButton(Menu<?, ?> menu, int index) {
+        public TabButton(Menu<?, ?> menu, int index, ItemStack icon) {
             super(menu);
             this.index = index;
+            this.icon = icon;
         }
 
         @Override
@@ -34,6 +42,9 @@ public class Tab extends Panel {
             var ty = index == currentTab ? BUTTON_HEIGHT : 0;
             var z = getBlitOffset();
             RenderUtil.blit(poseStack, BUTTON_TEX, z, rect, tx, ty);
+            if (!icon.isEmpty()) {
+                RenderUtil.renderItem(icon, rect.x() + ICON_X_OFFSET, rect.y() + ICON_Y_OFFSET);
+            }
         }
 
         @Override
@@ -43,16 +54,28 @@ public class Tab extends Panel {
         }
     }
 
-    private final List<Panel> tabPanels;
+    private final List<Panel> tabPanels = new ArrayList<>();
     private int currentTab = 0;
 
-    public Tab(MenuScreen<?> screen, Panel... tabPanels) {
+    public Tab(MenuScreen<?> screen, Object... args) {
         super(screen);
-        this.tabPanels = List.of(tabPanels);
 
-        for (var i = 0; i < tabPanels.length; i++) {
-            var button = new TabButton(menu, i);
-            addWidget(new Rect(i * BUTTON_WIDTH, -BUTTON_OFFSET, BUTTON_WIDTH, BUTTON_HEIGHT), button);
+        for (var i = 0; i < args.length; i++) {
+            var k = tabPanels.size();
+            tabPanels.add((Panel) args[i]);
+
+            var icon = ItemStack.EMPTY;
+            if (i + 1 < args.length) {
+                if (args[i + 1] instanceof ItemLike item) {
+                    icon = new ItemStack(item);
+                } else if (args[i + 1] instanceof RegistryEntry<?> entry) {
+                    icon = new ItemStack((ItemLike) entry.get());
+                }
+                i++;
+            }
+
+            var button = new TabButton(menu, k, icon);
+            addWidget(new Rect(k * BUTTON_WIDTH, -BUTTON_OFFSET, BUTTON_WIDTH, BUTTON_HEIGHT), button);
         }
     }
 
