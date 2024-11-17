@@ -44,11 +44,11 @@ public class CellItem extends CapabilityItem {
 
     public static int getTint(ItemStack item, int index) {
         if (index != 1) {
-            return 0xFFFFFFFF;
+            return 0xFF000000;
         }
         var fluid = getFluid(item);
         if (fluid.isEmpty()) {
-            return 0xFFFFFFFF;
+            return 0xFF000000;
         }
         return fluid.getFluid().getAttributes().getColor();
     }
