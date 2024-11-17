@@ -81,6 +81,7 @@ import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
+import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
@@ -634,13 +635,13 @@ public final class Machines {
             .component(ELECTRIC_PISTON, 1)
             .component(ELECTRIC_PUMP, 1)
             .material(heat, "wire", wireNumber)
-            .item(() -> Items.GLASS, 2)
+            .material(GLASS, "primary", 2)
             .tech(Technologies.HOT_WORKING)
             .build()
             .recipe(FLUID_SOLIDIFIER)
             .circuit(2)
             .component(ELECTRIC_PUMP, 2)
-            .item(() -> Items.GLASS, 2)
+            .material(GLASS, "primary", 2)
             .tech(Technologies.HOT_WORKING)
             .build()
             .recipe(STEAM_TURBINE)
@@ -661,8 +662,7 @@ public final class Machines {
             .circuit(4)
             .component(ELECTRIC_PUMP, 1)
             .material(main, "plate", 2)
-            // TODO: use material glass
-            .item(() -> Items.GLASS, 1)
+            .material(GLASS, "primary", 1)
             .tech(Technologies.PUMP_AND_PISTON)
             .build()
             .recipe(BATTERY_BOX)
@@ -676,7 +676,7 @@ public final class Machines {
             .component(CONVEYOR_MODULE, 1)
             .component(ELECTRIC_PUMP, 1)
             .item(() -> Items.CHEST, 1)
-            .item(() -> Items.GLASS, 1)
+            .material(GLASS, "primary", 1)
             .tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             .build();
     }

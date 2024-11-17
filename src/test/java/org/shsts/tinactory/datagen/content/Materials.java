@@ -53,6 +53,7 @@ import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
+import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.GLOWSTONE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
@@ -392,7 +393,8 @@ public final class Materials {
             .toolProcess()
             .build()
             .material(GLOWSTONE, SHINY).build()
-            .material(RARE_EARTH, ROUGH).build();
+            .material(RARE_EARTH, ROUGH).build()
+            .material(GLASS, SHINY).build();
 
         // disable vanilla nugget
         disableVanillaOres("iron");

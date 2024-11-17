@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -73,6 +72,7 @@ import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
+import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
@@ -300,8 +300,7 @@ public final class Components {
             }
         });
 
-        // TODO: quartz should be Glass
-        componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, RUBY);
+        componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, GLASS);
         // TODO: quartz should be Emerald
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, ELECTRUM, RUBY);
 
@@ -450,14 +449,14 @@ public final class Components {
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(VACUUM_TUBE.getItem())
             .pattern("BGB").pattern("WWW")
-            .define('G', Items.GLASS)
+            .define('G', GLASS.tag("primary"))
             .define('W', COPPER.tag("wire"))
             .define('B', IRON.tag("bolt"))
             .unlockedBy("has_wire", has(COPPER.tag("wire"))));
 
         ASSEMBLER.recipe(DATA_GEN, VACUUM_TUBE.item())
             .outputItem(2, VACUUM_TUBE.item(), 1)
-            .inputItem(0, () -> Items.GLASS, 1)
+            .inputItem(0, GLASS.tag("primary"), 1)
             .inputItem(0, COPPER.tag("wire"), 1)
             .inputItem(0, IRON.tag("bolt"), 1)
             .workTicks(120L)

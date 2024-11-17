@@ -85,6 +85,7 @@ public final class AllMaterials {
     public static MaterialSet RUBBER;
     public static MaterialSet GLOWSTONE;
     public static MaterialSet RARE_EARTH;
+    public static MaterialSet GLASS;
 
     static {
         SET = new HashMap<>();
@@ -133,6 +134,12 @@ public final class AllMaterials {
         RARE_EARTH = set("rare_earth")
             .color(0xFF808064)
             .dust()
+            .buildObject();
+
+        GLASS = set("glass")
+            .color(0xFFFAFAFA)
+            .existing("gem", Items.GLASS)
+            .alias("primary", "gem")
             .buildObject();
     }
 
