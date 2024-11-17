@@ -9,7 +9,6 @@ import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.builder.DataBuilder;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
@@ -66,7 +65,7 @@ public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
             builder.voltage(variant.voltage);
         }
         var tech = BASE_ORE.get(variant);
-        var baseProgress = 50L * (1L << (long) variant.rank);
+        var baseProgress = 30L;
         if (!baseOre) {
             tech = dataGen.tech("ore/" + id)
                 .maxProgress(baseProgress)
@@ -76,14 +75,6 @@ public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
             RESEARCH_BENCH.recipe(dataGen, tech)
                 .target(tech)
                 .defaultInput(variant.voltage)
-                .build();
-        }
-
-        for (var ore : new HashSet<>(ores)) {
-            RESEARCH_BENCH.recipe(dataGen, tech.getPath() + "_from_" + ore.name)
-                .target(tech)
-                .inputItem(ore.tag("raw"))
-                .voltage(variant.voltage)
                 .build();
         }
 

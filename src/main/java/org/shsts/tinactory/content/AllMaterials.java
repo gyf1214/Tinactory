@@ -57,6 +57,7 @@ public final class AllMaterials {
     public static MaterialSet BRASS;
     public static MaterialSet GALLIUM_ARSENIDE;
     public static MaterialSet KANTHAL;
+    public static MaterialSet ELECTRUM;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;

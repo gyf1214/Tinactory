@@ -44,7 +44,7 @@ public final class Technologies {
         BASE_ORE = new HashMap<>();
         for (var variant : OreVariant.values()) {
             var tech = factory.child("ore_base/" + variant.name().toLowerCase())
-                .maxProgress(20L * (1L << (long) variant.rank))
+                .maxProgress(20L)
                 .displayItem(variant.baseItem)
                 .researchVoltage(variant.voltage)
                 .buildLoc();

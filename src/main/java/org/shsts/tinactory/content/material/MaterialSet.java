@@ -300,6 +300,10 @@ public class MaterialSet {
             return metal().dummies("wire", "dust_tiny");
         }
 
+        public Builder<P> wireFine() {
+            return wire().dummies("wire_fine");
+        }
+
         public Builder<P> metalExt() {
             return metal().plate().stick();
         }
@@ -324,8 +328,12 @@ public class MaterialSet {
             return metalExt().dummies("gear");
         }
 
+        public Builder<P> bolt() {
+            return metalExt().dummies("bolt");
+        }
+
         public Builder<P> mechanical() {
-            return metalExt().dummies("bolt", "screw");
+            return bolt().dummies("screw");
         }
 
         public Builder<P> rotor() {

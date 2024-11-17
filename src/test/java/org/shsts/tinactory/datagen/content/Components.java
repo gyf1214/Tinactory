@@ -31,7 +31,9 @@ import java.util.stream.Stream;
 
 import static org.shsts.tinactory.content.AllItems.ADVANCED_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER;
+import static org.shsts.tinactory.content.AllItems.ADVANCED_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW;
+import static org.shsts.tinactory.content.AllItems.BASIC_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.BATTERY;
 import static org.shsts.tinactory.content.AllItems.BOULES;
 import static org.shsts.tinactory.content.AllItems.CABLE;
@@ -48,6 +50,7 @@ import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
 import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
+import static org.shsts.tinactory.content.AllItems.GOOD_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.ITEM_FILTER;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.RAW_WAFERS;
@@ -56,6 +59,7 @@ import static org.shsts.tinactory.content.AllItems.RESISTOR;
 import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
 import static org.shsts.tinactory.content.AllItems.SENSOR;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
+import static org.shsts.tinactory.content.AllItems.TRANSISTOR;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllItems.WAFERS;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
@@ -67,7 +71,9 @@ import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
+import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
+import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
@@ -296,8 +302,8 @@ public final class Components {
 
         // TODO: quartz should be Glass
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, RUBY);
-        // TODO: sensor and quartz should be Electrum and Emerald
-        componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, BRASS, RUBY);
+        // TODO: quartz should be Emerald
+        componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, ELECTRUM, RUBY);
 
         batteryRecipe(Voltage.LV, CADMIUM);
         // TODO: Na
@@ -482,6 +488,13 @@ public final class Components {
 
         circuitRecipe(GOOD_ELECTRONIC, ELECTRONIC_CIRCUIT, 2, DIODE, 2, COPPER.tag("wire"), 2);
 
+        circuitRecipe(BASIC_INTEGRATED, CHIPS.get("integrated_circuit"), RESISTOR, 2, DIODE, 2,
+            COPPER.tag("wire_fine"), 2, TIN.tag("bolt"), 2);
+        circuitRecipe(GOOD_INTEGRATED, BASIC_INTEGRATED, 2, RESISTOR, 2, DIODE, 2,
+            GOLD.tag("wire_fine"), 4, SILVER.tag("bolt"), 4);
+        circuitRecipe(ADVANCED_INTEGRATED, GOOD_INTEGRATED, 2, CHIPS.get("integrated_circuit"), 2,
+            CHIPS.get("ram"), 2, TRANSISTOR, 4, ELECTRUM.tag("wire_fine"), 8, COPPER.tag("bolt"), 8);
+
         // circuit components
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(RESISTOR.getItem(CircuitComponentTier.NORMAL))
@@ -499,6 +512,24 @@ public final class Components {
             .define('W', ItemTags.PLANKS)
             .unlockedBy("has_resin", has(STICKY_RESIN.get())));
 
+        ASSEMBLER.recipe(DATA_GEN, Circuits.board(CircuitTier.ELECTRONIC))
+            .outputItem(2, Circuits.board(CircuitTier.ELECTRONIC), 1)
+            .inputItem(0, ItemTags.PLANKS, 1)
+            .inputItem(0, STICKY_RESIN, 2)
+            .workTicks(200L)
+            .voltage(Voltage.ULV)
+            .build();
+
+        ASSEMBLER.recipe(DATA_GEN, Circuits.board(CircuitTier.INTEGRATED))
+            .outputItem(2, Circuits.board(CircuitTier.INTEGRATED), 1)
+            .inputItem(0, Circuits.board(CircuitTier.ELECTRONIC), 2)
+            .inputItem(0, RED_ALLOY.tag("wire"), 8)
+            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(1f))
+            .workTicks(200L)
+            .voltage(Voltage.LV)
+            .requireTech(Technologies.INTEGRATED_CIRCUIT)
+            .build();
+
         // circuit boards
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
@@ -506,6 +537,25 @@ public final class Components {
             .define('B', Circuits.board(CircuitTier.ELECTRONIC).get())
             .define('W', COPPER.tag("wire"))
             .unlockedBy("has_board", has(Circuits.board(CircuitTier.ELECTRONIC).get())));
+
+        ASSEMBLER.recipe(DATA_GEN, Circuits.circuitBoard(CircuitTier.ELECTRONIC))
+            .outputItem(2, Circuits.circuitBoard(CircuitTier.ELECTRONIC), 1)
+            .inputItem(0, Circuits.board(CircuitTier.ELECTRONIC), 1)
+            .inputItem(0, COPPER.tag("wire"), 8)
+            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(0.5f))
+            .workTicks(200L)
+            .voltage(Voltage.ULV)
+            .build();
+
+        ASSEMBLER.recipe(DATA_GEN, Circuits.circuitBoard(CircuitTier.INTEGRATED))
+            .outputItem(2, Circuits.circuitBoard(CircuitTier.INTEGRATED), 1)
+            .inputItem(0, Circuits.board(CircuitTier.INTEGRATED), 1)
+            .inputItem(0, SILVER.tag("wire"), 8)
+            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(0.5f))
+            .workTicks(200L)
+            .voltage(Voltage.LV)
+            .requireTech(Technologies.INTEGRATED_CIRCUIT)
+            .build();
 
         // boules
         BLAST_FURNACE.recipe(DATA_GEN, BOULES.get(0))
@@ -575,8 +625,12 @@ public final class Components {
             i++;
         }
         var builder = CIRCUIT_ASSEMBLER.recipe(DATA_GEN, circuit.item())
-            .outputItem(2, circuit.item(), output)
-            .inputItem(0, circuit.circuitBoard(), 1);
+            .outputItem(2, circuit.item(), output);
+
+        if (circuit.level().voltageOffset < 2) {
+            builder.inputItem(0, circuit.circuitBoard(), 1);
+        }
+
         for (; i < args.length; i++) {
             var item = args[i];
             var count = 1;

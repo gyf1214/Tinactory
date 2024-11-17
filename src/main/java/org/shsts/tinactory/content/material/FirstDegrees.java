@@ -7,6 +7,7 @@ import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
+import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
@@ -53,7 +54,7 @@ public final class FirstDegrees {
 
         RED_ALLOY = set("red_alloy")
             .color(0xFFC80000)
-            .wireAndPlate()
+            .plate().wireFine()
             .buildObject();
 
         BATTERY_ALLOY = set("battery_alloy")
@@ -84,6 +85,11 @@ public final class FirstDegrees {
         KANTHAL = set("kanthal")
             .color(0xFFC2D2DF)
             .wire()
+            .buildObject();
+
+        ELECTRUM = set("electrum")
+            .color(0xFFFFFF64)
+            .metalExt().wireFine().foil()
             .buildObject();
     }
 

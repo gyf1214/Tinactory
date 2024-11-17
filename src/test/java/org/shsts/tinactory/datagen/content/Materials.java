@@ -47,6 +47,7 @@ import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
+import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM;
@@ -296,6 +297,10 @@ public final class Materials {
             .mix(Voltage.LV, IRON, 1, ALUMINIUM, 1, CHROME, 1)
             .machineProcess(Voltage.LV)
             .blast(Voltage.LV, 1800, 1000)
+            .build()
+            .material(ELECTRUM, SHINY)
+            .machineProcess(Voltage.LV, 0.75d).smelt()
+            .alloy(Voltage.LV, GOLD, 1, SILICON, 1)
             .build();
     }
 
@@ -524,6 +529,7 @@ public final class Materials {
             .define('X', logTag)
             .toolTag(TOOL_SAW)
             .build();
+
         // disable wood and woodStripped recipes
         DATA_GEN.nullRecipe(wood)
             .nullRecipe(woodStripped)

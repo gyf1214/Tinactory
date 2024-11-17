@@ -236,11 +236,12 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             macerate("primary");
             macerateTiny("nugget", 1);
             macerate("magnetic");
-            macerateTiny("wire", 3);
+            macerateTiny("wire", 4);
+            macerateTiny("wire_fine", 1);
             macerateTiny("ring", 2);
             macerate("plate");
             macerateTiny("foil", 2);
-            macerateTiny("stick", 3);
+            macerateTiny("stick", 4);
             macerateTiny("screw", 1);
             macerateTiny("bolt", 1);
             macerate("gear");
@@ -280,6 +281,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             molten("nugget", v, 1f / 9f);
             molten("magnetic", v, 0.5f);
             molten("wire", v, 0.5f);
+            molten("wire_fine", v, 0.125f);
             molten("ring", v, 0.25f);
             molten("plate", v, 1f);
             molten("foil", v, 0.25f);
@@ -294,6 +296,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         public MaterialBuilder<P> build() {
             process(POLARIZER, "magnetic", 1, "stick", 40L);
             process(WIREMILL, "wire", 2, "ingot", 48L);
+            process(WIREMILL, "wire_fine", 4, "wire", 64L);
             process(WIREMILL, "ring", 1, "stick", 64L);
             process(BENDER, "plate", 1, "ingot", 72L);
             process(BENDER, "foil", 4, "plate", 40L);

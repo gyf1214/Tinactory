@@ -46,19 +46,19 @@ public final class Elements {
             .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
             .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
             .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
-            .nugget().wire().molten()
+            .nugget().wireFine().molten()
             .ore(OreVariant.DEEPSLATE)
             .buildObject();
 
         COPPER = set("copper")
             .color(0xFFFF6400)
             .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
-            .foil().wireAndPlate().pipe().molten()
+            .foil().wireFine().bolt().pipe().molten()
             .buildObject();
 
         TIN = set("tin")
             .color(0xFFDCDCDC)
-            .wireAndPlate().rotor().molten()
+            .wireAndPlate().bolt().rotor().molten()
             .ore(OreVariant.STONE)
             .buildObject();
 
@@ -105,7 +105,7 @@ public final class Elements {
 
         SILVER = set("silver")
             .color(0xFFDCDCFF)
-            .foil().wire().molten()
+            .foil().wireFine().bolt().molten()
             .ore(OreVariant.DEEPSLATE)
             .buildObject();
 
