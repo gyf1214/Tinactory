@@ -1,17 +1,25 @@
 package org.shsts.tinactory.content.tool;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.IItemRenderProperties;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.util.MathUtil;
 
+import java.util.List;
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.core.util.I18n.tr;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -64,5 +72,15 @@ public class BatteryItem extends Item {
     @Override
     public int getBarColor(ItemStack pStack) {
         return 0xFF55FF55;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltips,
+        TooltipFlag isAdvanced) {
+        var line = tr("tinactory.tooltip.battery",
+            NUMBER_FORMAT.format(getPowerLevel(stack)),
+            NUMBER_FORMAT.format(capacity),
+            voltage.displayName());
+        tooltips.add(line.withStyle(ChatFormatting.GRAY));
     }
 }

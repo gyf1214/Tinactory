@@ -50,4 +50,8 @@ public enum Voltage {
         }
         throw new NoSuchElementException();
     }
+
+    public String displayName() {
+        return id.toUpperCase();
+    }
 }

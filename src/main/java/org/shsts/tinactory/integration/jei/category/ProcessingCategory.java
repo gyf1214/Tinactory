@@ -97,7 +97,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
         var y = layout.rect.endY() + SLOT_SIZE / 2;
         var total = recipe.power * recipe.workTicks;
         var duration = DOUBLE_FORMAT.format((double) recipe.workTicks / 20d);
-        var voltage = Voltage.fromValue(recipe.voltage).id.toUpperCase();
+        var voltage = Voltage.fromValue(recipe.voltage).displayName();
 
         if (recipe instanceof AssemblyRecipe recipe1) {
             y = drawRequiredText(stack, recipe1.requiredTech.isEmpty(), y);

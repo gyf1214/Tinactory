@@ -24,6 +24,8 @@
   "tinactory.tooltip.chestLock": "Empty slot locked",
   "tinactory.tooltip.chestUnlock": "Empty slot unlocked",
   "tinactory.tooltip.fluidCell": "%s / %s",
+  "tinactory.tooltip.battery": "%s / %s EU (%s)",
+  "tinactory.tooltip.tool": "%s Crafting Uses",
   "tinactory.gui.networkController.title": "Network Controller",
   "tinactory.gui.networkController.welcome": "New Team Name: ",
   "tinactory.gui.networkController.welcomeButton": "Create Team",
