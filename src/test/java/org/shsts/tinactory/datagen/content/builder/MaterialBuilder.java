@@ -251,7 +251,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             macerate("gem_exquisite", 16);
         }
 
-        private void molten(String sub, Voltage v, float amount) {
+        private void molten(String sub, Voltage v, float amount, boolean solidifier) {
             if (!material.hasItem(sub) || !material.hasFluid()) {
                 return;
             }
@@ -264,7 +264,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                 .workTicks(ticks(160L))
                 .build();
 
-            if (!sub.equals("magnetic")) {
+            if (solidifier) {
                 FLUID_SOLIDIFIER.recipe(DATA_GEN, material.loc(sub))
                     .outputItem(1, material.entry(sub), 1)
                     .inputFluid(0, fluid, material.fluidAmount(amount))
@@ -274,19 +274,23 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             }
         }
 
+        private void molten(String sub, Voltage v, float amount) {
+            molten(sub, v, amount, true);
+        }
+
         private void molten() {
             var v = material.hasItem("sheet") ? voltage : Voltage.fromRank(voltage.rank + 1);
 
             molten("primary", v, 1f);
             molten("nugget", v, 1f / 9f);
-            molten("magnetic", v, 0.5f);
-            molten("wire", v, 0.5f);
-            molten("wire_fine", v, 0.125f);
+            molten("magnetic", v, 0.5f, false);
+            molten("wire", v, 0.5f, false);
+            molten("wire_fine", v, 0.125f, false);
             molten("ring", v, 0.25f);
             molten("plate", v, 1f);
-            molten("foil", v, 0.25f);
+            molten("foil", v, 0.25f, false);
             molten("stick", v, 0.5f);
-            molten("screw", v, 1f / 9f);
+            molten("screw", v, 1f / 9f, false);
             molten("bolt", v, 0.125f);
             molten("gear", v, 2f);
             molten("rotor", v, 4f);
