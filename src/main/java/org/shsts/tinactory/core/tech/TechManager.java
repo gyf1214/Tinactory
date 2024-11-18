@@ -283,8 +283,10 @@ public class TechManager implements ITechManager {
     public static void init() {
         server = new Server();
         LOGGER.debug("create server tech manager {}", server);
-        Tinactory.registryClientPacket(TechInitPacket.class, TechInitPacket::new, client()::handleTechInit);
-        Tinactory.registryClientPacket(TechUpdatePacket.class, TechUpdatePacket::new, client()::handleTechUpdate);
+        Tinactory.registryClientPacket(TechInitPacket.class, TechInitPacket::new,
+            (p, ctx) -> client().handleTechInit(p, ctx));
+        Tinactory.registryClientPacket(TechUpdatePacket.class, TechUpdatePacket::new,
+            (p, ctx) -> client().handleTechUpdate(p, ctx));
     }
 
     public static void initClient() {
