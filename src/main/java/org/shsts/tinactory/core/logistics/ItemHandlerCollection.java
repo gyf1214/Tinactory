@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.logistics.IItemCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -24,12 +25,18 @@ public class ItemHandlerCollection implements IItemCollection {
     private final int minSlot;
     private final int maxSlot;
     private final RangedWrapper rangedWrapper;
+    private final boolean acceptOutput;
 
-    public ItemHandlerCollection(IItemHandlerModifiable itemHandler, int minSlot, int maxSlot) {
+    public ItemHandlerCollection(IItemHandlerModifiable itemHandler, int minSlot, int maxSlot, boolean acceptOutput) {
         this.itemHandler = itemHandler;
         this.minSlot = minSlot;
         this.maxSlot = maxSlot;
         this.rangedWrapper = new RangedWrapper(itemHandler, minSlot, maxSlot);
+        this.acceptOutput = acceptOutput;
+    }
+
+    public ItemHandlerCollection(IItemHandlerModifiable itemHandler, int minSlot, int maxSlot) {
+        this(itemHandler, minSlot, maxSlot, true);
     }
 
     public ItemHandlerCollection(IItemHandlerModifiable itemHandler) {
@@ -58,7 +65,7 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public boolean acceptOutput() {
-        return true;
+        return acceptOutput;
     }
 
     @Override
@@ -69,7 +76,7 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public ItemStack extractItem(ItemStack item, boolean simulate) {
-        if (item.isEmpty()) {
+        if (item.isEmpty() || !acceptOutput()) {
             return ItemStack.EMPTY;
         }
         var ret = ItemStack.EMPTY;
@@ -100,7 +107,7 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public int getItemCount(ItemStack item) {
-        if (item.isEmpty()) {
+        if (item.isEmpty() || !acceptOutput()) {
             return 0;
         }
         var ret = 0;
@@ -115,6 +122,9 @@ public class ItemHandlerCollection implements IItemCollection {
 
     @Override
     public Collection<ItemStack> getAllItems() {
+        if (!acceptOutput()) {
+            return Collections.emptyList();
+        }
         var allItems = new ArrayList<ItemStack>();
         for (var i = minSlot; i < maxSlot; i++) {
             var slotItem = itemHandler.getStackInSlot(i);

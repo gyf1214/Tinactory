@@ -30,7 +30,7 @@ import java.util.Optional;
  */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class SmartBlockEntity extends BlockEntity {
+public class SmartBlockEntity extends BlockEntity implements IEventSubscriber {
     private boolean isChunkUnloaded = false;
     private boolean isUpdateForced = true;
     @Nullable
@@ -160,6 +160,9 @@ public class SmartBlockEntity extends BlockEntity {
             handleUpdateTag(tag);
         }
     }
+
+    @Override
+    public void subscribeEvents(EventManager eventManager) {}
 
     /**
      * callback when this blockEntity is loaded

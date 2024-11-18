@@ -107,7 +107,6 @@ public class ElectricComponent extends NetworkComponent {
     }
 
     private final Map<BlockPos, Subnet> subnets = new HashMap<>();
-    private final Map<BlockPos, BlockPos> edges = new HashMap<>();
     private final List<Subnet> solveOrder = new ArrayList<>();
     private Metrics metrics = new Metrics();
 
@@ -121,8 +120,6 @@ public class ElectricComponent extends NetworkComponent {
     @Override
     public void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
         var sub = subnets.computeIfAbsent(subnet, Subnet::new);
-        edges.put(pos, subnet);
-
         if (state.getBlock() instanceof IElectricBlock electricBlock) {
             var voltage = electricBlock.getVoltage(state);
             if (voltage > 0) {
@@ -135,7 +132,7 @@ public class ElectricComponent extends NetworkComponent {
     @Override
     public void onConnect() {
         Subnet root = null;
-        for (var entry : edges.entrySet()) {
+        for (var entry : network.getAllBlocks()) {
             var child = entry.getKey();
             var parent = entry.getValue();
             if (parent.equals(child)) {
@@ -160,7 +157,6 @@ public class ElectricComponent extends NetworkComponent {
     @Override
     public void onDisconnect() {
         subnets.clear();
-        edges.clear();
         solveOrder.clear();
     }
 
@@ -190,7 +186,7 @@ public class ElectricComponent extends NetworkComponent {
         for (var sub : subnets.values()) {
             sub.reset();
         }
-        for (var entry : network.getMachines().entries()) {
+        for (var entry : network.getAllMachines().entries()) {
             entry.getValue().getElectric().ifPresent(electric -> {
                 var sub = subnets.get(entry.getKey());
 

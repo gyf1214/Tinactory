@@ -13,9 +13,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
@@ -80,8 +78,6 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     @Override
     protected void onConnect(Network network) {
         super.onConnect(network);
-        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-        logistics.addStorage(view);
     }
 
     @Override
@@ -94,11 +90,6 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     @Override
     public void onPreWork() {
-        if (machineConfig.getPortConfig("chestOutput") == MachineConfig.PortConfig.ACTIVE) {
-            machine.getNetwork()
-                .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
-                .ifPresent(logistics -> logistics.addActiveFluid(PortDirection.OUTPUT, view));
-        }
     }
 
     @Override

@@ -38,7 +38,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     }
 
     private IItemCollection getInputPort(IContainer container) {
-        return container.getPort(0, false).asItem();
+        return container.getPort(0, true).asItem();
     }
 
     private IItemCollection getOutputPort(IContainer container) {

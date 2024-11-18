@@ -42,7 +42,7 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class StackProcessingContainer extends CapabilityProvider
     implements IContainer, INBTSerializable<CompoundTag> {
-    private record PortInfo(SlotType type, IPort port, IPort internalPort) {
+    private record PortInfo(SlotType type, IPort externalPort, IPort internalPort) {
         public static final PortInfo EMPTY = new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
     }
 
@@ -69,8 +69,8 @@ public class StackProcessingContainer extends CapabilityProvider
         }
 
         this.internalItems = new WrapperItemHandler(itemSlots);
-        var items = new WrapperItemHandler(internalItems);
-        var externalItems = new WrapperItemHandler(items);
+        var menuItems = new WrapperItemHandler(internalItems);
+        var externalItems = new WrapperItemHandler(menuItems);
         var allFluids = new WrapperFluidTank[fluidSlots];
         internalItems.onUpdate(this::onUpdate);
 
@@ -91,37 +91,39 @@ public class StackProcessingContainer extends CapabilityProvider
                     if (type.direction == PortDirection.INPUT) {
                         externalItems.setAllowOutput(i, false);
                     } else {
-                        items.disallowInput(i);
+                        menuItems.disallowInput(i);
                     }
                 }
 
+                var allowOutput = type.direction != PortDirection.INPUT;
                 var internalPort = new ItemHandlerCollection(internalItems, itemIdx, endIdx);
-                var port1 = new ItemHandlerCollection(items, itemIdx, endIdx);
-                ports.add(new PortInfo(type, port1, internalPort));
+                var externalPort = new ItemHandlerCollection(externalItems, itemIdx, endIdx, allowOutput);
+                ports.add(new PortInfo(type, externalPort, internalPort));
 
                 itemIdx = endIdx;
             } else {
                 var slots = port.slots();
                 var internalFluids = new WrapperFluidTank[slots];
-                var fluids = new WrapperFluidTank[slots];
+                var externalFluids = new WrapperFluidTank[slots];
 
                 for (var i = 0; i < slots; i++) {
                     internalFluids[i] = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
                     internalFluids[i].onUpdate(this::onUpdate);
 
                     if (type.direction == PortDirection.INPUT) {
-                        fluids[i] = internalFluids[i];
+                        externalFluids[i] = internalFluids[i];
                     } else {
-                        fluids[i] = new WrapperFluidTank(internalFluids[i]);
-                        fluids[i].allowInput = false;
+                        externalFluids[i] = new WrapperFluidTank(internalFluids[i]);
+                        externalFluids[i].allowInput = false;
                     }
 
-                    allFluids[fluidIdx + i] = fluids[i];
+                    allFluids[fluidIdx + i] = externalFluids[i];
                 }
 
+                var allowOutput = type.direction != PortDirection.INPUT;
                 var internalPort = new CombinedFluidTank(internalFluids);
-                var port1 = new CombinedFluidTank(fluids);
-                ports.add(new PortInfo(type, port1, internalPort));
+                var externalPort = new CombinedFluidTank(allowOutput, externalFluids);
+                ports.add(new PortInfo(type, externalPort, internalPort));
 
                 fluidIdx += slots;
             }
@@ -130,7 +132,7 @@ public class StackProcessingContainer extends CapabilityProvider
         this.combinedFluids = new CombinedFluidTank(allFluids);
 
         this.itemHandlerCap = LazyOptional.of(() -> externalItems);
-        this.menuItemHandlerCap = LazyOptional.of(() -> items);
+        this.menuItemHandlerCap = LazyOptional.of(() -> menuItems);
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
@@ -173,7 +175,7 @@ public class StackProcessingContainer extends CapabilityProvider
             return IPort.EMPTY;
         }
         var portInfo = ports.get(port);
-        return internal ? portInfo.internalPort : portInfo.port;
+        return internal ? portInfo.internalPort : portInfo.externalPort;
     }
 
     @Nonnull

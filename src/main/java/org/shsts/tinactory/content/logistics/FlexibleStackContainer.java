@@ -39,10 +39,10 @@ public class FlexibleStackContainer extends CapabilityProvider
     implements IFlexibleContainer, INBTSerializable<CompoundTag> {
     private final BlockEntity blockEntity;
     private final WrapperItemHandler internalItems;
-    private final WrapperItemHandler items;
+    private final WrapperItemHandler menuItems;
     private final WrapperItemHandler externalItems;
     private final WrapperFluidTank[] internalFluids;
-    private final WrapperFluidTank[] fluids;
+    private final WrapperFluidTank[] externalFluids;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports = new ArrayList<>();
     private final LazyOptional<?> itemHandlerCap;
@@ -53,27 +53,27 @@ public class FlexibleStackContainer extends CapabilityProvider
         this.blockEntity = blockEntity;
 
         this.internalItems = new WrapperItemHandler(maxItemSlots);
-        this.items = new WrapperItemHandler(internalItems);
-        this.externalItems = new WrapperItemHandler(items);
+        this.menuItems = new WrapperItemHandler(internalItems);
+        this.externalItems = new WrapperItemHandler(menuItems);
         for (var i = 0; i < maxItemSlots; i++) {
-            items.disallowInput(i);
+            menuItems.disallowInput(i);
         }
         internalItems.onUpdate(this::onUpdate);
 
         this.internalFluids = new WrapperFluidTank[maxFluidSlots];
-        this.fluids = new WrapperFluidTank[maxFluidSlots];
+        this.externalFluids = new WrapperFluidTank[maxFluidSlots];
         var fluidSize = TinactoryConfig.INSTANCE.fluidSlotSize.get();
         for (var i = 0; i < maxFluidSlots; i++) {
             internalFluids[i] = new WrapperFluidTank(fluidSize);
             internalFluids[i].onUpdate(this::onUpdate);
-            fluids[i] = new WrapperFluidTank(internalFluids[i]);
-            fluids[i].allowInput = false;
+            externalFluids[i] = new WrapperFluidTank(internalFluids[i]);
+            externalFluids[i].allowInput = false;
         }
 
-        this.combinedFluids = new CombinedFluidTank(fluids);
+        this.combinedFluids = new CombinedFluidTank(externalFluids);
 
         this.itemHandlerCap = LazyOptional.of(() -> externalItems);
-        this.menuItemHandlerCap = LazyOptional.of(() -> items);
+        this.menuItemHandlerCap = LazyOptional.of(() -> menuItems);
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
@@ -86,35 +86,38 @@ public class FlexibleStackContainer extends CapabilityProvider
 
         var minSlot = slots.get(0).index();
         var maxSlot = slots.get(slots.size() - 1).index() + 1;
-        assert minSlot >= 0 && maxSlot <= items.getSlots() && minSlot < maxSlot;
+        assert minSlot >= 0 && maxSlot <= menuItems.getSlots() && minSlot < maxSlot;
         if (type == SlotType.ITEM_INPUT) {
             for (var i = minSlot; i < maxSlot; i++) {
-                items.resetFilter(i);
+                menuItems.resetFilter(i);
                 externalItems.setAllowOutput(i, false);
             }
         }
 
-        var port = new ItemHandlerCollection(items, minSlot, maxSlot);
+        var allowOutput = type.direction != PortDirection.INPUT;
         var internalPort = new ItemHandlerCollection(internalItems, minSlot, maxSlot);
-        return new PortInfo(type, port, internalPort);
+        var externalPort = new ItemHandlerCollection(externalItems, minSlot, maxSlot, allowOutput);
+        return new PortInfo(type, externalPort, internalPort);
     }
 
     private PortInfo createFluidPort(SlotType type, List<Layout.SlotInfo> slots) {
-        var views = new WrapperFluidTank[slots.size()];
-        var internalViews = new WrapperFluidTank[slots.size()];
+        var externalTanks = new WrapperFluidTank[slots.size()];
+        var internalTanks = new WrapperFluidTank[slots.size()];
         var k = 0;
         for (var slot : slots) {
             var i = slot.index();
             if (type == SlotType.FLUID_INPUT) {
-                fluids[i].allowInput = true;
+                externalFluids[i].allowInput = true;
             }
-            views[k] = fluids[i];
-            internalViews[k] = internalFluids[i];
+            externalTanks[k] = externalFluids[i];
+            internalTanks[k] = internalFluids[i];
             k++;
         }
-        var view = new CombinedFluidTank(views);
-        var internalView = new CombinedFluidTank(internalViews);
-        return new PortInfo(type, view, internalView);
+
+        var allowOutput = type.direction != PortDirection.INPUT;
+        var internalPort = new CombinedFluidTank(internalTanks);
+        var externalPort = new CombinedFluidTank(allowOutput, externalTanks);
+        return new PortInfo(type, externalPort, internalPort);
     }
 
     @Override
@@ -137,11 +140,11 @@ public class FlexibleStackContainer extends CapabilityProvider
 
     @Override
     public void resetLayout() {
-        for (var i = 0; i < items.getSlots(); i++) {
-            items.disallowInput(i);
+        for (var i = 0; i < menuItems.getSlots(); i++) {
+            menuItems.disallowInput(i);
             externalItems.setAllowOutput(i, true);
         }
-        for (var fluid : fluids) {
+        for (var fluid : externalFluids) {
             fluid.allowInput = false;
             fluid.resetFilter();
         }

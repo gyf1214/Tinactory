@@ -16,8 +16,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IItemCollection;
-import org.shsts.tinactory.api.logistics.PortDirection;
-import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.logistics.ItemSlotHandler;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
@@ -100,7 +98,9 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         var externalItems = new ExternalItemHandler();
 
         this.items = new WrapperItemHandler(internalItems);
-        this.port = new ItemHandlerCollection(items);
+        this.port = new ItemHandlerCollection(items) {
+
+        };
         this.filters = new ItemStack[size];
         this.itemHandlerCap = LazyOptional.of(() -> externalItems);
     }
@@ -146,8 +146,6 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     @Override
     protected void onConnect(Network network) {
         super.onConnect(network);
-        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-        logistics.addStorage(port);
     }
 
     @Override
@@ -162,11 +160,6 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     @Override
     public void onPreWork() {
-        if (machineConfig.getPortConfig("chestOutput") == MachineConfig.PortConfig.ACTIVE) {
-            machine.getNetwork()
-                .map(network -> network.getComponent(AllNetworks.LOGISTICS_COMPONENT))
-                .ifPresent(logistics -> logistics.addActiveItem(PortDirection.OUTPUT, port));
-        }
     }
 
     @Override

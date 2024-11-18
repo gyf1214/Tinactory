@@ -56,6 +56,9 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
         if (this.eventManager) {
             eventManager = new EventManager();
             attachCapability(e, updateHelper, EventManager.LOC, eventManager);
+            if (be instanceof IEventSubscriber subscriber) {
+                subscriber.subscribeEvents(eventManager);
+            }
         }
         for (var capEntry : capabilities.entrySet()) {
             var cap = capEntry.getValue().apply(be);

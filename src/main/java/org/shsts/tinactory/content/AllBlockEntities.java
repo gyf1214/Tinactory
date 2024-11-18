@@ -78,6 +78,7 @@ public final class AllBlockEntities {
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
+    //    public static final MachineSet LOGISTIC_WORKER;
     public static final Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> MULTI_BLOCK_INTERFACE;
 
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;

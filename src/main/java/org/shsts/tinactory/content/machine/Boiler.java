@@ -64,8 +64,8 @@ public class Boiler extends CapabilityProvider implements
 
     private void onLoad(Level world) {
         var container = AllCapabilities.CONTAINER.get(blockEntity);
-        fuelPort = container.getPort(0, false).asItem();
-        waterPort = container.getPort(1, false).asFluid();
+        fuelPort = container.getPort(0, true).asItem();
+        waterPort = container.getPort(1, true).asFluid();
         outputPort = container.getPort(2, true).asFluid();
 
         fuelPort.setItemFilter(List.of(item -> ForgeHooks.getBurnTime(item, null) > 0));

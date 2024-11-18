@@ -4,32 +4,32 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
-import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllNetworks;
-import org.shsts.tinactory.core.logistics.FluidContentWrapper;
-import org.shsts.tinactory.core.logistics.FluidTypeWrapper;
+import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.logistics.ILogisticsContentWrapper;
 import org.shsts.tinactory.core.logistics.ILogisticsTypeWrapper;
-import org.shsts.tinactory.core.logistics.ItemContentWrapper;
-import org.shsts.tinactory.core.logistics.ItemTypeWrapper;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.util.RandomList;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -86,22 +86,6 @@ public class LogisticsComponent extends NetworkComponent {
 
     public void resetWorkers() {
         ticks = 0;
-    }
-
-    @Override
-    public void onConnect() {
-        resetWorkers();
-    }
-
-    @Override
-    public void onDisconnect() {
-        activeRequests.clear();
-        activeRequestList.clear();
-        passivePorts.clear();
-        for (var list : passiveList.values()) {
-            list.clear();
-        }
-        storages.clear();
     }
 
     /**
@@ -202,6 +186,71 @@ public class LogisticsComponent extends NetworkComponent {
         return true;
     }
 
+    private record PortKey(UUID machineId, int portIndex) {}
+
+    public record PortInfo(Machine machine, int portIndex, IPort port, @Nullable BlockPos subnet) {}
+
+    private final Map<PortKey, PortInfo> ports = new HashMap<>();
+    private final Multimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
+    private final Set<PortKey> globalPorts = new HashSet<>();
+
+    public void registerPort(BlockPos subnet, Machine machine, int index, IPort port) {
+        var key = new PortKey(machine.getUuid(), index);
+        ports.put(key, new PortInfo(machine, index, port, subnet));
+        subnetPorts.put(subnet, key);
+    }
+
+    public void registerGlobalPort(Machine machine, int index, IPort port) {
+        var key = new PortKey(machine.getUuid(), index);
+        ports.put(key, new PortInfo(machine, index, port, null));
+        globalPorts.add(key);
+    }
+
+    public void unregisterPort(Machine machine, int index) {
+        var key = new PortKey(machine.getUuid(), index);
+        if (ports.containsKey(key)) {
+            var info = ports.get(key);
+            ports.remove(key);
+            if (info.subnet != null) {
+                subnetPorts.remove(info.subnet, key);
+            } else {
+                globalPorts.remove(key);
+            }
+        }
+    }
+
+    public Collection<PortInfo> getGlobalPorts() {
+        return globalPorts.stream()
+            .map(ports::get)
+            .toList();
+    }
+
+    public Collection<PortInfo> getVisiblePorts(BlockPos subnet) {
+        var ret = new ArrayList<PortInfo>();
+        globalPorts.forEach(key -> ret.add(ports.get(key)));
+        subnetPorts.get(subnet).forEach(key -> ret.add(ports.get(key)));
+        return ret;
+    }
+
+    @Override
+    public void onConnect() {
+        resetWorkers();
+    }
+
+    @Override
+    public void onDisconnect() {
+        activeRequests.clear();
+        activeRequestList.clear();
+        passivePorts.clear();
+        for (var list : passiveList.values()) {
+            list.clear();
+        }
+        storages.clear();
+
+        ports.clear();
+        subnetPorts.clear();
+    }
+
     private void onTick(Level world, Network network) {
         var delay = getWorkerDelay();
         var workers = getWorkerSize();
@@ -220,53 +269,6 @@ public class LogisticsComponent extends NetworkComponent {
 
         activeRequestList.clear();
         activeRequests.clear();
-    }
-
-    public void addActiveItem(PortDirection type, IItemCollection port, ItemStack item) {
-        var item1 = item.copy();
-        var req = new Request(type, port, new ItemTypeWrapper(item1), new ItemContentWrapper(item1));
-        activeRequestList.add(req);
-        activeRequests.put(req.type, req);
-    }
-
-    public void addActiveItem(PortDirection type, IItemCollection port) {
-        for (var stack : port.getAllItems()) {
-            addActiveItem(type, port, stack);
-        }
-    }
-
-    public void addActiveFluid(PortDirection type, IFluidCollection port, FluidStack fluid) {
-        var fluid1 = fluid.copy();
-        var req = new Request(type, port, new FluidTypeWrapper(fluid1), new FluidContentWrapper(fluid1));
-        activeRequestList.add(req);
-        activeRequests.put(req.type, req);
-    }
-
-    public void addActiveFluid(PortDirection type, IFluidCollection port) {
-        for (var stack : port.getAllFluids()) {
-            addActiveFluid(type, port, stack);
-        }
-    }
-
-    public void addPassivePort(PortDirection dir, IPort port) {
-        if (!passivePorts.containsEntry(dir, port)) {
-            LOGGER.debug("add PassivePort {} {}", dir, port);
-            passivePorts.put(dir, port);
-            passiveList.get(dir).add(port);
-        }
-    }
-
-    public void removePassivePort(PortDirection dir, IPort port) {
-        if (passivePorts.containsEntry(dir, port)) {
-            LOGGER.debug("remove PassivePort {} {}", dir, port);
-            passivePorts.remove(dir, port);
-            passiveList.get(dir).remove(port);
-        }
-    }
-
-    public void addStorage(IPort port) {
-        LOGGER.debug("add Storage {}", port);
-        storages.add(port);
     }
 
     @Override

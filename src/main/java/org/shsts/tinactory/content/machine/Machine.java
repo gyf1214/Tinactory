@@ -20,14 +20,11 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.PortDirection;
-import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.logistics.LogisticsComponent;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
@@ -75,9 +72,6 @@ public class Machine extends UpdatableCapabilityProvider
      */
     public void setConfig(SetMachineConfigPacket packet) {
         config.apply(packet);
-        if (packet.isSetPort()) {
-            updatePassiveRequests();
-        }
         sendUpdate(blockEntity);
         EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
     }
@@ -106,51 +100,6 @@ public class Machine extends UpdatableCapabilityProvider
         }
 
         token.setReturn(InteractionResult.PASS);
-    }
-
-    private void addActiveRequests(IContainer container, LogisticsComponent logistics) {
-        var size = container.portSize();
-        for (var i = 0; i < size; i++) {
-            if (!container.hasPort(i) || config.getPortConfig("portConfig_" + i) !=
-                MachineConfig.PortConfig.ACTIVE ||
-                container.portDirection(i) != PortDirection.OUTPUT) {
-                continue;
-            }
-            var port = container.getPort(i, false);
-            if (port.type() == PortType.ITEM) {
-                logistics.addActiveItem(PortDirection.OUTPUT, port.asItem());
-            } else if (port.type() == PortType.FLUID) {
-                logistics.addActiveFluid(PortDirection.OUTPUT, port.asFluid());
-            }
-        }
-    }
-
-    private void updatePassiveRequests() {
-        if (network == null) {
-            return;
-        }
-        var container1 = getContainer();
-        if (container1.isEmpty()) {
-            return;
-        }
-        var container = container1.get();
-        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-
-        var size = container.portSize();
-        for (var i = 0; i < size; i++) {
-            if (!container.hasPort(i)) {
-                continue;
-            }
-
-            var direction = container.portDirection(i);
-            var port = container.getPort(i, false);
-
-            if (config.getPortConfig("portConfig_" + i) == MachineConfig.PortConfig.PASSIVE) {
-                logistics.addPassivePort(direction, port);
-            } else {
-                logistics.removePassivePort(direction, port);
-            }
-        }
     }
 
     public Component getTitle() {
@@ -186,7 +135,6 @@ public class Machine extends UpdatableCapabilityProvider
     public void onConnectToNetwork(Network network) {
         LOGGER.debug("{}: connect to network {}", this, network);
         this.network = network;
-        updatePassiveRequests();
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 
@@ -204,8 +152,6 @@ public class Machine extends UpdatableCapabilityProvider
     private void onPreWork(Level world, Network network) {
         assert this.network == network;
         getProcessor().ifPresent(IProcessor::onPreWork);
-        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
-        getContainer().ifPresent(container -> addActiveRequests(container, logistics));
     }
 
     private void onWork(Level world, Network network) {
@@ -222,6 +168,10 @@ public class Machine extends UpdatableCapabilityProvider
         builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
         builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
         EventManager.invoke(blockEntity, AllEvents.BUILD_SCHEDULING, builder);
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     public Optional<Network> getNetwork() {

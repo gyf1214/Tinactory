@@ -12,6 +12,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -19,9 +20,15 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<CompoundTag> {
     private final WrapperFluidTank[] tanks;
+    private final boolean acceptOutput;
 
     public CombinedFluidTank(WrapperFluidTank... tanks) {
+        this(true, tanks);
+    }
+
+    public CombinedFluidTank(boolean acceptOutput, WrapperFluidTank... tanks) {
         this.tanks = tanks;
+        this.acceptOutput = acceptOutput;
     }
 
     @Override
@@ -87,7 +94,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
 
     @Override
     public boolean acceptOutput() {
-        return true;
+        return acceptOutput;
     }
 
     @Override
@@ -118,7 +125,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
 
     @Override
     public FluidStack drain(FluidStack fluid, boolean simulate) {
-        if (fluid.isEmpty()) {
+        if (fluid.isEmpty() || !acceptOutput()) {
             return FluidStack.EMPTY;
         }
         var action = simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE;
@@ -146,7 +153,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
 
     @Override
     public int getFluidAmount(FluidStack fluid) {
-        if (fluid.isEmpty()) {
+        if (fluid.isEmpty() || !acceptOutput()) {
             return 0;
         }
         var ret = 0;
@@ -161,6 +168,9 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
 
     @Override
     public Collection<FluidStack> getAllFluids() {
+        if (!acceptOutput()) {
+            return Collections.emptyList();
+        }
         return Arrays.stream(tanks)
             .map(WrapperFluidTank::getFluid)
             .filter(f -> !f.isEmpty())
