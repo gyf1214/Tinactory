@@ -56,6 +56,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     protected final BlockEntity blockEntity;
     public final RecipeType<? extends T> recipeType;
+    private final boolean autoRecipe;
 
     /**
      * This is only used during deserializeNBT when world is not available.
@@ -71,9 +72,10 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
 
-    protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType) {
+    protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, boolean autoRecipe) {
         this.blockEntity = blockEntity;
         this.recipeType = recipeType;
+        this.autoRecipe = autoRecipe;
     }
 
     protected Level getWorld() {
@@ -91,7 +93,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
             if (matches(world, targetRecipe, container)) {
                 return Optional.of(targetRecipe);
             }
-        } else {
+        } else if (autoRecipe) {
             var matches = getMatchedRecipes(world, container).toList();
             if (matches.size() == 1) {
                 return Optional.of(matches.get(0));
@@ -295,7 +297,13 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> machine(
         RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be)));
+            be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be), true));
+    }
+
+    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> noAutoRecipe(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        return CapabilityProviderBuilder.fromFactory(ID,
+            be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be), false));
     }
 
     public static <P> CapabilityProviderBuilder<BlockEntity, P> oreProcessor(P parent) {
@@ -315,9 +323,9 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> multiBlock(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type, boolean autoRecipe) {
         return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new MultiBlockProcessor<>(be, type.get()));
+            be -> new MultiBlockProcessor<>(be, type.get(), autoRecipe));
     }
 
     public static <P> CapabilityProviderBuilder<BlockEntity, P> blastFurnace(P parent) {

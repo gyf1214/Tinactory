@@ -11,7 +11,7 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 @MethodsReturnNonnullByDefault
 public class BlastFurnaceProcessor extends MultiBlockProcessor<BlastFurnaceRecipe> {
     public BlastFurnaceProcessor(BlockEntity blockEntity) {
-        super(blockEntity, AllRecipes.BLAST_FURNACE.get());
+        super(blockEntity, AllRecipes.BLAST_FURNACE.get(), true);
     }
 
     @Override

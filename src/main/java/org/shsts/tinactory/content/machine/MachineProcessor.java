@@ -42,8 +42,9 @@ public class MachineProcessor<T extends ProcessingRecipe>
     protected double workFactor = 1d;
     protected double energyFactor = 1d;
 
-    public MachineProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, Voltage voltage) {
-        super(blockEntity, recipeType);
+    public MachineProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType,
+        Voltage voltage, boolean autoRecipe) {
+        super(blockEntity, recipeType, autoRecipe);
         this.voltage = voltage;
     }
 

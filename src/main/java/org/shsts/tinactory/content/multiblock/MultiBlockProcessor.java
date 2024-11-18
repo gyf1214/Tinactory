@@ -9,8 +9,8 @@ import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 public class MultiBlockProcessor<T extends ProcessingRecipe> extends MachineProcessor<T> {
-    public MultiBlockProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType) {
-        super(blockEntity, recipeType, Voltage.PRIMITIVE);
+    public MultiBlockProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, boolean autoRecipe) {
+        super(blockEntity, recipeType, Voltage.PRIMITIVE, autoRecipe);
     }
 
     protected MultiBlock getMultiBlock() {

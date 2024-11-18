@@ -122,7 +122,7 @@ public final class AllMultiBlocks {
             .air('A')
             .build()
             .build()
-            .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.SIFTER))
+            .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.SIFTER, true))
             .build()
             .buildObject();
     }

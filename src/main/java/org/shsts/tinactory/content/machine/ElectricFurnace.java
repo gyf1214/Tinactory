@@ -33,7 +33,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     private double workFactor;
 
     public ElectricFurnace(BlockEntity blockEntity, Voltage voltage) {
-        super(blockEntity, RecipeType.SMELTING);
+        super(blockEntity, RecipeType.SMELTING, true);
         this.voltage = voltage;
     }
 

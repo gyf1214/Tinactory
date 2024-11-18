@@ -18,7 +18,7 @@ public class OreAnalyzerProcessor extends MachineProcessor<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
     public OreAnalyzerProcessor(BlockEntity blockEntity, Voltage voltage) {
-        super(blockEntity, AllRecipes.ORE_ANALYZER.get(), voltage);
+        super(blockEntity, AllRecipes.ORE_ANALYZER.get(), voltage, true);
     }
 
     @Override

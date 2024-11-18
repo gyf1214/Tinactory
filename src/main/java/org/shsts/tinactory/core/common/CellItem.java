@@ -44,7 +44,7 @@ public class CellItem extends CapabilityItem {
 
     public static int getTint(ItemStack item, int index) {
         if (index != 1) {
-            return 0xFF000000;
+            return 0xFFFFFFFF;
         }
         var fluid = getFluid(item);
         if (fluid.isEmpty()) {

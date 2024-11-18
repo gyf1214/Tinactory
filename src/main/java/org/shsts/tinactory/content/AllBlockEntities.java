@@ -108,6 +108,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         ASSEMBLER = set.processing(AllRecipes.ASSEMBLER)
+            .processor(RecipeProcessor::noAutoRecipe)
             .voltages(Voltage.ULV)
             .layoutSet()
             .port(ITEM_INPUT)
@@ -134,6 +135,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         CIRCUIT_ASSEMBLER = set.processing(AllRecipes.CIRCUIT_ASSEMBLER)
+            .processor(RecipeProcessor::noAutoRecipe)
             .layoutSet()
             .port(ITEM_INPUT)
             .slots(0, 1, 2, 3)
@@ -146,6 +148,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         STONE_GENERATOR = set.processing(AllRecipes.STONE_GENERATOR)
+            .processor(RecipeProcessor::noAutoRecipe)
             .voltages(Voltage.ULV)
             .layoutSet()
             .port(ITEM_OUTPUT)
@@ -315,6 +318,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         FLUID_SOLIDIFIER = set.processing(AllRecipes.FLUID_SOLIDIFIER)
+            .processor(RecipeProcessor::noAutoRecipe)
             .voltages(Voltage.LV)
             .layoutSet()
             .port(FLUID_INPUT)
