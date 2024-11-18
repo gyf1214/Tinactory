@@ -44,6 +44,7 @@ import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COBALT;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
+import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
@@ -120,6 +121,7 @@ public final class Materials {
         wood();
         elements();
         firstDegrees();
+        higherDegrees();
         ores();
         misc();
         tags();
@@ -302,6 +304,13 @@ public final class Materials {
             .material(ELECTRUM, SHINY)
             .machineProcess(Voltage.LV, 0.75d).smelt()
             .alloy(Voltage.LV, GOLD, 1, SILICON, 1)
+            .build();
+    }
+
+    private static void higherDegrees() {
+        FACTORY.material(COBALT_BRASS, METALLIC)
+            .machineProcess(Voltage.LV, 2d).smelt()
+            .mix(Voltage.LV, BRASS, 7, ALUMINIUM, 1, COBALT, 1)
             .build();
     }
 

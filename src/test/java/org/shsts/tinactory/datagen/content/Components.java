@@ -67,6 +67,7 @@ import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
+import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
@@ -98,6 +99,7 @@ import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.LASER_ENGRAVER;
+import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.COIL;
@@ -311,6 +313,8 @@ public final class Components {
         // TODO: Li
         batteryRecipe(Voltage.HV, CADMIUM);
 
+        buzzsawRecipe(BASIC_BUZZSAW, COBALT_BRASS, Voltage.LV);
+
         researchRecipe(Voltage.ULV)
             .inputItem(0, IRON.tag("plate"), 1)
             .inputItem(0, COPPER.tag("wire"), 1)
@@ -444,6 +448,15 @@ public final class Components {
             .outputItem(2, RESEARCH_EQUIPMENT.get(voltage), 1)
             .workTicks(200L)
             .voltage(voltage);
+    }
+
+    private static void buzzsawRecipe(RegistryEntry<Item> item, MaterialSet material, Voltage v) {
+        LATHE.recipe(DATA_GEN, item)
+            .outputItem(1, item, 1)
+            .inputItem(0, material.tag("gear"), 1)
+            .voltage(v)
+            .workTicks(240L)
+            .build();
     }
 
     private static void circuitRecipes() {

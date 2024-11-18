@@ -10,6 +10,7 @@ import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.material.Elements;
 import org.shsts.tinactory.content.material.FirstDegrees;
+import org.shsts.tinactory.content.material.HigherDegrees;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.Ores;
 
@@ -59,6 +60,9 @@ public final class AllMaterials {
     public static MaterialSet KANTHAL;
     public static MaterialSet ELECTRUM;
 
+    // Higher Degree
+    public static MaterialSet COBALT_BRASS;
+
     // Ore
     public static MaterialSet CHALCOPYRITE;
     public static MaterialSet PYRITE;
@@ -78,6 +82,7 @@ public final class AllMaterials {
     public static MaterialSet BAUXITE;
     public static MaterialSet ILMENITE;
 
+    // misc
     public static MaterialSet TEST;
     public static MaterialSet STONE;
     public static MaterialSet FLINT;
@@ -91,6 +96,7 @@ public final class AllMaterials {
         SET = new HashMap<>();
         Elements.init();
         FirstDegrees.init();
+        HigherDegrees.init();
         Ores.init();
 
         TEST = set("test")

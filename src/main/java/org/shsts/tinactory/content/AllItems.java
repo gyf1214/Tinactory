@@ -35,6 +35,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
@@ -155,17 +156,11 @@ public final class AllItems {
             .voltages(Voltage.ULV, Voltage.IV)
             .buildObject();
 
-        RESEARCH_EQUIPMENT = ComponentBuilder.<Item, MaterialSet>builder((v, mat) -> REGISTRATE
+        RESEARCH_EQUIPMENT = ComponentBuilder.simple(v -> REGISTRATE
                 .item("component/" + v.id + "/research_equipment", Item::new)
-                .tint(0xFFFFFFFF, mat.color)
+                .tint(0xFFFFFFFF, v.color)
                 .register())
-            .voltage(Voltage.ULV, IRON)
-            .voltage(Voltage.LV, STEEL)
-            .voltage(Voltage.MV, ALUMINIUM)
-            // TODO
-            .voltage(Voltage.HV, IRON)
-            // TODO
-            .voltage(Voltage.EV, IRON)
+            .voltages(Voltage.ULV, Voltage.EV)
             .buildObject();
 
         BATTERY = ComponentBuilder.simple(v -> REGISTRATE
@@ -197,8 +192,12 @@ public final class AllItems {
 
         GOOD_GRINDER = simple("component/grinder/good");
         ADVANCED_GRINDER = simple("component/grinder/advanced");
+
+        BASIC_BUZZSAW = REGISTRATE.item("component/buzzsaw/basic", Item::new)
+            .tint(COBALT_BRASS.color)
+            .register();
+
         // TODO: tint
-        BASIC_BUZZSAW = simple("component/buzzsaw/basic");
         GOOD_BUZZSAW = simple("component/buzzsaw/good");
         ADVANCED_BUZZSAW = simple("component/buzzsaw/advanced");
 
