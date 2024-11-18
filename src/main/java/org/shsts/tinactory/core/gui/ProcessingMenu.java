@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -22,7 +23,6 @@ import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
-import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import java.util.HashMap;
@@ -146,7 +146,7 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
 
     public static Component getTitle(BlockEntity be) {
         return AllCapabilities.MACHINE.tryGet(be)
-            .flatMap(Machine::getTitle)
-            .orElseGet(() -> I18n.name(be.getBlockState().getBlock()));
+            .map(Machine::getTitle)
+            .orElse(TextComponent.EMPTY);
     }
 }

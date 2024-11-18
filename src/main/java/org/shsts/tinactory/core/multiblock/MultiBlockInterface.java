@@ -169,11 +169,11 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public Optional<Component> getTitle() {
-        if (multiBlock == null) {
-            return Optional.empty();
+    public Component getTitle() {
+        if (config.hasString("name") || multiBlock == null) {
+            return super.getTitle();
         }
-        return Optional.of(I18n.name(multiBlock.blockEntity.getBlockState().getBlock()));
+        return I18n.name(multiBlock.blockEntity.getBlockState().getBlock());
     }
 
     public Optional<Layout> getLayout() {

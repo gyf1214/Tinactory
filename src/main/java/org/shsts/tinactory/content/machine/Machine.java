@@ -36,10 +36,12 @@ import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.tech.TeamProfile;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
@@ -54,6 +56,7 @@ public class Machine extends UpdatableCapabilityProvider
     @Nullable
     protected Network network;
 
+    private UUID uuid = UUID.randomUUID();
     public final MachineConfig config = new MachineConfig();
 
     protected Machine(SmartBlockEntity be) {
@@ -150,9 +153,10 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
-    public Optional<Component> getTitle() {
+    public Component getTitle() {
         return config.getString("name")
-            .map(Component.Serializer::fromJson);
+            .map(Component.Serializer::fromJson)
+            .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
     }
 
     @Override
@@ -264,12 +268,14 @@ public class Machine extends UpdatableCapabilityProvider
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
         tag.put("config", config.serializeNBT());
+        tag.putUUID("uuid", uuid);
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         config.deserializeNBT(tag.getCompound("config"));
+        uuid = tag.getUUID("uuid");
     }
 
     @Override

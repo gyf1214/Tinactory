@@ -29,6 +29,10 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
 
     private CompoundTag tag = new CompoundTag();
 
+    public boolean hasString(String key) {
+        return tag.contains(key, Tag.TAG_STRING);
+    }
+
     public Optional<String> getString(String key) {
         return tag.contains(key, Tag.TAG_STRING) ? Optional.of(tag.getString(key)) : Optional.empty();
     }
