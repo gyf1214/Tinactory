@@ -18,7 +18,6 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
-import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import java.util.Arrays;
@@ -29,9 +28,9 @@ import java.util.function.Function;
 public class ElectricTank extends ElectricStorage implements INBTSerializable<CompoundTag> {
     private final int size;
     private final WrapperFluidTank[] innerTanks;
-    private final WrapperFluidTank[] tanks;
-    private final CombinedFluidTank view;
-    private final CombinedFluidTank inner;
+    private final WrapperFluidTank[] externalTanks;
+    private final CombinedFluidTank innerPort;
+    private final CombinedFluidTank externalPort;
     private final FluidStack[] filters;
     private final LazyOptional<IFluidStackHandler> fluidHandlerCap;
 
@@ -40,19 +39,19 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         this.size = layout.slots.size();
         var capacity = TinactoryConfig.INSTANCE.tankSize.get();
         this.innerTanks = new WrapperFluidTank[size];
-        this.tanks = new WrapperFluidTank[size];
+        this.externalTanks = new WrapperFluidTank[size];
         for (var i = 0; i < size; i++) {
             var slot = i;
             innerTanks[i] = new WrapperFluidTank(capacity);
             innerTanks[i].onUpdate(this::onSlotChange);
             innerTanks[i].filter = stack -> allowFluidInTank(slot, stack);
-            tanks[i] = new WrapperFluidTank(innerTanks[i]);
+            externalTanks[i] = new WrapperFluidTank(innerTanks[i]);
         }
-        this.inner = new CombinedFluidTank(innerTanks);
-        this.view = new CombinedFluidTank(tanks);
+        this.innerPort = new CombinedFluidTank(innerTanks);
+        this.externalPort = new CombinedFluidTank(externalTanks);
         this.filters = new FluidStack[size];
 
-        this.fluidHandlerCap = LazyOptional.of(() -> inner);
+        this.fluidHandlerCap = LazyOptional.of(() -> innerPort);
     }
 
     private boolean allowFluidInTank(int slot, FluidStack stack) {
@@ -76,16 +75,14 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     }
 
     @Override
-    protected void onConnect(Network network) {
-        super.onConnect(network);
-    }
-
-    @Override
     protected void onMachineConfig() {
+        var allowInput = allowInput();
+        var allowOutput = allowOutput();
         for (var i = 0; i < size; i++) {
-            tanks[i].allowInput = machineConfig.getPortConfig("chestInput") != MachineConfig.PortConfig.NONE;
-            tanks[i].allowOutput = machineConfig.getPortConfig("chestOutput") != MachineConfig.PortConfig.NONE;
+            externalTanks[i].allowInput = allowInput;
+            externalTanks[i].allowOutput = allowOutput;
         }
+        machine.getNetwork().ifPresent(network -> registerPort(network, externalPort));
     }
 
     @Override
@@ -103,7 +100,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.put("tanks", inner.serializeNBT());
+        tag.put("tanks", innerPort.serializeNBT());
         var tag1 = new ListTag();
         for (var i = 0; i < size; i++) {
             if (filters[i] != null) {
@@ -119,7 +116,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        inner.deserializeNBT(tag.getCompound("tanks"));
+        innerPort.deserializeNBT(tag.getCompound("tanks"));
         var tag1 = tag.getList("filters", Tag.TAG_COMPOUND);
         Arrays.fill(filters, null);
         for (var tag2 : tag1) {

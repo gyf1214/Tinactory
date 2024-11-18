@@ -21,7 +21,6 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.ItemHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
-import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import java.util.Arrays;
@@ -34,8 +33,8 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     public final int capacity;
     private final int size;
     private final WrapperItemHandler internalItems;
-    private final WrapperItemHandler items;
-    private final IItemCollection port;
+    private final WrapperItemHandler externalItems;
+    private final IItemCollection externalPort;
     private final ItemStack[] filters;
     private final LazyOptional<?> itemHandlerCap;
 
@@ -97,9 +96,12 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         }
         var externalItems = new ExternalItemHandler();
 
-        this.items = new WrapperItemHandler(internalItems);
-        this.port = new ItemHandlerCollection(items) {
-
+        this.externalItems = new WrapperItemHandler(internalItems);
+        this.externalPort = new ItemHandlerCollection(ElectricChest.this.externalItems) {
+            @Override
+            public boolean acceptOutput() {
+                return allowOutput();
+            }
         };
         this.filters = new ItemStack[size];
         this.itemHandlerCap = LazyOptional.of(() -> externalItems);
@@ -144,18 +146,14 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     @Override
-    protected void onConnect(Network network) {
-        super.onConnect(network);
-    }
-
-    @Override
     protected void onMachineConfig() {
-        var allowInput = machineConfig.getPortConfig("chestInput") != MachineConfig.PortConfig.NONE;
-        var allowOutput = machineConfig.getPortConfig("chestOutput") != MachineConfig.PortConfig.NONE;
+        var allowInput = allowInput();
+        var allowOutput = allowOutput();
         for (var i = 0; i < size; i++) {
-            items.setFilter(i, $ -> allowInput);
-            items.setAllowOutput(i, allowOutput);
+            externalItems.setFilter(i, $ -> allowInput);
+            externalItems.setAllowOutput(i, allowOutput);
         }
+        machine.getNetwork().ifPresent(network -> registerPort(network, externalPort));
     }
 
     @Override

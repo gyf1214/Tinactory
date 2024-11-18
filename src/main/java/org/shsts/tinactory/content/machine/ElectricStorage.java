@@ -7,9 +7,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
@@ -19,6 +21,7 @@ import org.shsts.tinactory.core.network.Network;
 @MethodsReturnNonnullByDefault
 public abstract class ElectricStorage extends CapabilityProvider implements IEventSubscriber, IProcessor {
     protected final BlockEntity blockEntity;
+
     protected MachineConfig machineConfig;
     protected Machine machine;
 
@@ -28,6 +31,30 @@ public abstract class ElectricStorage extends CapabilityProvider implements IEve
 
     public boolean isUnlocked() {
         return machineConfig.getBoolean("unlockChest");
+    }
+
+    public boolean allowInput() {
+        return machineConfig.getBoolean("allowInput");
+    }
+
+    public boolean allowOutput() {
+        return machineConfig.getBoolean("allowOutput");
+    }
+
+    public boolean isGlobal() {
+        return machineConfig.getBoolean("global");
+    }
+
+    protected void registerPort(Network network, IPort port) {
+        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
+        logistics.unregisterPort(machine, 0);
+
+        if (isGlobal()) {
+            logistics.registerGlobalPort(machine, 0, port);
+        } else {
+            var subnet = network.getSubnet(blockEntity.getBlockPos());
+            logistics.registerPort(subnet, machine, 0, port);
+        }
     }
 
     protected void onSlotChange() {
