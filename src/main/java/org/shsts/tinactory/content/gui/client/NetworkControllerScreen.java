@@ -45,8 +45,8 @@ import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int WELCOME_BUTTON_WIDTH = 72;
-    private static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
-    private static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + FONT_HEIGHT +
+    public static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
+    public static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + FONT_HEIGHT +
         MARGIN_VERTICAL * 3 + MARGIN_TOP;
 
     private final Panel welcomePanel;

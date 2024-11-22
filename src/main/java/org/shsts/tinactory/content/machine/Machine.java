@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -135,6 +136,18 @@ public class Machine extends UpdatableCapabilityProvider
     public void onConnectToNetwork(Network network) {
         LOGGER.debug("{}: connect to network {}", this, network);
         this.network = network;
+
+        getContainer().ifPresent(container -> {
+            var subnet = network.getSubnet(blockEntity.getBlockPos());
+            var logistics = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
+            for (var i = 0; i < container.portSize(); i++) {
+                if (!container.hasPort(i)) {
+                    continue;
+                }
+                logistics.registerPort(subnet, this, i, container.getPort(i, false));
+            }
+        });
+
         EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
     }
 
@@ -196,6 +209,11 @@ public class Machine extends UpdatableCapabilityProvider
 
     public Optional<IElectricMachine> getElectric() {
         return AllCapabilities.ELECTRIC_MACHINE.tryGet(blockEntity);
+    }
+
+    public ItemStack getIcon() {
+        var block = blockEntity.getBlockState().getBlock();
+        return new ItemStack(block);
     }
 
     public void sendUpdate() {

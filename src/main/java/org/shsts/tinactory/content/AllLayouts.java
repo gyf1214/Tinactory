@@ -1,19 +1,28 @@
 package org.shsts.tinactory.content;
 
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Texture;
+
+import java.util.Map;
 
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 public final class AllLayouts {
+    public static final Layout EMPTY;
+    public static final Map<Voltage, Layout> EMPTY_SET;
     public static final Layout WORKBENCH;
     public static final Layout BOILER;
     public static final Layout BLAST_FURNACE;
     public static final Layout SIFTER;
 
     static {
+        EMPTY = Layout.builder().buildLayout();
+
+        EMPTY_SET = Layout.builder().buildObject();
+
         WORKBENCH = Layout.builder()
             .dummySlot(9 + 6 * SLOT_SIZE, SLOT_SIZE)
             .image(16 + 4 * SLOT_SIZE, 20, Texture.CRAFTING_ARROW)

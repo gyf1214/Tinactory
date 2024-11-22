@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -189,11 +190,20 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
+    public ItemStack getIcon() {
+        if (multiBlock == null) {
+            return super.getIcon();
+        }
+        var block = multiBlock.blockEntity.getBlockState().getBlock();
+        return new ItemStack(block);
+    }
+
+    @Override
     public CompoundTag serializeOnUpdate() {
         var tag = super.serializeOnUpdate();
         if (multiBlock != null) {
             var pos = multiBlock.blockEntity.getBlockPos();
-            tag.put("multiBlockPos", CodecHelper.serializeBlockPos(pos));
+            tag.put("multiBlockPos", CodecHelper.encodeBlockPos(pos));
         }
         return tag;
     }
@@ -205,7 +215,7 @@ public class MultiBlockInterface extends Machine {
         assert world != null;
 
         if (tag.contains("multiBlockPos", Tag.TAG_COMPOUND)) {
-            var pos = CodecHelper.deserializeBlockPos(tag.getCompound("multiBlockPos"));
+            var pos = CodecHelper.parseBlockPos(tag.getCompound("multiBlockPos"));
             var be1 = world.getBlockEntity(pos);
             if (be1 == null) {
                 return;

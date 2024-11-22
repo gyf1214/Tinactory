@@ -49,6 +49,10 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
         return tag.getBoolean(key);
     }
 
+    public Optional<CompoundTag> getCompound(String key) {
+        return tag.contains(key, Tag.TAG_COMPOUND) ? Optional.of(tag.getCompound(key)) : Optional.empty();
+    }
+
     public void apply(SetMachineConfigPacket packet) {
         tag.merge(packet.getSets());
         for (var key : packet.getResets()) {

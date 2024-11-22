@@ -123,12 +123,12 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        protected void onSelect(int index) {
+        protected void onSelect(int index, double mouseX, double mouseY) {
             TechPanel.this.onSelect(getTech(index));
         }
 
         @Override
-        protected Optional<List<Component>> buttonTooltip(int index) {
+        protected Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY) {
             return techTooltip(getTech(index));
         }
     }

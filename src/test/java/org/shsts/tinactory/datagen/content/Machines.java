@@ -45,6 +45,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.LASER_ENGRAVER;
 import static org.shsts.tinactory.content.AllBlockEntities.LATHE;
+import static org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.MIXER;
@@ -148,6 +149,7 @@ public final class Machines {
         machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
         machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest");
         machine(ELECTRIC_TANK, "overlay/machine/overlay_qtank");
+        machine(LOGISTIC_WORKER, "cover/overlay_conveyor");
 
         DATA_GEN.block(NETWORK_CONTROLLER)
             .blockState(MachineModel::builder, MachineModel::blockState)

@@ -119,6 +119,13 @@ public class SmartBlockEntity extends BlockEntity implements IEventSubscriber {
         level.sendBlockUpdated(getBlockPos(), state, state, Block.UPDATE_CLIENTS);
     }
 
+    public void forceAndSendUpdate() {
+        if (level != null && !level.isClientSide) {
+            isUpdateForced = true;
+            sendUpdate();
+        }
+    }
+
     private CompoundTag getUpdateTag(boolean forceUpdate) {
         var tag = new CompoundTag();
         var caps = getUpdateHelper().getUpdateTag(forceUpdate);

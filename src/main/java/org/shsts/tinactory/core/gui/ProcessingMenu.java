@@ -6,7 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -28,6 +27,8 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static org.shsts.tinactory.core.util.I18n.tr;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -67,13 +68,6 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
         }
 
         AllCapabilities.MACHINE.tryGet(blockEntity).ifPresent(Machine::sendUpdate);
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return super.stillValid(player) && AllCapabilities.MACHINE.tryGet(blockEntity)
-            .map(m -> m.canPlayerInteract(player))
-            .orElse(true);
     }
 
     public abstract Optional<RecipeType<?>> getRecipeType();
@@ -148,5 +142,10 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
         return AllCapabilities.MACHINE.tryGet(be)
             .map(Machine::getTitle)
             .orElse(TextComponent.EMPTY);
+    }
+
+    public static Component portLabel(PortType type, int index) {
+        var key = "tinactory.gui.portName." + type.name().toLowerCase() + "Label";
+        return tr(key, index);
     }
 }

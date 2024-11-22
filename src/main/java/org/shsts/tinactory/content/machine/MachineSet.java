@@ -4,6 +4,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
@@ -16,6 +18,7 @@ import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
+import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -74,7 +77,7 @@ public class MachineSet {
         protected final Registrate registrate;
         protected final List<Voltage> voltages = new ArrayList<>();
         @Nullable
-        protected BiFunction<Voltage, S, BlockEntityBuilder<SmartBlockEntity, ?, ?>> blockEntityBuilder = null;
+        protected BiFunction<Voltage, S, BlockEntityBuilder<?, ?, ?>> blockEntityBuilder = null;
         @Nullable
         protected LayoutSetBuilder<S> layoutSetBuilder = null;
         @Nullable
@@ -107,6 +110,16 @@ public class MachineSet {
             return layoutSet.get(voltage);
         }
 
+        public <X extends SmartBlockEntity> S machine(
+            Function<Voltage, String> id, Class<X> entityClass,
+            Function<Voltage, BlockEntityTypeBuilder.Factory<X>> entityFactory,
+            Function<Voltage, EntityBlockBuilder.Factory<X, ?>> blockFactory) {
+            assert blockEntityBuilder == null;
+            blockEntityBuilder = (v, $) -> registrate.blockEntity(id.apply(v),
+                entityFactory.apply(v), blockFactory.apply(v)).entityClass(entityClass);
+            return self();
+        }
+
         public S machine(Function<Voltage, String> id,
             Function<Voltage, EntityBlockBuilder.Factory<SmartBlockEntity, ?>> blockFactory) {
             assert blockEntityBuilder == null;
@@ -129,9 +142,8 @@ public class MachineSet {
         }
 
         @SuppressWarnings("unchecked")
-        protected static <B> Function<B, CapabilityProviderBuilder<? super SmartBlockEntity, B>> cast(
-            Function<?, ? extends CapabilityProviderBuilder<? super SmartBlockEntity, ?>> from) {
-            return (Function<B, CapabilityProviderBuilder<? super SmartBlockEntity, B>>) from;
+        protected static <F, T> T cast(F from) {
+            return (T) from;
         }
 
         public <B> S capability(Function<B, ? extends
@@ -148,9 +160,16 @@ public class MachineSet {
                 .build());
         }
 
-        public S layoutMenu(Function<Layout, Menu.Factory<SmartBlockEntity, ?>> factory) {
+        public <X extends BlockEntity, M extends Menu<? super X, M>> S menu(
+            Menu.Factory<X, M> factory) {
             return machine(v -> $ -> $.blockEntity()
-                .menu(factory.apply(getLayout(v))).build()
+                .menu(cast(factory)).build()
+                .build());
+        }
+
+        public S layoutMenu(Function<Layout, Menu.Factory<?, ?>> factory) {
+            return machine(v -> $ -> $.blockEntity()
+                .menu(cast(factory.apply(getLayout(v)))).build()
                 .build());
         }
 
@@ -182,8 +201,13 @@ public class MachineSet {
 
         @Override
         protected T createObject() {
-            assert layoutSetBuilder != null;
-            layoutSet = layoutSetBuilder.buildObject();
+            if (layoutSetBuilder != null) {
+                layoutSet = layoutSetBuilder.buildObject();
+            } else {
+                layoutSet = AllLayouts.EMPTY_SET;
+            }
+            assert layoutSet != null;
+
             if (voltages.isEmpty()) {
                 voltages(Voltage.LV);
             }

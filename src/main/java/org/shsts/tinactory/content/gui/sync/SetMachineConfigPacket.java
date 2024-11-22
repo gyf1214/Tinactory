@@ -33,10 +33,6 @@ public class SetMachineConfigPacket extends MenuEventPacket {
         return resets;
     }
 
-    public boolean isSetPort() {
-        return sets.getAllKeys().stream().anyMatch($ -> $.startsWith("portConfig_"));
-    }
-
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         super.serializeToBuf(buf);
@@ -77,6 +73,11 @@ public class SetMachineConfigPacket extends MenuEventPacket {
 
         public Builder setPort(String key, MachineConfig.PortConfig config) {
             sets.putByte(key, (byte) config.index);
+            return this;
+        }
+
+        public Builder set(String key, CompoundTag tag) {
+            sets.put(key, tag);
             return this;
         }
 

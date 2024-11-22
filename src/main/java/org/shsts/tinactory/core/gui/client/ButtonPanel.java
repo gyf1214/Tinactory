@@ -44,7 +44,7 @@ public abstract class ButtonPanel extends Panel {
 
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            return buttonTooltip(index);
+            return buttonTooltip(index, mouseX - rect.x(), mouseY - rect.y());
         }
 
         @Override
@@ -55,7 +55,7 @@ public abstract class ButtonPanel extends Panel {
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             super.onMouseClicked(mouseX, mouseY, button);
-            onSelect(index);
+            onSelect(index, mouseX - rect.x(), mouseY - rect.y());
         }
 
         public int getIndex() {
@@ -141,9 +141,9 @@ public abstract class ButtonPanel extends Panel {
     protected abstract void renderButton(PoseStack poseStack, int mouseX, int mouseY,
         float partialTick, Rect rect, int index);
 
-    protected abstract void onSelect(int index);
+    protected abstract void onSelect(int index, double mouseX, double mouseY);
 
-    protected abstract Optional<List<Component>> buttonTooltip(int index);
+    protected abstract Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY);
 
     protected void setPage(int index) {
         var buttonCount = buttons.size();

@@ -2,7 +2,7 @@ package org.shsts.tinactory.content;
 
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.electric.ElectricComponent;
-import org.shsts.tinactory.content.logistics.LogisticsComponent;
+import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
@@ -15,7 +15,7 @@ public final class AllNetworks {
     public static final RegistryEntry<IScheduling> WORK_SCHEDULING;
 
     public static final RegistryEntry<ComponentType<ElectricComponent>> ELECTRIC_COMPONENT;
-    public static final RegistryEntry<ComponentType<LogisticsComponent>> LOGISTICS_COMPONENT;
+    public static final RegistryEntry<ComponentType<LogisticComponent>> LOGISTIC_COMPONENT;
 
     static {
         PRE_WORK_SCHEDULING = REGISTRATE.scheduling("machine/pre_work").register();
@@ -24,7 +24,7 @@ public final class AllNetworks {
         WORK_SCHEDULING = REGISTRATE.scheduling("machine/work").after(() -> ELECTRIC_SCHEDULING).register();
 
         ELECTRIC_COMPONENT = REGISTRATE.componentType("electric", ElectricComponent.class, ElectricComponent::new);
-        LOGISTICS_COMPONENT = REGISTRATE.componentType("logistics", LogisticsComponent.class, LogisticsComponent::new);
+        LOGISTIC_COMPONENT = REGISTRATE.componentType("logistics", LogisticComponent.class, LogisticComponent::new);
     }
 
     public static void init() {}

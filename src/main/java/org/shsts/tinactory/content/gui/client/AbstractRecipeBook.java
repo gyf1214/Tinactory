@@ -40,7 +40,7 @@ import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE_CON
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class AbstractRecipeBook<T> extends Panel {
-    private static final int BUTTON_SIZE = SLOT_SIZE + 3;
+    public static final int BUTTON_SIZE = SLOT_SIZE + 3;
     private static final int BUTTON_PER_LINE = 4;
     public static final int BUTTON_TOP_MARGIN = BUTTON_SIZE / 2;
     public static final int PANEL_BORDER = 8;
@@ -96,7 +96,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
         }
 
         @Override
-        protected void onSelect(int index) {
+        protected void onSelect(int index, double mouseX, double mouseY) {
             var loc = getLoc(index);
             var recipe = getRecipe(loc);
             ghostRecipe.clear();
@@ -109,7 +109,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
         }
 
         @Override
-        protected Optional<List<Component>> buttonTooltip(int index) {
+        protected Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY) {
             var recipe = getRecipe(index);
             if (recipe == null) {
                 return Optional.of(List.of(I18n.tr("tinactory.tooltip.unselectRecipe")));

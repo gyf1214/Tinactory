@@ -10,6 +10,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
@@ -17,7 +18,6 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinactory.core.util.I18n;
 
 import java.util.List;
 
@@ -104,8 +104,7 @@ public class PortConfigPanel extends Panel {
                 continue;
             }
 
-            var key = "tinactory.gui.portConfig." + type.portType.name().toLowerCase() + "Label";
-            var label = new ConfigLabel(menu, I18n.tr(key, port), slots);
+            var label = new ConfigLabel(menu, ProcessingMenu.portLabel(type.portType, port), slots);
             label.verticalAlign = Label.Alignment.MIDDLE;
             label.color = 0xFFFFAA00;
             var button = new ConfigButton(menu, port, type.direction, slots);

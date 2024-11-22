@@ -1,6 +1,5 @@
 package org.shsts.tinactory.datagen.handler;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -11,6 +10,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.content.LanguageProcessor;
 import org.shsts.tinactory.datagen.context.TrackedContext;
@@ -33,7 +33,6 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
     }
 
     private class Provider extends LanguageProvider {
-        private final Gson gson = new Gson();
         private final ExistingFileHelper existingFileHelper;
         private final Set<String> trackedKeys = new HashSet<>();
 
@@ -47,7 +46,7 @@ public class LanguageHandler extends DataHandler<LanguageProvider> {
             var resource = existingFileHelper.getResource(loc, PackType.CLIENT_RESOURCES);
             try (var is = resource.getInputStream();
                 var br = new InputStreamReader(is)) {
-                return gson.fromJson(br, JsonObject.class);
+                return CodecHelper.jsonFromReader(br);
             }
         }
 

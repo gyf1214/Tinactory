@@ -135,7 +135,10 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         return player == this.player &&
             level == player.getLevel() &&
             level.getBlockEntity(pos) == be &&
-            player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64.0;
+            player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64.0 &&
+            AllCapabilities.MACHINE.tryGet(blockEntity)
+                .map(m -> m.canPlayerInteract(player))
+                .orElse(true);
     }
 
     @Override
@@ -423,6 +426,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
         }
     }
 
+    @FunctionalInterface
     public interface Factory<T1 extends BlockEntity, M1 extends Menu<? super T1, M1>> {
         M1 create(SmartMenuType<T1, M1> type, int id, Inventory inventory, T1 blockEntity);
     }

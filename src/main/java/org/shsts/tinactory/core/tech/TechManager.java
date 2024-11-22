@@ -1,7 +1,5 @@
 package org.shsts.tinactory.core.tech;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -89,8 +87,6 @@ public class TechManager implements ITechManager {
             private static final String PREFIX = "technologies";
             private static final String SUFFIX = ".json";
 
-            private final Gson gson = new Gson();
-
             private static Collection<ResourceLocation> listResources(ResourceManager manager) {
                 return manager.listResources(PREFIX, f -> f.endsWith(SUFFIX));
             }
@@ -101,8 +97,7 @@ public class TechManager implements ITechManager {
                 var loc1 = new ResourceLocation(loc.getNamespace(), path1);
                 try (var resource = manager.getResource(loc)) {
                     var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
-                    var reader = new BufferedReader(is);
-                    var jo = gson.fromJson(reader, JsonObject.class);
+                    var jo = CodecHelper.jsonFromReader(new BufferedReader(is));
                     var ret = CodecHelper.parseJson(Technology.CODEC, jo);
                     ret.setLoc(loc1);
                     return Optional.of(ret);

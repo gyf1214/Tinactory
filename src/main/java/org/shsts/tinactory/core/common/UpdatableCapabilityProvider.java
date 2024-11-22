@@ -15,7 +15,7 @@ public abstract class UpdatableCapabilityProvider extends CapabilityProvider
         be.sendUpdate();
     }
 
-    protected void forceUpdate() {
+    public void forceUpdate() {
         isUpdateForced = true;
     }
 

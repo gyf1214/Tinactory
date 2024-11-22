@@ -203,7 +203,7 @@ public class MultiBlock extends MultiBlockBase {
         var tag = new CompoundTag();
         if (multiBlockInterface != null) {
             var pos = multiBlockInterface.blockEntity.getBlockPos();
-            tag.put("interfacePos", CodecHelper.serializeBlockPos(pos));
+            tag.put("interfacePos", CodecHelper.encodeBlockPos(pos));
         }
         return tag;
     }
@@ -214,7 +214,7 @@ public class MultiBlock extends MultiBlockBase {
         assert world != null;
 
         if (tag.contains("interfacePos", Tag.TAG_COMPOUND)) {
-            var pos = CodecHelper.deserializeBlockPos(tag.getCompound("interfacePos"));
+            var pos = CodecHelper.parseBlockPos(tag.getCompound("interfacePos"));
 
             var be1 = world.getBlockEntity(pos);
             if (be1 == null) {

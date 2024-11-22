@@ -1,7 +1,5 @@
 package org.shsts.tinactory.core.tech;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
@@ -14,8 +12,6 @@ import java.util.Collection;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechInitPacket implements IPacket {
-    private static final Gson GSON = new Gson();
-
     private Collection<Technology> techs;
 
     public TechInitPacket() {}
@@ -30,7 +26,7 @@ public class TechInitPacket implements IPacket {
 
     private static Technology techFromBuf(FriendlyByteBuf buf) {
         var loc = buf.readResourceLocation();
-        var jo = GSON.fromJson(buf.readUtf(), JsonObject.class);
+        var jo = CodecHelper.jsonFromStr(buf.readUtf());
         var tech = CodecHelper.parseJson(Technology.CODEC, jo);
         tech.setLoc(loc);
         return tech;
@@ -39,7 +35,7 @@ public class TechInitPacket implements IPacket {
     private static void techToBuf(FriendlyByteBuf buf, Technology tech) {
         buf.writeResourceLocation(tech.getLoc());
         var je = CodecHelper.encodeJson(Technology.CODEC, tech);
-        buf.writeUtf(GSON.toJson(je));
+        buf.writeUtf(CodecHelper.jsonToStr(je));
     }
 
     @Override

@@ -9,10 +9,12 @@ import org.shsts.tinactory.content.gui.BoilerPlugin;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.ElectricStoragePlugin;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
+import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.ElectricChest;
@@ -78,7 +80,7 @@ public final class AllBlockEntities {
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
-    //    public static final MachineSet LOGISTIC_WORKER;
+    public static final MachineSet LOGISTIC_WORKER;
     public static final Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> MULTI_BLOCK_INTERFACE;
 
     public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
@@ -403,6 +405,13 @@ public final class AllBlockEntities {
                 return $;
             }).build()
             .tintVoltage(1)
+            .buildObject();
+
+        LOGISTIC_WORKER = set.machine()
+            .machine(v -> "network/" + v.id + "/logistic_worker", LogisticWorker.class,
+                LogisticWorker::factory, MachineBlock::factory)
+            .menu(LogisticWorkerMenu::new)
+            .machine(v -> $ -> $.blockEntity().menu().noInventory().build().build())
             .buildObject();
 
         NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",

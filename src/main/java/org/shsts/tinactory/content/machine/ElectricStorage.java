@@ -46,7 +46,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements IEve
     }
 
     protected void registerPort(Network network, IPort port) {
-        var logistics = network.getComponent(AllNetworks.LOGISTICS_COMPONENT);
+        var logistics = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
         logistics.unregisterPort(machine, 0);
 
         if (isGlobal()) {

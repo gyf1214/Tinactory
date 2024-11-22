@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticsComponent extends NetworkComponent {
+public class LogisticComponent extends NetworkComponent {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private record Request(PortDirection dir, IPort port,
@@ -50,7 +50,7 @@ public class LogisticsComponent extends NetworkComponent {
 
     private int ticks;
 
-    public LogisticsComponent(ComponentType<LogisticsComponent> type, Network network) {
+    public LogisticComponent(ComponentType<LogisticComponent> type, Network network) {
         super(type, network);
         this.passiveList.put(PortDirection.INPUT, new RandomList<>());
         this.passiveList.put(PortDirection.OUTPUT, new RandomList<>());
@@ -186,7 +186,7 @@ public class LogisticsComponent extends NetworkComponent {
         return true;
     }
 
-    private record PortKey(UUID machineId, int portIndex) {}
+    public record PortKey(UUID machineId, int portIndex) {}
 
     public record PortInfo(Machine machine, int portIndex, IPort port, @Nullable BlockPos subnet) {}
 
