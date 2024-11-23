@@ -1,8 +1,8 @@
 package org.shsts.tinactory.core.common;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import java.util.HashMap;
 import java.util.Map;

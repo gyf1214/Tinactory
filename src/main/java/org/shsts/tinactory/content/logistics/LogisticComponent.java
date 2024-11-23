@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -43,29 +44,15 @@ public class LogisticComponent extends NetworkComponent {
         ILogisticsContentWrapper content) {}
 
     private final Multimap<ILogisticsTypeWrapper, Request> activeRequests = ArrayListMultimap.create();
-    private final RandomList<Request> activeRequestList = new RandomList<>();
-    private final Multimap<PortDirection, IPort> passivePorts = HashMultimap.create();
     private final Map<PortDirection, RandomList<IPort>> passiveList = new HashMap<>();
     private final RandomList<IPort> storages = new RandomList<>();
 
-    private int ticks;
-
     public LogisticComponent(ComponentType<LogisticComponent> type, Network network) {
         super(type, network);
-        this.passiveList.put(PortDirection.INPUT, new RandomList<>());
-        this.passiveList.put(PortDirection.OUTPUT, new RandomList<>());
     }
 
     private int getTechLevel() {
         return network.team.getModifier("logistics_level");
-    }
-
-    private int getWorkerSize() {
-        return TinactoryConfig.INSTANCE.workerSize.get().get(getTechLevel());
-    }
-
-    private int getWorkerDelay() {
-        return TinactoryConfig.INSTANCE.workerDelay.get().get(getTechLevel());
     }
 
     private int getWorkerStack() {
@@ -82,10 +69,6 @@ public class LogisticComponent extends NetworkComponent {
             case FLUID -> getWorkerFluidStack();
             default -> throw new IllegalArgumentException();
         };
-    }
-
-    public void resetWorkers() {
-        ticks = 0;
     }
 
     /**
@@ -232,44 +215,21 @@ public class LogisticComponent extends NetworkComponent {
         return ret;
     }
 
-    @Override
-    public void onConnect() {
-        resetWorkers();
+    public boolean hasPort(PortKey key) {
+        return ports.containsKey(key);
+    }
+
+    public Optional<PortInfo> getPort(PortKey key) {
+        return Optional.ofNullable(ports.get(key));
     }
 
     @Override
     public void onDisconnect() {
-        activeRequests.clear();
-        activeRequestList.clear();
-        passivePorts.clear();
-        for (var list : passiveList.values()) {
-            list.clear();
-        }
-        storages.clear();
-
         ports.clear();
         subnetPorts.clear();
     }
 
-    private void onTick(Level world, Network network) {
-        var delay = getWorkerDelay();
-        var workers = getWorkerSize();
-        var index = ticks % delay;
-        var cycles = Math.min(ticks / delay, (workers + index) / delay);
-        ticks++;
-
-        for (var req : activeRequestList) {
-            if (cycles <= 0) {
-                break;
-            }
-            if (handleItemActiveRequest(req)) {
-                cycles--;
-            }
-        }
-
-        activeRequestList.clear();
-        activeRequests.clear();
-    }
+    private void onTick(Level world, Network network) {}
 
     @Override
     public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Ticker> cons) {

@@ -19,21 +19,29 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
+import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
+import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_PANEL_BG;
+import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -41,7 +49,7 @@ import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private record MachineInfo(UUID id, Component name, ItemStack icon) {}
 
-    private final int configSlots;
+    private final int workerSlots;
     private final Map<UUID, MachineInfo> machines = new HashMap<>();
     private final List<MachineInfo> machineList = new ArrayList<>();
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
@@ -57,22 +65,27 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private static final int BUTTON_SIZE = AbstractRecipeBook.BUTTON_SIZE;
     private static final int IMAGE_WIDTH = NetworkControllerScreen.WIDTH;
     private static final int IMAGE_HEIGHT = NetworkControllerScreen.HEIGHT;
+    private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
+    private static final int HORIZONTAL_SPACING = MARGIN_HORIZONTAL * 2;
 
     private class ConfigPanel extends ButtonPanel {
         private static final int WIDTH = BUTTON_SIZE * 3 + SPACING * 2;
-        private static final Rect FROM_RECT = new Rect(0, 0, BUTTON_SIZE, BUTTON_SIZE);
+        private static final Rect FROM_RECT = new Rect(1, 1, BUTTON_SIZE, BUTTON_SIZE);
         private static final Rect TO_RECT = FROM_RECT.offset(BUTTON_SIZE * 2 + SPACING * 2, 0);
         private static final Rect VALID_RECT = FROM_RECT.offset(BUTTON_SIZE + SPACING, 0);
         private static final Texture VALID_TEX = new Texture(
             gregtech("gui/widget/button_allow_import_export"), 20, 40);
+        private static final Texture BACKGROUND_TEX = new Texture(
+            mcLoc("gui/container/enchanting_table"), 256, 256);
+        private static final Rect BG_TEX_RECT = new Rect(0, 185, 108, 19);
 
         public ConfigPanel() {
-            super(LogisticWorkerScreen.this, WIDTH, BUTTON_SIZE, SPACING);
+            super(LogisticWorkerScreen.this, WIDTH + 2, BUTTON_SIZE + 2, 0);
         }
 
         @Override
         protected int getItemCount() {
-            return configSlots;
+            return workerSlots;
         }
 
         private Optional<ItemStack> getIcon(LogisticComponent.PortKey key) {
@@ -92,12 +105,12 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             var isFrom = selectedConfig == index && selectedFrom;
             var isTo = selectedConfig == index && !selectedFrom;
             var isValid = config.isValid();
-            var fromRect = rect.resize(BUTTON_SIZE, BUTTON_SIZE);
-            var toRect = rect.offset(BUTTON_SIZE * 2 + SPACING * 2, 0)
-                .resize(BUTTON_SIZE, BUTTON_SIZE);
-            var validRect = rect.offset(BUTTON_SIZE + SPACING, 1)
+            var fromRect = rect.offset(1, 1).resize(BUTTON_SIZE, BUTTON_SIZE);
+            var validRect = fromRect.offset(BUTTON_SIZE + SPACING, 1)
                 .resize(VALID_TEX.width(), VALID_TEX.height() / 2);
+            var toRect = fromRect.offset(BUTTON_SIZE * 2 + SPACING * 2, 0);
 
+            StretchImage.render(poseStack, BACKGROUND_TEX, z, rect, BG_TEX_RECT, 2);
             RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, z, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
             RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, z, toRect, isTo ? BUTTON_SIZE : 0, 0);
             RenderUtil.blit(poseStack, VALID_TEX, z, validRect, 0, isValid ? VALID_TEX.height() / 2 : 0);
@@ -140,9 +153,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
     }
 
-    private class MachinePanel extends ButtonPanel {
-        public MachinePanel() {
-            super(LogisticWorkerScreen.this, BUTTON_SIZE, BUTTON_SIZE, SPACING);
+    private class MachineSelectPanel extends ButtonPanel {
+        public MachineSelectPanel() {
+            super(LogisticWorkerScreen.this, BUTTON_SIZE, BUTTON_SIZE, 2);
         }
 
         @Override
@@ -162,7 +175,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         @Override
         protected void onSelect(int index, double mouseX, double mouseY) {
             selectedMachine = machineList.get(index).id;
-            portPanel.refresh();
+            portSelectPanel.refresh();
         }
 
         @Override
@@ -171,13 +184,13 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
     }
 
-    private class PortPanel extends ButtonPanel {
+    private class PortSelectPanel extends ButtonPanel {
         private static final int WIDTH = 42;
         private static final int X_OFFSET = SPACING;
-        private static final int Y_OFFSET = (BUTTON_SIZE - 9) / 2;
+        private static final int Y_OFFSET = (BUTTON_SIZE + 2 - FONT_HEIGHT) / 2 + 1;
 
-        public PortPanel() {
-            super(LogisticWorkerScreen.this, WIDTH, BUTTON_SIZE, SPACING);
+        public PortSelectPanel() {
+            super(LogisticWorkerScreen.this, WIDTH, BUTTON_SIZE + 2, 0);
         }
 
         @Override
@@ -213,7 +226,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             StretchImage.render(poseStack, tex, getBlitOffset(), rect, texRect, 3);
 
             RenderUtil.renderText(poseStack, port.portName(),
-                rect.x() + X_OFFSET, rect.y() + Y_OFFSET, 0xFF202020);
+                rect.x() + X_OFFSET, rect.y() + Y_OFFSET, PortPanel.TEXT_COLOR);
         }
 
         @Override
@@ -240,23 +253,40 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
     }
 
-    private final MachinePanel machinePanel;
-    private final PortPanel portPanel;
+    private final MachineSelectPanel machineSelectPanel;
+    private final PortSelectPanel portSelectPanel;
+
+    private static Component tr(String key) {
+        return I18n.tr("tinactory.gui.logisticWorker." + key);
+    }
 
     public LogisticWorkerScreen(LogisticWorkerMenu menu, Inventory inventory,
-        Component title, int configSlots) {
+        Component title, int workerSlots) {
         super(menu, inventory, title);
-        this.configSlots = configSlots;
+        this.workerSlots = workerSlots;
 
         var configPanel = new ConfigPanel();
-        this.machinePanel = new MachinePanel();
-        this.portPanel = new PortPanel();
+        this.machineSelectPanel = new MachineSelectPanel();
+        this.portSelectPanel = new PortSelectPanel();
 
-        addPanel(RectD.corners(0d, 0d, 0d, 1d), new Rect(SPACING, 0, ConfigPanel.WIDTH, 0), configPanel);
-        addPanel(RectD.corners(0d, 0d, 1d, 1d), Rect.corners(
-            SPACING * 2 + ConfigPanel.WIDTH, 0, -SPACING * 2 - PortPanel.WIDTH, 0), machinePanel);
-        addPanel(RectD.corners(1d, 0d, 1d, 1d), Rect.corners(
-            -SPACING - PortPanel.WIDTH, 0, -SPACING, 0), portPanel);
+        var offset1 = new Rect(0, TOP_MARGIN, ConfigPanel.WIDTH, -TOP_MARGIN);
+        var offset2 = Rect.corners(HORIZONTAL_SPACING + ConfigPanel.WIDTH + 1, TOP_MARGIN + 1,
+            -HORIZONTAL_SPACING - PortSelectPanel.WIDTH - 1, -1);
+        var offset3 = Rect.corners(-PortSelectPanel.WIDTH, TOP_MARGIN, 0, 0);
+        var anchor2 = RectD.corners(0d, 0d, 1d, 1d);
+        var anchor3 = RectD.corners(1d, 0d, 1d, 1d);
+
+        addWidget(new Label(menu, tr("configLabel")));
+        addWidget(new Rect(offset2.x() - 1, 0, 0, 0), new Label(menu, tr("machineLabel")));
+        addWidget(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
+            new Label(menu, tr("portLabel")));
+
+        var bg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
+        addWidget(anchor2, offset2.offset(-2, -2).enlarge(4, 4), bg);
+
+        addPanel(RectD.corners(0d, 0d, 0d, 1d), offset1, configPanel);
+        addPanel(anchor2, offset2, machineSelectPanel);
+        addPanel(anchor3, offset3, portSelectPanel);
 
         this.imageWidth = IMAGE_WIDTH;
         this.imageHeight = IMAGE_HEIGHT;
@@ -276,16 +306,21 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 machineList.add(info);
                 machines.put(port.machineId(), info);
             }
-            ports.put(new LogisticComponent.PortKey(port.machineId(), port.portIndex()), port);
+            ports.put(port.getKey(), port);
             machinePorts.put(port.machineId(), port);
+        }
+
+        for (var machine : machinePorts.keySet()) {
+            var l = machinePorts.get(machine);
+            l.sort(Comparator.comparingInt(LogisticWorkerSyncPacket.PortInfo::portIndex));
         }
 
         if (!machines.containsKey(selectedMachine)) {
             selectedMachine = null;
         }
 
-        machinePanel.refresh();
-        portPanel.refresh();
+        machineSelectPanel.refresh();
+        portSelectPanel.refresh();
     }
 
     private LogisticWorkerConfig getConfig(int slot) {

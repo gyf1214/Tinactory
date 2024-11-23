@@ -408,6 +408,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         LOGISTIC_WORKER = set.machine()
+            .voltages(Voltage.ULV)
             .machine(v -> "network/" + v.id + "/logistic_worker", LogisticWorker.class,
                 LogisticWorker::factory, MachineBlock::factory)
             .menu(LogisticWorkerMenu::new)

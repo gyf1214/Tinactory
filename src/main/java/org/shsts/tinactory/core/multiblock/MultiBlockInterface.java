@@ -118,9 +118,9 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public void setConfig(SetMachineConfigPacket packet) {
-        super.setConfig(packet);
-        if (multiBlock != null) {
+    public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
+        super.setConfig(packet, invokeEvent);
+        if (invokeEvent && multiBlock != null) {
             EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
         }
     }

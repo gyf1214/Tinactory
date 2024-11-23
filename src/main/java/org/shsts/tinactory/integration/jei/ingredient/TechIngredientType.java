@@ -1,8 +1,8 @@
 package org.shsts.tinactory.integration.jei.ingredient;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientType;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

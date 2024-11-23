@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.logistics;
 
+import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
@@ -8,6 +9,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.RangedWrapper;
 import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +23,8 @@ import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemHandlerCollection implements IItemCollection {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     public final IItemHandler itemHandler;
     private final int minSlot;
     private final int maxSlot;
@@ -97,12 +101,28 @@ public class ItemHandlerCollection implements IItemCollection {
                     ret.grow(extractedItem.getCount());
                 } else {
                     // don't know what to do actually, can only destroy the extracted item
+                    LOGGER.warn("{}: Extracted item {} cannot stack with required item {}",
+                        this, extractedItem, ret);
                     continue;
                 }
                 amount -= extractedItem.getCount();
             }
         }
         return ret;
+    }
+
+    @Override
+    public ItemStack extractItem(int limit, boolean simulate) {
+        if (limit <= 0 || !acceptOutput()) {
+            return ItemStack.EMPTY;
+        }
+        for (var i = minSlot; i < maxSlot; i++) {
+            var slotItem = itemHandler.getStackInSlot(i);
+            if (!slotItem.isEmpty()) {
+                return extractItem(ItemHelper.copyWithCount(slotItem, limit), simulate);
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     @Override

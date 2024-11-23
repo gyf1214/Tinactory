@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
@@ -34,6 +35,10 @@ public class LogisticWorkerSyncPacket extends MenuSyncPacket {
                 CodecHelper.parseComponent(buf.readUtf()),
                 CodecHelper.parseJson(ItemStack.CODEC, CodecHelper.jsonFromStr(buf.readUtf())),
                 CodecHelper.parseComponent(buf.readUtf()));
+        }
+
+        public LogisticComponent.PortKey getKey() {
+            return new LogisticComponent.PortKey(machineId, portIndex);
         }
     }
 

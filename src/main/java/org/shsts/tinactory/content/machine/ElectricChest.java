@@ -94,17 +94,17 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
             var slot = i;
             internalItems.setFilter(i, stack -> allowStackInSlot(slot, stack));
         }
-        var externalItems = new ExternalItemHandler();
+        var externalHandler = new ExternalItemHandler();
 
         this.externalItems = new WrapperItemHandler(internalItems);
-        this.externalPort = new ItemHandlerCollection(ElectricChest.this.externalItems) {
+        this.externalPort = new ItemHandlerCollection(this.externalItems) {
             @Override
             public boolean acceptOutput() {
                 return allowOutput();
             }
         };
         this.filters = new ItemStack[size];
-        this.itemHandlerCap = LazyOptional.of(() -> externalItems);
+        this.itemHandlerCap = LazyOptional.of(() -> externalHandler);
     }
 
     public ItemStack getStackInSlot(int slot) {

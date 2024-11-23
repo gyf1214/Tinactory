@@ -71,10 +71,16 @@ public class Machine extends UpdatableCapabilityProvider
     /**
      * Called only on server
      */
-    public void setConfig(SetMachineConfigPacket packet) {
+    public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
         config.apply(packet);
         sendUpdate(blockEntity);
-        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
+        if (invokeEvent) {
+            EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
+        }
+    }
+
+    public void setConfig(SetMachineConfigPacket packet) {
+        setConfig(packet, true);
     }
 
     public boolean canPlayerInteract(Player player) {

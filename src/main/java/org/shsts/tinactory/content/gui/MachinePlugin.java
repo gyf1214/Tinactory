@@ -11,7 +11,7 @@ import org.shsts.tinactory.content.gui.client.ElectricFurnaceRecipeBook;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.MarkerRecipeBook;
 import org.shsts.tinactory.content.gui.client.MultiBlockRecipeBook;
-import org.shsts.tinactory.content.gui.client.PortConfigPanel;
+import org.shsts.tinactory.content.gui.client.PortPanel;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
@@ -60,22 +60,22 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         if (menu.layout == null) {
             return;
         }
-        var portConfigPanel = new PortConfigPanel(screen, menu.layout);
+        var portPanel = new PortPanel(screen, menu.layout);
         var button = new SimpleButton(menu, Texture.SWITCH_BUTTON,
-            I18n.tr("tinactory.tooltip.openPortConfig"), 0, 0, 0, 0) {
+            I18n.tr("tinactory.tooltip.openPortPanel"), 0, 0, 0, 0) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
                 super.onMouseClicked(mouseX, mouseY, button);
-                portConfigPanel.setActive(!portConfigPanel.isActive());
-                if (portConfigPanel.isActive() && recipeBook != null) {
+                portPanel.setActive(!portPanel.isActive());
+                if (portPanel.isActive() && recipeBook != null) {
                     recipeBook.setBookActive(false);
                 }
             }
         };
         var buttonOverlay = new StaticWidget(menu, Texture.GREGTECH_LOGO);
 
-        screen.addPanel(PANEL_ANCHOR, PANEL_OFFSET, portConfigPanel);
-        portConfigPanel.setActive(false);
+        screen.addPanel(PANEL_ANCHOR, PANEL_OFFSET, portPanel);
+        portPanel.setActive(false);
         var buttonAnchor = RectD.corners(1d, 0d, 1d, 0d);
         var buttonOffset = new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE);
         screen.addWidget(buttonAnchor, buttonOffset, button);
@@ -90,7 +90,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
                     super.onMouseClicked(mouseX, mouseY, button);
                     recipeBook.setBookActive(!recipeBook.isBookActive());
                     if (recipeBook.isActive()) {
-                        portConfigPanel.setActive(false);
+                        portPanel.setActive(false);
                     }
                 }
             };

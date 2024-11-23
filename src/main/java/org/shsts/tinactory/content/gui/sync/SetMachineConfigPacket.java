@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
 
 import java.util.ArrayList;
@@ -71,14 +70,13 @@ public class SetMachineConfigPacket extends MenuEventPacket {
             return this;
         }
 
-        public Builder setPort(String key, MachineConfig.PortConfig config) {
-            sets.putByte(key, (byte) config.index);
-            return this;
-        }
-
         public Builder set(String key, CompoundTag tag) {
             sets.put(key, tag);
             return this;
+        }
+
+        public boolean isEmpty() {
+            return sets.isEmpty() && resets.isEmpty();
         }
 
         @Override

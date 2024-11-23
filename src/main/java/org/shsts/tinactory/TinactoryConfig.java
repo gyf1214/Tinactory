@@ -42,7 +42,7 @@ public final class TinactoryConfig {
         workerSize = builder.comment("Worker sizes for logistics component")
             .defineList("worker_size", List.of(8, 8, 16, 16, 32, 32), validator);
         workerDelay = builder.comment("Worker delays for logistics component")
-            .defineList("worker_delay", List.of(40, 40, 40, 20, 20, 20), validator);
+            .defineList("worker_delay", List.of(40, 40, 20, 20, 10, 10), validator);
         workerStack = builder.comment("Worker item stacks for logistics component")
             .defineList("worker_stack", List.of(4, 16, 64, 64, 128, 128), validator);
         workerFluidStack = builder.comment("Worker fluid stacks for logistics component")

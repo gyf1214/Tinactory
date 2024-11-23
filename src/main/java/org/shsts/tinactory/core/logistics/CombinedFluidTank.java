@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.logistics;
 
+import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +10,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +21,8 @@ import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<CompoundTag> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private final WrapperFluidTank[] tanks;
     private final boolean acceptOutput;
 
@@ -142,13 +146,31 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
                 } else if (stack.isFluidEqual(stack1)) {
                     stack.grow(stack1.getAmount());
                 } else {
-                    // don't know what to do actually, can only destroy the extracted item
+                    // don't know what to do actually, can only destroy the extracted fluid
+                    LOGGER.warn("{}: Extracted fluid {} cannot stack with required fluid {}",
+                        this, stack1, stack);
                     continue;
                 }
                 amount -= stack1.getAmount();
             }
         }
         return stack;
+    }
+
+    @Override
+    public FluidStack drain(int limit, boolean simulate) {
+        if (limit <= 0 || !acceptOutput()) {
+            return FluidStack.EMPTY;
+        }
+        for (var tank : tanks) {
+            var tankFluid = tank.getFluid();
+            if (!tankFluid.isEmpty()) {
+                var fluid = tankFluid.copy();
+                fluid.setAmount(limit);
+                return drain(fluid, simulate);
+            }
+        }
+        return FluidStack.EMPTY;
     }
 
     @Override

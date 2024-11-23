@@ -21,14 +21,19 @@ public interface IFluidCollection extends IPort {
     boolean acceptOutput();
 
     /**
-     * returns the amount of fluid inserted
+     * Returns the amount of fluid inserted. The passed FluidStack can be safely modified.
      */
     int fill(FluidStack fluid, boolean simulate);
 
     /**
-     * returns the amount of fluid taken
+     * Returns the fluid taken. The passed and returned FluidStack can be safely modified.
      */
     FluidStack drain(FluidStack fluid, boolean simulate);
+
+    /**
+     * Returns the fluid taken. The returned FluidStack can be safely modified.
+     */
+    FluidStack drain(int limit, boolean simulate);
 
     int getFluidAmount(FluidStack fluid);
 

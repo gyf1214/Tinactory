@@ -35,6 +35,6 @@ public class LogisticWorkerMenu extends Menu<LogisticWorker, LogisticWorkerMenu>
 
     @Override
     public MenuScreen<LogisticWorkerMenu> createScreen(Inventory inventory, Component title) {
-        return new LogisticWorkerScreen(this, inventory, title, blockEntity.getConfigSlots());
+        return new LogisticWorkerScreen(this, inventory, title, blockEntity.workerSlots);
     }
 }

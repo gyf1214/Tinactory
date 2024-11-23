@@ -6,9 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.gui.client.PortConfigButton;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
@@ -26,7 +24,6 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.util.I18n.tr;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
@@ -84,9 +81,5 @@ public class ElectricStoragePlugin<M extends Menu<?, M>> implements IMenuPlugin<
         var offset = new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE);
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
         screen.addWidget(anchor, offset, new LockButton());
-        screen.addWidget(anchor, offset.offset(-SLOT_SIZE - SPACING, 0), new PortConfigButton(
-            menu, machineConfig, "chestOutput", PortDirection.OUTPUT));
-        screen.addWidget(anchor, offset.offset(-(SLOT_SIZE + SPACING) * 2, 0), new PortConfigButton(
-            menu, machineConfig, "chestInput", PortDirection.INPUT));
     }
 }
