@@ -21,7 +21,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.common.SmartRecipe;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -98,7 +98,7 @@ public class MachineProcessor<T extends ProcessingRecipe>
                     itemFilters.put(idx, item.ingredient);
                 } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
                     var stack1 = item.stack();
-                    itemFilters.put(idx, stack -> ItemHelper.canItemsStack(stack, stack1));
+                    itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
                 } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
                     var stack1 = fluid.fluid();
                     fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));

@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -28,7 +28,7 @@ public class ChestItemSyncPacket extends MenuSyncPacket {
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         super.serializeToBuf(buf);
-        ItemHelper.serializeStackToBuf(stack, buf);
+        StackHelper.serializeStackToBuf(stack, buf);
         buf.writeBoolean(filter != null);
         if (filter != null) {
             buf.writeItem(filter);
@@ -38,7 +38,7 @@ public class ChestItemSyncPacket extends MenuSyncPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         super.deserializeFromBuf(buf);
-        stack = ItemHelper.deserializeStackFromBuf(buf);
+        stack = StackHelper.deserializeStackFromBuf(buf);
         var hasFilter = buf.readBoolean();
         filter = hasFilter ? buf.readItem() : null;
     }
@@ -47,7 +47,7 @@ public class ChestItemSyncPacket extends MenuSyncPacket {
         if (filter == null || that.filter == null) {
             return filter == that.filter;
         }
-        return ItemHelper.itemStackEqual(filter, that.filter);
+        return StackHelper.itemStackEqual(filter, that.filter);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ChestItemSyncPacket extends MenuSyncPacket {
         if (!super.equals(o)) {
             return false;
         }
-        return ItemHelper.itemStackEqual(stack, that.stack) &&
+        return StackHelper.itemStackEqual(stack, that.stack) &&
             filterEqual(that);
     }
 

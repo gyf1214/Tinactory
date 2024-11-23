@@ -24,7 +24,7 @@ import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
@@ -200,14 +200,14 @@ public class FlexibleStackContainer extends CapabilityProvider
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.put("stack", ItemHelper.serializeItemHandler(internalItems));
+        tag.put("stack", StackHelper.serializeItemHandler(internalItems));
         tag.put("fluid", combinedFluids.serializeNBT());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
+        StackHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 

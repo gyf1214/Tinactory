@@ -17,7 +17,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.HashMap;
@@ -69,9 +69,9 @@ public final class ProcessingIngredients {
                 return false;
             }
             if (amount <= 0) {
-                return !simulate || ItemHelper.hasItem(collection, ingredient);
+                return !simulate || StackHelper.hasItem(collection, ingredient);
             } else {
-                return ItemHelper.consumeItemCollection(collection, ingredient, amount, simulate);
+                return StackHelper.consumeItemCollection(collection, ingredient, amount, simulate);
             }
         }
 

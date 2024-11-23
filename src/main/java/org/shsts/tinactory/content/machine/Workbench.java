@@ -29,7 +29,7 @@ import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.SmartRecipe;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
@@ -222,12 +222,12 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
 
     @Override
     public CompoundTag serializeNBT() {
-        return ItemHelper.serializeItemHandler(itemView);
+        return StackHelper.serializeItemHandler(itemView);
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(itemView, tag);
+        StackHelper.deserializeItemHandler(itemView, tag);
     }
 
     public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {

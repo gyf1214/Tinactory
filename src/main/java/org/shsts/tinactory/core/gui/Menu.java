@@ -31,7 +31,7 @@ import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -292,7 +292,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
 
     protected FluidClickResult doClickFluidSlot(ItemStack item, IFluidTank tank,
         boolean mayDrain, boolean mayFill) {
-        var cap = ItemHelper.getFluidHandlerFromItem(item);
+        var cap = StackHelper.getFluidHandlerFromItem(item);
         if (cap.isEmpty()) {
             return new FluidClickResult();
         }
@@ -344,7 +344,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
             }
             item.shrink(1);
             var retItem = clickResult.stack;
-            var combinedItem = ItemHelper.combineStack(outputItem, retItem);
+            var combinedItem = StackHelper.combineStack(outputItem, retItem);
             if (combinedItem.isEmpty()) {
                 ItemHandlerHelper.giveItemToPlayer(player, retItem);
             } else {

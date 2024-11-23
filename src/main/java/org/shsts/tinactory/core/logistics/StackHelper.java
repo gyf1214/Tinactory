@@ -11,6 +11,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
@@ -24,7 +25,7 @@ import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public final class ItemHelper {
+public final class StackHelper {
     public static CompoundTag serializeItemHandler(IItemHandler itemHandler) {
         var listTag = new ListTag();
         var size = itemHandler.getSlots();
@@ -102,10 +103,19 @@ public final class ItemHelper {
     }
 
     public static ItemStack copyWithCount(ItemStack stack, int count) {
-        if (stack.isEmpty()) {
+        if (stack.isEmpty() || count <= 0) {
             return ItemStack.EMPTY;
         }
         return ItemHandlerHelper.copyStackWithSize(stack, count);
+    }
+
+    public static FluidStack copyWithAmount(FluidStack stack, int amount) {
+        if (stack.isEmpty() || amount <= 0) {
+            return FluidStack.EMPTY;
+        }
+        var ret = stack.copy();
+        stack.setAmount(amount);
+        return ret;
     }
 
     public static boolean hasItem(IItemCollection collection, Predicate<ItemStack> ingredient) {

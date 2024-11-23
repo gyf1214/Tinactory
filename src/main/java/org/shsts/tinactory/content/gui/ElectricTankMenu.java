@@ -22,7 +22,7 @@ import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
 
 import java.util.HashMap;
@@ -60,7 +60,7 @@ public class ElectricTankMenu extends Menu<BlockEntity, ElectricTankMenu> {
         if (fluidContainer.getFluidInTank(tankIndex).isEmpty()) {
             var filter = tank.getFilter(tankIndex);
             var carried = getCarried();
-            var fluidCarried = ItemHelper.getFluidHandlerFromItem(carried)
+            var fluidCarried = StackHelper.getFluidHandlerFromItem(carried)
                 .map(h -> h.getFluidInTank(0))
                 .orElse(FluidStack.EMPTY);
             if (carried.isEmpty() && !filter.isEmpty()) {

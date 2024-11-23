@@ -23,7 +23,7 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -138,12 +138,12 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public CompoundTag serializeNBT() {
-        return ItemHelper.serializeItemHandler(handler);
+        return StackHelper.serializeItemHandler(handler);
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(handler, tag);
+        StackHelper.deserializeItemHandler(handler, tag);
     }
 
     public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {

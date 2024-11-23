@@ -19,7 +19,7 @@ import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.content.logistics.ItemSlotHandler;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
@@ -50,7 +50,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
             if (item.isEmpty() || item.getCount() <= item.getMaxStackSize()) {
                 return item;
             } else {
-                return ItemHelper.copyWithCount(item, item.getMaxStackSize());
+                return StackHelper.copyWithCount(item, item.getMaxStackSize());
             }
         }
 
@@ -128,7 +128,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     public void setFilter(int slot, ItemStack stack) {
-        filters[slot] = ItemHelper.copyWithCount(stack, 1);
+        filters[slot] = StackHelper.copyWithCount(stack, 1);
         blockEntity.setChanged();
     }
 
@@ -139,10 +139,10 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     public boolean allowStackInSlot(int slot, ItemStack stack) {
         if (filters[slot] != null) {
-            return ItemHelper.canItemsStack(stack, filters[slot]);
+            return StackHelper.canItemsStack(stack, filters[slot]);
         }
         var stack1 = internalItems.getStackInSlot(slot);
-        return (stack1.isEmpty() && isUnlocked()) || ItemHelper.canItemsStack(stack, stack1);
+        return (stack1.isEmpty() && isUnlocked()) || StackHelper.canItemsStack(stack, stack1);
     }
 
     @Override
@@ -171,7 +171,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.put("items", ItemHelper.serializeItemHandler(internalItems));
+        tag.put("items", StackHelper.serializeItemHandler(internalItems));
         var tag1 = new ListTag();
         for (var i = 0; i < size; i++) {
             if (filters[i] != null) {
@@ -187,7 +187,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        ItemHelper.deserializeItemHandler(internalItems, tag.getCompound("items"));
+        StackHelper.deserializeItemHandler(internalItems, tag.getCompound("items"));
         var tag1 = tag.getList("filters", Tag.TAG_COMPOUND);
         Arrays.fill(filters, null);
         for (var tag2 : tag1) {

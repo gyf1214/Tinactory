@@ -26,7 +26,7 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
 
 import java.util.List;
@@ -101,7 +101,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
                 return ItemStack.EMPTY;
             }
             var count = Math.min(stack.getCount(), stack.getMaxStackSize());
-            return ItemHelper.copyWithCount(stack, count);
+            return StackHelper.copyWithCount(stack, count);
         }
 
         @Override
@@ -109,7 +109,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
 
         @Override
         public ItemStack remove(int amount) {
-            return ItemHelper.copyWithCount(chest.getStackInSlot(slot), amount);
+            return StackHelper.copyWithCount(chest.getStackInSlot(slot), amount);
         }
 
         @Override

@@ -19,7 +19,7 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.CraftingSlot;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -57,7 +57,7 @@ public class WorkbenchMenu extends Menu<SmartBlockEntity, WorkbenchMenu> {
         }
         var slot = slots.get(index);
         var newStack = slot.getItem();
-        return ItemHelper.itemStackEqual(oldStack, newStack) ? newStack : ItemStack.EMPTY;
+        return StackHelper.itemStackEqual(oldStack, newStack) ? newStack : ItemStack.EMPTY;
     }
 
     @OnlyIn(Dist.CLIENT)

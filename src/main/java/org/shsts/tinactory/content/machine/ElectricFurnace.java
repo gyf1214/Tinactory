@@ -20,7 +20,7 @@ import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 
 import java.util.Random;
@@ -99,7 +99,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     @Override
     protected void onWorkBegin(SmeltingRecipe recipe, IContainer container) {
         var ingredient = recipe.getIngredients().get(0);
-        ItemHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false);
+        StackHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false);
         calculateFactors();
     }
 

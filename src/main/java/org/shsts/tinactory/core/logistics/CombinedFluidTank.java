@@ -165,8 +165,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
         for (var tank : tanks) {
             var tankFluid = tank.getFluid();
             if (!tankFluid.isEmpty()) {
-                var fluid = tankFluid.copy();
-                fluid.setAmount(limit);
+                var fluid = StackHelper.copyWithAmount(tankFluid, limit);
                 return drain(fluid, simulate);
             }
         }

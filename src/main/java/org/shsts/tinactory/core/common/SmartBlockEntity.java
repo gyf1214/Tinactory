@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.core.logistics.ItemHelper;
+import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.Optional;
 
@@ -188,7 +188,7 @@ public class SmartBlockEntity extends BlockEntity implements IEventSubscriber {
     protected void onRemovedInWorld(Level world) {
         EventManager.invoke(this, AllEvents.REMOVED_IN_WORLD, world);
         AllCapabilities.MENU_ITEM_HANDLER.tryGet(this)
-            .ifPresent(itemHandler -> ItemHelper.dropItemHandler(world, worldPosition, itemHandler));
+            .ifPresent(itemHandler -> StackHelper.dropItemHandler(world, worldPosition, itemHandler));
     }
 
     /**

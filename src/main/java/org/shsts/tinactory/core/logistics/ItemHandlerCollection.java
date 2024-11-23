@@ -90,14 +90,14 @@ public class ItemHandlerCollection implements IItemCollection {
                 break;
             }
             var slotItem = itemHandler.getStackInSlot(i);
-            if (ItemHelper.canItemsStack(item, slotItem)) {
+            if (StackHelper.canItemsStack(item, slotItem)) {
                 var extractedItem = itemHandler.extractItem(i, amount, simulate);
                 if (extractedItem.isEmpty()) {
                     continue;
                 }
                 if (ret.isEmpty()) {
                     ret = extractedItem;
-                } else if (ItemHelper.canItemsStack(ret, extractedItem)) {
+                } else if (StackHelper.canItemsStack(ret, extractedItem)) {
                     ret.grow(extractedItem.getCount());
                 } else {
                     // don't know what to do actually, can only destroy the extracted item
@@ -119,7 +119,7 @@ public class ItemHandlerCollection implements IItemCollection {
         for (var i = minSlot; i < maxSlot; i++) {
             var slotItem = itemHandler.getStackInSlot(i);
             if (!slotItem.isEmpty()) {
-                return extractItem(ItemHelper.copyWithCount(slotItem, limit), simulate);
+                return extractItem(StackHelper.copyWithCount(slotItem, limit), simulate);
             }
         }
         return ItemStack.EMPTY;
@@ -133,7 +133,7 @@ public class ItemHandlerCollection implements IItemCollection {
         var ret = 0;
         for (var i = minSlot; i < maxSlot; i++) {
             var slotItem = itemHandler.getStackInSlot(i);
-            if (ItemHelper.canItemsStack(item, slotItem)) {
+            if (StackHelper.canItemsStack(item, slotItem)) {
                 ret += slotItem.getCount();
             }
         }
