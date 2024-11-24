@@ -49,6 +49,7 @@ public class MachineModel {
     private static final String IO_MODEL = "block/machine/io";
     public static final ResourceLocation PRIMITIVE_TEX = gregtech("blocks/casings/wood_wall");
     public static final String IO_TEX = "overlay/machine/overlay_energy_in_multi";
+    public static final String IO_OUT_TEX = "overlay/machine/overlay_energy_out_multi";
     public static final String ME_BUS = "overlay/appeng/me_output_bus";
 
     @Nullable

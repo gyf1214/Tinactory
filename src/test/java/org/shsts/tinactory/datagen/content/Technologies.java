@@ -68,14 +68,14 @@ public final class Technologies {
             .displayItem(AllMaterials.COPPER.item("wire"))
             .buildLoc();
 
+        BATTERY = factory.tech("battery")
+            .maxProgress(40L)
+            .displayItem(AllItems.BATTERY.get(Voltage.LV))
+            .buildLoc();
+
         MOTOR = factory.child("motor")
             .maxProgress(30L)
             .displayItem(AllItems.ELECTRIC_MOTOR.get(Voltage.LV))
-            .buildLoc();
-
-        PUMP_AND_PISTON = factory.tech("pump_and_piston")
-            .maxProgress(35L)
-            .displayItem(AllItems.ELECTRIC_PISTON.get(Voltage.LV))
             .buildLoc();
 
         MATERIAL_CUTTING = factory.tech("material_cutting")
@@ -83,30 +83,29 @@ public final class Technologies {
             .displayItem(AllItems.BASIC_BUZZSAW)
             .buildLoc();
 
-        CONVEYOR_MODULE = factory.tech("conveyor_module")
-            .maxProgress(40L)
-            .displayItem(AllItems.CONVEYOR_MODULE.get(Voltage.LV))
-            .buildLoc();
-
-        BATTERY = factory.tech("battery")
-            .maxProgress(40L)
-            .displayItem(AllItems.BATTERY.get(Voltage.LV))
-            .buildLoc();
-
         SENSOR_AND_EMITTER = factory.tech("sensor_and_emitter")
             .maxProgress(40L)
             .displayItem(AllItems.EMITTER.get(Voltage.LV))
             .buildLoc();
 
-        HOT_WORKING = factory.base(PUMP_AND_PISTON).tech("hot_working")
+        PUMP_AND_PISTON = factory.child("pump_and_piston")
+            .maxProgress(35L)
+            .displayItem(AllItems.ELECTRIC_PISTON.get(Voltage.LV))
+            .buildLoc();
+
+        HOT_WORKING = factory.child("hot_working")
             .maxProgress(40L)
             .displayItem(Items.BLAZE_POWDER)
+            .buildLoc();
+
+        CONVEYOR_MODULE = factory.child("conveyor_module")
+            .maxProgress(40L)
+            .displayItem(AllItems.CONVEYOR_MODULE.get(Voltage.LV))
             .buildLoc();
 
         ROBOT_ARM = factory.child("robot_arm")
             .maxProgress(50L)
             .displayItem(AllItems.ROBOT_ARM.get(Voltage.LV))
-            .depends(CONVEYOR_MODULE)
             .buildLoc();
 
         factory.voltage(Voltage.LV);
@@ -158,11 +157,6 @@ public final class Technologies {
 
         public TechFactory reset() {
             base = null;
-            return this;
-        }
-
-        public TechFactory base(ResourceLocation loc) {
-            base = loc;
             return this;
         }
     }

@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.electric;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import org.shsts.tinactory.content.AllTags;
@@ -31,6 +32,10 @@ public final class Circuits {
 
         private CircuitComponent(String component) {
             this.component = component;
+        }
+
+        public ResourceLocation loc(CircuitComponentTier tier) {
+            return item(tier).loc;
         }
 
         public RegistryEntry<Item> item(CircuitComponentTier tier) {

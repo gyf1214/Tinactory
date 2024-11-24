@@ -46,6 +46,10 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
         return prop -> new SubnetBlock(prop, voltage, subVoltage);
     }
 
+    public static Function<Properties, SubnetBlock> buffer(Voltage voltage) {
+        return prop -> new SubnetBlock(prop, voltage, voltage);
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(IO_FACING);

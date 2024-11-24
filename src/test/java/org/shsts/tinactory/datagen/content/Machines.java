@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content;
 
+import com.google.common.collect.Streams;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
@@ -66,6 +67,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllItems.BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.CABLE;
 import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
+import static org.shsts.tinactory.content.AllItems.ELECTRIC_BUFFER;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
@@ -104,6 +106,7 @@ import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
 import static org.shsts.tinactory.datagen.content.Models.multiBlock;
 import static org.shsts.tinactory.datagen.content.Models.multiBlockInterface;
+import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_OUT_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS;
 
@@ -146,7 +149,7 @@ public final class Machines {
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
             .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
             .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
-        machine(BATTERY_BOX, "overlay/machine/overlay_energy_out_multi");
+        machine(BATTERY_BOX, IO_OUT_TEX);
         machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest");
         machine(ELECTRIC_TANK, "overlay/machine/overlay_qtank");
         machine(LOGISTIC_WORKER, "cover/overlay_conveyor");
@@ -184,13 +187,14 @@ public final class Machines {
             .tag(MINEABLE_WITH_WRENCH)
             .build());
 
-        TRANSFORMER.values().forEach(b -> DATA_GEN.block(b)
-            .blockState(MachineModel::builder, MachineModel::blockState)
-            .overlay(Direction.NORTH, IO_TEX)
-            .overlay(Direction.SOUTH, "overlay/machine/overlay_energy_out_multi")
-            .build()
-            .tag(MINEABLE_WITH_WRENCH)
-            .build());
+        Streams.concat(TRANSFORMER.values().stream(), ELECTRIC_BUFFER.values().stream())
+            .forEach(b -> DATA_GEN.block(b)
+                .blockState(MachineModel::builder, MachineModel::blockState)
+                .overlay(Direction.NORTH, IO_TEX)
+                .overlay(Direction.SOUTH, IO_OUT_TEX)
+                .build()
+                .tag(MINEABLE_WITH_WRENCH)
+                .build());
     }
 
     private static void multiBlockItem(RegistryEntry<? extends Block> block, String casing,
@@ -252,12 +256,13 @@ public final class Machines {
         ulvMachine(AllBlockEntities.ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
         ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
         ulvMachine(ELECTRIC_CHEST.entry(Voltage.ULV), () -> Blocks.CHEST);
+        ulvMachine(ELECTRIC_TANK.entry(Voltage.ULV), GLASS.tag("primary"));
         ulvMachine(LOGISTIC_WORKER.entry(Voltage.ULV), () -> Blocks.HOPPER);
+        ulvMachine(ELECTRIC_BUFFER.get(Voltage.ULV), CABLE.get(Voltage.ULV));
 
         TOOL_CRAFTING.recipe(DATA_GEN, NETWORK_CONTROLLER)
             .result(NETWORK_CONTROLLER, 1)
-            .pattern("BBB").pattern("VHV").pattern("WVW")
-            .define('B', circuit(Voltage.ULV))
+            .pattern("VWV").pattern("VHV").pattern("WVW")
             .define('W', CABLE.get(Voltage.ULV))
             .define('H', MACHINE_HULL.get(Voltage.ULV))
             .define('V', circuit(Voltage.ULV))
@@ -268,15 +273,6 @@ public final class Machines {
             .pattern("PVP").pattern("RHR").pattern("WVW")
             .define('P', COPPER.tag("pipe"))
             .define('R', IRON.tag("rotor"))
-            .define('W', CABLE.get(Voltage.ULV))
-            .define('H', MACHINE_HULL.get(Voltage.ULV))
-            .define('V', circuit(Voltage.ULV))
-            .toolTag(TOOL_WRENCH)
-            .build()
-            .recipe(DATA_GEN, ELECTRIC_TANK.entry(Voltage.ULV))
-            .result(ELECTRIC_TANK.entry(Voltage.ULV), 1)
-            .pattern("BBB").pattern("VHV").pattern("WVW")
-            .define('B', GLASS.tag("primary"))
             .define('W', CABLE.get(Voltage.ULV))
             .define('H', MACHINE_HULL.get(Voltage.ULV))
             .define('V', circuit(Voltage.ULV))
@@ -456,6 +452,19 @@ public final class Machines {
 
     private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
         Supplier<? extends ItemLike> base) {
+        TOOL_CRAFTING.recipe(DATA_GEN, result)
+            .result(result, 1)
+            .pattern("BBB").pattern("VHV").pattern("WVW")
+            .define('B', base)
+            .define('W', CABLE.get(Voltage.ULV))
+            .define('H', MACHINE_HULL.get(Voltage.ULV))
+            .define('V', circuit(Voltage.ULV))
+            .toolTag(TOOL_WRENCH)
+            .build();
+    }
+
+    private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
+        TagKey<Item> base) {
         TOOL_CRAFTING.recipe(DATA_GEN, result)
             .result(result, 1)
             .pattern("BBB").pattern("VHV").pattern("WVW")
@@ -693,11 +702,29 @@ public final class Machines {
             .material(GLASS, "primary", 1)
             .tech(Technologies.PUMP_AND_PISTON)
             .build()
+            // TODO: PIC
             .recipe(BATTERY_BOX)
             .circuit(2)
             .component(CABLE, 4)
             .item(() -> Items.CHEST, 1)
             .tech(Technologies.BATTERY)
+            .build()
+            // TODO: PIC
+            .recipe(TRANSFORMER)
+            .circuit(4)
+            .component(CABLE, 1)
+            .item(CABLE.get(Voltage.fromRank(v.rank - 1)), 4)
+            .tech(Technologies.BATTERY)
+            .build()
+            // TODO: PIC
+            .recipe(ELECTRIC_BUFFER)
+            .circuit(4)
+            .component(CABLE, 2)
+            .tech(Technologies.BATTERY)
+            .build()
+            .recipe(LOGISTIC_WORKER)
+            .circuit(2)
+            .tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             .build()
             .recipe(MULTI_BLOCK_INTERFACE)
             .circuit(2)

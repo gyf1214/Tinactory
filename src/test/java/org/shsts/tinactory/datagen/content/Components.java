@@ -314,7 +314,6 @@ public final class Components {
         });
 
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, GLASS);
-        // TODO: quartz should be Emerald
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, ELECTRUM, RUBY);
 
         batteryRecipe(Voltage.LV, CADMIUM);
@@ -527,6 +526,30 @@ public final class Components {
             .define('C', COAL.tag("dust"))
             .unlockedBy("has_resin", has(STICKY_RESIN.get())));
 
+        ASSEMBLER.recipe(DATA_GEN, RESISTOR.item(CircuitComponentTier.NORMAL))
+            .outputItem(2, RESISTOR.item(CircuitComponentTier.NORMAL), 1)
+            .inputItem(0, COAL.tag("dust"), 1)
+            .inputItem(0, STICKY_RESIN, 1)
+            .inputItem(0, COPPER.tag("wire_fine"), 4)
+            .workTicks(ASSEMBLY_TICKS)
+            .build();
+
+        ASSEMBLER.recipe(DATA_GEN, DIODE.item(CircuitComponentTier.NORMAL))
+            .outputItem(2, DIODE.item(CircuitComponentTier.NORMAL), 1)
+            .inputItem(0, GALLIUM_ARSENIDE.tag("dust"), 1)
+            .inputItem(0, GLASS.tag("primary"), 1)
+            .inputItem(0, COPPER.tag("wire_fine"), 4)
+            .workTicks(ASSEMBLY_TICKS)
+            .build();
+
+        ASSEMBLER.recipe(DATA_GEN, suffix(DIODE.loc(CircuitComponentTier.NORMAL), "_from_wafer"))
+            .outputItem(2, DIODE.item(CircuitComponentTier.NORMAL), 1)
+            .inputItem(0, GALLIUM_ARSENIDE.tag("dust"), 1)
+            .inputItem(0, GLASS.tag("primary"), 1)
+            .inputItem(0, COPPER.tag("wire_fine"), 4)
+            .workTicks(ASSEMBLY_TICKS)
+            .build();
+
         // boards
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(Circuits.board(CircuitTier.ELECTRONIC).get(), 3)
@@ -586,7 +609,7 @@ public final class Components {
             .inputItem(0, SILICON.tag("dust"), 32)
             .inputItem(0, GALLIUM_ARSENIDE.tag("dust"), 1)
             .voltage(Voltage.LV)
-            .workTicks(6400)
+            .workTicks(6400L)
             .temperature(2100)
             .build();
 

@@ -90,6 +90,7 @@ import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
+import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
@@ -106,6 +107,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_SHEARS;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
@@ -303,7 +305,7 @@ public final class Materials {
             .build()
             .material(ELECTRUM, SHINY)
             .machineProcess(Voltage.LV, 0.75d).smelt()
-            .alloy(Voltage.LV, GOLD, 1, SILICON, 1)
+            .alloy(Voltage.LV, GOLD, 1, SILVER, 1)
             .build();
     }
 
@@ -456,6 +458,20 @@ public final class Materials {
             .result(RAW_RUBBER.entry("dust"), 1)
             .pattern("A").define('A', STICKY_RESIN)
             .toolTag(TOOL_MORTAR)
+            .build();
+
+        EXTRACTOR.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
+            .outputItem(1, RAW_RUBBER.entry("dust"), 3)
+            .inputItem(0, STICKY_RESIN, 1)
+            .workTicks(160L)
+            .voltage(Voltage.LV)
+            .build();
+
+        EXTRACTOR.recipe(DATA_GEN, suffix(RAW_RUBBER.loc("dust"), "_from_log"))
+            .outputItem(1, RAW_RUBBER.entry("dust"), 1)
+            .inputItem(0, RUBBER_LOG, 1)
+            .workTicks(320L)
+            .voltage(Voltage.LV)
             .build();
 
         ALLOY_SMELTER.recipe(DATA_GEN, RUBBER.loc("sheet"))

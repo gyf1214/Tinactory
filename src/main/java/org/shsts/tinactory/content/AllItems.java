@@ -62,6 +62,7 @@ public final class AllItems {
     public static final Map<Voltage, RegistryEntry<BatteryItem>> BATTERY;
     public static final Map<Voltage, RegistryEntry<CableBlock>> CABLE;
     public static final Map<Voltage, RegistryEntry<SubnetBlock>> TRANSFORMER;
+    public static final Map<Voltage, RegistryEntry<SubnetBlock>> ELECTRIC_BUFFER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> BUZZSAW;
 
@@ -185,9 +186,20 @@ public final class AllItems {
         TRANSFORMER = ComponentBuilder.simple(v -> REGISTRATE
                 .block("network/" + v.id + "/transformer", SubnetBlock.transformer(v))
                 .translucent()
-                .tint(i -> i == 0 ? v.color : (i == 1 ? Voltage.fromRank(v.rank - 1).color : 0xFFFFFFFF))
-                .register())
+                .tint(i -> switch (i) {
+                    case 0 -> v.color;
+                    case 1 -> Voltage.fromRank(v.rank - 1).color;
+                    default -> 0xFFFFFFFF;
+                }).register())
             .voltages(Voltage.LV, Voltage.IV)
+            .buildObject();
+
+        ELECTRIC_BUFFER = ComponentBuilder.simple(v -> REGISTRATE
+                .block("network/" + v.id + "/electric_buffer", SubnetBlock.buffer(v))
+                .translucent()
+                .tint(i -> i < 2 ? v.color : 0xFFFFFFFF)
+                .register())
+            .voltages(Voltage.ULV, Voltage.IV)
             .buildObject();
 
         GOOD_GRINDER = simple("component/grinder/good");

@@ -386,7 +386,7 @@ public final class AllBlockEntities {
                 }
                 return $;
             }).build()
-            .tintVoltage(1)
+            .tintVoltage(2)
             .buildObject();
 
         ELECTRIC_TANK = set.machine()
@@ -404,7 +404,7 @@ public final class AllBlockEntities {
                 }
                 return $;
             }).build()
-            .tintVoltage(1)
+            .tintVoltage(2)
             .buildObject();
 
         LOGISTIC_WORKER = set.machine()
@@ -413,6 +413,7 @@ public final class AllBlockEntities {
                 LogisticWorker::factory, MachineBlock::factory)
             .menu(LogisticWorkerMenu::new)
             .machine(v -> $ -> $.blockEntity().menu().noInventory().build().build())
+            .tintVoltage(2)
             .buildObject();
 
         NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",
