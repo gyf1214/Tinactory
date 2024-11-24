@@ -34,7 +34,7 @@ public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
     }
 
     public VeinBuilder<P> ore(MaterialSet material, double rate) {
-        builder.outputItem(ores.size() + 1, material.entry("raw"), 1, rate);
+        builder.outputItem(1, material.entry("raw"), 1, rate);
         ores.add(material);
         if (variant == null) {
             variant = material.oreVariant();

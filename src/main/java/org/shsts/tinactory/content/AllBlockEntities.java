@@ -169,17 +169,13 @@ public final class AllBlockEntities {
             .layoutSet()
             .port(ITEM_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
+            .port(ITEM_OUTPUT)
+            .slots(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, 1, 2, Voltage.PRIMITIVE, Voltage.ULV)
+            .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, List.of(Voltage.ULV))
+            .slots(SLOT_SIZE * 3, 1, 2, 3, Voltage.LV)
             .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-            .transform($ -> {
-                for (var i = 3; i < 6; i++) {
-                    var startVoltage = i == 5 ? Voltage.LV : Voltage.PRIMITIVE;
-                    $.port(ITEM_OUTPUT)
-                        .slot(SLOT_SIZE * i, 1 + SLOT_SIZE / 2, startVoltage, Voltage.MV)
-                        .slot(SLOT_SIZE * i, 1, Voltage.HV)
-                        .slot(SLOT_SIZE * i, 1 + SLOT_SIZE, Voltage.HV);
-                }
-                return $;
-            }).build().buildObject();
+            .build()
+            .buildObject();
 
         MACERATOR = set.processing(AllRecipes.MACERATOR)
             .transform(marker(true))
@@ -188,15 +184,9 @@ public final class AllBlockEntities {
             .slot(0, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, Voltage.LV, Voltage.HV)
-            .slot(SLOT_SIZE * 3, 1, Voltage.EV)
-            .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2, Voltage.MV, Voltage.HV)
-            .slot(SLOT_SIZE * 4, 1, Voltage.EV)
-            .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, List.of(Voltage.HV))
-            .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE, Voltage.EV)
-            .port(ITEM_OUTPUT)
-            .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE, Voltage.EV)
+            .slots(SLOT_SIZE * 3, 1, 2, 2, Voltage.EV)
             .progressBar(Texture.PROGRESS_MACERATE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();

@@ -54,4 +54,8 @@ public final class MathUtil {
     public static Vec3 dirNormal(Direction dir) {
         return new Vec3(dir.getStepX(), dir.getStepY(), dir.getStepZ());
     }
+
+    public static double safePow(double a, double b) {
+        return a > EPS ? Math.pow(a, b) : 0d;
+    }
 }

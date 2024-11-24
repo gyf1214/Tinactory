@@ -35,6 +35,7 @@ import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
@@ -176,9 +177,9 @@ public class Machine extends UpdatableCapabilityProvider
     private void onWork(Level world, Network network) {
         assert this.network == network;
         var workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
-        var workFactor1 = Math.pow(workFactor, TinactoryConfig.INSTANCE.workFactorExponent.get());
+        var machineSpeed = MathUtil.safePow(workFactor, TinactoryConfig.INSTANCE.workFactorExponent.get());
         getProcessor().ifPresent(processor -> {
-            processor.onWorkTick(workFactor1);
+            processor.onWorkTick(machineSpeed);
             updateWorkBlock(world, processor.getProgress() > 0d);
         });
     }

@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.content.AllNetworks;
@@ -74,7 +75,7 @@ public class ElectricComponent extends NetworkComponent {
         }
     }
 
-    public record Metrics(double workFactor, double gen, double workCons, double buffer) {
+    public record Metrics(double workSpeed, double gen, double workCons, double buffer) {
         public Metrics() {
             this(0d, 0d, 0d, 0d);
         }
@@ -91,7 +92,7 @@ public class ElectricComponent extends NetworkComponent {
         }
 
         public void writeToBuf(FriendlyByteBuf buf) {
-            buf.writeDouble(workFactor);
+            buf.writeDouble(workSpeed);
             buf.writeDouble(gen);
             buf.writeDouble(workCons);
             buf.writeDouble(buffer);
@@ -231,7 +232,8 @@ public class ElectricComponent extends NetworkComponent {
             buffer = bufferGen * bufferFactor;
         }
 
-        metrics = new Metrics(workFactor, gen, workCons, buffer);
+        var workSpeed = MathUtil.safePow(workFactor, TinactoryConfig.INSTANCE.workFactorExponent.get());
+        metrics = new Metrics(workSpeed, gen, workCons, buffer);
     }
 
     public double getWorkFactor() {

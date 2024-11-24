@@ -77,6 +77,14 @@ public class LayoutSetBuilder<P> extends BuilderBase<Map<Voltage, Layout>, P, La
         return slots(x, y, rows, columns, Arrays.asList(Voltage.values()));
     }
 
+    public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns, Voltage from) {
+        return slots(x, y, rows, columns, Voltage.between(from, Voltage.MAXIMUM));
+    }
+
+    public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns, Voltage from, Voltage to) {
+        return slots(x, y, rows, columns, Voltage.between(from, to));
+    }
+
     public LayoutSetBuilder<P> image(Rect rect, Texture tex) {
         images.add(new Layout.WidgetInfo(rect, tex));
         return this;

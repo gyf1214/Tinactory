@@ -127,7 +127,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             stateLabel.setLine(1, tr("stateLabel", packet.getState()));
             var metric = packet.getElectricMetrics();
             stateLabel.setLine(2, tr("workFactorLabel",
-                PERCENTAGE_FORMAT.format(metric.workFactor())));
+                PERCENTAGE_FORMAT.format(metric.workSpeed())));
             stateLabel.setLine(3, tr("efficiencyLabel",
                 PERCENTAGE_FORMAT.format(metric.efficiency())));
             var comp = MathUtil.compare(metric.buffer());

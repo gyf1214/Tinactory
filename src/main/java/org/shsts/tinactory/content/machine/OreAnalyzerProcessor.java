@@ -37,7 +37,7 @@ public class OreAnalyzerProcessor extends MachineProcessor<OreAnalyzerRecipe> {
         }
         emptyRecipe = random.nextDouble() <= emptyRate;
 
-        if (size == 1) {
+        if (emptyRecipe || size == 1) {
             return Optional.of(matches.get(0));
         }
 
