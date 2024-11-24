@@ -57,7 +57,7 @@ public class ToolItem extends Item {
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltips,
         TooltipFlag isAdvanced) {
         var line = tr("tinactory.tooltip.tool", NUMBER_FORMAT.format(
-            stack.getMaxStackSize() - stack.getDamageValue()));
+            stack.getMaxDamage() - stack.getDamageValue()));
         tooltips.add(line.withStyle(ChatFormatting.GRAY));
     }
 }
