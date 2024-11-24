@@ -526,28 +526,31 @@ public final class Components {
             .define('C', COAL.tag("dust"))
             .unlockedBy("has_resin", has(STICKY_RESIN.get())));
 
-        ASSEMBLER.recipe(DATA_GEN, RESISTOR.item(CircuitComponentTier.NORMAL))
+        ASSEMBLER.recipe(DATA_GEN, RESISTOR.loc(CircuitComponentTier.NORMAL))
             .outputItem(2, RESISTOR.item(CircuitComponentTier.NORMAL), 1)
             .inputItem(0, COAL.tag("dust"), 1)
             .inputItem(0, STICKY_RESIN, 1)
             .inputItem(0, COPPER.tag("wire_fine"), 4)
             .workTicks(ASSEMBLY_TICKS)
+            .voltage(Voltage.ULV)
             .build();
 
-        ASSEMBLER.recipe(DATA_GEN, DIODE.item(CircuitComponentTier.NORMAL))
+        ASSEMBLER.recipe(DATA_GEN, DIODE.loc(CircuitComponentTier.NORMAL))
             .outputItem(2, DIODE.item(CircuitComponentTier.NORMAL), 1)
             .inputItem(0, GALLIUM_ARSENIDE.tag("dust"), 1)
             .inputItem(0, GLASS.tag("primary"), 1)
             .inputItem(0, COPPER.tag("wire_fine"), 4)
             .workTicks(ASSEMBLY_TICKS)
+            .voltage(Voltage.LV)
             .build();
 
         ASSEMBLER.recipe(DATA_GEN, suffix(DIODE.loc(CircuitComponentTier.NORMAL), "_from_wafer"))
             .outputItem(2, DIODE.item(CircuitComponentTier.NORMAL), 1)
-            .inputItem(0, GALLIUM_ARSENIDE.tag("dust"), 1)
+            .inputItem(0, RAW_WAFERS.get(0), 1)
             .inputItem(0, GLASS.tag("primary"), 1)
             .inputItem(0, COPPER.tag("wire_fine"), 4)
             .workTicks(ASSEMBLY_TICKS)
+            .voltage(Voltage.LV)
             .build();
 
         // boards

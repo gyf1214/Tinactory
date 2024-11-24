@@ -150,8 +150,12 @@ public final class Machines {
             .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
             .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
         machine(BATTERY_BOX, IO_OUT_TEX);
-        machine(ELECTRIC_CHEST, "overlay/machine/overlay_qchest");
-        machine(ELECTRIC_TANK, "overlay/machine/overlay_qtank");
+        machine(ELECTRIC_CHEST, $ -> $.ioTex(IO_TEX)
+            .overlay(Direction.UP, "overlay/machine/overlay_qchest")
+            .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
+        machine(ELECTRIC_TANK, $ -> $.ioTex(IO_TEX)
+            .overlay(Direction.UP, "overlay/machine/overlay_qtank")
+            .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
         machine(LOGISTIC_WORKER, "cover/overlay_conveyor");
 
         DATA_GEN.block(NETWORK_CONTROLLER)
