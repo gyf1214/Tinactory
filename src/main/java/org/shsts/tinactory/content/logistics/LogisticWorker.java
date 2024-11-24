@@ -200,7 +200,7 @@ public class LogisticWorker extends SmartBlockEntity {
             stack.setAmount(limit);
             var stack2 = from.drain(stack, false);
             var remaining1 = to.fill(stack2, false);
-            if (remaining1 != 0) {
+            if (remaining1 != stack2.getAmount()) {
                 LOGGER.warn("transmit fluid failed from={} to={} content={}", from, to, stack);
             }
         }

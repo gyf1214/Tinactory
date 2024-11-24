@@ -215,9 +215,10 @@ public final class AllItems {
             "low_pic", "pic", "high_pic");
 
         FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> REGISTRATE
-                .item("tool/fluid_cell/" + mat.name, CellItem.factory(1 << (v.rank - 2)))
+                .item("tool/fluid_cell/" + mat.name, CellItem.factory(1 << (v.rank - 1)))
                 .tint(() -> () -> CellItem::getTint)
                 .register())
+            .voltage(Voltage.ULV, IRON)
             .voltage(Voltage.LV, STEEL)
             .voltage(Voltage.MV, ALUMINIUM)
             .buildObject();

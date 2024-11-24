@@ -114,7 +114,7 @@ public final class StackHelper {
             return FluidStack.EMPTY;
         }
         var ret = stack.copy();
-        stack.setAmount(amount);
+        ret.setAmount(amount);
         return ret;
     }
 

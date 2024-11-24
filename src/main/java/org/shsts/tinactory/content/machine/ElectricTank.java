@@ -86,10 +86,6 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     }
 
     @Override
-    public void onPreWork() {
-    }
-
-    @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
             return fluidHandlerCap.cast();

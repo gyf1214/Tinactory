@@ -32,7 +32,7 @@ public final class TinactoryConfig {
         fluidSlotSize = builder.comment("Default size of a fluid slot.")
             .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
         baseFluidCellSize = builder.comment("Size of the base fluid cell.")
-            .defineInRange("base_fluid_cell_size", 8000, 0, Integer.MAX_VALUE);
+            .defineInRange("base_fluid_cell_size", 4000, 0, Integer.MAX_VALUE);
         chestSize = builder.comment("Size of the electric chest")
             .defineInRange("chest_size", 1024, 1, Integer.MAX_VALUE);
         tankSize = builder.comment("Size of the electric tank")

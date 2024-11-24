@@ -90,6 +90,7 @@ public class LogisticComponent extends NetworkComponent {
     @Override
     public void onDisconnect() {
         ports.clear();
+        globalPorts.clear();
         subnetPorts.clear();
     }
 

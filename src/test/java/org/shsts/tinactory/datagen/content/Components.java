@@ -105,6 +105,7 @@ import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.COIL;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
+import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.name;
@@ -259,7 +260,8 @@ public final class Components {
             .build();
 
         FLUID_CELL.forEach((v, item) -> {
-            var texBase = "metaitems/large_fluid_cell." + name(item.id, -1);
+            var texBase = v == Voltage.ULV ? "metaitems/fluid_cell" :
+                "metaitems/large_fluid_cell." + name(item.id, -1);
             DATA_GEN.item(item)
                 .model(basicItem(texBase + "/base", texBase + "/overlay"))
                 .build();
@@ -278,6 +280,14 @@ public final class Components {
             .define('#', IRON.tag("plate"))
             .define('W', CABLE.get(Voltage.ULV))
             .toolTag(TOOL_WRENCH)
+            .build();
+
+        TOOL_CRAFTING.recipe(DATA_GEN, FLUID_CELL.get(Voltage.ULV))
+            .result(FLUID_CELL.get(Voltage.ULV), 1)
+            .pattern("###").pattern("#G#").pattern(" # ")
+            .define('#', IRON.tag("plate"))
+            .define('G', GLASS.tag("primary"))
+            .toolTag(TOOL_HAMMER, TOOL_WRENCH)
             .build();
     }
 

@@ -81,6 +81,9 @@ public abstract class ElectricStorage extends CapabilityProvider implements IEve
     }
 
     @Override
+    public void onPreWork() {}
+
+    @Override
     public void onWorkTick(double partial) {}
 
     @Override

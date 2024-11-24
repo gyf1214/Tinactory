@@ -55,10 +55,6 @@ public record Texture(ResourceLocation loc, int width, int height) {
         modLoc("gui/disable_recipe"), 16, 16);
     public static final Texture RECIPE_BUTTON = new Texture(
         modLoc("gui/recipe_book_button"), 42, 21);
-    public static final Texture IMPORT_EXPORT_BUTTON = new Texture(
-        modLoc("gui/import_export"), 18, 18);
-    public static final Texture CLEAR_GRID_BUTTON = new Texture(
-        gregtech("gui/widget/button_clear_grid"), 18, 18);
     public static final Texture CRAFTING_ARROW = new Texture(
         modLoc("gui/arrow_crafting"), 22, 15);
 

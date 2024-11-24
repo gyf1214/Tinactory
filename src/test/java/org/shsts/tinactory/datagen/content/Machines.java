@@ -252,6 +252,7 @@ public final class Machines {
         ulvMachine(AllBlockEntities.ASSEMBLER.entry(Voltage.ULV), WORKBENCH);
         ulvMachine(ELECTRIC_FURNACE.entry(Voltage.ULV), () -> Blocks.FURNACE);
         ulvMachine(ELECTRIC_CHEST.entry(Voltage.ULV), () -> Blocks.CHEST);
+        ulvMachine(LOGISTIC_WORKER.entry(Voltage.ULV), () -> Blocks.HOPPER);
 
         TOOL_CRAFTING.recipe(DATA_GEN, NETWORK_CONTROLLER)
             .result(NETWORK_CONTROLLER, 1)
@@ -261,13 +262,21 @@ public final class Machines {
             .define('H', MACHINE_HULL.get(Voltage.ULV))
             .define('V', circuit(Voltage.ULV))
             .toolTag(TOOL_WRENCH)
-            .build();
-
-        TOOL_CRAFTING.recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
+            .build()
+            .recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
             .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
             .pattern("PVP").pattern("RHR").pattern("WVW")
             .define('P', COPPER.tag("pipe"))
             .define('R', IRON.tag("rotor"))
+            .define('W', CABLE.get(Voltage.ULV))
+            .define('H', MACHINE_HULL.get(Voltage.ULV))
+            .define('V', circuit(Voltage.ULV))
+            .toolTag(TOOL_WRENCH)
+            .build()
+            .recipe(DATA_GEN, ELECTRIC_TANK.entry(Voltage.ULV))
+            .result(ELECTRIC_TANK.entry(Voltage.ULV), 1)
+            .pattern("BBB").pattern("VHV").pattern("WVW")
+            .define('B', GLASS.tag("primary"))
             .define('W', CABLE.get(Voltage.ULV))
             .define('H', MACHINE_HULL.get(Voltage.ULV))
             .define('V', circuit(Voltage.ULV))
@@ -299,7 +308,7 @@ public final class Machines {
             .inputItem(0, circuit(Voltage.ULV), 2)
             .inputItem(0, CABLE.get(Voltage.ULV), 2)
             .inputItem(0, () -> Blocks.CHEST, 1)
-            .inputItem(0, () -> Blocks.GLASS, 1)
+            .inputItem(0, GLASS.tag("primary"), 1)
             .voltage(Voltage.ULV)
             .workTicks(ASSEMBLE_TICKS)
             .requireTech(Technologies.STEEL)
@@ -353,6 +362,7 @@ public final class Machines {
             .nullRecipe(Items.RESPAWN_ANCHOR)
             .nullRecipe(Items.GLOWSTONE)
             .nullRecipe(Items.WHITE_WOOL)
+            .nullRecipe(Items.BUCKET)
             .nullRecipe(Items.SHEARS)
             .nullRecipe(Items.FLINT_AND_STEEL)
             .nullRecipe(Items.SPYGLASS)
@@ -388,6 +398,12 @@ public final class Machines {
             .define('P', IRON.tag("plate"))
             .define('C', Items.CHEST)
             .toolTag(TOOL_WRENCH, TOOL_HAMMER)
+            .build()
+            .recipe(DATA_GEN, Items.BUCKET)
+            .result(Items.BUCKET, 1)
+            .pattern("P P").pattern(" P ")
+            .define('P', IRON.tag("plate"))
+            .toolTag(TOOL_HAMMER)
             .build();
     }
 
@@ -554,7 +570,7 @@ public final class Machines {
             .component(ELECTRIC_MOTOR, 1)
             .component(ELECTRIC_PISTON, 1)
             .component(GRINDER, 1)
-            .item(() -> Blocks.GLASS, 1)
+            .material(GLASS, "primary", 1)
             .tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
             .build()
             .recipe(ORE_ANALYZER)
@@ -574,7 +590,7 @@ public final class Machines {
             .circuit(2)
             .component(ELECTRIC_MOTOR, 1)
             .material(rotor, "rotor", 2)
-            .item(() -> Blocks.GLASS, 1)
+            .material(GLASS, "primary", 1)
             .tech(Technologies.MOTOR)
             .build()
             .recipe(CENTRIFUGE)
@@ -603,7 +619,7 @@ public final class Machines {
             .circuit(2)
             .component(ELECTRIC_MOTOR, 1)
             .material(rotor, "rotor", 1)
-            .item(() -> Blocks.GLASS, 4)
+            .material(GLASS, "primary", 4)
             .tech(Technologies.MOTOR)
             .build()
             .recipe(POLARIZER)

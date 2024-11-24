@@ -24,8 +24,10 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.util.I18n.tr;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -46,40 +48,111 @@ public class ElectricStoragePlugin<M extends Menu<?, M>> implements IMenuPlugin<
     }
 
     @OnlyIn(Dist.CLIENT)
-    private class LockButton extends Button {
-        private static final Texture TEX = new Texture(
-            gregtech("gui/widget/button_public_private"), 18, 36);
+    private class PortButton extends Button {
+        private static final Texture PORT_TEX = new Texture(
+            modLoc("gui/import_export"), 18, 18);
+        private static final Texture DISABLE_TEX = new Texture(
+            gregtech("gui/widget/button_clear_grid"), 18, 18);
+        private static final Rect OUTPUT_RECT = new Rect(0, 0, 18, 18);
+        private static final Rect INPUT_RECT = new Rect(0, 18, 18, -18);
 
-        public LockButton() {
+        private final Rect portRect;
+        private final String configKey;
+        private final String langKey;
+
+        public PortButton(boolean input) {
             super(ElectricStoragePlugin.this.menu);
+            this.portRect = input ? INPUT_RECT : OUTPUT_RECT;
+            var name = input ? "Input" : "Output";
+            this.configKey = "allow" + name;
+            this.langKey = "tinactory.tooltip.chest" + name;
         }
 
         @Override
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            var uy = machineConfig.getBoolean("unlockChest") ? 0 : TEX.height() / 2;
-            RenderUtil.blit(poseStack, TEX, getBlitOffset(), rect, 0, uy);
+            var z = getBlitOffset();
+            if (machineConfig.getBoolean(configKey)) {
+                RenderUtil.blit(poseStack, Texture.SWITCH_BUTTON, z, rect);
+                RenderUtil.blit(poseStack, PORT_TEX, z, 0xFF5555FF, rect, portRect);
+            } else {
+                RenderUtil.blit(poseStack, DISABLE_TEX, z, rect);
+            }
         }
 
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            var component = machineConfig.getBoolean("unlockChest") ?
-                tr("tinactory.tooltip.chestUnlock") : tr("tinactory.tooltip.chestLock");
-            return Optional.of(List.of(component));
+            var suffix = machineConfig.getBoolean(configKey) ? ".allow" : ".disallow";
+            return Optional.of(List.of(tr(langKey + suffix)));
         }
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
-            var val = !machineConfig.getBoolean("unlockChest");
+            super.onMouseClicked(mouseX, mouseY, button);
+            var val = !machineConfig.getBoolean(configKey);
             menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG,
-                SetMachineConfigPacket.builder().set("unlockChest", val));
+                SetMachineConfigPacket.builder().set(configKey, val));
         }
     }
+
+    @OnlyIn(Dist.CLIENT)
+    private class SwitchButton extends Button {
+        private final String configKey;
+        private final Texture texture;
+        private final int enableTexY;
+        private final int disableTexY;
+        private final String enableLang;
+        private final String disableLang;
+
+        public SwitchButton(String configKey, Texture texture, int disableTexY, int enableTexY,
+            String disableLang, String enableLang) {
+            super(ElectricStoragePlugin.this.menu);
+            this.configKey = configKey;
+            this.texture = texture;
+            this.disableTexY = disableTexY;
+            this.enableTexY = enableTexY;
+            this.disableLang = disableLang;
+            this.enableLang = enableLang;
+        }
+
+        @Override
+        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+            var texRect = machineConfig.getBoolean(configKey) ? enableTexY : disableTexY;
+            RenderUtil.blit(poseStack, texture, getBlitOffset(), rect, 0, texRect);
+        }
+
+        @Override
+        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
+            var langKey = machineConfig.getBoolean(configKey) ? enableLang : disableLang;
+            return Optional.of(List.of(tr("tinactory.tooltip." + langKey)));
+        }
+
+        @Override
+        public void onMouseClicked(double mouseX, double mouseY, int button) {
+            super.onMouseClicked(mouseX, mouseY, button);
+            var val = !machineConfig.getBoolean(configKey);
+            menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG,
+                SetMachineConfigPacket.builder().set(configKey, val));
+        }
+    }
+
+    private static final Texture LOCK_TEX = new Texture(
+        gregtech("gui/widget/button_public_private"), 18, 36);
+    private static final Texture GLOBAL_TEX = new Texture(
+        gregtech("gui/widget/button_distinct_buses"), 18, 36);
 
     @OnlyIn(Dist.CLIENT)
     @Override
     public void applyMenuScreen(MenuScreen<M> screen) {
         var offset = new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE);
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
-        screen.addWidget(anchor, offset, new LockButton());
+        screen.addWidget(anchor, offset, new SwitchButton("unlockChest", LOCK_TEX,
+            18, 0, "chestLock", "chestUnlock"));
+        offset = offset.offset(-SLOT_SIZE - SPACING, 0);
+        screen.addWidget(anchor, offset, new PortButton(false));
+        offset = offset.offset(-SLOT_SIZE - SPACING, 0);
+        screen.addWidget(anchor, offset, new PortButton(true));
+        offset = offset.offset(-SLOT_SIZE - SPACING, 0);
+        screen.addWidget(anchor, offset, new SwitchButton("global", GLOBAL_TEX,
+            0, 18, "chestLocal", "chestGlobal"));
     }
 }

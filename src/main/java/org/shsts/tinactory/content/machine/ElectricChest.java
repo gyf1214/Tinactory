@@ -157,10 +157,6 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     @Override
-    public void onPreWork() {
-    }
-
-    @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return itemHandlerCap.cast();
