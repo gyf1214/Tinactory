@@ -14,9 +14,13 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+
+import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -98,6 +102,15 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
+    private static int createSpawn(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var pos = BlockPosArgument.getSpawnablePos(ctx, "pos");
+        var world = ctx.getSource().getLevel();
+
+        AllWorldGens.PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
+            world.getChunkSource().getGenerator(), new Random(), pos);
+        return Command.SINGLE_SUCCESS;
+    }
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var builder = Commands.literal(Tinactory.ID)
             .then(Commands.literal("createTeam")
@@ -110,7 +123,11 @@ public final class AllCommands {
             .then(Commands.literal("setTargetTech")
                 .then(Commands.argument("tech", ResourceLocationArgument.id())
                     .executes(AllCommands::setTargetTech))
-                .executes(AllCommands::resetTargetTech));
+                .executes(AllCommands::resetTargetTech))
+            .then(Commands.literal("admin").requires(p -> p.hasPermission(2))
+                .then(Commands.literal("createSpawn")
+                    .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                        .executes(AllCommands::createSpawn))));
 
         dispatcher.register(builder);
     }
