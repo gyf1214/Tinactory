@@ -4,6 +4,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
@@ -33,6 +35,7 @@ public class LogisticWorkerMenu extends Menu<LogisticWorker, LogisticWorkerMenu>
         blockEntity.forceAndSendUpdate();
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public MenuScreen<LogisticWorkerMenu> createScreen(Inventory inventory, Component title) {
         return new LogisticWorkerScreen(this, inventory, title, blockEntity.workerSlots);
