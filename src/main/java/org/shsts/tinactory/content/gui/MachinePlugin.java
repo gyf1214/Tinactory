@@ -39,7 +39,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
 
     @OnlyIn(Dist.CLIENT)
     @Nullable
-    private AbstractRecipeBook<?> recipeBook = null;
+    private AbstractRecipeBook<?> recipeBook;
 
     public MachinePlugin(ProcessingMenu menu) {
         this.buttonY = menu.getHeight() + MARGIN_VERTICAL;
