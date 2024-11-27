@@ -73,7 +73,6 @@ public class BlockDataBuilder<U extends Block, P> extends
 
     public BlockDataBuilder<U, P> drop(Supplier<? extends ItemLike> item, float chance) {
         getDrop().dropSingle(loc, item, chance);
-        dropSet = true;
         return self();
     }
 
@@ -84,7 +83,6 @@ public class BlockDataBuilder<U extends Block, P> extends
     public BlockDataBuilder<U, P> dropOnState(Supplier<? extends ItemLike> item,
         BooleanProperty prop, boolean value) {
         getDrop().dropOnState(loc, item, object, prop, value);
-        dropSet = true;
         return self();
     }
 
@@ -94,7 +92,6 @@ public class BlockDataBuilder<U extends Block, P> extends
 
     public BlockDataBuilder<U, P> dropSelfOnTool(TagKey<Item> tool) {
         getDrop().dropOnTool(loc, () -> object.get().asItem(), tool);
-        dropSet = true;
         return self();
     }
 

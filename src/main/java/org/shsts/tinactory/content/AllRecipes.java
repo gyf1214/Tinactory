@@ -50,6 +50,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CUTTER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ELECTROLYZER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final RecipeTypeEntry<BlastFurnaceRecipe, BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     // Recipes only used to mark input for recipe book purpose
@@ -151,6 +152,10 @@ public final class AllRecipes {
 
         FLUID_SOLIDIFIER = processing("fluid_solidifier")
             .defaults($ -> $.amperage(0.25d))
+            .register();
+
+        ELECTROLYZER = displayInput("electrolyzer")
+            .defaults($ -> $.amperage(0.5d))
             .register();
 
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)
