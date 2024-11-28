@@ -45,8 +45,7 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     public MachineBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType, Voltage voltage) {
         super(properties.strength(2f, 6f).requiresCorrectToolForDrops(), entityType);
         this.voltage = voltage;
-        this.resistance = Math.sqrt((double) voltage.value / 2d) *
-            TinactoryConfig.INSTANCE.machineResistanceFactor.get();
+        this.resistance = voltage.rank * TinactoryConfig.INSTANCE.machineResistanceFactor.get();
     }
 
     public static <T extends SmartBlockEntity> EntityBlockBuilder.Factory<T, MachineBlock<T>> factory(

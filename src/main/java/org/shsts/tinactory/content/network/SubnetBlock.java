@@ -35,7 +35,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
         super(properties.strength(2f, 6f).requiresCorrectToolForDrops());
         this.voltage = voltage;
         this.subVoltage = subVoltage;
-        this.resistance = Math.sqrt((double) voltage.value / 2d) *
+        this.resistance = voltage.rank *
             TinactoryConfig.INSTANCE.machineResistanceFactor.get();
 
         registerDefaultState(stateDefinition.any().setValue(IO_FACING, Direction.NORTH));

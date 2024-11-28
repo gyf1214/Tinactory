@@ -65,8 +65,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         super(properties.strength(2f).requiresCorrectToolForDrops());
         this.radius = radius;
         this.voltage = voltage;
-        this.resistance = (double) voltage.rank *
-            TinactoryConfig.INSTANCE.cableResistanceFactor.get();
+        this.resistance = TinactoryConfig.INSTANCE.cableResistanceFactor.get();
         this.shapes = makeShapes();
         this.material = mat;
 
