@@ -21,6 +21,8 @@ public interface ITechnology {
 
     ItemStack getDisplayItem();
 
+    ResourceLocation getDisplayTexture();
+
     static String getDescriptionId(ResourceLocation loc) {
         return loc.getNamespace() + ".technology." + loc.getPath().replace('/', '.');
     }

@@ -74,8 +74,11 @@ public final class AllBlockEntities {
     public static final ProcessingSet COMPRESSOR;
     public static final ProcessingSet LATHE;
     public static final ProcessingSet CUTTER;
+    public static final ProcessingSet EXTRUDER;
     public static final ProcessingSet EXTRACTOR;
     public static final ProcessingSet FLUID_SOLIDIFIER;
+    public static final ProcessingSet ELECTROLYZER;
+    public static final ProcessingSet CHEMICAL_REACTOR;
     public static final ProcessingSet STEAM_TURBINE;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
@@ -259,7 +262,6 @@ public final class AllBlockEntities {
             .buildObject();
 
         MIXER = set.processing(AllRecipes.MIXER)
-            .voltages(Voltage.LV)
             .layoutSet()
             .port(ITEM_INPUT)
             .slots(0, 1, 2, 3)
@@ -297,8 +299,13 @@ public final class AllBlockEntities {
             .build()
             .buildObject();
 
+        EXTRUDER = set.processing(AllRecipes.EXTRUDER)
+            .voltages(Voltage.MV)
+            .processor(RecipeProcessor::noAutoRecipe)
+            .transform(simpleLayout(Texture.PROGRESS_EXTRUDER))
+            .buildObject();
+
         EXTRACTOR = set.processing(AllRecipes.EXTRACTOR)
-            .voltages(Voltage.LV)
             .layoutSet()
             .port(ITEM_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
@@ -312,13 +319,41 @@ public final class AllBlockEntities {
 
         FLUID_SOLIDIFIER = set.processing(AllRecipes.FLUID_SOLIDIFIER)
             .processor(RecipeProcessor::noAutoRecipe)
-            .voltages(Voltage.LV)
             .layoutSet()
             .port(FLUID_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
             .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .build()
+            .buildObject();
+
+        ELECTROLYZER = set.processing(AllRecipes.ELECTROLYZER)
+            .voltages(Voltage.MV)
+            .layoutSet()
+            .port(FLUID_INPUT)
+            .slot(0, 1 + SLOT_SIZE / 2)
+            .port(ITEM_INPUT)
+            .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
+            .port(ITEM_OUTPUT)
+            .slots(SLOT_SIZE * 4, 1, 1, 3)
+            .port(FLUID_OUTPUT)
+            .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 3)
+            .build()
+            .buildObject();
+
+        CHEMICAL_REACTOR = set.processing(AllRecipes.CHEMICAL_REACTOR)
+            .processor(RecipeProcessor::noAutoRecipe)
+            .voltages(Voltage.MV)
+            .layoutSet()
+            .port(ITEM_INPUT)
+            .slots(0, 1, 1, 2)
+            .port(FLUID_INPUT)
+            .slots(0, 1 + SLOT_SIZE, 1, 2)
+            .port(ITEM_OUTPUT)
+            .slots(SLOT_SIZE * 4, 1, 1, 2)
+            .port(FLUID_OUTPUT)
+            .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 2)
             .build()
             .buildObject();
 

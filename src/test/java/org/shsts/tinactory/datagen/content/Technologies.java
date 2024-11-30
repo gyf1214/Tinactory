@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 
@@ -37,6 +38,9 @@ public final class Technologies {
     public static ResourceLocation KANTHAL;
     public static ResourceLocation SIFTING;
     public static ResourceLocation INTEGRATED_CIRCUIT;
+    public static ResourceLocation COLD_WORKING;
+    public static ResourceLocation ELECTROLYZING;
+    public static ResourceLocation CHEMISTRY;
 
     public static void init() {
         var factory = new TechFactory();
@@ -124,6 +128,21 @@ public final class Technologies {
             .maxProgress(20L)
             .displayItem(AllItems.GOOD_INTEGRATED.item())
             .depends(SENSOR_AND_EMITTER, MATERIAL_CUTTING)
+            .buildLoc();
+
+        COLD_WORKING = factory.tech("cold_working")
+            .maxProgress(40L)
+            .displayTexture(gregtech("items/metaitems/shape.extruder.rotor"))
+            .buildLoc();
+
+        ELECTROLYZING = factory.tech("electrolyzing")
+            .maxProgress(40L)
+            .displayItem(AllMaterials.GOLD.entry("wire"))
+            .buildLoc();
+
+        CHEMISTRY = factory.tech("chemistry")
+            .maxProgress(40L)
+            .displayItem(AllItems.RESEARCH_EQUIPMENT.get(Voltage.LV))
             .buildLoc();
     }
 

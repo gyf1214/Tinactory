@@ -35,13 +35,16 @@ import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX;
 import static org.shsts.tinactory.content.AllBlockEntities.BENDER;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
+import static org.shsts.tinactory.content.AllBlockEntities.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllBlockEntities.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllBlockEntities.COMPRESSOR;
 import static org.shsts.tinactory.content.AllBlockEntities.CUTTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_TANK;
+import static org.shsts.tinactory.content.AllBlockEntities.ELECTROLYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.EXTRACTOR;
+import static org.shsts.tinactory.content.AllBlockEntities.EXTRUDER;
 import static org.shsts.tinactory.content.AllBlockEntities.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.LASER_ENGRAVER;
@@ -144,8 +147,11 @@ public final class Machines {
         machine(COMPRESSOR);
         machine(LATHE);
         machine(CUTTER);
+        machine(EXTRUDER);
         machine(EXTRACTOR);
         machine(FLUID_SOLIDIFIER);
+        machine(ELECTROLYZER);
+        machine(CHEMICAL_REACTOR);
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
             .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
             .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
@@ -671,6 +677,13 @@ public final class Machines {
             .component(BUZZSAW, 1)
             .tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
             .build()
+            .recipe(EXTRUDER)
+            .circuit(4)
+            .component(ELECTRIC_PISTON, 1)
+            .material(heat, "wire", wireNumber)
+            .material(pipe, "pipe", 1)
+            .tech(Technologies.COLD_WORKING)
+            .build()
             .recipe(EXTRACTOR)
             .circuit(2)
             .component(ELECTRIC_PISTON, 1)
@@ -684,6 +697,19 @@ public final class Machines {
             .component(ELECTRIC_PUMP, 2)
             .material(GLASS, "primary", 2)
             .tech(Technologies.HOT_WORKING)
+            .build()
+            .recipe(ELECTROLYZER)
+            .circuit(4)
+            .material(electric, "wire", wireNumber * 2)
+            .material(GLASS, "primary", 1)
+            .tech(Technologies.ELECTROLYZING)
+            .build()
+            .recipe(CHEMICAL_REACTOR)
+            .circuit(4)
+            .component(ELECTRIC_MOTOR, 2)
+            .material(rotor, "rotor", 2)
+            .material(GLASS, "primary", 2)
+            .tech(Technologies.CHEMISTRY)
             .build()
             .recipe(STEAM_TURBINE)
             .circuit(2)

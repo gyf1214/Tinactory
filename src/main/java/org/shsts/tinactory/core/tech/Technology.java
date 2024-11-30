@@ -17,6 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -27,14 +30,18 @@ public class Technology implements ITechnology {
     private final List<ITechnology> depends = new ArrayList<>();
     public final Map<String, Integer> modifiers;
     public final long maxProgress;
+    @Nullable
     public final Item displayItem;
+    @Nullable
+    public final ResourceLocation displayTexture;
 
     public Technology(List<ResourceLocation> dependIds, long maxProgress, Map<String, Integer> modifiers,
-        Item displayItem) {
+        Optional<Item> displayItem, Optional<ResourceLocation> displayTexture) {
         this.dependIds = dependIds;
         this.modifiers = modifiers;
         this.maxProgress = maxProgress;
-        this.displayItem = displayItem;
+        this.displayItem = displayItem.orElse(null);
+        this.displayTexture = displayTexture.orElse(null);
     }
 
     @Override
@@ -71,7 +78,12 @@ public class Technology implements ITechnology {
 
     @Override
     public ItemStack getDisplayItem() {
-        return new ItemStack(displayItem);
+        return displayItem != null ? new ItemStack(displayItem) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ResourceLocation getDisplayTexture() {
+        return displayTexture != null ? displayTexture : modLoc("void");
     }
 
     @Override
@@ -101,6 +113,9 @@ public class Technology implements ITechnology {
             .forGetter(tech -> tech.dependIds),
         Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
         Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("modifiers").forGetter(tech -> tech.modifiers),
-        ForgeRegistries.ITEMS.getCodec().fieldOf("display_item").forGetter(tech -> tech.displayItem)
+        ForgeRegistries.ITEMS.getCodec().optionalFieldOf("display_item")
+            .forGetter(tech -> Optional.ofNullable(tech.displayItem)),
+        ResourceLocation.CODEC.optionalFieldOf("display_texture")
+            .forGetter(tech -> Optional.ofNullable(tech.displayTexture))
     ).apply(instance, Technology::new));
 }

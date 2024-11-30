@@ -48,9 +48,11 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> COMPRESSOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> LATHE;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CUTTER;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRUDER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ELECTROLYZER;
+    public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> CHEMICAL_REACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final RecipeTypeEntry<BlastFurnaceRecipe, BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     // Recipes only used to mark input for recipe book purpose
@@ -68,9 +70,7 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.25d).workTicks(200L))
             .register();
 
-        ASSEMBLER = REGISTRATE.recipeType("assembler", AssemblyRecipe.SERIALIZER)
-            .clazz(AssemblyRecipe.class)
-            .builder(AssemblyRecipe.Builder::new)
+        ASSEMBLER = assembly("assembler")
             .defaults($ -> $.amperage(0.375d))
             .register();
 
@@ -146,6 +146,10 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.375d))
             .register();
 
+        EXTRUDER = processing("extruder")
+            .defaults($ -> $.amperage(0.625d))
+            .register();
+
         EXTRACTOR = displayInput("extractor")
             .defaults($ -> $.amperage(0.5d))
             .register();
@@ -156,6 +160,10 @@ public final class AllRecipes {
 
         ELECTROLYZER = displayInput("electrolyzer")
             .defaults($ -> $.amperage(0.5d))
+            .register();
+
+        CHEMICAL_REACTOR = assembly("chemical_reactor")
+            .defaults($ -> $.amperage(0.25d))
             .register();
 
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)
@@ -193,6 +201,12 @@ public final class AllRecipes {
 
     private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate> displayInput(String id) {
         return processing(id, DisplayInputRecipe::builder);
+    }
+
+    private static RecipeTypeBuilder<AssemblyRecipe, AssemblyRecipe.Builder, Registrate> assembly(String id) {
+        return REGISTRATE.recipeType(id, AssemblyRecipe.SERIALIZER)
+            .clazz(AssemblyRecipe.class)
+            .builder(AssemblyRecipe.Builder::new);
     }
 
     private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate> processing(

@@ -46,6 +46,7 @@ import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
+import static org.shsts.tinactory.content.AllRecipes.EXTRUDER;
 import static org.shsts.tinactory.content.AllRecipes.FLUID_SOLIDIFIER;
 import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
@@ -293,8 +294,32 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             molten("screw", v, 1f / 9f, false);
             molten("bolt", v, 0.125f);
             molten("gear", v, 2f);
-            molten("rotor", v, 4f);
+            molten("rotor", v, 4.25f);
             molten("pipe", v, 3f);
+        }
+
+        private void extrude(String target, int outCount, int inCount) {
+            if (material.hasItem(target) && material.hasItem("ingot")) {
+                EXTRUDER.recipe(DATA_GEN, material.loc(target))
+                    .outputItem(1, material.entry(target), outCount)
+                    .inputItem(0, material.tag("ingot"), inCount)
+                    .voltage(Voltage.fromRank(voltage.rank + 1))
+                    .workTicks(ticks(96L))
+                    .build();
+            }
+        }
+
+        private void extrude() {
+            extrude("stick", 2, 1);
+            extrude("plate", 1, 1);
+            extrude("sheet", 1, 1);
+            extrude("foil", 4, 1);
+            extrude("ring", 4, 1);
+            extrude("wire", 2, 1);
+            extrude("bolt", 8, 1);
+            extrude("gear", 1, 2);
+            extrude("rotor", 1, 5);
+            extrude("pipe", 1, 3);
         }
 
         public MaterialBuilder<P> build() {
@@ -335,6 +360,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
 
             macerate();
             molten();
+            extrude();
 
             hasProcess = true;
             return MaterialBuilder.this;

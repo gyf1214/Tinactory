@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.api.tech.ITechnology;
@@ -31,6 +30,8 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     private final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     private Supplier<ResourceLocation> displayItem = null;
+    @Nullable
+    private ResourceLocation displayTexture = null;
     @Nullable
     private Voltage researchVoltage;
 
@@ -66,6 +67,11 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
         return this;
     }
 
+    public TechBuilder<P> displayTexture(ResourceLocation val) {
+        displayTexture = val;
+        return this;
+    }
+
     public TechBuilder<P> researchVoltage(Voltage val) {
         researchVoltage = val;
         return this;
@@ -95,15 +101,19 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
 
     public JsonObject serialize() {
         assert maxProgress > 0;
-        var jo = new com.google.gson.JsonObject();
+        var jo = new JsonObject();
         jo.addProperty("max_progress", maxProgress);
         var ja = new JsonArray();
         depends.forEach(d -> ja.add(d.toString()));
         jo.add("depends", ja);
-        var displayItemLoc = displayItem == null ? Items.AIR.getRegistryName() : displayItem.get();
-        assert displayItemLoc != null;
-        jo.addProperty("display_item", displayItemLoc.toString());
-        var jo1 = new com.google.gson.JsonObject();
+
+        if (displayItem != null) {
+            jo.addProperty("display_item", displayItem.get().toString());
+        } else if (displayTexture != null) {
+            jo.addProperty("display_texture", displayTexture.toString());
+        }
+
+        var jo1 = new JsonObject();
         for (var entry : modifiers.entrySet()) {
             jo1.addProperty(entry.getKey(), entry.getValue());
         }
