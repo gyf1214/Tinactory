@@ -292,7 +292,7 @@ public final class Materials {
             .material(RUTILE, SHINY)
             .build()
             .material(BRASS, METALLIC)
-            .machineProcess(Voltage.LV, 0.75d).smelt()
+            .toolProcess(0.75d).smelt()
             .alloy(Voltage.LV, ZINC, 1, COPPER, 3)
             .build()
             .material(GALLIUM_ARSENIDE, DULL)
