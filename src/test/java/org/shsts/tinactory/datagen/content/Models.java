@@ -224,11 +224,6 @@ public final class Models {
         return machineBlock("casings/solid/machine_casing_" + casing, "multiblock/" + overlay);
     }
 
-    public static <U extends Block> Consumer<RegistryDataContext<Block, U, BlockStateProvider>> multiBlock(
-        String casing) {
-        return multiBlock(casing, "blast_furnace");
-    }
-
     public static Consumer<RegistryDataContext<Block,
         MachineBlock<SmartBlockEntity>, BlockStateProvider>> multiBlockInterface(String ioTex) {
         return ctx -> {

@@ -96,6 +96,7 @@ import static org.shsts.tinactory.content.AllMultiBlocks.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.SIFTER;
 import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_STEEL_CASING;
+import static org.shsts.tinactory.content.AllMultiBlocks.VACUUM_FREEZER;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
@@ -189,8 +190,9 @@ public final class Machines {
             .tag(MINEABLE_WITH_WRENCH)
             .build();
 
-        multiBlockItem(BLAST_FURNACE, "heatproof", AllRecipes.BLAST_FURNACE);
-        multiBlockItem(SIFTER, "solid_steel", AllRecipes.SIFTER);
+        multiBlockItem(BLAST_FURNACE, "heatproof", "blast_furnace", AllRecipes.BLAST_FURNACE);
+        multiBlockItem(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
+        multiBlockItem(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
 
         MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
             .blockState(multiBlockInterface(IO_TEX))
@@ -208,9 +210,9 @@ public final class Machines {
     }
 
     private static void multiBlockItem(RegistryEntry<? extends Block> block, String casing,
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        String overlay, RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
         DATA_GEN.block(block)
-            .blockState(multiBlock(casing))
+            .blockState(multiBlock(casing, overlay))
             .tag(MINEABLE_WITH_WRENCH)
             .itemTag(machineTag(type))
             .build();

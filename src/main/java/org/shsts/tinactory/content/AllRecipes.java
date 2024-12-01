@@ -55,6 +55,7 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> CHEMICAL_REACTOR;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final RecipeTypeEntry<BlastFurnaceRecipe, BlastFurnaceRecipe.Builder> BLAST_FURNACE;
+    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> VACUUM_FREEZER;
     // Recipes only used to mark input for recipe book purpose
     public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
 
@@ -174,6 +175,10 @@ public final class AllRecipes {
             .clazz(BlastFurnaceRecipe.class)
             .builder(BlastFurnaceRecipe.Builder::new)
             .defaults($ -> $.amperage(4d))
+            .register();
+
+        VACUUM_FREEZER = processing("vacuum_freezer")
+            .defaults($ -> $.amperage(0.75d))
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.SERIALIZER)

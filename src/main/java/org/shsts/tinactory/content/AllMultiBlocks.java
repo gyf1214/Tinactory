@@ -24,11 +24,13 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public final class AllMultiBlocks {
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> SIFTER;
+    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> VACUUM_FREEZER;
 
     // solid blocks
     public static final Set<RegistryEntry<Block>> SOLID_CASING;
     public static final RegistryEntry<Block> HEATPROOF_CASING;
     public static final RegistryEntry<Block> SOLID_STEEL_CASING;
+    public static final RegistryEntry<Block> FROST_PROOF_CASING;
     // coil blocks
     public static final Set<RegistryEntry<CoilBlock>> COIL_BLOCKS;
     public static final RegistryEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
@@ -44,6 +46,7 @@ public final class AllMultiBlocks {
         SOLID_CASING = new HashSet<>();
         HEATPROOF_CASING = solid("heatproof");
         SOLID_STEEL_CASING = solid("solid_steel");
+        FROST_PROOF_CASING = solid("frost_proof");
 
         COIL_BLOCKS = new HashSet<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
@@ -123,6 +126,35 @@ public final class AllMultiBlocks {
             .build()
             .build()
             .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.SIFTER, true))
+            .build()
+            .buildObject();
+
+        VACUUM_FREEZER = multiBlock("vacuum_freezer")
+            .blockEntity()
+            .capability(MultiBlock::simple)
+            .appearanceBlock(FROST_PROOF_CASING)
+            .spec()
+            .layer()
+            .row("BBB")
+            .row("BBB")
+            .row("B$B")
+            .build()
+            .layer()
+            .row("CCC")
+            .row("CAC")
+            .row("CCC")
+            .build()
+            .layer()
+            .row("CCC")
+            .row("CCC")
+            .row("CCC")
+            .build()
+            .blockOrInterface('B', FROST_PROOF_CASING)
+            .block('C', FROST_PROOF_CASING)
+            .air('A')
+            .build()
+            .build()
+            .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.VACUUM_FREEZER, true))
             .build()
             .buildObject();
     }
