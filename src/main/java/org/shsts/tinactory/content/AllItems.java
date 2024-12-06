@@ -24,6 +24,7 @@ import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CellItem;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
@@ -81,7 +83,13 @@ public final class AllItems {
     public static final Circuits.CircuitComponent DIODE;
     public static final Circuits.CircuitComponent TRANSISTOR;
 
-    public static final RegistryEntry<Item> STICKY_RESIN;
+    // chips
+    public static final List<RegistryEntry<Item>> BOULES;
+    public static final List<RegistryEntry<Item>> RAW_WAFERS;
+    public static final Map<String, RegistryEntry<Item>> WAFERS;
+    public static final Map<String, RegistryEntry<Item>> CHIPS;
+
+    public static final IEntry<Item> STICKY_RESIN;
     public static final RegistryEntry<SimpleFluid> STEAM;
     public static final RegistryEntry<RubberLogBlock> RUBBER_LOG;
     public static final RegistryEntry<LeavesBlock> RUBBER_LEAVES;
@@ -91,11 +99,6 @@ public final class AllItems {
     public static final RegistryEntry<Item> BASIC_BUZZSAW;
     public static final RegistryEntry<Item> GOOD_BUZZSAW;
     public static final RegistryEntry<Item> ADVANCED_BUZZSAW;
-    public static final List<RegistryEntry<Item>> BOULES;
-    public static final List<RegistryEntry<Item>> RAW_WAFERS;
-    public static final Map<String, RegistryEntry<Item>> WAFERS;
-    public static final Map<String, RegistryEntry<Item>> CHIPS;
-
     public static final Map<Voltage, RegistryEntry<CellItem>> FLUID_CELL;
     public static final RegistryEntry<Item> ITEM_FILTER;
 
@@ -202,16 +205,16 @@ public final class AllItems {
             .voltages(Voltage.ULV, Voltage.IV)
             .buildObject();
 
-        GOOD_GRINDER = simple("component/grinder/good");
-        ADVANCED_GRINDER = simple("component/grinder/advanced");
+        GOOD_GRINDER = xSimple("component/grinder/good");
+        ADVANCED_GRINDER = xSimple("component/grinder/advanced");
 
         BASIC_BUZZSAW = _REGISTRATE.item("component/buzzsaw/basic", Item::new)
             .tint(COBALT_BRASS.color)
             .register();
 
         // TODO: tint
-        GOOD_BUZZSAW = simple("component/buzzsaw/good");
-        ADVANCED_BUZZSAW = simple("component/buzzsaw/advanced");
+        GOOD_BUZZSAW = xSimple("component/buzzsaw/good");
+        ADVANCED_BUZZSAW = xSimple("component/buzzsaw/advanced");
 
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
         BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);
@@ -235,13 +238,13 @@ public final class AllItems {
             .voltage(Voltage.MV, ALUMINIUM)
             .buildObject();
 
-        ITEM_FILTER = simple("component/item_filter");
+        ITEM_FILTER = xSimple("component/item_filter");
     }
 
     public static void init() {}
 
     private static ComponentBuilder.DummyBuilder<Item, ?> componentBuilder(String name) {
-        return ComponentBuilder.simple(v -> simple("component/" + v.id + "/" + name));
+        return ComponentBuilder.simple(v -> xSimple("component/" + v.id + "/" + name));
     }
 
     private static Map<Voltage, RegistryEntry<Item>> component(String name) {
@@ -252,21 +255,25 @@ public final class AllItems {
         return ret;
     }
 
-    private static RegistryEntry<Item> simple(String name) {
+    private static RegistryEntry<Item> xSimple(String name) {
         return _REGISTRATE.item(name, Item::new).register();
+    }
+
+    private static IEntry<Item> simple(String name) {
+        return REGISTRATE.item(name, Item::new).register();
     }
 
     private static void boules(String... names) {
         for (var name : names) {
-            BOULES.add(simple("boule/" + name));
-            RAW_WAFERS.add(simple("wafer_raw/" + name));
+            BOULES.add(xSimple("boule/" + name));
+            RAW_WAFERS.add(xSimple("wafer_raw/" + name));
         }
     }
 
     private static void wafers(String... names) {
         for (var name : names) {
-            WAFERS.put(name, simple("wafer/" + name));
-            CHIPS.put(name, simple("chip/" + name));
+            WAFERS.put(name, xSimple("wafer/" + name));
+            CHIPS.put(name, xSimple("chip/" + name));
         }
     }
 

@@ -97,12 +97,17 @@ public class Tinactory {
     public Tinactory() {
         this.modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::onConstructEvent);
-
-        onCreate(modEventBus);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> onCreateClient(modEventBus));
     }
 
-    private static void onCreate(IEventBus modEventBus) {
+    private void onConstructEvent(FMLConstructModEvent event) {
+        event.enqueueWork(this::onConstruct);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> event.enqueueWork(this::onConstructClient));
+    }
+
+    public void onConstruct() {
+        CORE = ITinyCoreLib.get();
+        REGISTRATE = CORE.registrate(ID);
+
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
 
         AllRegistries.init();
@@ -122,33 +127,19 @@ public class Tinactory {
         MenuSyncHandler.init();
         MenuEventHandler.init();
 
+        REGISTRATE.register(modEventBus);
         _REGISTRATE.register(modEventBus);
         modEventBus.addListener(Tinactory::init);
         MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);
     }
 
-    private static void onCreateClient(IEventBus modEventBus) {
+    public void onConstructClient() {
         TechManager.initClient();
 
+        REGISTRATE.registerClient(modEventBus);
         _REGISTRATE.registerClient(modEventBus);
         modEventBus.addListener(Tinactory::initClient);
         MinecraftForge.EVENT_BUS.register(AllClientEvents.class);
-    }
-
-    private void onConstructEvent(FMLConstructModEvent event) {
-        event.enqueueWork(this::onConstruct);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> event.enqueueWork(this::onConstructClient));
-    }
-
-    public void onConstruct() {
-        CORE = ITinyCoreLib.get();
-        REGISTRATE = CORE.registrate(ID);
-
-        REGISTRATE.register(modEventBus);
-    }
-
-    public void onConstructClient() {
-        REGISTRATE.registerClient(modEventBus);
     }
 
     private static void init(FMLCommonSetupEvent event) {

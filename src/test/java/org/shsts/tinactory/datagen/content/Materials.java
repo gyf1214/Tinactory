@@ -535,11 +535,10 @@ public final class Materials {
             .tag(TOOL_SCREWDRIVER, TOOL)
             .tag(TOOL_WRENCH, TOOL)
             .tag(TOOL_WIRE_CUTTER, TOOL)
+            .tag(() -> Items.SHEARS, TOOL_SHEARS)
+            .tag(() -> Items.STICK, TOOL_HANDLE)
             .tag(WROUGHT_IRON.tag("stick"), TOOL_HANDLE)
             .tag(IRON.tag("screw"), TOOL_SCREW);
-
-        _DATA_GEN.tag(() -> Items.SHEARS, TOOL_SHEARS)
-            .tag(() -> Items.STICK, TOOL_HANDLE);
     }
 
     private static void woodRecipes(String prefix) {

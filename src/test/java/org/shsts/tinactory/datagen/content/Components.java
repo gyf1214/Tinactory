@@ -111,10 +111,12 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
+import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
 import static org.shsts.tinactory.datagen.content.Models.solidBlock;
 import static org.shsts.tinactory.datagen.content.Models.xBasicItem;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -240,8 +242,8 @@ public final class Components {
     }
 
     private static void misc() {
-        _DATA_GEN.item(STICKY_RESIN)
-            .model(xBasicItem("metaitems/rubber_drop"))
+        DATA_GEN.item(STICKY_RESIN)
+            .model(basicItem("metaitems/rubber_drop"))
             .build();
 
         SOLID_CASING.forEach(block -> _DATA_GEN.block(block)

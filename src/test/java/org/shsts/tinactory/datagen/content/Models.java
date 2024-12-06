@@ -108,6 +108,16 @@ public final class Models {
         };
     }
 
+    public static <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> basicItem(
+        String... layers) {
+        return ctx -> {
+            var provider = ctx.provider().withExistingParent(ctx.id(), "item/generated");
+            for (var i = 0; i < layers.length; i++) {
+                provider.texture("layer" + i, gregtech("items/" + layers[i]));
+            }
+        };
+    }
+
     public static <U extends Item> void componentItem(
         RegistryDataContext<Item, U, ItemModelProvider> ctx) {
         var tex = "items/metaitems/" + name(ctx.id, -1).replace('_', '.') + "." + name(ctx.id, -2);

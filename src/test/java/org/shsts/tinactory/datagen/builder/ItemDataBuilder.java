@@ -10,6 +10,7 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -33,7 +34,7 @@ public class ItemDataBuilder<U extends Item, P> extends
 
     @SafeVarargs
     public final ItemDataBuilder<U, P> tag(TagKey<Item>... tags) {
-        callbacks.add(() -> xDataGen.tag(object, tags));
+        callbacks.add(() -> dataGen.tag(object, List.of(tags)));
         return this;
     }
 

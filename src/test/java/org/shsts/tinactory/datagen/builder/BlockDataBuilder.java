@@ -17,6 +17,7 @@ import org.shsts.tinactory.datagen.context.RegistryDataContext;
 import org.shsts.tinactory.datagen.handler.LootTableHandler;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -58,13 +59,13 @@ public class BlockDataBuilder<U extends Block, P> extends
 
     @SafeVarargs
     public final BlockDataBuilder<U, P> tag(TagKey<Block>... tags) {
-        callbacks.add(() -> xDataGen.tag(object, tags));
+        callbacks.add(() -> dataGen.tag(object, List.of(tags)));
         return this;
     }
 
     @SafeVarargs
     public final BlockDataBuilder<U, P> itemTag(TagKey<Item>... tags) {
-        callbacks.add(() -> xDataGen.tag(() -> object.get().asItem(), tags));
+        callbacks.add(() -> dataGen.tag(() -> object.get().asItem(), List.of(tags)));
         return this;
     }
 

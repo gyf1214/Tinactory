@@ -2,19 +2,14 @@ package org.shsts.tinactory.datagen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -37,17 +32,14 @@ import org.shsts.tinactory.datagen.handler.ItemModelHandler;
 import org.shsts.tinactory.datagen.handler.LanguageHandler;
 import org.shsts.tinactory.datagen.handler.LootTableHandler;
 import org.shsts.tinactory.datagen.handler.RecipeHandler;
-import org.shsts.tinactory.datagen.handler.TagsHandler;
 import org.shsts.tinactory.datagen.handler.TechHandler;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -72,23 +64,18 @@ public final class DataGen implements IRecipeDataConsumer {
 
     private final Registrate registrate;
     private final List<DataHandler<?>> dataHandlers;
-    private final Map<ResourceKey<? extends Registry<?>>, TagsHandler<?>> tagsHandlers;
     private final Set<TrackedContext<?>> trackedContexts;
 
-    @SuppressWarnings("deprecation")
     public DataGen(Registrate registrate) {
         this.modid = registrate.modid;
         this.registrate = registrate;
         this.dataHandlers = new ArrayList<>();
-        this.tagsHandlers = new HashMap<>();
         this.trackedContexts = new HashSet<>();
 
         this.blockTrackedCtx = trackedCtx(TrackedType.BLOCK);
         this.itemTrackedCtx = trackedCtx(TrackedType.ITEM);
         this.langTrackedCtx = trackedCtx(TrackedType.LANG);
 
-        createTagsHandler(Registry.BLOCK);
-        createTagsHandler(Registry.ITEM);
         this.blockStateHandler = handler(new BlockStateHandler(this));
         this.itemModelHandler = handler(new ItemModelHandler(this));
         this.lootTableHandler = handler(new LootTableHandler(this));
@@ -103,13 +90,6 @@ public final class DataGen implements IRecipeDataConsumer {
 
     public <U extends Item> ItemDataBuilder<U, DataGen> item(RegistryEntry<U> entry) {
         return new ItemDataBuilder<>(DATA_GEN, this, entry.loc, entry);
-    }
-
-    @SafeVarargs
-    public final <T> DataGen tag(Supplier<? extends T> object, TagKey<T>... tags) {
-        assert tags.length > 0;
-        tagsHandler(tags[0].registry()).addTags(object, tags);
-        return this;
     }
 
     public DataGen replaceVanillaRecipe(Supplier<RecipeBuilder> recipe) {
@@ -164,11 +144,6 @@ public final class DataGen implements IRecipeDataConsumer {
         trackLang(key.getNamespace() + '.' + key.getPath().replace('/', '.'));
     }
 
-    public void register(IEventBus modEventBus) {
-        modEventBus.addListener(this::onGatherData);
-        modEventBus.addListener(this::onCommonSetup);
-    }
-
     @Override
     public String getModId() {
         return modid;
@@ -189,25 +164,13 @@ public final class DataGen implements IRecipeDataConsumer {
         return dataHandler;
     }
 
-    private <T> void createTagsHandler(Registry<T> registry) {
-        var ret = new TagsHandler<>(this, registry);
-        tagsHandlers.put(registry.key(), ret);
-        handler(ret);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> TagsHandler<T> tagsHandler(ResourceKey<? extends Registry<T>> key) {
-        assert tagsHandlers.containsKey(key);
-        return (TagsHandler<T>) tagsHandlers.get(key);
-    }
-
     private <V> TrackedContext<V> trackedCtx(TrackedType<V> type) {
         var ret = new TrackedContext<>(registrate, type);
         trackedContexts.add(ret);
         return ret;
     }
 
-    private void onGatherData(GatherDataEvent event) {
+    public void onGatherData(GatherDataEvent event) {
         init();
         for (var handler : dataHandlers) {
             handler.onGatherData(event);
@@ -225,12 +188,6 @@ public final class DataGen implements IRecipeDataConsumer {
                 return "Validation: " + modid;
             }
         });
-    }
-
-    private void onCommonSetup(FMLCommonSetupEvent event) {
-        for (var handler : dataHandlers) {
-            handler.clear();
-        }
     }
 
     public static final DataGen _DATA_GEN = new DataGen(Tinactory._REGISTRATE);

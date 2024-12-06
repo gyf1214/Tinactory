@@ -42,10 +42,6 @@ minecraft {
                 tinydevices {
                     source sourceSets.main
                 }
-
-                tinydevices_test {
-                    source sourceSets.test
-                }
             }
         }
 
@@ -59,10 +55,6 @@ minecraft {
             mods {
                 tinydevices {
                     source sourceSets.main
-                }
-
-                tinydevices_test {
-                    source sourceSets.test
                 }
             }
         }
@@ -120,7 +112,6 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
-    testCompileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 
     compileOnly files("libs/gtceu_resources_2.8.7.zip")

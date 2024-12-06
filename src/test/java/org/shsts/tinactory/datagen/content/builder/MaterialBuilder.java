@@ -563,7 +563,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             newItem(sub, tag, entry);
         } else {
             // simple add tag for existing item
-            xDataGen.tag(entry, tag);
+            dataGen.tag(entry, tag);
         }
     }
 

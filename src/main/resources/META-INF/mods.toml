@@ -30,7 +30,7 @@ side = "BOTH"
 [[dependencies.tinactory]]
 modId = "tinycorelib"
 mandatory = true
-versionRange = "[1.18.2-0.0.1.0-SNAPSHOT,)"
+versionRange = "[1.18.2-0.0.1,)"
 ordering = "NONE"
 side = "BOTH"
 
