@@ -3,8 +3,8 @@ package org.shsts.tinactory.datagen.builder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.context.TrackedContext;
+import org.shsts.tinycorelib.datagen.api.IDataGen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public abstract class TrackedDataBuilder<V, U extends V, P, S extends TrackedDat
     protected final Supplier<U> object;
     protected final List<Runnable> callbacks = new ArrayList<>();
 
-    public TrackedDataBuilder(DataGen dataGen, P parent, ResourceLocation loc,
+    public TrackedDataBuilder(IDataGen dataGen, P parent, ResourceLocation loc,
         TrackedContext<V> ctx, Supplier<U> object) {
         super(dataGen, parent, loc);
         this.ctx = ctx;

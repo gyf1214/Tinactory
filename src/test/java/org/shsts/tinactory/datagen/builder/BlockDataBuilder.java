@@ -13,13 +13,15 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.core.common.BuilderBase;
-import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 import org.shsts.tinactory.datagen.handler.LootTableHandler;
+import org.shsts.tinycorelib.datagen.api.IDataGen;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -31,8 +33,8 @@ public class BlockDataBuilder<U extends Block, P> extends
     private Consumer<RegistryDataContext<Item, ?, ItemModelProvider>> itemModel = null;
     private boolean dropSet = false;
 
-    public BlockDataBuilder(DataGen dataGen, P parent, ResourceLocation loc, Supplier<U> object) {
-        super(dataGen, parent, loc, dataGen.blockTrackedCtx, object);
+    public BlockDataBuilder(IDataGen dataGen, P parent, ResourceLocation loc, Supplier<U> object) {
+        super(dataGen, parent, loc, _DATA_GEN.blockTrackedCtx, object);
     }
 
     public BlockDataBuilder<U, P> blockState(Consumer<RegistryDataContext<Block, U, BlockStateProvider>> cons) {
@@ -56,19 +58,19 @@ public class BlockDataBuilder<U extends Block, P> extends
 
     @SafeVarargs
     public final BlockDataBuilder<U, P> tag(TagKey<Block>... tags) {
-        callbacks.add(() -> dataGen.tag(object, tags));
+        callbacks.add(() -> xDataGen.tag(object, tags));
         return this;
     }
 
     @SafeVarargs
     public final BlockDataBuilder<U, P> itemTag(TagKey<Item>... tags) {
-        callbacks.add(() -> dataGen.tag(() -> object.get().asItem(), tags));
+        callbacks.add(() -> xDataGen.tag(() -> object.get().asItem(), tags));
         return this;
     }
 
     private LootTableHandler getDrop() {
         dropSet = true;
-        return dataGen.lootTableHandler;
+        return xDataGen.lootTableHandler;
     }
 
     public BlockDataBuilder<U, P> drop(Supplier<? extends ItemLike> item, float chance) {
@@ -105,7 +107,7 @@ public class BlockDataBuilder<U extends Block, P> extends
         if (!dropSet) {
             dropSelf();
         }
-        dataGen.blockStateHandler.addBlockStateCallback(loc, object, blockState);
-        dataGen.itemModelHandler.addBlockItemCallback(loc, object, ctx -> itemModel.accept(ctx));
+        xDataGen.blockStateHandler.addBlockStateCallback(loc, object, blockState);
+        xDataGen.itemModelHandler.addBlockItemCallback(loc, object, ctx -> itemModel.accept(ctx));
     }
 }

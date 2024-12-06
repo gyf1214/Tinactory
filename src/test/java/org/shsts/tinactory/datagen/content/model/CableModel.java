@@ -12,8 +12,9 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.network.CableBlock;
-import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
+import org.shsts.tinycorelib.datagen.api.context.IDataContext;
+import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -110,29 +111,29 @@ public final class CableModel {
         return model;
     }
 
-    public static void genBlockModels(DataContext<BlockModelProvider> ctx) {
-        genOpenEnd(ctx.provider, OPEN_MODEL, RADIUS, true)
+    public static void genBlockModels(IDataContext<BlockModelProvider> ctx) {
+        genOpenEnd(ctx.provider(), OPEN_MODEL, RADIUS, true)
             .texture("base", INSULATION_TEX)
             .texture("insulation", INSULATION_OPEN_TEX)
             .texture("wire", WIRE_TEX);
-        genOpenEnd(ctx.provider, OPEN_WIRE_MODEL, WIRE_RADIUS, false)
+        genOpenEnd(ctx.provider(), OPEN_WIRE_MODEL, WIRE_RADIUS, false)
             .texture("base", WHITE_TEX)
             .texture("wire", WIRE_TEX);
-        genClosedEnd(ctx.provider, CLOSED_MODEL, RADIUS)
+        genClosedEnd(ctx.provider(), CLOSED_MODEL, RADIUS)
             .texture("base", INSULATION_TEX);
-        genClosedEnd(ctx.provider, CLOSED_WIRE_MODEL, WIRE_RADIUS)
+        genClosedEnd(ctx.provider(), CLOSED_WIRE_MODEL, WIRE_RADIUS)
             .texture("base", WHITE_TEX);
     }
 
-    public static void genItemModels(DataContext<ItemModelProvider> ctx) {
-        genItem(ctx.provider, ITEM_MODEL, RADIUS, true)
+    public static void genItemModels(IDataContext<ItemModelProvider> ctx) {
+        genItem(ctx.provider(), ITEM_MODEL, RADIUS, true)
             .texture("base", INSULATION_TEX)
             .texture("insulation", INSULATION_OPEN_TEX)
             .texture("wire", WIRE_TEX);
-        genItem(ctx.provider, ITEM_WIRE_MODEL, SMALL_WIRE_RADIUS, false)
+        genItem(ctx.provider(), ITEM_WIRE_MODEL, SMALL_WIRE_RADIUS, false)
             .texture("base", WIRE_TEX)
             .texture("wire", WIRE_TEX);
-        genItem(ctx.provider, ITEM_PIPE_MODEL, PIPE_RADIUS, false)
+        genItem(ctx.provider(), ITEM_PIPE_MODEL, PIPE_RADIUS, false)
             .texture("base", PIPE_SIDE_TEX)
             .texture("wire", PIPE_IN_TEX);
     }
@@ -167,8 +168,8 @@ public final class CableModel {
         ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_MODEL));
     }
 
-    public static void wire(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_WIRE_MODEL));
+    public static void wire(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        ctx.provider().withExistingParent(ctx.id(), modLoc(ITEM_WIRE_MODEL));
     }
 
     public static void ulvCable(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
@@ -177,7 +178,7 @@ public final class CableModel {
             .texture("wire", "#base");
     }
 
-    public static void pipe(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        ctx.provider.withExistingParent(ctx.id, modLoc(ITEM_PIPE_MODEL));
+    public static void pipe(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        ctx.provider().withExistingParent(ctx.id(), modLoc(ITEM_PIPE_MODEL));
     }
 }

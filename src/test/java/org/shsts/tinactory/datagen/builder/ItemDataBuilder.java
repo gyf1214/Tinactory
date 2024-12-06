@@ -7,11 +7,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
+import org.shsts.tinycorelib.datagen.api.IDataGen;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -20,8 +22,8 @@ public class ItemDataBuilder<U extends Item, P> extends
     @Nullable
     private Consumer<RegistryDataContext<Item, U, ItemModelProvider>> model = null;
 
-    public ItemDataBuilder(DataGen dataGen, P parent, ResourceLocation loc, Supplier<U> item) {
-        super(dataGen, parent, loc, dataGen.itemTrackedCtx, item);
+    public ItemDataBuilder(IDataGen dataGen, P parent, ResourceLocation loc, Supplier<U> item) {
+        super(dataGen, parent, loc, _DATA_GEN.itemTrackedCtx, item);
     }
 
     public ItemDataBuilder<U, P> model(Consumer<RegistryDataContext<Item, U, ItemModelProvider>> cons) {
@@ -31,13 +33,13 @@ public class ItemDataBuilder<U extends Item, P> extends
 
     @SafeVarargs
     public final ItemDataBuilder<U, P> tag(TagKey<Item>... tags) {
-        callbacks.add(() -> dataGen.tag(object, tags));
+        callbacks.add(() -> xDataGen.tag(object, tags));
         return this;
     }
 
     @Override
     protected void doRegister() {
         assert model != null;
-        dataGen.itemModelHandler.addModelCallback(loc, object, model);
+        xDataGen.itemModelHandler.addModelCallback(loc, object, model);
     }
 }

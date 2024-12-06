@@ -20,8 +20,8 @@ import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.core.common.SimpleBuilder;
-import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
+import org.shsts.tinycorelib.datagen.api.context.IDataContext;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -298,7 +298,7 @@ public class MachineModel {
         }
     }
 
-    public static void genBlockModels(DataContext<BlockModelProvider> ctx) {
+    public static void genBlockModels(IDataContext<BlockModelProvider> ctx) {
         genCasingModel(ctx);
         genIOModel(ctx);
     }
@@ -311,8 +311,8 @@ public class MachineModel {
         return new Builder<>(parent);
     }
 
-    private static void genCasingModel(DataContext<BlockModelProvider> ctx) {
-        var model = ctx.provider.withExistingParent(CASING_MODEL, mcLoc("block/block"))
+    private static void genCasingModel(IDataContext<BlockModelProvider> ctx) {
+        var model = ctx.provider().withExistingParent(CASING_MODEL, mcLoc("block/block"))
             .texture("particle", "#side")
             .element().from(0, 0, 0).to(16, 16, 16)
             .allFaces((d, f) -> f.cullface(d).texture(switch (d) {
@@ -335,8 +335,8 @@ public class MachineModel {
         }
     }
 
-    private static void genIOModel(DataContext<BlockModelProvider> ctx) {
-        ctx.provider.withExistingParent(IO_MODEL, mcLoc("block/block"))
+    private static void genIOModel(IDataContext<BlockModelProvider> ctx) {
+        ctx.provider().withExistingParent(IO_MODEL, mcLoc("block/block"))
             .element().from(0, 0, 0).to(16, 16, 16)
             .face(FRONT_FACING)
             .cullface(FRONT_FACING)

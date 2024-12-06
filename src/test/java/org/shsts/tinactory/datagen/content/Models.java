@@ -25,6 +25,7 @@ import org.shsts.tinactory.datagen.content.model.CableModel;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
+import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -35,7 +36,7 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.prepend;
-import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -77,7 +78,7 @@ public final class Models {
             .build();
     }
 
-    public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>> basicItem(
+    public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>> xBasicItem(
         ResourceLocation... layers) {
         return ctx -> {
             var provider = ctx.provider.withExistingParent(ctx.id, "item/generated");
@@ -87,12 +88,22 @@ public final class Models {
         };
     }
 
-    public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>> basicItem(
+    public static <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>> xBasicItem(
         String... layers) {
         return ctx -> {
             var provider = ctx.provider.withExistingParent(ctx.id, "item/generated");
             for (var i = 0; i < layers.length; i++) {
                 provider.texture("layer" + i, gregtech("items/" + layers[i]));
+            }
+        };
+    }
+
+    public static <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> basicItem(
+        ResourceLocation... layers) {
+        return ctx -> {
+            var provider = ctx.provider().withExistingParent(ctx.id(), "item/generated");
+            for (var i = 0; i < layers.length; i++) {
+                provider.texture("layer" + i, layers[i]);
             }
         };
     }
@@ -126,15 +137,15 @@ public final class Models {
         }
     }
 
-    public static <U extends Block> Consumer<RegistryDataContext<Block, U, BlockStateProvider>> oreBlock(
+    public static <U extends Block> Consumer<IEntryDataContext<Block, U, BlockStateProvider>> oreBlock(
         OreVariant variant) {
         return ctx -> {
-            var models = ctx.provider.models();
+            var models = ctx.provider().models();
             var loc = variant.baseBlock.getRegistryName();
             assert loc != null;
             var baseModel = new ConfiguredModel(models.getExistingFile(prepend(loc, "block")));
             var overlay = new ConfiguredModel(models.getExistingFile(modLoc("block/material/ore_overlay")));
-            ctx.provider.simpleBlock(ctx.object, baseModel, overlay);
+            ctx.provider().simpleBlock(ctx.object(), baseModel, overlay);
         };
     }
 
@@ -185,11 +196,11 @@ public final class Models {
         }
     }
 
-    public static void wireItem(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public static void wireItem(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         CableModel.wire(ctx);
     }
 
-    public static void pipeItem(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public static void pipeItem(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         CableModel.pipe(ctx);
     }
 
@@ -254,7 +265,7 @@ public final class Models {
     }
 
     public static void init() {
-        _DATA_GEN.blockModel(ctx -> ctx.provider
+        DATA_GEN.blockModel(ctx -> ctx.provider()
                 .withExistingParent("cube_tint", mcLoc("block/block"))
                 .element()
                 .from(0, 0, 0).to(16, 16, 16)
@@ -266,7 +277,7 @@ public final class Models {
             .blockModel(CableModel::genBlockModels)
             .itemModel(CableModel::genItemModels)
             .blockModel(MachineModel::genBlockModels)
-            .blockModel(ctx -> IconSet.DULL.blockOverlay(ctx.provider,
+            .blockModel(ctx -> IconSet.DULL.blockOverlay(ctx.provider(),
                 "material/ore", "ore"));
     }
 }

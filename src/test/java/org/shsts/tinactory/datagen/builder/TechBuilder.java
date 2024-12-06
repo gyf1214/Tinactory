@@ -10,8 +10,8 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinactory.datagen.handler.TechProvider;
+import org.shsts.tinycorelib.datagen.api.IDataGen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,11 +35,11 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     @Nullable
     private Voltage researchVoltage;
 
-    public TechBuilder(DataGen dataGen, P parent, String id) {
+    public TechBuilder(IDataGen dataGen, P parent, String id) {
         super(dataGen, parent, id);
     }
 
-    public TechBuilder(DataGen dataGen, P parent, ResourceLocation loc) {
+    public TechBuilder(IDataGen dataGen, P parent, ResourceLocation loc) {
         super(dataGen, parent, loc);
     }
 
@@ -85,11 +85,11 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     @Override
     protected void register() {
         assert maxProgress > 0;
-        dataGen.techHandler.addTech(this);
+        xDataGen.techHandler.addTech(this);
         var description = ITechnology.getDescriptionId(loc);
         var details = ITechnology.getDetailsId(loc);
-        dataGen.trackLang(description);
-        dataGen.trackLang(details);
+        xDataGen.trackLang(description);
+        xDataGen.trackLang(details);
 
         if (researchVoltage != null) {
             RESEARCH_BENCH.recipe(_DATA_GEN, loc)

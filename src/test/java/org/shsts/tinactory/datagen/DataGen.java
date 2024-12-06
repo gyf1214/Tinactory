@@ -13,8 +13,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
@@ -32,7 +30,6 @@ import org.shsts.tinactory.datagen.content.Materials;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
-import org.shsts.tinactory.datagen.context.DataContext;
 import org.shsts.tinactory.datagen.context.TrackedContext;
 import org.shsts.tinactory.datagen.handler.BlockStateHandler;
 import org.shsts.tinactory.datagen.handler.DataHandler;
@@ -52,10 +49,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -100,41 +97,18 @@ public final class DataGen implements IRecipeDataConsumer {
         this.languageHandler = handler(new LanguageHandler(this, langTrackedCtx));
     }
 
-    public <U extends Block> BlockDataBuilder<U, DataGen> block(ResourceLocation loc, Supplier<U> block) {
-        return new BlockDataBuilder<>(this, this, loc, block);
-    }
-
     public <U extends Block> BlockDataBuilder<U, DataGen> block(RegistryEntry<U> entry) {
-        return new BlockDataBuilder<>(this, this, entry.loc, entry);
+        return new BlockDataBuilder<>(DATA_GEN, this, entry.loc, entry);
     }
 
-    public <U extends Item> ItemDataBuilder<U, DataGen> item(ResourceLocation loc, Supplier<U> item) {
-        return new ItemDataBuilder<>(this, this, loc, item);
-    }
-
-    public <U extends Item> ItemDataBuilder<U, DataGen> item(RegistryEntry<U> item) {
-        return new ItemDataBuilder<>(this, this, item.loc, item);
-    }
-
-    public DataGen blockModel(Consumer<DataContext<BlockModelProvider>> cons) {
-        blockStateHandler.addBlockModelCallback(cons);
-        return this;
-    }
-
-    public DataGen itemModel(Consumer<DataContext<ItemModelProvider>> cons) {
-        itemModelHandler.addModelCallback(cons);
-        return this;
+    public <U extends Item> ItemDataBuilder<U, DataGen> item(RegistryEntry<U> entry) {
+        return new ItemDataBuilder<>(DATA_GEN, this, entry.loc, entry);
     }
 
     @SafeVarargs
     public final <T> DataGen tag(Supplier<? extends T> object, TagKey<T>... tags) {
         assert tags.length > 0;
         tagsHandler(tags[0].registry()).addTags(object, tags);
-        return this;
-    }
-
-    public <T> DataGen tag(TagKey<T> object, TagKey<T> tag) {
-        tagsHandler(tag.registry()).addTag(object, tag);
         return this;
     }
 
@@ -175,11 +149,11 @@ public final class DataGen implements IRecipeDataConsumer {
     }
 
     public TechBuilder<DataGen> tech(String id) {
-        return new TechBuilder<>(this, this, id);
+        return new TechBuilder<>(DATA_GEN, this, id);
     }
 
     public <P> TechBuilder<P> tech(P parent, String id) {
-        return new TechBuilder<>(this, parent, modLoc(id));
+        return new TechBuilder<>(DATA_GEN, parent, modLoc(id));
     }
 
     public void trackLang(String key) {

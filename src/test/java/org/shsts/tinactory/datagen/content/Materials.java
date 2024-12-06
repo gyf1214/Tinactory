@@ -109,12 +109,12 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
-import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
 import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
 import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -131,7 +131,7 @@ public final class Materials {
 
     private static class MaterialFactory {
         public MaterialBuilder<MaterialFactory> material(MaterialSet material, IconSet icon) {
-            return (new MaterialBuilder<>(_DATA_GEN, this, material)).icon(icon);
+            return (new MaterialBuilder<>(DATA_GEN, this, material)).icon(icon);
         }
     }
 
@@ -192,7 +192,7 @@ public final class Materials {
             .block(RUBBER_SAPLING)
             .blockState(ctx -> ctx.provider.simpleBlock(ctx.object, ctx.provider.models()
                 .cross(ctx.id, gregtech("blocks/wood/rubber/sapling_rubber"))))
-            .itemModel(basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
+            .itemModel(Models.xBasicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
             .tag(BlockTags.SAPLINGS).itemTag(ItemTags.SAPLINGS)
             .build();
     }
@@ -528,17 +528,18 @@ public final class Materials {
     }
 
     private static void tags() {
-        _DATA_GEN.tag(TOOL_HAMMER, TOOL)
+        DATA_GEN.tag(TOOL_HAMMER, TOOL)
             .tag(TOOL_MORTAR, TOOL)
             .tag(TOOL_FILE, TOOL)
             .tag(TOOL_SAW, TOOL)
             .tag(TOOL_SCREWDRIVER, TOOL)
             .tag(TOOL_WRENCH, TOOL)
             .tag(TOOL_WIRE_CUTTER, TOOL)
-            .tag(() -> Items.SHEARS, TOOL_SHEARS)
-            .tag(() -> Items.STICK, TOOL_HANDLE)
             .tag(WROUGHT_IRON.tag("stick"), TOOL_HANDLE)
             .tag(IRON.tag("screw"), TOOL_SCREW);
+
+        _DATA_GEN.tag(() -> Items.SHEARS, TOOL_SHEARS)
+            .tag(() -> Items.STICK, TOOL_HANDLE);
     }
 
     private static void woodRecipes(String prefix) {

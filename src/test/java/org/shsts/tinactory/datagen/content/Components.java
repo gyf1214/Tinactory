@@ -111,9 +111,9 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
-import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
 import static org.shsts.tinactory.datagen.content.Models.solidBlock;
+import static org.shsts.tinactory.datagen.content.Models.xBasicItem;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 
 @ParametersAreNonnullByDefault
@@ -149,7 +149,7 @@ public final class Components {
             .build());
 
         RESEARCH_EQUIPMENT.forEach((v, entry) -> _DATA_GEN.item(entry)
-            .model(basicItem(RESEARCH_TEX + "base", RESEARCH_TEX + "overlay"))
+            .model(xBasicItem(RESEARCH_TEX + "base", RESEARCH_TEX + "overlay"))
             .build());
 
         CABLE.forEach((v, entry) -> _DATA_GEN.block(entry)
@@ -159,20 +159,20 @@ public final class Components {
             .build());
 
         _DATA_GEN.item(GOOD_GRINDER)
-            .model(basicItem(GRINDER_TEX + ".diamond"))
+            .model(xBasicItem(GRINDER_TEX + ".diamond"))
             .build()
             .item(ADVANCED_GRINDER)
-            .model(basicItem(GRINDER_TEX + ".tungsten"))
+            .model(xBasicItem(GRINDER_TEX + ".tungsten"))
             .build();
 
         for (var item : List.of(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW)) {
             _DATA_GEN.item(item)
-                .model(basicItem(BUZZSAW_TEX))
+                .model(xBasicItem(BUZZSAW_TEX))
                 .build();
         }
 
         Stream.concat(BOULES.stream(), RAW_WAFERS.stream()).forEach(entry -> _DATA_GEN.item(entry)
-            .model(basicItem("metaitems/" + entry.id
+            .model(xBasicItem("metaitems/" + entry.id
                 .replace('/', '.')
                 .replace("wafer_raw.", "wafer.")
                 .replace("glowstone", "phosphorus")))
@@ -199,7 +199,7 @@ public final class Components {
 
     private static void chip(String name, String tex) {
         List.of(WAFERS.get(name), CHIPS.get(name)).forEach(entry -> _DATA_GEN.item(entry)
-            .model(basicItem("metaitems/" + entry.id
+            .model(xBasicItem("metaitems/" + entry.id
                 .replace('/', '.')
                 .replace("chip.", "plate.")
                 .replace(name, tex)))
@@ -208,13 +208,13 @@ public final class Components {
 
     private static void circuits() {
         Circuits.forEach((tier, level, item) -> _DATA_GEN.item(item)
-            .model(basicItem("metaitems/" + item.id.replace('/', '.')))
+            .model(xBasicItem("metaitems/" + item.id.replace('/', '.')))
             .tag(AllTags.circuit(Circuits.getVoltage(tier, level)))
             .build());
         Circuits.forEachComponent((component, tier, item) -> {
             var texKey = tier.prefix.isEmpty() ? component : tier.prefix + "." + component;
             var builder = _DATA_GEN.item(item)
-                .model(basicItem("metaitems/component." + texKey));
+                .model(xBasicItem("metaitems/component." + texKey));
             for (var tier1 : CircuitComponentTier.values()) {
                 if (tier1.rank <= tier.rank) {
                     builder.tag(AllTags.circuitComponent(component, tier1));
@@ -231,17 +231,17 @@ public final class Components {
             };
 
             _DATA_GEN.item(Circuits.board(tier))
-                .model(basicItem("metaitems/board." + boardName))
+                .model(xBasicItem("metaitems/board." + boardName))
                 .build()
                 .item(Circuits.circuitBoard(tier))
-                .model(basicItem("metaitems/circuit_board." + tier.circuitBoard))
+                .model(xBasicItem("metaitems/circuit_board." + tier.circuitBoard))
                 .build();
         }
     }
 
     private static void misc() {
         _DATA_GEN.item(STICKY_RESIN)
-            .model(basicItem("metaitems/rubber_drop"))
+            .model(xBasicItem("metaitems/rubber_drop"))
             .build();
 
         SOLID_CASING.forEach(block -> _DATA_GEN.block(block)
@@ -263,7 +263,7 @@ public final class Components {
             var texBase = v == Voltage.ULV ? "metaitems/fluid_cell" :
                 "metaitems/large_fluid_cell." + name(item.id, -1);
             _DATA_GEN.item(item)
-                .model(basicItem(texBase + "/base", texBase + "/overlay"))
+                .model(xBasicItem(texBase + "/base", texBase + "/overlay"))
                 .build();
         });
     }

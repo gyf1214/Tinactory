@@ -113,6 +113,7 @@ import static org.shsts.tinactory.datagen.content.Models.multiBlockInterface;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_OUT_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -426,7 +427,7 @@ public final class Machines {
 
     private static void machine(MachineSet set, Transformer<MachineModel.Builder<?>> model) {
         var tag = getMachineTag(set);
-        tag.ifPresent($ -> _DATA_GEN.tag($, AllTags.MACHINE));
+        tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
         for (var voltage : set.voltages) {
             var builder = _DATA_GEN.block(set.entry(voltage))
                 .blockState(MachineModel::builder, MachineModel::blockState)

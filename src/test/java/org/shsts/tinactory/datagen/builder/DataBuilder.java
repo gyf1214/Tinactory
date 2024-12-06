@@ -6,22 +6,24 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.datagen.DataGen;
+import org.shsts.tinycorelib.datagen.api.IDataGen;
+
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class DataBuilder<P, S extends DataBuilder<P, S>> extends BuilderBase<Unit, P, S> {
     public final ResourceLocation loc;
-    protected final DataGen dataGen;
+    protected final DataGen xDataGen;
+    protected final IDataGen dataGen;
 
-    public DataBuilder(DataGen dataGen, P parent, String id) {
-        super(parent);
-        this.dataGen = dataGen;
-        this.loc = new ResourceLocation(dataGen.modid, id);
-        onBuild.add(this::register);
+    protected DataBuilder(IDataGen dataGen, P parent, String id) {
+        this(dataGen, parent, new ResourceLocation(dataGen.modid(), id));
     }
 
-    public DataBuilder(DataGen dataGen, P parent, ResourceLocation loc) {
+    protected DataBuilder(IDataGen dataGen, P parent, ResourceLocation loc) {
         super(parent);
+        this.xDataGen = _DATA_GEN;
         this.dataGen = dataGen;
         this.loc = loc;
         onBuild.add(this::register);
