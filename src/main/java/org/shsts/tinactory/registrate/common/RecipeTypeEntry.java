@@ -13,6 +13,7 @@ import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.function.Supplier;
 
@@ -80,5 +81,9 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, 
 
     public B recipe(IRecipeDataConsumer consumer, RegistryEntry<?> item) {
         return recipe(consumer, item.loc);
+    }
+
+    public B recipe(IRecipeDataConsumer consumer, IEntry<?> item) {
+        return recipe(consumer, item.loc());
     }
 }

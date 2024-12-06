@@ -209,14 +209,14 @@ public final class Components {
     }
 
     private static void circuits() {
-        Circuits.forEach((tier, level, item) -> _DATA_GEN.item(item)
-            .model(xBasicItem("metaitems/" + item.id.replace('/', '.')))
+        Circuits.forEach((tier, level, item) -> DATA_GEN.item(item)
+            .model(basicItem("metaitems/" + item.id().replace('/', '.')))
             .tag(AllTags.circuit(Circuits.getVoltage(tier, level)))
             .build());
         Circuits.forEachComponent((component, tier, item) -> {
             var texKey = tier.prefix.isEmpty() ? component : tier.prefix + "." + component;
-            var builder = _DATA_GEN.item(item)
-                .model(xBasicItem("metaitems/component." + texKey));
+            var builder = DATA_GEN.item(item)
+                .model(basicItem("metaitems/component." + texKey));
             for (var tier1 : CircuitComponentTier.values()) {
                 if (tier1.rank <= tier.rank) {
                     builder.tag(AllTags.circuitComponent(component, tier1));
@@ -232,11 +232,11 @@ public final class Components {
                 default -> tier.board;
             };
 
-            _DATA_GEN.item(Circuits.board(tier))
-                .model(xBasicItem("metaitems/board." + boardName))
+            DATA_GEN.item(Circuits.board(tier))
+                .model(basicItem("metaitems/board." + boardName))
                 .build()
                 .item(Circuits.circuitBoard(tier))
-                .model(xBasicItem("metaitems/circuit_board." + tier.circuitBoard))
+                .model(basicItem("metaitems/circuit_board." + tier.circuitBoard))
                 .build();
         }
     }
