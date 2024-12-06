@@ -17,8 +17,6 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
-// optional JarJar
-//jarJar.enable()
 
 group = 'org.shsts.tinactory'
 archivesBaseName = "tinactory-${minecraft_version}"
@@ -97,13 +95,21 @@ repositories {
     mavenCentral()
     maven {
         // Location of the maven that hosts JEI files (and TiC)
-        name 'Progwml6 maven'
-        url 'https://dvs1.progwml6.com/files/maven'
+        name = 'Progwml6 maven'
+        url = 'https://dvs1.progwml6.com/files/maven'
     }
     maven {
-        url = "https://cursemaven.com"
+        url = 'https://cursemaven.com'
         content {
             includeGroup "curse.maven"
+        }
+    }
+    maven {
+        name = 'shsts'
+        url = 'https://www.shsts.org/m2'
+        credentials {
+            username = shstsUser
+            password = shstsPassword
         }
     }
 }
@@ -119,11 +125,12 @@ dependencies {
 
     runtimeOnly fg.deobf("curse.maven:ctm-267602:3933537")
 
-    // optional Registrate
-//    jarJar(group: 'com.tterrag.registrate', name: 'Registrate', version: "[${registrate_version},)") {
-//        jarJar.pin(it, registrate_version)
-//    }
-//    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
+    compileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
+    runtimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
+    testCompileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
+    testCompileOnly "org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}:api"
+    testRuntimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
+    testRuntimeOnly fg.deobf("org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}")
 }
 
 sourceSets.main.resources {
@@ -139,52 +146,4 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
-jar {
-//    if JarJar is enabled, the original jar is named slim
-//    classifier = 'slim'
-    manifest {
-        attributes([
-                "Specification-Title"     : "tinactory",
-                "Specification-Vendor"    : "shsts",
-                "Specification-Version"   : "1",
-                "Implementation-Title"    : project.jar.baseName,
-                "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : "shsts",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-}
 jar.finalizedBy('reobfJar')
-
-// optional API jar
-//task apiJar(type: Jar) {
-//    classifier = 'api'
-//    include "org/shsts/tinactory/api/**"
-//    from sourceSets.main.allSource
-//    from sourceSets.main.output
-//}
-//artifacts {
-//    archives apiJar
-//}
-
-// JarJar
-//reobf {
-//    jarJar {}
-//}
-//tasks.jarJar.classifier = ''
-//tasks.jarJar.finalizedBy('reobfJarJar')
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
-//            artifact tasks.jarJar
-//            artifact apiJar
-        }
-    }
-    repositories {
-        maven {
-            url project.hasProperty('urlMaven') ? urlMaven : "file://${projectDir}/../release"
-        }
-    }
-}

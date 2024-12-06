@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 public final class AllEvents {
     public record OnUseArg(Player player, InteractionHand hand, BlockHitResult hitResult) {}
@@ -30,17 +30,17 @@ public final class AllEvents {
     public static final RegistryEntry<Event<Unit>> SET_MACHINE_CONFIG;
 
     static {
-        SERVER_LOAD = REGISTRATE.event("server_load");
-        CLIENT_LOAD = REGISTRATE.event("client_load");
-        REMOVED_IN_WORLD = REGISTRATE.event("removed_in_world");
-        REMOVED_BY_CHUNK = REGISTRATE.event("removed_by_chunk");
-        SERVER_TICK = REGISTRATE.event("server_tick");
-        SERVER_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
+        SERVER_LOAD = _REGISTRATE.event("server_load");
+        CLIENT_LOAD = _REGISTRATE.event("client_load");
+        REMOVED_IN_WORLD = _REGISTRATE.event("removed_in_world");
+        REMOVED_BY_CHUNK = _REGISTRATE.event("removed_by_chunk");
+        SERVER_TICK = _REGISTRATE.event("server_tick");
+        SERVER_USE = _REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
 
-        CONTAINER_CHANGE = REGISTRATE.event("logistics/container_change");
-        CONNECT = REGISTRATE.event("network/connect");
-        BUILD_SCHEDULING = REGISTRATE.event("network/build_scheduling");
-        SET_MACHINE_CONFIG = REGISTRATE.event("machine/set_config");
+        CONTAINER_CHANGE = _REGISTRATE.event("logistics/container_change");
+        CONNECT = _REGISTRATE.event("network/connect");
+        BUILD_SCHEDULING = _REGISTRATE.event("network/build_scheduling");
+        SET_MACHINE_CONFIG = _REGISTRATE.event("machine/set_config");
     }
 
     public static void init() {}

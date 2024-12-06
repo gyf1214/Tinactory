@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -96,7 +96,7 @@ public class ProcessingSet extends MachineSet {
 
     public static RegistryEntry<MachineBlock<SmartBlockEntity>> multiblockInterface(Voltage voltage) {
         var id = "multi_block/" + voltage.id + "/interface";
-        return REGISTRATE.blockEntity(id, MachineBlock.multiBlockInterface(voltage))
+        return _REGISTRATE.blockEntity(id, MachineBlock.multiBlockInterface(voltage))
             .blockEntity()
             .eventManager()
             .simpleCapability(MultiBlockInterface::basic)

@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
@@ -259,7 +259,7 @@ public class MaterialSet {
         }
 
         private void dummy(String sub) {
-            put(sub, () -> REGISTRATE.item(newId(sub), Item::new)
+            put(sub, () -> _REGISTRATE.item(newId(sub), Item::new)
                 .tint(color)
                 .register());
         }
@@ -352,7 +352,7 @@ public class MaterialSet {
         }
 
         public Builder<P> fluid(String sub, int baseAmount) {
-            fluid = REGISTRATE.simpleFluid("material/" + sub + "/" + name,
+            fluid = _REGISTRATE.simpleFluid("material/" + sub + "/" + name,
                 gregtech("blocks/material_sets/dull/liquid"), color);
             fluidBaseAmount = baseAmount;
             return this;
@@ -365,7 +365,7 @@ public class MaterialSet {
         public Builder<P> ore(OreVariant variant) {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
-                var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
+                var ore = _REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
                     .material(variant.baseBlock.defaultBlockState().getMaterial())
                     .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
                     .translucent()
@@ -391,7 +391,7 @@ public class MaterialSet {
 
             private ToolBuilder item(String category, Function<Item.Properties, ToolItem> factory) {
                 var sub = "tool/" + category;
-                put(sub, () -> REGISTRATE.item(newId(sub), factory)
+                put(sub, () -> _REGISTRATE.item(newId(sub), factory)
                     .tint(0xFFFFFFFF, color)
                     .register());
                 return this;

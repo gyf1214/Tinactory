@@ -17,7 +17,7 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -52,7 +52,7 @@ public final class AllMultiBlocks {
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
         KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
 
-        GRATE_MACHINE_CASING = REGISTRATE.block("multi_block/grate_machine_casing", Block::new)
+        GRATE_MACHINE_CASING = _REGISTRATE.block("multi_block/grate_machine_casing", Block::new)
             .properties(CASING_PROPERTY)
             .register();
 
@@ -160,7 +160,7 @@ public final class AllMultiBlocks {
     }
 
     private static BlockEntityBuilder<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>, ?> multiBlock(String name) {
-        return REGISTRATE.blockEntity("multi_block/" + name, PrimitiveBlock<SmartBlockEntity>::new)
+        return _REGISTRATE.blockEntity("multi_block/" + name, PrimitiveBlock<SmartBlockEntity>::new)
             .blockEntity()
             .eventManager().ticking()
             .build()
@@ -168,7 +168,7 @@ public final class AllMultiBlocks {
     }
 
     private static RegistryEntry<Block> solid(String name) {
-        var ret = REGISTRATE.block("multi_block/solid/" + name, Block::new)
+        var ret = _REGISTRATE.block("multi_block/solid/" + name, Block::new)
             .properties(CASING_PROPERTY)
             .register();
         SOLID_CASING.add(ret);
@@ -176,7 +176,7 @@ public final class AllMultiBlocks {
     }
 
     private static RegistryEntry<CoilBlock> coil(String name, int temperature) {
-        var ret = REGISTRATE.block("multi_block/coil/" + name, CoilBlock.factory(temperature))
+        var ret = _REGISTRATE.block("multi_block/coil/" + name, CoilBlock.factory(temperature))
             .properties(CASING_PROPERTY)
             .register();
         COIL_BLOCKS.add(ret);

@@ -48,7 +48,7 @@ import java.util.function.Supplier;
 public class Tinactory {
     public static final String ID = "tinactory";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final Registrate REGISTRATE = new Registrate(ID);
+    public static final Registrate _REGISTRATE = new Registrate(ID);
 
     private static final String CHANNEL_VERSION = "1";
     private static final AtomicInteger MSG_ID = new AtomicInteger(0);
@@ -112,7 +112,7 @@ public class Tinactory {
         MenuSyncHandler.init();
         MenuEventHandler.init();
 
-        REGISTRATE.register(modEventBus);
+        _REGISTRATE.register(modEventBus);
         modEventBus.addListener(Tinactory::init);
         MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);
     }
@@ -120,7 +120,7 @@ public class Tinactory {
     private static void onCreateClient(IEventBus modEventBus) {
         TechManager.initClient();
 
-        REGISTRATE.registerClient(modEventBus);
+        _REGISTRATE.registerClient(modEventBus);
         modEventBus.addListener(Tinactory::initClient);
         MinecraftForge.EVENT_BUS.register(AllClientEvents.class);
     }

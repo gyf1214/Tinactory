@@ -23,7 +23,7 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -60,12 +60,12 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
 
     static {
-        TOOL_CRAFTING = REGISTRATE.recipeType("tool_crafting", ToolRecipe.SERIALIZER)
+        TOOL_CRAFTING = _REGISTRATE.recipeType("tool_crafting", ToolRecipe.SERIALIZER)
             .clazz(ToolRecipe.class)
             .builder(ToolRecipe.Builder::new)
             .register();
 
-        RESEARCH_BENCH = REGISTRATE.recipeType("research_bench", ResearchRecipe.SERIALIZER)
+        RESEARCH_BENCH = _REGISTRATE.recipeType("research_bench", ResearchRecipe.SERIALIZER)
             .clazz(ResearchRecipe.class)
             .builder(ResearchRecipe.Builder::new)
             .defaults($ -> $.amperage(0.25d).workTicks(200L))
@@ -87,7 +87,7 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.125d).workTicks(20L))
             .register();
 
-        ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.SERIALIZER)
+        ORE_ANALYZER = _REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.SERIALIZER)
             .clazz(OreAnalyzerRecipe.class)
             .builder(OreAnalyzerRecipe.Builder::new)
             .defaults($ -> $.amperage(0.125d).workTicks(32L))
@@ -171,7 +171,7 @@ public final class AllRecipes {
             .defaults($ -> $.autoVoid().amperage(1d).workTicks(100))
             .register();
 
-        BLAST_FURNACE = REGISTRATE.recipeType("blast_furnace", BlastFurnaceRecipe.SERIALIZER)
+        BLAST_FURNACE = _REGISTRATE.recipeType("blast_furnace", BlastFurnaceRecipe.SERIALIZER)
             .clazz(BlastFurnaceRecipe.class)
             .builder(BlastFurnaceRecipe.Builder::new)
             .defaults($ -> $.amperage(4d))
@@ -181,7 +181,7 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.75d))
             .register();
 
-        MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.SERIALIZER)
+        MARKER = _REGISTRATE.recipeType("marker", MarkerRecipe.SERIALIZER)
             .clazz(MarkerRecipe.class)
             .builder(MarkerRecipe.Builder::new)
             .register();
@@ -209,14 +209,14 @@ public final class AllRecipes {
     }
 
     private static RecipeTypeBuilder<AssemblyRecipe, AssemblyRecipe.Builder, Registrate> assembly(String id) {
-        return REGISTRATE.recipeType(id, AssemblyRecipe.SERIALIZER)
+        return _REGISTRATE.recipeType(id, AssemblyRecipe.SERIALIZER)
             .clazz(AssemblyRecipe.class)
             .builder(AssemblyRecipe.Builder::new);
     }
 
     private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate> processing(
         String id, SmartRecipeBuilder.Factory<ProcessingRecipe, ProcessingRecipe.Builder> builderFactory) {
-        return REGISTRATE.recipeType(id, ProcessingRecipe.SERIALIZER)
+        return _REGISTRATE.recipeType(id, ProcessingRecipe.SERIALIZER)
             .clazz(ProcessingRecipe.class)
             .builder(builderFactory);
     }

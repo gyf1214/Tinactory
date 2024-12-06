@@ -11,7 +11,7 @@ import org.shsts.tinactory.registrate.common.RegistryEntry;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -108,7 +108,7 @@ public final class Circuits {
     }
 
     public static Circuit circuit(CircuitTier tier, CircuitLevel level, String id) {
-        var item = REGISTRATE.item("circuit/" + id, Item::new).register();
+        var item = _REGISTRATE.item("circuit/" + id, Item::new).register();
         var key = new CircuitKey(tier, level);
         assert !CIRCUITS.containsKey(key);
         CIRCUITS.put(key, item);
@@ -117,7 +117,7 @@ public final class Circuits {
 
     public static CircuitComponent circuitComponent(String name) {
         for (var tier : CircuitComponentTier.values()) {
-            var item = REGISTRATE.item(tier.getName(name), Item::new).register();
+            var item = _REGISTRATE.item(tier.getName(name), Item::new).register();
             var key = new ComponentKey(name, tier);
             assert !COMPONENTS.containsKey(key);
             COMPONENTS.put(key, item);
@@ -127,11 +127,11 @@ public final class Circuits {
 
     public static void addBoards() {
         for (var tier : CircuitTier.values()) {
-            var board = REGISTRATE.item("board/" + tier.board, Item::new).register();
+            var board = _REGISTRATE.item("board/" + tier.board, Item::new).register();
             BOARDS.put(tier, board);
         }
         for (var tier : CircuitTier.values()) {
-            var circuitBoard = REGISTRATE.item("circuit_board/" + tier.circuitBoard, Item::new).register();
+            var circuitBoard = _REGISTRATE.item("circuit_board/" + tier.circuitBoard, Item::new).register();
             CIRCUIT_BOARDS.put(tier, circuitBoard);
         }
     }

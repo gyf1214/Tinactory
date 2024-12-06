@@ -21,7 +21,7 @@ import org.shsts.tinactory.datagen.content.model.IconSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
@@ -544,7 +544,7 @@ public final class Materials {
     private static void woodRecipes(String prefix) {
         var nether = prefix.equals("crimson") || prefix.equals("warped");
 
-        var planks = REGISTRATE.itemHandler.getEntry(prefix + "_planks");
+        var planks = _REGISTRATE.itemHandler.getEntry(prefix + "_planks");
         var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;

@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
@@ -441,7 +441,7 @@ public final class AllBlockEntities {
             .tintVoltage(2)
             .buildObject();
 
-        NETWORK_CONTROLLER = REGISTRATE.blockEntity("network/controller",
+        NETWORK_CONTROLLER = _REGISTRATE.blockEntity("network/controller",
                 NetworkController::new,
                 MachineBlock.factory(Voltage.PRIMITIVE))
             .entityClass(NetworkController.class)
@@ -455,7 +455,7 @@ public final class AllBlockEntities {
             .translucent()
             .buildObject();
 
-        WORKBENCH = REGISTRATE.blockEntity("primitive/workbench",
+        WORKBENCH = _REGISTRATE.blockEntity("primitive/workbench",
                 PrimitiveBlock<SmartBlockEntity>::new)
             .blockEntity()
             .simpleCapability(Workbench::builder)
@@ -477,7 +477,7 @@ public final class AllBlockEntities {
     private static class SetFactory {
         public <T extends ProcessingRecipe> ProcessingSet.Builder<T, SetFactory> processing(
             RecipeTypeEntry<T, ?> recipeType) {
-            return (new ProcessingSet.Builder<>(REGISTRATE, recipeType, this))
+            return (new ProcessingSet.Builder<>(_REGISTRATE, recipeType, this))
                 .tintVoltage(2)
                 .onCreateObject(PROCESSING_SETS::add);
         }
@@ -490,7 +490,7 @@ public final class AllBlockEntities {
         }
 
         public MachineSet.Builder<SetFactory> machine() {
-            return new MachineSet.Builder<>(REGISTRATE, this);
+            return new MachineSet.Builder<>(_REGISTRATE, this);
         }
     }
 
@@ -498,7 +498,7 @@ public final class AllBlockEntities {
         var recipeType = set.recipeType;
         var id = "primitive/" + recipeType.id;
         var layout = set.layout(Voltage.PRIMITIVE);
-        return REGISTRATE.blockEntity(id, PrimitiveMachine::new,
+        return _REGISTRATE.blockEntity(id, PrimitiveMachine::new,
                 PrimitiveBlock<PrimitiveMachine>::new)
             .entityClass(PrimitiveMachine.class)
             .blockEntity()
@@ -516,7 +516,7 @@ public final class AllBlockEntities {
     private static RegistryEntry<MachineBlock<SmartBlockEntity>> boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;
-        return REGISTRATE.blockEntity(id, MachineBlock.factory(Voltage.PRIMITIVE))
+        return _REGISTRATE.blockEntity(id, MachineBlock.factory(Voltage.PRIMITIVE))
             .blockEntity()
             .simpleCapability(Boiler.builder(burnSpeed))
             .simpleCapability(StackProcessingContainer.builder(layout))

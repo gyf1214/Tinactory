@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
@@ -119,12 +119,12 @@ public final class AllItems {
 
         STICKY_RESIN = simple("rubber_tree/sticky_resin");
 
-        RUBBER_LOG = REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
+        RUBBER_LOG = _REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
             .material(Material.WOOD)
             .properties(p -> p.sound(SoundType.WOOD))
             .register();
 
-        RUBBER_LEAVES = REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
+        RUBBER_LEAVES = _REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
             .material(Material.LEAVES)
             .properties(p -> p.strength(0.2f).randomTicks()
                 .sound(SoundType.GRASS).noOcclusion()
@@ -135,7 +135,7 @@ public final class AllItems {
             .tint(0xFF55FF55)
             .register();
 
-        RUBBER_SAPLING = REGISTRATE.block("rubber_tree/sapling",
+        RUBBER_SAPLING = _REGISTRATE.block("rubber_tree/sapling",
                 prop -> new SaplingBlock(new RubberTreeGrower(), prop))
             .material(Material.PLANT)
             .properties(p -> p.noCollission().randomTicks()
@@ -143,7 +143,7 @@ public final class AllItems {
             .renderType(() -> RenderType::cutout)
             .register();
 
-        STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
+        STEAM = _REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
 
         ELECTRIC_MOTOR = component("electric_motor");
         ELECTRIC_PUMP = component("electric_pump");
@@ -157,21 +157,21 @@ public final class AllItems {
             .voltages(Voltage.ULV, Voltage.IV)
             .buildObject();
 
-        RESEARCH_EQUIPMENT = ComponentBuilder.simple(v -> REGISTRATE
+        RESEARCH_EQUIPMENT = ComponentBuilder.simple(v -> _REGISTRATE
                 .item("component/" + v.id + "/research_equipment", Item::new)
                 .tint(0xFFFFFFFF, v.color)
                 .register())
             .voltages(Voltage.ULV, Voltage.EV)
             .buildObject();
 
-        BATTERY = ComponentBuilder.simple(v -> REGISTRATE
+        BATTERY = ComponentBuilder.simple(v -> _REGISTRATE
                 .item("network/" + v.id + "/battery", prop ->
                     new BatteryItem(prop, v, 12000 * v.value))
                 .register())
             .voltages(Voltage.LV, Voltage.HV)
             .buildObject();
 
-        CABLE = ComponentBuilder.<CableBlock, MaterialSet>builder((v, mat) -> REGISTRATE
+        CABLE = ComponentBuilder.<CableBlock, MaterialSet>builder((v, mat) -> _REGISTRATE
                 .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
                 .transform(CableBlock.tint(v, mat.color))
                 .translucent()
@@ -183,7 +183,7 @@ public final class AllItems {
             .voltage(Voltage.EV, ALUMINIUM)
             .buildObject();
 
-        TRANSFORMER = ComponentBuilder.simple(v -> REGISTRATE
+        TRANSFORMER = ComponentBuilder.simple(v -> _REGISTRATE
                 .block("network/" + v.id + "/transformer", SubnetBlock.transformer(v))
                 .translucent()
                 .tint(i -> switch (i) {
@@ -194,7 +194,7 @@ public final class AllItems {
             .voltages(Voltage.LV, Voltage.IV)
             .buildObject();
 
-        ELECTRIC_BUFFER = ComponentBuilder.simple(v -> REGISTRATE
+        ELECTRIC_BUFFER = ComponentBuilder.simple(v -> _REGISTRATE
                 .block("network/" + v.id + "/electric_buffer", SubnetBlock.buffer(v))
                 .translucent()
                 .tint(i -> i < 2 ? v.color : 0xFFFFFFFF)
@@ -205,7 +205,7 @@ public final class AllItems {
         GOOD_GRINDER = simple("component/grinder/good");
         ADVANCED_GRINDER = simple("component/grinder/advanced");
 
-        BASIC_BUZZSAW = REGISTRATE.item("component/buzzsaw/basic", Item::new)
+        BASIC_BUZZSAW = _REGISTRATE.item("component/buzzsaw/basic", Item::new)
             .tint(COBALT_BRASS.color)
             .register();
 
@@ -226,7 +226,7 @@ public final class AllItems {
             "simple_soc", "soc", "advanced_soc",
             "low_pic", "pic", "high_pic");
 
-        FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> REGISTRATE
+        FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> _REGISTRATE
                 .item("tool/fluid_cell/" + mat.name, CellItem.factory(1 << (v.rank - 1)))
                 .tint(() -> () -> CellItem::getTint)
                 .register())
@@ -253,7 +253,7 @@ public final class AllItems {
     }
 
     private static RegistryEntry<Item> simple(String name) {
-        return REGISTRATE.item(name, Item::new).register();
+        return _REGISTRATE.item(name, Item::new).register();
     }
 
     private static void boules(String... names) {

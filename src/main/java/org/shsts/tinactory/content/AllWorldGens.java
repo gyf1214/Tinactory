@@ -17,7 +17,7 @@ import org.shsts.tinactory.content.worldgen.VoidPreset;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -37,21 +37,21 @@ public final class AllWorldGens {
         // biomes
         VOID_BIOME = biome("void");
 
-        FEATURE_HANDLER = REGISTRATE.forgeHandler(ForgeRegistries.FEATURES);
-        PLAYER_START_FEATURE = REGISTRATE.registryEntry("player_start", FEATURE_HANDLER, PlayerStartFeature::new);
+        FEATURE_HANDLER = _REGISTRATE.forgeHandler(ForgeRegistries.FEATURES);
+        PLAYER_START_FEATURE = _REGISTRATE.registryEntry("player_start", FEATURE_HANDLER, PlayerStartFeature::new);
 
         BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_FEATURE,
             RUBBER_TREE_GROWER, new ConfiguredFeature<>(Feature.NO_OP, NoneFeatureConfiguration.INSTANCE));
 
         // world types
-        WORLD_TYPE_HANDLER = REGISTRATE.forgeHandler(
+        WORLD_TYPE_HANDLER = _REGISTRATE.forgeHandler(
             ForgeRegistries.Keys.WORLD_TYPES, ForgeWorldPreset.class, ForgeRegistries.WORLD_TYPES);
-        VOID_PRESET = REGISTRATE.registryEntry("void", WORLD_TYPE_HANDLER, VoidPreset::new);
+        VOID_PRESET = _REGISTRATE.registryEntry("void", WORLD_TYPE_HANDLER, VoidPreset::new);
     }
 
     private static ResourceKey<Biome> biome(String id) {
-        REGISTRATE.biome(id);
-        return ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(REGISTRATE.modid, id));
+        _REGISTRATE.biome(id);
+        return ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(_REGISTRATE.modid, id));
     }
 
     public static void init() {}

@@ -13,7 +13,7 @@ import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.registrate.common.CapabilityEntry;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 public final class AllCapabilities {
     public static final CapabilityEntry<UpdateHelper> UPDATE_HELPER;
@@ -29,17 +29,17 @@ public final class AllCapabilities {
     public static final CapabilityEntry<MultiBlock> MULTI_BLOCK;
 
     static {
-        UPDATE_HELPER = REGISTRATE.capability(UpdateHelper.class, new CapabilityToken<>() {});
-        EVENT_MANAGER = REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
-        PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
-        CONTAINER = REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
-        ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
-        WORKBENCH = REGISTRATE.capability(IWorkbench.class, new CapabilityToken<>() {});
-        FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
-        MENU_ITEM_HANDLER = REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
+        UPDATE_HELPER = _REGISTRATE.capability(UpdateHelper.class, new CapabilityToken<>() {});
+        EVENT_MANAGER = _REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
+        PROCESSOR = _REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
+        CONTAINER = _REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
+        ELECTRIC_MACHINE = _REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
+        WORKBENCH = _REGISTRATE.capability(IWorkbench.class, new CapabilityToken<>() {});
+        FLUID_STACK_HANDLER = _REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
+        MENU_ITEM_HANDLER = _REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
 
-        MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
-        MULTI_BLOCK = REGISTRATE.capability(MultiBlock.class, new CapabilityToken<>() {});
+        MACHINE = _REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
+        MULTI_BLOCK = _REGISTRATE.capability(MultiBlock.class, new CapabilityToken<>() {});
     }
 
     public static void init() {}
