@@ -18,7 +18,7 @@ import java.util.Map;
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -159,7 +159,7 @@ public final class Technologies {
         }
 
         public TechBuilder<TechFactory> tech(String id) {
-            var builder = DATA_GEN.tech(this, id);
+            var builder = _DATA_GEN.tech(this, id);
             if (base != null) {
                 builder.depends(base);
             }

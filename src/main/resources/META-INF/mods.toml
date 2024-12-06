@@ -14,16 +14,23 @@ displayName="Tinactory"
 authors="Tiny"
 
 [[dependencies.tinactory]]
-    modId="forge"
-    mandatory=true
-    versionRange="[40,)"
-    ordering="NONE"
-    side="BOTH"
+modId = "forge"
+mandatory = true
+versionRange = "[40,)"
+ordering = "NONE"
+side = "BOTH"
 
 [[dependencies.tinactory]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.18.2,1.19)"
-    ordering="NONE"
-    side="BOTH"
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.18.2,1.19)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.tinactory]]
+modId = "tinycorelib"
+mandatory = true
+versionRange = "[1.18.2-0.0.1.0-SNAPSHOT,)"
+ordering = "NONE"
+side = "BOTH"
 

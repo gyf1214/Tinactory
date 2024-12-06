@@ -105,7 +105,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.content.AllTags.circuit;
 import static org.shsts.tinactory.content.AllTags.machineTag;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
 import static org.shsts.tinactory.datagen.content.Models.multiBlock;
@@ -165,7 +165,7 @@ public final class Machines {
             .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
         machine(LOGISTIC_WORKER, "cover/overlay_conveyor");
 
-        DATA_GEN.block(NETWORK_CONTROLLER)
+        _DATA_GEN.block(NETWORK_CONTROLLER)
             .blockState(MachineModel::builder, MachineModel::blockState)
             .casing("casings/computer/computer_casing")
             .overlay("overlay/machine/overlay_maintenance_full_auto")
@@ -194,13 +194,13 @@ public final class Machines {
         multiBlockItem(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
         multiBlockItem(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
 
-        MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
+        MULTI_BLOCK_INTERFACE.values().forEach(b -> _DATA_GEN.block(b)
             .blockState(multiBlockInterface(IO_TEX))
             .tag(MINEABLE_WITH_WRENCH)
             .build());
 
         Streams.concat(TRANSFORMER.values().stream(), ELECTRIC_BUFFER.values().stream())
-            .forEach(b -> DATA_GEN.block(b)
+            .forEach(b -> _DATA_GEN.block(b)
                 .blockState(MachineModel::builder, MachineModel::blockState)
                 .overlay(Direction.NORTH, IO_TEX)
                 .overlay(Direction.SOUTH, IO_OUT_TEX)
@@ -211,7 +211,7 @@ public final class Machines {
 
     private static void multiBlockItem(RegistryEntry<? extends Block> block, String casing,
         String overlay, RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
-        DATA_GEN.block(block)
+        _DATA_GEN.block(block)
             .blockState(multiBlock(casing, overlay))
             .tag(MINEABLE_WITH_WRENCH)
             .itemTag(machineTag(type))
@@ -220,7 +220,7 @@ public final class Machines {
 
     private static void primitiveRecipes() {
         // workbench
-        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        _DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(WORKBENCH.get())
                 .pattern("WSW")
                 .pattern("SCS")
@@ -272,7 +272,7 @@ public final class Machines {
         ulvMachine(LOGISTIC_WORKER.entry(Voltage.ULV), () -> Blocks.HOPPER);
         ulvMachine(ELECTRIC_BUFFER.get(Voltage.ULV), CABLE.get(Voltage.ULV));
 
-        TOOL_CRAFTING.recipe(DATA_GEN, NETWORK_CONTROLLER)
+        TOOL_CRAFTING.recipe(_DATA_GEN, NETWORK_CONTROLLER)
             .result(NETWORK_CONTROLLER, 1)
             .pattern("VWV").pattern("VHV").pattern("WVW")
             .define('W', CABLE.get(Voltage.ULV))
@@ -280,7 +280,7 @@ public final class Machines {
             .define('V', circuit(Voltage.ULV))
             .toolTag(TOOL_WRENCH)
             .build()
-            .recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
+            .recipe(_DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
             .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
             .pattern("PVP").pattern("RHR").pattern("WVW")
             .define('P', COPPER.tag("pipe"))
@@ -291,7 +291,7 @@ public final class Machines {
             .toolTag(TOOL_WRENCH)
             .build();
 
-        ASSEMBLER.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
+        ASSEMBLER.recipe(_DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
             .outputItem(2, ALLOY_SMELTER.entry(Voltage.ULV), 1)
             .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 1)
             .inputItem(0, circuit(Voltage.ULV), 2)
@@ -300,7 +300,7 @@ public final class Machines {
             .voltage(Voltage.ULV)
             .workTicks(ASSEMBLE_TICKS)
             .build()
-            .recipe(DATA_GEN, BLAST_FURNACE)
+            .recipe(_DATA_GEN, BLAST_FURNACE)
             .outputItem(2, BLAST_FURNACE, 1)
             .inputItem(0, HEATPROOF_CASING, 1)
             .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 3)
@@ -310,7 +310,7 @@ public final class Machines {
             .voltage(Voltage.ULV)
             .workTicks(ASSEMBLE_TICKS)
             .build()
-            .recipe(DATA_GEN, MULTI_BLOCK_INTERFACE.get(Voltage.ULV))
+            .recipe(_DATA_GEN, MULTI_BLOCK_INTERFACE.get(Voltage.ULV))
             .outputItem(2, MULTI_BLOCK_INTERFACE.get(Voltage.ULV), 1)
             .inputItem(0, MACHINE_HULL.get(Voltage.ULV), 1)
             .inputItem(0, circuit(Voltage.ULV), 2)
@@ -327,7 +327,7 @@ public final class Machines {
         machineRecipe(Voltage.LV, STEEL, COPPER, TIN, BRONZE, TIN);
         machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
 
-        ASSEMBLER.recipe(DATA_GEN, SIFTER)
+        ASSEMBLER.recipe(_DATA_GEN, SIFTER)
             .outputItem(2, SIFTER, 1)
             .inputItem(0, SOLID_STEEL_CASING, 1)
             .inputItem(0, circuit(Voltage.MV), 3)
@@ -342,7 +342,7 @@ public final class Machines {
     }
 
     private static void miscRecipes() {
-        TOOL_CRAFTING.recipe(DATA_GEN, LOW_PRESSURE_BOILER)
+        TOOL_CRAFTING.recipe(_DATA_GEN, LOW_PRESSURE_BOILER)
             .result(LOW_PRESSURE_BOILER, 1)
             .pattern("PPP").pattern("PWP").pattern("VFV")
             .define('P', IRON.tag("plate"))
@@ -353,7 +353,7 @@ public final class Machines {
             .build();
 
         // disable vanilla recipes
-        DATA_GEN.nullRecipe(Items.BLAST_FURNACE)
+        _DATA_GEN.nullRecipe(Items.BLAST_FURNACE)
             .nullRecipe(Items.SMOKER)
             .nullRecipe(Items.STONECUTTER)
             .nullRecipe(Items.FLETCHING_TABLE)
@@ -400,14 +400,14 @@ public final class Machines {
             .nullRecipe(Items.DETECTOR_RAIL)
             .nullRecipe(Items.ACTIVATOR_RAIL);
 
-        TOOL_CRAFTING.recipe(DATA_GEN, Items.HOPPER)
+        TOOL_CRAFTING.recipe(_DATA_GEN, Items.HOPPER)
             .result(Items.HOPPER, 1)
             .pattern("P P").pattern("PCP").pattern(" P ")
             .define('P', IRON.tag("plate"))
             .define('C', Items.CHEST)
             .toolTag(TOOL_WRENCH, TOOL_HAMMER)
             .build()
-            .recipe(DATA_GEN, Items.BUCKET)
+            .recipe(_DATA_GEN, Items.BUCKET)
             .result(Items.BUCKET, 1)
             .pattern("P P").pattern(" P ")
             .define('P', IRON.tag("plate"))
@@ -426,9 +426,9 @@ public final class Machines {
 
     private static void machine(MachineSet set, Transformer<MachineModel.Builder<?>> model) {
         var tag = getMachineTag(set);
-        tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
+        tag.ifPresent($ -> _DATA_GEN.tag($, AllTags.MACHINE));
         for (var voltage : set.voltages) {
-            var builder = DATA_GEN.block(set.entry(voltage))
+            var builder = _DATA_GEN.block(set.entry(voltage))
                 .blockState(MachineModel::builder, MachineModel::blockState)
                 .transform(model.cast())
                 .build()
@@ -454,7 +454,7 @@ public final class Machines {
         String overlay) {
         machine(set, overlay);
         var tag = getMachineTag(set);
-        var builder = DATA_GEN.block(primitive)
+        var builder = _DATA_GEN.block(primitive)
             .blockState(machineBlock(overlay))
             .tag(MINEABLE_WITH_WRENCH)
             .tag(BlockTags.MINEABLE_WITH_AXE);
@@ -464,7 +464,7 @@ public final class Machines {
 
     private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
         Supplier<? extends ItemLike> base) {
-        TOOL_CRAFTING.recipe(DATA_GEN, result)
+        TOOL_CRAFTING.recipe(_DATA_GEN, result)
             .result(result, 1)
             .pattern("BBB").pattern("VHV").pattern("WVW")
             .define('B', base)
@@ -477,7 +477,7 @@ public final class Machines {
 
     private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
         TagKey<Item> base) {
-        TOOL_CRAFTING.recipe(DATA_GEN, result)
+        TOOL_CRAFTING.recipe(_DATA_GEN, result)
             .result(result, 1)
             .pattern("BBB").pattern("VHV").pattern("WVW")
             .define('B', base)
@@ -500,7 +500,7 @@ public final class Machines {
         }
 
         private AssemblyRecipeBuilder<RecipeFactory> recipe(RegistryEntry<? extends ItemLike> item, Voltage v1) {
-            var builder = ASSEMBLER.recipe(DATA_GEN, item)
+            var builder = ASSEMBLER.recipe(_DATA_GEN, item)
                 .outputItem(2, item, 1)
                 .voltage(v1)
                 .workTicks(ASSEMBLE_TICKS)

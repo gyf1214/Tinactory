@@ -20,7 +20,7 @@ import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
 import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -34,18 +34,18 @@ public final class Markers {
         markerWash("dust_impure");
         markerWash("dust_pure");
 
-        MARKER.recipe(DATA_GEN, "centrifuge_dust_pure")
+        MARKER.recipe(_DATA_GEN, "centrifuge_dust_pure")
             .baseType(CENTRIFUGE)
             .inputItem(0, AllMaterials.tag("dust_pure"))
             .build();
 
-        MARKER.recipe(DATA_GEN, "thermal_centrifuge_crushed_purified")
+        MARKER.recipe(_DATA_GEN, "thermal_centrifuge_crushed_purified")
             .baseType(THERMAL_CENTRIFUGE)
             .inputItem(0, AllMaterials.tag("crushed_purified"))
             .build();
 
         for (var variant : OreVariant.values()) {
-            MARKER.recipe(DATA_GEN, "analyze_" + variant.getName())
+            MARKER.recipe(_DATA_GEN, "analyze_" + variant.getName())
                 .baseType(ORE_ANALYZER)
                 .inputItem(0, variant.baseItem)
                 .voltage(variant.voltage)
@@ -56,14 +56,14 @@ public final class Markers {
     }
 
     private static void markerCrush(String sub) {
-        MARKER.recipe(DATA_GEN, "crush_" + sub)
+        MARKER.recipe(_DATA_GEN, "crush_" + sub)
             .baseType(MACERATOR)
             .inputItem(0, AllMaterials.tag(sub))
             .build();
     }
 
     private static void markerWash(String sub) {
-        MARKER.recipe(DATA_GEN, "wash_" + sub)
+        MARKER.recipe(_DATA_GEN, "wash_" + sub)
             .baseType(ORE_WASHER)
             .inputItem(0, AllMaterials.tag(sub))
             .inputFluid(1, Fluids.WATER)
@@ -80,7 +80,7 @@ public final class Markers {
         allTypes.add(SIFTER);
 
         for (var type : allTypes) {
-            DATA_GEN.trackLang(RecipeCategory.categoryTitleId(type.loc));
+            _DATA_GEN.trackLang(RecipeCategory.categoryTitleId(type.loc));
         }
     }
 }

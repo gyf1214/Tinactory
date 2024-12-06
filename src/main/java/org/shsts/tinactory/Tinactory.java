@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
@@ -36,6 +37,8 @@ import org.shsts.tinactory.core.gui.sync.MenuSyncHandler;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.AllRegistries;
 import org.shsts.tinactory.registrate.Registrate;
+import org.shsts.tinycorelib.api.ITinyCoreLib;
+import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.slf4j.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -86,8 +89,15 @@ public class Tinactory {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 
+    public static ITinyCoreLib CORE;
+    public static IRegistrate REGISTRATE;
+
+    private final IEventBus modEventBus;
+
     public Tinactory() {
-        var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        this.modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        modEventBus.addListener(this::onConstructEvent);
+
         onCreate(modEventBus);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> onCreateClient(modEventBus));
     }
@@ -125,7 +135,23 @@ public class Tinactory {
         MinecraftForge.EVENT_BUS.register(AllClientEvents.class);
     }
 
-    private static void init(final FMLCommonSetupEvent event) {
+    private void onConstructEvent(FMLConstructModEvent event) {
+        event.enqueueWork(this::onConstruct);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> event.enqueueWork(this::onConstructClient));
+    }
+
+    public void onConstruct() {
+        CORE = ITinyCoreLib.get();
+        REGISTRATE = CORE.registrate(ID);
+
+        REGISTRATE.register(modEventBus);
+    }
+
+    public void onConstructClient() {
+        REGISTRATE.registerClient(modEventBus);
+    }
+
+    private static void init(FMLCommonSetupEvent event) {
         LOGGER.info("hello Tinactory!");
     }
 

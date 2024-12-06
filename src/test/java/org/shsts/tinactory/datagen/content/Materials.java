@@ -108,7 +108,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
@@ -131,7 +131,7 @@ public final class Materials {
 
     private static class MaterialFactory {
         public MaterialBuilder<MaterialFactory> material(MaterialSet material, IconSet icon) {
-            return (new MaterialBuilder<>(DATA_GEN, this, material)).icon(icon);
+            return (new MaterialBuilder<>(_DATA_GEN, this, material)).icon(icon);
         }
     }
 
@@ -149,7 +149,7 @@ public final class Materials {
         woodRecipes("warped");
 
         // disable wooden and iron tools
-        DATA_GEN.nullRecipe(Items.WOODEN_AXE)
+        _DATA_GEN.nullRecipe(Items.WOODEN_AXE)
             .nullRecipe(Items.WOODEN_HOE)
             .nullRecipe(Items.WOODEN_PICKAXE)
             .nullRecipe(Items.WOODEN_SHOVEL)
@@ -161,20 +161,20 @@ public final class Materials {
             .nullRecipe(Items.IRON_SWORD);
 
         // stick
-        TOOL_CRAFTING.recipe(DATA_GEN, Items.STICK)
+        TOOL_CRAFTING.recipe(_DATA_GEN, Items.STICK)
             .result(Items.STICK, 4)
             .pattern("#").pattern("#")
             .define('#', ItemTags.PLANKS)
             .toolTag(TOOL_SAW)
             .build();
-        DATA_GEN.replaceVanillaRecipe(() -> ShapedRecipeBuilder
+        _DATA_GEN.replaceVanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(Items.STICK, 2)
             .define('#', ItemTags.PLANKS)
             .pattern("#").pattern("#")
             .unlockedBy("has_planks", has(ItemTags.PLANKS)));
 
         // rubber
-        DATA_GEN.block(RUBBER_LOG)
+        _DATA_GEN.block(RUBBER_LOG)
             .blockState(ctx -> ctx.provider
                 .axisBlock(ctx.object, gregtech("blocks/wood/rubber/log_rubber_side"),
                     gregtech("blocks/wood/rubber/log_rubber_top")))
@@ -319,14 +319,14 @@ public final class Materials {
     private static void ores() {
         // stone generator
         for (var variant : OreVariant.values()) {
-            STONE_GENERATOR.recipe(DATA_GEN, variant.baseItem)
+            STONE_GENERATOR.recipe(_DATA_GEN, variant.baseItem)
                 .outputItem(0, variant.baseItem, 1)
                 .voltage(variant == OreVariant.STONE ? Voltage.PRIMITIVE : variant.voltage)
                 .build();
         }
         // generate water
         STONE_GENERATOR
-            .recipe(DATA_GEN, Fluids.WATER)
+            .recipe(_DATA_GEN, Fluids.WATER)
             .outputFluid(1, Fluids.WATER, 1000)
             .voltage(Voltage.ULV)
             .build();
@@ -417,26 +417,26 @@ public final class Materials {
         disableVanillaOres("lapis", "lazuli");
 
         // smelt wrought iron nugget
-        DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+        _DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(IRON.tag("nugget")), WROUGHT_IRON.item("nugget"), 0, 200)
             .unlockedBy("has_material", has(IRON.tag("nugget"))), "_from_iron");
 
         // stone -> gravel
-        TOOL_CRAFTING.recipe(DATA_GEN, Items.GRAVEL)
+        TOOL_CRAFTING.recipe(_DATA_GEN, Items.GRAVEL)
             .result(Items.GRAVEL, 1)
             .pattern("#").pattern("#")
             .define('#', STONE.tag("block"))
             .toolTag(TOOL_HAMMER)
             .build()
             // gravel -> flint
-            .recipe(DATA_GEN, FLINT.loc("primary"))
+            .recipe(_DATA_GEN, FLINT.loc("primary"))
             .result(FLINT.entry("primary"), 1)
             .pattern("###")
             .define('#', Items.GRAVEL)
             .toolTag(TOOL_HAMMER)
             .build()
             // gravel -> sand
-            .recipe(DATA_GEN, Items.SAND)
+            .recipe(_DATA_GEN, Items.SAND)
             .result(Items.SAND, 1)
             .pattern("#")
             .define('#', Items.GRAVEL)
@@ -446,7 +446,7 @@ public final class Materials {
         // generate steam
         for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
             var consume = (int) voltage.value / 8 * (14 - voltage.rank);
-            STEAM_TURBINE.recipe(DATA_GEN, voltage.id)
+            STEAM_TURBINE.recipe(_DATA_GEN, voltage.id)
                 .voltage(voltage)
                 .inputFluid(0, STEAM, consume)
                 .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
@@ -454,27 +454,27 @@ public final class Materials {
         }
 
         // rubber
-        TOOL_CRAFTING.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
+        TOOL_CRAFTING.recipe(_DATA_GEN, RAW_RUBBER.loc("dust"))
             .result(RAW_RUBBER.entry("dust"), 1)
             .pattern("A").define('A', STICKY_RESIN)
             .toolTag(TOOL_MORTAR)
             .build();
 
-        EXTRACTOR.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
+        EXTRACTOR.recipe(_DATA_GEN, RAW_RUBBER.loc("dust"))
             .outputItem(1, RAW_RUBBER.entry("dust"), 3)
             .inputItem(0, STICKY_RESIN, 1)
             .workTicks(160L)
             .voltage(Voltage.LV)
             .build();
 
-        EXTRACTOR.recipe(DATA_GEN, suffix(RAW_RUBBER.loc("dust"), "_from_log"))
+        EXTRACTOR.recipe(_DATA_GEN, suffix(RAW_RUBBER.loc("dust"), "_from_log"))
             .outputItem(1, RAW_RUBBER.entry("dust"), 1)
             .inputItem(0, RUBBER_LOG, 1)
             .workTicks(320L)
             .voltage(Voltage.LV)
             .build();
 
-        ALLOY_SMELTER.recipe(DATA_GEN, RUBBER.loc("sheet"))
+        ALLOY_SMELTER.recipe(_DATA_GEN, RUBBER.loc("sheet"))
             .inputItem(0, RAW_RUBBER.entry("dust"), 3)
             .inputItem(0, SULFUR.entry("dust"), 1)
             .outputItem(1, RUBBER.entry("sheet"), 3)
@@ -488,24 +488,24 @@ public final class Materials {
     private static void disableVanillaOres(String name, String suffix) {
         var fullName = name + (suffix.isEmpty() ? "" : "_" + suffix);
 
-        DATA_GEN.nullRecipe(name + "_block");
+        _DATA_GEN.nullRecipe(name + "_block");
 
         if (suffix.equals("ingot")) {
-            DATA_GEN.nullRecipe("raw_" + name)
+            _DATA_GEN.nullRecipe("raw_" + name)
                 .nullRecipe("raw_" + name + "_block");
             if (name.equals("copper")) {
-                DATA_GEN.nullRecipe(fullName)
+                _DATA_GEN.nullRecipe(fullName)
                     .nullRecipe(fullName + "_from_waxed_copper_block");
             } else {
-                DATA_GEN.nullRecipe(fullName + "_from_" + name + "_block")
+                _DATA_GEN.nullRecipe(fullName + "_from_" + name + "_block")
                     .nullRecipe(fullName + "_from_nuggets")
                     .nullRecipe(name + "_nugget");
                 for (var method : VANILLA_METHODS) {
-                    DATA_GEN.nullRecipe(name + "_nugget_from_" + method);
+                    _DATA_GEN.nullRecipe(name + "_nugget_from_" + method);
                 }
             }
         } else {
-            DATA_GEN.nullRecipe(fullName);
+            _DATA_GEN.nullRecipe(fullName);
         }
 
         var ores = new ArrayList<>(List.of("", "_deepslate"));
@@ -515,10 +515,10 @@ public final class Materials {
 
         for (var method : VANILLA_METHODS) {
             for (var ore : ores) {
-                DATA_GEN.nullRecipe(fullName + "_from_" + method + ore + "_" + name + "_ore");
+                _DATA_GEN.nullRecipe(fullName + "_from_" + method + ore + "_" + name + "_ore");
             }
             if (suffix.equals("ingot")) {
-                DATA_GEN.nullRecipe(fullName + "_from_" + method + "_raw_" + name);
+                _DATA_GEN.nullRecipe(fullName + "_from_" + method + "_raw_" + name);
             }
         }
     }
@@ -528,7 +528,7 @@ public final class Materials {
     }
 
     private static void tags() {
-        DATA_GEN.tag(TOOL_HAMMER, TOOL)
+        _DATA_GEN.tag(TOOL_HAMMER, TOOL)
             .tag(TOOL_MORTAR, TOOL)
             .tag(TOOL_FILE, TOOL)
             .tag(TOOL_SAW, TOOL)
@@ -550,7 +550,7 @@ public final class Materials {
         var woodStripped = "stripped_" + wood;
 
         // saw plank
-        TOOL_CRAFTING.recipe(DATA_GEN, planks.loc)
+        TOOL_CRAFTING.recipe(_DATA_GEN, planks.loc)
             .result(planks, 4)
             .pattern("X")
             .define('X', logTag)
@@ -558,7 +558,7 @@ public final class Materials {
             .build();
 
         // disable wood and woodStripped recipes
-        DATA_GEN.nullRecipe(wood)
+        _DATA_GEN.nullRecipe(wood)
             .nullRecipe(woodStripped)
             // reduce vanilla recipe to 2 planks
             .replaceVanillaRecipe(() -> ShapelessRecipeBuilder

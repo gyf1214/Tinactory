@@ -70,7 +70,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.oreBlock;
@@ -160,7 +160,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             if (!material.hasItem(result) || !material.hasItem(input)) {
                 return;
             }
-            recipeType.recipe(DATA_GEN, material.loc(result))
+            recipeType.recipe(_DATA_GEN, material.loc(result))
                 .outputItem(1, material.entry(result), count)
                 .inputItem(0, material.tag(input), 1)
                 .voltage(voltage)
@@ -184,7 +184,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                 k = k1;
                 i = 1;
             }
-            var builder = ASSEMBLER.recipe(DATA_GEN, material.loc(sub))
+            var builder = ASSEMBLER.recipe(_DATA_GEN, material.loc(sub))
                 .outputItem(2, material.entry(sub), k)
                 .voltage(voltage)
                 .workTicks(ticks(workTicks));
@@ -213,7 +213,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             if (material.loc(sub).equals(material.loc(result))) {
                 return;
             }
-            MACERATOR.recipe(DATA_GEN, suffix(material.loc(result), "_from_" + sub))
+            MACERATOR.recipe(_DATA_GEN, suffix(material.loc(result), "_from_" + sub))
                 .outputItem(1, material.entry(result), amount)
                 .inputItem(0, material.tag(sub), 1)
                 .voltage(voltage)
@@ -258,7 +258,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             }
             var fluid = material.fluidEntry();
 
-            EXTRACTOR.recipe(DATA_GEN, suffix(fluid.loc, "_from_" + sub))
+            EXTRACTOR.recipe(_DATA_GEN, suffix(fluid.loc, "_from_" + sub))
                 .outputFluid(2, fluid, material.fluidAmount(amount))
                 .inputItem(0, material.tag(sub), 1)
                 .voltage(v)
@@ -266,7 +266,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                 .build();
 
             if (solidifier) {
-                FLUID_SOLIDIFIER.recipe(DATA_GEN, material.loc(sub))
+                FLUID_SOLIDIFIER.recipe(_DATA_GEN, material.loc(sub))
                     .outputItem(1, material.entry(sub), 1)
                     .inputFluid(0, fluid, material.fluidAmount(amount))
                     .voltage(v)
@@ -300,7 +300,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
 
         private void extrude(String target, int outCount, int inCount) {
             if (material.hasItem(target) && material.hasItem("ingot")) {
-                EXTRUDER.recipe(DATA_GEN, material.loc(target))
+                EXTRUDER.recipe(_DATA_GEN, material.loc(target))
                     .outputItem(1, material.entry(target), outCount)
                     .inputItem(0, material.tag("ingot"), inCount)
                     .voltage(Voltage.fromRank(voltage.rank + 1))
@@ -334,7 +334,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             process(LATHE, "lens", 1, "gem_exquisite", 600L);
 
             if (material.hasItem("bolt") && material.hasItem("stick")) {
-                CUTTER.recipe(DATA_GEN, material.loc("bolt"))
+                CUTTER.recipe(_DATA_GEN, material.loc("bolt"))
                     .outputItem(2, material.entry("bolt"), 4)
                     .inputItem(0, material.tag("stick"), 1)
                     .inputFluid(1, Fluids.WATER, 5)
@@ -344,7 +344,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             }
 
             if (material.hasItem("gem_flawless") && material.hasItem("gem")) {
-                CUTTER.recipe(DATA_GEN, material.loc("gem"))
+                CUTTER.recipe(_DATA_GEN, material.loc("gem"))
                     .outputItem(2, material.entry("gem"), 8)
                     .inputItem(0, material.tag("gem_flawless"), 1)
                     .inputFluid(1, Fluids.WATER, 80)

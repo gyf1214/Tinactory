@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -92,7 +92,7 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
         dataGen.trackLang(details);
 
         if (researchVoltage != null) {
-            RESEARCH_BENCH.recipe(DATA_GEN, loc)
+            RESEARCH_BENCH.recipe(_DATA_GEN, loc)
                 .target(loc)
                 .defaultInput(researchVoltage)
                 .build();

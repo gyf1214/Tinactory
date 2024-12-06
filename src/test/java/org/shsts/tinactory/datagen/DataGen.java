@@ -259,7 +259,7 @@ public final class DataGen implements IRecipeDataConsumer {
         }
     }
 
-    public static final DataGen DATA_GEN = new DataGen(Tinactory._REGISTRATE);
+    public static final DataGen _DATA_GEN = new DataGen(Tinactory._REGISTRATE);
 
     public static void init() {
         Models.init();

@@ -35,7 +35,7 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.prepend;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -254,7 +254,7 @@ public final class Models {
     }
 
     public static void init() {
-        DATA_GEN.blockModel(ctx -> ctx.provider
+        _DATA_GEN.blockModel(ctx -> ctx.provider
                 .withExistingParent("cube_tint", mcLoc("block/block"))
                 .element()
                 .from(0, 0, 0).to(16, 16, 16)

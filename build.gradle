@@ -72,6 +72,8 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             jvmArgs '-ea'
 
+            ideaModule project.name + ".test"
+
             mods {
                 tinydevices {
                     source sourceSets.main
