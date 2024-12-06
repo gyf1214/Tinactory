@@ -15,6 +15,7 @@ import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
@@ -220,13 +222,13 @@ public class MaterialSet {
             items.put(sub, entry);
         }
 
-        private void put(String sub, Supplier<RegistryEntry<? extends Item>> item) {
+        private void put(String sub, Supplier<IEntry<? extends Item>> item) {
             if (items.containsKey(sub)) {
                 items.get(sub);
                 return;
             }
             var entry = item.get();
-            put(sub, entry.loc, entry);
+            put(sub, entry.loc(), entry);
         }
 
         public Builder<P> existing(String sub, Item item) {
@@ -259,7 +261,7 @@ public class MaterialSet {
         }
 
         private void dummy(String sub) {
-            put(sub, () -> _REGISTRATE.item(newId(sub), Item::new)
+            put(sub, () -> REGISTRATE.item(newId(sub), Item::new)
                 .tint(color)
                 .register());
         }
@@ -365,14 +367,14 @@ public class MaterialSet {
         public Builder<P> ore(OreVariant variant) {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
-                var ore = _REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
+                var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
                     .material(variant.baseBlock.defaultBlockState().getMaterial())
                     .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance))
                     .translucent()
                     .tint(color)
                     .noBlockItem()
                     .register();
-                blocks.put("ore", new BlockEntry(ore.loc, ore));
+                blocks.put("ore", new BlockEntry(ore.loc(), ore));
             }
             return dummies("raw", "crushed", "crushed_centrifuged", "crushed_purified")
                 .dummies("dust_impure", "dust_pure").dust();
@@ -391,7 +393,7 @@ public class MaterialSet {
 
             private ToolBuilder item(String category, Function<Item.Properties, ToolItem> factory) {
                 var sub = "tool/" + category;
-                put(sub, () -> _REGISTRATE.item(newId(sub), factory)
+                put(sub, () -> REGISTRATE.item(newId(sub), factory)
                     .tint(0xFFFFFFFF, color)
                     .register());
                 return this;

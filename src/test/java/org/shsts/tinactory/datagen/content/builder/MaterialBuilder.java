@@ -26,7 +26,7 @@ import org.shsts.tinactory.datagen.builder.DataBuilder;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 import org.slf4j.Logger;
@@ -558,7 +558,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         }
 
         var entry = material.entry(sub);
-        if (entry instanceof RegistryEntry<?>) {
+        if (entry instanceof IEntry<? extends Item>) {
             // build item data for new item
             newItem(sub, tag, entry);
         } else {
