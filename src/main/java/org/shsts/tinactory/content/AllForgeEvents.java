@@ -25,6 +25,8 @@ import org.shsts.tinactory.core.tech.TinactorySavedData;
 
 import java.util.Random;
 
+import static org.shsts.tinactory.content.AllWorldGens.PLAYER_START_FEATURE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllForgeEvents {
@@ -54,7 +56,7 @@ public final class AllForgeEvents {
             if (!world.getBiome(spawn).is(AllWorldGens.VOID_BIOME)) {
                 return;
             }
-            AllWorldGens.PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
+            PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
                 world.getChunkSource().getGenerator(), new Random(), spawn);
             event.getSettings().setSpawn(spawn, 0f);
             event.setCanceled(true);

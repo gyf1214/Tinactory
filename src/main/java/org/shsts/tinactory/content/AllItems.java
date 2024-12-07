@@ -46,6 +46,7 @@ import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.electric.Circuits.circuit;
 import static org.shsts.tinactory.content.electric.Circuits.circuitComponent;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.registrate.AllRegistries.simpleFluid;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -90,7 +91,7 @@ public final class AllItems {
     public static final Map<String, RegistryEntry<Item>> CHIPS;
 
     public static final IEntry<Item> STICKY_RESIN;
-    public static final RegistryEntry<SimpleFluid> STEAM;
+    public static final IEntry<SimpleFluid> STEAM;
     public static final RegistryEntry<RubberLogBlock> RUBBER_LOG;
     public static final RegistryEntry<LeavesBlock> RUBBER_LEAVES;
     public static final RegistryEntry<SaplingBlock> RUBBER_SAPLING;
@@ -146,7 +147,7 @@ public final class AllItems {
             .renderType(() -> RenderType::cutout)
             .register();
 
-        STEAM = _REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
+        STEAM = simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
 
         ELECTRIC_MOTOR = component("electric_motor");
         ELECTRIC_PUMP = component("electric_pump");

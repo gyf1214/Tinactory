@@ -258,7 +258,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             }
             var fluid = material.fluidEntry();
 
-            EXTRACTOR.recipe(_DATA_GEN, suffix(fluid.loc, "_from_" + sub))
+            EXTRACTOR.recipe(_DATA_GEN, suffix(material.fluidLoc(), "_from_" + sub))
                 .outputFluid(2, fluid, material.fluidAmount(amount))
                 .inputItem(0, material.tag(sub), 1)
                 .voltage(v)
@@ -412,7 +412,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     private <U extends ProcessingRecipe, B extends ProcessingRecipe.BuilderBase<U, B>> void compose(
         Voltage v, RecipeTypeEntry<U, B> recipeType, int outputPort,
         boolean decompose, long workTicks, String output, Object... components) {
-        var loc = output.equals("fluid") ? material.fluidEntry().loc : material.loc(output);
+        var loc = output.equals("fluid") ? material.fluidLoc() : material.loc(output);
 
         var alloyCount = 0;
         var totalCount = 0;

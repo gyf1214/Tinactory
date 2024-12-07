@@ -14,7 +14,6 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.core.common.SimpleBuilder;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
@@ -24,10 +23,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.registrate.AllRegistries.simpleFluid;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -78,7 +77,7 @@ public class MaterialSet {
     @Nullable
     private final OreVariant oreVariant;
     @Nullable
-    private final RegistryEntry<? extends Fluid> fluid;
+    private final IEntry<? extends Fluid> fluid;
     public final int fluidBaseAmount;
 
     private MaterialSet(Builder<?> builder) {
@@ -159,7 +158,12 @@ public class MaterialSet {
         return fluid != null;
     }
 
-    public RegistryEntry<? extends Fluid> fluidEntry() {
+    public ResourceLocation fluidLoc() {
+        assert fluid != null;
+        return fluid.loc();
+    }
+
+    public Supplier<? extends Fluid> fluidEntry() {
         assert fluid != null;
         return fluid;
     }
@@ -181,7 +185,7 @@ public class MaterialSet {
         @Nullable
         private OreVariant oreVariant = null;
         @Nullable
-        private RegistryEntry<? extends Fluid> fluid = null;
+        private IEntry<? extends Fluid> fluid = null;
         private int fluidBaseAmount = 0;
 
         public Builder(P parent, String name) {
@@ -354,7 +358,7 @@ public class MaterialSet {
         }
 
         public Builder<P> fluid(String sub, int baseAmount) {
-            fluid = _REGISTRATE.simpleFluid("material/" + sub + "/" + name,
+            fluid = simpleFluid("material/" + sub + "/" + name,
                 gregtech("blocks/material_sets/dull/liquid"), color);
             fluidBaseAmount = baseAmount;
             return this;

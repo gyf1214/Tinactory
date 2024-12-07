@@ -105,32 +105,36 @@ public class Tinactory {
     }
 
     public void onConstruct() {
-        CORE = ITinyCoreLib.get();
-        REGISTRATE = CORE.registrate(ID);
+        try {
+            CORE = ITinyCoreLib.get();
+            REGISTRATE = CORE.registrate(ID);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
+            ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
 
-        AllRegistries.init();
+            AllRegistries.init();
 
-        AllRecipes.init();
-        AllCapabilities.init();
-        AllEvents.init();
-        AllNetworks.init();
+            AllRecipes.init();
+            AllCapabilities.init();
+            AllEvents.init();
+            AllNetworks.init();
 
-        AllMaterials.init();
-        AllItems.init();
-        AllBlockEntities.init();
-        AllMultiBlocks.init();
+            AllMaterials.init();
+            AllItems.init();
+            AllBlockEntities.init();
+            AllMultiBlocks.init();
 
-        TechManager.init();
-        AllWorldGens.init();
-        MenuSyncHandler.init();
-        MenuEventHandler.init();
+            TechManager.init();
+            AllWorldGens.init();
+            MenuSyncHandler.init();
+            MenuEventHandler.init();
 
-        REGISTRATE.register(modEventBus);
-        _REGISTRATE.register(modEventBus);
-        modEventBus.addListener(Tinactory::init);
-        MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);
+            REGISTRATE.register(modEventBus);
+            _REGISTRATE.register(modEventBus);
+            modEventBus.addListener(Tinactory::init);
+            MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);
+        } catch (Throwable e) {
+            LOGGER.error("Fatal error encountered during construct!", e);
+        }
     }
 
     public void onConstructClient() {
