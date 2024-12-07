@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class EntryBuilder<U, E, P, S extends EntryBuilder<U, E, P, S>> extends Builder<U, P, S> {
+public abstract class EntryBuilder<U, E, P, S extends EntryBuilder<U, E, P, S>> extends XBuilder<U, P, S> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Nullable

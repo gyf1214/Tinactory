@@ -7,10 +7,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.IForgeRegistry;
-import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>, P>
+public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends XBuilderBase<?, ?, B>, P>
     extends EntryBuilder<RecipeType<T>, RecipeTypeEntry<T, B>, P, RecipeTypeBuilder<T, B, P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 

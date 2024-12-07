@@ -13,12 +13,12 @@ import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class SmartRecipeSerializer<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
+public abstract class SmartRecipeSerializer<T extends SmartRecipe<?>, B extends XBuilderBase<?, ?, B>>
     extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T> {
     protected final RecipeTypeEntry<T, B> type;
 
     @FunctionalInterface
-    public interface Factory<T1 extends SmartRecipe<?>, B1 extends BuilderBase<?, ?, B1>> {
+    public interface Factory<T1 extends SmartRecipe<?>, B1 extends XBuilderBase<?, ?, B1>> {
         SmartRecipeSerializer<T1, B1> create(RecipeTypeEntry<T1, B1> type);
     }
 

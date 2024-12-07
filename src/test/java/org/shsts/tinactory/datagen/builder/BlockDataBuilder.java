@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import org.shsts.tinactory.core.common.BuilderBase;
+import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.datagen.context.RegistryDataContext;
 import org.shsts.tinactory.datagen.handler.LootTableHandler;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
@@ -43,7 +43,7 @@ public class BlockDataBuilder<U extends Block, P> extends
         return this;
     }
 
-    public <R, S extends BuilderBase<R, BlockDataBuilder<U, P>, S>> S blockState(
+    public <R, S extends XBuilderBase<R, BlockDataBuilder<U, P>, S>> S blockState(
         Function<BlockDataBuilder<U, P>, S> builderFactory,
         Function<R, Consumer<RegistryDataContext<Block, U, BlockStateProvider>>> consFunction) {
         var childBuilder = builderFactory.apply(this);

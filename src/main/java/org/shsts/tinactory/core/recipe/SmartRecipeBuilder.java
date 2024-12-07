@@ -3,18 +3,18 @@ package org.shsts.tinactory.core.recipe;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.SmartRecipe;
+import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class SmartRecipeBuilder<U extends SmartRecipe<?>, S extends SmartRecipeBuilder<U, S>>
-    extends BuilderBase<U, RecipeTypeEntry<U, S>, S> {
+    extends XBuilderBase<U, RecipeTypeEntry<U, S>, S> {
     public final ResourceLocation loc;
 
     @FunctionalInterface
-    public interface Factory<U1 extends SmartRecipe<?>, S1 extends BuilderBase<?, ?, S1>> {
+    public interface Factory<U1 extends SmartRecipe<?>, S1 extends XBuilderBase<?, ?, S1>> {
         S1 create(IRecipeDataConsumer consumer, RecipeTypeEntry<U1, S1> parent, ResourceLocation loc);
     }
 

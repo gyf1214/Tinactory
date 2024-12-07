@@ -6,10 +6,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.Registrate;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>>
+public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends XBuilderBase<?, ?, B>>
     extends RegistryEntry<RecipeType<T>> {
     private final SmartRecipeBuilder.Factory<T, B> builderFactory;
     @Nullable

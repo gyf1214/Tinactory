@@ -13,13 +13,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
+import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.registrate.builder.BlockBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
@@ -252,7 +252,7 @@ public class Registrate {
     }
 
     public <T extends SmartRecipe<?>,
-        B extends BuilderBase<?, ?, B>> RecipeTypeBuilder<T, B, Registrate> recipeType(
+        B extends XBuilderBase<?, ?, B>> RecipeTypeBuilder<T, B, Registrate> recipeType(
         String id, SmartRecipeSerializer.Factory<T, B> serializer) {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }

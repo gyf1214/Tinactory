@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
-import org.shsts.tinactory.core.common.BuilderBase;
+import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 
@@ -12,7 +12,7 @@ import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class DataBuilder<P, S extends DataBuilder<P, S>> extends BuilderBase<Unit, P, S> {
+public abstract class DataBuilder<P, S extends DataBuilder<P, S>> extends XBuilderBase<Unit, P, S> {
     public final ResourceLocation loc;
     protected final DataGen xDataGen;
     protected final IDataGen dataGen;

@@ -7,8 +7,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
-import org.shsts.tinactory.core.common.BuilderBase;
 import org.shsts.tinactory.core.common.SmartRecipe;
+import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -27,7 +27,7 @@ public class RecipeTypeHandler {
         this.recipeTypeRegister = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, registrate.modid);
     }
 
-    public <T extends SmartRecipe<?>, B extends BuilderBase<?, ?, B>> RecipeTypeEntry<T, B> register(
+    public <T extends SmartRecipe<?>, B extends XBuilderBase<?, ?, B>> RecipeTypeEntry<T, B> register(
         RecipeTypeBuilder<T, B, ?> builder) {
         builders.add(builder);
         var recipeType = recipeTypeRegister.register(builder.id, builder::buildObject);

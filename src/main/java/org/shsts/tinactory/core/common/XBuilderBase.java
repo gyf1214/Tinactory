@@ -9,12 +9,12 @@ import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class BuilderBase<U, P, S extends BuilderBase<U, P, S>> implements ISelf<S> {
+public abstract class XBuilderBase<U, P, S extends XBuilderBase<U, P, S>> implements ISelf<S> {
     protected final P parent;
     protected final List<Consumer<U>> onCreateObject = new ArrayList<>();
     protected final List<Runnable> onBuild = new ArrayList<>();
 
-    protected BuilderBase(P parent) {
+    protected XBuilderBase(P parent) {
         this.parent = parent;
     }
 

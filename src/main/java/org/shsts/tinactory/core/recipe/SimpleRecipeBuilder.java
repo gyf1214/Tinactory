@@ -4,12 +4,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.common.BuilderBase;
+import org.shsts.tinactory.core.common.XBuilderBase;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class SimpleRecipeBuilder<P, S extends SimpleRecipeBuilder<P, S>>
-    extends BuilderBase<FinishedRecipe, P, S> {
+    extends XBuilderBase<FinishedRecipe, P, S> {
     public final ResourceLocation loc;
 
     public SimpleRecipeBuilder(IRecipeDataConsumer consumer, P parent, ResourceLocation loc) {
