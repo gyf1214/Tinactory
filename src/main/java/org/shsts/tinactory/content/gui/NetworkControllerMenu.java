@@ -9,25 +9,29 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
+import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.network.NetworkController;
+
+import static org.shsts.tinactory.content.AllCapabilities.NETWORK_CONTROLLER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class NetworkControllerMenu extends Menu<NetworkController, NetworkControllerMenu> {
+public class NetworkControllerMenu extends Menu<SmartBlockEntity, NetworkControllerMenu> {
     private final int syncSlot;
 
-    public NetworkControllerMenu(SmartMenuType<NetworkController, ?> type, int id,
-        Inventory inventory, NetworkController blockEntity) {
+    public NetworkControllerMenu(SmartMenuType<SmartBlockEntity, ?> type, int id,
+        Inventory inventory, SmartBlockEntity blockEntity) {
         super(type, id, inventory, blockEntity);
         this.syncSlot = addSyncSlot(NetworkControllerSyncPacket::new);
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return blockEntity.canPlayerInteract(player) && super.stillValid(player);
+        return NETWORK_CONTROLLER.tryGet(blockEntity)
+            .map($ -> $.canPlayerInteract(player)).orElse(false) &&
+            super.stillValid(player);
     }
 
     @OnlyIn(Dist.CLIENT)

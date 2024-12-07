@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
@@ -16,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -48,9 +51,11 @@ public class LogisticWorkerSyncPacket extends MenuSyncPacket {
         this.visiblePorts = new ArrayList<>();
     }
 
-    public LogisticWorkerSyncPacket(int containerId, int index, LogisticWorker be) {
+    public LogisticWorkerSyncPacket(int containerId, int index, BlockEntity be) {
         super(containerId, index);
-        this.visiblePorts = be.getVisiblePorts();
+        this.visiblePorts = LOGISTIC_WORKER.tryGet(be)
+            .map(LogisticWorker::getVisiblePorts)
+            .orElseGet(List::of);
     }
 
     public Collection<PortInfo> getPorts() {

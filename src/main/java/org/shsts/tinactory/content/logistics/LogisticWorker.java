@@ -7,8 +7,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.TinactoryConfig;
@@ -24,25 +23,32 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.common.IEventSubscriber;
+import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
-import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
+import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorker extends SmartBlockEntity {
+public class LogisticWorker extends CapabilityProvider
+    implements IEventSubscriber {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final String ID = "network/logistic_worker";
 
+    private final BlockEntity blockEntity;
     private final Voltage voltage;
     public final int workerSlots;
     private final int workerInterval;
@@ -53,10 +59,9 @@ public class LogisticWorker extends SmartBlockEntity {
 
     private final LazyOptional<IElectricMachine> electricCap;
 
-    public LogisticWorker(BlockEntityType<LogisticWorker> type, BlockPos pos, BlockState state,
-        Voltage voltage) {
-        super(type, pos, state);
-        this.voltage = voltage;
+    public LogisticWorker(BlockEntity blockEntity) {
+        this.blockEntity = blockEntity;
+        this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
         var idx = voltage.rank - 1;
         this.workerSlots = TinactoryConfig.INSTANCE.workerSize.get().get(idx);
         this.workerInterval = TinactoryConfig.INSTANCE.workerDelay.get().get(idx);
@@ -65,6 +70,10 @@ public class LogisticWorker extends SmartBlockEntity {
 
         var electric = new Electric();
         this.electricCap = LazyOptional.of(() -> electric);
+    }
+
+    public static <P> CapabilityProviderBuilder<BlockEntity, P> factory(P parent) {
+        return CapabilityProviderBuilder.fromFactory(parent, ID, LogisticWorker::new);
     }
 
     private class Electric implements IElectricMachine {
@@ -89,21 +98,17 @@ public class LogisticWorker extends SmartBlockEntity {
         }
     }
 
-    public static BlockEntityTypeBuilder.Factory<LogisticWorker> factory(Voltage v) {
-        return (type, pos, state) -> new LogisticWorker(type, pos, state, v);
-    }
-
     public Optional<Network> getNetwork() {
-        return AllCapabilities.MACHINE.tryGet(this)
+        return AllCapabilities.MACHINE.tryGet(blockEntity)
             .flatMap(Machine::getNetwork);
     }
 
     public List<LogisticWorkerSyncPacket.PortInfo> getVisiblePorts() {
         var ret = new ArrayList<LogisticWorkerSyncPacket.PortInfo>();
-        var machine = AllCapabilities.MACHINE.get(this);
+        var machine = AllCapabilities.MACHINE.get(blockEntity);
         machine.getNetwork().ifPresent(network -> {
             var logistics = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
-            var subnet = network.getSubnet(worldPosition);
+            var subnet = network.getSubnet(blockEntity.getBlockPos());
             for (var info : logistics.getVisiblePorts(subnet)) {
                 var machine1 = info.machine();
                 var index = info.portIndex();
@@ -117,7 +122,7 @@ public class LogisticWorker extends SmartBlockEntity {
     }
 
     private Optional<LogisticWorkerConfig> getConfig(int index) {
-        var machine = AllCapabilities.MACHINE.get(this);
+        var machine = AllCapabilities.MACHINE.get(blockEntity);
         return machine.config.getCompound(PREFIX + index)
             .map(LogisticWorkerConfig::fromTag);
     }
@@ -145,17 +150,17 @@ public class LogisticWorker extends SmartBlockEntity {
     }
 
     private void validateConfigs() {
-        if (level == null || level.isClientSide) {
+        var world = blockEntity.getLevel();
+        if (world == null || world.isClientSide) {
             return;
         }
-
-        var machine = AllCapabilities.MACHINE.get(this);
+        var machine = AllCapabilities.MACHINE.get(blockEntity);
         var network = machine.getNetwork();
         if (network.isEmpty()) {
             return;
         }
         var logistic = network.get().getComponent(AllNetworks.LOGISTIC_COMPONENT);
-        var subnet = network.get().getSubnet(worldPosition);
+        var subnet = network.get().getSubnet(blockEntity.getBlockPos());
 
         var packet = SetMachineConfigPacket.builder();
         for (var i = 0; i < workerSlots; i++) {
@@ -212,9 +217,9 @@ public class LogisticWorker extends SmartBlockEntity {
             return;
         }
         getConfig(currentSlot).filter(LogisticWorkerConfig::isValid).ifPresent(entry -> {
-            var machine = AllCapabilities.MACHINE.get(this);
+            var machine = AllCapabilities.MACHINE.get(blockEntity);
             var logistic = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
-            var subnet = network.getSubnet(worldPosition);
+            var subnet = network.getSubnet(blockEntity.getBlockPos());
 
             if (validateConfig(logistic, subnet, entry)) {
                 var from = entry.from().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
@@ -249,9 +254,11 @@ public class LogisticWorker extends SmartBlockEntity {
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
+        if (cap == LOGISTIC_WORKER.get()) {
+            return myself().cast();
+        } else if (cap == ELECTRIC_MACHINE.get()) {
             return electricCap.cast();
         }
-        return super.getCapability(cap, side);
+        return LazyOptional.empty();
     }
 }

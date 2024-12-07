@@ -42,6 +42,8 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
 @MethodsReturnNonnullByDefault
@@ -207,7 +209,7 @@ public class Machine extends UpdatableCapabilityProvider
     }
 
     public Optional<IProcessor> getProcessor() {
-        return AllCapabilities.PROCESSOR.tryGet(blockEntity);
+        return PROCESSOR.tryGet(blockEntity);
     }
 
     public Optional<IContainer> getContainer() {
@@ -233,7 +235,7 @@ public class Machine extends UpdatableCapabilityProvider
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.MACHINE.get()) {
+        if (cap == MACHINE.get()) {
             return myself();
         }
         return LazyOptional.empty();
@@ -271,9 +273,8 @@ public class Machine extends UpdatableCapabilityProvider
     }
 
     public static Optional<IProcessor> getProcessor(BlockEntity be) {
-        if (be instanceof PrimitiveMachine) {
-            return AllCapabilities.PROCESSOR.tryGet(be);
-        }
-        return AllCapabilities.MACHINE.tryGet(be).flatMap(Machine::getProcessor);
+        var machine = MACHINE.tryGet(be);
+        return machine.map(Machine::getProcessor)
+            .orElseGet(() -> PROCESSOR.tryGet(be));
     }
 }

@@ -86,11 +86,11 @@ public final class AllBlockEntities {
     public static final MachineSet LOGISTIC_WORKER;
     public static final Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> MULTI_BLOCK_INTERFACE;
 
-    public static final RegistryEntry<MachineBlock<NetworkController>> NETWORK_CONTROLLER;
+    public static final RegistryEntry<MachineBlock<SmartBlockEntity>> NETWORK_CONTROLLER;
     public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
-    public static final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> PRIMITIVE_STONE_GENERATOR;
-    public static final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> PRIMITIVE_ORE_ANALYZER;
-    public static final RegistryEntry<PrimitiveBlock<PrimitiveMachine>> PRIMITIVE_ORE_WASHER;
+    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> PRIMITIVE_STONE_GENERATOR;
+    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> PRIMITIVE_ORE_ANALYZER;
+    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> PRIMITIVE_ORE_WASHER;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
     public static final RegistryEntry<MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
 
@@ -434,19 +434,20 @@ public final class AllBlockEntities {
 
         LOGISTIC_WORKER = set.machine()
             .voltages(Voltage.ULV)
-            .machine(v -> "network/" + v.id + "/logistic_worker", LogisticWorker.class,
-                LogisticWorker::factory, MachineBlock::factory)
+            .machine(v -> "network/" + v.id + "/logistic_worker", MachineBlock::factory)
+            .capability(LogisticWorker::factory)
             .menu(LogisticWorkerMenu::new)
             .machine(v -> $ -> $.blockEntity().menu().noInventory().build().build())
             .tintVoltage(2)
             .buildObject();
 
         NETWORK_CONTROLLER = _REGISTRATE.blockEntity("network/controller",
-                NetworkController::new,
+                SmartBlockEntity::new,
                 MachineBlock.factory(Voltage.PRIMITIVE))
-            .entityClass(NetworkController.class)
+            .entityClass(SmartBlockEntity.class)
             .blockEntity()
             .eventManager().ticking()
+            .simpleCapability(NetworkController::factory)
             .menu(NetworkControllerMenu::new)
             .noInventory()
             .title("networkController")
@@ -494,15 +495,16 @@ public final class AllBlockEntities {
         }
     }
 
-    private static RegistryEntry<PrimitiveBlock<PrimitiveMachine>> primitive(ProcessingSet set) {
+    private static RegistryEntry<PrimitiveBlock<SmartBlockEntity>> primitive(ProcessingSet set) {
         var recipeType = set.recipeType;
         var id = "primitive/" + recipeType.id;
         var layout = set.layout(Voltage.PRIMITIVE);
-        return _REGISTRATE.blockEntity(id, PrimitiveMachine::new,
-                PrimitiveBlock<PrimitiveMachine>::new)
-            .entityClass(PrimitiveMachine.class)
+        return _REGISTRATE.blockEntity(id, SmartBlockEntity::new,
+                PrimitiveBlock<SmartBlockEntity>::new)
+            .entityClass(SmartBlockEntity.class)
             .blockEntity()
             .eventManager().ticking()
+            .simpleCapability(PrimitiveMachine::builder)
             .simpleCapability(RecipeProcessor.machine(recipeType))
             .simpleCapability(StackProcessingContainer.builder(layout))
             .menu(ProcessingMenu.machine(layout, recipeType))

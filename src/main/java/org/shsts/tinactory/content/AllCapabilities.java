@@ -5,12 +5,14 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.machine.IWorkbench;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.UpdateHelper;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
+import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinycorelib.api.registrate.entry.ICapability;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -26,6 +28,8 @@ public final class AllCapabilities {
     public static final ICapability<IItemHandlerModifiable> MENU_ITEM_HANDLER;
 
     public static final ICapability<Machine> MACHINE;
+    public static final ICapability<NetworkController> NETWORK_CONTROLLER;
+    public static final ICapability<LogisticWorker> LOGISTIC_WORKER;
     public static final ICapability<MultiBlock> MULTI_BLOCK;
 
     static {
@@ -39,6 +43,8 @@ public final class AllCapabilities {
         MENU_ITEM_HANDLER = REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
 
         MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
+        NETWORK_CONTROLLER = REGISTRATE.capability(NetworkController.class, new CapabilityToken<>() {});
+        LOGISTIC_WORKER = REGISTRATE.capability(LogisticWorker.class, new CapabilityToken<>() {});
         MULTI_BLOCK = REGISTRATE.capability(MultiBlock.class, new CapabilityToken<>() {});
     }
 

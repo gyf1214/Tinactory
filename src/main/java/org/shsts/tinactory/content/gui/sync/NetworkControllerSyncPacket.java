@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
@@ -10,6 +11,8 @@ import org.shsts.tinactory.core.network.NetworkBase;
 import org.shsts.tinactory.core.network.NetworkController;
 
 import java.util.Objects;
+
+import static org.shsts.tinactory.content.AllCapabilities.NETWORK_CONTROLLER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -20,13 +23,15 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
 
     public NetworkControllerSyncPacket() {}
 
-    public NetworkControllerSyncPacket(int containerId, int index, NetworkController be) {
+    public NetworkControllerSyncPacket(int containerId, int index, BlockEntity be) {
         super(containerId, index);
-        this.present = be.getNetwork().isPresent();
+        var network = NETWORK_CONTROLLER.tryGet(be)
+            .flatMap(NetworkController::getNetwork);
+        this.present = network.isPresent();
         if (present) {
-            var network = be.getNetwork().get();
-            this.state = network.getState();
-            this.electricMetrics = network.getComponent(AllNetworks.ELECTRIC_COMPONENT)
+            this.state = network.get().getState();
+            this.electricMetrics = network.get()
+                .getComponent(AllNetworks.ELECTRIC_COMPONENT)
                 .getMetrics();
         }
     }
