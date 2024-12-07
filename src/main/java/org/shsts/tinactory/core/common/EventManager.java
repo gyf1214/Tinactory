@@ -12,11 +12,11 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.content.AllCapabilities;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -60,18 +60,18 @@ public class EventManager extends CapabilityProvider {
     }
 
     public static <A> void invoke(BlockEntity be, Supplier<Event<A>> event, A arg) {
-        AllCapabilities.EVENT_MANAGER.tryGet(be)
+        EVENT_MANAGER.tryGet(be)
             .ifPresent(eventManager -> eventManager.invoke(event.get(), arg));
     }
 
     public static void invoke(BlockEntity be, Supplier<Event<Unit>> event) {
-        AllCapabilities.EVENT_MANAGER.tryGet(be)
+        EVENT_MANAGER.tryGet(be)
             .ifPresent(eventManager -> eventManager.invoke(event.get()));
     }
 
     public static <A, R> R invokeReturn(BlockEntity be, Supplier<ReturnEvent<A, R>> event, A arg) {
         var e = event.get();
-        return AllCapabilities.EVENT_MANAGER.tryGet(be)
+        return EVENT_MANAGER.tryGet(be)
             .map(eventManager -> eventManager.invoke(e, arg))
             .orElse(e.getDefaultReturn());
     }
@@ -79,7 +79,7 @@ public class EventManager extends CapabilityProvider {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.EVENT_MANAGER.get()) {
+        if (cap == EVENT_MANAGER.get()) {
             return myself();
         }
         return LazyOptional.empty();

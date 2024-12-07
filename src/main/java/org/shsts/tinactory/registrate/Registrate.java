@@ -8,7 +8,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -30,10 +29,8 @@ import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
-import org.shsts.tinactory.registrate.common.CapabilityEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
-import org.shsts.tinactory.registrate.handler.CapabilityHandler;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RecipeTypeHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
@@ -66,7 +63,6 @@ public class Registrate {
     public final RegistryEntryHandler<MenuType<?>> menuTypeHandler;
 
     // Others
-    public final CapabilityHandler capabilityHandler;
     public final RecipeTypeHandler recipeTypeHandler;
 
     // Client
@@ -85,7 +81,6 @@ public class Registrate {
         this.itemHandler = forgeHandler(ForgeRegistries.ITEMS);
         this.blockEntityHandler = forgeHandler(ForgeRegistries.BLOCK_ENTITIES);
         this.menuTypeHandler = forgeHandler(ForgeRegistries.CONTAINERS);
-        this.capabilityHandler = new CapabilityHandler(this);
 
         this.recipeTypeHandler = new RecipeTypeHandler(this);
 
@@ -115,7 +110,6 @@ public class Registrate {
         for (var handler : registryEntryHandlers.values()) {
             handler.addListener(modEventBus);
         }
-        modEventBus.addListener(capabilityHandler::onRegisterEvent);
         recipeTypeHandler.addListeners(modEventBus);
     }
 
@@ -243,10 +237,6 @@ public class Registrate {
     public <T extends IForgeRegistryEntry<T>, U extends T> RegistryEntry<U> registryEntry(
         String id, SmartRegistry<T> registry, Supplier<U> factory) {
         return (new SimpleRegistryEntryBuilder<>(registry.getHandler(), id, factory)).register();
-    }
-
-    public <T> CapabilityEntry<T> capability(Class<T> clazz, CapabilityToken<T> token) {
-        return capabilityHandler.register(clazz, token);
     }
 
     public SchedulingBuilder<Registrate> scheduling(String id) {

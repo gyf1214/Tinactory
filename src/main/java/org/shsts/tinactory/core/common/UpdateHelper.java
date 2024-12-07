@@ -12,13 +12,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.content.AllCapabilities;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.shsts.tinactory.content.AllCapabilities.UPDATE_HELPER;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -77,7 +77,7 @@ public class UpdateHelper extends CapabilityProvider {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.UPDATE_HELPER.get()) {
+        if (cap == UPDATE_HELPER.get()) {
             return myself();
         }
         return LazyOptional.empty();

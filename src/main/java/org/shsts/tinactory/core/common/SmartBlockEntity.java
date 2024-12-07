@@ -25,6 +25,8 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.AllCapabilities.UPDATE_HELPER;
+
 /**
  * workaround to <a href="https://github.com/MinecraftForge/MinecraftForge/issues/8302">MinecraftForge#8302</a>
  */
@@ -107,7 +109,7 @@ public class SmartBlockEntity extends BlockEntity implements IEventSubscriber {
 
     private UpdateHelper getUpdateHelper() {
         if (updateHelper == null) {
-            updateHelper = AllCapabilities.UPDATE_HELPER.get(this);
+            updateHelper = UPDATE_HELPER.get(this);
         }
         return updateHelper;
     }
