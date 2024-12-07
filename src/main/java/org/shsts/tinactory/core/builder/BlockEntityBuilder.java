@@ -1,4 +1,4 @@
-package org.shsts.tinactory.registrate.builder;
+package org.shsts.tinactory.core.builder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -8,6 +8,8 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.ValueHolder;
+import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
+import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import java.util.function.Supplier;

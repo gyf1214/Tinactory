@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.network;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.network.IScheduling;
-import org.shsts.tinactory.core.common.Builder;
+import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 

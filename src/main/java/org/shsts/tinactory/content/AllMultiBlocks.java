@@ -7,11 +7,11 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
+import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
-import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 
 import java.util.HashSet;
