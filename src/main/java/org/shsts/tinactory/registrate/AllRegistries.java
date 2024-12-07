@@ -23,16 +23,16 @@ import static org.shsts.tinactory.Tinactory._REGISTRATE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllRegistries {
-    public static final SmartRegistry<IScheduling> SCHEDULING_REGISTRY;
     public static final SmartRegistry<Event<?>> EVENT;
 
+    public static final IRegistry<IScheduling> SCHEDULINGS;
     public static final IRegistry<ComponentType<?>> COMPONENT_TYPES;
     public static final IEntryHandler<Fluid> FLUIDS;
     public static final IEntryHandler<Feature<?>> FEATURES;
     public static final IEntryHandler<ForgeWorldPreset> WORLD_TYPES;
 
     static {
-        SCHEDULING_REGISTRY = _REGISTRATE.registry("scheduling", IScheduling.class)
+        SCHEDULINGS = REGISTRATE.registry("scheduling", IScheduling.class)
             .onBake(SchedulingManager::onBake)
             .register();
         EVENT = _REGISTRATE.simpleRegistry("event", Event.class);

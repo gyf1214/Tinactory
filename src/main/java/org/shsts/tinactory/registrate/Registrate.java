@@ -28,7 +28,6 @@ import org.shsts.tinactory.registrate.builder.ItemBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
-import org.shsts.tinactory.registrate.builder.SchedulingBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
 import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
@@ -213,12 +212,6 @@ public class Registrate {
         return (new RegistryBuilderWrapper<>(this, id, (Class<T>) clazz, this)).register();
     }
 
-    public <T extends IForgeRegistryEntry<T>, B extends RegistryEntryBuilder<T, ?, Registrate, B>> B registryEntry(
-        String id, SmartRegistry<T> registry,
-        RegistryEntryBuilder.BuilderFactory<T, Registrate, B> builderFactory) {
-        return builderFactory.create(this, registry.getHandler(), id, this);
-    }
-
     private class SimpleRegistryEntryBuilder<T extends IForgeRegistryEntry<T>, U extends T>
         extends RegistryEntryBuilder<T, U, Registrate, SimpleRegistryEntryBuilder<T, U>> {
         private final Supplier<U> factory;
@@ -237,10 +230,6 @@ public class Registrate {
     public <T extends IForgeRegistryEntry<T>, U extends T> RegistryEntry<U> registryEntry(
         String id, SmartRegistry<T> registry, Supplier<U> factory) {
         return (new SimpleRegistryEntryBuilder<>(registry.getHandler(), id, factory)).register();
-    }
-
-    public SchedulingBuilder<Registrate> scheduling(String id) {
-        return registryEntry(id, AllRegistries.SCHEDULING_REGISTRY, SchedulingBuilder<Registrate>::new);
     }
 
     public <A> RegistryEntry<Event<A>> event(String id) {
