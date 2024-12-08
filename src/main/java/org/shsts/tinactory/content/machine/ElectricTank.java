@@ -35,7 +35,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     private final LazyOptional<IFluidStackHandler> fluidHandlerCap;
 
     public ElectricTank(BlockEntity blockEntity, Layout layout) {
-        super(blockEntity);
+        super(blockEntity, layout);
         this.size = layout.slots.size();
         var capacity = TinactoryConfig.INSTANCE.tankSize.get();
         this.innerTanks = new WrapperFluidTank[size];

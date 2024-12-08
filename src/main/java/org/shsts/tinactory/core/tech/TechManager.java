@@ -152,7 +152,7 @@ public class TechManager implements ITechManager {
 
         private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
             var p = team.fullUpdatePacket();
-            Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
+            Tinactory._CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
         }
 
         @Override
@@ -184,7 +184,7 @@ public class TechManager implements ITechManager {
 
         public void onPlayerJoin(ServerPlayer player) {
             var p = new TechInitPacket(technologies.values());
-            Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
+            Tinactory._CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
             teamByPlayer(player).ifPresent(profile -> sendFullUpdatePacket(player, profile));
         }
     }

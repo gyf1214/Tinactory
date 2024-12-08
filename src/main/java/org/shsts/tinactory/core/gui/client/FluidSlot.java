@@ -11,7 +11,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
-import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
+import org.shsts.tinactory.core.gui.sync.SlotEventPacket1;
 import org.shsts.tinactory.core.util.ClientUtil;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class FluidSlot extends MenuWidget {
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
         menu.triggerEvent(MenuEventHandler.FLUID_SLOT_CLICK, (containerId, eventId) ->
-            new SlotEventPacket(containerId, eventId, tank, button));
+            new SlotEventPacket1(containerId, eventId, tank, button));
     }
 
     @Override

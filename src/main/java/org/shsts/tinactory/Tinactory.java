@@ -38,12 +38,15 @@ import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.AllRegistries;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
+import org.shsts.tinycorelib.api.network.IChannel;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.slf4j.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -55,15 +58,15 @@ public class Tinactory {
 
     private static final String CHANNEL_VERSION = "1";
     private static final AtomicInteger MSG_ID = new AtomicInteger(0);
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-        new ResourceLocation(ID, "channel"),
+    public static final SimpleChannel _CHANNEL = NetworkRegistry.newSimpleChannel(
+        new ResourceLocation(ID, "channel1"),
         () -> CHANNEL_VERSION,
         CHANNEL_VERSION::equals,
         CHANNEL_VERSION::equals);
 
     public static <T extends IPacket> void registryPacket(Class<T> clazz, Supplier<T> constructor,
         BiConsumer<T, NetworkEvent.Context> handler) {
-        CHANNEL.registerMessage(MSG_ID.getAndIncrement(), clazz, IPacket::serializeToBuf,
+        _CHANNEL.registerMessage(MSG_ID.getAndIncrement(), clazz, IPacket::serializeToBuf,
             (buf) -> {
                 var p = constructor.get();
                 p.deserializeFromBuf(buf);
@@ -82,15 +85,16 @@ public class Tinactory {
     }
 
     public static <P extends IPacket> void sendToServer(P packet) {
-        CHANNEL.sendToServer(packet);
+        _CHANNEL.sendToServer(packet);
     }
 
     public static <P extends IPacket> void sendToPlayer(ServerPlayer player, P packet) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+        _CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 
     public static ITinyCoreLib CORE;
     public static IRegistrate REGISTRATE;
+    public static IChannel CHANNEL;
 
     private final IEventBus modEventBus;
 
@@ -108,6 +112,7 @@ public class Tinactory {
         try {
             CORE = ITinyCoreLib.get();
             REGISTRATE = CORE.registrate(ID);
+            CHANNEL = CORE.createChannel(modLoc("channel"), "1");
 
             ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
 

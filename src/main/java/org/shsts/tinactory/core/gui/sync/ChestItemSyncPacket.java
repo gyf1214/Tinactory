@@ -6,28 +6,27 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ChestItemSyncPacket extends MenuSyncPacket {
+public class ChestItemSyncPacket implements IPacket {
     private ItemStack stack;
     @Nullable
     private ItemStack filter;
 
     public ChestItemSyncPacket() {}
 
-    public ChestItemSyncPacket(int containerId, int index, ItemStack stack, @Nullable ItemStack filter) {
-        super(containerId, index);
+    public ChestItemSyncPacket(ItemStack stack, @Nullable ItemStack filter) {
         this.stack = stack;
         this.filter = filter;
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        super.serializeToBuf(buf);
         StackHelper.serializeStackToBuf(stack, buf);
         buf.writeBoolean(filter != null);
         if (filter != null) {
@@ -37,7 +36,6 @@ public class ChestItemSyncPacket extends MenuSyncPacket {
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        super.deserializeFromBuf(buf);
         stack = StackHelper.deserializeStackFromBuf(buf);
         var hasFilter = buf.readBoolean();
         filter = hasFilter ? buf.readItem() : null;

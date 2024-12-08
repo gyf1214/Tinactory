@@ -32,11 +32,12 @@ import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M> implements IWidgetConsumer {
+public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
+    implements IMenuScreen, IWidgetConsumer {
     private static final Texture BACKGROUND = new Texture(gregtech("gui/base/background"), WIDTH, 166);
 
     protected final Panel rootPanel;
-    protected final List<GuiComponent> hoverables = new ArrayList<>();
+    protected final List<Widget> hoverables = new ArrayList<>();
 
     public MenuScreen(M menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -59,7 +60,8 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         rootPanel.addGuiComponent(anchor, offset, widget);
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidgetToScreen(
+    @Override
+    public <T extends GuiEventListener & Widget & NarratableEntry> void addWidgetToScreen(
         T widget) {
         addRenderableWidget(widget);
         hoverables.add(widget);
@@ -109,7 +111,7 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         font.draw(poseStack, title, (float) titleLabelX, (float) titleLabelY, RenderUtil.TEXT_COLOR);
     }
 
-    public Optional<GuiComponent> getHovered(int mouseX, int mouseY) {
+    public Optional<Widget> getHovered(int mouseX, int mouseY) {
         for (var hoverable : hoverables) {
             if (hoverable instanceof MenuWidget widget && widget.isHovering(mouseX, mouseY)) {
                 return Optional.of(hoverable);

@@ -83,7 +83,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     public ElectricChest(BlockEntity blockEntity, Layout layout) {
-        super(blockEntity);
+        super(blockEntity, layout);
         this.size = layout.slots.size() / 2;
         this.capacity = TinactoryConfig.INSTANCE.chestSize.get();
 

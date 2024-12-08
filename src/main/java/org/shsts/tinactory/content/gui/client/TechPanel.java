@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -355,14 +355,14 @@ public class TechPanel extends Panel {
         refresh();
     }
 
-    public static boolean isHoveringTech(GuiComponent component) {
+    public static boolean isHoveringTech(Widget component) {
         return component instanceof TechButton ||
             component instanceof RequiredTechButtons ||
             (component instanceof ButtonPanel.ItemButton itemButton &&
                 itemButton.getParent() instanceof TechButtonPanel);
     }
 
-    public static Optional<ITechnology> getHoveredTech(GuiComponent component, double mouseX) {
+    public static Optional<ITechnology> getHoveredTech(Widget component, double mouseX) {
         if (component instanceof TechButton button) {
             return Optional.ofNullable(button.technology);
         } else if (component instanceof RequiredTechButtons buttons) {

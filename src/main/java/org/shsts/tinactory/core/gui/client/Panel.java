@@ -50,7 +50,7 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
             }
         }
 
-        public void addToScreen(MenuScreen<?> screen) {
+        public void addToScreen(IMenuScreen screen) {
             if (child instanceof MenuWidget widget) {
                 screen.addWidgetToScreen(widget);
             } else if (child instanceof AbstractWidget widget) {
@@ -69,11 +69,19 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
 
     protected final Menu<?, ?> menu;
     protected final MenuScreen<?> screen;
+    protected final IMenuScreen screen1;
     protected final List<Child> children = new ArrayList<>();
     protected boolean active = true;
 
+    public Panel(MenuScreen1 screen) {
+        this.screen = null;
+        this.screen1 = screen;
+        this.menu = null;
+    }
+
     public Panel(MenuScreen<?> screen) {
         this.screen = screen;
+        this.screen1 = screen;
         this.menu = screen.getMenu();
     }
 

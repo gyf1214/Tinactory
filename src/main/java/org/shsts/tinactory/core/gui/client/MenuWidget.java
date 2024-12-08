@@ -14,6 +14,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,11 +25,19 @@ import java.util.Optional;
 public abstract class MenuWidget extends GuiComponent implements
     Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
 
+    protected final IMenu iMenu;
     protected final Menu<?, ?> menu;
     protected Rect rect;
     protected boolean active = true;
 
+    public MenuWidget(IMenu menu) {
+        this.iMenu = menu;
+        this.menu = null;
+        this.setBlitOffset(0);
+    }
+
     public MenuWidget(Menu<?, ?> menu) {
+        this.iMenu = null;
         this.menu = menu;
         this.setBlitOffset(0);
     }

@@ -15,18 +15,21 @@ import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.network.Network;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class ElectricStorage extends CapabilityProvider implements IEventSubscriber, IProcessor {
     protected final BlockEntity blockEntity;
+    public final Layout layout;
 
     protected MachineConfig machineConfig;
     protected Machine machine;
 
-    public ElectricStorage(BlockEntity blockEntity) {
+    public ElectricStorage(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
+        this.layout = layout;
     }
 
     public boolean isUnlocked() {

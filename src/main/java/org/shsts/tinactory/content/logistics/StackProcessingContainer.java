@@ -8,7 +8,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -47,6 +46,7 @@ public class StackProcessingContainer extends CapabilityProvider
     }
 
     private final BlockEntity blockEntity;
+    private final Layout layout;
     private final WrapperItemHandler internalItems;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports;
@@ -55,8 +55,10 @@ public class StackProcessingContainer extends CapabilityProvider
     private final LazyOptional<?> menuItemHandlerCap;
     private final LazyOptional<?> fluidHandlerCap;
 
-    private StackProcessingContainer(BlockEntity blockEntity, List<Layout.PortInfo> portInfo) {
+    private StackProcessingContainer(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
+        this.layout = layout;
+        var portInfo = layout.ports;
         this.ports = new ArrayList<>(portInfo.size());
 
         var itemSlots = 0;
@@ -207,31 +209,8 @@ public class StackProcessingContainer extends CapabilityProvider
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
     }
 
-    public static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
-        private final List<Layout.PortInfo> ports = new ArrayList<>();
-
-        public Builder(P parent) {
-            super(parent, "logistics/stack_container");
-        }
-
-        public Builder<P> layout(Layout layout) {
-            ports.clear();
-            ports.addAll(layout.ports);
-            return this;
-        }
-
-        @Override
-        protected Function<BlockEntity, ICapabilityProvider> createObject() {
-            var ports = this.ports;
-            return be -> new StackProcessingContainer(be, ports);
-        }
-    }
-
-    public static <P> Builder<P> builder(P parent) {
-        return new Builder<>(parent);
-    }
-
     public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Layout layout) {
-        return p -> builder(p).layout(layout);
+        return CapabilityProviderBuilder.fromFactory("logistics/stack_container",
+            be -> new StackProcessingContainer(be, layout));
     }
 }

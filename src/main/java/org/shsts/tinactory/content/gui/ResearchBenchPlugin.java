@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -74,7 +74,7 @@ public class ResearchBenchPlugin implements IMenuPlugin<ProcessingMenu> {
         return $ -> INSTANCE;
     }
 
-    public static boolean isHoveringTech(GuiComponent component) {
+    public static boolean isHoveringTech(Widget component) {
         return component instanceof TechButton;
     }
 }

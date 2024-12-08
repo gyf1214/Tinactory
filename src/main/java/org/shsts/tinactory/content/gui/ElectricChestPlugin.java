@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -18,26 +17,33 @@ import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.SmartMenuType;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
-import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.IMenuPlugin;
+import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import static org.shsts.tinactory.content.AllEvents.CHEST_SLOT_CLICK;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.client.FluidSlot.HIGHLIGHT_COLOR;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
+public class ElectricChestPlugin implements IMenuPlugin {
+    private final IMenu menu;
     private final ElectricChest chest;
     private final Layout layout;
 
@@ -118,16 +124,15 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
         }
     }
 
-    public ElectricChestMenu(SmartMenuType<?, ?> type, int id, Inventory inventory,
-        BlockEntity blockEntity, Layout layout) {
-        super(type, id, inventory, blockEntity);
-        this.chest = (ElectricChest) AllCapabilities.PROCESSOR.get(blockEntity);
-        this.layout = layout;
+    public ElectricChestPlugin(IMenu menu) {
+        this.menu = menu;
+        this.chest = (ElectricChest) AllCapabilities.PROCESSOR.get(menu.blockEntity());
+        this.layout = chest.layout;
 
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {
-            var syncSlot = addSyncSlot(itemSyncPacket(i));
-            onSyncPacket(syncSlot, onItemSync(i));
+            var syncSlot = menu.addSyncSlot(itemSyncPacket(i));
+            menu.onSyncPacket(syncSlot, onItemSync(i));
         }
         for (var i = 0; i < size * 2; i++) {
             var slotInfo = layout.slots.get(i);
@@ -135,17 +140,17 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
             var y = slotInfo.y() + MARGIN_TOP + 1;
 
             var slot = i < size ? new InputSlot(i, x, y) : new OutputSlot(i - size, x, y);
-            addSlot(slot);
+            menu.addSlot(slot);
         }
-        this.height = layout.rect.endY();
-        onEventPacket(MenuEventHandler.CHEST_SLOT_CLICK, this::onClickSlot);
+        menu.onEventPacket(CHEST_SLOT_CLICK, this::onClickSlot);
 
-        AllCapabilities.MACHINE.tryGet(blockEntity).ifPresent(Machine::sendUpdate);
+        AllCapabilities.MACHINE.tryGet(menu.blockEntity())
+            .ifPresent(Machine::sendUpdate);
     }
 
-    private SyncPacketFactory<BlockEntity, ChestItemSyncPacket> itemSyncPacket(int slot) {
-        return (containerId, index, $) -> new ChestItemSyncPacket(containerId, index,
-            chest.getStackInSlot(slot), chest.getFilter(slot).orElse(null));
+    private Function<BlockEntity, ChestItemSyncPacket> itemSyncPacket(int slot) {
+        return $ -> new ChestItemSyncPacket(chest.getStackInSlot(slot),
+            chest.getFilter(slot).orElse(null));
     }
 
     private Consumer<ChestItemSyncPacket> onItemSync(int slot) {
@@ -157,7 +162,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
     }
 
     private void onClickSlot(SlotEventPacket p) {
-        var carried = getCarried();
+        var carried = menu.getMenu().getCarried();
         var slot = p.getIndex();
         if (!chest.getStackInSlot(slot).isEmpty()) {
             return;
@@ -174,7 +179,7 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
         private final int slot;
 
         public ItemSlot(int slot) {
-            super(ElectricChestMenu.this);
+            super(ElectricChestPlugin.this.menu);
             this.slot = slot;
         }
 
@@ -224,16 +229,14 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
-            triggerEvent(MenuEventHandler.CHEST_SLOT_CLICK, (containerId, eventId) ->
-                new SlotEventPacket(containerId, eventId, slot, button));
+            iMenu.triggerEvent(CHEST_SLOT_CLICK, () -> new SlotEventPacket(slot, button));
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
-    public MenuScreen<ElectricChestMenu> createScreen(Inventory inventory, Component title) {
-        var screen = super.createScreen(inventory, title);
-
+    @OnlyIn(Dist.CLIENT)
+    public void applyMenuScreen(MenuScreenBase s) {
+        var screen = (MenuScreen1) s;
         var layoutPanel = new Panel(screen);
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {
@@ -244,11 +247,5 @@ public class ElectricChestMenu extends Menu<BlockEntity, ElectricChestMenu> {
             layoutPanel.addWidget(new Rect(x, y, SLOT_SIZE - 2, SLOT_SIZE - 2), new ItemSlot(i));
         }
         screen.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
-
-        return screen;
-    }
-
-    public static <T extends BlockEntity> Menu.Factory<T, ElectricChestMenu> factory(Layout layout) {
-        return (type, id, inventory, be) -> new ElectricChestMenu(type, id, inventory, be, layout);
     }
 }
