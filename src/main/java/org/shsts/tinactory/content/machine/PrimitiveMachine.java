@@ -53,7 +53,7 @@ public class PrimitiveMachine extends CapabilityProvider implements IEventSubscr
     }
 
     public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, "primitiveMachine",
+        return CapabilityProviderBuilder.fromFactory(parent, "machine/primitive",
             PrimitiveMachine::new);
     }
 }
