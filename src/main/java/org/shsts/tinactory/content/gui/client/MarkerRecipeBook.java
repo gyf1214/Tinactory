@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 
@@ -14,7 +14,7 @@ import org.shsts.tinactory.core.util.ClientUtil;
 public class MarkerRecipeBook extends MachineRecipeBook {
     private final boolean includeNormal;
 
-    public MarkerRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
+    public MarkerRecipeBook(MenuScreen1<? extends ProcessingMenu> screen,
         RecipeType<? extends ProcessingRecipe> recipeType,
         boolean includeNormal) {
         super(screen, recipeType);

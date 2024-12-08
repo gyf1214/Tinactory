@@ -6,7 +6,6 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.BoilerPlugin;
-import org.shsts.tinactory.content.gui.ElectricStoragePlugin;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
@@ -29,7 +28,6 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.SimpleMenu;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.network.NetworkController;
@@ -397,8 +395,7 @@ public final class AllBlockEntities {
         ELECTRIC_CHEST = set.machine()
             .machine(v -> "machine/" + v.id + "/electric_chest", MachineBlock::factory)
             .layoutCapability(ElectricChest::builder)
-            .menu(SimpleMenu::new)
-            .<SimpleMenu>plugin(ElectricStoragePlugin::new)
+            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.ELECTRIC_CHEST).build())
             .voltages(Voltage.ULV, Voltage.HV)
             .layoutSet()
             .port(SlotType.NONE)
@@ -418,7 +415,6 @@ public final class AllBlockEntities {
             .machine(v -> "machine/" + v.id + "/electric_tank", MachineBlock::factory)
             .layoutCapability(ElectricTank::builder)
             .layoutMenu(ElectricTankMenu::factory)
-            .<ElectricTankMenu>plugin(ElectricStoragePlugin::new)
             .voltages(Voltage.ULV, Voltage.HV)
             .layoutSet()
             .port(FLUID_INPUT)

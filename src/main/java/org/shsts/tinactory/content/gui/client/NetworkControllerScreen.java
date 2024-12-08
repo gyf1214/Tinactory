@@ -19,7 +19,7 @@ import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.Tab;
 import org.shsts.tinactory.core.gui.client.Widgets;
@@ -42,7 +42,7 @@ import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
+public class NetworkControllerScreen extends MenuScreen1<NetworkControllerMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int WELCOME_BUTTON_WIDTH = 72;
     public static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;

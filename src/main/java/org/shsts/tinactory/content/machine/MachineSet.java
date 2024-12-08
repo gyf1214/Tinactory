@@ -16,7 +16,6 @@ import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
@@ -234,7 +233,8 @@ public class MachineSet {
         return $ -> $.blockEntity()
             .eventManager()
             .simpleCapability(Machine::builder)
-            .menu().title(ProcessingMenu::getTitle).build()
+            // TODO
+//            .menu().title(ProcessingMenu::getTitle).build()
             .build()
             .translucent();
     }

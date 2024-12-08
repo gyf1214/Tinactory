@@ -18,7 +18,7 @@ import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -51,11 +51,11 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
 
     @OnlyIn(Dist.CLIENT)
     @Nullable
-    protected abstract AbstractRecipeBook<?> createRecipeBook(MenuScreen<ProcessingMenu> screen);
+    protected abstract AbstractRecipeBook<?> createRecipeBook(MenuScreen1<ProcessingMenu> screen);
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void applyMenuScreen(MenuScreen<ProcessingMenu> screen) {
+    public void applyMenuScreen(MenuScreen1<ProcessingMenu> screen) {
         var menu = screen.getMenu();
         if (menu.layout == null) {
             return;
@@ -112,7 +112,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         return menu -> new MachinePlugin(menu) {
             @OnlyIn(Dist.CLIENT)
             @Override
-            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen<ProcessingMenu> screen) {
+            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen1<ProcessingMenu> screen) {
                 return new MachineRecipeBook(screen, recipeType.get());
             }
         };
@@ -123,7 +123,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         return menu -> new MachinePlugin(menu) {
             @OnlyIn(Dist.CLIENT)
             @Override
-            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen<ProcessingMenu> screen) {
+            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen1<ProcessingMenu> screen) {
                 return new MarkerRecipeBook(screen, recipeType.get(), includeNormal);
             }
         };
@@ -134,7 +134,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
             @OnlyIn(Dist.CLIENT)
             @Nullable
             @Override
-            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen<ProcessingMenu> screen) {
+            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen1<ProcessingMenu> screen) {
                 return null;
             }
         };
@@ -144,7 +144,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         return menu -> new MachinePlugin(menu) {
             @OnlyIn(Dist.CLIENT)
             @Override
-            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen<ProcessingMenu> screen) {
+            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen1<ProcessingMenu> screen) {
                 return new ElectricFurnaceRecipeBook(screen, layout);
             }
         };
@@ -154,7 +154,7 @@ public abstract class MachinePlugin implements IMenuPlugin<ProcessingMenu> {
         return new MachinePlugin(menu) {
             @OnlyIn(Dist.CLIENT)
             @Override
-            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen<ProcessingMenu> screen) {
+            protected AbstractRecipeBook<?> createRecipeBook(MenuScreen1<ProcessingMenu> screen) {
                 return new MultiBlockRecipeBook(screen);
             }
         };

@@ -90,7 +90,7 @@ public abstract class ButtonPanel extends Panel {
         }
     }
 
-    public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
+    public ButtonPanel(MenuScreen1<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
         super(screen);
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;

@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.SmartMenuType;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.Registrate;
 
@@ -70,7 +70,7 @@ public class MenuBuilder<T extends SmartBlockEntity, M extends Menu<? super T, M
     }
 
     @OnlyIn(Dist.CLIENT)
-    private MenuScreens.ScreenConstructor<M, MenuScreen<M>> getScreenFactory() {
+    private MenuScreens.ScreenConstructor<M, MenuScreen1<M>> getScreenFactory() {
         return (menu, inventory, title) -> {
             var screen = menu.createScreen(inventory, title);
             menu.applyPlugin(screen);

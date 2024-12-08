@@ -5,13 +5,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IMenuPlugin<M extends Menu<?, M>> {
     @OnlyIn(Dist.CLIENT)
-    void applyMenuScreen(MenuScreen<M> screen);
+    void applyMenuScreen(MenuScreen1<M> screen);
 
     default void onMenuRemoved(Player player) {}
 

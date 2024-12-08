@@ -19,6 +19,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
 import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
@@ -114,6 +115,14 @@ public class MultiBlockInterface extends Machine {
     private void onContainerChange() {
         if (multiBlock != null) {
             EventManager.invoke(multiBlock.blockEntity, AllEvents.CONTAINER_CHANGE);
+        }
+    }
+
+    @Override
+    public void setConfig(SetMachineConfigPacket1 packet, boolean invokeEvent) {
+        super.setConfig(packet, invokeEvent);
+        if (invokeEvent && multiBlock != null) {
+            EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
         }
     }
 

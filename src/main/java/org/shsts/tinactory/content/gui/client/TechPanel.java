@@ -19,7 +19,7 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
@@ -104,7 +104,7 @@ public class TechPanel extends Panel {
 
     private class TechButtonPanel extends ButtonPanel {
         public TechButtonPanel() {
-            super(TechPanel.this.screen, BUTTON_SIZE, BUTTON_SIZE, 0);
+            super(TechPanel.this.screen1, BUTTON_SIZE, BUTTON_SIZE, 0);
         }
 
         private ITechnology getTech(int index) {
@@ -206,7 +206,7 @@ public class TechPanel extends Panel {
         }
     }
 
-    public TechPanel(MenuScreen<?> screen) {
+    public TechPanel(MenuScreen1<?> screen) {
         super(screen);
         this.techManager = TechManager.client();
 

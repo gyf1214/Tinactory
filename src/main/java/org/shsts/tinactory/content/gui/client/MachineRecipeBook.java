@@ -15,7 +15,7 @@ import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -37,7 +37,7 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     @Nullable
     private final Layout layout;
 
-    private MachineRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
+    private MachineRecipeBook(MenuScreen1<? extends ProcessingMenu> screen,
         @Nullable RecipeType<? extends ProcessingRecipe> recipeType,
         @Nullable Layout layout) {
         super(screen, layout == null ? 0 : layout.getXOffset());
@@ -46,7 +46,7 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
         TechManager.client().onProgressChange(onTechChange);
     }
 
-    public MachineRecipeBook(MenuScreen<? extends ProcessingMenu> screen,
+    public MachineRecipeBook(MenuScreen1<? extends ProcessingMenu> screen,
         @Nullable RecipeType<? extends ProcessingRecipe> recipeType) {
         this(screen, recipeType, screen.getMenu().layout);
     }

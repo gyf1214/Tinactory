@@ -17,7 +17,7 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
@@ -119,8 +119,8 @@ public class ElectricTankMenu extends Menu<BlockEntity, ElectricTankMenu> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public MenuScreen<ElectricTankMenu> createScreen(Inventory inventory, Component title) {
-        var screen = new MenuScreen<>(this, inventory, title);
+    public MenuScreen1<ElectricTankMenu> createScreen(Inventory inventory, Component title) {
+        var screen = new MenuScreen1<>(this, inventory, title);
 
         var layoutPanel = new Panel(screen);
         for (var slot : layout.slots) {

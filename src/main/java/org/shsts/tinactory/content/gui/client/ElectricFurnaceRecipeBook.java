@@ -9,7 +9,7 @@ import net.minecraft.world.item.crafting.SmeltingRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
@@ -24,7 +24,7 @@ public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe
     private final Layout.SlotInfo inputSlot;
     private final Layout.SlotInfo outputSlot;
 
-    public ElectricFurnaceRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, Layout layout) {
+    public ElectricFurnaceRecipeBook(MenuScreen1<? extends Menu<?, ?>> screen, Layout layout) {
         super(screen, layout.getXOffset());
         this.inputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == 0)

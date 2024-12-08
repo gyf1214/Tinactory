@@ -10,14 +10,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
 import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
@@ -54,7 +54,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
 
     private class RecipeButtonPanel extends ButtonPanel {
         public RecipeButtonPanel() {
-            super(AbstractRecipeBook.this.screen, BUTTON_SIZE, BUTTON_SIZE, 0);
+            super(AbstractRecipeBook.this.screen1, BUTTON_SIZE, BUTTON_SIZE, 0);
         }
 
         @Override
@@ -101,9 +101,9 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             var recipe = getRecipe(loc);
             ghostRecipe.clear();
             if (recipe == null) {
-                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder().reset("targetRecipe"));
+                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket1.builder().reset("targetRecipe"));
             } else {
-                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder().set("targetRecipe", loc));
+                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket1.builder().set("targetRecipe", loc));
                 selectRecipe(recipe);
             }
         }
@@ -128,7 +128,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
     protected final Map<ResourceLocation, T> recipes = new HashMap<>();
     private final List<ResourceLocation> recipeList = new ArrayList<>();
 
-    public AbstractRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, int xOffset) {
+    public AbstractRecipeBook(MenuScreen1<? extends Menu<?, ?>> screen, int xOffset) {
         super(screen);
         this.blockEntity = screen.getMenu().blockEntity;
         this.machineConfig = AllCapabilities.MACHINE.get(blockEntity).config;

@@ -15,7 +15,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
@@ -74,8 +74,8 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public MenuScreen<ProcessingMenu> createScreen(Inventory inventory, Component title) {
-        var screen = new MenuScreen<>(this, inventory, title);
+    public MenuScreen1<ProcessingMenu> createScreen(Inventory inventory, Component title) {
+        var screen = new MenuScreen1<>(this, inventory, title);
 
         if (layout != null) {
             var layoutPanel = new Panel(screen);

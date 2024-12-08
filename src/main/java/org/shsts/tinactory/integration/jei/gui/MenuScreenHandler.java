@@ -14,7 +14,7 @@ import org.shsts.tinactory.content.gui.client.TechPanel;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.integration.jei.JEI;
 import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
@@ -30,7 +30,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
+public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen1<?>> {
     private final JEI plugin;
     private final Map<Class<? extends Menu<?, ?>>, IMenuScreenClickableProvider<?>> clickableHandlers;
 
@@ -55,7 +55,7 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
     }
 
     @Override
-    public @Nullable Object getIngredientUnderMouse(MenuScreen<?> screen, double mouseX, double mouseY) {
+    public @Nullable Object getIngredientUnderMouse(MenuScreen1<?> screen, double mouseX, double mouseY) {
         var hovered = screen.getHovered((int) mouseX, (int) mouseY);
         if (hovered.isEmpty()) {
             return null;
@@ -76,7 +76,7 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
         return null;
     }
 
-    private Optional<IGuiClickableArea> processingClickable(MenuScreen<ProcessingMenu> screen) {
+    private Optional<IGuiClickableArea> processingClickable(MenuScreen1<ProcessingMenu> screen) {
         var menu = screen.getMenu();
 
         var category = menu.getRecipeType().flatMap(plugin::processingCategory);
@@ -95,7 +95,7 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen<?>> {
     }
 
     @Override
-    public Collection<IGuiClickableArea> getGuiClickableAreas(MenuScreen<?> screen,
+    public Collection<IGuiClickableArea> getGuiClickableAreas(MenuScreen1<?> screen,
         double mouseX, double mouseY) {
         var ret = new ArrayList<IGuiClickableArea>();
         var menu = screen.getMenu();

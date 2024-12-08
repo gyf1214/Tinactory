@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 
@@ -34,7 +34,7 @@ public class BoilerPlugin implements IMenuPlugin<ProcessingMenu> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void applyMenuScreen(MenuScreen<ProcessingMenu> screen) {
+    public void applyMenuScreen(MenuScreen1<ProcessingMenu> screen) {
         var menu = screen.getMenu();
 
         if (menu.layout != null) {

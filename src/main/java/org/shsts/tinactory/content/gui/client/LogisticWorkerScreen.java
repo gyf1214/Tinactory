@@ -12,7 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.core.gui.Rect;
@@ -20,7 +20,7 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
@@ -46,7 +46,7 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
+public class LogisticWorkerScreen extends MenuScreen1<LogisticWorkerMenu> {
     private record MachineInfo(UUID id, Component name, ItemStack icon) {}
 
     private final int workerSlots;
@@ -132,7 +132,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 config.to().ifPresent(p -> selectedMachine = p.machineId());
             } else if (VALID_RECT.in(mouseX, mouseY)) {
                 config.setValid(!config.isValid());
-                var packet = SetMachineConfigPacket.builder()
+                var packet = SetMachineConfigPacket1.builder()
                     .set(PREFIX + index, config.serializeNBT());
                 menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, packet);
             }
@@ -242,7 +242,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             } else {
                 config.setTo(port.machineId(), port.portIndex());
             }
-            var packet = SetMachineConfigPacket.builder()
+            var packet = SetMachineConfigPacket1.builder()
                 .set(PREFIX + selectedConfig, config.serializeNBT());
             menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, packet);
         }

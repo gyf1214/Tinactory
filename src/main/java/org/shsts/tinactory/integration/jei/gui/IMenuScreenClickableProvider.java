@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 
 import java.util.Optional;
 
@@ -12,10 +12,10 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IMenuScreenClickableProvider<M extends Menu<?, M>> {
-    Optional<IGuiClickableArea> getGuiClickableAreas(MenuScreen<M> screen);
+    Optional<IGuiClickableArea> getGuiClickableAreas(MenuScreen1<M> screen);
 
     @SuppressWarnings("unchecked")
-    default Optional<IGuiClickableArea> guiClickableAreas(MenuScreen<?> screen) {
-        return getGuiClickableAreas((MenuScreen<M>) screen);
+    default Optional<IGuiClickableArea> guiClickableAreas(MenuScreen1<?> screen) {
+        return getGuiClickableAreas((MenuScreen1<M>) screen);
     }
 }

@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.network.NetworkEvent;
 import org.shsts.tinactory.Tinactory;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
 import org.shsts.tinactory.core.gui.Menu;
 import org.slf4j.Logger;
 
@@ -22,7 +22,7 @@ public final class MenuEventHandler {
     public record Event<P extends MenuEventPacket>(int id, Class<P> clazz) {}
 
     public static final Event<SlotEventPacket1> FLUID_SLOT_CLICK;
-    public static final Event<SetMachineConfigPacket> SET_MACHINE_CONFIG;
+    public static final Event<SetMachineConfigPacket1> SET_MACHINE_CONFIG;
 
     private static <P extends MenuEventPacket> void handle(P packet, NetworkEvent.Context ctx) {
         var player = ctx.getSender();
@@ -47,7 +47,7 @@ public final class MenuEventHandler {
 
     static {
         FLUID_SLOT_CLICK = register(SlotEventPacket1.class, SlotEventPacket1::new);
-        SET_MACHINE_CONFIG = register(SetMachineConfigPacket.class, SetMachineConfigPacket::new);
+        SET_MACHINE_CONFIG = register(SetMachineConfigPacket1.class, SetMachineConfigPacket1::new);
     }
 
     public static void init() {}

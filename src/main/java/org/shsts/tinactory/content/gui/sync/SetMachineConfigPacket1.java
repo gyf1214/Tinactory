@@ -5,21 +5,21 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinycorelib.api.network.IPacket;
+import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SetMachineConfigPacket implements IPacket {
+public class SetMachineConfigPacket1 extends MenuEventPacket {
     private CompoundTag sets;
     private List<String> resets;
 
-    public SetMachineConfigPacket() {}
+    public SetMachineConfigPacket1() {}
 
-    private SetMachineConfigPacket(Builder builder) {
+    private SetMachineConfigPacket1(int containerId, int eventId, Builder builder) {
+        super(containerId, eventId);
         this.sets = builder.sets;
         this.resets = builder.resets;
     }
@@ -34,17 +34,19 @@ public class SetMachineConfigPacket implements IPacket {
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
+        super.serializeToBuf(buf);
         buf.writeNbt(sets);
         buf.writeCollection(resets, FriendlyByteBuf::writeUtf);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
+        super.deserializeFromBuf(buf);
         sets = buf.readNbt();
         resets = buf.readCollection(ArrayList::new, FriendlyByteBuf::readUtf);
     }
 
-    public static class Builder implements Supplier<SetMachineConfigPacket> {
+    public static class Builder implements MenuEventPacket.Factory<SetMachineConfigPacket1> {
         private final CompoundTag sets = new CompoundTag();
         private final List<String> resets = new ArrayList<>();
 
@@ -78,8 +80,13 @@ public class SetMachineConfigPacket implements IPacket {
         }
 
         @Override
-        public SetMachineConfigPacket get() {
-            return new SetMachineConfigPacket(this);
+        public SetMachineConfigPacket1 create(int containerId, int eventId) {
+            return new SetMachineConfigPacket1(containerId, eventId, this);
+        }
+
+        public SetMachineConfigPacket1 create() {
+            // where containerId and eventId are irrelevant
+            return create(0, 0);
         }
     }
 

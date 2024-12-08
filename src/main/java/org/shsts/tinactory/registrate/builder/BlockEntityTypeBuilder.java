@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,7 +15,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 
@@ -48,7 +48,7 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
     @Nullable
     private ChildMenuBuilder<?> menuBuilder = null;
     @Nullable
-    private Supplier<SmartMenuType<U, ?>> menu = null;
+    private Supplier<MenuType<?>> menu = null;
 
     public BlockEntityTypeBuilder(Registrate registrate, String id, P parent, Factory<U> factory) {
         super(registrate, registrate.blockEntityHandler, id, parent);
@@ -84,8 +84,9 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
         return eventManager(true);
     }
 
-    public void setMenu(Supplier<SmartMenuType<U, ?>> value) {
+    public BlockEntityTypeBuilder<U, P> setMenu(Supplier<MenuType<?>> value) {
         menu = value;
+        return this;
     }
 
     private class ChildMenuBuilder<M extends Menu<? super U, M>>

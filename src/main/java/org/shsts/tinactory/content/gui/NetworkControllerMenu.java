@@ -12,7 +12,7 @@ import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.SmartMenuType;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 
 import static org.shsts.tinactory.content.AllCapabilities.NETWORK_CONTROLLER;
 
@@ -36,7 +36,7 @@ public class NetworkControllerMenu extends Menu<SmartBlockEntity, NetworkControl
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public MenuScreen<NetworkControllerMenu> createScreen(Inventory inventory, Component title) {
+    public MenuScreen1<NetworkControllerMenu> createScreen(Inventory inventory, Component title) {
         return new NetworkControllerScreen(this, inventory, title, syncSlot);
     }
 }

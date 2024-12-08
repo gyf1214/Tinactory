@@ -25,7 +25,7 @@ import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.ISelf;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
@@ -168,7 +168,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void applyPlugin(MenuScreen<S> screen) {
+    public void applyPlugin(MenuScreen1<S> screen) {
         for (var plugin : plugins) {
             plugin.applyMenuScreen(screen);
         }
@@ -432,7 +432,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
     }
 
     @OnlyIn(Dist.CLIENT)
-    public MenuScreen<S> createScreen(Inventory inventory, Component title) {
-        return new MenuScreen<>(self(), inventory, title);
+    public MenuScreen1<S> createScreen(Inventory inventory, Component title) {
+        return new MenuScreen1<>(self(), inventory, title);
     }
 }

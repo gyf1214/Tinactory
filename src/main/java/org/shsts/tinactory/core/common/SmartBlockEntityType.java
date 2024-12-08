@@ -3,12 +3,12 @@ package org.shsts.tinactory.core.common;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import org.shsts.tinactory.core.gui.SmartMenuType;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +20,7 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
     public final Class<T> entityClass;
     public final boolean ticking;
     @Nullable
-    public final Supplier<SmartMenuType<T, ?>> menu;
+    public final Supplier<MenuType<?>> menu;
 
     private final boolean eventManager;
     private final Map<ResourceLocation, Function<? super T, ? extends ICapabilityProvider>> capabilities;
@@ -29,7 +29,7 @@ public class SmartBlockEntityType<T extends BlockEntity> extends BlockEntityType
     public SmartBlockEntityType(BlockEntitySupplier<? extends T> factory, Set<Block> validBlocks,
         Class<T> entityClass, boolean ticking, boolean eventManager,
         Map<ResourceLocation, Function<? super T, ? extends ICapabilityProvider>> capabilities,
-        @Nullable Supplier<SmartMenuType<T, ?>> menu) {
+        @Nullable Supplier<MenuType<?>> menu) {
         super(factory, validBlocks, null);
         this.entityClass = entityClass;
         this.ticking = ticking;

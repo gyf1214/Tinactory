@@ -11,13 +11,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.ElectricChest;
-import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuScreen1;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
@@ -26,7 +23,6 @@ import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.IMenu;
-import org.shsts.tinycorelib.api.gui.IMenuPlugin;
 import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
 
 import java.util.List;
@@ -34,7 +30,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.content.AllEvents.CHEST_SLOT_CLICK;
+import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllMenus.CHEST_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -42,10 +39,8 @@ import static org.shsts.tinactory.core.gui.client.FluidSlot.HIGHLIGHT_COLOR;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricChestPlugin implements IMenuPlugin {
-    private final IMenu menu;
+public class ElectricChestPlugin extends ElectricStoragePlugin {
     private final ElectricChest chest;
-    private final Layout layout;
 
     private class InputSlot extends Slot {
         private final int slot;
@@ -125,9 +120,12 @@ public class ElectricChestPlugin implements IMenuPlugin {
     }
 
     public ElectricChestPlugin(IMenu menu) {
-        this.menu = menu;
-        this.chest = (ElectricChest) AllCapabilities.PROCESSOR.get(menu.blockEntity());
-        this.layout = chest.layout;
+        this(menu, (ElectricChest) PROCESSOR.get(menu.blockEntity()));
+    }
+
+    public ElectricChestPlugin(IMenu menu, ElectricChest chest) {
+        super(menu, chest.layout);
+        this.chest = chest;
 
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {
@@ -144,8 +142,7 @@ public class ElectricChestPlugin implements IMenuPlugin {
         }
         menu.onEventPacket(CHEST_SLOT_CLICK, this::onClickSlot);
 
-        AllCapabilities.MACHINE.tryGet(menu.blockEntity())
-            .ifPresent(Machine::sendUpdate);
+        machine.sendUpdate();
     }
 
     private Function<BlockEntity, ChestItemSyncPacket> itemSyncPacket(int slot) {
@@ -236,7 +233,9 @@ public class ElectricChestPlugin implements IMenuPlugin {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void applyMenuScreen(MenuScreenBase s) {
-        var screen = (MenuScreen1) s;
+        super.applyMenuScreen(s);
+
+        var screen = (MenuScreen) s;
         var layoutPanel = new Panel(screen);
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {

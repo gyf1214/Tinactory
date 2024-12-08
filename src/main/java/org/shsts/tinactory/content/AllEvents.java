@@ -8,13 +8,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.common.ReturnEvent;
-import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
-import org.shsts.tinycorelib.api.gui.IMenuEvent;
 
-import static org.shsts.tinactory.Tinactory.CHANNEL;
 import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 public final class AllEvents {
@@ -32,8 +29,6 @@ public final class AllEvents {
     public static final RegistryEntry<Event<NetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
     public static final RegistryEntry<Event<Unit>> SET_MACHINE_CONFIG;
 
-    public static final IMenuEvent<SlotEventPacket> CHEST_SLOT_CLICK;
-
     static {
         SERVER_LOAD = _REGISTRATE.event("server_load");
         CLIENT_LOAD = _REGISTRATE.event("client_load");
@@ -46,8 +41,6 @@ public final class AllEvents {
         CONNECT = _REGISTRATE.event("network/connect");
         BUILD_SCHEDULING = _REGISTRATE.event("network/build_scheduling");
         SET_MACHINE_CONFIG = _REGISTRATE.event("machine/set_config");
-
-        CHEST_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
     }
 
     public static void init() {}

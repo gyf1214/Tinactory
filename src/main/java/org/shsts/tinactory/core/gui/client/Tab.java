@@ -57,7 +57,7 @@ public class Tab extends Panel {
     private final List<Panel> tabPanels = new ArrayList<>();
     private int currentTab = 0;
 
-    public Tab(MenuScreen<?> screen, Object... args) {
+    public Tab(MenuScreen1<?> screen, Object... args) {
         super(screen);
 
         for (var i = 0; i < args.length; i++) {

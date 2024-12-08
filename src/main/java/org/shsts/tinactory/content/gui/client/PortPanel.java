@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
@@ -63,7 +63,7 @@ public class PortPanel extends Panel {
 
     private final int xOffset;
 
-    public PortPanel(MenuScreen<?> screen, Layout layout) {
+    public PortPanel(MenuScreen1<?> screen, Layout layout) {
         super(screen);
         var menu = screen.getMenu();
         this.xOffset = layout.getXOffset();
@@ -90,8 +90,8 @@ public class PortPanel extends Panel {
     }
 
     private void renderHoverOverlay(PoseStack poseStack, List<Layout.SlotInfo> slots) {
-        var bx = screen.getGuiLeft() + MARGIN_HORIZONTAL + xOffset;
-        var by = screen.getGuiTop() + MARGIN_TOP;
+        var bx = screen1.getGuiLeft() + MARGIN_HORIZONTAL + xOffset;
+        var by = screen1.getGuiTop() + MARGIN_TOP;
         for (var slot : slots) {
             var x = slot.x() + 1 + bx;
             var y = slot.y() + 1 + by;

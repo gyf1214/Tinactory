@@ -27,6 +27,7 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllForgeEvents;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
+import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.AllMultiBlocks;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.AllRecipes;
@@ -111,8 +112,8 @@ public class Tinactory {
     public void onConstruct() {
         try {
             CORE = ITinyCoreLib.get();
-            REGISTRATE = CORE.registrate(ID);
             CHANNEL = CORE.createChannel(modLoc("channel"), "1");
+            REGISTRATE = CORE.registrate(ID).setDefaultChannel(CHANNEL);
 
             ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
 
@@ -124,6 +125,7 @@ public class Tinactory {
             AllNetworks.init();
 
             AllMaterials.init();
+            AllMenus.init();
             AllItems.init();
             AllBlockEntities.init();
             AllMultiBlocks.init();

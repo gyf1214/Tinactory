@@ -13,7 +13,7 @@ import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.SmartMenuType;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 
 import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
@@ -39,7 +39,7 @@ public class LogisticWorkerMenu extends Menu<SmartBlockEntity, LogisticWorkerMen
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public MenuScreen<LogisticWorkerMenu> createScreen(Inventory inventory, Component title) {
+    public MenuScreen1<LogisticWorkerMenu> createScreen(Inventory inventory, Component title) {
         var slots = LOGISTIC_WORKER.get(blockEntity).workerSlots;
         return new LogisticWorkerScreen(this, inventory, title, slots);
     }

@@ -16,7 +16,7 @@ import org.shsts.tinactory.content.gui.client.TechPanel;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
@@ -62,7 +62,7 @@ public class ResearchBenchPlugin implements IMenuPlugin<ProcessingMenu> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void applyMenuScreen(MenuScreen<ProcessingMenu> screen) {
+    public void applyMenuScreen(MenuScreen1<ProcessingMenu> screen) {
         var layout = AllBlockEntities.RESEARCH_BENCH.layout(Voltage.MAXIMUM);
         var rect = layout.images.get(0).rect().offset(layout.getXOffset(), 0);
         screen.addWidget(rect, new TechButton(screen.getMenu()));

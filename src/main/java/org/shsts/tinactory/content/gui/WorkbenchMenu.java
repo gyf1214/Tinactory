@@ -15,7 +15,7 @@ import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.SmartMenuType;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.CraftingSlot;
@@ -62,7 +62,7 @@ public class WorkbenchMenu extends Menu<SmartBlockEntity, WorkbenchMenu> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public MenuScreen<WorkbenchMenu> createScreen(Inventory inventory, Component title) {
+    public MenuScreen1<WorkbenchMenu> createScreen(Inventory inventory, Component title) {
         var screen = super.createScreen(inventory, title);
         var layout = AllLayouts.WORKBENCH;
         var panel = new Panel(screen);

@@ -21,7 +21,7 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
@@ -162,7 +162,7 @@ public class LogisticWorker extends CapabilityProvider
         var logistic = network.get().getComponent(AllNetworks.LOGISTIC_COMPONENT);
         var subnet = network.get().getSubnet(blockEntity.getBlockPos());
 
-        var packet = SetMachineConfigPacket.builder();
+        var packet = SetMachineConfigPacket1.builder();
         for (var i = 0; i < workerSlots; i++) {
             var key = PREFIX + i;
             getConfig(i).ifPresent(entry -> {
@@ -232,7 +232,7 @@ public class LogisticWorker extends CapabilityProvider
                 tick = 0;
             } else {
                 entry.setValid(false);
-                var packet = SetMachineConfigPacket.builder()
+                var packet = SetMachineConfigPacket1.builder()
                     .set(PREFIX + currentSlot, entry.serializeNBT())
                     .create();
                 // try revalidate
