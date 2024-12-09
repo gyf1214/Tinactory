@@ -62,7 +62,7 @@ public class ChestItemSyncPacket implements IPacket {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), stack, filter);
+        return Objects.hash(stack, filter);
     }
 
     public ItemStack getStack() {

@@ -30,7 +30,7 @@ public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlug
     private final int endInvSlot;
     private final int endY;
 
-    public InventoryPlugin(IMenu menu, int y) {
+    protected InventoryPlugin(IMenu menu, int y) {
         this.menu = menu;
         this.beginInvSlot = menu.getSlotSize();
         var inventory = menu.inventory();

@@ -4,9 +4,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.content.gui.ElectricChestPlugin;
 import org.shsts.tinactory.content.gui.ElectricTankPlugin;
+import org.shsts.tinactory.content.gui.PrimitivePlugin;
 import org.shsts.tinactory.content.gui.WorkbenchPlugin;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
+import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
@@ -16,6 +18,7 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
+import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinycorelib.api.gui.IMenuEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -34,11 +37,13 @@ public final class AllMenus {
     public static final IMenuType ELECTRIC_CHEST;
     public static final IMenuType ELECTRIC_TANK;
     public static final IMenuType LOGISTIC_WORKER;
+    public static final IMenuType PRIMITIVE_MACHINE;
 
     static {
         CHANNEL
-            .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
+            .registerMenuSyncPacket(SyncPackets.Double.class, SyncPackets.Double::new)
             .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new)
+            .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
             .registerMenuSyncPacket(NetworkControllerSyncPacket.class,
                 NetworkControllerSyncPacket::new)
             .registerMenuSyncPacket(LogisticWorkerSyncPacket.class,
@@ -84,6 +89,12 @@ public final class AllMenus {
             .title("tinactory.gui.logisticWorker.title")
             .screen(() -> () -> LogisticWorkerScreen::new)
             .dummyPlugin(menu -> menu.addSyncSlot("info", LogisticWorkerSyncPacket::new))
+            .register();
+
+        PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive")
+            .title(ProcessingMenu::getTitle)
+            .screen(() -> () -> ProcessingScreen::new)
+            .plugin(PrimitivePlugin::new)
             .register();
     }
 

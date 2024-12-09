@@ -9,13 +9,8 @@ import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.MenuScreen1;
-import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
-
-import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -37,16 +32,16 @@ public class BoilerPlugin implements IMenuPlugin<ProcessingMenu> {
     public void applyMenuScreen(MenuScreen1<ProcessingMenu> screen) {
         var menu = screen.getMenu();
 
-        if (menu.layout != null) {
-            var xOffset = menu.layout.getXOffset();
-            var burnBar = new ProgressBar(menu, Texture.PROGRESS_BURN, burnSlot);
-            burnBar.direction = ProgressBar.Direction.VERTICAL;
-            screen.addWidget(new Rect(xOffset + 1, 1 + SLOT_SIZE, 16, 16), burnBar);
-
-            var heatBar = new ProgressBar(menu, Texture.HEAT_EMPTY, Texture.HEAT_FULL, heatSlot);
-            heatBar.direction = ProgressBar.Direction.VERTICAL;
-            var rect = new Rect(xOffset + SLOT_SIZE * 2, 1, Texture.HEAT_EMPTY.width(), Texture.HEAT_EMPTY.height());
-            screen.addWidget(rect, heatBar);
-        }
+//        if (menu.layout != null) {
+//            var xOffset = menu.layout.getXOffset();
+//            var burnBar = new ProgressBar(menu, Texture.PROGRESS_BURN, burnSlot);
+//            burnBar.direction = ProgressBar.Direction.VERTICAL;
+//            screen.addWidget(new Rect(xOffset + 1, 1 + SLOT_SIZE, 16, 16), burnBar);
+//
+//            var heatBar = new ProgressBar(menu, Texture.HEAT_EMPTY, Texture.HEAT_FULL, heatSlot);
+//            heatBar.direction = ProgressBar.Direction.VERTICAL;
+//            var rect = new Rect(xOffset + SLOT_SIZE * 2, 1, Texture.HEAT_EMPTY.width(), Texture.HEAT_EMPTY.height());
+//            screen.addWidget(rect, heatBar);
+//        }
     }
 }

@@ -50,10 +50,6 @@ public class Label extends MenuWidget {
         setLines(lines);
     }
 
-    public Label(Menu<?, ?> menu) {
-        super(menu);
-    }
-
     public Label(Menu<?, ?> menu, Component... lines) {
         super(menu);
         setLines(lines);

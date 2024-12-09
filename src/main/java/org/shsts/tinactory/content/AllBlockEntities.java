@@ -495,9 +495,7 @@ public final class AllBlockEntities {
             .simpleCapability(PrimitiveMachine::builder)
             .simpleCapability(RecipeProcessor.machine(recipeType))
             .simpleCapability(StackProcessingContainer.builder(layout))
-            .menu(ProcessingMenu.machine(layout, recipeType))
-            .title(ProcessingMenu::getTitle)
-            .build()
+            .setMenu(AllMenus.PRIMITIVE_MACHINE)
             .build()
             .translucent()
             .buildObject();

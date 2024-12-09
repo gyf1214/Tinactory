@@ -2,6 +2,7 @@ package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -30,26 +31,41 @@ public class FluidSlot extends MenuWidget {
 
     private final int tank;
     private final int syncSlot;
+    @Nullable
+    private final String syncName;
 
     public FluidSlot(IMenu menu, int tank, int syncSlot) {
         super(menu);
         this.tank = tank;
         this.syncSlot = syncSlot;
+        this.syncName = null;
+    }
+
+    public FluidSlot(IMenu menu, int tank, String syncName) {
+        super(menu);
+        this.tank = tank;
+        this.syncSlot = 0;
+        this.syncName = syncName;
     }
 
     public FluidSlot(Menu<?, ?> menu, int tank, int syncSlot) {
         super(menu);
         this.tank = tank;
         this.syncSlot = syncSlot;
+        this.syncName = null;
     }
 
     public FluidStack getFluidStack() {
-        if (menu1 == null) {
-            return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
-                .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
-        } else {
+        if (menu1 != null) {
             return menu1.getSyncPacket(syncSlot, FluidSyncPacket1.class)
                 .map(FluidSyncPacket1::getFluidStack).orElse(FluidStack.EMPTY);
+        }
+        if (syncName != null) {
+            return menu.getSyncPacket(syncName, FluidSyncPacket.class)
+                .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
+        } else {
+            return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
+                .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
         }
     }
 

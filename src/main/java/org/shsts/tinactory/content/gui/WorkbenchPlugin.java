@@ -10,8 +10,8 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.WorkbenchResult;
-import org.shsts.tinactory.core.gui.InventoryPlugin;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.LayoutPlugin;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.IMenu;
 
@@ -19,15 +19,14 @@ import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.WORKBENCH;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
-import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WorkbenchPlugin extends InventoryPlugin<WorkbenchScreen> {
+public class WorkbenchPlugin extends LayoutPlugin<WorkbenchScreen> {
     private static final Layout LAYOUT = AllLayouts.WORKBENCH;
 
     public WorkbenchPlugin(IMenu menu) {
-        super(menu, LAYOUT.rect.endY() + SPACING);
+        super(menu, LAYOUT, 0);
         var workbench = WORKBENCH.get(menu.blockEntity());
         var container = MENU_ITEM_HANDLER.get(menu.blockEntity());
         var xOffset = LAYOUT.getXOffset();

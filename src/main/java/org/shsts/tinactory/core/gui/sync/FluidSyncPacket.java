@@ -42,7 +42,7 @@ public class FluidSyncPacket implements IPacket {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), fluidStack);
+        return Objects.hash(fluidStack);
     }
 
     public FluidStack getFluidStack() {

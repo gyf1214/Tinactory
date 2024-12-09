@@ -9,8 +9,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineConfig;
-import org.shsts.tinactory.core.gui.InventoryPlugin;
-import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.LayoutPlugin;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
@@ -22,7 +21,6 @@ import org.shsts.tinycorelib.api.gui.IMenu;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -33,18 +31,12 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricStoragePlugin extends InventoryPlugin<MenuScreen> {
-    protected final Layout layout;
+public class ElectricStoragePlugin extends LayoutPlugin<MenuScreen> {
     protected final Machine machine;
     private final MachineConfig machineConfig;
 
     protected ElectricStoragePlugin(IMenu menu) {
-        this(menu, LAYOUT_PROVIDER.get(menu.blockEntity()).getLayout());
-    }
-
-    private ElectricStoragePlugin(IMenu menu, Layout layout) {
-        super(menu, layout.rect.endY() + SPACING * 2 + SLOT_SIZE);
-        this.layout = layout;
+        super(menu, SLOT_SIZE + SPACING);
         this.machine = MACHINE.get(menu.blockEntity());
         this.machineConfig = machine.config;
 

@@ -86,6 +86,6 @@ public class LogisticWorkerSyncPacket implements IPacket {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), visiblePorts);
+        return Objects.hash(visiblePorts);
     }
 }

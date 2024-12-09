@@ -88,9 +88,9 @@ public class NetworkControllerSyncPacket implements IPacket {
     @Override
     public int hashCode() {
         if (present) {
-            return Objects.hash(super.hashCode(), present);
+            return Objects.hash(true);
         } else {
-            return Objects.hash(super.hashCode(), present, state, electricMetrics);
+            return Objects.hash(false, state, electricMetrics);
         }
     }
 }

@@ -10,16 +10,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
-import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
@@ -36,7 +33,6 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
     @Nullable
     public final Layout layout;
     private final Map<Layout.SlotInfo, Integer> fluidSyncIndex = new HashMap<>();
-    private final int progressBarIndex;
 
     public ProcessingMenu(SmartMenuType<?, ?> type, int id, Inventory inventory,
         BlockEntity blockEntity, @Nullable Layout layout) {
@@ -54,17 +50,7 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
                     case FLUID -> fluidSyncIndex.put(slot, addFluidSlot(slot.index()));
                 }
             }
-            if (layout.progressBar != null) {
-                this.progressBarIndex = addSyncSlot(MenuSyncPacket.Double::new,
-                    be -> Machine.getProcessor(be)
-                        .map(IProcessor::getProgress)
-                        .orElse(0d));
-            } else {
-                this.progressBarIndex = -1;
-            }
             this.height = layout.rect.endY() + (isPrimitive ? SLOT_SIZE / 2 : 0);
-        } else {
-            this.progressBarIndex = -1;
         }
 
         AllCapabilities.MACHINE.tryGet(blockEntity).ifPresent(Machine::sendUpdate);
@@ -92,12 +78,6 @@ public abstract class ProcessingMenu extends Menu<BlockEntity, ProcessingMenu> {
 
             for (var image : layout.images) {
                 layoutPanel.addWidget(image.rect(), new StaticWidget(this, image.texture()));
-            }
-
-            var progressBar = layout.progressBar;
-            if (progressBar != null) {
-                var widget = new ProgressBar(this, progressBar.texture(), progressBarIndex);
-                layoutPanel.addWidget(progressBar.rect(), widget);
             }
 
             screen.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
