@@ -10,6 +10,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineConfig;
+import org.shsts.tinactory.core.gui.InventoryPlugin;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -18,8 +19,6 @@ import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.IMenu;
-import org.shsts.tinycorelib.api.gui.IMenuPlugin;
-import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,19 +32,24 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricStoragePlugin implements IMenuPlugin {
-    protected final IMenu menu;
+public class ElectricStoragePlugin extends InventoryPlugin<MenuScreen> {
     protected final Layout layout;
     protected final Machine machine;
     private final MachineConfig machineConfig;
 
     protected ElectricStoragePlugin(IMenu menu, Layout layout) {
-        this.menu = menu;
+        super(menu, layout.rect.endY() + SPACING * 2 + SLOT_SIZE);
         this.layout = layout;
         this.machine = AllCapabilities.MACHINE.get(menu.blockEntity());
         this.machineConfig = machine.config;
 
         menu.onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public Class<MenuScreen> menuScreenClass() {
+        return MenuScreen.class;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -143,8 +147,9 @@ public class ElectricStoragePlugin implements IMenuPlugin {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void applyMenuScreen(MenuScreenBase s) {
-        var screen = (MenuScreen) s;
+    public void applyMenuScreen(MenuScreen screen) {
+        super.applyMenuScreen(screen);
+
         var buttonY = layout.rect.endY() + SPACING;
         var offset = new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE);
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
@@ -157,6 +162,5 @@ public class ElectricStoragePlugin implements IMenuPlugin {
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
         screen.addWidget(anchor, offset, new SwitchButton("global", GLOBAL_TEX,
             0, 18, "chestLocal", "chestGlobal"));
-        screen.contentHeight = buttonY + SLOT_SIZE;
     }
 }

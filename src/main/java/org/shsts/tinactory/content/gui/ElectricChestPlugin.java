@@ -23,7 +23,6 @@ import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.IMenu;
-import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
 
 import java.util.List;
 import java.util.Optional;
@@ -232,10 +231,9 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void applyMenuScreen(MenuScreenBase s) {
-        super.applyMenuScreen(s);
+    public void applyMenuScreen(MenuScreen screen) {
+        super.applyMenuScreen(screen);
 
-        var screen = (MenuScreen) s;
         var layoutPanel = new Panel(screen);
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {
