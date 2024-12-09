@@ -5,6 +5,7 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.AllRecipes;
-import org.shsts.tinactory.content.gui.WorkbenchPlugin;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 
 import java.util.Collections;
@@ -20,10 +20,10 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchPlugin> {
+public class ToolCategory extends RecipeCategory<ToolRecipe, AbstractContainerMenu> {
     private ToolCategory(Block workbench) {
         super(AllRecipes.TOOL_CRAFTING, AllLayouts.WORKBENCH, Ingredient.of(workbench),
-            new ItemStack(workbench), WorkbenchPlugin.class);
+            new ItemStack(workbench), AbstractContainerMenu.class);
     }
 
     public ToolCategory() {

@@ -25,6 +25,7 @@ import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -48,7 +49,7 @@ import static org.shsts.tinactory.core.util.LocHelper.prepend;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?, M>> {
+public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends AbstractContainerMenu> {
     protected static final int WIDTH = Menu.CONTENT_WIDTH;
 
     protected final RecipeTypeEntry<? extends T, ?> recipeType;
@@ -143,7 +144,7 @@ public abstract class RecipeCategory<T extends SmartRecipe<?>, M extends Menu<?,
 
     protected List<Slot> getInventorySlots(M container) {
         var list = new ArrayList<Slot>();
-        var slotSize = container.getSlotSize();
+        var slotSize = container.slots.size();
         for (var k = layout.slots.size(); k < slotSize; k++) {
             list.add(container.getSlot(k));
         }

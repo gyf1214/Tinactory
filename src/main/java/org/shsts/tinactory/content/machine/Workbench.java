@@ -24,7 +24,6 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.core.common.CapabilityProvider;
@@ -36,6 +35,9 @@ import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.slf4j.Logger;
 
 import java.util.List;
+
+import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.WORKBENCH;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -212,9 +214,9 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
+        if (cap == MENU_ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
-        } else if (cap == AllCapabilities.WORKBENCH.get()) {
+        } else if (cap == WORKBENCH.get()) {
             return myself();
         }
         return LazyOptional.empty();

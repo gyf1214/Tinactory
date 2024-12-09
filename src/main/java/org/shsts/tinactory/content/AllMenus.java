@@ -4,7 +4,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.content.gui.ElectricChestPlugin;
 import org.shsts.tinactory.content.gui.ElectricTankPlugin;
+import org.shsts.tinactory.content.gui.WorkbenchPlugin;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
+import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
@@ -25,6 +27,7 @@ public final class AllMenus {
     public static final IMenuEvent<SlotEventPacket> CHEST_SLOT_CLICK;
     public static final IMenuEvent<SetMachineConfigPacket> SET_MACHINE_CONFIG;
 
+    public static final IMenuType WORKBENCH;
     public static final IMenuType NETWORK_CONTROLLER;
     public static final IMenuType ELECTRIC_CHEST;
     public static final IMenuType ELECTRIC_TANK;
@@ -42,6 +45,12 @@ public final class AllMenus {
             SlotEventPacket::new);
         SET_MACHINE_CONFIG = CHANNEL.registerMenuEventPacket(SetMachineConfigPacket.class,
             SetMachineConfigPacket::new);
+
+        WORKBENCH = REGISTRATE.menu("primitive/workbench")
+            .title("tinactory.gui.networkController.title")
+            .screen(() -> () -> WorkbenchScreen::new)
+            .plugin(WorkbenchPlugin::new)
+            .register();
 
         ELECTRIC_CHEST = REGISTRATE.menu("machine/electric_chest")
             .title(ProcessingMenu::getTitle)

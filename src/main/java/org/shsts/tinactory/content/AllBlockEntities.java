@@ -450,6 +450,7 @@ public final class AllBlockEntities {
                 PrimitiveBlock<SmartBlockEntity>::new)
             .blockEntity()
             .simpleCapability(Workbench::builder)
+            .setMenu(AllMenus.WORKBENCH)
             .build()
             .buildObject();
 
