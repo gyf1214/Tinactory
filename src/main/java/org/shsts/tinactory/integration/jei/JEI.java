@@ -24,6 +24,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -31,6 +32,7 @@ import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
+import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler1;
 import org.shsts.tinactory.integration.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientHelper;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
@@ -121,7 +123,8 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addGenericGuiContainerHandler(MenuScreen1.class, new MenuScreenHandler(this));
+        registration.addGenericGuiContainerHandler(MenuScreen1.class, new MenuScreenHandler1(this));
+        registration.addGenericGuiContainerHandler(MenuScreen.class, new MenuScreenHandler());
     }
 
     @Override

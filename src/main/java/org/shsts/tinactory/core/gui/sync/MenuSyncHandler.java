@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.network.NetworkEvent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
-import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Menu;
 import org.slf4j.Logger;
 
@@ -37,7 +36,6 @@ public final class MenuSyncHandler {
         register(MenuSyncPacket.Double.class, MenuSyncPacket.Double::new);
         register(MenuSyncPacket.LocHolder.class, MenuSyncPacket.LocHolder::new);
         register(FluidSyncPacket1.class, FluidSyncPacket1::new);
-        register(NetworkControllerSyncPacket.class, NetworkControllerSyncPacket::new);
         register(LogisticWorkerSyncPacket.class, LogisticWorkerSyncPacket::new);
     }
 }

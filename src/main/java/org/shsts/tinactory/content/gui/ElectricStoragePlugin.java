@@ -43,6 +43,7 @@ public class ElectricStoragePlugin extends InventoryPlugin<MenuScreen> {
         this.machine = AllCapabilities.MACHINE.get(menu.blockEntity());
         this.machineConfig = machine.config;
 
+        menu.setValidPredicate($ -> machine.canPlayerInteract(menu.player()));
         menu.onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
     }
 

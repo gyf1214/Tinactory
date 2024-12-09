@@ -37,9 +37,6 @@ public class FluidSyncPacket implements IPacket {
         if (!(o instanceof FluidSyncPacket that)) {
             return false;
         }
-        if (!super.equals(o)) {
-            return false;
-        }
         return fluidStack.isFluidStackIdentical(that.fluidStack);
     }
 

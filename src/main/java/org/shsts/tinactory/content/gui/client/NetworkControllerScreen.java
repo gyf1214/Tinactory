@@ -14,18 +14,18 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen1;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.Tab;
 import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinycorelib.api.gui.IMenu;
 import org.slf4j.Logger;
 
 import java.util.function.Consumer;
@@ -42,7 +42,7 @@ import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkControllerScreen extends MenuScreen1<NetworkControllerMenu> {
+public class NetworkControllerScreen extends MenuScreen {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int WELCOME_BUTTON_WIDTH = 72;
     public static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
@@ -60,8 +60,7 @@ public class NetworkControllerScreen extends MenuScreen1<NetworkControllerMenu> 
         return I18n.tr("tinactory.gui.networkController." + key, args);
     }
 
-    public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
-        Component title, int syncSlot) {
+    public NetworkControllerScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
 
         this.welcomePanel = new Panel(this);
@@ -88,7 +87,7 @@ public class NetworkControllerScreen extends MenuScreen1<NetworkControllerMenu> 
         rootPanel.addPanel(techPanel);
         rootPanel.addPanel(new Rect(-MARGIN_HORIZONTAL, -MARGIN_TOP, 0, 0), tabs);
 
-        menu.onSyncPacket(syncSlot, this::refresh);
+        menu.onSyncPacket("info", this::refresh);
         TechManager.client().onProgressChange(onTechChange);
         statePanel.setActive(false);
         welcomePanel.setActive(false);
@@ -152,7 +151,7 @@ public class NetworkControllerScreen extends MenuScreen1<NetworkControllerMenu> 
     }
 
     private void onWelcomePressed() {
-        if (menu.player instanceof LocalPlayer player) {
+        if (iMenu.player() instanceof LocalPlayer player) {
             var name = welcomeEdit.getValue();
             var command = "/" + Tinactory.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
             player.chat(command);

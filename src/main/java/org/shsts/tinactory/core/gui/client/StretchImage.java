@@ -8,6 +8,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -16,6 +17,13 @@ public class StretchImage extends MenuWidget {
     private final Texture texture;
     private final Rect texRect;
     private final int border;
+
+    public StretchImage(IMenu menu, Texture texture, Rect texRect, int border) {
+        super(menu);
+        this.texture = texture;
+        this.texRect = texRect;
+        this.border = border;
+    }
 
     public StretchImage(Menu<?, ?> menu, Texture texture, Rect texRect, int border) {
         super(menu);

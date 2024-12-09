@@ -101,9 +101,9 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             var recipe = getRecipe(loc);
             ghostRecipe.clear();
             if (recipe == null) {
-                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket1.builder().reset("targetRecipe"));
+                menu1.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket1.builder().reset("targetRecipe"));
             } else {
-                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket1.builder().set("targetRecipe", loc));
+                menu1.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket1.builder().set("targetRecipe", loc));
                 selectRecipe(recipe);
             }
         }
@@ -136,7 +136,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
         this.ghostRecipe = new GhostRecipe(screen.getMenu());
 
         buttonPanel = new RecipeButtonPanel();
-        var panelBg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);
+        var panelBg = new StretchImage(menu1, Texture.RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);
         bookPanel.addWidget(RectD.FULL, Rect.ZERO, panelBg);
         bookPanel.addPanel(BUTTON_PANEL_OFFSET, buttonPanel);
         bookPanel.setActive(false);

@@ -8,7 +8,6 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.BoilerPlugin;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
-import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
@@ -443,10 +442,7 @@ public final class AllBlockEntities {
             .blockEntity()
             .eventManager().ticking()
             .simpleCapability(NetworkController::factory)
-            .menu(NetworkControllerMenu::new)
-            .noInventory()
-            .title("networkController")
-            .build()
+            .setMenu(AllMenus.NETWORK_CONTROLLER)
             .build()
             .translucent()
             .buildObject();

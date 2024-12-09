@@ -55,6 +55,10 @@ public class MenuScreen extends MenuScreenBase implements IMenuScreen, IWidgetCo
         }
     }
 
+    public IMenu menu() {
+        return iMenu;
+    }
+
     @Override
     public void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget) {
         rootPanel.addGuiComponent(anchor, offset, widget);

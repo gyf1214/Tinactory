@@ -56,9 +56,6 @@ public class ChestItemSyncPacket implements IPacket {
         if (!(o instanceof ChestItemSyncPacket that)) {
             return false;
         }
-        if (!super.equals(o)) {
-            return false;
-        }
         return StackHelper.itemStackEqual(stack, that.stack) &&
             filterEqual(that);
     }

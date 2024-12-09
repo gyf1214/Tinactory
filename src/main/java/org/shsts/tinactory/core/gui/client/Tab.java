@@ -5,10 +5,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class Tab extends Panel {
         private final int index;
         private final ItemStack icon;
 
-        public TabButton(Menu<?, ?> menu, int index, ItemStack icon) {
+        public TabButton(IMenu menu, int index, ItemStack icon) {
             super(menu);
             this.index = index;
             this.icon = icon;
@@ -57,7 +57,7 @@ public class Tab extends Panel {
     private final List<Panel> tabPanels = new ArrayList<>();
     private int currentTab = 0;
 
-    public Tab(MenuScreen1<?> screen, Object... args) {
+    public Tab(MenuScreen screen, Object... args) {
         super(screen);
 
         for (var i = 0; i < args.length; i++) {

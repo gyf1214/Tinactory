@@ -134,7 +134,7 @@ public class LogisticWorkerScreen extends MenuScreen1<LogisticWorkerMenu> {
                 config.setValid(!config.isValid());
                 var packet = SetMachineConfigPacket1.builder()
                     .set(PREFIX + index, config.serializeNBT());
-                menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, packet);
+                menu1.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, packet);
             }
         }
 
@@ -244,7 +244,7 @@ public class LogisticWorkerScreen extends MenuScreen1<LogisticWorkerMenu> {
             }
             var packet = SetMachineConfigPacket1.builder()
                 .set(PREFIX + selectedConfig, config.serializeNBT());
-            menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, packet);
+            menu1.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, packet);
         }
 
         @Override

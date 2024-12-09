@@ -4,6 +4,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.content.gui.ElectricChestPlugin;
 import org.shsts.tinactory.content.gui.ElectricTankPlugin;
+import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
+import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
@@ -23,12 +25,16 @@ public final class AllMenus {
     public static final IMenuEvent<SlotEventPacket> CHEST_SLOT_CLICK;
     public static final IMenuEvent<SetMachineConfigPacket> SET_MACHINE_CONFIG;
 
+    public static final IMenuType NETWORK_CONTROLLER;
     public static final IMenuType ELECTRIC_CHEST;
     public static final IMenuType ELECTRIC_TANK;
 
     static {
-        CHANNEL.registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
-            .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new);
+        CHANNEL
+            .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
+            .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new)
+            .registerMenuSyncPacket(NetworkControllerSyncPacket.class,
+                NetworkControllerSyncPacket::new);
 
         FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class,
             SlotEventPacket::new);
@@ -37,16 +43,27 @@ public final class AllMenus {
         SET_MACHINE_CONFIG = CHANNEL.registerMenuEventPacket(SetMachineConfigPacket.class,
             SetMachineConfigPacket::new);
 
-        ELECTRIC_CHEST = REGISTRATE.menu("machine/" + "/electric_chest")
+        ELECTRIC_CHEST = REGISTRATE.menu("machine/electric_chest")
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> MenuScreen::new)
             .plugin(ElectricChestPlugin::new)
             .register();
 
-        ELECTRIC_TANK = REGISTRATE.menu("machine/" + "/electric_tank")
+        ELECTRIC_TANK = REGISTRATE.menu("machine/electric_tank")
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> MenuScreen::new)
             .plugin(ElectricTankPlugin::new)
+            .register();
+
+        NETWORK_CONTROLLER = REGISTRATE.menu("network/controller")
+            .title("tinactory.gui.networkController.title")
+            .screen(() -> () -> NetworkControllerScreen::new)
+            .dummyPlugin(menu -> {
+                menu.setValidPredicate($ -> AllCapabilities.NETWORK_CONTROLLER
+                    .get(menu.blockEntity())
+                    .canPlayerInteract(menu.player()));
+                menu.addSyncSlot("info", NetworkControllerSyncPacket::new);
+            })
             .register();
     }
 
