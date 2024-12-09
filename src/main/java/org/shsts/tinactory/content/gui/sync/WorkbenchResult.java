@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui.sync;
+package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -10,10 +10,10 @@ import org.shsts.tinactory.core.gui.Menu;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CraftingSlot extends Slot {
+public class WorkbenchResult extends Slot {
     private final IWorkbench workbench;
 
-    public CraftingSlot(IWorkbench workbench, int xPos, int yPos) {
+    public WorkbenchResult(IWorkbench workbench, int xPos, int yPos) {
         super(Menu.EMPTY_CONTAINER, 0, xPos, yPos);
         this.workbench = workbench;
     }

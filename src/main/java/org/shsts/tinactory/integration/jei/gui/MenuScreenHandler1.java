@@ -6,9 +6,7 @@ import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
-import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
@@ -36,15 +34,6 @@ public class MenuScreenHandler1 implements IGuiContainerHandler<MenuScreen1<?>> 
         this.plugin = plugin;
         this.clickableHandlers = new HashMap<>();
         clickableHandler(ProcessingMenu.class, this::processingClickable);
-
-        var layout = AllLayouts.WORKBENCH;
-        var rect = layout.images.get(0).rect();
-        var x = rect.x() + layout.getXOffset() + MARGIN_HORIZONTAL;
-        var y = rect.y() + MARGIN_TOP;
-        var workbenchArea = IGuiClickableArea.createBasic(x, y,
-            rect.width(), rect.height(), plugin.toolCategory.type);
-
-        clickableHandler(WorkbenchMenu.class, screen -> Optional.of(workbenchArea));
     }
 
     private <M extends Menu<?, M>> void clickableHandler(Class<M> clazz,

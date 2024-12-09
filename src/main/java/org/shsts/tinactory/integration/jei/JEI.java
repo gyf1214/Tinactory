@@ -22,7 +22,6 @@ import org.shsts.tinactory.content.AllMultiBlocks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.MenuScreen1;
@@ -124,7 +123,8 @@ public class JEI implements IModPlugin {
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addGenericGuiContainerHandler(MenuScreen1.class, new MenuScreenHandler1(this));
-        registration.addGenericGuiContainerHandler(MenuScreen.class, new MenuScreenHandler());
+        registration.addGuiContainerHandler(MenuScreen.class, new MenuScreenHandler());
+        MenuScreenHandler.addWorkbenchClickArea(registration, toolCategory);
     }
 
     @Override
@@ -132,6 +132,6 @@ public class JEI implements IModPlugin {
         for (var category : categories) {
             category.registerRecipeTransferHandlers(registration);
         }
-        registration.addRecipeTransferHandler(WorkbenchMenu.class, RecipeTypes.CRAFTING, 9, 9, 19, 36);
+//        registration.addRecipeTransferHandler(WorkbenchPlugin.class, RecipeTypes.CRAFTING, 9, 9, 19, 36);
     }
 }

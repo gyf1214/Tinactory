@@ -10,6 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -25,10 +26,13 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 @MethodsReturnNonnullByDefault
 public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlugin<S> {
     protected final IMenu menu;
+    private final int beginInvSlot;
+    private final int endInvSlot;
     private final int endY;
 
     public InventoryPlugin(IMenu menu, int y) {
         this.menu = menu;
+        this.beginInvSlot = menu.getSlotSize();
         var inventory = menu.inventory();
         var barY = y + 3 * SLOT_SIZE + SPACING;
         var barY1 = barY + MARGIN_TOP;
@@ -43,7 +47,53 @@ public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlug
                 menu.addSlot(new Slot(inventory, 9 + i * 9 + j, x + 1, y1 + 1));
             }
         }
+        this.endInvSlot = menu.getSlotSize();
         this.endY = barY + SLOT_SIZE;
+
+        menu.setOnQuickMoveStack(this::onQuickMoveStack);
+    }
+
+    protected boolean onQuickMoveStack(Slot slot) {
+        if (menu.world().isClientSide) {
+            return false;
+        }
+        if (!slot.hasItem()) {
+            return false;
+        }
+        var inv = new PlayerMainInvWrapper(menu.inventory());
+        if (slot.index < beginInvSlot || slot.index >= endInvSlot) {
+            if (!slot.mayPickup(menu.player())) {
+                return false;
+            }
+            var oldStack = slot.getItem().copy();
+            var stack = oldStack.copy();
+            var reminder = ItemHandlerHelper.insertItemStacked(inv, stack, true);
+            stack.shrink(reminder.getCount());
+            if (stack.isEmpty()) {
+                return false;
+            }
+            var stack1 = slot.safeTake(stack.getCount(), Integer.MAX_VALUE, menu.player());
+            ItemHandlerHelper.insertItemStacked(inv, stack1, false);
+
+            return ItemStack.isSame(oldStack, slot.getItem());
+        } else {
+            var invIndex = slot.getContainerSlot();
+            var oldStack = inv.getStackInSlot(invIndex).copy();
+            var stack = oldStack.copy();
+            var amount = stack.getCount();
+            for (var i = 0; i < menu.getSlotSize(); i = i + 1 == beginInvSlot ? endInvSlot : i + 1) {
+                var targetSlot = menu.getSlot(i);
+                if (!targetSlot.mayPlace(stack)) {
+                    continue;
+                }
+                var reminder = targetSlot.safeInsert(stack);
+                if (reminder.getCount() < amount) {
+                    inv.extractItem(invIndex, amount - reminder.getCount(), false);
+                    return ItemStack.isSame(oldStack, slot.getItem());
+                }
+            }
+            return false;
+        }
     }
 
     protected enum FluidClickAction {

@@ -9,7 +9,6 @@ import org.shsts.tinactory.content.gui.BoilerPlugin;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
-import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
@@ -451,7 +450,6 @@ public final class AllBlockEntities {
                 PrimitiveBlock<SmartBlockEntity>::new)
             .blockEntity()
             .simpleCapability(Workbench::builder)
-            .menu(WorkbenchMenu::new).build()
             .build()
             .buildObject();
 
