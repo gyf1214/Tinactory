@@ -13,7 +13,6 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
@@ -22,6 +21,8 @@ import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
 import java.util.Arrays;
 import java.util.function.Function;
+
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -87,7 +88,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
+        if (cap == FLUID_STACK_HANDLER.get()) {
             return fluidHandlerCap.cast();
         }
         return super.getCapability(cap, side);

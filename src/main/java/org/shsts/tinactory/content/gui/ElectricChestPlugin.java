@@ -119,12 +119,8 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
     }
 
     public ElectricChestPlugin(IMenu menu) {
-        this(menu, (ElectricChest) PROCESSOR.get(menu.blockEntity()));
-    }
-
-    private ElectricChestPlugin(IMenu menu, ElectricChest chest) {
-        super(menu, chest.layout);
-        this.chest = chest;
+        super(menu);
+        this.chest = (ElectricChest) PROCESSOR.get(menu.blockEntity());
 
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {

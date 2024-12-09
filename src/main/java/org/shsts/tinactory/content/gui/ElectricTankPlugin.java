@@ -41,12 +41,8 @@ public class ElectricTankPlugin extends ElectricStoragePlugin {
     private final IFluidStackHandler container;
 
     public ElectricTankPlugin(IMenu menu) {
-        this(menu, (ElectricTank) PROCESSOR.get(menu.blockEntity()));
-    }
-
-    private ElectricTankPlugin(IMenu menu, ElectricTank tank) {
-        super(menu, tank.layout);
-        this.tank = tank;
+        super(menu);
+        this.tank = (ElectricTank) PROCESSOR.get(menu.blockEntity());
         this.container = FLUID_STACK_HANDLER.get(menu.blockEntity());
 
         for (var slot : layout.slots) {

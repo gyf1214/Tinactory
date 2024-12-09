@@ -9,13 +9,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
+import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
 /**
@@ -32,7 +32,7 @@ public class PrimitiveMachine extends CapabilityProvider implements IEventSubscr
 
     private void onServerTick(Level world) {
         var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
-        var processor = AllCapabilities.PROCESSOR.get(blockEntity);
+        var processor = PROCESSOR.get(blockEntity);
         processor.onPreWork();
         processor.onWorkTick(workSpeed);
         var working = processor.getProgress() > 0d;

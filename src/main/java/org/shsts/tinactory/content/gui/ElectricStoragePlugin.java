@@ -6,7 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineConfig;
@@ -23,6 +22,8 @@ import org.shsts.tinycorelib.api.gui.IMenu;
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
@@ -37,10 +38,14 @@ public class ElectricStoragePlugin extends InventoryPlugin<MenuScreen> {
     protected final Machine machine;
     private final MachineConfig machineConfig;
 
-    protected ElectricStoragePlugin(IMenu menu, Layout layout) {
+    protected ElectricStoragePlugin(IMenu menu) {
+        this(menu, LAYOUT_PROVIDER.get(menu.blockEntity()).getLayout());
+    }
+
+    private ElectricStoragePlugin(IMenu menu, Layout layout) {
         super(menu, layout.rect.endY() + SPACING * 2 + SLOT_SIZE);
         this.layout = layout;
-        this.machine = AllCapabilities.MACHINE.get(menu.blockEntity());
+        this.machine = MACHINE.get(menu.blockEntity());
         this.machineConfig = machine.config;
 
         menu.setValidPredicate($ -> machine.canPlayerInteract(menu.player()));

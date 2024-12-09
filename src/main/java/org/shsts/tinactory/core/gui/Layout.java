@@ -114,4 +114,6 @@ public class Layout {
     public static LayoutSetBuilder<?> builder() {
         return new LayoutSetBuilder<>(Unit.INSTANCE);
     }
+
+    public static final Layout EMPTY = builder().buildLayout();
 }

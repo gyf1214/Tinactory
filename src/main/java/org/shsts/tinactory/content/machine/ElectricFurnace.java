@@ -17,7 +17,6 @@ import net.minecraftforge.items.wrapper.RecipeWrapper;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -25,6 +24,8 @@ import org.shsts.tinactory.core.machine.RecipeProcessor;
 
 import java.util.Random;
 import java.util.stream.Stream;
+
+import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -146,7 +147,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
+        if (cap == ELECTRIC_MACHINE.get()) {
             return myself();
         }
         return super.getCapability(cap, side);

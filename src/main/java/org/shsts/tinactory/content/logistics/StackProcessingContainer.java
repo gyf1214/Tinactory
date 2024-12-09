@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -10,7 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -29,6 +27,7 @@ import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
@@ -37,10 +36,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StackProcessingContainer extends CapabilityProvider
-    implements IContainer, INBTSerializable<CompoundTag> {
+    implements IContainer, ILayoutProvider, INBTSerializable<CompoundTag> {
     private record PortInfo(SlotType type, IPort externalPort, IPort internalPort) {
         public static final PortInfo EMPTY = new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
     }
@@ -180,16 +185,20 @@ public class StackProcessingContainer extends CapabilityProvider
         return internal ? portInfo.internalPort : portInfo.externalPort;
     }
 
-    @Nonnull
+    @Override
+    public Layout getLayout() {
+        return layout;
+    }
+
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.CONTAINER.get()) {
+        if (cap == LAYOUT_PROVIDER.get() || cap == CONTAINER.get()) {
             return myself();
-        } else if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
+        } else if (cap == FLUID_STACK_HANDLER.get()) {
             return fluidHandlerCap.cast();
-        } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        } else if (cap == ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
-        } else if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
+        } else if (cap == MENU_ITEM_HANDLER.get()) {
             return menuItemHandlerCap.cast();
         }
         return LazyOptional.empty();

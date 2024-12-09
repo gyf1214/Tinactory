@@ -13,6 +13,7 @@ import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.UpdateHelper;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
+import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinycorelib.api.registrate.entry.ICapability;
@@ -31,6 +32,7 @@ public final class AllCapabilities {
     public static final ICapability<IFluidStackHandler> FLUID_STACK_HANDLER;
     public static final ICapability<IItemHandlerModifiable> MENU_ITEM_HANDLER;
 
+    public static final ICapability<ILayoutProvider> LAYOUT_PROVIDER;
     public static final ICapability<Machine> MACHINE;
     public static final ICapability<NetworkController> NETWORK_CONTROLLER;
     public static final ICapability<LogisticWorker> LOGISTIC_WORKER;
@@ -48,6 +50,7 @@ public final class AllCapabilities {
         FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
         MENU_ITEM_HANDLER = REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
 
+        LAYOUT_PROVIDER = REGISTRATE.capability(ILayoutProvider.class, new CapabilityToken<>() {});
         MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
         NETWORK_CONTROLLER = REGISTRATE.capability(NetworkController.class, new CapabilityToken<>() {});
         LOGISTIC_WORKER = REGISTRATE.capability(LogisticWorker.class, new CapabilityToken<>() {});
