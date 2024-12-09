@@ -30,10 +30,12 @@ import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 import static org.shsts.tinactory.core.util.ClientUtil.INTEGER_FORMAT;
@@ -47,7 +49,7 @@ public class NetworkControllerScreen extends MenuScreen {
     private static final int WELCOME_BUTTON_WIDTH = 72;
     public static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
     public static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + FONT_HEIGHT +
-        MARGIN_VERTICAL * 3 + MARGIN_TOP;
+        MARGIN_VERTICAL * 2 + SPACING + PANEL_BORDER * 2;
 
     private final Panel welcomePanel;
     private final EditBox welcomeEdit;
@@ -93,7 +95,7 @@ public class NetworkControllerScreen extends MenuScreen {
         welcomePanel.setActive(false);
 
         this.contentWidth = WIDTH;
-        this.imageHeight = HEIGHT;
+        this.contentHeight = HEIGHT;
     }
 
     @Override

@@ -228,7 +228,6 @@ public class TechPanel extends Panel {
         addPanel(anchor1, offset2, availableTechPanel);
 
         this.selectedTechPanel = new Panel(screen);
-
         this.selectedTechLabel = new Label(menu);
         this.selectedTechDetailsLabel = new Label(menu);
         var label3 = new Label(menu, tr("techRequirementsLabel"));
