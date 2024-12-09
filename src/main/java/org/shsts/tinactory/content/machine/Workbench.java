@@ -8,7 +8,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -45,19 +44,60 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static class CraftingStack extends CraftingContainer {
+        private final IItemHandlerModifiable items;
+
         @SuppressWarnings("ConstantConditions")
-        public CraftingStack(int width, int height) {
+        public CraftingStack(IItemHandlerModifiable items, int width, int height) {
             super(null, width, height);
+            this.items = items;
+        }
+
+        @Override
+        public int getContainerSize() {
+            return getWidth() * getHeight();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            for (var i = 0; i < items.getSlots(); i++) {
+                if (!items.getStackInSlot(i).isEmpty()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public ItemStack getItem(int index) {
+            return items.getStackInSlot(index);
+        }
+
+        @Override
+        public ItemStack removeItemNoUpdate(int index) {
+            var stack = getItem(index);
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            setItem(index, ItemStack.EMPTY);
+            return stack;
         }
 
         @Override
         public ItemStack removeItem(int index, int count) {
-            return ContainerHelper.removeItem(items, index, count);
+            var stack = items.getStackInSlot(index);
+            return stack.isEmpty() ? ItemStack.EMPTY : stack.split(count);
         }
 
         @Override
         public void setItem(int index, ItemStack stack) {
-            items.set(index, stack);
+            items.setStackInSlot(index, stack);
+        }
+
+        @Override
+        public void clearContent() {
+            for (var i = 0; i < items.getSlots(); i++) {
+                items.setStackInSlot(i, ItemStack.EMPTY);
+            }
         }
     }
 
@@ -81,7 +121,7 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     private boolean initialized = false;
     private final BlockEntity blockEntity;
     private final CraftingStack craftingStack;
-    private final WrapperItemHandler craftingView;
+    private final ItemStackHandler craftingView;
     private final ToolItemHandler toolStorage;
     private ItemStack output;
     private final WrapperItemHandler itemView;
@@ -93,8 +133,8 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     public Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
 
-        this.craftingStack = new CraftingStack(3, 3);
-        this.craftingView = new WrapperItemHandler(craftingStack);
+        this.craftingView = new ItemStackHandler(9);
+        this.craftingStack = new CraftingStack(craftingView, 3, 3);
 
         this.output = ItemStack.EMPTY;
 
@@ -211,7 +251,6 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         return toolStorage;
     }
 
-    @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == MENU_ITEM_HANDLER.get()) {
