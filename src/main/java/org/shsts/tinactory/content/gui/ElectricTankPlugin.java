@@ -4,62 +4,65 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.ElectricTank;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.MenuScreen1;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricTankMenu extends Menu<BlockEntity, ElectricTankMenu> {
-    private final Layout layout;
+public class ElectricTankPlugin extends ElectricStoragePlugin {
     private final Map<Layout.SlotInfo, Integer> fluidSyncIndex = new HashMap<>();
     private final Map<Layout.SlotInfo, Integer> filterSyncIndex = new HashMap<>();
     private final ElectricTank tank;
+    private final IFluidStackHandler container;
 
-    public ElectricTankMenu(SmartMenuType<? extends BlockEntity, ?> type, int id,
-        Inventory inventory, BlockEntity blockEntity, Layout layout) {
-        super(type, id, inventory, blockEntity);
-        this.layout = layout;
-        this.tank = (ElectricTank) AllCapabilities.PROCESSOR.get(blockEntity);
-
-        for (var slot : layout.slots) {
-            fluidSyncIndex.put(slot, addFluidSlot(slot.index()));
-            filterSyncIndex.put(slot, addSyncSlot(FluidSyncPacket::new,
-                $ -> tank.getFilter(slot.index())));
-        }
-        this.height = layout.rect.endY();
+    public ElectricTankPlugin(IMenu menu) {
+        this(menu, (ElectricTank) PROCESSOR.get(menu.blockEntity()));
     }
 
-    @Override
-    public void clickFluidSlot(int tankIndex, int button) {
-        if (fluidContainer == null) {
-            return;
+    private ElectricTankPlugin(IMenu menu, ElectricTank tank) {
+        super(menu, tank.layout);
+        this.tank = tank;
+        this.container = FLUID_STACK_HANDLER.get(menu.blockEntity());
+
+        for (var slot : layout.slots) {
+            fluidSyncIndex.put(slot, menu.addSyncSlot($ ->
+                new FluidSyncPacket(container.getFluidInTank(slot.index()))));
+            filterSyncIndex.put(slot, menu.addSyncSlot($ ->
+                new FluidSyncPacket(tank.getFilter(slot.index()))));
         }
-        if (fluidContainer.getFluidInTank(tankIndex).isEmpty()) {
+
+        menu.onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(p.getIndex(), p.getButton()));
+    }
+
+    private void clickFluidSlot(int tankIndex, int button) {
+        if (container.getFluidInTank(tankIndex).isEmpty()) {
             var filter = tank.getFilter(tankIndex);
-            var carried = getCarried();
+            var carried = menu.getMenu().getCarried();
             var fluidCarried = StackHelper.getFluidHandlerFromItem(carried)
                 .map(h -> h.getFluidInTank(0))
                 .orElse(FluidStack.EMPTY);
@@ -73,20 +76,20 @@ public class ElectricTankMenu extends Menu<BlockEntity, ElectricTankMenu> {
                 }
             }
         }
-        super.clickFluidSlot(tankIndex, button);
+        clickFluidSlot(container, tankIndex, button);
     }
 
     @OnlyIn(Dist.CLIENT)
     private class TankSlot extends FluidSlot {
         private final int filterIndex;
 
-        public TankSlot(Menu<?, ?> menu, Layout.SlotInfo slot) {
+        public TankSlot(IMenu menu, Layout.SlotInfo slot) {
             super(menu, slot.index(), fluidSyncIndex.get(slot));
             this.filterIndex = filterSyncIndex.get(slot);
         }
 
         private FluidStack getFilterFluid() {
-            return getSyncPacket(filterIndex, FluidSyncPacket.class)
+            return menu.getSyncPacket(filterIndex, FluidSyncPacket.class)
                 .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
         }
 
@@ -117,24 +120,18 @@ public class ElectricTankMenu extends Menu<BlockEntity, ElectricTankMenu> {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
-    public MenuScreen1<ElectricTankMenu> createScreen(Inventory inventory, Component title) {
-        var screen = new MenuScreen1<>(this, inventory, title);
+    @OnlyIn(Dist.CLIENT)
+    public void applyMenuScreen(MenuScreen screen) {
+        super.applyMenuScreen(screen);
 
         var layoutPanel = new Panel(screen);
         for (var slot : layout.slots) {
             var rect = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
             var rect1 = rect.offset(1, 1).enlarge(-2, -2);
-            layoutPanel.addWidget(rect, new StaticWidget(this, Texture.SLOT_BACKGROUND));
-            layoutPanel.addWidget(rect1, new TankSlot(this, slot));
+            layoutPanel.addWidget(rect, new StaticWidget(menu, Texture.SLOT_BACKGROUND));
+            layoutPanel.addWidget(rect1, new TankSlot(menu, slot));
         }
         screen.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
-
-        return screen;
-    }
-
-    public static <T extends BlockEntity> Menu.Factory<T, ElectricTankMenu> factory(Layout layout) {
-        return (type, id, inventory, be) -> new ElectricTankMenu(type, id, inventory, be, layout);
     }
 }

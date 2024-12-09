@@ -6,7 +6,6 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.BoilerPlugin;
-import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
@@ -414,7 +413,7 @@ public final class AllBlockEntities {
         ELECTRIC_TANK = set.machine()
             .machine(v -> "machine/" + v.id + "/electric_tank", MachineBlock::factory)
             .layoutCapability(ElectricTank::builder)
-            .layoutMenu(ElectricTankMenu::factory)
+            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.ELECTRIC_TANK).build())
             .voltages(Voltage.ULV, Voltage.HV)
             .layoutSet()
             .port(FLUID_INPUT)

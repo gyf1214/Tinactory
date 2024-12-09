@@ -25,20 +25,20 @@ import java.util.Optional;
 public abstract class MenuWidget extends GuiComponent implements
     Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
 
-    protected final IMenu iMenu;
-    protected final Menu<?, ?> menu;
+    protected final IMenu menu;
+    protected final Menu<?, ?> menu1;
     protected Rect rect;
     protected boolean active = true;
 
     public MenuWidget(IMenu menu) {
-        this.iMenu = menu;
-        this.menu = null;
+        this.menu = menu;
+        this.menu1 = null;
         this.setBlitOffset(0);
     }
 
-    public MenuWidget(Menu<?, ?> menu) {
-        this.iMenu = null;
-        this.menu = menu;
+    public MenuWidget(Menu<?, ?> menu1) {
+        this.menu = null;
+        this.menu1 = menu1;
         this.setBlitOffset(0);
     }
 
@@ -76,7 +76,7 @@ public abstract class MenuWidget extends GuiComponent implements
     }
 
     protected boolean isClicking(double mouseX, double mouseY, int button) {
-        return active && canClick(button) && rect.in(mouseX, mouseY);
+        return active && rect.in(mouseX, mouseY) && canClick(button);
     }
 
     @Override

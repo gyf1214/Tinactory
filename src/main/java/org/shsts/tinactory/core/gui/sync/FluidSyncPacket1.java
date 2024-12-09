@@ -4,28 +4,30 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FluidSyncPacket implements IPacket {
-    private FluidStack fluidStack;
+public class FluidSyncPacket1 extends MenuSyncPacket {
+    private FluidStack fluidStack = FluidStack.EMPTY;
 
-    public FluidSyncPacket() {}
+    public FluidSyncPacket1() {}
 
-    public FluidSyncPacket(FluidStack fluidStack) {
+    public FluidSyncPacket1(int containerId, int index, FluidStack fluidStack) {
+        super(containerId, index);
         this.fluidStack = fluidStack.copy();
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
+        super.serializeToBuf(buf);
         fluidStack.writeToPacket(buf);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
+        super.deserializeFromBuf(buf);
         fluidStack = FluidStack.readFromPacket(buf);
     }
 
@@ -34,7 +36,7 @@ public class FluidSyncPacket implements IPacket {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof FluidSyncPacket that)) {
+        if (!(o instanceof FluidSyncPacket1 that)) {
             return false;
         }
         if (!super.equals(o)) {

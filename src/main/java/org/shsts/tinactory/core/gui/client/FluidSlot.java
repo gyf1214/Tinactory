@@ -10,12 +10,17 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.core.gui.sync.FluidSyncPacket1;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
+import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket1;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -26,6 +31,12 @@ public class FluidSlot extends MenuWidget {
     private final int tank;
     private final int syncSlot;
 
+    public FluidSlot(IMenu menu, int tank, int syncSlot) {
+        super(menu);
+        this.tank = tank;
+        this.syncSlot = syncSlot;
+    }
+
     public FluidSlot(Menu<?, ?> menu, int tank, int syncSlot) {
         super(menu);
         this.tank = tank;
@@ -33,8 +44,13 @@ public class FluidSlot extends MenuWidget {
     }
 
     public FluidStack getFluidStack() {
-        return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
-            .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
+        if (menu1 == null) {
+            return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
+                .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
+        } else {
+            return menu1.getSyncPacket(syncSlot, FluidSyncPacket1.class)
+                .map(FluidSyncPacket1::getFluidStack).orElse(FluidStack.EMPTY);
+        }
     }
 
     @Override
@@ -53,13 +69,18 @@ public class FluidSlot extends MenuWidget {
 
     @Override
     protected boolean canClick(int button) {
-        return (button == 0 || button == 1) && !menu.getCarried().isEmpty();
+        var menu2 = menu1 == null ? menu.getMenu() : menu1;
+        return (button == 0 || button == 1) && !menu2.getCarried().isEmpty();
     }
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        menu.triggerEvent(MenuEventHandler.FLUID_SLOT_CLICK, (containerId, eventId) ->
-            new SlotEventPacket1(containerId, eventId, tank, button));
+        if (menu1 == null) {
+            menu.triggerEvent(FLUID_SLOT_CLICK, () -> new SlotEventPacket(tank, button));
+        } else {
+            menu1.triggerEvent(MenuEventHandler.FLUID_SLOT_CLICK, (containerId, eventId) ->
+                new SlotEventPacket1(containerId, eventId, tank, button));
+        }
     }
 
     @Override

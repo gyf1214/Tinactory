@@ -26,7 +26,7 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.client.MenuScreen1;
-import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.core.gui.sync.FluidSyncPacket1;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
 import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
@@ -277,7 +277,7 @@ public class Menu<T extends BlockEntity, S extends Menu<T, S>> extends AbstractC
 
     public int addFluidSlot(int tank) {
         assert fluidContainer != null;
-        return addSyncSlot(FluidSyncPacket::new, $ -> fluidContainer.getTank(tank).getFluid());
+        return addSyncSlot(FluidSyncPacket1::new, $ -> fluidContainer.getTank(tank).getFluid());
     }
 
     protected enum FluidClickAction {

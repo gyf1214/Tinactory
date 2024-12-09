@@ -36,7 +36,7 @@ public final class MenuSyncHandler {
         register(MenuSyncPacket.Long.class, MenuSyncPacket.Long::new);
         register(MenuSyncPacket.Double.class, MenuSyncPacket.Double::new);
         register(MenuSyncPacket.LocHolder.class, MenuSyncPacket.LocHolder::new);
-        register(FluidSyncPacket.class, FluidSyncPacket::new);
+        register(FluidSyncPacket1.class, FluidSyncPacket1::new);
         register(NetworkControllerSyncPacket.class, NetworkControllerSyncPacket::new);
         register(LogisticWorkerSyncPacket.class, LogisticWorkerSyncPacket::new);
     }

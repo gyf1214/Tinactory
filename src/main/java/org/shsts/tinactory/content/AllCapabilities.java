@@ -1,6 +1,8 @@
 package org.shsts.tinactory.content;
 
 import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
@@ -18,6 +20,8 @@ import org.shsts.tinycorelib.api.registrate.entry.ICapability;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 public final class AllCapabilities {
+    public static final ICapability<IItemHandler> ITEM_HANDLER;
+
     public static final ICapability<UpdateHelper> UPDATE_HELPER;
     public static final ICapability<EventManager> EVENT_MANAGER;
     public static final ICapability<IProcessor> PROCESSOR;
@@ -33,6 +37,8 @@ public final class AllCapabilities {
     public static final ICapability<MultiBlock> MULTI_BLOCK;
 
     static {
+        ITEM_HANDLER = REGISTRATE.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+
         UPDATE_HELPER = REGISTRATE.capability(UpdateHelper.class, new CapabilityToken<>() {});
         EVENT_MANAGER = REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
         PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});

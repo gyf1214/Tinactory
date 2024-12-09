@@ -94,7 +94,7 @@ public class ElectricStoragePlugin extends InventoryPlugin<MenuScreen> {
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             super.onMouseClicked(mouseX, mouseY, button);
             var val = !machineConfig.getBoolean(configKey);
-            iMenu.triggerEvent(SET_MACHINE_CONFIG,
+            menu.triggerEvent(SET_MACHINE_CONFIG,
                 SetMachineConfigPacket.builder().set(configKey, val));
         }
     }
@@ -135,7 +135,7 @@ public class ElectricStoragePlugin extends InventoryPlugin<MenuScreen> {
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             super.onMouseClicked(mouseX, mouseY, button);
             var val = !machineConfig.getBoolean(configKey);
-            iMenu.triggerEvent(SET_MACHINE_CONFIG,
+            menu.triggerEvent(SET_MACHINE_CONFIG,
                 SetMachineConfigPacket.builder().set(configKey, val));
         }
     }

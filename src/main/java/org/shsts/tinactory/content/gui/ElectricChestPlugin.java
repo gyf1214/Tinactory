@@ -122,7 +122,7 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
         this(menu, (ElectricChest) PROCESSOR.get(menu.blockEntity()));
     }
 
-    public ElectricChestPlugin(IMenu menu, ElectricChest chest) {
+    private ElectricChestPlugin(IMenu menu, ElectricChest chest) {
         super(menu, chest.layout);
         this.chest = chest;
 
@@ -225,7 +225,7 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
-            iMenu.triggerEvent(CHEST_SLOT_CLICK, () -> new SlotEventPacket(slot, button));
+            menu.triggerEvent(CHEST_SLOT_CLICK, () -> new SlotEventPacket(slot, button));
         }
     }
 
