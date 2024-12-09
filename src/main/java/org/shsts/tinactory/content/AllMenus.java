@@ -5,8 +5,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.content.gui.ElectricChestPlugin;
 import org.shsts.tinactory.content.gui.ElectricTankPlugin;
 import org.shsts.tinactory.content.gui.WorkbenchPlugin;
+import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
+import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
@@ -31,13 +33,16 @@ public final class AllMenus {
     public static final IMenuType NETWORK_CONTROLLER;
     public static final IMenuType ELECTRIC_CHEST;
     public static final IMenuType ELECTRIC_TANK;
+    public static final IMenuType LOGISTIC_WORKER;
 
     static {
         CHANNEL
             .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
             .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new)
             .registerMenuSyncPacket(NetworkControllerSyncPacket.class,
-                NetworkControllerSyncPacket::new);
+                NetworkControllerSyncPacket::new)
+            .registerMenuSyncPacket(LogisticWorkerSyncPacket.class,
+                LogisticWorkerSyncPacket::new);
 
         FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class,
             SlotEventPacket::new);
@@ -73,6 +78,12 @@ public final class AllMenus {
                     .canPlayerInteract(menu.player()));
                 menu.addSyncSlot("info", NetworkControllerSyncPacket::new);
             })
+            .register();
+
+        LOGISTIC_WORKER = REGISTRATE.menu("network/logistic_worker")
+            .title("tinactory.gui.logisticWorker.title")
+            .screen(() -> () -> LogisticWorkerScreen::new)
+            .dummyPlugin(menu -> menu.addSyncSlot("info", LogisticWorkerSyncPacket::new))
             .register();
     }
 

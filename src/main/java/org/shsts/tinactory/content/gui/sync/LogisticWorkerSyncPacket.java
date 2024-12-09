@@ -8,8 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
-import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +22,7 @@ import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorkerSyncPacket extends MenuSyncPacket {
+public class LogisticWorkerSyncPacket implements IPacket {
     public record PortInfo(UUID machineId, int portIndex, Component machineName, ItemStack icon, Component portName) {
         public static void serialize(FriendlyByteBuf buf, PortInfo info) {
             buf.writeUUID(info.machineId);
@@ -51,8 +51,7 @@ public class LogisticWorkerSyncPacket extends MenuSyncPacket {
         this.visiblePorts = new ArrayList<>();
     }
 
-    public LogisticWorkerSyncPacket(int containerId, int index, BlockEntity be) {
-        super(containerId, index);
+    public LogisticWorkerSyncPacket(BlockEntity be) {
         this.visiblePorts = LOGISTIC_WORKER.tryGet(be)
             .map(LogisticWorker::getVisiblePorts)
             .orElseGet(List::of);
@@ -64,13 +63,11 @@ public class LogisticWorkerSyncPacket extends MenuSyncPacket {
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        super.serializeToBuf(buf);
         buf.writeCollection(visiblePorts, PortInfo::serialize);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        super.deserializeFromBuf(buf);
         visiblePorts.addAll(buf.readList(PortInfo::deserialize));
     }
 
@@ -80,9 +77,6 @@ public class LogisticWorkerSyncPacket extends MenuSyncPacket {
             return true;
         }
         if (!(o instanceof LogisticWorkerSyncPacket that)) {
-            return false;
-        }
-        if (!super.equals(o)) {
             return false;
         }
         var thisPorts = new HashSet<>(visiblePorts);

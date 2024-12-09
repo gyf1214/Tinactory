@@ -6,7 +6,6 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.BoilerPlugin;
-import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
@@ -429,8 +428,7 @@ public final class AllBlockEntities {
             .voltages(Voltage.ULV)
             .machine(v -> "network/" + v.id + "/logistic_worker", MachineBlock::factory)
             .capability(LogisticWorker::factory)
-            .menu(LogisticWorkerMenu::new)
-            .machine(v -> $ -> $.blockEntity().menu().noInventory().build().build())
+            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.LOGISTIC_WORKER).build())
             .tintVoltage(2)
             .buildObject();
 

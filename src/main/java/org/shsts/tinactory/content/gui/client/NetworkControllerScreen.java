@@ -92,15 +92,14 @@ public class NetworkControllerScreen extends MenuScreen {
         statePanel.setActive(false);
         welcomePanel.setActive(false);
 
-        this.imageWidth = WIDTH;
+        this.contentWidth = WIDTH;
         this.imageHeight = HEIGHT;
     }
 
     @Override
-    protected void init() {
-        leftPos = (width - WIDTH) / 2;
-        topPos = (height - HEIGHT - Tab.BUTTON_OFFSET) / 2 + Tab.BUTTON_OFFSET;
-        initRect();
+    protected void centerWindow() {
+        leftPos = (width - imageWidth) / 2;
+        topPos = (height - imageHeight - Tab.BUTTON_OFFSET) / 2 + Tab.BUTTON_OFFSET;
     }
 
     @Override

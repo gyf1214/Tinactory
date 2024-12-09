@@ -10,21 +10,22 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
+import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen1;
+import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,6 +35,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_PANEL_BG;
 import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
@@ -46,10 +49,11 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorkerScreen extends MenuScreen1<LogisticWorkerMenu> {
+public class LogisticWorkerScreen extends MenuScreen {
     private record MachineInfo(UUID id, Component name, ItemStack icon) {}
 
     private final int workerSlots;
+    private final MachineConfig machineConfig;
     private final Map<UUID, MachineInfo> machines = new HashMap<>();
     private final List<MachineInfo> machineList = new ArrayList<>();
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
@@ -260,10 +264,11 @@ public class LogisticWorkerScreen extends MenuScreen1<LogisticWorkerMenu> {
         return I18n.tr("tinactory.gui.logisticWorker." + key);
     }
 
-    public LogisticWorkerScreen(LogisticWorkerMenu menu, Inventory inventory,
-        Component title, int workerSlots) {
+    public LogisticWorkerScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.workerSlots = workerSlots;
+        var blockEntity = menu.blockEntity();
+        this.machineConfig = MACHINE.get(blockEntity).config;
+        this.workerSlots = LOGISTIC_WORKER.get(blockEntity).workerSlots;
 
         var configPanel = new ConfigPanel();
         this.machineSelectPanel = new MachineSelectPanel();
@@ -291,7 +296,7 @@ public class LogisticWorkerScreen extends MenuScreen1<LogisticWorkerMenu> {
         this.imageWidth = IMAGE_WIDTH;
         this.imageHeight = IMAGE_HEIGHT;
 
-        menu.onSyncPacket(menu.syncSlot, this::refreshVisiblePorts);
+        menu.onSyncPacket("info", this::refreshVisiblePorts);
     }
 
     private void refreshVisiblePorts(LogisticWorkerSyncPacket p) {
@@ -324,7 +329,7 @@ public class LogisticWorkerScreen extends MenuScreen1<LogisticWorkerMenu> {
     }
 
     private LogisticWorkerConfig getConfig(int slot) {
-        return menu.machineConfig.getCompound(PREFIX + slot)
+        return machineConfig.getCompound(PREFIX + slot)
             .map(LogisticWorkerConfig::fromTag)
             .orElseGet(LogisticWorkerConfig::new);
     }

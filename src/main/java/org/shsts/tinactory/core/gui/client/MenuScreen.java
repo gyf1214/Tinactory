@@ -71,11 +71,15 @@ public class MenuScreen extends MenuScreenBase implements IMenuScreen, IWidgetCo
         hoverables.add(widget);
     }
 
+    protected void centerWindow() {
+        super.init();
+    }
+
     @Override
     protected void init() {
         imageWidth = contentWidth + MARGIN_HORIZONTAL * 2;
         imageHeight = contentHeight + MARGIN_TOP + MARGIN_VERTICAL;
-        super.init();
+        centerWindow();
         initRect();
     }
 
