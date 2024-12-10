@@ -7,7 +7,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
 
 import java.util.Optional;
 
@@ -34,13 +33,6 @@ public final class MachineConfig implements INBTSerializable<CompoundTag> {
 
     public Optional<CompoundTag> getCompound(String key) {
         return tag.contains(key, Tag.TAG_COMPOUND) ? Optional.of(tag.getCompound(key)) : Optional.empty();
-    }
-
-    public void apply(SetMachineConfigPacket1 packet) {
-        tag.merge(packet.getSets());
-        for (var key : packet.getResets()) {
-            tag.remove(key);
-        }
     }
 
     public void apply(SetMachineConfigPacket packet) {

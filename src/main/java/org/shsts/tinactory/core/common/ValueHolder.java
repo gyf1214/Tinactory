@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -22,6 +23,10 @@ public class ValueHolder<T> implements Supplier<T> {
     public T get() {
         assert value != null;
         return value;
+    }
+
+    public Optional<T> tryGet() {
+        return Optional.ofNullable(value);
     }
 
     public static <T1> ValueHolder<T1> create() {

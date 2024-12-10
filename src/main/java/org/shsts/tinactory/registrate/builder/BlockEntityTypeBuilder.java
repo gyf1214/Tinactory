@@ -14,7 +14,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartBlockEntityType;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 
@@ -45,8 +44,6 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
     private Class<U> entityClass = null;
     private final Map<ResourceLocation, Function<? super U, ? extends ICapabilityProvider>>
         capabilities = new HashMap<>();
-    @Nullable
-    private ChildMenuBuilder<?> menuBuilder = null;
     @Nullable
     private Supplier<MenuType<?>> menu = null;
 
@@ -87,28 +84,6 @@ public class BlockEntityTypeBuilder<U extends SmartBlockEntity, P> extends
     public BlockEntityTypeBuilder<U, P> setMenu(Supplier<MenuType<?>> value) {
         menu = value;
         return this;
-    }
-
-    private class ChildMenuBuilder<M extends Menu<? super U, M>>
-        extends MenuBuilder<U, M, BlockEntityTypeBuilder<U, P>> {
-        public ChildMenuBuilder(Registrate registrate, String id, Menu.Factory<U, M> factory) {
-            super(registrate, id, BlockEntityTypeBuilder.this, factory);
-            onCreateEntry.add(entry -> parent.setMenu(entry::get));
-            parent.onCreateEntry.add($ -> register());
-        }
-    }
-
-    public <M extends Menu<? super U, M>> MenuBuilder<U, M, BlockEntityTypeBuilder<U, P>> menu(
-        Menu.Factory<U, M> factory) {
-        assert menuBuilder == null;
-        var builder = new ChildMenuBuilder<>(registrate, id, factory);
-        menuBuilder = builder;
-        return builder;
-    }
-
-    public MenuBuilder<U, ?, BlockEntityTypeBuilder<U, P>> menu() {
-        assert menuBuilder != null;
-        return menuBuilder;
     }
 
     public <C extends CapabilityProviderBuilder<? super U, BlockEntityTypeBuilder<U, P>>> C capability(

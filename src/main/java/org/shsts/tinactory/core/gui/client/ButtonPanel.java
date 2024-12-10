@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
@@ -44,10 +43,6 @@ public abstract class ButtonPanel extends Panel {
             super(menu);
         }
 
-        public ItemButton(Menu<?, ?> menu) {
-            super(menu);
-        }
-
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
             return buttonTooltip(index, mouseX - rect.x(), mouseY - rect.y());
@@ -73,22 +68,12 @@ public abstract class ButtonPanel extends Panel {
         }
     }
 
-    private ItemButton createItemButton() {
-        return menu1 == null ? new ItemButton(menu) : new ItemButton(menu1);
-    }
-
     private class PageButton extends SimpleButton {
         private static final int TEX_Y = 208;
 
         private final int pageChange;
 
         public PageButton(IMenu menu, int texX, int pageChange) {
-            super(menu, Texture.RECIPE_BOOK_BG, null, texX, TEX_Y,
-                texX, TEX_Y + PAGE_OFFSET.height());
-            this.pageChange = pageChange;
-        }
-
-        public PageButton(Menu<?, ?> menu, int texX, int pageChange) {
             super(menu, Texture.RECIPE_BOOK_BG, null, texX, TEX_Y,
                 texX, TEX_Y + PAGE_OFFSET.height());
             this.pageChange = pageChange;
@@ -106,30 +91,13 @@ public abstract class ButtonPanel extends Panel {
         }
     }
 
-    private PageButton createPageButton(int texX, int pageChange) {
-        return menu1 == null ? new PageButton(menu, texX, pageChange) :
-            new PageButton(menu1, texX, pageChange);
-    }
-
     public ButtonPanel(MenuScreen screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
         super(screen);
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;
         this.verticalSpacing = verticalSpacing;
-        this.leftPageButton = createPageButton(15, -1);
-        this.rightPageButton = createPageButton(1, 1);
-
-        addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_OFFSET.width(), 0), leftPageButton);
-        addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(PAGE_MARGIN, 0), rightPageButton);
-    }
-
-    public ButtonPanel(MenuScreen1<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
-        super(screen);
-        this.buttonWidth = buttonWidth;
-        this.buttonHeight = buttonHeight;
-        this.verticalSpacing = verticalSpacing;
-        this.leftPageButton = createPageButton(15, -1);
-        this.rightPageButton = createPageButton(1, 1);
+        this.leftPageButton = new PageButton(menu, 15, -1);
+        this.rightPageButton = new PageButton(menu, 1, 1);
 
         addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_OFFSET.width(), 0), leftPageButton);
         addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(PAGE_MARGIN, 0), rightPageButton);
@@ -153,7 +121,7 @@ public abstract class ButtonPanel extends Panel {
                 var y = row * (buttonHeight + verticalSpacing);
 
                 var offset = new Rect(x, y, buttonWidth, buttonHeight);
-                var button = createItemButton();
+                var button = new ItemButton(menu);
                 buttons.add(button);
                 button.setActive(active);
                 addWidget(offset, button);

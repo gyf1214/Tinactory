@@ -6,7 +6,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
@@ -21,17 +24,20 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingScreen extends MenuScreen {
+    protected final Layout layout;
+    protected final Panel layoutPanel;
     @Nullable
     private RecipeType<?> recipeType = null;
 
     public ProcessingScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
 
-        var layout = LAYOUT_PROVIDER.get(menu.blockEntity()).getLayout();
-        var layoutPanel = new Panel(this);
+        this.layout = LAYOUT_PROVIDER.get(menu.blockEntity()).getLayout();
+        this.layoutPanel = new Panel(this);
 
         for (var slot : layout.slots) {
             if (slot.type().portType == PortType.FLUID) {

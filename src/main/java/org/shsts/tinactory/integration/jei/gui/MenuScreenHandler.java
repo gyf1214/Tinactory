@@ -7,8 +7,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllLayouts;
-import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
+import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
 import org.shsts.tinactory.content.gui.client.TechPanel;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
@@ -32,7 +32,7 @@ public class MenuScreenHandler implements IGuiContainerHandler<MenuScreen> {
         if (hovered.get() instanceof FluidSlot slot) {
             var stack = slot.getFluidStack();
             return stack.isEmpty() ? null : stack;
-        } else if (ResearchBenchPlugin.isHoveringTech(hovered.get())) {
+        } else if (ResearchBenchScreen.isHoveringTech(hovered.get())) {
             return TechManager.localTeam()
                 .flatMap(ITeamProfile::getTargetTech)
                 .map(tech -> new TechWrapper(tech.getLoc()))

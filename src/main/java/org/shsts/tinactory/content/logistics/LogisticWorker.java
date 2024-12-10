@@ -21,7 +21,7 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
+import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
@@ -39,7 +39,7 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
-import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
+import static org.shsts.tinactory.core.gui.ProcessingPlugin.portLabel;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -162,7 +162,7 @@ public class LogisticWorker extends CapabilityProvider
         var logistic = network.get().getComponent(AllNetworks.LOGISTIC_COMPONENT);
         var subnet = network.get().getSubnet(blockEntity.getBlockPos());
 
-        var packet = SetMachineConfigPacket1.builder();
+        var packet = SetMachineConfigPacket.builder();
         for (var i = 0; i < workerSlots; i++) {
             var key = PREFIX + i;
             getConfig(i).ifPresent(entry -> {
@@ -174,7 +174,7 @@ public class LogisticWorker extends CapabilityProvider
         }
         if (!packet.isEmpty()) {
             // skip event to skip validation
-            machine.setConfig(packet.create(), false);
+            machine.setConfig(packet.get(), false);
         }
     }
 
@@ -232,9 +232,9 @@ public class LogisticWorker extends CapabilityProvider
                 tick = 0;
             } else {
                 entry.setValid(false);
-                var packet = SetMachineConfigPacket1.builder()
+                var packet = SetMachineConfigPacket.builder()
                     .set(PREFIX + currentSlot, entry.serializeNBT())
-                    .create();
+                    .get();
                 // try revalidate
                 machine.setConfig(packet);
             }

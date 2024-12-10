@@ -2,22 +2,21 @@ package org.shsts.tinactory.content.gui.client;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.AllRecipes;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.gui.client.MenuScreen1;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MarkerRecipeBook extends MachineRecipeBook {
     private final boolean includeNormal;
 
-    public MarkerRecipeBook(MenuScreen1<? extends ProcessingMenu> screen,
-        RecipeType<? extends ProcessingRecipe> recipeType,
-        boolean includeNormal) {
-        super(screen, recipeType);
+    public MarkerRecipeBook(ProcessingScreen screen, Layout layout, boolean includeNormal) {
+        super(screen, layout);
         this.includeNormal = includeNormal;
     }
 

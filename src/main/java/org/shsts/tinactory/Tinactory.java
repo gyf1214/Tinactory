@@ -33,8 +33,6 @@ import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllWorldGens;
 import org.shsts.tinactory.core.common.IPacket;
-import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
-import org.shsts.tinactory.core.gui.sync.MenuSyncHandler;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.AllRegistries;
 import org.shsts.tinactory.registrate.Registrate;
@@ -132,8 +130,6 @@ public class Tinactory {
 
             TechManager.init();
             AllWorldGens.init();
-            MenuSyncHandler.init();
-            MenuEventHandler.init();
 
             REGISTRATE.register(modEventBus);
             _REGISTRATE.register(modEventBus);

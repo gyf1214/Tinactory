@@ -5,9 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.BoilerPlugin;
-import org.shsts.tinactory.content.gui.MachinePlugin;
-import org.shsts.tinactory.content.gui.ResearchBenchPlugin;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
@@ -22,7 +19,6 @@ import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.Transformer;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
@@ -42,7 +38,6 @@ import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
 import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
-import static org.shsts.tinactory.content.machine.ProcessingSet.marker;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
@@ -96,8 +91,7 @@ public final class AllBlockEntities {
         var set = new SetFactory();
 
         RESEARCH_BENCH = set.processing(AllRecipes.RESEARCH_BENCH)
-            .processingPlugin(MachinePlugin::processing)
-            .processingPlugin(r -> ResearchBenchPlugin.builder())
+            .menu(AllMenus.RESEARCH_BENCH)
             .voltages(Voltage.ULV)
             .layoutSet()
             .port(ITEM_INPUT)
@@ -161,7 +155,7 @@ public final class AllBlockEntities {
 
         ORE_ANALYZER = set.processing(AllRecipes.ORE_ANALYZER)
             .processor(r -> RecipeProcessor::oreProcessor)
-            .transform(marker(false))
+            .menu(AllMenus.MARKER)
             .voltages(Voltage.ULV)
             .layoutSet()
             .port(ITEM_INPUT)
@@ -175,7 +169,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         MACERATOR = set.processing(AllRecipes.MACERATOR)
-            .transform(marker(true))
+            .menu(AllMenus.MARKER_WITH_NORMAL)
             .layoutSet()
             .port(ITEM_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
@@ -189,7 +183,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         ORE_WASHER = set.processing(AllRecipes.ORE_WASHER)
-            .transform(marker(true))
+            .menu(AllMenus.MARKER_WITH_NORMAL)
             .voltages(Voltage.ULV)
             .layoutSet()
             .port(ITEM_INPUT)
@@ -207,7 +201,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         CENTRIFUGE = set.processing(AllRecipes.CENTRIFUGE)
-            .transform(marker(true))
+            .menu(AllMenus.MARKER_WITH_NORMAL)
             .layoutSet()
             .port(ITEM_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
@@ -235,8 +229,7 @@ public final class AllBlockEntities {
             .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::factory)
             .layoutCapability(StackProcessingContainer::builder)
             .capability(RecipeProcessor::electricFurnace)
-            .layoutMenu(ProcessingMenu::machine)
-            .layoutPlugin(MachinePlugin::electricFurnace)
+            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.ELECTRIC_FURNACE).build())
             .tintVoltage(2)
             .voltages(Voltage.ULV)
             .transform(simpleLayout(Texture.PROGRESS_ARROW))
@@ -366,14 +359,15 @@ public final class AllBlockEntities {
         LOW_PRESSURE_BOILER = boiler("low", 5d);
         HIGH_PRESSURE_BOILER = boiler("high", 17d);
 
-        MULTI_BLOCK_INTERFACE = ComponentBuilder.simple(ProcessingSet::multiblockInterface)
+        MULTI_BLOCK_INTERFACE = ComponentBuilder
+            .simple(ProcessingSet::multiblockInterface)
             .voltages(Voltage.ULV, Voltage.LuV)
             .buildObject();
 
         BATTERY_BOX = set.machine()
             .machine(v -> "machine/" + v.id + "/battery_box", MachineBlock::sided)
             .capability(BatteryBox::builder)
-            .layoutMenu(ProcessingMenu::machine)
+            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.BATTERY_BOX).build())
             .voltages(Voltage.LV, Voltage.HV)
             .layoutSet()
             .port(ITEM_INPUT)
@@ -508,10 +502,7 @@ public final class AllBlockEntities {
             .blockEntity()
             .simpleCapability(Boiler.builder(burnSpeed))
             .simpleCapability(StackProcessingContainer.builder(layout))
-            .menu(ProcessingMenu.machine(layout))
-            .plugin(MachinePlugin::noBook)
-            .plugin(BoilerPlugin::new)
-            .build()
+            .setMenu(AllMenus.BOILER)
             .build()
             .transform(baseMachine())
             .buildObject();

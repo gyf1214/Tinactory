@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.gui;
+package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
@@ -6,33 +6,28 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.content.AllBlockEntities;
-import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.client.TechPanel;
-import org.shsts.tinactory.core.gui.IMenuPlugin;
-import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.List;
 import java.util.Optional;
 
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ResearchBenchPlugin implements IMenuPlugin<ProcessingMenu> {
-    @OnlyIn(Dist.CLIENT)
+public class ResearchBenchScreen extends ProcessingScreen {
     private static class TechButton extends MenuWidget {
         @Nullable
         private ITechnology tech = null;
 
-        public TechButton(Menu<?, ?> menu) {
+        public TechButton(IMenu menu) {
             super(menu);
         }
 
@@ -60,18 +55,10 @@ public class ResearchBenchPlugin implements IMenuPlugin<ProcessingMenu> {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void applyMenuScreen(MenuScreen1<ProcessingMenu> screen) {
-        var layout = AllBlockEntities.RESEARCH_BENCH.layout(Voltage.MAXIMUM);
+    public ResearchBenchScreen(IMenu menu, Inventory inventory, Component title) {
+        super(menu, inventory, title);
         var rect = layout.images.get(0).rect().offset(layout.getXOffset(), 0);
-        screen.addWidget(rect, new TechButton(screen.getMenu()));
-    }
-
-    private static final ResearchBenchPlugin INSTANCE = new ResearchBenchPlugin();
-
-    public static IMenuPlugin.Factory<ProcessingMenu> builder() {
-        return $ -> INSTANCE;
+        addWidget(rect, new TechButton(menu));
     }
 
     public static boolean isHoveringTech(Widget component) {

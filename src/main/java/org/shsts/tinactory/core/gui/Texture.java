@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.WIDTH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
@@ -13,6 +14,8 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @MethodsReturnNonnullByDefault
 public record Texture(ResourceLocation loc, int width, int height) {
     public static final Texture VOID = new Texture(modLoc("void"), 16, 16);
+    public static final Texture BACKGROUND = new Texture(
+        gregtech("gui/base/background"), WIDTH, 166);
 
     public static final Texture SLOT_BACKGROUND = new Texture(
         gregtech("gui/base/slot"), SLOT_SIZE, SLOT_SIZE);

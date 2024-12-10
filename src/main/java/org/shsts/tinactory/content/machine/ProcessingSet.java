@@ -3,16 +3,13 @@ package org.shsts.tinactory.content.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.Transformer;
-import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
@@ -22,6 +19,7 @@ import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.Collection;
 import java.util.Map;
@@ -45,7 +43,7 @@ public class ProcessingSet extends MachineSet {
         BuilderBase<ProcessingSet, P, Builder<T, P>> {
         public final RecipeTypeEntry<T, ?> recipeType;
         private boolean hasProcessor = false;
-        private boolean hasPlugin = false;
+        private boolean hasMenu = false;
 
         public Builder(Registrate registrate, RecipeTypeEntry<T, ?> recipeType, P parent) {
             super(registrate, parent);
@@ -54,9 +52,6 @@ public class ProcessingSet extends MachineSet {
             machine(v -> "machine/" + v.id + "/" + recipeType.id, MachineBlock::factory);
             machine(v -> $ -> $.blockEntity()
                 .simpleCapability(StackProcessingContainer.builder(getLayout(v)))
-                .menu(ProcessingMenu.machine(getLayout(v), recipeType))
-                .title(ProcessingMenu::getTitle)
-                .build()
                 .build());
         }
 
@@ -66,10 +61,9 @@ public class ProcessingSet extends MachineSet {
             return capability(factory.apply(recipeType));
         }
 
-        public Builder<T, P> processingPlugin(Function<RecipeTypeEntry<? extends ProcessingRecipe, ?>,
-            IMenuPlugin.Factory<?>> factory) {
-            hasPlugin = true;
-            return plugin(factory.apply(recipeType));
+        public Builder<T, P> menu(IMenuType menuType) {
+            hasMenu = true;
+            return machine(v -> $ -> $.blockEntity().setMenu(menuType).build());
         }
 
         @Override
@@ -77,8 +71,8 @@ public class ProcessingSet extends MachineSet {
             if (!hasProcessor) {
                 processor(RecipeProcessor::machine);
             }
-            if (!hasPlugin) {
-                processingPlugin(MachinePlugin::processing);
+            if (!hasMenu) {
+                machine(v -> $ -> $.blockEntity().setMenu(AllMenus.PROCESSING_MACHINE).build());
             }
             return super.createMachine(voltage);
         }
@@ -90,10 +84,6 @@ public class ProcessingSet extends MachineSet {
         }
     }
 
-    public static <T extends ProcessingRecipe, P> Transformer<Builder<T, P>> marker(boolean includeNormal) {
-        return $ -> $.processingPlugin(r -> MachinePlugin.marker(r, includeNormal));
-    }
-
     public static RegistryEntry<MachineBlock<SmartBlockEntity>> multiblockInterface(Voltage voltage) {
         var id = "multi_block/" + voltage.id + "/interface";
         return _REGISTRATE.blockEntity(id, MachineBlock.multiBlockInterface(voltage))
@@ -101,10 +91,7 @@ public class ProcessingSet extends MachineSet {
             .eventManager()
             .simpleCapability(MultiBlockInterface::basic)
             .simpleCapability(FlexibleStackContainer::builder)
-            .menu(ProcessingMenu.multiBlock())
-            .title(ProcessingMenu::getTitle)
-            .plugin(MachinePlugin::multiBlock)
-            .build()
+            .setMenu(AllMenus.MULTIBLOCK)
             .renderer(() -> () -> MultiBlockInterfaceRenderer::new)
             .build()
             .block()

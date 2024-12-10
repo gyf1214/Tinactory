@@ -9,7 +9,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinycorelib.api.gui.IMenu;
@@ -51,7 +50,7 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
             }
         }
 
-        public void addToScreen(IMenuScreen screen) {
+        public void addToScreen(MenuScreen screen) {
             if (child instanceof MenuWidget widget) {
                 screen.addWidgetToScreen(widget);
             } else if (child instanceof AbstractWidget widget) {
@@ -69,24 +68,13 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
     }
 
     protected final IMenu menu;
-    protected final Menu<?, ?> menu1;
-    protected final IMenuScreen screen;
-    protected final MenuScreen1<?> screen1;
+    protected final MenuScreen screen;
     protected final List<Child> children = new ArrayList<>();
     protected boolean active = true;
 
     public Panel(MenuScreen screen) {
         this.screen = screen;
-        this.screen1 = null;
         this.menu = screen.menu();
-        this.menu1 = null;
-    }
-
-    public Panel(MenuScreen1<?> screen1) {
-        this.screen = screen1;
-        this.screen1 = screen1;
-        this.menu = null;
-        this.menu1 = screen1.getMenu();
     }
 
     @Override

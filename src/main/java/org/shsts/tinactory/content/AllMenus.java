@@ -2,18 +2,24 @@ package org.shsts.tinactory.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.gui.ElectricChestPlugin;
 import org.shsts.tinactory.content.gui.ElectricTankPlugin;
+import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.gui.PrimitivePlugin;
 import org.shsts.tinactory.content.gui.WorkbenchPlugin;
+import org.shsts.tinactory.content.gui.client.BoilerScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
+import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
+import org.shsts.tinactory.content.machine.Boiler;
+import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.core.gui.ProcessingPlugin;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
@@ -38,6 +44,14 @@ public final class AllMenus {
     public static final IMenuType ELECTRIC_TANK;
     public static final IMenuType LOGISTIC_WORKER;
     public static final IMenuType PRIMITIVE_MACHINE;
+    public static final IMenuType PROCESSING_MACHINE;
+    public static final IMenuType MARKER;
+    public static final IMenuType MARKER_WITH_NORMAL;
+    public static final IMenuType BOILER;
+    public static final IMenuType ELECTRIC_FURNACE;
+    public static final IMenuType RESEARCH_BENCH;
+    public static final IMenuType BATTERY_BOX;
+    public static final IMenuType MULTIBLOCK;
 
     static {
         CHANNEL
@@ -63,13 +77,13 @@ public final class AllMenus {
             .register();
 
         ELECTRIC_CHEST = REGISTRATE.menu("machine/electric_chest")
-            .title(ProcessingMenu::getTitle)
+            .title(ProcessingPlugin::getTitle)
             .screen(() -> () -> MenuScreen::new)
             .plugin(ElectricChestPlugin::new)
             .register();
 
         ELECTRIC_TANK = REGISTRATE.menu("machine/electric_tank")
-            .title(ProcessingMenu::getTitle)
+            .title(ProcessingPlugin::getTitle)
             .screen(() -> () -> MenuScreen::new)
             .plugin(ElectricTankPlugin::new)
             .register();
@@ -92,9 +106,61 @@ public final class AllMenus {
             .register();
 
         PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive")
-            .title(ProcessingMenu::getTitle)
+            .title(ProcessingPlugin::getTitle)
             .screen(() -> () -> ProcessingScreen::new)
             .plugin(PrimitivePlugin::new)
+            .register();
+
+        PROCESSING_MACHINE = REGISTRATE.menu("machine/processing")
+            .title(ProcessingPlugin::getTitle)
+            .screen(() -> () -> ProcessingScreen::new)
+            .plugin(MachinePlugin::processing)
+            .register();
+
+        MARKER = REGISTRATE.menu("machine/marker")
+            .title(ProcessingPlugin::getTitle)
+            .screen(() -> () -> ProcessingScreen::new)
+            .plugin(MachinePlugin.marker(false))
+            .register();
+
+        MARKER_WITH_NORMAL = REGISTRATE.menu("machine/marker_with_normal")
+            .title(ProcessingPlugin::getTitle)
+            .screen(() -> () -> ProcessingScreen::new)
+            .plugin(MachinePlugin.marker(true))
+            .register();
+
+        BOILER = REGISTRATE.menu("machine/boiler")
+            .title(ProcessingPlugin::getTitle)
+            .screen(() -> () -> BoilerScreen::new)
+            .dummyPlugin(menu -> {
+                menu.addSyncSlot("burn", be -> new SyncPackets.Double(Machine.getProcessor(be)
+                    .map(IProcessor::getProgress).orElse(0d)));
+                menu.addSyncSlot("heat", be -> new SyncPackets.Double(Machine.getProcessor(be)
+                    .map($ -> ((Boiler) $).getHeat() / 500d).orElse(0d)));
+            })
+            .register();
+
+        ELECTRIC_FURNACE = REGISTRATE.menu("machine/electric_furnace")
+            .title(ProcessingPlugin::getTitle)
+            .screen(() -> () -> ProcessingScreen::new)
+            .plugin(MachinePlugin::electricFurnace)
+            .register();
+
+        RESEARCH_BENCH = REGISTRATE.menu("machine/research_bench")
+            .title(ProcessingPlugin::getTitle)
+            .screen(() -> () -> ResearchBenchScreen::new)
+            .plugin(MachinePlugin::processing)
+            .register();
+
+        BATTERY_BOX = REGISTRATE.menu("machine/battery_box")
+            .title(ProcessingPlugin::getTitle)
+            .screen(() -> () -> ProcessingScreen::new)
+            .register();
+
+        MULTIBLOCK = REGISTRATE.menu("multi_block")
+            .title(ProcessingPlugin::getTitle)
+            .screen(() -> () -> ProcessingScreen::new)
+            .plugin(MachinePlugin::multiBlock)
             .register();
     }
 

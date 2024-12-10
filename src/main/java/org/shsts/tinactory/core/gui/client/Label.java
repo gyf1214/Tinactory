@@ -50,11 +50,6 @@ public class Label extends MenuWidget {
         setLines(lines);
     }
 
-    public Label(Menu<?, ?> menu, Component... lines) {
-        super(menu);
-        setLines(lines);
-    }
-
     private void updateSize() {
         if (formattedLines.isEmpty()) {
             cacheWidth = lines.stream()

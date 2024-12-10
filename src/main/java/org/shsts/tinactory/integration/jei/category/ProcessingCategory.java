@@ -10,19 +10,17 @@ import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
@@ -50,13 +48,13 @@ import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, ProcessingMenu> {
+public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, AbstractContainerMenu> {
     private static final int EXTRA_HEIGHT = FONT_HEIGHT * 3 + SPACING * 2 + SLOT_SIZE / 2;
 
     public ProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
         Layout layout, Block icon) {
         super(recipeType, layout, Ingredient.of(AllTags.machineTag(recipeType)),
-            new ItemStack(icon), ProcessingMenu.class);
+            new ItemStack(icon), AbstractContainerMenu.class);
     }
 
     @Override
@@ -197,11 +195,13 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Process
     }
 
     @Override
-    protected boolean canTransfer(ProcessingMenu menu, ProcessingRecipe recipe) {
-        return AllCapabilities.PROCESSOR.tryGet(menu.blockEntity)
-            .map(p -> p instanceof MachineProcessor<?> processor &&
-                processor.recipeType == recipe.getType())
-            .orElse(false);
+    protected boolean canTransfer(AbstractContainerMenu menu, ProcessingRecipe recipe) {
+        // TODO
+//        return AllCapabilities.PROCESSOR.tryGet(menu.blockEntity)
+//            .map(p -> p instanceof MachineProcessor<?> processor &&
+//                processor.recipeType == recipe.getType())
+//            .orElse(false);
+        return false;
     }
 
     @Override

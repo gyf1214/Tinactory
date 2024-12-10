@@ -17,8 +17,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.network.NetworkHooks;
-import org.shsts.tinactory.core.gui.SmartMenuType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.Optional;
@@ -69,7 +67,7 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
     }
 
     @Override
-    @SuppressWarnings({"deprecation", "unchecked"})
+    @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
         InteractionHand hand, BlockHitResult hitResult) {
         var be = getBlockEntity(world, pos);
@@ -87,13 +85,8 @@ public class SmartEntityBlock<T extends BlockEntity> extends Block implements En
             return InteractionResult.PASS;
         }
         if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {
-
             if (menu instanceof IMenuType iMenu) {
                 iMenu.open(serverPlayer, pos);
-            } else if (menu.get() instanceof SmartMenuType<?, ?> smartType) {
-                var smartType1 = (SmartMenuType<T, ?>) smartType;
-                var menuProvider = smartType1.getProvider(be.get());
-                NetworkHooks.openGui(serverPlayer, menuProvider, pos);
             }
             return InteractionResult.CONSUME;
         } else {

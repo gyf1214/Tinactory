@@ -13,9 +13,7 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -34,21 +32,20 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     @Nullable
     protected final RecipeType<? extends ProcessingRecipe> recipeType;
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
-    @Nullable
     private final Layout layout;
 
-    private MachineRecipeBook(MenuScreen1<? extends ProcessingMenu> screen,
-        @Nullable RecipeType<? extends ProcessingRecipe> recipeType,
-        @Nullable Layout layout) {
-        super(screen, layout == null ? 0 : layout.getXOffset());
+    public MachineRecipeBook(ProcessingScreen screen, Layout layout,
+        @Nullable RecipeType<? extends ProcessingRecipe> recipeType) {
+        super(screen, layout.getXOffset());
         this.recipeType = recipeType;
         this.layout = layout;
         TechManager.client().onProgressChange(onTechChange);
     }
 
-    public MachineRecipeBook(MenuScreen1<? extends ProcessingMenu> screen,
-        @Nullable RecipeType<? extends ProcessingRecipe> recipeType) {
-        this(screen, recipeType, screen.getMenu().layout);
+    @SuppressWarnings("unchecked")
+    public MachineRecipeBook(ProcessingScreen screen, Layout layout) {
+        this(screen, layout, (RecipeType<? extends ProcessingRecipe>)
+            screen.getRecipeType().orElse(null));
     }
 
     public void remove() {

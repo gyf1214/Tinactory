@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
@@ -12,10 +11,8 @@ import org.shsts.tinactory.core.common.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.Transformer;
-import org.shsts.tinactory.core.gui.IMenuPlugin;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
@@ -159,31 +156,6 @@ public class MachineSet {
                 .build());
         }
 
-        public <X extends BlockEntity, M extends Menu<? super X, M>> S menu(
-            Menu.Factory<X, M> factory) {
-            return machine(v -> $ -> $.blockEntity()
-                .menu(cast(factory)).build()
-                .build());
-        }
-
-        public S layoutMenu(Function<Layout, Menu.Factory<?, ?>> factory) {
-            return machine(v -> $ -> $.blockEntity()
-                .menu(cast(factory.apply(getLayout(v)))).build()
-                .build());
-        }
-
-        public <M extends Menu<?, M>> S plugin(IMenuPlugin.Factory<M> factory) {
-            return machine(v -> $ -> $.blockEntity()
-                .menu().plugin(factory).build()
-                .build());
-        }
-
-        public S layoutPlugin(Function<Layout, IMenuPlugin.Factory<?>> factory) {
-            return machine(v -> $ -> $.blockEntity()
-                .menu().plugin(factory.apply(getLayout(v))).build()
-                .build());
-        }
-
         public S tintVoltage(int index) {
             return machine(v -> $ -> $.block().tint(i -> i == index ? v.color : 0xFFFFFFFF).build());
         }
@@ -233,8 +205,6 @@ public class MachineSet {
         return $ -> $.blockEntity()
             .eventManager()
             .simpleCapability(Machine::builder)
-            // TODO
-//            .menu().title(ProcessingMenu::getTitle).build()
             .build()
             .translucent();
     }

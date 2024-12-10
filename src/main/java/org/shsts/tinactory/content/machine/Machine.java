@@ -26,7 +26,6 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket1;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
@@ -73,20 +72,8 @@ public class Machine extends UpdatableCapabilityProvider
     }
 
     /**
-     * Called only on server
+     * Called only on server.
      */
-    public void setConfig(SetMachineConfigPacket1 packet, boolean invokeEvent) {
-        config.apply(packet);
-        sendUpdate(blockEntity);
-        if (invokeEvent) {
-            EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
-        }
-    }
-
-    public void setConfig(SetMachineConfigPacket1 packet) {
-        setConfig(packet, true);
-    }
-
     public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
         config.apply(packet);
         sendUpdate(blockEntity);
@@ -95,6 +82,9 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
+    /**
+     * Called only on server.
+     */
     public void setConfig(SetMachineConfigPacket packet) {
         setConfig(packet, true);
     }
@@ -114,7 +104,7 @@ public class Machine extends UpdatableCapabilityProvider
         if (item.is(Items.NAME_TAG) && item.hasCustomHoverName()) {
             if (!player.level.isClientSide) {
                 var name = Component.Serializer.toJson(item.getHoverName());
-                setConfig(SetMachineConfigPacket1.builder().set("name", name).create());
+                setConfig(SetMachineConfigPacket.builder().set("name", name).get());
                 item.shrink(1);
             }
 

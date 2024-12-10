@@ -104,7 +104,7 @@ public class TechPanel extends Panel {
 
     private class TechButtonPanel extends ButtonPanel {
         public TechButtonPanel() {
-            super((MenuScreen) TechPanel.this.screen, BUTTON_SIZE, BUTTON_SIZE, 0);
+            super(TechPanel.this.screen, BUTTON_SIZE, BUTTON_SIZE, 0);
         }
 
         private ITechnology getTech(int index) {

@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.IMenu;
 
@@ -26,15 +25,6 @@ public abstract class Button extends MenuWidget {
     }
 
     public Button(IMenu menu) {
-        this(menu, null);
-    }
-
-    public Button(Menu<?, ?> menu, @Nullable Component tooltip) {
-        super(menu);
-        this.tooltip = tooltip;
-    }
-
-    public Button(Menu<?, ?> menu) {
         this(menu, null);
     }
 

@@ -27,12 +27,12 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.client.MenuScreen1.BACKGROUND;
+import static org.shsts.tinactory.core.gui.Texture.BACKGROUND;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuScreen extends MenuScreenBase implements IMenuScreen, IWidgetConsumer {
+public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
     protected final Panel rootPanel;
     protected final List<Widget> hoverables = new ArrayList<>();
 

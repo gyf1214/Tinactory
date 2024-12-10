@@ -6,10 +6,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuScreen1;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
@@ -18,13 +18,14 @@ import org.shsts.tinactory.core.util.ClientUtil;
 import java.util.List;
 import java.util.Optional;
 
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe> {
     private final Layout.SlotInfo inputSlot;
     private final Layout.SlotInfo outputSlot;
 
-    public ElectricFurnaceRecipeBook(MenuScreen1<? extends Menu<?, ?>> screen, Layout layout) {
+    public ElectricFurnaceRecipeBook(ProcessingScreen screen, Layout layout) {
         super(screen, layout.getXOffset());
         this.inputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == 0)
