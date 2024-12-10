@@ -19,6 +19,7 @@ import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.core.gui.LayoutPlugin;
 import org.shsts.tinactory.core.gui.ProcessingPlugin;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
@@ -114,7 +115,7 @@ public final class AllMenus {
         PROCESSING_MACHINE = REGISTRATE.menu("machine/processing")
             .title(ProcessingPlugin::getTitle)
             .screen(() -> () -> ProcessingScreen::new)
-            .plugin(MachinePlugin::processing)
+            .plugin(MachinePlugin::new)
             .register();
 
         MARKER = REGISTRATE.menu("machine/marker")
@@ -132,6 +133,7 @@ public final class AllMenus {
         BOILER = REGISTRATE.menu("machine/boiler")
             .title(ProcessingPlugin::getTitle)
             .screen(() -> () -> BoilerScreen::new)
+            .plugin(MachinePlugin::noBook)
             .dummyPlugin(menu -> {
                 menu.addSyncSlot("burn", be -> new SyncPackets.Double(Machine.getProcessor(be)
                     .map(IProcessor::getProgress).orElse(0d)));
@@ -149,12 +151,13 @@ public final class AllMenus {
         RESEARCH_BENCH = REGISTRATE.menu("machine/research_bench")
             .title(ProcessingPlugin::getTitle)
             .screen(() -> () -> ResearchBenchScreen::new)
-            .plugin(MachinePlugin::processing)
+            .plugin(MachinePlugin::new)
             .register();
 
         BATTERY_BOX = REGISTRATE.menu("machine/battery_box")
             .title(ProcessingPlugin::getTitle)
-            .screen(() -> () -> ProcessingScreen::new)
+            .screen(() -> () -> MenuScreen::new)
+            .plugin(LayoutPlugin::simple)
             .register();
 
         MULTIBLOCK = REGISTRATE.menu("multi_block")

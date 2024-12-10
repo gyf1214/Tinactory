@@ -22,8 +22,8 @@ import java.util.List;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BUTTON_TOP_MARGIN;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_BORDER;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
@@ -92,7 +92,7 @@ public class PortPanel extends Panel {
     }
 
     private void renderHoverOverlay(PoseStack poseStack, List<Layout.SlotInfo> slots) {
-        var bx = screen.getGuiLeft() + MARGIN_HORIZONTAL + xOffset;
+        var bx = screen.getGuiLeft() + MARGIN_X + xOffset;
         var by = screen.getGuiTop() + MARGIN_TOP;
         for (var slot : slots) {
             var x = slot.x() + 1 + bx;

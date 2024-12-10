@@ -14,32 +14,43 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.SmartBlockEntity;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 
+import java.util.function.Function;
+
+import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
-    IProcessor, IElectricMachine, INBTSerializable<CompoundTag> {
+    IProcessor, IElectricMachine, ILayoutProvider, INBTSerializable<CompoundTag> {
+    private final Layout layout;
     private final BlockEntity blockEntity;
     private final Voltage voltage;
     private Machine machine;
     private final WrapperItemHandler handler;
     private final LazyOptional<IItemHandler> itemHandlerCap;
 
-    public BatteryBox(BlockEntity blockEntity) {
+    public BatteryBox(BlockEntity blockEntity, Layout layout) {
+        this.layout = layout;
         this.blockEntity = blockEntity;
         this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
         var size = voltage.rank * voltage.rank;
@@ -61,7 +72,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     @Override
     public void onWorkTick(double partial) {
         var factor = machine.getNetwork().orElseThrow()
-            .getComponent(AllNetworks.ELECTRIC_COMPONENT)
+            .getComponent(ELECTRIC_COMPONENT)
             .getBufferFactor();
         var sign = MathUtil.compare(factor);
         if (sign == 0) {
@@ -119,18 +130,22 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
+    public Layout getLayout() {
+        return layout;
+    }
+
+    @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD,
-            $ -> machine = AllCapabilities.MACHINE.get(blockEntity));
+        eventManager.subscribe(SERVER_LOAD, $ -> machine = MACHINE.get(blockEntity));
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.ELECTRIC_MACHINE.get() ||
-            cap == AllCapabilities.PROCESSOR.get()) {
+        if (cap == ELECTRIC_MACHINE.get() || cap == PROCESSOR.get() ||
+            cap == LAYOUT_PROVIDER.get()) {
             return myself();
-        } else if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
+        } else if (cap == MENU_ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
         }
         return LazyOptional.empty();
@@ -146,7 +161,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         StackHelper.deserializeItemHandler(handler, tag);
     }
 
-    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, "battery_box", BatteryBox::new);
+    public static <P> Function<P, CapabilityProviderBuilder<SmartBlockEntity,
+        P>> builder(Layout layout) {
+        return CapabilityProviderBuilder.fromFactory("battery_box", be -> new BatteryBox(be, layout));
     }
 }

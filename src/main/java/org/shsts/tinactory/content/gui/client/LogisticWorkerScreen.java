@@ -41,7 +41,7 @@ import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_PANEL_BG;
 import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
@@ -70,7 +70,7 @@ public class LogisticWorkerScreen extends MenuScreen {
     private static final int IMAGE_WIDTH = NetworkControllerScreen.WIDTH;
     private static final int IMAGE_HEIGHT = NetworkControllerScreen.HEIGHT;
     private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
-    private static final int HORIZONTAL_SPACING = MARGIN_HORIZONTAL * 2;
+    private static final int HORIZONTAL_SPACING = MARGIN_X * 2;
 
     private class ConfigPanel extends ButtonPanel {
         private static final int WIDTH = BUTTON_SIZE * 3 + SPACING * 2;

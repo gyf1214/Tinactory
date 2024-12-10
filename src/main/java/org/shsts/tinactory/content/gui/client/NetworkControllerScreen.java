@@ -32,9 +32,9 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
@@ -87,7 +87,7 @@ public class NetworkControllerScreen extends MenuScreen {
         rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
         rootPanel.addPanel(statePanel);
         rootPanel.addPanel(techPanel);
-        rootPanel.addPanel(new Rect(-MARGIN_HORIZONTAL, -MARGIN_TOP, 0, 0), tabs);
+        rootPanel.addPanel(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
 
         menu.onSyncPacket("info", this::refresh);
         TechManager.client().onProgressChange(onTechChange);

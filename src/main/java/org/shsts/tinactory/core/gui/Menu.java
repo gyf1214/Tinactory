@@ -11,7 +11,7 @@ public final class Menu {
     public static final int WIDTH = 176;
     public static final int SLOT_SIZE = 18;
     public static final int CONTENT_WIDTH = 9 * SLOT_SIZE;
-    public static final int MARGIN_HORIZONTAL = (WIDTH - CONTENT_WIDTH) / 2;
+    public static final int MARGIN_X = (WIDTH - CONTENT_WIDTH) / 2;
     public static final int FONT_HEIGHT = 9;
     public static final int SPACING = 3;
     public static final int MARGIN_VERTICAL = 3 + SPACING;

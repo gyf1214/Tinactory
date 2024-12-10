@@ -2,13 +2,13 @@ package org.shsts.tinactory.content.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.client.AbstractRecipeBook;
 import org.shsts.tinactory.content.gui.client.ElectricFurnaceRecipeBook;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.MarkerRecipeBook;
-import org.shsts.tinactory.content.gui.client.MultiBlockRecipeBook;
 import org.shsts.tinactory.content.gui.client.PortPanel;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.core.common.ValueHolder;
@@ -18,6 +18,8 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
+import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.IMenu;
 import org.shsts.tinycorelib.api.gui.IMenuPlugin;
@@ -26,6 +28,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_ANCHOR;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_OFFSET;
@@ -47,6 +50,14 @@ public class MachinePlugin extends ProcessingPlugin {
 
     @OnlyIn(Dist.CLIENT)
     protected Optional<AbstractRecipeBook<?>> createRecipeBook(ProcessingScreen screen) {
+        return Optional.of(new MachineRecipeBook(screen, layout));
+    }
+
+    protected Optional<RecipeType<?>> getRecipeType() {
+        var processor = PROCESSOR.tryGet(menu.blockEntity()).orElse(null);
+        if (processor instanceof RecipeProcessor<?> recipeProcessor) {
+            return Optional.of(recipeProcessor.recipeType);
+        }
         return Optional.empty();
     }
 
@@ -54,6 +65,7 @@ public class MachinePlugin extends ProcessingPlugin {
     @OnlyIn(Dist.CLIENT)
     public void applyMenuScreen(ProcessingScreen screen) {
         super.applyMenuScreen(screen);
+        getRecipeType().ifPresent(screen::setRecipeType);
 
         var buttonY = layout.rect.endY() + SPACING;
 
@@ -101,16 +113,6 @@ public class MachinePlugin extends ProcessingPlugin {
         recipeBookHolder.tryGet().ifPresent(AbstractRecipeBook::remove);
     }
 
-    public static IMenuPlugin<ProcessingScreen> processing(IMenu menu) {
-        return new MachinePlugin(menu) {
-            @Override
-            @OnlyIn(Dist.CLIENT)
-            protected Optional<AbstractRecipeBook<?>> createRecipeBook(ProcessingScreen screen) {
-                return Optional.of(new MachineRecipeBook(screen, layout));
-            }
-        };
-    }
-
     public static Function<IMenu, IMenuPlugin<?>> marker(boolean includeNormal) {
         return menu -> new MachinePlugin(menu) {
             @Override
@@ -122,7 +124,12 @@ public class MachinePlugin extends ProcessingPlugin {
     }
 
     public static IMenuPlugin<ProcessingScreen> noBook(IMenu menu) {
-        return new MachinePlugin(menu);
+        return new MachinePlugin(menu) {
+            @Override
+            protected Optional<AbstractRecipeBook<?>> createRecipeBook(ProcessingScreen screen) {
+                return Optional.empty();
+            }
+        };
     }
 
     public static IMenuPlugin<ProcessingScreen> electricFurnace(IMenu menu) {
@@ -138,9 +145,9 @@ public class MachinePlugin extends ProcessingPlugin {
     public static IMenuPlugin<ProcessingScreen> multiBlock(IMenu menu) {
         return new MachinePlugin(menu) {
             @Override
-            @OnlyIn(Dist.CLIENT)
-            protected Optional<AbstractRecipeBook<?>> createRecipeBook(ProcessingScreen screen) {
-                return Optional.of(new MultiBlockRecipeBook(screen, layout));
+            protected Optional<RecipeType<?>> getRecipeType() {
+                var multiBlockInterface = (MultiBlockInterface) MACHINE.get(menu.blockEntity());
+                return multiBlockInterface.getRecipeType();
             }
         };
     }

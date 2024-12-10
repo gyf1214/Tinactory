@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
@@ -18,30 +17,24 @@ import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.IMenu;
 
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.util.I18n.tr;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class ProcessingPlugin extends LayoutPlugin<ProcessingScreen> {
+public class ProcessingPlugin extends LayoutPlugin<ProcessingScreen> {
     protected ProcessingPlugin(IMenu menu, int extraHeight) {
         super(menu, extraHeight);
-        var blockEntity = menu.blockEntity();
-        var items = MENU_ITEM_HANDLER.get(blockEntity);
-        var fluids = FLUID_STACK_HANDLER.get(blockEntity);
-        var xOffset = layout.getXOffset();
+        addSlots(menu, layout);
+
+        var fluids = FLUID_STACK_HANDLER.get(menu.blockEntity());
         for (var slot : layout.slots) {
-            var x = xOffset + slot.x() + MARGIN_HORIZONTAL + 1;
-            var y = slot.y() + MARGIN_TOP + 1;
-            switch (slot.type().portType) {
-                case ITEM -> menu.addSlot(new SlotItemHandler(items, slot.index(), x, y));
-                case FLUID -> menu.addSyncSlot("fluidSlot_" + slot.index(),
+            if (slot.type().portType == PortType.FLUID) {
+                menu.addSyncSlot("fluidSlot_" + slot.index(),
                     $ -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
             }
         }
+
         if (layout.progressBar != null) {
             menu.addSyncSlot("progress", be -> new SyncPackets.Double(Machine.getProcessor(be)
                 .map(IProcessor::getProgress)

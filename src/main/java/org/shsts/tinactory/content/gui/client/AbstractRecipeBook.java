@@ -29,9 +29,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @OnlyIn(Dist.CLIENT)
@@ -44,8 +44,8 @@ public abstract class AbstractRecipeBook<T> extends Panel {
     public static final int PANEL_BORDER = 8;
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
     public static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
-    public static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_HORIZONTAL - PANEL_WIDTH,
-        -MARGIN_TOP, -MARGIN_HORIZONTAL, MARGIN_VERTICAL);
+    public static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_X - PANEL_WIDTH,
+        -MARGIN_TOP, -MARGIN_X, MARGIN_VERTICAL);
     public static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
     private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER, PANEL_BORDER + BUTTON_TOP_MARGIN,
         -PANEL_BORDER, -PANEL_BORDER);

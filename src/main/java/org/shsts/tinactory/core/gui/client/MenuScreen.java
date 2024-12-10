@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.core.gui.Menu.CONTENT_WIDTH;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.BACKGROUND;
 
@@ -41,14 +41,14 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
 
     public MenuScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.titleLabelX = MARGIN_HORIZONTAL;
+        this.titleLabelX = MARGIN_X;
         this.titleLabelY = MARGIN_VERTICAL;
         this.contentWidth = CONTENT_WIDTH;
         this.contentHeight = 0;
 
         this.rootPanel = new Panel(this);
         for (var slot : menu.getMenu().slots) {
-            int x = slot.x - 1 - MARGIN_HORIZONTAL;
+            int x = slot.x - 1 - MARGIN_X;
             int y = slot.y - 1 - MARGIN_TOP;
             var slotBg = new StaticWidget(menu, Texture.SLOT_BACKGROUND);
             rootPanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
@@ -77,15 +77,15 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
 
     @Override
     protected void init() {
-        imageWidth = contentWidth + MARGIN_HORIZONTAL * 2;
+        imageWidth = contentWidth + MARGIN_X * 2;
         imageHeight = contentHeight + MARGIN_TOP + MARGIN_VERTICAL;
         centerWindow();
         initRect();
     }
 
     protected void initRect() {
-        var rect = new Rect(leftPos + MARGIN_HORIZONTAL, topPos + MARGIN_TOP,
-            imageWidth - MARGIN_HORIZONTAL * 2, imageHeight - MARGIN_TOP - MARGIN_VERTICAL);
+        var rect = new Rect(leftPos + MARGIN_X, topPos + MARGIN_TOP,
+            imageWidth - MARGIN_X * 2, imageHeight - MARGIN_TOP - MARGIN_VERTICAL);
         rootPanel.init(rect);
     }
 

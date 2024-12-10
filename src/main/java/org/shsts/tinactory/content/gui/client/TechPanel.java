@@ -36,8 +36,8 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @OnlyIn(Dist.CLIENT)
@@ -53,7 +53,7 @@ public class TechPanel extends Panel {
     public static final int PANEL_BORDER = 2;
     public static final Rect BUTTON_PANEL_BG = BACKGROUND_TEX_RECT.offset(6, 6).enlarge(-12, -12);
     private static final int LEFT_WIDTH = PANEL_BORDER * 2 + BUTTON_SIZE * 5;
-    public static final int LEFT_OFFSET = LEFT_WIDTH + MARGIN_HORIZONTAL * 2;
+    public static final int LEFT_OFFSET = LEFT_WIDTH + MARGIN_X * 2;
     public static final int RIGHT_WIDTH = LEFT_WIDTH + BUTTON_SIZE * 2;
     private static final int PROGRESS_HEIGHT = 5;
 

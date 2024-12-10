@@ -34,7 +34,7 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
     private final Layout layout;
 
-    public MachineRecipeBook(ProcessingScreen screen, Layout layout,
+    private MachineRecipeBook(ProcessingScreen screen, Layout layout,
         @Nullable RecipeType<? extends ProcessingRecipe> recipeType) {
         super(screen, layout.getXOffset());
         this.recipeType = recipeType;

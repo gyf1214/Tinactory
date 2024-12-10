@@ -366,7 +366,7 @@ public final class AllBlockEntities {
 
         BATTERY_BOX = set.machine()
             .machine(v -> "machine/" + v.id + "/battery_box", MachineBlock::sided)
-            .capability(BatteryBox::builder)
+            .layoutCapability(BatteryBox::builder)
             .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.BATTERY_BOX).build())
             .voltages(Voltage.LV, Voltage.HV)
             .layoutSet()

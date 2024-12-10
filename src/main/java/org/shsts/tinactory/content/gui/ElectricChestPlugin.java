@@ -31,8 +31,8 @@ import java.util.function.Function;
 
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllMenus.CHEST_SLOT_CLICK;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.client.FluidSlot.HIGHLIGHT_COLOR;
 
@@ -129,7 +129,7 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
         }
         for (var i = 0; i < size * 2; i++) {
             var slotInfo = layout.slots.get(i);
-            var x = layout.getXOffset() + slotInfo.x() + MARGIN_HORIZONTAL + 1;
+            var x = layout.getXOffset() + slotInfo.x() + MARGIN_X + 1;
             var y = slotInfo.y() + MARGIN_TOP + 1;
 
             var slot = i < size ? new InputSlot(i, x, y) : new OutputSlot(i - size, x, y);

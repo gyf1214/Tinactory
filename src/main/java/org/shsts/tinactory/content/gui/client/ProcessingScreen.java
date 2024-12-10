@@ -28,7 +28,7 @@ import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingScreen extends MenuScreen {
-    protected final Layout layout;
+    public final Layout layout;
     protected final Panel layoutPanel;
     @Nullable
     private RecipeType<?> recipeType = null;
