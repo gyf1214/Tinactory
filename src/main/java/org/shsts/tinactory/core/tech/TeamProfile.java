@@ -10,7 +10,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.common.util.INBTSerializable;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.ServerUtil;
@@ -19,6 +18,8 @@ import org.slf4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static org.shsts.tinactory.Tinactory.CHANNEL;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -62,7 +63,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             if (player == null) {
                 continue;
             }
-            Tinactory.sendToPlayer(player, packet);
+            CHANNEL.sendToPlayer(player, packet);
         }
     }
 
