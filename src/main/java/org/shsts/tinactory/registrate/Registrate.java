@@ -3,7 +3,6 @@ package org.shsts.tinactory.registrate;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -30,7 +29,6 @@ import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
-import org.shsts.tinactory.registrate.handler.MenuScreenHandler;
 import org.shsts.tinactory.registrate.handler.RecipeTypeHandler;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
 import org.shsts.tinactory.registrate.handler.RegistryHandler;
@@ -59,14 +57,12 @@ public class Registrate {
     public final RegistryEntryHandler<Block> blockHandler;
     public final RegistryEntryHandler<Item> itemHandler;
     public final RegistryEntryHandler<BlockEntityType<?>> blockEntityHandler;
-    public final RegistryEntryHandler<MenuType<?>> menuTypeHandler;
 
     // Others
     public final RecipeTypeHandler recipeTypeHandler;
 
     // Client
     public final RenderTypeHandler renderTypeHandler;
-    public final MenuScreenHandler menuScreenHandler;
     public final RendererHandler rendererHandler;
     public final TintHandler tintHandler;
 
@@ -79,12 +75,10 @@ public class Registrate {
         this.blockHandler = forgeHandler(ForgeRegistries.BLOCKS);
         this.itemHandler = forgeHandler(ForgeRegistries.ITEMS);
         this.blockEntityHandler = forgeHandler(ForgeRegistries.BLOCK_ENTITIES);
-        this.menuTypeHandler = forgeHandler(ForgeRegistries.CONTAINERS);
 
         this.recipeTypeHandler = new RecipeTypeHandler(this);
 
         this.renderTypeHandler = new RenderTypeHandler();
-        this.menuScreenHandler = new MenuScreenHandler();
         this.rendererHandler = new RendererHandler();
         this.tintHandler = new TintHandler();
 
@@ -114,7 +108,6 @@ public class Registrate {
 
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(renderTypeHandler::onClientSetup);
-        event.enqueueWork(menuScreenHandler::onClientSetup);
     }
 
     public void registerClient(IEventBus modEventBus) {
