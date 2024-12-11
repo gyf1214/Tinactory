@@ -12,28 +12,28 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.content.AllEvents1;
+import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
-import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.NETWORK_CONTROLLER;
-import static org.shsts.tinactory.content.AllEvents1.REMOVED_BY_CHUNK;
-import static org.shsts.tinactory.content.AllEvents1.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.content.AllEvents1.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllEvents1.SERVER_TICK;
-import static org.shsts.tinactory.content.AllEvents1.SERVER_USE;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_TICK;
+import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkController extends CapabilityProvider implements IEventSubscriber,
-    INBTSerializable<CompoundTag> {
+public class NetworkController extends CapabilityProvider
+    implements IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final String ID = "network/controller";
 
     private final BlockEntity blockEntity;
@@ -95,20 +95,20 @@ public class NetworkController extends CapabilityProvider implements IEventSubsc
         return network == null || network.team.hasPlayer(player);
     }
 
-    private void onServerUse(AllEvents1.OnUseArg args,
-        ReturnEvent.Token<InteractionResult> result) {
+    private void onServerUse(AllEvents.OnUseArg args,
+        IReturnEvent.Result<InteractionResult> result) {
         if (!canPlayerInteract(args.player())) {
-            result.setReturn(InteractionResult.FAIL);
+            result.set(InteractionResult.FAIL);
         }
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD, $ -> this.onServerLoad());
-        eventManager.subscribe(REMOVED_IN_WORLD, $ -> this.onRemoved());
-        eventManager.subscribe(REMOVED_BY_CHUNK, $ -> this.onRemoved());
-        eventManager.subscribe(SERVER_TICK, $ -> this.onServerTick());
-        eventManager.subscribe(SERVER_USE, this::onServerUse);
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> onServerLoad());
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), $ -> onRemoved());
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), $ -> onRemoved());
+        eventManager.subscribe(SERVER_TICK.get(), $ -> onServerTick());
+        eventManager.subscribe(SERVER_USE.get(), this::onServerUse);
     }
 
     @Override

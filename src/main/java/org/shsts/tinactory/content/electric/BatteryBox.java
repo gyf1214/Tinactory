@@ -17,14 +17,14 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
@@ -33,7 +33,7 @@ import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
-import static org.shsts.tinactory.content.AllEvents1.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
@@ -139,8 +139,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD, $ -> machine = MACHINE.get(blockEntity));
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> machine = MACHINE.get(blockEntity));
     }
 
     @Nonnull

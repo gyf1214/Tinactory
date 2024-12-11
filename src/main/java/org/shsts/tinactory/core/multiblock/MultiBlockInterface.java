@@ -17,20 +17,25 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.Optional;
+
+import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
+import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -118,7 +123,7 @@ public class MultiBlockInterface extends Machine {
 
     private void onContainerChange() {
         if (multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents1.CONTAINER_CHANGE);
+            EVENT_MANAGER.get(blockEntity).invoke(CONTAINER_CHANGE.get());
         }
     }
 
@@ -126,7 +131,7 @@ public class MultiBlockInterface extends Machine {
     public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
         super.setConfig(packet, invokeEvent);
         if (invokeEvent && multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents1.SET_MACHINE_CONFIG);
+            EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
         }
     }
 
@@ -136,11 +141,11 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
+    public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
-        eventManager.subscribe(AllEvents1.SERVER_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents1.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents1.CONTAINER_CHANGE, this::onContainerChange);
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CONTAINER_CHANGE.get(), this::onContainerChange);
     }
 
     @Override
@@ -232,7 +237,7 @@ public class MultiBlockInterface extends Machine {
         }
 
         if (multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents1.SET_MACHINE_CONFIG);
+            EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
         }
     }
 }

@@ -21,7 +21,6 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.electric.GeneratorProcessor;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
@@ -32,12 +31,12 @@ import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
 import org.shsts.tinactory.content.multiblock.MultiBlockProcessor;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
@@ -46,6 +45,12 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -291,12 +296,12 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents1.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents1.REMOVED_BY_CHUNK, this::onRemoved);
-        eventManager.subscribe(AllEvents1.REMOVED_IN_WORLD, this::onRemoved);
-        eventManager.subscribe(AllEvents1.CONTAINER_CHANGE, this::setUpdateRecipe);
-        eventManager.subscribe(AllEvents1.SET_MACHINE_CONFIG, this::onMachineConfig);
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
+        eventManager.subscribe(CONTAINER_CHANGE.get(), this::setUpdateRecipe);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }
 
     @Nonnull

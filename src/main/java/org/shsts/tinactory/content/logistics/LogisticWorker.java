@@ -17,18 +17,17 @@ import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
@@ -38,6 +37,8 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
+import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.ProcessingPlugin.portLabel;
 
@@ -244,9 +245,9 @@ public class LogisticWorker extends CapabilityProvider
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents1.SET_MACHINE_CONFIG, this::validateConfigs);
-        eventManager.subscribe(AllEvents1.BUILD_SCHEDULING, this::buildScheduling);
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::validateConfigs);
     }
 
     private void buildScheduling(NetworkComponent.SchedulingBuilder builder) {

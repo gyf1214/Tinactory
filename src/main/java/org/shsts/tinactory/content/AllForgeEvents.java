@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -17,7 +16,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.CapabilityItem;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.multiblock.MultiBlockManager;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -30,13 +28,6 @@ import static org.shsts.tinactory.content.AllWorldGens.PLAYER_START_FEATURE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllForgeEvents {
-    @SubscribeEvent
-    public static void onAttachBlockEntity(AttachCapabilitiesEvent<BlockEntity> event) {
-        if (event.getObject().getType() instanceof SmartBlockEntityType<?> type) {
-            type.attachCapabilities(event);
-        }
-    }
-
     @SubscribeEvent
     public static void onAttachItemStack(AttachCapabilitiesEvent<ItemStack> event) {
         if (event.getObject().getItem() instanceof CapabilityItem capabilityItem) {

@@ -7,19 +7,24 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.content.AllEvents1;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.common.WeakMap;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_TICK;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class MultiBlockBase extends UpdatableCapabilityProvider implements IEventSubscriber {
+public abstract class MultiBlockBase extends UpdatableCapabilityProvider
+    implements IEventSubscriber {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final int CHECK_CYCLE = 40;
@@ -89,11 +94,11 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider impleme
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents1.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents1.REMOVED_IN_WORLD, $ -> onRemove());
-        eventManager.subscribe(AllEvents1.REMOVED_BY_CHUNK, $ -> onRemove());
-        eventManager.subscribe(AllEvents1.SERVER_TICK, $ -> onServerTick());
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), $ -> onRemove());
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), $ -> onRemove());
+        eventManager.subscribe(SERVER_TICK.get(), $ -> onServerTick());
     }
 
     @Override

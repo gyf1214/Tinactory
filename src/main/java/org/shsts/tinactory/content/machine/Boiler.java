@@ -6,7 +6,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.ForgeHooks;
@@ -19,16 +18,17 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.List;
 
+import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
@@ -68,7 +68,7 @@ public class Boiler extends CapabilityProvider implements
         return heat;
     }
 
-    private void onLoad(Level world) {
+    private void onLoad() {
         var container = AllCapabilities.CONTAINER.get(blockEntity);
         fuelPort = container.getPort(0, true).asItem();
         waterPort = container.getPort(1, true).asFluid();
@@ -79,9 +79,9 @@ public class Boiler extends CapabilityProvider implements
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents1.SERVER_LOAD, this::onLoad);
-        eventManager.subscribe(AllEvents1.CLIENT_LOAD, this::onLoad);
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
     }
 
     @Override

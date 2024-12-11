@@ -23,26 +23,33 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents1;
+import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
-import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
 @MethodsReturnNonnullByDefault
@@ -83,7 +90,7 @@ public class Machine extends UpdatableCapabilityProvider
         config.apply(packet);
         sendUpdate(blockEntity);
         if (invokeEvent) {
-            EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
+            EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
         }
     }
 
@@ -98,10 +105,11 @@ public class Machine extends UpdatableCapabilityProvider
         return network != null && network.team.hasPlayer(player);
     }
 
-    protected void onServerUse(AllEvents1.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
+    protected void onServerUse(AllEvents.OnUseArg arg,
+        IReturnEvent.Result<InteractionResult> result) {
         var player = arg.player();
         if (!canPlayerInteract(player)) {
-            token.setReturn(InteractionResult.FAIL);
+            result.set(InteractionResult.FAIL);
             return;
         }
 
@@ -113,11 +121,11 @@ public class Machine extends UpdatableCapabilityProvider
                 item.shrink(1);
             }
 
-            token.setReturn(InteractionResult.sidedSuccess(player.level.isClientSide));
+            result.set(InteractionResult.sidedSuccess(player.level.isClientSide));
             return;
         }
 
-        token.setReturn(InteractionResult.PASS);
+        result.set(InteractionResult.PASS);
     }
 
     public Component getTitle() {
@@ -127,10 +135,10 @@ public class Machine extends UpdatableCapabilityProvider
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents1.REMOVED_IN_WORLD, this::onRemoved);
-        eventManager.subscribe(AllEvents1.REMOVED_BY_CHUNK, this::onRemoved);
-        eventManager.subscribe(AllEvents1.SERVER_USE, this::onServerUse);
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
+        eventManager.subscribe(SERVER_USE.get(), this::onServerUse);
     }
 
     protected static Optional<BlockState> getRealBlockState(Level world, BlockEntity be) {
@@ -177,7 +185,7 @@ public class Machine extends UpdatableCapabilityProvider
             }
         });
 
-        EventManager.invoke(blockEntity, AllEvents1.CONNECT, network);
+        EVENT_MANAGER.get(blockEntity).invoke(CONNECT.get(), network);
     }
 
     /**
@@ -209,7 +217,7 @@ public class Machine extends UpdatableCapabilityProvider
     public void buildSchedulings(NetworkComponent.SchedulingBuilder builder) {
         builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
         builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
-        EventManager.invoke(blockEntity, AllEvents1.BUILD_SCHEDULING, builder);
+        EVENT_MANAGER.get(blockEntity).invoke(BUILD_SCHEDULING.get(), builder);
     }
 
     public UUID getUuid() {
@@ -283,7 +291,7 @@ public class Machine extends UpdatableCapabilityProvider
     @Override
     public void deserializeOnUpdate(CompoundTag tag) {
         deserializeNBT(tag);
-        EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
+        EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
     }
 
     public static Optional<IProcessor> getProcessor(BlockEntity be) {

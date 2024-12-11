@@ -19,11 +19,9 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.MultiBlockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
-import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -40,6 +38,9 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -160,7 +161,7 @@ public class MultiBlock extends MultiBlockBase {
         assert multiBlockInterface != null;
         multiBlockInterface.setMultiBlock(this);
         sendUpdate(blockEntity);
-        EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
+        EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
     }
 
     @Override
@@ -170,7 +171,7 @@ public class MultiBlock extends MultiBlockBase {
         }
         multiBlockInterface = null;
         sendUpdate(blockEntity);
-        EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
+        EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
     }
 
     public Optional<MultiBlockInterface> getInterface() {
@@ -226,7 +227,7 @@ public class MultiBlock extends MultiBlockBase {
             multiBlockInterface = null;
         }
 
-        EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
+        EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
     }
 
     public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, MultiBlock>,

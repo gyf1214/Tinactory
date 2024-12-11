@@ -10,7 +10,6 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.machine.IWorkbench;
 import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.UpdateHelper;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
@@ -26,7 +25,6 @@ public final class AllCapabilities {
     public static final ICapability<IEventManager> EVENT_MANAGER;
 
     public static final ICapability<UpdateHelper> UPDATE_HELPER;
-    public static final ICapability<EventManager> EVENT_MANAGER1;
     public static final ICapability<IProcessor> PROCESSOR;
     public static final ICapability<IContainer> CONTAINER;
     public static final ICapability<IElectricMachine> ELECTRIC_MACHINE;
@@ -45,7 +43,6 @@ public final class AllCapabilities {
         EVENT_MANAGER = REGISTRATE.getCapability(new CapabilityToken<>() {});
 
         UPDATE_HELPER = REGISTRATE.capability(UpdateHelper.class, new CapabilityToken<>() {});
-        EVENT_MANAGER1 = REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
         PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
         CONTAINER = REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
         ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});

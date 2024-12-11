@@ -17,10 +17,8 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
@@ -37,10 +35,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -150,7 +150,7 @@ public class StackProcessingContainer extends CapabilityProvider
     }
 
     private void onUpdate() {
-        EventManager.invoke(blockEntity, AllEvents1.CONTAINER_CHANGE);
+        EVENT_MANAGER.get(blockEntity).invoke(CONTAINER_CHANGE.get());
         blockEntity.setChanged();
     }
 
