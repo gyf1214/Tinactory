@@ -44,7 +44,7 @@ public class MachineBlock extends SmartEntityBlock
     public MachineBlock(Properties properties,
         Supplier<IBlockEntityType> entityType,
         @Nullable IMenuType menu, Voltage voltage) {
-        super(properties, entityType, menu);
+        super(properties.strength(2f, 6f).requiresCorrectToolForDrops(), entityType, menu);
         this.voltage = voltage;
         this.resistance = voltage.rank * TinactoryConfig.INSTANCE.machineResistanceFactor.get();
     }
