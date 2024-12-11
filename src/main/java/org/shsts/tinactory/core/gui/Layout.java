@@ -77,6 +77,14 @@ public class Layout {
         this.rect = new Rect(0, 0, maxX, maxY);
     }
 
+    public static <P> LayoutSetBuilder<P> builder(P parent) {
+        return new LayoutSetBuilder<>(parent);
+    }
+
+    public static LayoutSetBuilder<?> builder() {
+        return new LayoutSetBuilder<>(Unit.INSTANCE);
+    }
+
     public int getXOffset() {
         return (Menu.CONTENT_WIDTH - rect.width()) / 2;
     }
@@ -107,14 +115,6 @@ public class Layout {
 
     public List<SlotWith<IProcessingResult>> getProcessingOutputs(ProcessingRecipe recipe) {
         return getSlotWithInfo(recipe.outputs, ProcessingRecipe.Output::port, ProcessingRecipe.Output::result);
-    }
-
-    public static <P> LayoutSetBuilder<P> builder(P parent) {
-        return new LayoutSetBuilder<>(parent);
-    }
-
-    public static LayoutSetBuilder<?> builder() {
-        return new LayoutSetBuilder<>(Unit.INSTANCE);
     }
 
     public static final Layout EMPTY = builder().buildLayout();

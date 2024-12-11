@@ -2,22 +2,25 @@ package org.shsts.tinactory.datagen.content.builder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.util.Unit;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
-import org.shsts.tinactory.datagen.builder.DataBuilder;
-import org.shsts.tinycorelib.datagen.api.IDataGen;
+import org.shsts.tinactory.core.builder.Builder;
+import org.shsts.tinactory.datagen.builder.TechBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
+import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Technologies.BASE_ORE;
+import static org.shsts.tinactory.datagen.content.Technologies.TECHS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
+public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
     private final String id;
     private final double rate;
     private final OreAnalyzerRecipe.Builder builder;
@@ -26,11 +29,16 @@ public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
     private boolean primitive = false;
     private OreVariant variant = null;
 
-    public VeinBuilder(IDataGen dataGen, P parent, String id, double rate) {
-        super(dataGen, parent, id);
+    private VeinBuilder(P parent, String id, double rate) {
+        super(parent);
         this.id = id;
         this.rate = rate;
-        this.builder = ORE_ANALYZER.recipe(xDataGen, id).rate(rate);
+        this.builder = ORE_ANALYZER.recipe(_DATA_GEN, id).rate(rate);
+    }
+
+    public static <P> VeinBuilder<P> factory(P parent, String id, double rate) {
+        var builder = new VeinBuilder<>(parent, id, rate);
+        return builder.onBuild(builder::onRegister);
     }
 
     public VeinBuilder<P> ore(MaterialSet material, double rate) {
@@ -57,7 +65,11 @@ public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
     }
 
     @Override
-    protected void register() {
+    protected Unit createObject() {
+        return Unit.INSTANCE;
+    }
+
+    private void onRegister() {
         assert variant != null;
         assert rate > 0d;
         assert !ores.isEmpty();
@@ -67,12 +79,13 @@ public class VeinBuilder<P> extends DataBuilder<P, VeinBuilder<P>> {
         var tech = BASE_ORE.get(variant);
         var baseProgress = 30L;
         if (!baseOre) {
-            tech = xDataGen.tech("ore/" + id)
+            tech = TECHS.builder("ore/" + id, TechBuilder::factory)
                 .maxProgress(baseProgress)
                 .displayItem(ores.get(0).loc("raw"))
-                .depends(tech).buildLoc();
+                .depends(tech)
+                .register();
 
-            RESEARCH_BENCH.recipe(xDataGen, tech)
+            RESEARCH_BENCH.recipe(_DATA_GEN, tech)
                 .target(tech)
                 .defaultInput(variant.voltage)
                 .build();

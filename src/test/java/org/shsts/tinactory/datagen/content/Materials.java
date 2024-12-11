@@ -133,7 +133,7 @@ public final class Materials {
 
     private static class MaterialFactory {
         public MaterialBuilder<MaterialFactory> material(MaterialSet material, IconSet icon) {
-            return (new MaterialBuilder<>(DATA_GEN, this, material)).icon(icon);
+            return MaterialBuilder.factory(DATA_GEN, this, material).icon(icon);
         }
     }
 

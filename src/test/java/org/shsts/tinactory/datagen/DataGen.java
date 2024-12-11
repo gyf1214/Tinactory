@@ -14,7 +14,6 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.NullRecipe;
-import org.shsts.tinactory.datagen.builder.TechBuilder;
 import org.shsts.tinactory.datagen.content.Components;
 import org.shsts.tinactory.datagen.content.Machines;
 import org.shsts.tinactory.datagen.content.Markers;
@@ -35,9 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -101,14 +97,6 @@ public final class DataGen implements IRecipeDataConsumer {
         var loc = item.getRegistryName();
         assert loc != null;
         return nullRecipe(loc);
-    }
-
-    public TechBuilder<DataGen> tech(String id) {
-        return new TechBuilder<>(DATA_GEN, this, id);
-    }
-
-    public <P> TechBuilder<P> tech(P parent, String id) {
-        return new TechBuilder<>(DATA_GEN, parent, modLoc(id));
     }
 
     public void trackLang(String key) {
