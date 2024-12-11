@@ -79,7 +79,7 @@ public final class AllMultiBlocks {
             .block('T', HEATPROOF_CASING)
             .build()
             .build()
-            .build()
+            .end()
             .buildObject();
 
         SIFTER = multiBlock("sifter")
@@ -126,7 +126,7 @@ public final class AllMultiBlocks {
             .air('A')
             .build()
             .build()
-            .build()
+            .end()
             .buildObject();
 
         VACUUM_FREEZER = multiBlock("vacuum_freezer")
@@ -156,7 +156,7 @@ public final class AllMultiBlocks {
             .air('A')
             .build()
             .build()
-            .build()
+            .end()
             .buildObject();
     }
 

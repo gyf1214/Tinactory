@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
@@ -76,8 +75,7 @@ public class MachineSet {
         protected Function<Voltage, BlockEntityBuilder<?, ?>> blockEntityBuilder = null;
         @Nullable
         protected LayoutSetBuilder<S> layoutSetBuilder = null;
-        @Nullable
-        protected Map<Voltage, Layout> layoutSet = null;
+        protected Map<Voltage, Layout> layoutSet = Layout.EMPTY_SET;
 
         protected BuilderBase(IRegistrate registrate, P parent) {
             super(parent);
@@ -96,7 +94,8 @@ public class MachineSet {
 
         public LayoutSetBuilder<S> layoutSet() {
             if (layoutSetBuilder == null) {
-                layoutSetBuilder = Layout.builder(self());
+                layoutSetBuilder = Layout.builder(self())
+                    .onCreateObject($ -> layoutSet = $);
             }
             return layoutSetBuilder;
         }
@@ -164,13 +163,6 @@ public class MachineSet {
 
         @Override
         protected T createObject() {
-            if (layoutSetBuilder != null) {
-                layoutSet = layoutSetBuilder.buildObject();
-            } else {
-                layoutSet = AllLayouts.EMPTY_SET;
-            }
-            assert layoutSet != null;
-
             if (voltages.isEmpty()) {
                 voltages(Voltage.LV);
             }

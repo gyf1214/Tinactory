@@ -123,7 +123,7 @@ public class MultiBlockInterface extends Machine {
 
     private void onContainerChange() {
         if (multiBlock != null) {
-            EVENT_MANAGER.get(blockEntity).invoke(CONTAINER_CHANGE.get());
+            EVENT_MANAGER.get(multiBlock.blockEntity).invoke(CONTAINER_CHANGE.get());
         }
     }
 
@@ -131,7 +131,7 @@ public class MultiBlockInterface extends Machine {
     public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
         super.setConfig(packet, invokeEvent);
         if (invokeEvent && multiBlock != null) {
-            EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
+            EVENT_MANAGER.get(multiBlock.blockEntity).invoke(SET_MACHINE_CONFIG.get());
         }
     }
 
@@ -237,7 +237,7 @@ public class MultiBlockInterface extends Machine {
         }
 
         if (multiBlock != null) {
-            EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
+            EVENT_MANAGER.get(multiBlock.blockEntity).invoke(SET_MACHINE_CONFIG.get());
         }
     }
 }

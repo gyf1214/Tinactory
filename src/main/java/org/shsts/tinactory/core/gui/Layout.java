@@ -7,11 +7,13 @@ import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
@@ -116,4 +118,6 @@ public class Layout {
     }
 
     public static final Layout EMPTY = builder().buildLayout();
+
+    public static final Map<Voltage, Layout> EMPTY_SET = builder().buildObject();
 }
