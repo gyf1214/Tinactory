@@ -152,7 +152,7 @@ public final class AllMaterials {
     public static final Map<String, MaterialSet> SET;
 
     public static MaterialSet.Builder<?> set(String id) {
-        return (new MaterialSet.Builder<>(Unit.INSTANCE, id))
+        return MaterialSet.builder(Unit.INSTANCE, id)
             .onCreateObject(mat -> SET.put(mat.name, mat));
     }
 

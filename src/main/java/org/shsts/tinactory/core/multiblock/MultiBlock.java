@@ -265,9 +265,8 @@ public class MultiBlock extends MultiBlockBase {
         }
 
         public MultiBlockSpec.Builder<Builder<P>> spec() {
-            var builder1 = MultiBlockSpec.builder(this);
-            builder1.onCreateObject(spec -> this.checker = spec);
-            return builder1;
+            return child(MultiBlockSpec::builder)
+                .onCreateObject(spec -> this.checker = spec);
         }
 
         @Override

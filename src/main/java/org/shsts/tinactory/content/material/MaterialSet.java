@@ -13,7 +13,7 @@ import net.minecraft.world.level.material.Fluid;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.tool.ToolItem;
 import org.shsts.tinactory.content.tool.UsableToolItem;
-import org.shsts.tinactory.core.common.SimpleBuilder1;
+import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
@@ -177,7 +177,7 @@ public class MaterialSet {
         return oreVariant;
     }
 
-    public static class Builder<P> extends SimpleBuilder1<MaterialSet, P, Builder<P>> {
+    public static class Builder<P> extends SimpleBuilder<MaterialSet, P, Builder<P>> {
         private final String name;
         private final Map<String, ItemEntry> items = new HashMap<>();
         private final Map<String, BlockEntry> blocks = new HashMap<>();
@@ -188,7 +188,7 @@ public class MaterialSet {
         private IEntry<? extends Fluid> fluid = null;
         private int fluidBaseAmount = 0;
 
-        public Builder(P parent, String name) {
+        private Builder(P parent, String name) {
             super(parent);
             this.name = name;
         }
@@ -384,7 +384,7 @@ public class MaterialSet {
                 .dummies("dust_impure", "dust_pure").dust();
         }
 
-        public class ToolBuilder extends SimpleBuilder1<Unit, Builder<P>, ToolBuilder> {
+        public class ToolBuilder extends SimpleBuilder<Unit, Builder<P>, ToolBuilder> {
             private final int durability;
             @Nullable
             private final Tier tier;
@@ -440,6 +440,10 @@ public class MaterialSet {
         public ToolBuilder tool(int durability) {
             return new ToolBuilder(durability, null);
         }
+    }
+
+    public static <P> Builder<P> builder(P parent, String name) {
+        return new Builder<>(parent, name);
     }
 
     @Override
