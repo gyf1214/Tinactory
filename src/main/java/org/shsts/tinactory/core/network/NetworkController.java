@@ -23,7 +23,6 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.NETWORK_CONTROLLER;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
@@ -113,9 +112,6 @@ public class NetworkController extends CapabilityProvider
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == NETWORK_CONTROLLER.get()) {
-            return myself().cast();
-        }
         return LazyOptional.empty();
     }
 
@@ -133,5 +129,13 @@ public class NetworkController extends CapabilityProvider
         if (tag.contains("team", Tag.TAG_STRING)) {
             teamName = tag.getString("team");
         }
+    }
+
+    public static Optional<NetworkController> tryGet(BlockEntity be) {
+        return tryGet(be, ID, NetworkController.class);
+    }
+
+    public static NetworkController get(BlockEntity be) {
+        return get(be, ID, NetworkController.class);
     }
 }

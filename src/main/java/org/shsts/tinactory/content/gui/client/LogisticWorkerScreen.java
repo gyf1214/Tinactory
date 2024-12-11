@@ -13,6 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
+import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Rect;
@@ -34,7 +35,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_PANEL_BG;
@@ -268,7 +268,7 @@ public class LogisticWorkerScreen extends MenuScreen {
         super(menu, inventory, title);
         var blockEntity = menu.blockEntity();
         this.machineConfig = MACHINE.get(blockEntity).config;
-        this.workerSlots = LOGISTIC_WORKER.get(blockEntity).workerSlots;
+        this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
 
         var configPanel = new ConfigPanel();
         this.machineSelectPanel = new MachineSelectPanel();

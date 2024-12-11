@@ -46,6 +46,8 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
@@ -207,10 +209,10 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     private void updateTargetRecipe() {
-        var recipe = AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
+        var recipe = MultiBlock.tryGet(blockEntity)
             .flatMap(MultiBlock::getInterface)
             .map($ -> (Machine) $)
-            .or(() -> AllCapabilities.MACHINE.tryGet(blockEntity))
+            .or(() -> MACHINE.tryGet(blockEntity))
             .flatMap($ -> $.config.getLoc("targetRecipe"));
 
         recipe.ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
@@ -262,9 +264,9 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     protected Optional<IContainer> getContainer() {
-        return AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
+        return MultiBlock.tryGet(blockEntity)
             .flatMap(MultiBlock::getContainer)
-            .or(() -> AllCapabilities.CONTAINER.tryGet(blockEntity));
+            .or(() -> CONTAINER.tryGet(blockEntity));
     }
 
     @SuppressWarnings("unchecked")

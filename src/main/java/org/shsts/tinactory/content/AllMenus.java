@@ -26,6 +26,7 @@ import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
+import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinycorelib.api.gui.IMenuEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -93,7 +94,7 @@ public final class AllMenus {
             .title("tinactory.gui.networkController.title")
             .screen(() -> () -> NetworkControllerScreen::new)
             .dummyPlugin(menu -> {
-                menu.setValidPredicate(() -> AllCapabilities.NETWORK_CONTROLLER
+                menu.setValidPredicate(() -> NetworkController
                     .get(menu.blockEntity())
                     .canPlayerInteract(menu.player()));
                 menu.addSyncSlot("info", NetworkControllerSyncPacket::new);

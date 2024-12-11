@@ -45,6 +45,7 @@ import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 @MethodsReturnNonnullByDefault
 public class MultiBlock extends MultiBlockBase {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final String ID = "multi_block";
 
     public final Layout layout;
     private final Consumer<MultiBlockCheckCtx> checker;
@@ -192,9 +193,6 @@ public class MultiBlock extends MultiBlockBase {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.MULTI_BLOCK.get()) {
-            return myself();
-        }
         return LazyOptional.empty();
     }
 
@@ -231,7 +229,6 @@ public class MultiBlock extends MultiBlockBase {
 
     public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, MultiBlock>,
         IBlockEntityTypeBuilder<P>, Builder<P>> {
-        private static final String ID = "multi_block";
 
         private final BiFunction<BlockEntity, Builder<P>, MultiBlock> factory;
         @Nullable
@@ -280,5 +277,13 @@ public class MultiBlock extends MultiBlockBase {
 
     public static <P> Builder<P> blastFurnace(IBlockEntityTypeBuilder<P> parent) {
         return new Builder<>(parent, BlastFurnace::new);
+    }
+
+    public static Optional<MultiBlock> tryGet(BlockEntity be) {
+        return tryGet(be, ID, MultiBlock.class);
+    }
+
+    public static MultiBlock get(BlockEntity be) {
+        return get(be, ID, MultiBlock.class);
     }
 }

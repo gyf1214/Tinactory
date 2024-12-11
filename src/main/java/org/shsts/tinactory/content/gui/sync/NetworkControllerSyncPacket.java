@@ -12,8 +12,6 @@ import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;
 
-import static org.shsts.tinactory.content.AllCapabilities.NETWORK_CONTROLLER;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class NetworkControllerSyncPacket implements IPacket {
@@ -24,7 +22,7 @@ public class NetworkControllerSyncPacket implements IPacket {
     public NetworkControllerSyncPacket() {}
 
     public NetworkControllerSyncPacket(BlockEntity be) {
-        var network = NETWORK_CONTROLLER.tryGet(be)
+        var network = NetworkController.tryGet(be)
             .flatMap(NetworkController::getNetwork);
         this.present = network.isPresent();
         if (present) {

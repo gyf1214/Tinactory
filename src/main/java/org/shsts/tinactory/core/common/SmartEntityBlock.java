@@ -24,7 +24,6 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
 
 @MethodsReturnNonnullByDefault
@@ -85,11 +84,8 @@ public class SmartEntityBlock extends Block implements EntityBlock {
         }
 
         if (!world.isClientSide) {
-            var result = EVENT_MANAGER.tryGet(be.get()).map($ -> {
-                var args = new AllEvents.OnUseArg(player, hand, hitResult);
-                return $.invokeReturn(SERVER_USE.get(), args);
-            }).orElse(InteractionResult.PASS);
-
+            var args = new AllEvents.OnUseArg(player, hand, hitResult);
+            var result = CapabilityProvider.invokeReturn(be.get(), SERVER_USE, args);
             if (result != InteractionResult.PASS) {
                 return result;
             }

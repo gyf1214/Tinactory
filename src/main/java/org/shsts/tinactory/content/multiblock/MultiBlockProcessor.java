@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.multiblock;
 
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
@@ -15,7 +14,7 @@ public class MultiBlockProcessor<T extends ProcessingRecipe> extends MachineProc
     }
 
     protected MultiBlock getMultiBlock() {
-        return AllCapabilities.MULTI_BLOCK.get(blockEntity);
+        return MultiBlock.get(blockEntity);
     }
 
     @Override

@@ -229,7 +229,7 @@ public class MultiBlockInterface extends Machine {
             if (be1 == null) {
                 return;
             }
-            AllCapabilities.MULTI_BLOCK.tryGet(be1)
+            MultiBlock.tryGet(be1)
                 .ifPresentOrElse(this::setMultiBlock, this::resetMultiBlock);
         } else {
             resetMultiBlock();

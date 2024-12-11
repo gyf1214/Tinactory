@@ -9,9 +9,11 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinycorelib.api.blockentity.IEvent;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -22,18 +24,29 @@ public abstract class CapabilityProvider implements ICapabilityProvider {
         return myself.cast();
     }
 
-    protected static void invoke(BlockEntity be, Supplier<IEvent<Unit>> event) {
+    public static void invoke(BlockEntity be, Supplier<IEvent<Unit>> event) {
         EVENT_MANAGER.tryGet(be).ifPresent($ -> $.invoke(event.get()));
     }
 
-    protected static <A> void invoke(BlockEntity be, Supplier<IEvent<A>> event, A arg) {
+    public static <A> void invoke(BlockEntity be, Supplier<IEvent<A>> event, A arg) {
         EVENT_MANAGER.tryGet(be).ifPresent($ -> $.invoke(event.get(), arg));
     }
 
-    protected static <A, R> R invokeReturn(BlockEntity be, Supplier<IReturnEvent<A, R>> event,
+    public static <A, R> R invokeReturn(BlockEntity be, Supplier<IReturnEvent<A, R>> event,
         A arg) {
         return EVENT_MANAGER.tryGet(be)
             .map($ -> $.invokeReturn(event.get(), arg))
             .orElse(event.get().defaultResult());
+    }
+
+    protected static <T extends ICapabilityProvider> Optional<T> tryGet(
+        BlockEntity be, String id, Class<T> clazz) {
+        return EVENT_MANAGER.tryGet(be)
+            .flatMap($ -> $.tryGetProvider(modLoc(id), clazz));
+    }
+
+    protected static <T extends ICapabilityProvider> T get(
+        BlockEntity be, String id, Class<T> clazz) {
+        return EVENT_MANAGER.get(be).getProvider(modLoc(id), clazz);
     }
 }

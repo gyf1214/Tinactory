@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LogisticWorkerSyncPacket implements IPacket {
@@ -52,7 +50,7 @@ public class LogisticWorkerSyncPacket implements IPacket {
     }
 
     public LogisticWorkerSyncPacket(BlockEntity be) {
-        this.visiblePorts = LOGISTIC_WORKER.tryGet(be)
+        this.visiblePorts = LogisticWorker.tryGet(be)
             .map(LogisticWorker::getVisiblePorts)
             .orElseGet(List::of);
     }

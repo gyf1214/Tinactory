@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
@@ -256,11 +255,17 @@ public class LogisticWorker extends CapabilityProvider
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LOGISTIC_WORKER.get()) {
-            return myself().cast();
-        } else if (cap == ELECTRIC_MACHINE.get()) {
+        if (cap == ELECTRIC_MACHINE.get()) {
             return electricCap.cast();
         }
         return LazyOptional.empty();
+    }
+
+    public static Optional<LogisticWorker> tryGet(BlockEntity be) {
+        return tryGet(be, ID, LogisticWorker.class);
+    }
+
+    public static LogisticWorker get(BlockEntity be) {
+        return get(be, ID, LogisticWorker.class);
     }
 }
