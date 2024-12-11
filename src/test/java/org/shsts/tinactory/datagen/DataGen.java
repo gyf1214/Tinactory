@@ -23,9 +23,8 @@ import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
 import org.shsts.tinactory.datagen.context.TrackedContext;
 import org.shsts.tinactory.datagen.handler.DataHandler;
-import org.shsts.tinactory.datagen.handler.LanguageHandler;
+import org.shsts.tinactory.datagen.handler.LanguageDataProvider;
 import org.shsts.tinactory.datagen.handler.RecipeHandler;
-import org.shsts.tinactory.datagen.handler.TechHandler;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
 
@@ -35,6 +34,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class DataGen implements IRecipeDataConsumer {
@@ -43,8 +44,6 @@ public final class DataGen implements IRecipeDataConsumer {
     public final TrackedContext<String> langTrackedCtx;
 
     public final RecipeHandler recipeHandler;
-    public final TechHandler techHandler;
-    public final LanguageHandler languageHandler;
 
     private final Registrate registrate;
     private final List<DataHandler<?>> dataHandlers;
@@ -59,8 +58,6 @@ public final class DataGen implements IRecipeDataConsumer {
         this.langTrackedCtx = trackedCtx(TrackedType.LANG);
 
         this.recipeHandler = handler(new RecipeHandler(this));
-        this.techHandler = handler(new TechHandler(this));
-        this.languageHandler = handler(new LanguageHandler(this, langTrackedCtx));
     }
 
     public DataGen replaceVanillaRecipe(Supplier<RecipeBuilder> recipe) {
@@ -134,7 +131,6 @@ public final class DataGen implements IRecipeDataConsumer {
     }
 
     public void onGatherData(GatherDataEvent event) {
-        init();
         for (var handler : dataHandlers) {
             handler.onGatherData(event);
         }
@@ -156,6 +152,7 @@ public final class DataGen implements IRecipeDataConsumer {
     public static final DataGen _DATA_GEN = new DataGen(Tinactory._REGISTRATE);
 
     public static void init() {
+        DATA_GEN.addProvider(LanguageDataProvider::new);
         Models.init();
         Technologies.init();
         Materials.init();

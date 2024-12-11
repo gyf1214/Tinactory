@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import org.shsts.tinactory.datagen.DataGen;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 import org.shsts.tinycorelib.datagen.api.ITinyDataGen;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ public class TinactoryTest {
         DATA_CORE = ITinyDataGen.get();
         DATA_GEN = DATA_CORE.dataGen(REGISTRATE);
 
+        DataGen.init();
         DATA_GEN.onGatherData(event);
         _DATA_GEN.onGatherData(event);
     }
