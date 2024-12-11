@@ -21,7 +21,7 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.electric.GeneratorProcessor;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
@@ -37,14 +37,14 @@ import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 @ParametersAreNonnullByDefault
@@ -52,6 +52,8 @@ import java.util.stream.Stream;
 public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityProvider implements
     IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    private static final String ID = "machine/recipe_processor";
     public static final long PROGRESS_PER_TICK = 256;
 
     protected final BlockEntity blockEntity;
@@ -72,10 +74,50 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
 
-    protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, boolean autoRecipe) {
+    protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType,
+        boolean autoRecipe) {
         this.blockEntity = blockEntity;
         this.recipeType = recipeType;
         this.autoRecipe = autoRecipe;
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> machine(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        return $ -> $.capability(ID, be ->
+            new MachineProcessor<>(be, type.get(), true));
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> noAutoRecipe(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        return $ -> $.capability(ID, be ->
+            new MachineProcessor<>(be, type.get(), false));
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> oreProcessor(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, OreAnalyzerProcessor::new);
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> generator(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        return $ -> $.capability(ID, be ->
+            new GeneratorProcessor(be, type.get()));
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> electricFurnace(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, ElectricFurnace::new);
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> multiBlock(
+        RecipeTypeEntry<? extends ProcessingRecipe, ?> type, boolean autoRecipe) {
+        return $ -> $.capability(ID, be ->
+            new MultiBlockProcessor<>(be, type.get(), autoRecipe));
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> blastFurnace(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, BlastFurnaceProcessor::new);
     }
 
     protected Level getWorld() {
@@ -250,11 +292,11 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
-        eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
-        eventManager.subscribe(AllEvents.CONTAINER_CHANGE, this::setUpdateRecipe);
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
+        eventManager.subscribe(AllEvents1.SERVER_LOAD, this::onServerLoad);
+        eventManager.subscribe(AllEvents1.REMOVED_BY_CHUNK, this::onRemoved);
+        eventManager.subscribe(AllEvents1.REMOVED_IN_WORLD, this::onRemoved);
+        eventManager.subscribe(AllEvents1.CONTAINER_CHANGE, this::setUpdateRecipe);
+        eventManager.subscribe(AllEvents1.SET_MACHINE_CONFIG, this::onMachineConfig);
     }
 
     @Nonnull
@@ -287,48 +329,8 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         }
     }
 
-    private static final String ID = "machine/recipe_processor";
-
     public static Voltage getBlockVoltage(BlockEntity be) {
-        return be.getBlockState().getBlock() instanceof MachineBlock<?> machineBlock ?
+        return be.getBlockState().getBlock() instanceof MachineBlock machineBlock ?
             machineBlock.voltage : Voltage.PRIMITIVE;
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> machine(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be), true));
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> noAutoRecipe(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be), false));
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> oreProcessor(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID,
-            be -> new OreAnalyzerProcessor(be, getBlockVoltage(be)));
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> generator(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new GeneratorProcessor(be, type.get(), getBlockVoltage(be)));
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> electricFurnace(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID,
-            be -> new ElectricFurnace(be, getBlockVoltage(be)));
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> multiBlock(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type, boolean autoRecipe) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new MultiBlockProcessor<>(be, type.get(), autoRecipe));
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> blastFurnace(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID, BlastFurnaceProcessor::new);
     }
 }

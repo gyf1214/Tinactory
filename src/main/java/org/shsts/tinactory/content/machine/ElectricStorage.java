@@ -9,7 +9,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
@@ -98,10 +98,10 @@ public abstract class ElectricStorage extends CapabilityProvider
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CONNECT, this::onConnect);
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
+        eventManager.subscribe(AllEvents1.SERVER_LOAD, $ -> onLoad());
+        eventManager.subscribe(AllEvents1.CLIENT_LOAD, $ -> onLoad());
+        eventManager.subscribe(AllEvents1.CONNECT, this::onConnect);
+        eventManager.subscribe(AllEvents1.SET_MACHINE_CONFIG, this::onMachineConfig);
     }
 
     @Override

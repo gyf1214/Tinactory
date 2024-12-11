@@ -6,24 +6,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.Event;
 import org.shsts.tinactory.core.common.ReturnEvent;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.common.XBuilderBase;
-import org.shsts.tinactory.registrate.builder.BlockBuilder;
-import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
-import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
-import org.shsts.tinactory.registrate.builder.ItemBuilder;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.builder.RegistryBuilderWrapper;
 import org.shsts.tinactory.registrate.builder.RegistryEntryBuilder;
@@ -40,7 +32,6 @@ import org.shsts.tinactory.registrate.tracking.TrackedType;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
@@ -119,82 +110,6 @@ public class Registrate {
 
     // builders
 
-    private class SimpleBlockBuilder<U extends Block>
-        extends BlockBuilder<U, Registrate, SimpleBlockBuilder<U>> {
-        public SimpleBlockBuilder(String id, Function<BlockBehaviour.Properties, U> factory) {
-            super(Registrate.this, id, Registrate.this, factory);
-        }
-    }
-
-    public <U extends Block> BlockBuilder<U, Registrate, ?> block(String id,
-        Function<BlockBehaviour.Properties, U> factory) {
-        return new SimpleBlockBuilder<>(id, factory);
-    }
-
-    public <T extends SmartBlockEntity, P, U extends SmartEntityBlock<T>> EntityBlockBuilder<T, U, P> entityBlock(
-        P parent, String id, EntityBlockBuilder.Factory<T, U> factory) {
-        return new EntityBlockBuilder<>(this, id, parent, factory);
-    }
-
-    private class SimpleItemBuilder<U extends Item>
-        extends ItemBuilder<U, Registrate, SimpleItemBuilder<U>> {
-
-        protected SimpleItemBuilder(String id, Function<Item.Properties, U> factory) {
-            super(Registrate.this, id, Registrate.this, factory);
-            onCreateObject.add(registrate::trackItem);
-        }
-    }
-
-    public <U extends Item> ItemBuilder<U, Registrate, ?> item(String id,
-        Function<Item.Properties, U> factory) {
-        return new SimpleItemBuilder<>(id, factory);
-    }
-
-    public <U extends SmartBlockEntity, P> BlockEntityTypeBuilder<U, P> blockEntityType(P parent, String id,
-        BlockEntityTypeBuilder.Factory<U> factory) {
-        return new BlockEntityTypeBuilder<>(this, id, parent, factory);
-    }
-
-    private class SimpleBlockEntityBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>>
-        extends BlockEntityBuilder<T, U, Registrate> {
-        private final String id;
-        private final BlockEntityTypeBuilder.Factory<T> blockEntityFactory;
-        private final EntityBlockBuilder.Factory<T, U> blockFactory;
-
-        private SimpleBlockEntityBuilder(String id,
-            BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
-            EntityBlockBuilder.Factory<T, U> blockFactory) {
-            super(Registrate.this);
-            this.id = id;
-            this.blockEntityFactory = blockEntityFactory;
-            this.blockFactory = blockFactory;
-        }
-
-        @Override
-        protected BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U, Registrate>> createBlockEntityBuilder() {
-            return Registrate.this.blockEntityType(this, id, blockEntityFactory);
-        }
-
-        @Override
-        protected EntityBlockBuilder<T, U, BlockEntityBuilder<T, U, Registrate>> createBlockBuilder() {
-            return Registrate.this.entityBlock(this, id, blockFactory);
-        }
-    }
-
-    public <T extends SmartBlockEntity,
-        U extends SmartEntityBlock<T>> BlockEntityBuilder<T, U, Registrate> blockEntity(
-        String id, BlockEntityTypeBuilder.Factory<T> blockEntityFactory,
-        EntityBlockBuilder.Factory<T, U> blockFactory) {
-        return new SimpleBlockEntityBuilder<>(id, blockEntityFactory, blockFactory);
-    }
-
-    public <U extends SmartEntityBlock<
-        SmartBlockEntity>> BlockEntityBuilder<SmartBlockEntity, U, Registrate> blockEntity(
-        String id, EntityBlockBuilder.Factory<SmartBlockEntity, U> blockFactory) {
-        return (new SimpleBlockEntityBuilder<>(id, SmartBlockEntity::new, blockFactory))
-            .entityClass(SmartBlockEntity.class);
-    }
-
     public <T extends IForgeRegistryEntry<T>> RegistryBuilderWrapper<T, Registrate> registry(
         String id, Class<T> clazz) {
         return new RegistryBuilderWrapper<>(this, id, clazz, this);
@@ -248,13 +163,6 @@ public class Registrate {
         assert loc != null;
         trackedObjects.put(TrackedType.BLOCK, block, loc.toString());
         trackTranslation(block.getDescriptionId());
-    }
-
-    public void trackItem(Item item) {
-        var loc = item.getRegistryName();
-        assert loc != null;
-        trackedObjects.put(TrackedType.ITEM, item, loc.toString());
-        trackTranslation(item.getDescriptionId());
     }
 
     public <V> Map<V, String> getTracked(TrackedType<V> type) {

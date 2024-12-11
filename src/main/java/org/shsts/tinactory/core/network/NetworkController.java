@@ -12,23 +12,23 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.NETWORK_CONTROLLER;
-import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
-import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllEvents.SERVER_TICK;
-import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
+import static org.shsts.tinactory.content.AllEvents1.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.content.AllEvents1.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents1.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents1.SERVER_TICK;
+import static org.shsts.tinactory.content.AllEvents1.SERVER_USE;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -43,12 +43,13 @@ public class NetworkController extends CapabilityProvider implements IEventSubsc
     @Nullable
     private String teamName = null;
 
-    public NetworkController(BlockEntity blockEntity) {
+    private NetworkController(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
     }
 
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> factory(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID, NetworkController::new);
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, NetworkController::new);
     }
 
     private void createNetwork(TeamProfile team) {
@@ -94,7 +95,7 @@ public class NetworkController extends CapabilityProvider implements IEventSubsc
         return network == null || network.team.hasPlayer(player);
     }
 
-    private void onServerUse(AllEvents.OnUseArg args,
+    private void onServerUse(AllEvents1.OnUseArg args,
         ReturnEvent.Token<InteractionResult> result) {
         if (!canPlayerInteract(args.player())) {
             result.setReturn(InteractionResult.FAIL);

@@ -23,20 +23,19 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.common.ReturnEvent;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -50,9 +49,10 @@ import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 @ParametersAreNonnullByDefault
 public class Machine extends UpdatableCapabilityProvider
     implements IEventSubscriber, INBTSerializable<CompoundTag> {
+    protected static final String ID = "network/machine";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public final SmartBlockEntity blockEntity;
+    public final BlockEntity blockEntity;
 
     @Nullable
     protected Network network;
@@ -60,8 +60,13 @@ public class Machine extends UpdatableCapabilityProvider
     private UUID uuid = UUID.randomUUID();
     public final MachineConfig config = new MachineConfig();
 
-    protected Machine(SmartBlockEntity be) {
+    protected Machine(BlockEntity be) {
         this.blockEntity = be;
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, Machine::new);
     }
 
     private void onRemoved(Level world) {
@@ -78,7 +83,7 @@ public class Machine extends UpdatableCapabilityProvider
         config.apply(packet);
         sendUpdate(blockEntity);
         if (invokeEvent) {
-            EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
+            EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
         }
     }
 
@@ -93,7 +98,7 @@ public class Machine extends UpdatableCapabilityProvider
         return network != null && network.team.hasPlayer(player);
     }
 
-    protected void onServerUse(AllEvents.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
+    protected void onServerUse(AllEvents1.OnUseArg arg, ReturnEvent.Token<InteractionResult> token) {
         var player = arg.player();
         if (!canPlayerInteract(player)) {
             token.setReturn(InteractionResult.FAIL);
@@ -123,13 +128,25 @@ public class Machine extends UpdatableCapabilityProvider
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
-        eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
-        eventManager.subscribe(AllEvents.SERVER_USE, this::onServerUse);
+        eventManager.subscribe(AllEvents1.REMOVED_IN_WORLD, this::onRemoved);
+        eventManager.subscribe(AllEvents1.REMOVED_BY_CHUNK, this::onRemoved);
+        eventManager.subscribe(AllEvents1.SERVER_USE, this::onServerUse);
+    }
+
+    protected static Optional<BlockState> getRealBlockState(Level world, BlockEntity be) {
+        var pos = be.getBlockPos();
+        if (!world.isLoaded(pos)) {
+            return Optional.empty();
+        }
+        var state = be.getBlockState();
+        if (!world.getBlockState(pos).is(state.getBlock())) {
+            return Optional.empty();
+        }
+        return Optional.of(state);
     }
 
     protected Optional<BlockState> getWorkBlock(Level world) {
-        return blockEntity.getRealBlockState();
+        return getRealBlockState(world, blockEntity);
     }
 
     protected void setWorkBlock(Level world, BlockState state) {
@@ -160,7 +177,7 @@ public class Machine extends UpdatableCapabilityProvider
             }
         });
 
-        EventManager.invoke(blockEntity, AllEvents.CONNECT, network);
+        EventManager.invoke(blockEntity, AllEvents1.CONNECT, network);
     }
 
     /**
@@ -192,7 +209,7 @@ public class Machine extends UpdatableCapabilityProvider
     public void buildSchedulings(NetworkComponent.SchedulingBuilder builder) {
         builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
         builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
-        EventManager.invoke(blockEntity, AllEvents.BUILD_SCHEDULING, builder);
+        EventManager.invoke(blockEntity, AllEvents1.BUILD_SCHEDULING, builder);
     }
 
     public UUID getUuid() {
@@ -266,13 +283,7 @@ public class Machine extends UpdatableCapabilityProvider
     @Override
     public void deserializeOnUpdate(CompoundTag tag) {
         deserializeNBT(tag);
-        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
-    }
-
-    protected static final String ID = "network/machine";
-
-    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID, Machine::new);
+        EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
     }
 
     public static Optional<IProcessor> getProcessor(BlockEntity be) {

@@ -17,7 +17,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
@@ -29,12 +29,12 @@ import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
@@ -46,6 +46,8 @@ import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 @MethodsReturnNonnullByDefault
 public class StackProcessingContainer extends CapabilityProvider
     implements IContainer, ILayoutProvider, INBTSerializable<CompoundTag> {
+    public static final String ID = "logistics/stack_container";
+
     private record PortInfo(SlotType type, IPort externalPort, IPort internalPort) {
         public static final PortInfo EMPTY = new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
     }
@@ -143,8 +145,12 @@ public class StackProcessingContainer extends CapabilityProvider
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
+        return $ -> $.capability(ID, be -> new StackProcessingContainer(be, layout));
+    }
+
     private void onUpdate() {
-        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE);
+        EventManager.invoke(blockEntity, AllEvents1.CONTAINER_CHANGE);
         blockEntity.setChanged();
     }
 
@@ -216,10 +222,5 @@ public class StackProcessingContainer extends CapabilityProvider
     public void deserializeNBT(CompoundTag tag) {
         StackHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Layout layout) {
-        return CapabilityProviderBuilder.fromFactory("logistics/stack_container",
-            be -> new StackProcessingContainer(be, layout));
     }
 }

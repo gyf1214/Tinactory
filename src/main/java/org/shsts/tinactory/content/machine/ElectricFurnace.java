@@ -33,9 +33,9 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     private final Voltage voltage;
     private double workFactor;
 
-    public ElectricFurnace(BlockEntity blockEntity, Voltage voltage) {
+    public ElectricFurnace(BlockEntity blockEntity) {
         super(blockEntity, RecipeType.SMELTING, true);
-        this.voltage = voltage;
+        this.voltage = getBlockVoltage(blockEntity);
     }
 
     private IItemCollection getInputPort(IContainer container) {

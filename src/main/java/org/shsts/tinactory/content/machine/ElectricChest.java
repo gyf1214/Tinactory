@@ -21,15 +21,17 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricChest extends ElectricStorage implements INBTSerializable<CompoundTag> {
+    private static final String ID = "machine/chest";
+
     public final int capacity;
     private final int size;
     private final WrapperItemHandler internalItems;
@@ -105,6 +107,10 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         };
         this.filters = new ItemStack[size];
         this.itemHandlerCap = LazyOptional.of(() -> externalHandler);
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
+        return $ -> $.capability(ID, be -> new ElectricChest(be, layout));
     }
 
     public ItemStack getStackInSlot(int slot) {
@@ -192,9 +198,5 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
             var item = ItemStack.of(tag3);
             filters[slot] = item;
         }
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Layout layout) {
-        return CapabilityProviderBuilder.fromFactory("machine/chest", be -> new ElectricChest(be, layout));
     }
 }

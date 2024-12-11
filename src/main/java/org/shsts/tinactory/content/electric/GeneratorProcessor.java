@@ -10,9 +10,9 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class GeneratorProcessor extends MachineProcessor<ProcessingRecipe> {
-    public GeneratorProcessor(BlockEntity blockEntity, RecipeType<? extends ProcessingRecipe> recipeType,
-        Voltage voltage) {
-        super(blockEntity, recipeType, voltage, true);
+    public GeneratorProcessor(BlockEntity blockEntity,
+        RecipeType<? extends ProcessingRecipe> recipeType) {
+        super(blockEntity, recipeType, true);
     }
 
     @Override

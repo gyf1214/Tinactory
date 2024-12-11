@@ -9,11 +9,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
@@ -24,10 +24,17 @@ import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class PrimitiveMachine extends CapabilityProvider implements IEventSubscriber {
+    private static final String ID = "machine/primitive";
+
     private final BlockEntity blockEntity;
 
     public PrimitiveMachine(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, PrimitiveMachine::new);
     }
 
     private void onServerTick(Level world) {
@@ -49,11 +56,6 @@ public class PrimitiveMachine extends CapabilityProvider implements IEventSubscr
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_TICK, this::onServerTick);
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, "machine/primitive",
-            PrimitiveMachine::new);
+        eventManager.subscribe(AllEvents1.SERVER_TICK, this::onServerTick);
     }
 }

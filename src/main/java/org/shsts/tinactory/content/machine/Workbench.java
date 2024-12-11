@@ -30,7 +30,7 @@ import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -42,6 +42,7 @@ import static org.shsts.tinactory.content.AllCapabilities.WORKBENCH;
 @MethodsReturnNonnullByDefault
 public class Workbench extends CapabilityProvider implements INBTSerializable<CompoundTag>, IWorkbench {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final String ID = "primitive/workbench_container";
 
     private static class CraftingStack extends CraftingContainer {
         private final IItemHandlerModifiable items;
@@ -130,7 +131,7 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
 
     private final LazyOptional<?> itemHandlerCap;
 
-    public Workbench(BlockEntity blockEntity) {
+    private Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
 
         this.craftingView = new ItemStackHandler(9);
@@ -145,6 +146,11 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         this.itemView.onUpdate(this::onUpdate);
 
         this.itemHandlerCap = LazyOptional.of(() -> itemView);
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, Workbench::new);
     }
 
     @FunctionalInterface
@@ -269,9 +275,5 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     @Override
     public void deserializeNBT(CompoundTag tag) {
         StackHelper.deserializeItemHandler(itemView, tag);
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, "primitive/workbench_container", Workbench::new);
     }
 }

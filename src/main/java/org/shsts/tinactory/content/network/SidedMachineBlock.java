@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.network;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -9,19 +10,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SidedMachineBlock<T extends BlockEntity> extends MachineBlock<T> {
-    public SidedMachineBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType, Voltage voltage) {
-        super(properties, entityType, voltage);
+public class SidedMachineBlock extends MachineBlock {
+    public SidedMachineBlock(Properties properties,
+        Supplier<IBlockEntityType> entityType,
+        @Nullable IMenuType menu, Voltage voltage) {
+        super(properties, entityType, menu, voltage);
     }
 
     @Override

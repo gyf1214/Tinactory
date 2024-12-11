@@ -18,6 +18,7 @@ import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllClientEvents;
 import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.AllForgeEvents;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
@@ -72,6 +73,7 @@ public class Tinactory {
 
             AllRecipes.init();
             AllCapabilities.init();
+            AllEvents1.init();
             AllEvents.init();
             AllNetworks.init();
 

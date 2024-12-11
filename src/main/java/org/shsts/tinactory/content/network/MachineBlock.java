@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.network;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -10,7 +11,6 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -21,19 +21,18 @@ import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.tool.IWrenchable;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
-import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
+public class MachineBlock extends SmartEntityBlock
     implements IWrenchable, IConnector, IElectricBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final DirectionProperty IO_FACING = DirectionProperty.create("io_facing");
@@ -42,25 +41,27 @@ public class MachineBlock<T extends BlockEntity> extends SmartEntityBlock<T>
     public final Voltage voltage;
     protected final double resistance;
 
-    public MachineBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType, Voltage voltage) {
-        super(properties.strength(2f, 6f).requiresCorrectToolForDrops(), entityType);
+    public MachineBlock(Properties properties,
+        Supplier<IBlockEntityType> entityType,
+        @Nullable IMenuType menu, Voltage voltage) {
+        super(properties, entityType, menu);
         this.voltage = voltage;
         this.resistance = voltage.rank * TinactoryConfig.INSTANCE.machineResistanceFactor.get();
     }
 
-    public static <T extends SmartBlockEntity> EntityBlockBuilder.Factory<T, MachineBlock<T>> factory(
-        Voltage voltage) {
-        return (properties, entityType) -> new MachineBlock<>(properties, entityType, voltage);
+    public static Factory<MachineBlock> factory(Voltage voltage) {
+        return (properties, entityType, menu) ->
+            new MachineBlock(properties, entityType, menu, voltage);
     }
 
-    public static <T extends SmartBlockEntity> EntityBlockBuilder.Factory<T, MachineBlock<T>> sided(
-        Voltage voltage) {
-        return (properties, entityType) -> new SidedMachineBlock<>(properties, entityType, voltage);
+    public static Factory<MachineBlock> sided(Voltage voltage) {
+        return (properties, entityType, menu) ->
+            new SidedMachineBlock(properties, entityType, menu, voltage);
     }
 
-    public static EntityBlockBuilder.Factory<SmartBlockEntity, MachineBlock<SmartBlockEntity>> multiBlockInterface(
-        Voltage voltage) {
-        return (properties, entityType) -> new MultiBlockInterfaceBlock(properties, entityType, voltage);
+    public static Factory<MachineBlock> multiBlockInterface(Voltage voltage) {
+        return (properties, entityType, menu) ->
+            new MultiBlockInterfaceBlock(properties, entityType, menu, voltage);
     }
 
     @Override

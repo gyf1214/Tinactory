@@ -23,7 +23,6 @@ import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CellItem;
 import org.shsts.tinactory.core.common.SimpleFluid;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
@@ -51,21 +49,21 @@ import static org.shsts.tinactory.registrate.AllRegistries.simpleFluid;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllItems {
-    public static final Set<RegistryEntry<Item>> COMPONENT_ITEMS;
-    public static final Map<Voltage, RegistryEntry<Item>> ELECTRIC_MOTOR;
-    public static final Map<Voltage, RegistryEntry<Item>> ELECTRIC_PUMP;
-    public static final Map<Voltage, RegistryEntry<Item>> ELECTRIC_PISTON;
-    public static final Map<Voltage, RegistryEntry<Item>> CONVEYOR_MODULE;
-    public static final Map<Voltage, RegistryEntry<Item>> ROBOT_ARM;
-    public static final Map<Voltage, RegistryEntry<Item>> SENSOR;
-    public static final Map<Voltage, RegistryEntry<Item>> EMITTER;
-    public static final Map<Voltage, RegistryEntry<Item>> FIELD_GENERATOR;
-    public static final Map<Voltage, RegistryEntry<Item>> MACHINE_HULL;
-    public static final Map<Voltage, RegistryEntry<Item>> RESEARCH_EQUIPMENT;
-    public static final Map<Voltage, RegistryEntry<BatteryItem>> BATTERY;
-    public static final Map<Voltage, RegistryEntry<CableBlock>> CABLE;
-    public static final Map<Voltage, RegistryEntry<SubnetBlock>> TRANSFORMER;
-    public static final Map<Voltage, RegistryEntry<SubnetBlock>> ELECTRIC_BUFFER;
+    public static final Set<IEntry<Item>> COMPONENT_ITEMS;
+    public static final Map<Voltage, IEntry<Item>> ELECTRIC_MOTOR;
+    public static final Map<Voltage, IEntry<Item>> ELECTRIC_PUMP;
+    public static final Map<Voltage, IEntry<Item>> ELECTRIC_PISTON;
+    public static final Map<Voltage, IEntry<Item>> CONVEYOR_MODULE;
+    public static final Map<Voltage, IEntry<Item>> ROBOT_ARM;
+    public static final Map<Voltage, IEntry<Item>> SENSOR;
+    public static final Map<Voltage, IEntry<Item>> EMITTER;
+    public static final Map<Voltage, IEntry<Item>> FIELD_GENERATOR;
+    public static final Map<Voltage, IEntry<Item>> MACHINE_HULL;
+    public static final Map<Voltage, IEntry<Item>> RESEARCH_EQUIPMENT;
+    public static final Map<Voltage, IEntry<BatteryItem>> BATTERY;
+    public static final Map<Voltage, IEntry<CableBlock>> CABLE;
+    public static final Map<Voltage, IEntry<SubnetBlock>> TRANSFORMER;
+    public static final Map<Voltage, IEntry<SubnetBlock>> ELECTRIC_BUFFER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> BUZZSAW;
 
@@ -85,23 +83,23 @@ public final class AllItems {
     public static final Circuits.CircuitComponent TRANSISTOR;
 
     // chips
-    public static final List<RegistryEntry<Item>> BOULES;
-    public static final List<RegistryEntry<Item>> RAW_WAFERS;
-    public static final Map<String, RegistryEntry<Item>> WAFERS;
-    public static final Map<String, RegistryEntry<Item>> CHIPS;
+    public static final List<IEntry<Item>> BOULES;
+    public static final List<IEntry<Item>> RAW_WAFERS;
+    public static final Map<String, IEntry<Item>> WAFERS;
+    public static final Map<String, IEntry<Item>> CHIPS;
 
     public static final IEntry<Item> STICKY_RESIN;
     public static final IEntry<SimpleFluid> STEAM;
-    public static final RegistryEntry<RubberLogBlock> RUBBER_LOG;
-    public static final RegistryEntry<LeavesBlock> RUBBER_LEAVES;
-    public static final RegistryEntry<SaplingBlock> RUBBER_SAPLING;
-    public static final RegistryEntry<Item> GOOD_GRINDER;
-    public static final RegistryEntry<Item> ADVANCED_GRINDER;
-    public static final RegistryEntry<Item> BASIC_BUZZSAW;
-    public static final RegistryEntry<Item> GOOD_BUZZSAW;
-    public static final RegistryEntry<Item> ADVANCED_BUZZSAW;
-    public static final Map<Voltage, RegistryEntry<CellItem>> FLUID_CELL;
-    public static final RegistryEntry<Item> ITEM_FILTER;
+    public static final IEntry<RubberLogBlock> RUBBER_LOG;
+    public static final IEntry<LeavesBlock> RUBBER_LEAVES;
+    public static final IEntry<SaplingBlock> RUBBER_SAPLING;
+    public static final IEntry<Item> GOOD_GRINDER;
+    public static final IEntry<Item> ADVANCED_GRINDER;
+    public static final IEntry<Item> BASIC_BUZZSAW;
+    public static final IEntry<Item> GOOD_BUZZSAW;
+    public static final IEntry<Item> ADVANCED_BUZZSAW;
+    public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
+    public static final IEntry<Item> ITEM_FILTER;
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
@@ -123,12 +121,12 @@ public final class AllItems {
 
         STICKY_RESIN = simple("rubber_tree/sticky_resin");
 
-        RUBBER_LOG = _REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
+        RUBBER_LOG = REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
             .material(Material.WOOD)
             .properties(p -> p.sound(SoundType.WOOD))
             .register();
 
-        RUBBER_LEAVES = _REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
+        RUBBER_LEAVES = REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
             .material(Material.LEAVES)
             .properties(p -> p.strength(0.2f).randomTicks()
                 .sound(SoundType.GRASS).noOcclusion()
@@ -139,7 +137,7 @@ public final class AllItems {
             .tint(0xFF55FF55)
             .register();
 
-        RUBBER_SAPLING = _REGISTRATE.block("rubber_tree/sapling",
+        RUBBER_SAPLING = REGISTRATE.block("rubber_tree/sapling",
                 prop -> new SaplingBlock(new RubberTreeGrower(), prop))
             .material(Material.PLANT)
             .properties(p -> p.noCollission().randomTicks()
@@ -161,21 +159,21 @@ public final class AllItems {
             .voltages(Voltage.ULV, Voltage.IV)
             .buildObject();
 
-        RESEARCH_EQUIPMENT = ComponentBuilder.simple(v -> _REGISTRATE
+        RESEARCH_EQUIPMENT = ComponentBuilder.simple(v -> REGISTRATE
                 .item("component/" + v.id + "/research_equipment", Item::new)
                 .tint(0xFFFFFFFF, v.color)
                 .register())
             .voltages(Voltage.ULV, Voltage.EV)
             .buildObject();
 
-        BATTERY = ComponentBuilder.simple(v -> _REGISTRATE
+        BATTERY = ComponentBuilder.simple(v -> REGISTRATE
                 .item("network/" + v.id + "/battery", prop ->
                     new BatteryItem(prop, v, 12000 * v.value))
                 .register())
             .voltages(Voltage.LV, Voltage.HV)
             .buildObject();
 
-        CABLE = ComponentBuilder.<CableBlock, MaterialSet>builder((v, mat) -> _REGISTRATE
+        CABLE = ComponentBuilder.<CableBlock, MaterialSet>builder((v, mat) -> REGISTRATE
                 .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
                 .transform(CableBlock.tint(v, mat.color))
                 .translucent()
@@ -187,7 +185,7 @@ public final class AllItems {
             .voltage(Voltage.EV, ALUMINIUM)
             .buildObject();
 
-        TRANSFORMER = ComponentBuilder.simple(v -> _REGISTRATE
+        TRANSFORMER = ComponentBuilder.simple(v -> REGISTRATE
                 .block("network/" + v.id + "/transformer", SubnetBlock.transformer(v))
                 .translucent()
                 .tint(i -> switch (i) {
@@ -198,7 +196,7 @@ public final class AllItems {
             .voltages(Voltage.LV, Voltage.IV)
             .buildObject();
 
-        ELECTRIC_BUFFER = ComponentBuilder.simple(v -> _REGISTRATE
+        ELECTRIC_BUFFER = ComponentBuilder.simple(v -> REGISTRATE
                 .block("network/" + v.id + "/electric_buffer", SubnetBlock.buffer(v))
                 .translucent()
                 .tint(i -> i < 2 ? v.color : 0xFFFFFFFF)
@@ -206,16 +204,16 @@ public final class AllItems {
             .voltages(Voltage.ULV, Voltage.IV)
             .buildObject();
 
-        GOOD_GRINDER = xSimple("component/grinder/good");
-        ADVANCED_GRINDER = xSimple("component/grinder/advanced");
+        GOOD_GRINDER = simple("component/grinder/good");
+        ADVANCED_GRINDER = simple("component/grinder/advanced");
 
-        BASIC_BUZZSAW = _REGISTRATE.item("component/buzzsaw/basic", Item::new)
+        BASIC_BUZZSAW = REGISTRATE.item("component/buzzsaw/basic", Item::new)
             .tint(COBALT_BRASS.color)
             .register();
 
         // TODO: tint
-        GOOD_BUZZSAW = xSimple("component/buzzsaw/good");
-        ADVANCED_BUZZSAW = xSimple("component/buzzsaw/advanced");
+        GOOD_BUZZSAW = simple("component/buzzsaw/good");
+        ADVANCED_BUZZSAW = simple("component/buzzsaw/advanced");
 
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
         BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);
@@ -230,7 +228,7 @@ public final class AllItems {
             "simple_soc", "soc", "advanced_soc",
             "low_pic", "pic", "high_pic");
 
-        FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> _REGISTRATE
+        FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> REGISTRATE
                 .item("tool/fluid_cell/" + mat.name, CellItem.factory(1 << (v.rank - 1)))
                 .tint(() -> () -> CellItem::getTint)
                 .register())
@@ -239,25 +237,21 @@ public final class AllItems {
             .voltage(Voltage.MV, ALUMINIUM)
             .buildObject();
 
-        ITEM_FILTER = xSimple("component/item_filter");
+        ITEM_FILTER = simple("component/item_filter");
     }
 
     public static void init() {}
 
-    private static ComponentBuilder.DummyBuilder<Item, ?> componentBuilder(String name) {
-        return ComponentBuilder.simple(v -> xSimple("component/" + v.id + "/" + name));
+    private static ComponentBuilder.Simple<Item, ?> componentBuilder(String name) {
+        return ComponentBuilder.simple(v -> simple("component/" + v.id + "/" + name));
     }
 
-    private static Map<Voltage, RegistryEntry<Item>> component(String name) {
+    private static Map<Voltage, IEntry<Item>> component(String name) {
         var ret = componentBuilder(name)
             .voltages(Voltage.LV, Voltage.IV)
             .buildObject();
         COMPONENT_ITEMS.addAll(ret.values());
         return ret;
-    }
-
-    private static RegistryEntry<Item> xSimple(String name) {
-        return _REGISTRATE.item(name, Item::new).register();
     }
 
     private static IEntry<Item> simple(String name) {
@@ -266,15 +260,15 @@ public final class AllItems {
 
     private static void boules(String... names) {
         for (var name : names) {
-            BOULES.add(xSimple("boule/" + name));
-            RAW_WAFERS.add(xSimple("wafer_raw/" + name));
+            BOULES.add(simple("boule/" + name));
+            RAW_WAFERS.add(simple("wafer_raw/" + name));
         }
     }
 
     private static void wafers(String... names) {
         for (var name : names) {
-            WAFERS.put(name, xSimple("wafer/" + name));
-            CHIPS.put(name, xSimple("chip/" + name));
+            WAFERS.put(name, simple("wafer/" + name));
+            CHIPS.put(name, simple("chip/" + name));
         }
     }
 

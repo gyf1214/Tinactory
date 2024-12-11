@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.Optional;
@@ -177,18 +177,18 @@ public class SmartBlockEntity extends BlockEntity implements IEventSubscriber {
      * callback when this blockEntity is loaded
      */
     protected void onServerLoad(Level world) {
-        EventManager.invoke(this, AllEvents.SERVER_LOAD, world);
+        EventManager.invoke(this, AllEvents1.SERVER_LOAD, world);
     }
 
     protected void onClientLoad(Level world) {
-        EventManager.invoke(this, AllEvents.CLIENT_LOAD, world);
+        EventManager.invoke(this, AllEvents1.CLIENT_LOAD, world);
     }
 
     /**
      * callback when this blockEntity is truly removed in world
      */
     protected void onRemovedInWorld(Level world) {
-        EventManager.invoke(this, AllEvents.REMOVED_IN_WORLD, world);
+        EventManager.invoke(this, AllEvents1.REMOVED_IN_WORLD, world);
         AllCapabilities.MENU_ITEM_HANDLER.tryGet(this)
             .ifPresent(itemHandler -> StackHelper.dropItemHandler(world, worldPosition, itemHandler));
     }
@@ -197,14 +197,14 @@ public class SmartBlockEntity extends BlockEntity implements IEventSubscriber {
      * callback when this blockEntity is removed because of chunk unload
      */
     protected void onRemovedByChunk(Level world) {
-        EventManager.invoke(this, AllEvents.REMOVED_BY_CHUNK, world);
+        EventManager.invoke(this, AllEvents1.REMOVED_BY_CHUNK, world);
     }
 
     /**
      * Sever tick callback, need the block to have ticking = true
      */
     protected void onServerTick(Level world, BlockPos pos, BlockState state) {
-        EventManager.invoke(this, AllEvents.SERVER_TICK, world);
+        EventManager.invoke(this, AllEvents1.SERVER_TICK, world);
     }
 
     /**
@@ -222,8 +222,8 @@ public class SmartBlockEntity extends BlockEntity implements IEventSubscriber {
     }
 
     protected InteractionResult onServerUse(Player player, InteractionHand hand, BlockHitResult hitResult) {
-        var arg = new AllEvents.OnUseArg(player, hand, hitResult);
-        return EventManager.invokeReturn(this, AllEvents.SERVER_USE, arg);
+        var arg = new AllEvents1.OnUseArg(player, hand, hitResult);
+        return EventManager.invokeReturn(this, AllEvents1.SERVER_USE, arg);
     }
 
     protected InteractionResult onClientUse(Player player, InteractionHand hand, BlockHitResult hitResult) {

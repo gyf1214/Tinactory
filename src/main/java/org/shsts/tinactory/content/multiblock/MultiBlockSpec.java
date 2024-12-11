@@ -9,7 +9,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
-import org.shsts.tinactory.core.common.SimpleBuilder;
+import org.shsts.tinactory.core.common.SimpleBuilder1;
 import org.shsts.tinactory.core.multiblock.MultiBlockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 
@@ -139,7 +139,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         }
     }
 
-    public static class Builder<P> extends SimpleBuilder<MultiBlockSpec, P, Builder<P>> {
+    public static class Builder<P> extends SimpleBuilder1<MultiBlockSpec, P, Builder<P>> {
         private final List<Layer> layers = new ArrayList<>();
         private final Map<Character, BiConsumer<MultiBlockCheckCtx, BlockPos>> checkers = new HashMap<>();
         private int centerLayerIdx = -1;
@@ -264,7 +264,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         }
     }
 
-    public static class LayerBuilder<P> extends SimpleBuilder<Layer, Builder<P>, LayerBuilder<P>> {
+    public static class LayerBuilder<P> extends SimpleBuilder1<Layer, Builder<P>, LayerBuilder<P>> {
         private final List<String> rows = new ArrayList<>();
         private int height = 1;
 

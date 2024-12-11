@@ -40,7 +40,7 @@ public class ElectricStoragePlugin extends LayoutPlugin<MenuScreen> {
         this.machine = MACHINE.get(menu.blockEntity());
         this.machineConfig = machine.config;
 
-        menu.setValidPredicate($ -> machine.canPlayerInteract(menu.player()));
+        menu.setValidPredicate(() -> machine.canPlayerInteract(menu.player()));
         menu.onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
     }
 

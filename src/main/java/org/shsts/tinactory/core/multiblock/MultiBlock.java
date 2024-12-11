@@ -14,19 +14,19 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
+import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.MultiBlockSpec;
+import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class MultiBlock extends MultiBlockBase {
     @Nullable
     protected MultiBlockInterface multiBlockInterface = null;
 
-    public MultiBlock(SmartBlockEntity blockEntity, Builder<?> builder) {
+    public MultiBlock(BlockEntity blockEntity, Builder<?> builder) {
         super(blockEntity);
         this.layout = Objects.requireNonNull(builder.layout);
         this.checker = Objects.requireNonNull(builder.checker);
@@ -160,7 +160,7 @@ public class MultiBlock extends MultiBlockBase {
         assert multiBlockInterface != null;
         multiBlockInterface.setMultiBlock(this);
         sendUpdate(blockEntity);
-        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
+        EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class MultiBlock extends MultiBlockBase {
         }
         multiBlockInterface = null;
         sendUpdate(blockEntity);
-        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
+        EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
     }
 
     public Optional<MultiBlockInterface> getInterface() {
@@ -226,11 +226,14 @@ public class MultiBlock extends MultiBlockBase {
             multiBlockInterface = null;
         }
 
-        EventManager.invoke(blockEntity, AllEvents.SET_MACHINE_CONFIG);
+        EventManager.invoke(blockEntity, AllEvents1.SET_MACHINE_CONFIG);
     }
 
-    public static class Builder<P> extends CapabilityProviderBuilder<SmartBlockEntity, P> {
-        private final BiFunction<SmartBlockEntity, Builder<?>, MultiBlock> factory;
+    public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, MultiBlock>,
+        IBlockEntityTypeBuilder<P>, Builder<P>> {
+        private static final String ID = "multi_block";
+
+        private final BiFunction<BlockEntity, Builder<P>, MultiBlock> factory;
         @Nullable
         private Supplier<BlockState> appearance = null;
         @Nullable
@@ -238,19 +241,22 @@ public class MultiBlock extends MultiBlockBase {
         @Nullable
         private Consumer<MultiBlockCheckCtx> checker = null;
 
-        public Builder(P parent, BiFunction<SmartBlockEntity, Builder<?>, MultiBlock> factory) {
-            super(parent, "multi_block");
+        public Builder(IBlockEntityTypeBuilder<P> parent,
+            BiFunction<BlockEntity, Builder<P>, MultiBlock> factory) {
+            super(parent);
             this.factory = factory;
+
+            onCreateObject($ -> parent.capability(ID, $::apply));
         }
 
         public Builder<P> layout(Layout val) {
             this.layout = val;
-            return this;
+            return self();
         }
 
         public Builder<P> appearance(Supplier<BlockState> val) {
             this.appearance = val;
-            return this;
+            return self();
         }
 
         public Builder<P> appearanceBlock(Supplier<Block> val) {
@@ -264,17 +270,16 @@ public class MultiBlock extends MultiBlockBase {
         }
 
         @Override
-        protected Function<SmartBlockEntity, ICapabilityProvider> createObject() {
+        protected Function<BlockEntity, MultiBlock> createObject() {
             return be -> factory.apply(be, this);
         }
     }
 
-    public static <P> Function<P, Builder<P>> builder(
-        BiFunction<SmartBlockEntity, Builder<?>, MultiBlock> factory) {
-        return p -> new Builder<>(p, factory);
+    public static <P> Builder<P> simple(IBlockEntityTypeBuilder<P> parent) {
+        return new Builder<>(parent, MultiBlock::new);
     }
 
-    public static <P> Builder<P> simple(P parent) {
-        return new Builder<>(parent, MultiBlock::new);
+    public static <P> Builder<P> blastFurnace(IBlockEntityTypeBuilder<P> parent) {
+        return new Builder<>(parent, BlastFurnace::new);
     }
 }

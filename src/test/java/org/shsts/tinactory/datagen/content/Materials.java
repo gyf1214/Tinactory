@@ -109,6 +109,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
+import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
@@ -174,12 +175,13 @@ public final class Materials {
             .unlockedBy("has_planks", has(ItemTags.PLANKS)));
 
         // rubber
-        _DATA_GEN.block(RUBBER_LOG)
-            .blockState(ctx -> ctx.provider
-                .axisBlock(ctx.object, gregtech("blocks/wood/rubber/log_rubber_side"),
+        DATA_GEN.block(RUBBER_LOG)
+            .blockState(ctx -> ctx.provider()
+                .axisBlock(ctx.object(),
+                    gregtech("blocks/wood/rubber/log_rubber_side"),
                     gregtech("blocks/wood/rubber/log_rubber_top")))
-            .tag(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN)
-            .itemTag(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN)
+            .tag(List.of(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN))
+            .itemTag(List.of(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN))
             .dropSelf()
             .dropOnState(STICKY_RESIN, RubberLogBlock.HAS_RUBBER, true)
             .build()
@@ -190,9 +192,10 @@ public final class Materials {
             .drop(RUBBER_SAPLING, 0.05f)
             .build()
             .block(RUBBER_SAPLING)
-            .blockState(ctx -> ctx.provider.simpleBlock(ctx.object, ctx.provider.models()
-                .cross(ctx.id, gregtech("blocks/wood/rubber/sapling_rubber"))))
-            .itemModel(Models.xBasicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
+            .blockState(ctx -> ctx.provider()
+                .simpleBlock(ctx.object(), ctx.provider().models()
+                    .cross(ctx.id(), gregtech("blocks/wood/rubber/sapling_rubber"))))
+            .itemModel(basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
             .tag(BlockTags.SAPLINGS).itemTag(ItemTags.SAPLINGS)
             .build();
     }

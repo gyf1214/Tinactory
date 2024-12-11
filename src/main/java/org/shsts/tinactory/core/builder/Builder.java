@@ -12,8 +12,8 @@ import java.util.function.Consumer;
 @MethodsReturnNonnullByDefault
 public abstract class Builder<U, P, S extends IBuilder<U, P, S>> implements IBuilder<U, P, S> {
     protected final P parent;
-    protected final List<Consumer<U>> onCreateObject = new ArrayList<>();
-    protected final List<Runnable> onBuild = new ArrayList<>();
+    private final List<Consumer<U>> onCreateObject = new ArrayList<>();
+    private final List<Runnable> onBuild = new ArrayList<>();
 
     protected Builder(P parent) {
         this.parent = parent;
@@ -37,6 +37,11 @@ public abstract class Builder<U, P, S extends IBuilder<U, P, S>> implements IBui
             cb.run();
         }
         onBuild.clear();
+        return parent;
+    }
+
+    @Override
+    public P end() {
         return parent;
     }
 

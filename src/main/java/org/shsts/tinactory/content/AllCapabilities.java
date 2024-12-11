@@ -16,15 +16,17 @@ import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.network.NetworkController;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.ICapability;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 public final class AllCapabilities {
     public static final ICapability<IItemHandler> ITEM_HANDLER;
+    public static final ICapability<IEventManager> EVENT_MANAGER;
 
     public static final ICapability<UpdateHelper> UPDATE_HELPER;
-    public static final ICapability<EventManager> EVENT_MANAGER;
+    public static final ICapability<EventManager> EVENT_MANAGER1;
     public static final ICapability<IProcessor> PROCESSOR;
     public static final ICapability<IContainer> CONTAINER;
     public static final ICapability<IElectricMachine> ELECTRIC_MACHINE;
@@ -40,9 +42,10 @@ public final class AllCapabilities {
 
     static {
         ITEM_HANDLER = REGISTRATE.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        EVENT_MANAGER = REGISTRATE.getCapability(new CapabilityToken<>() {});
 
         UPDATE_HELPER = REGISTRATE.capability(UpdateHelper.class, new CapabilityToken<>() {});
-        EVENT_MANAGER = REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
+        EVENT_MANAGER1 = REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
         PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
         CONTAINER = REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
         ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});

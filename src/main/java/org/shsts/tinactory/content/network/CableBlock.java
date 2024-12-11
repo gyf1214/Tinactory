@@ -30,10 +30,10 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.content.tool.UsableToolItem;
-import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
-import org.shsts.tinactory.registrate.builder.BlockBuilder;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +83,8 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         return prop -> new CableBlock(prop, radius, voltage, mat);
     }
 
-    public static <S extends BlockBuilder<?, ?, S>> Transformer<S> tint(Voltage voltage, int color) {
+    public static <U extends Block, P> Transformer<IBlockBuilder<U, P>> tint(
+        Voltage voltage, int color) {
         if (voltage == Voltage.ULV) {
             return $ -> $.tint(color);
         } else {

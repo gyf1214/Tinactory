@@ -19,9 +19,10 @@ import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
-import org.shsts.tinactory.core.common.SimpleBuilder;
-import org.shsts.tinactory.datagen.context.RegistryDataContext;
+import org.shsts.tinactory.core.builder.SimpleBuilder;
+import org.shsts.tinycorelib.datagen.api.builder.IBlockDataBuilder;
 import org.shsts.tinycorelib.datagen.api.context.IDataContext;
+import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,9 +73,9 @@ public class MachineModel {
         if (casing != null) {
             return casing;
         }
-        if (block instanceof PrimitiveBlock<?>) {
+        if (block instanceof PrimitiveBlock) {
             return PRIMITIVE_TEX;
-        } else if (block instanceof MachineBlock<?> machineBlock) {
+        } else if (block instanceof MachineBlock machineBlock) {
             return casingTex(machineBlock.voltage);
         } else if (block instanceof SubnetBlock subnetBlock) {
             return casingTex(subnetBlock.voltage);
@@ -155,12 +156,12 @@ public class MachineModel {
             .texture("io_overlay", ioTex);
     }
 
-    private void primitive(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var prov = ctx.provider.models();
-        var model = blockModel(ctx.id, ctx.object, false, prov);
-        var workingModel = blockModel(ctx.id + "_active", ctx.object, true, prov);
+    private void primitive(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var prov = ctx.provider().models();
+        var model = blockModel(ctx.id(), ctx.object(), false, prov);
+        var workingModel = blockModel(ctx.id() + "_active", ctx.object(), true, prov);
 
-        ctx.provider.getVariantBuilder(ctx.object)
+        ctx.provider().getVariantBuilder(ctx.object())
             .forAllStates(state -> {
                 var dir = state.getValue(MachineBlock.FACING);
                 var working = state.getValue(MachineBlock.WORKING);
@@ -168,21 +169,21 @@ public class MachineModel {
             });
     }
 
-    private void sided(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var model = blockModel(ctx.id, ctx.object, false, ctx.provider.models());
-        ctx.provider.getVariantBuilder(ctx.object)
+    private void sided(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var model = blockModel(ctx.id(), ctx.object(), false, ctx.provider().models());
+        ctx.provider().getVariantBuilder(ctx.object())
             .forAllStates(state -> {
                 var dir = state.getValue(MachineBlock.IO_FACING);
                 return rotateModel(model, dir);
             });
     }
 
-    private void machine(RegistryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
-        var prov = ctx.provider.models();
-        var base = blockModel(ctx.id, ctx.object, false, prov);
-        var working = blockModel(ctx.id + "_active", ctx.object, true, prov);
-        var io = ioModel(ctx.id, prov);
-        var multipart = ctx.provider.getMultipartBuilder(ctx.object);
+    private void machine(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var prov = ctx.provider().models();
+        var base = blockModel(ctx.id(), ctx.object(), false, prov);
+        var working = blockModel(ctx.id() + "_active", ctx.object(), true, prov);
+        var io = ioModel(ctx.id(), prov);
+        var multipart = ctx.provider().getMultipartBuilder(ctx.object());
 
         for (var dir : Direction.values()) {
             if (dir.getAxis() != Direction.Axis.Y) {
@@ -216,14 +217,14 @@ public class MachineModel {
         }
     }
 
-    public <U extends Block> Consumer<RegistryDataContext<Block, U, BlockStateProvider>> blockState() {
+    public <U extends Block> Consumer<IEntryDataContext<Block, U, BlockStateProvider>> blockState() {
         return ctx -> {
-            if (ctx.object instanceof PrimitiveBlock<?>) {
+            if (ctx.object() instanceof PrimitiveBlock) {
                 primitive(ctx);
-            } else if (ctx.object instanceof SidedMachineBlock<?> ||
-                ctx.object instanceof SubnetBlock) {
+            } else if (ctx.object() instanceof SidedMachineBlock ||
+                ctx.object() instanceof SubnetBlock) {
                 sided(ctx);
-            } else if (ctx.object instanceof MachineBlock<?>) {
+            } else if (ctx.object() instanceof MachineBlock) {
                 machine(ctx);
             } else {
                 throw new IllegalArgumentException();
@@ -231,9 +232,9 @@ public class MachineModel {
         };
     }
 
-    public void itemModel(RegistryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
-        var model = ctx.provider.withExistingParent(ctx.id, modLoc(CASING_MODEL));
-        applyTextures(model, ctx.provider.existingFileHelper);
+    public void itemModel(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+        var model = ctx.provider().withExistingParent(ctx.id(), modLoc(CASING_MODEL));
+        applyTextures(model, ctx.provider().existingFileHelper);
     }
 
     public static class Builder<P> extends SimpleBuilder<MachineModel, P, Builder<P>> {
@@ -307,8 +308,10 @@ public class MachineModel {
         return new Builder<>(Unit.INSTANCE);
     }
 
-    public static <P> Builder<P> builder(P parent) {
-        return new Builder<>(parent);
+    public static <U extends Block, P> Builder<IBlockDataBuilder<U, P>> builder(
+        IBlockDataBuilder<U, P> parent) {
+        return new Builder<>(parent)
+            .onCreateObject(model -> parent.blockState(model.blockState()));
     }
 
     private static void genCasingModel(IDataContext<BlockModelProvider> ctx) {

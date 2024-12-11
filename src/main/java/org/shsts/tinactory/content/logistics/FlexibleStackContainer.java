@@ -15,7 +15,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
@@ -26,7 +26,7 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +43,8 @@ import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 @MethodsReturnNonnullByDefault
 public class FlexibleStackContainer extends CapabilityProvider
     implements IFlexibleContainer, ILayoutProvider, INBTSerializable<CompoundTag> {
+    private static final String ID = StackProcessingContainer.ID;
+
     private final BlockEntity blockEntity;
     private final WrapperItemHandler internalItems;
     private final WrapperItemHandler menuItems;
@@ -83,6 +85,11 @@ public class FlexibleStackContainer extends CapabilityProvider
         this.itemHandlerCap = LazyOptional.of(() -> externalItems);
         this.menuItemHandlerCap = LazyOptional.of(() -> menuItems);
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, be -> new FlexibleStackContainer(be, 16, 8));
     }
 
     private record PortInfo(SlotType type, IPort port, IPort internal) {}
@@ -167,7 +174,7 @@ public class FlexibleStackContainer extends CapabilityProvider
     }
 
     private void onUpdate() {
-        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE);
+        EventManager.invoke(blockEntity, AllEvents1.CONTAINER_CHANGE);
         blockEntity.setChanged();
     }
 
@@ -224,10 +231,5 @@ public class FlexibleStackContainer extends CapabilityProvider
     public void deserializeNBT(CompoundTag tag) {
         StackHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, "logistics/stack_container",
-            be -> new FlexibleStackContainer(be, 16, 8));
     }
 }

@@ -11,23 +11,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -48,9 +48,14 @@ public class MultiBlockInterface extends Machine {
     @Nullable
     private RecipeType<?> recipeType = null;
 
-    public MultiBlockInterface(SmartBlockEntity be) {
+    public MultiBlockInterface(BlockEntity be) {
         super(be);
         this.voltage = RecipeProcessor.getBlockVoltage(be);
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, MultiBlockInterface::new);
     }
 
     /**
@@ -68,7 +73,7 @@ public class MultiBlockInterface extends Machine {
     }
 
     private void setJoined(Level world, boolean value) {
-        blockEntity.getRealBlockState().ifPresent(state -> {
+        getRealBlockState(world, blockEntity).ifPresent(state -> {
             var newState = state.setValue(MultiBlockInterfaceBlock.JOINED, value);
             world.setBlock(blockEntity.getBlockPos(), newState, 3);
         });
@@ -113,7 +118,7 @@ public class MultiBlockInterface extends Machine {
 
     private void onContainerChange() {
         if (multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents.CONTAINER_CHANGE);
+            EventManager.invoke(multiBlock.blockEntity, AllEvents1.CONTAINER_CHANGE);
         }
     }
 
@@ -121,7 +126,7 @@ public class MultiBlockInterface extends Machine {
     public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
         super.setConfig(packet, invokeEvent);
         if (invokeEvent && multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
+            EventManager.invoke(multiBlock.blockEntity, AllEvents1.SET_MACHINE_CONFIG);
         }
     }
 
@@ -133,9 +138,9 @@ public class MultiBlockInterface extends Machine {
     @Override
     public void subscribeEvents(EventManager eventManager) {
         super.subscribeEvents(eventManager);
-        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CONTAINER_CHANGE, this::onContainerChange);
+        eventManager.subscribe(AllEvents1.SERVER_LOAD, $ -> onLoad());
+        eventManager.subscribe(AllEvents1.CLIENT_LOAD, $ -> onLoad());
+        eventManager.subscribe(AllEvents1.CONTAINER_CHANGE, this::onContainerChange);
     }
 
     @Override
@@ -143,7 +148,7 @@ public class MultiBlockInterface extends Machine {
         if (multiBlock == null) {
             return Optional.empty();
         }
-        return multiBlock.blockEntity.getRealBlockState();
+        return getRealBlockState(world, multiBlock.blockEntity);
     }
 
     @Override
@@ -227,11 +232,7 @@ public class MultiBlockInterface extends Machine {
         }
 
         if (multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
+            EventManager.invoke(multiBlock.blockEntity, AllEvents1.SET_MACHINE_CONFIG);
         }
-    }
-
-    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> basic(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID, MultiBlockInterface::new);
     }
 }

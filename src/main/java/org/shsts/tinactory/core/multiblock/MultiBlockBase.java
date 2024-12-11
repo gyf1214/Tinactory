@@ -6,10 +6,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import org.shsts.tinactory.content.AllEvents;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.common.WeakMap;
 import org.slf4j.Logger;
@@ -24,14 +24,14 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider impleme
 
     private static final int CHECK_CYCLE = 40;
 
-    public final SmartBlockEntity blockEntity;
+    public final BlockEntity blockEntity;
     protected MultiBlockManager manager;
     @Nullable
     protected WeakMap.Ref<MultiBlockBase> ref = null;
     private int checkTick = 0;
     private boolean preInvalid = false;
 
-    public MultiBlockBase(SmartBlockEntity blockEntity) {
+    public MultiBlockBase(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
     }
 
@@ -90,10 +90,10 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider impleme
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, $ -> onRemove());
-        eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, $ -> onRemove());
-        eventManager.subscribe(AllEvents.SERVER_TICK, $ -> onServerTick());
+        eventManager.subscribe(AllEvents1.SERVER_LOAD, this::onServerLoad);
+        eventManager.subscribe(AllEvents1.REMOVED_IN_WORLD, $ -> onRemove());
+        eventManager.subscribe(AllEvents1.REMOVED_BY_CHUNK, $ -> onRemove());
+        eventManager.subscribe(AllEvents1.SERVER_TICK, $ -> onServerTick());
     }
 
     @Override

@@ -9,8 +9,8 @@ import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.core.common.SimpleBuilder;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.common.SimpleBuilder1;
+import org.shsts.tinactory.core.common.Transformer1;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRecipeBuilder<P>> {
+public class AssemblyRecipeBuilder<P> extends SimpleBuilder1<Unit, P, AssemblyRecipeBuilder<P>> {
     private final Voltage voltage;
     @Nullable
     private final AssemblyRecipe.Builder builder;
@@ -82,7 +82,7 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
         return this;
     }
 
-    public AssemblyRecipeBuilder<P> transformBuilder(Transformer<AssemblyRecipe.Builder> trans) {
+    public AssemblyRecipeBuilder<P> transformBuilder(Transformer1<AssemblyRecipe.Builder> trans) {
         if (builder != null) {
             builder.transform(trans);
         }

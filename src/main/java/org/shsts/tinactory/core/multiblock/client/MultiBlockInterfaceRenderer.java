@@ -9,10 +9,10 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
 
@@ -20,7 +20,7 @@ import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<SmartBlockEntity> {
+public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<BlockEntity> {
     private final BlockRenderDispatcher blockRenderDispatcher;
     private final ModelBlockRenderer blockRenderer;
 
@@ -30,16 +30,16 @@ public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<SmartBlo
     }
 
     @Override
-    public void render(SmartBlockEntity sbe, float partialTick, PoseStack poseStack,
+    public void render(BlockEntity be, float partialTick, PoseStack poseStack,
         MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        var blockState = sbe.getBlockState();
+        var blockState = be.getBlockState();
         if (!blockState.getValue(MultiBlockInterfaceBlock.JOINED)) {
             return;
         }
-        var world = sbe.getLevel();
+        var world = be.getLevel();
         assert world != null;
-        var pos = sbe.getBlockPos();
-        var cap = AllCapabilities.MACHINE.tryGet(sbe);
+        var pos = be.getBlockPos();
+        var cap = AllCapabilities.MACHINE.tryGet(be);
         if (cap.isEmpty() || !(cap.get() instanceof MultiBlockInterface multiBlockInterface)) {
             return;
         }

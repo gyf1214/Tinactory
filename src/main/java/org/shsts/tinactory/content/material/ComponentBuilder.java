@@ -4,8 +4,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.core.common.SimpleBuilder;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinactory.core.builder.SimpleBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +16,14 @@ import java.util.stream.Collectors;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ComponentBuilder<U, T, P> extends SimpleBuilder<Map<Voltage, RegistryEntry<U>>,
+public class ComponentBuilder<U, T, P> extends SimpleBuilder<Map<Voltage, IEntry<U>>,
     P, ComponentBuilder<U, T, P>> {
     protected record Pair<T>(Voltage voltage, T parameter) {}
 
     protected final List<Pair<T>> voltages = new ArrayList<>();
-    private final BiFunction<Voltage, T, RegistryEntry<U>> factory;
+    private final BiFunction<Voltage, T, IEntry<U>> factory;
 
-    protected ComponentBuilder(P parent, BiFunction<Voltage, T, RegistryEntry<U>> factory) {
+    protected ComponentBuilder(P parent, BiFunction<Voltage, T, IEntry<U>> factory) {
         super(parent);
         this.factory = factory;
     }
@@ -34,32 +34,43 @@ public class ComponentBuilder<U, T, P> extends SimpleBuilder<Map<Voltage, Regist
     }
 
     @Override
-    protected Map<Voltage, RegistryEntry<U>> createObject() {
+    protected Map<Voltage, IEntry<U>> createObject() {
         return voltages.stream().collect(Collectors.toMap(Pair::voltage,
             $ -> factory.apply($.voltage, $.parameter)));
     }
 
-    public static class DummyBuilder<U, P> extends ComponentBuilder<U, Unit, P> {
-        public DummyBuilder(P parent, Function<Voltage, RegistryEntry<U>> factory) {
+    public static class Simple<U, P> extends ComponentBuilder<U, Unit, P> {
+        private Simple(P parent, Function<Voltage, IEntry<U>> factory) {
             super(parent, (v, $) -> factory.apply(v));
         }
 
-        public DummyBuilder<U, P> voltage(Voltage v) {
+        public Simple<U, P> voltage(Voltage v) {
             voltages.add(new Pair<>(v, Unit.INSTANCE));
             return this;
         }
 
-        public DummyBuilder<U, P> voltages(Voltage from, Voltage to) {
+        public Simple<U, P> voltages(Voltage from, Voltage to) {
             Voltage.between(from, to).forEach(this::voltage);
             return this;
         }
     }
 
-    public static <U, T> ComponentBuilder<U, T, ?> builder(BiFunction<Voltage, T, RegistryEntry<U>> factory) {
-        return new ComponentBuilder<>(Unit.INSTANCE, factory);
+    public static <U, T, P> ComponentBuilder<U, T, P> builder(
+        P parent, BiFunction<Voltage, T, IEntry<U>> factory) {
+        return new ComponentBuilder<>(parent, factory);
     }
 
-    public static <U> DummyBuilder<U, ?> simple(Function<Voltage, RegistryEntry<U>> factory) {
-        return new DummyBuilder<>(Unit.INSTANCE, factory);
+    public static <U, T> ComponentBuilder<U, T, ?> builder(
+        BiFunction<Voltage, T, IEntry<U>> factory) {
+        return builder(Unit.INSTANCE, factory);
+    }
+
+    public static <U, P> Simple<U, P> simple(P parent,
+        Function<Voltage, IEntry<U>> factory) {
+        return new Simple<>(parent, factory);
+    }
+
+    public static <U> Simple<U, ?> simple(Function<Voltage, IEntry<U>> factory) {
+        return simple(Unit.INSTANCE, factory);
     }
 }

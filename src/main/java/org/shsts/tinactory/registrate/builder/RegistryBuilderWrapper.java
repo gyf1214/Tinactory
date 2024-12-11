@@ -8,7 +8,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegistryBuilder;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.common.Transformer1;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.SmartRegistry;
 import org.shsts.tinactory.registrate.handler.RegistryEntryHandler;
@@ -23,14 +23,14 @@ public class RegistryBuilderWrapper<T extends IForgeRegistryEntry<T>, P>
 
     private final Class<T> entryClass;
     @Nullable
-    private Transformer<RegistryBuilder<T>> transformer = $ -> $;
+    private Transformer1<RegistryBuilder<T>> transformer = $ -> $;
 
     public RegistryBuilderWrapper(Registrate registrate, String id, Class<T> entryClass, P parent) {
         super(registrate, id, parent);
         this.entryClass = entryClass;
     }
 
-    public RegistryBuilderWrapper<T, P> builder(Transformer<RegistryBuilder<T>> trans) {
+    public RegistryBuilderWrapper<T, P> builder(Transformer1<RegistryBuilder<T>> trans) {
         assert transformer != null;
         transformer = transformer.chain(trans);
         return self();

@@ -93,7 +93,7 @@ public final class AllMenus {
             .title("tinactory.gui.networkController.title")
             .screen(() -> () -> NetworkControllerScreen::new)
             .dummyPlugin(menu -> {
-                menu.setValidPredicate($ -> AllCapabilities.NETWORK_CONTROLLER
+                menu.setValidPredicate(() -> AllCapabilities.NETWORK_CONTROLLER
                     .get(menu.blockEntity())
                     .canPlayerInteract(menu.player()));
                 menu.addSyncSlot("info", NetworkControllerSyncPacket::new);

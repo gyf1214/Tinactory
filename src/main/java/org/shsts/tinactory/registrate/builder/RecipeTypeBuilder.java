@@ -9,7 +9,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.common.Transformer1;
 import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.registrate.Registrate;
@@ -27,7 +27,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends XBuilderBase<
     private SmartRecipeBuilder.Factory<T, B> builderFactory = null;
     @Nullable
     private Class<T> clazz;
-    private Transformer<B> defaults = $ -> $;
+    private Transformer1<B> defaults = $ -> $;
 
     public RecipeTypeBuilder(Registrate registrate, String id, P parent,
         SmartRecipeSerializer.Factory<T, B> serializerFactory) {
@@ -45,7 +45,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends XBuilderBase<
         return this;
     }
 
-    public RecipeTypeBuilder<T, B, P> defaults(Transformer<B> trans) {
+    public RecipeTypeBuilder<T, B, P> defaults(Transformer1<B> trans) {
         defaults = defaults.chain(trans);
         return this;
     }
@@ -84,7 +84,7 @@ public class RecipeTypeBuilder<T extends SmartRecipe<?>, B extends XBuilderBase<
         return clazz;
     }
 
-    public Transformer<B> getDefaults() {
+    public Transformer1<B> getDefaults() {
         return defaults;
     }
 

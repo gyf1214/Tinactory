@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.common.Transformer1;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -27,7 +27,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
     @Nullable
     protected Function<BlockBehaviour.Properties, U> factory = null;
     protected Material material = Material.STONE;
-    protected Transformer<BlockBehaviour.Properties> properties = $ -> $;
+    protected Transformer1<BlockBehaviour.Properties> properties = $ -> $;
 
     @Nullable
     protected BlockItemBuilder<?> blockItemBuilder = null;
@@ -52,7 +52,7 @@ public class BlockBuilder<U extends Block, P, S extends BlockBuilder<U, P, S>>
         return self();
     }
 
-    public S properties(Transformer<BlockBehaviour.Properties> trans) {
+    public S properties(Transformer1<BlockBehaviour.Properties> trans) {
         properties = properties.chain(trans);
         return self();
     }

@@ -21,12 +21,13 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.core.common.Transformer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -166,8 +167,8 @@ public final class Machines {
             .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
         machine(LOGISTIC_WORKER, "cover/overlay_conveyor");
 
-        _DATA_GEN.block(NETWORK_CONTROLLER)
-            .blockState(MachineModel::builder, MachineModel::blockState)
+        DATA_GEN.block(NETWORK_CONTROLLER)
+            .child(MachineModel::builder)
             .casing("casings/computer/computer_casing")
             .overlay("overlay/machine/overlay_maintenance_full_auto")
             .ioTex(ME_BUS)
@@ -176,16 +177,16 @@ public final class Machines {
             .build()
             .block(WORKBENCH)
             .blockState(cubeBlock("casings/crafting_table"))
-            .tag(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH)
+            .tag(List.of(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH))
             .build()
             .block(LOW_PRESSURE_BOILER)
-            .blockState(MachineModel::builder, MachineModel::blockState)
+            .child(MachineModel::builder)
             .casing(Voltage.ULV).overlay(BOILER_TEX).ioTex(ME_BUS)
             .build()
             .tag(MINEABLE_WITH_WRENCH)
             .build()
             .block(HIGH_PRESSURE_BOILER)
-            .blockState(MachineModel::builder, MachineModel::blockState)
+            .child(MachineModel::builder)
             .casing(Voltage.MV).overlay(BOILER_TEX).ioTex(ME_BUS)
             .build()
             .tag(MINEABLE_WITH_WRENCH)
@@ -195,14 +196,14 @@ public final class Machines {
         multiBlockItem(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
         multiBlockItem(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
 
-        MULTI_BLOCK_INTERFACE.values().forEach(b -> _DATA_GEN.block(b)
+        MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
             .blockState(multiBlockInterface(IO_TEX))
             .tag(MINEABLE_WITH_WRENCH)
             .build());
 
         Streams.concat(TRANSFORMER.values().stream(), ELECTRIC_BUFFER.values().stream())
-            .forEach(b -> _DATA_GEN.block(b)
-                .blockState(MachineModel::builder, MachineModel::blockState)
+            .forEach(b -> DATA_GEN.block(b)
+                .child(MachineModel::builder)
                 .overlay(Direction.NORTH, IO_TEX)
                 .overlay(Direction.SOUTH, IO_OUT_TEX)
                 .build()
@@ -210,9 +211,9 @@ public final class Machines {
                 .build());
     }
 
-    private static void multiBlockItem(RegistryEntry<? extends Block> block, String casing,
+    private static void multiBlockItem(IEntry<? extends Block> block, String casing,
         String overlay, RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
-        _DATA_GEN.block(block)
+        DATA_GEN.block(block)
             .blockState(multiBlock(casing, overlay))
             .tag(MINEABLE_WITH_WRENCH)
             .itemTag(machineTag(type))
@@ -425,12 +426,13 @@ public final class Machines {
         return Optional.empty();
     }
 
-    private static void machine(MachineSet set, Transformer<MachineModel.Builder<?>> model) {
+    private static void machine(MachineSet set,
+        Transformer<MachineModel.Builder<?>> model) {
         var tag = getMachineTag(set);
         tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
         for (var voltage : set.voltages) {
-            var builder = _DATA_GEN.block(set.entry(voltage))
-                .blockState(MachineModel::builder, MachineModel::blockState)
+            var builder = DATA_GEN.block(set.entry(voltage))
+                .child(MachineModel::builder)
                 .transform(model.cast())
                 .build()
                 .tag(MINEABLE_WITH_WRENCH);
@@ -451,11 +453,11 @@ public final class Machines {
         machine(set, "machines/" + set.recipeType.id);
     }
 
-    private static void primitiveMachine(MachineSet set, RegistryEntry<? extends Block> primitive,
+    private static void primitiveMachine(MachineSet set, IEntry<? extends Block> primitive,
         String overlay) {
         machine(set, overlay);
         var tag = getMachineTag(set);
-        var builder = _DATA_GEN.block(primitive)
+        var builder = DATA_GEN.block(primitive)
             .blockState(machineBlock(overlay))
             .tag(MINEABLE_WITH_WRENCH)
             .tag(BlockTags.MINEABLE_WITH_AXE);
@@ -463,7 +465,7 @@ public final class Machines {
         builder.build();
     }
 
-    private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
+    private static void ulvMachine(IEntry<? extends ItemLike> result,
         Supplier<? extends ItemLike> base) {
         TOOL_CRAFTING.recipe(_DATA_GEN, result)
             .result(result, 1)
@@ -476,7 +478,7 @@ public final class Machines {
             .build();
     }
 
-    private static void ulvMachine(RegistryEntry<? extends ItemLike> result,
+    private static void ulvMachine(IEntry<? extends ItemLike> result,
         TagKey<Item> base) {
         TOOL_CRAFTING.recipe(_DATA_GEN, result)
             .result(result, 1)
@@ -489,7 +491,7 @@ public final class Machines {
             .build();
     }
 
-    private static void ulvFromPrimitive(MachineSet set, RegistryEntry<? extends Block> primitive) {
+    private static void ulvFromPrimitive(MachineSet set, IEntry<? extends Block> primitive) {
         ulvMachine(set.entry(Voltage.ULV), primitive);
     }
 
@@ -500,7 +502,8 @@ public final class Machines {
             this.voltage = voltage;
         }
 
-        private AssemblyRecipeBuilder<RecipeFactory> recipe(RegistryEntry<? extends ItemLike> item, Voltage v1) {
+        private AssemblyRecipeBuilder<RecipeFactory> recipe(
+            IEntry<? extends ItemLike> item, Voltage v1) {
             var builder = ASSEMBLER.recipe(_DATA_GEN, item)
                 .outputItem(2, item, 1)
                 .voltage(v1)
@@ -539,7 +542,7 @@ public final class Machines {
         }
 
         public AssemblyRecipeBuilder<RecipeFactory> recipe(
-            Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> set, Voltage v1) {
+            Map<Voltage, ? extends IEntry<? extends ItemLike>> set, Voltage v1) {
             if (!set.containsKey(voltage)) {
                 return new AssemblyRecipeBuilder<>(this);
             }
@@ -551,7 +554,7 @@ public final class Machines {
         }
 
         public AssemblyRecipeBuilder<RecipeFactory> recipe(
-            Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> set) {
+            Map<Voltage, ? extends IEntry<? extends ItemLike>> set) {
             return recipe(set, Voltage.fromRank(voltage.rank - 1));
         }
     }

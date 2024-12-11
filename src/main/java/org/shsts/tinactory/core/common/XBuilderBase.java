@@ -37,7 +37,7 @@ public abstract class XBuilderBase<U, P, S extends XBuilderBase<U, P, S>> implem
         return parent;
     }
 
-    public S transform(Transformer<S> trans) {
+    public S transform(Transformer1<S> trans) {
         return trans.apply(self());
     }
 

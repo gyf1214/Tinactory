@@ -6,7 +6,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.AllRecipes;
-import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 
 import java.util.Optional;
@@ -17,8 +16,8 @@ import java.util.Random;
 public class OreAnalyzerProcessor extends MachineProcessor<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
-    public OreAnalyzerProcessor(BlockEntity blockEntity, Voltage voltage) {
-        super(blockEntity, AllRecipes.ORE_ANALYZER.get(), voltage, true);
+    public OreAnalyzerProcessor(BlockEntity blockEntity) {
+        super(blockEntity, AllRecipes.ORE_ANALYZER.get(), true);
     }
 
     @Override

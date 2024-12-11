@@ -85,7 +85,7 @@ public class Network extends NetworkBase {
         for (var component : components.values()) {
             component.putBlock(pos, state, subnet);
         }
-        if (state.getBlock() instanceof SmartEntityBlock<?> entityBlock) {
+        if (state.getBlock() instanceof SmartEntityBlock entityBlock) {
             entityBlock.getBlockEntity(world, pos)
                 .flatMap(AllCapabilities.MACHINE::tryGet)
                 .ifPresent(machine -> putMachine(subnet, machine));

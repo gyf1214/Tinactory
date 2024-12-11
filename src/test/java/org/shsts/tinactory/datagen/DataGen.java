@@ -15,8 +15,6 @@ import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.NullRecipe;
-import org.shsts.tinactory.datagen.builder.BlockDataBuilder;
-import org.shsts.tinactory.datagen.builder.ItemDataBuilder;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
 import org.shsts.tinactory.datagen.content.Components;
 import org.shsts.tinactory.datagen.content.Machines;
@@ -26,15 +24,11 @@ import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
 import org.shsts.tinactory.datagen.context.TrackedContext;
-import org.shsts.tinactory.datagen.handler.BlockStateHandler;
 import org.shsts.tinactory.datagen.handler.DataHandler;
-import org.shsts.tinactory.datagen.handler.ItemModelHandler;
 import org.shsts.tinactory.datagen.handler.LanguageHandler;
-import org.shsts.tinactory.datagen.handler.LootTableHandler;
 import org.shsts.tinactory.datagen.handler.RecipeHandler;
 import org.shsts.tinactory.datagen.handler.TechHandler;
 import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinactory.registrate.tracking.TrackedType;
 
 import java.util.ArrayList;
@@ -55,9 +49,6 @@ public final class DataGen implements IRecipeDataConsumer {
     public final TrackedContext<Item> itemTrackedCtx;
     public final TrackedContext<String> langTrackedCtx;
 
-    public final BlockStateHandler blockStateHandler;
-    public final ItemModelHandler itemModelHandler;
-    public final LootTableHandler lootTableHandler;
     public final RecipeHandler recipeHandler;
     public final TechHandler techHandler;
     public final LanguageHandler languageHandler;
@@ -76,20 +67,9 @@ public final class DataGen implements IRecipeDataConsumer {
         this.itemTrackedCtx = trackedCtx(TrackedType.ITEM);
         this.langTrackedCtx = trackedCtx(TrackedType.LANG);
 
-        this.blockStateHandler = handler(new BlockStateHandler(this));
-        this.itemModelHandler = handler(new ItemModelHandler(this));
-        this.lootTableHandler = handler(new LootTableHandler(this));
         this.recipeHandler = handler(new RecipeHandler(this));
         this.techHandler = handler(new TechHandler(this));
         this.languageHandler = handler(new LanguageHandler(this, langTrackedCtx));
-    }
-
-    public <U extends Block> BlockDataBuilder<U, DataGen> block(RegistryEntry<U> entry) {
-        return new BlockDataBuilder<>(DATA_GEN, this, entry.loc, entry);
-    }
-
-    public <U extends Item> ItemDataBuilder<U, DataGen> item(RegistryEntry<U> entry) {
-        return new ItemDataBuilder<>(DATA_GEN, this, entry.loc, entry);
     }
 
     public DataGen replaceVanillaRecipe(Supplier<RecipeBuilder> recipe) {

@@ -7,7 +7,7 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.common.Transformer1;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.common.DistLazy;
 import org.shsts.tinactory.registrate.common.RegistryEntry;
@@ -20,7 +20,7 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
     extends RegistryEntryBuilder<Item, U, P, S> {
 
     protected final Function<Item.Properties, U> factory;
-    protected Transformer<Item.Properties> properties = $ -> $.tab(CreativeModeTab.TAB_MISC);
+    protected Transformer1<Item.Properties> properties = $ -> $.tab(CreativeModeTab.TAB_MISC);
     @Nullable
     protected DistLazy<ItemColor> tint = null;
 
@@ -30,7 +30,7 @@ public class ItemBuilder<U extends Item, P, S extends ItemBuilder<U, P, S>>
         this.factory = factory;
     }
 
-    public S properties(Transformer<Item.Properties> trans) {
+    public S properties(Transformer1<Item.Properties> trans) {
         properties = properties.chain(trans);
         return self();
     }

@@ -19,15 +19,15 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.common.IEventSubscriber;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.List;
-import java.util.function.Function;
 
 import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_TICK;
 
@@ -35,6 +35,7 @@ import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_
 @MethodsReturnNonnullByDefault
 public class Boiler extends CapabilityProvider implements
     IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
+    private static final String ID = "machine/boiler";
     private static final double BASE_HEAT = 20d;
     private static final double BURN_HEAT = 100d;
     private static final double BASE_DECAY = 0.0002d;
@@ -53,9 +54,14 @@ public class Boiler extends CapabilityProvider implements
     private long currentBurn = 0L;
     private double leftSteam = 0d;
 
-    public Boiler(BlockEntity blockEntity, double burnSpeed) {
+    private Boiler(BlockEntity blockEntity, double burnSpeed) {
         this.blockEntity = blockEntity;
         this.burnSpeed = burnSpeed;
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
+        double burnSpeed) {
+        return $ -> $.capability(ID, be -> new Boiler(be, burnSpeed));
     }
 
     public double getHeat() {
@@ -74,8 +80,8 @@ public class Boiler extends CapabilityProvider implements
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onLoad);
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, this::onLoad);
+        eventManager.subscribe(AllEvents1.SERVER_LOAD, this::onLoad);
+        eventManager.subscribe(AllEvents1.CLIENT_LOAD, this::onLoad);
     }
 
     @Override
@@ -159,9 +165,5 @@ public class Boiler extends CapabilityProvider implements
         maxBurn = tag.getLong("maxBurn");
         currentBurn = tag.getLong("currentBurn");
         leftSteam = tag.getDouble("leftSteam");
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(double burnSpeed) {
-        return CapabilityProviderBuilder.fromFactory("machine/boiler", be -> new Boiler(be, burnSpeed));
     }
 }

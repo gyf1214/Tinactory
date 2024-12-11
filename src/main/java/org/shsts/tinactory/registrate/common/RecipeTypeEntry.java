@@ -8,7 +8,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.common.Transformer1;
 import org.shsts.tinactory.core.common.XBuilderBase;
 import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
@@ -25,12 +25,12 @@ public class RecipeTypeEntry<T extends SmartRecipe<?>, B extends XBuilderBase<?,
     @Nullable
     private SmartRecipeSerializer<T, B> serializer;
     private final String prefix;
-    private final Transformer<B> defaults;
+    private final Transformer1<B> defaults;
     public final Class<T> clazz;
 
     public RecipeTypeEntry(Registrate registrate, String id, Supplier<RecipeType<T>> supplier,
         SmartRecipeBuilder.Factory<T, B> builderFactory, String prefix, Class<T> clazz,
-        Transformer<B> defaults) {
+        Transformer1<B> defaults) {
         super(registrate.modid, id, supplier);
         this.builderFactory = builderFactory;
         this.prefix = prefix;

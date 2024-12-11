@@ -3,64 +3,78 @@ package org.shsts.tinactory.core.builder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.common.SimpleBuilder;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import net.minecraft.util.Unit;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.common.ValueHolder;
-import org.shsts.tinactory.registrate.builder.BlockEntityTypeBuilder;
-import org.shsts.tinactory.registrate.builder.EntityBlockBuilder;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.IRegistrate;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
-import java.util.function.Supplier;
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class BlockEntityBuilder<T extends SmartBlockEntity, U extends SmartEntityBlock<T>, P>
-    extends SimpleBuilder<RegistryEntry<U>, P, BlockEntityBuilder<T, U, P>> {
-    private final ValueHolder<Supplier<U>> blockHolder = ValueHolder.create();
-    private final ValueHolder<Supplier<SmartBlockEntityType<T>>> typeHolder =
-        ValueHolder.create();
+public class BlockEntityBuilder<U extends SmartEntityBlock, P>
+    extends SimpleBuilder<IEntry<U>, P, BlockEntityBuilder<U, P>> {
+    private final IRegistrate registrate;
+    private final String id;
+    private final SmartEntityBlock.Factory<U> factory;
+    private final ValueHolder<IEntry<U>> blockHolder = ValueHolder.create();
+    private final ValueHolder<IBlockEntityType> typeHolder = ValueHolder.create();
 
     @Nullable
-    private BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U, P>> typeBuilder = null;
+    private IMenuType menu = null;
     @Nullable
-    private EntityBlockBuilder<T, U, BlockEntityBuilder<T, U, P>> blockBuilder = null;
+    private IBlockEntityTypeBuilder<BlockEntityBuilder<U, P>> typeBuilder = null;
+    @Nullable
+    private IBlockBuilder<U, BlockEntityBuilder<U, P>> blockBuilder = null;
 
-    public BlockEntityBuilder(P parent) {
+    public BlockEntityBuilder(IRegistrate registrate, P parent, String id,
+        SmartEntityBlock.Factory<U> factory) {
         super(parent);
+        this.registrate = registrate;
+        this.id = id;
+        this.factory = factory;
     }
 
-    protected abstract BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U, P>> createBlockEntityBuilder();
+    protected IBlockEntityTypeBuilder<BlockEntityBuilder<U, P>> createTypeBuilder() {
+        return registrate.blockEntityType(this, id)
+            .validBlock(() -> blockHolder.get().get());
+    }
 
-    protected abstract EntityBlockBuilder<T, U, BlockEntityBuilder<T, U, P>> createBlockBuilder();
+    protected IBlockBuilder<U, BlockEntityBuilder<U, P>> createBlockBuilder() {
+        return registrate.block(this, id, properties ->
+            factory.create(properties, typeHolder, menu));
+    }
 
-    public BlockEntityTypeBuilder<T, BlockEntityBuilder<T, U, P>> blockEntity() {
+    public IBlockEntityTypeBuilder<BlockEntityBuilder<U, P>> blockEntity() {
         if (typeBuilder == null) {
-            var blockHolder = this.blockHolder;
-            typeBuilder = this.createBlockEntityBuilder()
-                .validBlock(() -> blockHolder.get().get());
+            typeBuilder = createTypeBuilder();
         }
         return typeBuilder;
     }
 
-    public EntityBlockBuilder<T, U, BlockEntityBuilder<T, U, P>> block() {
+    public IBlockBuilder<U, BlockEntityBuilder<U, P>> block() {
         if (blockBuilder == null) {
-            blockBuilder = createBlockBuilder().type(typeHolder);
+            blockBuilder = createBlockBuilder();
         }
         return blockBuilder;
     }
 
-    public BlockEntityBuilder<T, U, P> entityClass(Class<T> entityClass) {
-        return blockEntity().entityClass(entityClass).build();
+    public BlockEntityBuilder<U, P> menu(IMenuType value) {
+        menu = value;
+        return self();
     }
 
-    public BlockEntityBuilder<T, U, P> translucent() {
-        return block().translucent().build();
+    public BlockEntityBuilder<U, P> translucent() {
+        return block().translucent().end();
     }
 
     @Override
-    public RegistryEntry<U> createObject() {
+    public IEntry<U> createObject() {
         var block = this.block().register();
         var blockEntity = this.blockEntity().register();
 
@@ -68,5 +82,15 @@ public abstract class BlockEntityBuilder<T extends SmartBlockEntity, U extends S
         typeHolder.setValue(blockEntity);
 
         return block;
+    }
+
+    public static <U extends SmartEntityBlock, P> BlockEntityBuilder<U, P> builder(
+        P parent, String id, SmartEntityBlock.Factory<U> factory) {
+        return new BlockEntityBuilder<>(REGISTRATE, parent, id, factory);
+    }
+
+    public static <U extends SmartEntityBlock> BlockEntityBuilder<U, ?> builder(
+        String id, SmartEntityBlock.Factory<U> factory) {
+        return builder(Unit.INSTANCE, id, factory);
     }
 }

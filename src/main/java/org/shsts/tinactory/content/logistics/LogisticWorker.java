@@ -17,7 +17,7 @@ import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.content.AllEvents1;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
@@ -29,7 +29,7 @@ import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -72,8 +72,9 @@ public class LogisticWorker extends CapabilityProvider
         this.electricCap = LazyOptional.of(() -> electric);
     }
 
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> factory(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID, LogisticWorker::new);
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, LogisticWorker::new);
     }
 
     private class Electric implements IElectricMachine {
@@ -244,8 +245,8 @@ public class LogisticWorker extends CapabilityProvider
 
     @Override
     public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::validateConfigs);
-        eventManager.subscribe(AllEvents.BUILD_SCHEDULING, this::buildScheduling);
+        eventManager.subscribe(AllEvents1.SET_MACHINE_CONFIG, this::validateConfigs);
+        eventManager.subscribe(AllEvents1.BUILD_SCHEDULING, this::buildScheduling);
     }
 
     private void buildScheduling(NetworkComponent.SchedulingBuilder builder) {

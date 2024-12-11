@@ -1,9 +1,9 @@
-package org.shsts.tinactory.core.network;
+package org.shsts.tinactory.core.builder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.network.IScheduling;
-import org.shsts.tinactory.core.builder.Builder;
+import org.shsts.tinactory.core.network.Scheduling;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
@@ -26,7 +26,7 @@ public class SchedulingBuilder<P> extends Builder<IScheduling, P, SchedulingBuil
         this.registrate = registrate;
         this.id = id;
 
-        onBuild.add(this::register);
+        onBuild(this::register);
     }
 
     public final SchedulingBuilder<P> before(Supplier<Supplier<IScheduling>> before) {

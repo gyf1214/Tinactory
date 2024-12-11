@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 
 import java.util.OptionalInt;
@@ -19,7 +19,7 @@ public class BlastFurnace extends MultiBlock {
     @Nullable
     private CoilBlock coilBlock = null;
 
-    public BlastFurnace(SmartBlockEntity blockEntity, Builder<?> builder) {
+    public BlastFurnace(BlockEntity blockEntity, Builder<?> builder) {
         super(blockEntity, builder);
     }
 

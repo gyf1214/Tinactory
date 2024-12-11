@@ -17,22 +17,22 @@ import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.builder.BlockEntityBuilder;
+import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
@@ -73,15 +73,15 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
     public static final MachineSet LOGISTIC_WORKER;
-    public static final Map<Voltage, RegistryEntry<MachineBlock<SmartBlockEntity>>> MULTI_BLOCK_INTERFACE;
+    public static final Map<Voltage, IEntry<MachineBlock>> MULTI_BLOCK_INTERFACE;
 
-    public static final RegistryEntry<MachineBlock<SmartBlockEntity>> NETWORK_CONTROLLER;
-    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> WORKBENCH;
-    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> PRIMITIVE_STONE_GENERATOR;
-    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> PRIMITIVE_ORE_ANALYZER;
-    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> PRIMITIVE_ORE_WASHER;
-    public static final RegistryEntry<MachineBlock<SmartBlockEntity>> LOW_PRESSURE_BOILER;
-    public static final RegistryEntry<MachineBlock<SmartBlockEntity>> HIGH_PRESSURE_BOILER;
+    public static final IEntry<MachineBlock> NETWORK_CONTROLLER;
+    public static final IEntry<PrimitiveBlock> WORKBENCH;
+    public static final IEntry<PrimitiveBlock> PRIMITIVE_STONE_GENERATOR;
+    public static final IEntry<PrimitiveBlock> PRIMITIVE_ORE_ANALYZER;
+    public static final IEntry<PrimitiveBlock> PRIMITIVE_ORE_WASHER;
+    public static final IEntry<MachineBlock> LOW_PRESSURE_BOILER;
+    public static final IEntry<MachineBlock> HIGH_PRESSURE_BOILER;
 
     public static final Set<ProcessingSet> PROCESSING_SETS;
 
@@ -154,7 +154,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         ORE_ANALYZER = set.processing(AllRecipes.ORE_ANALYZER)
-            .processor(r -> RecipeProcessor::oreProcessor)
+            .processor($ -> RecipeProcessor::oreProcessor)
             .menu(AllMenus.MARKER)
             .voltages(Voltage.ULV)
             .layoutSet()
@@ -227,9 +227,9 @@ public final class AllBlockEntities {
 
         ELECTRIC_FURNACE = set.machine()
             .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::factory)
-            .layoutCapability(StackProcessingContainer::builder)
-            .capability(RecipeProcessor::electricFurnace)
-            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.ELECTRIC_FURNACE).build())
+            .menu(AllMenus.ELECTRIC_FURNACE)
+            .layoutMachine(StackProcessingContainer::factory)
+            .machine(RecipeProcessor::electricFurnace)
             .tintVoltage(2)
             .voltages(Voltage.ULV)
             .transform(simpleLayout(Texture.PROGRESS_ARROW))
@@ -366,8 +366,8 @@ public final class AllBlockEntities {
 
         BATTERY_BOX = set.machine()
             .machine(v -> "machine/" + v.id + "/battery_box", MachineBlock::sided)
-            .layoutCapability(BatteryBox::builder)
-            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.BATTERY_BOX).build())
+            .menu(AllMenus.BATTERY_BOX)
+            .layoutMachine(BatteryBox::factory)
             .voltages(Voltage.LV, Voltage.HV)
             .layoutSet()
             .port(ITEM_INPUT)
@@ -384,8 +384,8 @@ public final class AllBlockEntities {
 
         ELECTRIC_CHEST = set.machine()
             .machine(v -> "machine/" + v.id + "/electric_chest", MachineBlock::factory)
-            .layoutCapability(ElectricChest::builder)
-            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.ELECTRIC_CHEST).build())
+            .menu(AllMenus.ELECTRIC_CHEST)
+            .layoutMachine(ElectricChest::factory)
             .voltages(Voltage.ULV, Voltage.HV)
             .layoutSet()
             .port(SlotType.NONE)
@@ -403,8 +403,8 @@ public final class AllBlockEntities {
 
         ELECTRIC_TANK = set.machine()
             .machine(v -> "machine/" + v.id + "/electric_tank", MachineBlock::factory)
-            .layoutCapability(ElectricTank::builder)
-            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.ELECTRIC_TANK).build())
+            .menu(AllMenus.ELECTRIC_TANK)
+            .layoutMachine(ElectricTank::factory)
             .voltages(Voltage.ULV, Voltage.HV)
             .layoutSet()
             .port(FLUID_INPUT)
@@ -420,30 +420,27 @@ public final class AllBlockEntities {
 
         LOGISTIC_WORKER = set.machine()
             .voltages(Voltage.ULV)
+            .menu(AllMenus.LOGISTIC_WORKER)
             .machine(v -> "network/" + v.id + "/logistic_worker", MachineBlock::factory)
-            .capability(LogisticWorker::factory)
-            .machine(v -> $ -> $.blockEntity().setMenu(AllMenus.LOGISTIC_WORKER).build())
+            .machine(LogisticWorker::factory)
             .tintVoltage(2)
             .buildObject();
 
-        NETWORK_CONTROLLER = _REGISTRATE.blockEntity("network/controller",
-                SmartBlockEntity::new,
+        NETWORK_CONTROLLER = set.blockEntity("network/controller",
                 MachineBlock.factory(Voltage.PRIMITIVE))
-            .entityClass(SmartBlockEntity.class)
+            .menu(AllMenus.NETWORK_CONTROLLER)
             .blockEntity()
-            .eventManager().ticking()
-            .simpleCapability(NetworkController::factory)
-            .setMenu(AllMenus.NETWORK_CONTROLLER)
-            .build()
+            .transform(NetworkController::factory)
+            .end()
             .translucent()
             .buildObject();
 
-        WORKBENCH = _REGISTRATE.blockEntity("primitive/workbench",
-                PrimitiveBlock<SmartBlockEntity>::new)
+        WORKBENCH = set.blockEntity("primitive/workbench",
+                PrimitiveBlock::new)
+            .menu(AllMenus.WORKBENCH)
             .blockEntity()
-            .simpleCapability(Workbench::builder)
-            .setMenu(AllMenus.WORKBENCH)
-            .build()
+            .transform(Workbench::factory)
+            .end()
             .buildObject();
 
         PRIMITIVE_STONE_GENERATOR = primitive(STONE_GENERATOR);
@@ -458,63 +455,67 @@ public final class AllBlockEntities {
     }
 
     private static class SetFactory {
+        public <U extends SmartEntityBlock> BlockEntityBuilder<U, SetFactory> blockEntity(
+            String id, SmartEntityBlock.Factory<U> factory) {
+            return BlockEntityBuilder.builder(this, id, factory);
+        }
+
+        public MachineSet.Builder<SetFactory> machine() {
+            return MachineSet.builder(this);
+        }
+
         public <T extends ProcessingRecipe> ProcessingSet.Builder<T, SetFactory> processing(
             RecipeTypeEntry<T, ?> recipeType) {
-            return (new ProcessingSet.Builder<>(_REGISTRATE, recipeType, this))
+            return ProcessingSet.builder(this, recipeType)
                 .tintVoltage(2)
                 .onCreateObject(PROCESSING_SETS::add);
         }
 
         public <T extends ProcessingRecipe> ProcessingSet simpleMachine(
-            RecipeTypeEntry<T, ?> recipeType, Texture progress) {
+            RecipeTypeEntry<T, ?> recipeType, Texture progressBar) {
             return processing(recipeType)
-                .transform(simpleLayout(progress))
+                .transform(simpleLayout(progressBar))
                 .buildObject();
-        }
-
-        public MachineSet.Builder<SetFactory> machine() {
-            return new MachineSet.Builder<>(_REGISTRATE, this);
         }
     }
 
-    private static RegistryEntry<PrimitiveBlock<SmartBlockEntity>> primitive(ProcessingSet set) {
+    private static IEntry<PrimitiveBlock> primitive(ProcessingSet set) {
         var recipeType = set.recipeType;
         var id = "primitive/" + recipeType.id;
         var layout = set.layout(Voltage.PRIMITIVE);
-        return _REGISTRATE.blockEntity(id, SmartBlockEntity::new,
-                PrimitiveBlock<SmartBlockEntity>::new)
-            .entityClass(SmartBlockEntity.class)
+        return BlockEntityBuilder.builder(set, id, PrimitiveBlock::new)
+            .menu(AllMenus.PRIMITIVE_MACHINE)
             .blockEntity()
-            .eventManager().ticking()
-            .simpleCapability(PrimitiveMachine::builder)
-            .simpleCapability(RecipeProcessor.machine(recipeType))
-            .simpleCapability(StackProcessingContainer.builder(layout))
-            .setMenu(AllMenus.PRIMITIVE_MACHINE)
-            .build()
+            .transform(PrimitiveMachine::factory)
+            .transform(RecipeProcessor.machine(recipeType))
+            .transform(StackProcessingContainer.factory(layout))
+            .end()
             .translucent()
             .buildObject();
     }
 
-    private static RegistryEntry<MachineBlock<SmartBlockEntity>> boiler(String name, double burnSpeed) {
+    private static IEntry<MachineBlock> boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;
-        return _REGISTRATE.blockEntity(id, MachineBlock.factory(Voltage.PRIMITIVE))
+        return BlockEntityBuilder.builder(id,
+                MachineBlock.factory(Voltage.PRIMITIVE))
+            .menu(AllMenus.BOILER)
             .blockEntity()
-            .simpleCapability(Boiler.builder(burnSpeed))
-            .simpleCapability(StackProcessingContainer.builder(layout))
-            .setMenu(AllMenus.BOILER)
-            .build()
+            .transform(Boiler.factory(burnSpeed))
+            .transform(StackProcessingContainer.factory(layout))
+            .end()
             .transform(baseMachine())
             .buildObject();
     }
 
-    private static <S extends MachineSet.BuilderBase<?, ?, S>> Transformer<S> simpleLayout(Texture progress) {
+    private static <S extends MachineSet.BuilderBase<?, ?,
+        S>> Transformer<S> simpleLayout(Texture progressBar) {
         return $ -> $.layoutSet()
             .port(ITEM_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-            .progressBar(progress, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(progressBar, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build();
     }
 }
