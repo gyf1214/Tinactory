@@ -41,7 +41,8 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         this(subfolder, DULL);
     }
 
-    private Optional<ResourceLocation> getTex(ResourceLocation baseLoc, ExistingFileHelper helper, String sub) {
+    private Optional<ResourceLocation> getTex(ResourceLocation baseLoc,
+        ExistingFileHelper helper, String sub) {
         if (sub.equals("magnetic_overlay")) {
             return Optional.of(MAGNETIC_LOC);
         }
@@ -54,8 +55,8 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         return Optional.empty();
     }
 
-    public <U extends Item, P extends ItemModelProvider> Consumer<IEntryDataContext<Item, U, P>> itemModel(
-        String sub) {
+    public <U extends Item, P extends ItemModelProvider> Consumer<IEntryDataContext<Item,
+        U, P>> itemModel(String sub) {
         return ctx -> {
             var helper = ctx.provider().existingFileHelper;
 
@@ -71,7 +72,8 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         };
     }
 
-    public <T extends ModelBuilder<T>> T blockOverlay(ModelProvider<T> prov, String id, String sub) {
+    public <T extends ModelBuilder<T>> T blockOverlay(ModelProvider<T> prov,
+        String id, String sub) {
         var tex = getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() ->
             new IllegalArgumentException("No block overlay %s for icon set %s"
                 .formatted(sub, subfolder)));
