@@ -154,17 +154,6 @@ public class Registrate {
         return new RecipeTypeBuilder<>(this, id, this, serializer);
     }
 
-    public void trackTranslation(String key) {
-        trackedObjects.put(TrackedType.LANG, key, key);
-    }
-
-    public void trackBlock(Block block) {
-        var loc = block.getRegistryName();
-        assert loc != null;
-        trackedObjects.put(TrackedType.BLOCK, block, loc.toString());
-        trackTranslation(block.getDescriptionId());
-    }
-
     public <V> Map<V, String> getTracked(TrackedType<V> type) {
         return trackedObjects.getObjects(type);
     }

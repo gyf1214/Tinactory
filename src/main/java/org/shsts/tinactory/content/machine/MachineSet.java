@@ -127,14 +127,6 @@ public class MachineSet {
             return self();
         }
 
-        public <V> S voltageMachine(
-            Function<Voltage, Transformer<IBlockEntityTypeBuilder<V>>> trans) {
-            assert blockEntityBuilder != null;
-            blockEntityBuilder = v -> blockEntityBuilder.apply(v)
-                .blockEntity().transform(trans.apply(v).cast()).end();
-            return self();
-        }
-
         public <V> S layoutMachine(
             Function<Layout, Transformer<IBlockEntityTypeBuilder<V>>> trans) {
             assert blockEntityBuilder != null;
