@@ -11,18 +11,16 @@ import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinycorelib.api.blockentity.IEvent;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
-import org.shsts.tinycorelib.api.registrate.handler.IEntryHandler;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.registrate.AllRegistries.EVENTS;
 import static org.shsts.tinycorelib.api.CoreLibKeys.CLIENT_LOAD_LOC;
-import static org.shsts.tinycorelib.api.CoreLibKeys.EVENT_REGISTRY_KEY;
 import static org.shsts.tinycorelib.api.CoreLibKeys.REMOVED_BY_CHUNK_LOC;
 import static org.shsts.tinycorelib.api.CoreLibKeys.REMOVED_IN_WORLD_LOC;
 import static org.shsts.tinycorelib.api.CoreLibKeys.SERVER_LOAD_LOC;
 import static org.shsts.tinycorelib.api.CoreLibKeys.SERVER_TICK_LOC;
 
 public final class AllEvents {
-    public static final IEntryHandler<IEvent<?>> EVENTS;
     public static final IEntry<IEvent<Level>> SERVER_LOAD;
     public static final IEntry<IEvent<Level>> CLIENT_LOAD;
     public static final IEntry<IEvent<Level>> REMOVED_IN_WORLD;
@@ -40,7 +38,6 @@ public final class AllEvents {
     private AllEvents() {}
 
     static {
-        EVENTS = REGISTRATE.getHandler(EVENT_REGISTRY_KEY, IEvent.class);
 
         SERVER_LOAD = EVENTS.getEntry(SERVER_LOAD_LOC);
         CLIENT_LOAD = EVENTS.getEntry(CLIENT_LOAD_LOC);

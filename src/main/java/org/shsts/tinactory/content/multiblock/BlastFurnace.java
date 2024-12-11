@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.multiblock.MultiBlock;
 
 import java.util.OptionalInt;
 
-import static org.shsts.tinactory.Tinactory._REGISTRATE;
+import static org.shsts.tinactory.registrate.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -51,7 +51,7 @@ public class BlastFurnace extends MultiBlock {
         coilBlock = null;
         if (tag.contains("coilBlock", Tag.TAG_STRING)) {
             var loc = new ResourceLocation(tag.getString("coilBlock"));
-            var block = _REGISTRATE.blockHandler.getEntry(loc).get();
+            var block = BLOCKS.getEntry(loc).get();
             if (block instanceof CoilBlock coilBlock1) {
                 coilBlock = coilBlock1;
             }

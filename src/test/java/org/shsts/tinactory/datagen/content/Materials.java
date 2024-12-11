@@ -21,7 +21,6 @@ import org.shsts.tinactory.datagen.content.model.IconSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.shsts.tinactory.Tinactory._REGISTRATE;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
@@ -115,6 +114,7 @@ import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
 import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
 import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
+import static org.shsts.tinactory.registrate.AllRegistries.ITEMS;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -547,13 +547,13 @@ public final class Materials {
     private static void woodRecipes(String prefix) {
         var nether = prefix.equals("crimson") || prefix.equals("warped");
 
-        var planks = _REGISTRATE.itemHandler.getEntry(prefix + "_planks");
+        var planks = ITEMS.getEntry(prefix + "_planks");
         var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;
 
         // saw plank
-        TOOL_CRAFTING.recipe(_DATA_GEN, planks.loc)
+        TOOL_CRAFTING.recipe(_DATA_GEN, planks.loc())
             .result(planks, 4)
             .pattern("X")
             .define('X', logTag)

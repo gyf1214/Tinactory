@@ -97,7 +97,6 @@ public class Tinactory {
         TechManager.initClient();
 
         REGISTRATE.registerClient(modEventBus);
-        _REGISTRATE.registerClient(modEventBus);
         modEventBus.addListener(Tinactory::initClient);
         MinecraftForge.EVENT_BUS.register(AllClientEvents.class);
     }

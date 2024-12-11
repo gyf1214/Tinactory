@@ -9,7 +9,6 @@ import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.common.SmartRecipe;
@@ -45,8 +44,6 @@ import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 public final class DataGen implements IRecipeDataConsumer {
     public final String modid;
 
-    public final TrackedContext<Block> blockTrackedCtx;
-    public final TrackedContext<Item> itemTrackedCtx;
     public final TrackedContext<String> langTrackedCtx;
 
     public final RecipeHandler recipeHandler;
@@ -63,8 +60,6 @@ public final class DataGen implements IRecipeDataConsumer {
         this.dataHandlers = new ArrayList<>();
         this.trackedContexts = new HashSet<>();
 
-        this.blockTrackedCtx = trackedCtx(TrackedType.BLOCK);
-        this.itemTrackedCtx = trackedCtx(TrackedType.ITEM);
         this.langTrackedCtx = trackedCtx(TrackedType.LANG);
 
         this.recipeHandler = handler(new RecipeHandler(this));
