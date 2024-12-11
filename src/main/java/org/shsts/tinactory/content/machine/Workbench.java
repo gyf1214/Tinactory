@@ -34,13 +34,13 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.WORKBENCH;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Workbench extends CapabilityProvider implements INBTSerializable<CompoundTag>, IWorkbench {
+public class Workbench extends CapabilityProvider implements INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "primitive/workbench_container";
 
@@ -191,7 +191,6 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         blockEntity.setChanged();
     }
 
-    @Override
     public ItemStack getResult() {
         if (!initialized) {
             onUpdate();
@@ -200,7 +199,9 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         return output;
     }
 
-    @Override
+    /**
+     * Only called on client for the purpose of syncing.
+     */
     public void setResult(ItemStack stack) {
         var world = blockEntity.getLevel();
         if (world == null || !world.isClientSide) {
@@ -209,7 +210,6 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         output = stack;
     }
 
-    @Override
     public void onTake(Player player, ItemStack stack) {
         if (stack.isEmpty() || currentRecipe == null) {
             return;
@@ -261,8 +261,6 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == MENU_ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
-        } else if (cap == WORKBENCH.get()) {
-            return myself();
         }
         return LazyOptional.empty();
     }
@@ -275,5 +273,13 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     @Override
     public void deserializeNBT(CompoundTag tag) {
         StackHelper.deserializeItemHandler(itemView, tag);
+    }
+
+    public static Optional<Workbench> tryGet(BlockEntity be) {
+        return tryGet(be, ID, Workbench.class);
+    }
+
+    public static Workbench get(BlockEntity be) {
+        return get(be, ID, Workbench.class);
     }
 }
