@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.core.common.XBuilderBase;
+import org.shsts.tinactory.core.builder.Builder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LayoutSetBuilder<P> extends XBuilderBase<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
+public class LayoutSetBuilder<P> extends Builder<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
     private record SlotAndVoltages(Layout.SlotInfo slot, Collection<Voltage> voltages) {}
 
     private final List<Layout.WidgetInfo> images = new ArrayList<>();
