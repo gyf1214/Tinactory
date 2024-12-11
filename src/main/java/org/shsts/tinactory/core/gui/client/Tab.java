@@ -9,8 +9,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
 import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class Tab extends Panel {
             if (i + 1 < args.length) {
                 if (args[i + 1] instanceof ItemLike item) {
                     icon = new ItemStack(item);
-                } else if (args[i + 1] instanceof RegistryEntry<?> entry) {
+                } else if (args[i + 1] instanceof IEntry<?> entry) {
                     icon = new ItemStack((ItemLike) entry.get());
                 }
                 i++;

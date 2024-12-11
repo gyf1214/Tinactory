@@ -12,7 +12,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
@@ -30,6 +29,8 @@ import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
@@ -81,8 +82,8 @@ public class NetworkControllerScreen extends MenuScreen {
 
         this.techPanel = new TechPanel(this);
 
-        this.tabs = new Tab(this, statePanel, AllItems.CABLE.get(Voltage.LV),
-            techPanel, AllItems.RESEARCH_EQUIPMENT.get(Voltage.LV));
+        this.tabs = new Tab(this, statePanel, CABLE.get(Voltage.LV),
+            techPanel, RESEARCH_EQUIPMENT.get(Voltage.LV));
 
         rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
         rootPanel.addPanel(statePanel);
