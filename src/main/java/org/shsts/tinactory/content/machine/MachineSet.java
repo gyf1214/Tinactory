@@ -115,14 +115,16 @@ public class MachineSet {
         }
 
         public S menu(IMenuType menu) {
-            assert blockEntityBuilder == null;
-            blockEntityBuilder = v -> blockEntityBuilder.apply(v).menu(menu);
+            assert blockEntityBuilder != null;
+            var old = blockEntityBuilder;
+            blockEntityBuilder = v -> old.apply(v).menu(menu);
             return self();
         }
 
         public <V> S machine(Transformer<IBlockEntityTypeBuilder<V>> trans) {
             assert blockEntityBuilder != null;
-            blockEntityBuilder = v -> blockEntityBuilder.apply(v)
+            var old = blockEntityBuilder;
+            blockEntityBuilder = v -> old.apply(v)
                 .blockEntity().transform(trans.cast()).end();
             return self();
         }
@@ -130,7 +132,8 @@ public class MachineSet {
         public <V> S layoutMachine(
             Function<Layout, Transformer<IBlockEntityTypeBuilder<V>>> trans) {
             assert blockEntityBuilder != null;
-            blockEntityBuilder = v -> blockEntityBuilder.apply(v)
+            var old = blockEntityBuilder;
+            blockEntityBuilder = v -> old.apply(v)
                 .blockEntity().transform(trans.apply(getLayout(v)).cast()).end();
             return self();
         }
@@ -138,7 +141,8 @@ public class MachineSet {
         public <U extends Block, V> S voltageBlock(
             Function<Voltage, Transformer<IBlockBuilder<U, V>>> trans) {
             assert blockEntityBuilder != null;
-            blockEntityBuilder = v -> blockEntityBuilder.apply(v)
+            var old = blockEntityBuilder;
+            blockEntityBuilder = v -> old.apply(v)
                 .block().transform(trans.apply(v).cast()).end();
             return self();
         }

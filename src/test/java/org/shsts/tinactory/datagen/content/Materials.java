@@ -107,6 +107,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_SHEARS;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
@@ -547,7 +548,7 @@ public final class Materials {
     private static void woodRecipes(String prefix) {
         var nether = prefix.equals("crimson") || prefix.equals("warped");
 
-        var planks = ITEMS.getEntry(prefix + "_planks");
+        var planks = ITEMS.getEntry(mcLoc(prefix + "_planks"));
         var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;

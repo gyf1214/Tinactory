@@ -419,10 +419,10 @@ public final class AllBlockEntities {
             .buildObject();
 
         LOGISTIC_WORKER = set.machine()
-            .voltages(Voltage.ULV)
-            .menu(AllMenus.LOGISTIC_WORKER)
             .machine(v -> "network/" + v.id + "/logistic_worker", MachineBlock::factory)
+            .menu(AllMenus.LOGISTIC_WORKER)
             .machine(LogisticWorker::factory)
+            .voltages(Voltage.ULV)
             .tintVoltage(2)
             .buildObject();
 
