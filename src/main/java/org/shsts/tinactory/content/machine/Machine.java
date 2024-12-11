@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
@@ -90,7 +89,7 @@ public class Machine extends UpdatableCapabilityProvider
         config.apply(packet);
         sendUpdate(blockEntity);
         if (invokeEvent) {
-            EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
+            invoke(blockEntity, SET_MACHINE_CONFIG);
         }
     }
 
@@ -185,7 +184,7 @@ public class Machine extends UpdatableCapabilityProvider
             }
         });
 
-        EVENT_MANAGER.get(blockEntity).invoke(CONNECT.get(), network);
+        invoke(blockEntity, CONNECT, network);
     }
 
     /**
@@ -217,7 +216,7 @@ public class Machine extends UpdatableCapabilityProvider
     public void buildSchedulings(NetworkComponent.SchedulingBuilder builder) {
         builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
         builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
-        EVENT_MANAGER.get(blockEntity).invoke(BUILD_SCHEDULING.get(), builder);
+        invoke(blockEntity, BUILD_SCHEDULING, builder);
     }
 
     public UUID getUuid() {
@@ -291,7 +290,7 @@ public class Machine extends UpdatableCapabilityProvider
     @Override
     public void deserializeOnUpdate(CompoundTag tag) {
         deserializeNBT(tag);
-        EVENT_MANAGER.get(blockEntity).invoke(SET_MACHINE_CONFIG.get());
+        invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 
     public static Optional<IProcessor> getProcessor(BlockEntity be) {

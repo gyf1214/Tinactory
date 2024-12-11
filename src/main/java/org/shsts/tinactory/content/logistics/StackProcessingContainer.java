@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
-import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
@@ -150,7 +149,7 @@ public class StackProcessingContainer extends CapabilityProvider
     }
 
     private void onUpdate() {
-        EVENT_MANAGER.get(blockEntity).invoke(CONTAINER_CHANGE.get());
+        invoke(blockEntity, CONTAINER_CHANGE);
         blockEntity.setChanged();
     }
 

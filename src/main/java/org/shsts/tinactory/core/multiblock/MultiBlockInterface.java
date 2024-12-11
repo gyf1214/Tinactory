@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
@@ -123,7 +122,7 @@ public class MultiBlockInterface extends Machine {
 
     private void onContainerChange() {
         if (multiBlock != null) {
-            EVENT_MANAGER.get(multiBlock.blockEntity).invoke(CONTAINER_CHANGE.get());
+            invoke(multiBlock.blockEntity, CONTAINER_CHANGE);
         }
     }
 
@@ -131,7 +130,7 @@ public class MultiBlockInterface extends Machine {
     public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
         super.setConfig(packet, invokeEvent);
         if (invokeEvent && multiBlock != null) {
-            EVENT_MANAGER.get(multiBlock.blockEntity).invoke(SET_MACHINE_CONFIG.get());
+            invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);
         }
     }
 
@@ -237,7 +236,7 @@ public class MultiBlockInterface extends Machine {
         }
 
         if (multiBlock != null) {
-            EVENT_MANAGER.get(multiBlock.blockEntity).invoke(SET_MACHINE_CONFIG.get());
+            invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);
         }
     }
 }
