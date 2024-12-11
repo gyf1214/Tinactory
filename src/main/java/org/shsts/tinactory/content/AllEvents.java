@@ -13,7 +13,7 @@ import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.registrate.AllRegistries.EVENTS;
+import static org.shsts.tinactory.content.AllRegistries.EVENTS;
 import static org.shsts.tinycorelib.api.CoreLibKeys.CLIENT_LOAD_LOC;
 import static org.shsts.tinycorelib.api.CoreLibKeys.REMOVED_BY_CHUNK_LOC;
 import static org.shsts.tinycorelib.api.CoreLibKeys.REMOVED_IN_WORLD_LOC;

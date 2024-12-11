@@ -12,7 +12,7 @@ import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.registrate.AllRegistries.COMPONENT_TYPES;
+import static org.shsts.tinactory.content.AllRegistries.COMPONENT_TYPES;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -23,10 +23,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
-import static org.shsts.tinactory.registrate.AllRegistries.simpleFluid;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

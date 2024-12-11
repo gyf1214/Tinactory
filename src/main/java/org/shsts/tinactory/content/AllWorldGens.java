@@ -16,9 +16,9 @@ import org.shsts.tinactory.content.worldgen.VoidPreset;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllRegistries.FEATURES;
+import static org.shsts.tinactory.content.AllRegistries.WORLD_TYPES;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.registrate.AllRegistries.FEATURES;
-import static org.shsts.tinactory.registrate.AllRegistries.WORLD_TYPES;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

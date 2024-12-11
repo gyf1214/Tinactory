@@ -41,10 +41,10 @@ import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
 import static org.shsts.tinactory.content.electric.Circuits.circuit;
 import static org.shsts.tinactory.content.electric.Circuits.circuitComponent;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
-import static org.shsts.tinactory.registrate.AllRegistries.simpleFluid;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

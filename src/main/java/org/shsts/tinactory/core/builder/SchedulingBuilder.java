@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.registrate.AllRegistries.SCHEDULINGS;
+import static org.shsts.tinactory.content.AllRegistries.SCHEDULINGS;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

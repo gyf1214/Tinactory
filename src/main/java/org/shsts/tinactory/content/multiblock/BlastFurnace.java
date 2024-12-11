@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.multiblock.MultiBlock;
 
 import java.util.OptionalInt;
 
-import static org.shsts.tinactory.registrate.AllRegistries.BLOCKS;
+import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
