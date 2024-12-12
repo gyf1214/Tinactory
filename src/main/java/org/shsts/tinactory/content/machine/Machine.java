@@ -22,6 +22,7 @@ import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllNetworks;
@@ -85,7 +86,7 @@ public class Machine extends UpdatableCapabilityProvider
     /**
      * Called only on server.
      */
-    public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
+    public void setConfig(ISetMachineConfigPacket packet, boolean invokeEvent) {
         config.apply(packet);
         sendUpdate(blockEntity);
         if (invokeEvent) {
@@ -96,7 +97,7 @@ public class Machine extends UpdatableCapabilityProvider
     /**
      * Called only on server.
      */
-    public void setConfig(SetMachineConfigPacket packet) {
+    public void setConfig(ISetMachineConfigPacket packet) {
         setConfig(packet, true);
     }
 

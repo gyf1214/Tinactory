@@ -164,16 +164,20 @@ public class LogisticWorker extends CapabilityProvider
         var subnet = network.get().getSubnet(blockEntity.getBlockPos());
 
         var packet = SetMachineConfigPacket.builder();
+        var empty = true;
         for (var i = 0; i < workerSlots; i++) {
             var key = PREFIX + i;
-            getConfig(i).ifPresent(entry -> {
-                if (!validateConfig(logistic, subnet, entry)) {
-                    entry.setValid(false);
-                    packet.set(key, entry.serializeNBT());
-                }
-            });
+            var entry = getConfig(i);
+            if (entry.isEmpty()) {
+                continue;
+            }
+            if (!validateConfig(logistic, subnet, entry.get())) {
+                entry.get().setValid(false);
+                packet.set(key, entry.get().serializeNBT());
+                empty = false;
+            }
         }
-        if (!packet.isEmpty()) {
+        if (!empty) {
             // skip event to skip validation
             machine.setConfig(packet.get(), false);
         }

@@ -3,6 +3,7 @@ package org.shsts.tinactory.content;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.gui.ElectricChestPlugin;
 import org.shsts.tinactory.content.gui.ElectricTankPlugin;
 import org.shsts.tinactory.content.gui.MachinePlugin;
@@ -38,7 +39,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public final class AllMenus {
     public static final IMenuEvent<SlotEventPacket> FLUID_SLOT_CLICK;
     public static final IMenuEvent<SlotEventPacket> CHEST_SLOT_CLICK;
-    public static final IMenuEvent<SetMachineConfigPacket> SET_MACHINE_CONFIG;
+    public static final IMenuEvent<ISetMachineConfigPacket> SET_MACHINE_CONFIG;
 
     public static final IMenuType WORKBENCH;
     public static final IMenuType NETWORK_CONTROLLER;
@@ -69,7 +70,7 @@ public final class AllMenus {
             SlotEventPacket::new);
         CHEST_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class,
             SlotEventPacket::new);
-        SET_MACHINE_CONFIG = CHANNEL.registerMenuEventPacket(SetMachineConfigPacket.class,
+        SET_MACHINE_CONFIG = CHANNEL.registerMenuEventPacket(ISetMachineConfigPacket.class,
             SetMachineConfigPacket::new);
 
         WORKBENCH = REGISTRATE.menu("primitive/workbench")

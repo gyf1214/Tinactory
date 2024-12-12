@@ -16,9 +16,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.Layout;
@@ -127,7 +127,7 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
+    public void setConfig(ISetMachineConfigPacket packet, boolean invokeEvent) {
         super.setConfig(packet, invokeEvent);
         if (invokeEvent && multiBlock != null) {
             invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);

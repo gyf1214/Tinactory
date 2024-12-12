@@ -4,16 +4,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinycorelib.api.network.IPacket;
+import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SetMachineConfigPacket implements IPacket {
+public class SetMachineConfigPacket implements ISetMachineConfigPacket {
     private CompoundTag sets;
     private List<String> resets;
 
@@ -24,10 +22,12 @@ public class SetMachineConfigPacket implements IPacket {
         this.resets = builder.resets;
     }
 
+    @Override
     public CompoundTag getSets() {
         return sets;
     }
 
+    @Override
     public List<String> getResets() {
         return resets;
     }
@@ -44,31 +44,30 @@ public class SetMachineConfigPacket implements IPacket {
         resets = buf.readCollection(ArrayList::new, FriendlyByteBuf::readUtf);
     }
 
-    public static class Builder implements Supplier<SetMachineConfigPacket> {
+    public static class Builder implements ISetMachineConfigPacket.Builder {
         private final CompoundTag sets = new CompoundTag();
         private final List<String> resets = new ArrayList<>();
 
-        public Builder reset(String key) {
+        @Override
+        public ISetMachineConfigPacket.Builder reset(String key) {
             resets.add(key);
             return this;
         }
 
-        public Builder set(String key, boolean val) {
+        @Override
+        public ISetMachineConfigPacket.Builder set(String key, boolean val) {
             sets.putBoolean(key, val);
             return this;
         }
 
-        public Builder set(String key, ResourceLocation val) {
-            sets.putString(key, val.toString());
-            return this;
-        }
-
-        public Builder set(String key, String value) {
+        @Override
+        public ISetMachineConfigPacket.Builder set(String key, String value) {
             sets.putString(key, value);
             return this;
         }
 
-        public Builder set(String key, CompoundTag tag) {
+        @Override
+        public ISetMachineConfigPacket.Builder set(String key, CompoundTag tag) {
             sets.put(key, tag);
             return this;
         }
@@ -78,12 +77,12 @@ public class SetMachineConfigPacket implements IPacket {
         }
 
         @Override
-        public SetMachineConfigPacket get() {
+        public ISetMachineConfigPacket get() {
             return new SetMachineConfigPacket(this);
         }
     }
 
-    public static Builder builder() {
+    public static ISetMachineConfigPacket.Builder builder() {
         return new Builder();
     }
 }
