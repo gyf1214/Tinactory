@@ -1,7 +1,7 @@
 package org.shsts.tinactory.api.machine;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinycorelib.api.network.IPacket;

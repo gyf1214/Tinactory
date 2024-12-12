@@ -1,9 +1,9 @@
 package org.shsts.tinactory.integration.jei.category;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.drawable.IDrawable;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

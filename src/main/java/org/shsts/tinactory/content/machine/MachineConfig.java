@@ -4,37 +4,39 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class MachineConfig implements INBTSerializable<CompoundTag> {
+public class MachineConfig implements IMachineConfig {
     private CompoundTag tag = new CompoundTag();
 
-    public boolean hasString(String key) {
-        return tag.contains(key, Tag.TAG_STRING);
+    @Override
+    public boolean contains(String key, int tagType) {
+        return tag.contains(key, tagType);
     }
 
+    @Override
     public Optional<String> getString(String key) {
-        return tag.contains(key, Tag.TAG_STRING) ? Optional.of(tag.getString(key)) : Optional.empty();
+        return tag.contains(key, Tag.TAG_STRING) ? Optional.of(tag.getString(key)) :
+            Optional.empty();
     }
 
-    public Optional<ResourceLocation> getLoc(String key) {
-        return getString(key).map(ResourceLocation::new);
-    }
-
+    @Override
     public boolean getBoolean(String key) {
         return tag.getBoolean(key);
     }
 
+    @Override
     public Optional<CompoundTag> getCompound(String key) {
-        return tag.contains(key, Tag.TAG_COMPOUND) ? Optional.of(tag.getCompound(key)) : Optional.empty();
+        return tag.contains(key, Tag.TAG_COMPOUND) ? Optional.of(tag.getCompound(key)) :
+            Optional.empty();
     }
 
+    @Override
     public void apply(ISetMachineConfigPacket packet) {
         tag.merge(packet.getSets());
         for (var key : packet.getResets()) {

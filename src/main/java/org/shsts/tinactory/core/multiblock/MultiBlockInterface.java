@@ -180,7 +180,7 @@ public class MultiBlockInterface extends Machine {
 
     @Override
     public Component getTitle() {
-        if (config.hasString("name") || multiBlock == null) {
+        if (config.contains("name", Tag.TAG_STRING) || multiBlock == null) {
             return super.getTitle();
         }
         return I18n.name(multiBlock.blockEntity.getBlockState().getBlock());
