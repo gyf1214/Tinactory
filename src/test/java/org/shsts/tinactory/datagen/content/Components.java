@@ -277,7 +277,7 @@ public final class Components {
             .requires(Ingredient.of(IRON.tag("wire")), 4)
             .unlockedBy("has_wire", has(IRON.tag("wire"))));
 
-        TOOL_CRAFTING.recipe(_DATA_GEN, MACHINE_HULL.get(Voltage.ULV))
+        TOOL_CRAFTING.recipe(DATA_GEN, MACHINE_HULL.get(Voltage.ULV))
             .result(MACHINE_HULL.get(Voltage.ULV), 1)
             .pattern("###").pattern("#W#").pattern("###")
             .define('#', IRON.tag("plate"))
@@ -285,7 +285,7 @@ public final class Components {
             .toolTag(TOOL_WRENCH)
             .build();
 
-        TOOL_CRAFTING.recipe(_DATA_GEN, FLUID_CELL.get(Voltage.ULV))
+        TOOL_CRAFTING.recipe(DATA_GEN, FLUID_CELL.get(Voltage.ULV))
             .result(FLUID_CELL.get(Voltage.ULV), 1)
             .pattern("###").pattern("#G#").pattern(" # ")
             .define('#', IRON.tag("plate"))
@@ -295,7 +295,7 @@ public final class Components {
     }
 
     private static void componentRecipes() {
-        TOOL_CRAFTING.recipe(_DATA_GEN, CABLE.get(Voltage.LV))
+        TOOL_CRAFTING.recipe(DATA_GEN, CABLE.get(Voltage.LV))
             .result(CABLE.get(Voltage.LV), 1)
             .pattern("WWR").pattern("WWR").pattern("RR ")
             .define('W', TIN.tag("wire"))

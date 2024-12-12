@@ -163,7 +163,7 @@ public final class Materials {
             .nullRecipe(Items.IRON_SWORD);
 
         // stick
-        TOOL_CRAFTING.recipe(_DATA_GEN, Items.STICK)
+        TOOL_CRAFTING.recipe(DATA_GEN, Items.STICK)
             .result(Items.STICK, 4)
             .pattern("#").pattern("#")
             .define('#', ItemTags.PLANKS)
@@ -426,21 +426,21 @@ public final class Materials {
             .unlockedBy("has_material", has(IRON.tag("nugget"))), "_from_iron");
 
         // stone -> gravel
-        TOOL_CRAFTING.recipe(_DATA_GEN, Items.GRAVEL)
+        TOOL_CRAFTING.recipe(DATA_GEN, Items.GRAVEL)
             .result(Items.GRAVEL, 1)
             .pattern("#").pattern("#")
             .define('#', STONE.tag("block"))
             .toolTag(TOOL_HAMMER)
             .build()
             // gravel -> flint
-            .recipe(_DATA_GEN, FLINT.loc("primary"))
+            .recipe(DATA_GEN, FLINT.loc("primary"))
             .result(FLINT.entry("primary"), 1)
             .pattern("###")
             .define('#', Items.GRAVEL)
             .toolTag(TOOL_HAMMER)
             .build()
             // gravel -> sand
-            .recipe(_DATA_GEN, Items.SAND)
+            .recipe(DATA_GEN, Items.SAND)
             .result(Items.SAND, 1)
             .pattern("#")
             .define('#', Items.GRAVEL)
@@ -458,7 +458,7 @@ public final class Materials {
         }
 
         // rubber
-        TOOL_CRAFTING.recipe(_DATA_GEN, RAW_RUBBER.loc("dust"))
+        TOOL_CRAFTING.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
             .result(RAW_RUBBER.entry("dust"), 1)
             .pattern("A").define('A', STICKY_RESIN)
             .toolTag(TOOL_MORTAR)
@@ -554,7 +554,7 @@ public final class Materials {
         var woodStripped = "stripped_" + wood;
 
         // saw plank
-        TOOL_CRAFTING.recipe(_DATA_GEN, planks.loc())
+        TOOL_CRAFTING.recipe(DATA_GEN, planks)
             .result(planks, 4)
             .pattern("X")
             .define('X', logTag)

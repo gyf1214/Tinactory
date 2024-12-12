@@ -621,7 +621,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
     @SuppressWarnings("unchecked")
     private void toolProcess(String result, int count, String[] patterns, int size, Object[] args) {
-        var builder = TOOL_CRAFTING.recipe(_DATA_GEN, material.loc(result))
+        var builder = TOOL_CRAFTING.recipe(dataGen, material.loc(result))
             .result(material.entry(result), count);
         for (var pat : patterns) {
             builder.pattern(pat);

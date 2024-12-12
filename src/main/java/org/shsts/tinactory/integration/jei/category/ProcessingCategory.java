@@ -48,7 +48,7 @@ import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, AbstractContainerMenu> {
+public class ProcessingCategory extends RecipeCategory1<ProcessingRecipe, AbstractContainerMenu> {
     private static final int EXTRA_HEIGHT = FONT_HEIGHT * 3 + SPACING * 2 + SLOT_SIZE / 2;
 
     public ProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
@@ -89,7 +89,7 @@ public class ProcessingCategory extends RecipeCategory<ProcessingRecipe, Abstrac
     }
 
     @Override
-    protected void drawExtra(ProcessingRecipe recipe, IDrawHelper helper, IRecipeSlotsView recipeSlotsView,
+    protected void drawExtra(ProcessingRecipe recipe, ICategoryDrawHelper helper, IRecipeSlotsView recipeSlotsView,
         PoseStack stack, double mouseX, double mouseY) {
         helper.drawProgressBar(stack, (int) recipe.workTicks);
         var y = layout.rect.endY() + SLOT_SIZE / 2;

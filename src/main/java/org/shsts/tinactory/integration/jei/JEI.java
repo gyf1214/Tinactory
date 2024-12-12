@@ -30,7 +30,7 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
-import org.shsts.tinactory.integration.jei.category.RecipeCategory;
+import org.shsts.tinactory.integration.jei.category.RecipeCategory1;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
 import org.shsts.tinactory.integration.jei.gui.NetworkControllerHandler;
@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @JeiPlugin
@@ -59,15 +60,14 @@ public class JEI implements IModPlugin {
 
     public final ToolCategory toolCategory;
 
-    private final List<RecipeCategory<?, ?>> categories;
-    private final Map<RecipeType<?>, RecipeCategory<?, ?>> processingCategories;
+    private final List<RecipeCategory1<?, ?>> categories;
+    private final Map<RecipeType<?>, RecipeCategory1<?, ?>> processingCategories;
 
     public JEI() {
         this.categories = new ArrayList<>();
         this.processingCategories = new HashMap<>();
 
         this.toolCategory = new ToolCategory();
-        categories.add(toolCategory);
         for (var set : AllBlockEntities.getProcessingSets()) {
             var layout = set.layout(Voltage.MAXIMUM);
             var icon = set.icon();
@@ -85,7 +85,7 @@ public class JEI implements IModPlugin {
         processingCategories.put(recipeType.get(), category);
     }
 
-    public Optional<RecipeCategory<?, ?>> processingCategory(RecipeType<?> recipeType) {
+    public Optional<RecipeCategory1<?, ?>> processingCategory(RecipeType<?> recipeType) {
         return Optional.ofNullable(processingCategories.get(recipeType));
     }
 
@@ -102,6 +102,7 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
+        toolCategory.registerCategory(registration);
         for (var category : categories) {
             category.registerCategory(registration);
         }
@@ -109,14 +110,17 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        var recipeManager = ClientUtil.getRecipeManager();
+        var recipeManager1 = ClientUtil.getRecipeManager();
+        var recipeManager = CORE.clientRecipeManager();
+        toolCategory.registerRecipes(registration, recipeManager);
         for (var category : categories) {
-            category.registerRecipes(registration, recipeManager);
+            category.registerRecipes(registration, recipeManager1);
         }
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        toolCategory.registerCatalysts(registration);
         for (var category : categories) {
             category.registerCatalysts(registration);
         }

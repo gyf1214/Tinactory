@@ -5,7 +5,6 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
@@ -20,10 +19,10 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ToolCategory extends RecipeCategory<ToolRecipe, AbstractContainerMenu> {
+public class ToolCategory extends RecipeCategory<ToolRecipe> {
     private ToolCategory(Block workbench) {
         super(AllRecipes.TOOL_CRAFTING, AllLayouts.WORKBENCH, Ingredient.of(workbench),
-            new ItemStack(workbench), AbstractContainerMenu.class);
+            new ItemStack(workbench));
     }
 
     public ToolCategory() {

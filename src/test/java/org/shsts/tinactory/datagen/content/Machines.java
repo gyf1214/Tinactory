@@ -274,7 +274,7 @@ public final class Machines {
         ulvMachine(LOGISTIC_WORKER.entry(Voltage.ULV), () -> Blocks.HOPPER);
         ulvMachine(ELECTRIC_BUFFER.get(Voltage.ULV), CABLE.get(Voltage.ULV));
 
-        TOOL_CRAFTING.recipe(_DATA_GEN, NETWORK_CONTROLLER)
+        TOOL_CRAFTING.recipe(DATA_GEN, NETWORK_CONTROLLER)
             .result(NETWORK_CONTROLLER, 1)
             .pattern("VWV").pattern("VHV").pattern("WVW")
             .define('W', CABLE.get(Voltage.ULV))
@@ -282,7 +282,7 @@ public final class Machines {
             .define('V', circuit(Voltage.ULV))
             .toolTag(TOOL_WRENCH)
             .build()
-            .recipe(_DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
+            .recipe(DATA_GEN, STEAM_TURBINE.entry(Voltage.ULV))
             .result(STEAM_TURBINE.entry(Voltage.ULV), 1)
             .pattern("PVP").pattern("RHR").pattern("WVW")
             .define('P', COPPER.tag("pipe"))
@@ -344,7 +344,7 @@ public final class Machines {
     }
 
     private static void miscRecipes() {
-        TOOL_CRAFTING.recipe(_DATA_GEN, LOW_PRESSURE_BOILER)
+        TOOL_CRAFTING.recipe(DATA_GEN, LOW_PRESSURE_BOILER)
             .result(LOW_PRESSURE_BOILER, 1)
             .pattern("PPP").pattern("PWP").pattern("VFV")
             .define('P', IRON.tag("plate"))
@@ -402,14 +402,14 @@ public final class Machines {
             .nullRecipe(Items.DETECTOR_RAIL)
             .nullRecipe(Items.ACTIVATOR_RAIL);
 
-        TOOL_CRAFTING.recipe(_DATA_GEN, Items.HOPPER)
+        TOOL_CRAFTING.recipe(DATA_GEN, Items.HOPPER)
             .result(Items.HOPPER, 1)
             .pattern("P P").pattern("PCP").pattern(" P ")
             .define('P', IRON.tag("plate"))
             .define('C', Items.CHEST)
             .toolTag(TOOL_WRENCH, TOOL_HAMMER)
             .build()
-            .recipe(_DATA_GEN, Items.BUCKET)
+            .recipe(DATA_GEN, Items.BUCKET)
             .result(Items.BUCKET, 1)
             .pattern("P P").pattern(" P ")
             .define('P', IRON.tag("plate"))
@@ -467,7 +467,7 @@ public final class Machines {
 
     private static void ulvMachine(IEntry<? extends ItemLike> result,
         Supplier<? extends ItemLike> base) {
-        TOOL_CRAFTING.recipe(_DATA_GEN, result)
+        TOOL_CRAFTING.recipe(DATA_GEN, result)
             .result(result, 1)
             .pattern("BBB").pattern("VHV").pattern("WVW")
             .define('B', base)
@@ -480,7 +480,7 @@ public final class Machines {
 
     private static void ulvMachine(IEntry<? extends ItemLike> result,
         TagKey<Item> base) {
-        TOOL_CRAFTING.recipe(_DATA_GEN, result)
+        TOOL_CRAFTING.recipe(DATA_GEN, result)
             .result(result, 1)
             .pattern("BBB").pattern("VHV").pattern("WVW")
             .define('B', base)

@@ -7,13 +7,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
@@ -23,10 +20,8 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
@@ -36,7 +31,10 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.Optional;
 
+import static net.minecraft.world.item.crafting.RecipeType.CRAFTING;
+import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -127,7 +125,7 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     private ItemStack output;
     private final WrapperItemHandler itemView;
     @Nullable
-    private Recipe<?> currentRecipe = null;
+    private Object currentRecipe = null;
 
     private final LazyOptional<?> itemHandlerCap;
 
@@ -153,38 +151,24 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         return builder.capability(ID, Workbench::new);
     }
 
-    @FunctionalInterface
-    private interface RecipeFunction<C extends Container, R extends Recipe<C>, V> {
-        V apply(R recipe, C container);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <C extends Container, R extends Recipe<C>, V> V applyRecipeFunc(RecipeFunction<C, R, V> func) {
-        if (currentRecipe instanceof CraftingRecipe) {
-            return func.apply((R) currentRecipe, (C) craftingStack);
-        } else if (currentRecipe instanceof ToolRecipe) {
-            return func.apply((R) currentRecipe, (C) new SmartRecipe.ContainerWrapper<>(this));
-        } else {
-            throw new IllegalStateException();
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
     private void onUpdate() {
         var world = blockEntity.getLevel();
         if (world == null || world.isClientSide) {
             return;
         }
 
-        var recipeManager = world.getRecipeManager();
+        var recipeManager = CORE.recipeManager(world);
+        var vanillaRecipes = world.getRecipeManager();
 
-        currentRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL_CRAFTING.get(), this, world)
-            .map($ -> (Recipe) $)
-            .or(() -> recipeManager.getRecipeFor(RecipeType.CRAFTING, craftingStack, world))
+        currentRecipe = recipeManager.getRecipeFor(TOOL_CRAFTING, this, world)
+            .map($ -> (Object) $)
+            .or(() -> vanillaRecipes.getRecipeFor(CRAFTING, craftingStack, world))
             .orElse(null);
 
-        if (currentRecipe != null) {
-            output = applyRecipeFunc(Recipe::assemble);
+        if (currentRecipe instanceof ToolRecipe tool) {
+            output = tool.assemble();
+        } else if (currentRecipe instanceof CraftingRecipe crafting) {
+            output = crafting.assemble(craftingStack);
         } else {
             output = ItemStack.EMPTY;
         }
@@ -221,11 +205,18 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         // vanilla logic of crafting triggers
         stack.onCraftedBy(player.level, player, amount);
         ForgeEventFactory.firePlayerCraftingEvent(player, stack, craftingStack);
-        if (!currentRecipe.isSpecial()) {
-            player.awardRecipes(List.of(currentRecipe));
+        if (currentRecipe instanceof CraftingRecipe crafting && !crafting.isSpecial()) {
+            player.awardRecipes(List.of(crafting));
         }
         ForgeHooks.setCraftingPlayer(player);
-        var remaining = applyRecipeFunc(Recipe::getRemainingItems);
+        List<ItemStack> remaining;
+        if (currentRecipe instanceof ToolRecipe tool) {
+            remaining = tool.getRemainingItems(this);
+        } else if (currentRecipe instanceof CraftingRecipe crafting) {
+            remaining = crafting.getRemainingItems(craftingStack);
+        } else {
+            throw new IllegalStateException();
+        }
         ForgeHooks.setCraftingPlayer(null);
 
         for (var i = 0; i < remaining.size(); i++) {

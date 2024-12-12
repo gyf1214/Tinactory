@@ -22,7 +22,7 @@ public final class WorkbenchHandler {
         var x = rect.x() + layout.getXOffset() + MARGIN_X;
         var y = rect.y() + MARGIN_TOP;
 
-        registration.addRecipeClickArea(WorkbenchScreen.class, x, y, rect.width(), rect.height(),
-            category.type);
+        registration.addRecipeClickArea(WorkbenchScreen.class,
+            x, y, rect.width(), rect.height(), category.type);
     }
 }

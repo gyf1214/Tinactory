@@ -1,0 +1,14 @@
+package org.shsts.tinactory.integration.jei.category;
+
+import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
+import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.ParametersAreNonnullByDefault;
+import mezz.jei.api.gui.drawable.IDrawable;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public interface ICategoryDrawHelper {
+    void drawProgressBar(PoseStack stack, int cycle);
+
+    IDrawable getBackground();
+}

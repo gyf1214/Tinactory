@@ -22,13 +22,15 @@ import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
-    public static final RecipeTypeEntry<ToolRecipe, ToolRecipe.Builder> TOOL_CRAFTING;
+    public static final IRecipeType<ToolRecipe.Builder> TOOL_CRAFTING;
     public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH_BENCH;
     public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLER;
     public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> LASER_ENGRAVER;
@@ -60,9 +62,10 @@ public final class AllRecipes {
     public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
 
     static {
-        TOOL_CRAFTING = _REGISTRATE.recipeType("tool_crafting", ToolRecipe.SERIALIZER)
-            .clazz(ToolRecipe.class)
-            .builder(ToolRecipe.Builder::new)
+        TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting",
+                ToolRecipe.Builder::new)
+            .recipeClass(ToolRecipe.class)
+            .serializer(ToolRecipe.SERIALIZER)
             .register();
 
         RESEARCH_BENCH = _REGISTRATE.recipeType("research_bench", ResearchRecipe.SERIALIZER)

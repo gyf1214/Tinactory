@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.material.OreVariant;
-import org.shsts.tinactory.integration.jei.category.RecipeCategory;
+import org.shsts.tinactory.integration.jei.category.RecipeCategory1;
 import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 
 import java.util.ArrayList;
@@ -19,7 +19,6 @@ import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
 import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
-import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -75,12 +74,13 @@ public final class Markers {
         for (var set : PROCESSING_SETS) {
             allTypes.add(set.recipeType);
         }
-        allTypes.add(TOOL_CRAFTING);
+        // TODO
+//        allTypes.add(TOOL_CRAFTING);
         allTypes.add(BLAST_FURNACE);
         allTypes.add(SIFTER);
 
         for (var type : allTypes) {
-            _DATA_GEN.trackLang(RecipeCategory.categoryTitleId(type.loc));
+            _DATA_GEN.trackLang(RecipeCategory1.categoryTitleId(type.loc));
         }
     }
 }
