@@ -4,73 +4,70 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.gui.sync.MenuEventPacket;
+import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SetMachineConfigPacket extends MenuEventPacket {
+public class SetMachineConfigPacket implements ISetMachineConfigPacket {
     private CompoundTag sets;
     private List<String> resets;
 
     public SetMachineConfigPacket() {}
 
-    private SetMachineConfigPacket(int containerId, int eventId, Builder builder) {
-        super(containerId, eventId);
+    private SetMachineConfigPacket(Builder builder) {
         this.sets = builder.sets;
         this.resets = builder.resets;
     }
 
+    @Override
     public CompoundTag getSets() {
         return sets;
     }
 
+    @Override
     public List<String> getResets() {
         return resets;
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        super.serializeToBuf(buf);
         buf.writeNbt(sets);
         buf.writeCollection(resets, FriendlyByteBuf::writeUtf);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        super.deserializeFromBuf(buf);
         sets = buf.readNbt();
         resets = buf.readCollection(ArrayList::new, FriendlyByteBuf::readUtf);
     }
 
-    public static class Builder implements MenuEventPacket.Factory<SetMachineConfigPacket> {
+    public static class Builder implements ISetMachineConfigPacket.Builder {
         private final CompoundTag sets = new CompoundTag();
         private final List<String> resets = new ArrayList<>();
 
-        public Builder reset(String key) {
+        @Override
+        public ISetMachineConfigPacket.Builder reset(String key) {
             resets.add(key);
             return this;
         }
 
-        public Builder set(String key, boolean val) {
+        @Override
+        public ISetMachineConfigPacket.Builder set(String key, boolean val) {
             sets.putBoolean(key, val);
             return this;
         }
 
-        public Builder set(String key, ResourceLocation val) {
-            sets.putString(key, val.toString());
-            return this;
-        }
-
-        public Builder set(String key, String value) {
+        @Override
+        public ISetMachineConfigPacket.Builder set(String key, String value) {
             sets.putString(key, value);
             return this;
         }
 
-        public Builder set(String key, CompoundTag tag) {
+        @Override
+        public ISetMachineConfigPacket.Builder set(String key, CompoundTag tag) {
             sets.put(key, tag);
             return this;
         }
@@ -80,17 +77,12 @@ public class SetMachineConfigPacket extends MenuEventPacket {
         }
 
         @Override
-        public SetMachineConfigPacket create(int containerId, int eventId) {
-            return new SetMachineConfigPacket(containerId, eventId, this);
-        }
-
-        public SetMachineConfigPacket create() {
-            // where containerId and eventId are irrelevant
-            return create(0, 0);
+        public ISetMachineConfigPacket get() {
+            return new SetMachineConfigPacket(this);
         }
     }
 
-    public static Builder builder() {
+    public static ISetMachineConfigPacket.Builder builder() {
         return new Builder();
     }
 }

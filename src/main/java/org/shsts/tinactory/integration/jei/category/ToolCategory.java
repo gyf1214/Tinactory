@@ -12,7 +12,6 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.AllRecipes;
-import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 
 import java.util.Collections;
@@ -20,10 +19,10 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ToolCategory extends RecipeCategory<ToolRecipe, WorkbenchMenu> {
+public class ToolCategory extends RecipeCategory<ToolRecipe> {
     private ToolCategory(Block workbench) {
         super(AllRecipes.TOOL_CRAFTING, AllLayouts.WORKBENCH, Ingredient.of(workbench),
-            new ItemStack(workbench), WorkbenchMenu.class);
+            new ItemStack(workbench));
     }
 
     public ToolCategory() {

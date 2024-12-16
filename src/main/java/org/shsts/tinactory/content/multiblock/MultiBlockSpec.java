@@ -5,11 +5,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
-import org.shsts.tinactory.core.common.SimpleBuilder;
+import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.multiblock.MultiBlockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 
@@ -20,6 +18,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -153,19 +153,18 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         }
 
         public LayerBuilder<P> layer() {
-            var ret = new LayerBuilder<>(this);
-            ret.onCreateObject(l -> {
-                layers.add(l);
-                var w = l.rows.get(0).length();
-                var d = l.rows.size();
-                if (width == 0) {
-                    width = w;
-                    depth = d;
-                } else if (width != w || depth != d) {
-                    throw new IllegalArgumentException("layer size not same");
-                }
-            });
-            return ret;
+            return new LayerBuilder<>(this)
+                .onCreateObject(l -> {
+                    layers.add(l);
+                    var w = l.rows.get(0).length();
+                    var d = l.rows.size();
+                    if (width == 0) {
+                        width = w;
+                        depth = d;
+                    } else if (width != w || depth != d) {
+                        throw new IllegalArgumentException("layer size not same");
+                    }
+                });
         }
 
         public Builder<P> check(char ch, BiConsumer<MultiBlockCheckCtx, BlockPos> checker) {
@@ -178,7 +177,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
             if (be.isEmpty()) {
                 return false;
             }
-            var machine = AllCapabilities.MACHINE.tryGet(be.get());
+            var machine = MACHINE.tryGet(be.get());
             if (machine.isEmpty() || !(machine.get() instanceof MultiBlockInterface inter)) {
                 return false;
             }
@@ -319,9 +318,5 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
 
     public static <P> Builder<P> builder(P parent) {
         return new Builder<>(parent);
-    }
-
-    public static Builder<?> builder() {
-        return new Builder<>(Unit.INSTANCE);
     }
 }

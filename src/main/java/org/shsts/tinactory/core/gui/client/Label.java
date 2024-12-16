@@ -9,6 +9,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,11 +41,11 @@ public class Label extends MenuWidget {
     public Alignment verticalAlign = Alignment.BEGIN;
     public int spacing = Menu.SPACING;
 
-    public Label(Menu<?, ?> menu) {
+    public Label(IMenu menu) {
         super(menu);
     }
 
-    public Label(Menu<?, ?> menu, Component... lines) {
+    public Label(IMenu menu, Component... lines) {
         super(menu);
         setLines(lines);
     }

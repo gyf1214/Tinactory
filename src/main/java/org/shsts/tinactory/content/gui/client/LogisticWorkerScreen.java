@@ -10,10 +10,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
+import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -23,8 +24,8 @@ import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,11 +35,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_PANEL_BG;
 import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
@@ -46,10 +49,11 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
+public class LogisticWorkerScreen extends MenuScreen {
     private record MachineInfo(UUID id, Component name, ItemStack icon) {}
 
     private final int workerSlots;
+    private final IMachineConfig machineConfig;
     private final Map<UUID, MachineInfo> machines = new HashMap<>();
     private final List<MachineInfo> machineList = new ArrayList<>();
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
@@ -66,7 +70,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private static final int IMAGE_WIDTH = NetworkControllerScreen.WIDTH;
     private static final int IMAGE_HEIGHT = NetworkControllerScreen.HEIGHT;
     private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
-    private static final int HORIZONTAL_SPACING = MARGIN_HORIZONTAL * 2;
+    private static final int HORIZONTAL_SPACING = MARGIN_X * 2;
 
     private class ConfigPanel extends ButtonPanel {
         private static final int WIDTH = BUTTON_SIZE * 3 + SPACING * 2;
@@ -134,7 +138,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 config.setValid(!config.isValid());
                 var packet = SetMachineConfigPacket.builder()
                     .set(PREFIX + index, config.serializeNBT());
-                menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, packet);
+                menu.triggerEvent(SET_MACHINE_CONFIG, packet);
             }
         }
 
@@ -244,7 +248,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             }
             var packet = SetMachineConfigPacket.builder()
                 .set(PREFIX + selectedConfig, config.serializeNBT());
-            menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG, packet);
+            menu.triggerEvent(SET_MACHINE_CONFIG, packet);
         }
 
         @Override
@@ -260,10 +264,11 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         return I18n.tr("tinactory.gui.logisticWorker." + key);
     }
 
-    public LogisticWorkerScreen(LogisticWorkerMenu menu, Inventory inventory,
-        Component title, int workerSlots) {
+    public LogisticWorkerScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.workerSlots = workerSlots;
+        var blockEntity = menu.blockEntity();
+        this.machineConfig = MACHINE.get(blockEntity).config();
+        this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
 
         var configPanel = new ConfigPanel();
         this.machineSelectPanel = new MachineSelectPanel();
@@ -288,10 +293,10 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         addPanel(anchor2, offset2, machineSelectPanel);
         addPanel(anchor3, offset3, portSelectPanel);
 
-        this.imageWidth = IMAGE_WIDTH;
-        this.imageHeight = IMAGE_HEIGHT;
+        this.contentWidth = IMAGE_WIDTH;
+        this.contentHeight = IMAGE_HEIGHT;
 
-        menu.onSyncPacket(menu.syncSlot, this::refreshVisiblePorts);
+        menu.onSyncPacket("info", this::refreshVisiblePorts);
     }
 
     private void refreshVisiblePorts(LogisticWorkerSyncPacket p) {
@@ -324,7 +329,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     }
 
     private LogisticWorkerConfig getConfig(int slot) {
-        return menu.machineConfig.getCompound(PREFIX + slot)
+        return machineConfig.getCompound(PREFIX + slot)
             .map(LogisticWorkerConfig::fromTag)
             .orElseGet(LogisticWorkerConfig::new);
     }

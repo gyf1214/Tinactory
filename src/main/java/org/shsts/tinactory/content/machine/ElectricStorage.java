@@ -8,25 +8,38 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.AllNetworks;
+import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
-import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.machine.ILayoutProvider;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+
+import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class ElectricStorage extends CapabilityProvider implements IEventSubscriber, IProcessor {
+public abstract class ElectricStorage extends CapabilityProvider
+    implements ILayoutProvider, IProcessor, IEventSubscriber {
     protected final BlockEntity blockEntity;
+    public final Layout layout;
 
-    protected MachineConfig machineConfig;
-    protected Machine machine;
+    protected IMachineConfig machineConfig;
+    protected IMachine machine;
 
-    public ElectricStorage(BlockEntity blockEntity) {
+    public ElectricStorage(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
+        this.layout = layout;
     }
 
     public boolean isUnlocked() {
@@ -45,8 +58,8 @@ public abstract class ElectricStorage extends CapabilityProvider implements IEve
         return machineConfig.getBoolean("global");
     }
 
-    protected void registerPort(Network network, IPort port) {
-        var logistics = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
+    protected void registerPort(INetwork network, IPort port) {
+        var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.unregisterPort(machine, 0);
 
         if (isGlobal()) {
@@ -62,22 +75,19 @@ public abstract class ElectricStorage extends CapabilityProvider implements IEve
     }
 
     private void onLoad() {
-        machine = AllCapabilities.MACHINE.get(blockEntity);
-        machineConfig = machine.config;
+        machine = MACHINE.get(blockEntity);
+        machineConfig = machine.config();
     }
 
-    protected void onConnect(Network network) {
+    protected void onConnect(INetwork network) {
         onMachineConfig();
     }
 
     protected abstract void onMachineConfig();
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CONNECT, this::onConnect);
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
+    public Layout getLayout() {
+        return layout;
     }
 
     @Override
@@ -92,8 +102,16 @@ public abstract class ElectricStorage extends CapabilityProvider implements IEve
     }
 
     @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CONNECT.get(), this::onConnect);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
+    }
+
+    @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.PROCESSOR.get()) {
+        if (cap == LAYOUT_PROVIDER.get() || cap == PROCESSOR.get()) {
             return myself();
         }
         return LazyOptional.empty();

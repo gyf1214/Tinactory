@@ -3,31 +3,29 @@ package org.shsts.tinactory.core.gui.sync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
+import org.shsts.tinycorelib.api.network.IPacket;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SlotEventPacket extends MenuEventPacket {
+public class SlotEventPacket implements IPacket {
     private int index;
     private int button;
 
     public SlotEventPacket() {}
 
-    public SlotEventPacket(int containerId, int eventId, int index, int button) {
-        super(containerId, eventId);
+    public SlotEventPacket(int index, int button) {
         this.index = index;
         this.button = button;
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        super.serializeToBuf(buf);
         buf.writeVarInt(index);
         buf.writeVarInt(button);
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        super.deserializeFromBuf(buf);
         index = buf.readVarInt();
         button = buf.readVarInt();
     }

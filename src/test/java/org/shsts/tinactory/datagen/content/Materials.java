@@ -21,7 +21,6 @@ import org.shsts.tinactory.datagen.content.model.IconSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
@@ -95,6 +94,7 @@ import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
+import static org.shsts.tinactory.content.AllRegistries.ITEMS;
 import static org.shsts.tinactory.content.AllTags.TOOL;
 import static org.shsts.tinactory.content.AllTags.TOOL_FILE;
 import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
@@ -107,14 +107,15 @@ import static org.shsts.tinactory.content.AllTags.TOOL_SHEARS;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
 import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
 import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -131,7 +132,7 @@ public final class Materials {
 
     private static class MaterialFactory {
         public MaterialBuilder<MaterialFactory> material(MaterialSet material, IconSet icon) {
-            return (new MaterialBuilder<>(DATA_GEN, this, material)).icon(icon);
+            return MaterialBuilder.factory(DATA_GEN, this, material).icon(icon);
         }
     }
 
@@ -175,11 +176,12 @@ public final class Materials {
 
         // rubber
         DATA_GEN.block(RUBBER_LOG)
-            .blockState(ctx -> ctx.provider
-                .axisBlock(ctx.object, gregtech("blocks/wood/rubber/log_rubber_side"),
+            .blockState(ctx -> ctx.provider()
+                .axisBlock(ctx.object(),
+                    gregtech("blocks/wood/rubber/log_rubber_side"),
                     gregtech("blocks/wood/rubber/log_rubber_top")))
-            .tag(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN)
-            .itemTag(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN)
+            .tag(List.of(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN))
+            .itemTag(List.of(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN))
             .dropSelf()
             .dropOnState(STICKY_RESIN, RubberLogBlock.HAS_RUBBER, true)
             .build()
@@ -190,8 +192,9 @@ public final class Materials {
             .drop(RUBBER_SAPLING, 0.05f)
             .build()
             .block(RUBBER_SAPLING)
-            .blockState(ctx -> ctx.provider.simpleBlock(ctx.object, ctx.provider.models()
-                .cross(ctx.id, gregtech("blocks/wood/rubber/sapling_rubber"))))
+            .blockState(ctx -> ctx.provider()
+                .simpleBlock(ctx.object(), ctx.provider().models()
+                    .cross(ctx.id(), gregtech("blocks/wood/rubber/sapling_rubber"))))
             .itemModel(basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
             .tag(BlockTags.SAPLINGS).itemTag(ItemTags.SAPLINGS)
             .build();
@@ -544,13 +547,13 @@ public final class Materials {
     private static void woodRecipes(String prefix) {
         var nether = prefix.equals("crimson") || prefix.equals("warped");
 
-        var planks = REGISTRATE.itemHandler.getEntry(prefix + "_planks");
+        var planks = ITEMS.getEntry(mcLoc(prefix + "_planks"));
         var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;
 
         // saw plank
-        TOOL_CRAFTING.recipe(DATA_GEN, planks.loc)
+        TOOL_CRAFTING.recipe(DATA_GEN, planks)
             .result(planks, 4)
             .pattern("X")
             .define('X', logTag)

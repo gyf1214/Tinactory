@@ -22,6 +22,8 @@ import org.shsts.tinactory.core.util.I18n;
 
 import java.util.Random;
 
+import static org.shsts.tinactory.content.AllWorldGens.PLAYER_START_FEATURE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllCommands {
@@ -106,7 +108,7 @@ public final class AllCommands {
         var pos = BlockPosArgument.getSpawnablePos(ctx, "pos");
         var world = ctx.getSource().getLevel();
 
-        AllWorldGens.PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
+        PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
             world.getChunkSource().getGenerator(), new Random(), pos);
         return Command.SINGLE_SUCCESS;
     }

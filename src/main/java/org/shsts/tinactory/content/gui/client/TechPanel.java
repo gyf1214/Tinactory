@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -36,8 +36,8 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @OnlyIn(Dist.CLIENT)
@@ -53,7 +53,7 @@ public class TechPanel extends Panel {
     public static final int PANEL_BORDER = 2;
     public static final Rect BUTTON_PANEL_BG = BACKGROUND_TEX_RECT.offset(6, 6).enlarge(-12, -12);
     private static final int LEFT_WIDTH = PANEL_BORDER * 2 + BUTTON_SIZE * 5;
-    public static final int LEFT_OFFSET = LEFT_WIDTH + MARGIN_HORIZONTAL * 2;
+    public static final int LEFT_OFFSET = LEFT_WIDTH + MARGIN_X * 2;
     public static final int RIGHT_WIDTH = LEFT_WIDTH + BUTTON_SIZE * 2;
     private static final int PROGRESS_HEIGHT = 5;
 
@@ -206,7 +206,7 @@ public class TechPanel extends Panel {
         }
     }
 
-    public TechPanel(MenuScreen<?> screen) {
+    public TechPanel(MenuScreen screen) {
         super(screen);
         this.techManager = TechManager.client();
 
@@ -228,7 +228,6 @@ public class TechPanel extends Panel {
         addPanel(anchor1, offset2, availableTechPanel);
 
         this.selectedTechPanel = new Panel(screen);
-
         this.selectedTechLabel = new Label(menu);
         this.selectedTechDetailsLabel = new Label(menu);
         var label3 = new Label(menu, tr("techRequirementsLabel"));
@@ -306,7 +305,7 @@ public class TechPanel extends Panel {
     }
 
     private void startResearch() {
-        if (menu.player instanceof LocalPlayer player && selectedTech != null) {
+        if (menu.player() instanceof LocalPlayer player && selectedTech != null) {
             var loc = selectedTech.getLoc().toString();
             var command = "/" + Tinactory.ID + " setTargetTech " + loc;
             player.chat(command);
@@ -355,14 +354,14 @@ public class TechPanel extends Panel {
         refresh();
     }
 
-    public static boolean isHoveringTech(GuiComponent component) {
+    public static boolean isHoveringTech(Widget component) {
         return component instanceof TechButton ||
             component instanceof RequiredTechButtons ||
             (component instanceof ButtonPanel.ItemButton itemButton &&
                 itemButton.getParent() instanceof TechButtonPanel);
     }
 
-    public static Optional<ITechnology> getHoveredTech(GuiComponent component, double mouseX) {
+    public static Optional<ITechnology> getHoveredTech(Widget component, double mouseX) {
         if (component instanceof TechButton button) {
             return Optional.ofNullable(button.technology);
         } else if (component instanceof RequiredTechButtons buttons) {

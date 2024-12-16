@@ -1,45 +1,45 @@
 package org.shsts.tinactory.content;
 
 import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.machine.IWorkbench;
-import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.UpdateHelper;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
-import org.shsts.tinactory.core.multiblock.MultiBlock;
-import org.shsts.tinactory.registrate.common.CapabilityEntry;
+import org.shsts.tinactory.core.machine.ILayoutProvider;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.registrate.entry.ICapability;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 public final class AllCapabilities {
-    public static final CapabilityEntry<UpdateHelper> UPDATE_HELPER;
-    public static final CapabilityEntry<EventManager> EVENT_MANAGER;
-    public static final CapabilityEntry<IProcessor> PROCESSOR;
-    public static final CapabilityEntry<IContainer> CONTAINER;
-    public static final CapabilityEntry<IElectricMachine> ELECTRIC_MACHINE;
-    public static final CapabilityEntry<IWorkbench> WORKBENCH;
-    public static final CapabilityEntry<IFluidStackHandler> FLUID_STACK_HANDLER;
-    public static final CapabilityEntry<IItemHandlerModifiable> MENU_ITEM_HANDLER;
+    public static final ICapability<IItemHandler> ITEM_HANDLER;
+    public static final ICapability<IEventManager> EVENT_MANAGER;
 
-    public static final CapabilityEntry<Machine> MACHINE;
-    public static final CapabilityEntry<MultiBlock> MULTI_BLOCK;
+    public static final ICapability<IProcessor> PROCESSOR;
+    public static final ICapability<IContainer> CONTAINER;
+    public static final ICapability<IElectricMachine> ELECTRIC_MACHINE;
+    public static final ICapability<IFluidStackHandler> FLUID_STACK_HANDLER;
+    public static final ICapability<IItemHandlerModifiable> MENU_ITEM_HANDLER;
+
+    public static final ICapability<ILayoutProvider> LAYOUT_PROVIDER;
+    public static final ICapability<IMachine> MACHINE;
 
     static {
-        UPDATE_HELPER = REGISTRATE.capability(UpdateHelper.class, new CapabilityToken<>() {});
-        EVENT_MANAGER = REGISTRATE.capability(EventManager.class, new CapabilityToken<>() {});
+        ITEM_HANDLER = REGISTRATE.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        EVENT_MANAGER = REGISTRATE.getCapability(new CapabilityToken<>() {});
+
         PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
         CONTAINER = REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
         ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
-        WORKBENCH = REGISTRATE.capability(IWorkbench.class, new CapabilityToken<>() {});
         FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
         MENU_ITEM_HANDLER = REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
 
-        MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
-        MULTI_BLOCK = REGISTRATE.capability(MultiBlock.class, new CapabilityToken<>() {});
+        LAYOUT_PROVIDER = REGISTRATE.capability(ILayoutProvider.class, new CapabilityToken<>() {});
+        MACHINE = REGISTRATE.capability(IMachine.class, new CapabilityToken<>() {});
     }
 
     public static void init() {}

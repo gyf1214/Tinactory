@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.multiblock;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -11,20 +12,20 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
+import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class MultiBlockInterfaceBlock extends SidedMachineBlock<SmartBlockEntity> {
+public class MultiBlockInterfaceBlock extends SidedMachineBlock {
     public static final BooleanProperty JOINED = BooleanProperty.create("joined");
 
     public MultiBlockInterfaceBlock(Properties properties,
-        Supplier<SmartBlockEntityType<SmartBlockEntity>> entityType,
-        Voltage voltage) {
-        super(properties, entityType, voltage);
+        Supplier<IBlockEntityType> entityType,
+        @Nullable IMenuType menu, Voltage voltage) {
+        super(properties, entityType, menu, voltage);
     }
 
     @Override

@@ -5,16 +5,19 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import org.shsts.tinactory.core.gui.Menu;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Tab extends Panel {
@@ -30,7 +33,7 @@ public class Tab extends Panel {
         private final int index;
         private final ItemStack icon;
 
-        public TabButton(Menu<?, ?> menu, int index, ItemStack icon) {
+        public TabButton(IMenu menu, int index, ItemStack icon) {
             super(menu);
             this.index = index;
             this.icon = icon;
@@ -57,7 +60,7 @@ public class Tab extends Panel {
     private final List<Panel> tabPanels = new ArrayList<>();
     private int currentTab = 0;
 
-    public Tab(MenuScreen<?> screen, Object... args) {
+    public Tab(MenuScreen screen, Object... args) {
         super(screen);
 
         for (var i = 0; i < args.length; i++) {
@@ -68,7 +71,7 @@ public class Tab extends Panel {
             if (i + 1 < args.length) {
                 if (args[i + 1] instanceof ItemLike item) {
                     icon = new ItemStack(item);
-                } else if (args[i + 1] instanceof RegistryEntry<?> entry) {
+                } else if (args[i + 1] instanceof IEntry<?> entry) {
                     icon = new ItemStack((ItemLike) entry.get());
                 }
                 i++;

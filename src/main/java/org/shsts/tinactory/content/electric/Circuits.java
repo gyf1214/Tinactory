@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,14 +18,14 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public final class Circuits {
     private record CircuitKey(CircuitTier tier, CircuitLevel level) {}
 
-    private static final Map<CircuitKey, RegistryEntry<Item>> CIRCUITS = new HashMap<>();
+    private static final Map<CircuitKey, IEntry<Item>> CIRCUITS = new HashMap<>();
 
     private record ComponentKey(String component, CircuitComponentTier tier) {}
 
-    private static final Map<ComponentKey, RegistryEntry<Item>> COMPONENTS = new HashMap<>();
+    private static final Map<ComponentKey, IEntry<Item>> COMPONENTS = new HashMap<>();
 
-    private static final Map<CircuitTier, RegistryEntry<Item>> BOARDS = new HashMap<>();
-    private static final Map<CircuitTier, RegistryEntry<Item>> CIRCUIT_BOARDS = new HashMap<>();
+    private static final Map<CircuitTier, IEntry<Item>> BOARDS = new HashMap<>();
+    private static final Map<CircuitTier, IEntry<Item>> CIRCUIT_BOARDS = new HashMap<>();
 
     public static class CircuitComponent {
         private final String component;
@@ -35,10 +35,10 @@ public final class Circuits {
         }
 
         public ResourceLocation loc(CircuitComponentTier tier) {
-            return item(tier).loc;
+            return item(tier).loc();
         }
 
-        public RegistryEntry<Item> item(CircuitComponentTier tier) {
+        public IEntry<Item> item(CircuitComponentTier tier) {
             return COMPONENTS.get(new ComponentKey(component, tier));
         }
 
@@ -53,14 +53,14 @@ public final class Circuits {
 
     public static class Circuit {
         private final CircuitKey key;
-        private final RegistryEntry<Item> item;
+        private final IEntry<Item> item;
 
-        private Circuit(CircuitKey key, RegistryEntry<Item> item) {
+        private Circuit(CircuitKey key, IEntry<Item> item) {
             this.key = key;
             this.item = item;
         }
 
-        public RegistryEntry<Item> item() {
+        public IEntry<Item> item() {
             return item;
         }
 
@@ -76,7 +76,7 @@ public final class Circuits {
             return key.level;
         }
 
-        public RegistryEntry<Item> circuitBoard() {
+        public IEntry<Item> circuitBoard() {
             return CIRCUIT_BOARDS.get(key.tier);
         }
     }
@@ -87,7 +87,7 @@ public final class Circuits {
 
     @FunctionalInterface
     public interface ForEachConsumer {
-        void accept(CircuitTier tier, CircuitLevel level, RegistryEntry<Item> item);
+        void accept(CircuitTier tier, CircuitLevel level, IEntry<Item> item);
     }
 
     public static void forEach(ForEachConsumer cons) {
@@ -98,7 +98,7 @@ public final class Circuits {
 
     @FunctionalInterface
     public interface ForEachComponentConsumer {
-        void accept(String component, CircuitComponentTier tier, RegistryEntry<Item> item);
+        void accept(String component, CircuitComponentTier tier, IEntry<Item> item);
     }
 
     public static void forEachComponent(ForEachComponentConsumer cons) {
@@ -136,11 +136,11 @@ public final class Circuits {
         }
     }
 
-    public static RegistryEntry<Item> board(CircuitTier tier) {
+    public static IEntry<Item> board(CircuitTier tier) {
         return BOARDS.get(tier);
     }
 
-    public static RegistryEntry<Item> circuitBoard(CircuitTier tier) {
+    public static IEntry<Item> circuitBoard(CircuitTier tier) {
         return CIRCUIT_BOARDS.get(tier);
     }
 }

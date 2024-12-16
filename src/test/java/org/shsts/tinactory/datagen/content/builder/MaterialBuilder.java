@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.datafixers.util.Unit;
 import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,14 +22,14 @@ import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.OreVariant;
+import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.datagen.DataGen;
-import org.shsts.tinactory.datagen.builder.DataBuilder;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.model.IconSet;
-import org.shsts.tinactory.datagen.context.RegistryDataContext;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+import org.shsts.tinycorelib.datagen.api.IDataGen;
+import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -70,14 +71,14 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.oreBlock;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
+public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static ResourceLocation toolTex(String sub) {
@@ -93,15 +94,23 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         .put("wire_cutter", "wire_cutter_base")
         .build();
 
+    private final IDataGen dataGen;
     private final MaterialSet material;
     @Nullable
     private IconSet icon = null;
     private boolean hasProcess = false;
     private boolean hasOreProcess = false;
 
-    public MaterialBuilder(DataGen dataGen, P parent, MaterialSet material) {
-        super(dataGen, parent, material.name);
+    private MaterialBuilder(IDataGen dataGen, P parent, MaterialSet material) {
+        super(parent);
+        this.dataGen = dataGen;
         this.material = material;
+    }
+
+    public static <P> MaterialBuilder<P> factory(IDataGen dataGen,
+        P parent, MaterialSet material) {
+        var builder = new MaterialBuilder<>(dataGen, parent, material);
+        return builder.onBuild(builder::onRegister);
     }
 
     public MaterialBuilder<P> icon(IconSet value) {
@@ -155,7 +164,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             return Math.round(ticks * factor);
         }
 
-        private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
+        private void process(IRecipeType<ProcessingRecipe.Builder> recipeType,
             String result, int count, String input, long workTicks) {
             if (!material.hasItem(result) || !material.hasItem(input)) {
                 return;
@@ -258,7 +267,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             }
             var fluid = material.fluidEntry();
 
-            EXTRACTOR.recipe(DATA_GEN, suffix(fluid.loc, "_from_" + sub))
+            EXTRACTOR.recipe(DATA_GEN, suffix(material.fluidLoc(), "_from_" + sub))
                 .outputFluid(2, fluid, material.fluidAmount(amount))
                 .inputItem(0, material.tag(sub), 1)
                 .voltage(v)
@@ -386,7 +395,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     }
 
     public MaterialBuilder<P> smelt(MaterialSet to) {
-        dataGen.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(material.tag("dust")), to.item("ingot"), 0, 200)
             .unlockedBy("has_material", has(material.tag("dust"))), "_from_" + material.name);
         return this;
@@ -399,7 +408,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             source = mat;
             suffix = "_from_" + source.name;
         }
-        BLAST_FURNACE.recipe(dataGen, suffix(material.loc("ingot"), suffix))
+        BLAST_FURNACE.recipe(DATA_GEN, suffix(material.loc("ingot"), suffix))
             .outputItem(2, material.entry("ingot"), 1)
             .inputItem(0, source.tag("dust"), 1)
             .voltage(v)
@@ -409,10 +418,9 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return this;
     }
 
-    private <U extends ProcessingRecipe, B extends ProcessingRecipe.BuilderBase<U, B>> void compose(
-        Voltage v, RecipeTypeEntry<U, B> recipeType, int outputPort,
-        boolean decompose, long workTicks, String output, Object... components) {
-        var loc = output.equals("fluid") ? material.fluidEntry().loc : material.loc(output);
+    private void compose(Voltage v, IRecipeType<ProcessingRecipe.Builder> recipeType,
+        int outputPort, boolean decompose, long workTicks, String output, Object... components) {
+        var loc = output.equals("fluid") ? material.fluidLoc() : material.loc(output);
 
         var alloyCount = 0;
         var totalCount = 0;
@@ -423,7 +431,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             i = 1;
         }
 
-        var builder = recipeType.recipe(dataGen, loc)
+        var builder = recipeType.recipe(DATA_GEN, loc)
             .voltage(v);
 
         for (; i < components.length; i += 2) {
@@ -515,7 +523,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         return oreBuilder(byproduct).primitive().build();
     }
 
-    private <U extends Item> Consumer<RegistryDataContext<Item, U, ItemModelProvider>> toolModel(String sub) {
+    private <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> toolModel(String sub) {
         var category = sub.substring("tool/".length());
         var handle = Optional.ofNullable(TOOL_HANDLE_TEX.get(category))
             .map(MaterialBuilder::toolTex)
@@ -558,7 +566,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         }
 
         var entry = material.entry(sub);
-        if (entry instanceof RegistryEntry<?>) {
+        if (entry instanceof IEntry<? extends Item>) {
             // build item data for new item
             newItem(sub, tag, entry);
         } else {
@@ -569,10 +577,12 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
 
     private void buildOre() {
         var variant = material.oreVariant();
+        var tierTag = variant.mineTier.getTag();
+        assert tierTag != null;
         dataGen.block(material.blockLoc("ore"), material.blockEntry("ore"))
             .blockState(oreBlock(variant))
             .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-            .tag(variant.mineTier.getTag())
+            .tag(tierTag)
             .drop(material.entry("raw"))
             .build();
     }
@@ -653,7 +663,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         if (args.length > materialCount) {
             toolProcess(result, count, patterns, materialCount, args);
         } else {
-            dataGen.vanillaRecipe(() -> shapedProcess(result, count, patterns, args));
+            DATA_GEN.vanillaRecipe(() -> shapedProcess(result, count, patterns, args));
         }
     }
 
@@ -665,7 +675,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         if (!material.hasItem(output) || !material.hasItem(input)) {
             return;
         }
-        dataGen.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(material.tag(input)), material.item(output), 0, 200)
             .unlockedBy("has_material", has(material.tag(input))));
     }
@@ -714,7 +724,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         }
 
         private void crush(String output, String input) {
-            MACERATOR.recipe(dataGen, suffix(material.loc(output), "_from_centrifuged"))
+            MACERATOR.recipe(DATA_GEN, suffix(material.loc(output), "_from_centrifuged"))
                 .inputItem(0, material.tag(input), 1)
                 .outputItem(1, material.entry(output), input.equals("raw") ? 2 * amount : 1)
                 .voltage(Voltage.LV)
@@ -727,7 +737,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             if (input.equals("dust_pure")) {
                 loc = suffix(loc, "_from_pure");
             }
-            var builder = ORE_WASHER.recipe(dataGen, loc)
+            var builder = ORE_WASHER.recipe(DATA_GEN, loc)
                 .inputItem(0, material.tag(input), 1)
                 .outputItem(2, material.entry(output), 1);
             if (input.equals("crushed")) {
@@ -766,7 +776,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
             wash("dust", "dust_impure");
             wash("dust", "dust_pure");
 
-            CENTRIFUGE.recipe(dataGen, material.loc("dust_pure"))
+            CENTRIFUGE.recipe(DATA_GEN, material.loc("dust_pure"))
                 .inputItem(0, material.tag("dust_pure"), 1)
                 .outputItem(2, material.entry("dust"), 1)
                 .outputItem(2, byproduct1, 1, 0.3d)
@@ -774,14 +784,14 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                 .workTicks(80)
                 .build();
 
-            THERMAL_CENTRIFUGE.recipe(dataGen, material.loc("crushed_centrifuged"))
+            THERMAL_CENTRIFUGE.recipe(DATA_GEN, material.loc("crushed_centrifuged"))
                 .inputItem(0, material.tag("crushed_purified"), 1)
                 .outputItem(1, material.entry("crushed_centrifuged"), 1)
                 .outputItem(1, byproduct2, 1, 0.4d)
                 .build();
 
             if (material.hasItem("gem")) {
-                SIFTER.recipe(dataGen, material.loc("crushed_purified"))
+                SIFTER.recipe(DATA_GEN, material.loc("crushed_purified"))
                     .inputItem(0, material.tag("crushed_purified"), 1)
                     .outputItem(1, material.entry("gem_flawless"), 1, 0.1d)
                     .outputItem(1, material.entry("gem"), 1, 0.35d)
@@ -790,7 +800,7 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
                     .workTicks(600L)
                     .build();
             } else if (hammerPrimary) {
-                SIFTER.recipe(dataGen, material.loc("crushed_purified"))
+                SIFTER.recipe(DATA_GEN, material.loc("crushed_purified"))
                     .inputItem(0, material.tag("crushed_purified"), 1)
                     .outputItem(1, material.entry("primary"), 1, 0.8d)
                     .outputItem(1, material.entry("primary"), 1, 0.35d)
@@ -817,7 +827,11 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
     }
 
     @Override
-    protected void register() {
+    protected Unit createObject() {
+        return Unit.INSTANCE;
+    }
+
+    private void onRegister() {
         for (var sub : material.itemSubs()) {
             buildItem(sub);
         }
@@ -826,11 +840,11 @@ public class MaterialBuilder<P> extends DataBuilder<P, MaterialBuilder<P>> {
         }
 
         if (material.hasItem("dust") && material.hasItem("dust_tiny")) {
-            dataGen.vanillaRecipe(() -> ShapelessRecipeBuilder
+            DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(material.item("dust_tiny"), 9)
                 .requires(material.tag("dust"))
                 .unlockedBy("has_dust", has(material.tag("dust"))));
-            dataGen.vanillaRecipe(() -> ShapelessRecipeBuilder
+            DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(material.item("dust"))
                 .requires(Ingredient.of(material.tag("dust_tiny")), 9)
                 .unlockedBy("has_dust_small", has(material.tag("dust_tiny"))));

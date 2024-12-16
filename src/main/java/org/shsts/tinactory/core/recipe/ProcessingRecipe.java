@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -16,28 +17,35 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.core.common.SmartRecipe;
-import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinactory.core.builder.RecipeBuilder;
+import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinycorelib.api.recipe.IRecipe;
+import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingRecipe extends SmartRecipe<IContainer> {
+public class ProcessingRecipe implements IRecipe<IMachine> {
     public record Input(int port, IProcessingIngredient ingredient) {}
 
     public record Output(int port, IProcessingResult result) {}
 
+    protected final ResourceLocation loc;
     public final List<Input> inputs;
     public final List<Output> outputs;
 
@@ -46,7 +54,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     public final long power;
 
     protected ProcessingRecipe(BuilderBase<?, ?> builder) {
-        super(builder.getType(), builder.loc);
+        this.loc = builder.loc;
         this.inputs = builder.getInputs();
         this.outputs = builder.getOutputs();
         this.workTicks = builder.workTicks;
@@ -63,15 +71,34 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         return output.result.insertPort(container.getPort(output.port, true), random, simulate);
     }
 
-    @Override
-    public boolean matches(IContainer container, Level world) {
-        return canCraftIn(container) &&
-            inputs.stream().allMatch(input -> consumeInput(container, input, true)) &&
-            outputs.stream().allMatch(output -> insertOutput(container, output, world.random, true));
+    protected boolean matchInputs(IContainer container) {
+        return inputs.stream().allMatch(input -> consumeInput(container, input, true));
     }
 
-    public boolean canCraftInVoltage(long voltage) {
-        return this.voltage <= voltage;
+    protected boolean matchOutputs(IContainer container, Random random) {
+        return outputs.stream().allMatch(output -> insertOutput(container, output, random, true));
+    }
+
+    protected boolean matchTeam(Optional<ITeamProfile> team) {
+        return true;
+    }
+
+    protected boolean matchElectric(Optional<IElectricMachine> electric) {
+        return voltage <= electric.map(IElectricMachine::getVoltage).orElse(0L);
+    }
+
+    /**
+     * Whether the machine can craft the recipe regardless of input or output;
+     */
+    public boolean canCraft(IMachine machine) {
+        return matchTeam(machine.owner()) && matchElectric(machine.electric());
+    }
+
+    @Override
+    public boolean matches(IMachine machine, Level world) {
+        var container = machine.container();
+        return canCraft(machine) &&
+            container.filter($ -> matchInputs($) && matchOutputs($, world.random)).isPresent();
     }
 
     public void consumeInputs(IContainer container) {
@@ -87,13 +114,20 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     }
 
     @Override
-    public ItemStack getResultItem() {
-        var output = getDisplay();
-        if (output instanceof ProcessingResults.ItemResult item) {
-            return item.stack;
-        } else {
-            return ItemStack.EMPTY;
-        }
+    public ResourceLocation loc() {
+        return loc;
+    }
+
+    protected static String getDescriptionId(ResourceLocation loc) {
+        return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
+    }
+
+    public Optional<String> getDescriptionId() {
+        return Optional.empty();
+    }
+
+    public Optional<Component> getDescription() {
+        return getDescriptionId().map(I18n::tr);
     }
 
     public IProcessingObject getDisplay() {
@@ -108,8 +142,8 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
     }
 
-    public abstract static class BuilderBase<U extends ProcessingRecipe, S extends BuilderBase<U, S>>
-        extends SmartRecipeBuilder<U, S> {
+    protected abstract static class BuilderBase<R extends ProcessingRecipe, S extends BuilderBase<R, S>>
+        extends RecipeBuilder<R, S> {
         protected final List<Supplier<Input>> inputs = new ArrayList<>();
         protected final List<Supplier<Output>> outputs = new ArrayList<>();
         protected long workTicks = 0;
@@ -117,12 +151,8 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         protected long power = 0;
         protected double amperage = 0d;
 
-        public BuilderBase(IRecipeDataConsumer consumer, RecipeTypeEntry<U, S> parent, ResourceLocation loc) {
-            super(consumer, parent, loc);
-        }
-
-        public S autoVoid() {
-            return self();
+        protected BuilderBase(IRecipeType<S> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         public S input(int port, Supplier<IProcessingIngredient> ingredient) {
@@ -222,10 +252,6 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
             return self();
         }
 
-        protected RecipeTypeEntry<U, S> getType() {
-            return parent;
-        }
-
         protected List<Input> getInputs() {
             return inputs.stream().map(Supplier::get).toList();
         }
@@ -240,7 +266,7 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
 
         @Override
-        public U buildObject() {
+        public R buildObject() {
             if (power <= 0) {
                 var voltage = this.voltage == 0 ? Voltage.ULV.value : this.voltage;
                 power = (long) (amperage * voltage);
@@ -251,9 +277,8 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
     }
 
     public static class Builder extends BuilderBase<ProcessingRecipe, Builder> {
-        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<ProcessingRecipe, Builder> parent,
-            ResourceLocation loc) {
-            super(consumer, parent, loc);
+        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         @Override
@@ -262,13 +287,9 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
     }
 
-    protected static class Serializer<T extends ProcessingRecipe, B extends BuilderBase<T, B>>
-        extends SmartRecipeSerializer<T, B> {
-        protected Serializer(RecipeTypeEntry<T, B> type) {
-            super(type);
-        }
-
-        protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
+    protected static class Serializer<R extends ProcessingRecipe, B extends BuilderBase<R, B>>
+        implements IRecipeSerializer<R, B> {
+        protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
             var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                 .map(JsonElement::getAsJsonObject)
@@ -287,12 +308,12 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
 
         @Override
-        public T fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
-            return buildFromJson(loc, jo).buildObject();
+        public R fromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
+            return buildFromJson(type, loc, jo).buildObject();
         }
 
         @Override
-        public void toJson(JsonObject jo, T recipe) {
+        public void toJson(JsonObject jo, R recipe) {
             var inputs = new JsonArray();
             recipe.inputs.stream()
                 .map(input -> {
@@ -317,6 +338,5 @@ public class ProcessingRecipe extends SmartRecipe<IContainer> {
         }
     }
 
-    public static final SmartRecipeSerializer.Factory<ProcessingRecipe, Builder>
-        SERIALIZER = Serializer::new;
+    public static final IRecipeSerializer<ProcessingRecipe, Builder> SERIALIZER = new Serializer<>();
 }

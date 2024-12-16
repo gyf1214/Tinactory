@@ -8,10 +8,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
-import org.shsts.tinactory.api.network.IScheduling;
-import org.shsts.tinactory.content.AllNetworks;
+import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.slf4j.Logger;
@@ -21,9 +20,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.DoublePredicate;
-import java.util.function.Supplier;
+
+import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_SCHEDULING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -37,7 +36,7 @@ public class ElectricComponent extends NetworkComponent {
         public double bGen, bCons;
         public double pGen, pCons;
 
-        public List<Subnet> children = new ArrayList<>();
+        public final List<Subnet> children = new ArrayList<>();
 
         public Subnet(BlockPos center) {
             this.center = center;
@@ -114,7 +113,7 @@ public class ElectricComponent extends NetworkComponent {
     private double workFactor;
     private double bufferFactor;
 
-    public ElectricComponent(ComponentType<?> type, Network network) {
+    public ElectricComponent(ComponentType<?> type, INetwork network) {
         super(type, network);
     }
 
@@ -133,7 +132,7 @@ public class ElectricComponent extends NetworkComponent {
     @Override
     public void onConnect() {
         Subnet root = null;
-        for (var entry : network.getAllBlocks()) {
+        for (var entry : network.allBlocks()) {
             var child = entry.getKey();
             var parent = entry.getValue();
             if (parent.equals(child)) {
@@ -187,8 +186,8 @@ public class ElectricComponent extends NetworkComponent {
         for (var sub : subnets.values()) {
             sub.reset();
         }
-        for (var entry : network.getAllMachines().entries()) {
-            entry.getValue().getElectric().ifPresent(electric -> {
+        for (var entry : network.allMachines().entries()) {
+            entry.getValue().electric().ifPresent(electric -> {
                 var sub = subnets.get(entry.getKey());
 
                 switch (electric.getMachineType()) {
@@ -249,7 +248,7 @@ public class ElectricComponent extends NetworkComponent {
     }
 
     @Override
-    public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Ticker> cons) {
-        cons.accept(AllNetworks.ELECTRIC_SCHEDULING, ($1, $2) -> solveNetwork());
+    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(ELECTRIC_SCHEDULING.get(), ($1, $2) -> solveNetwork());
     }
 }

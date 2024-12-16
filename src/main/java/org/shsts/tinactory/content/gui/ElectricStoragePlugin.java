@@ -6,23 +6,23 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.machine.MachineConfig;
-import org.shsts.tinactory.core.gui.IMenuPlugin;
-import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.LayoutPlugin;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.util.I18n.tr;
@@ -31,20 +31,23 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricStoragePlugin<M extends Menu<?, M>> implements IMenuPlugin<M> {
-    private final M menu;
-    private final int buttonY;
-    private final MachineConfig machineConfig;
+public class ElectricStoragePlugin extends LayoutPlugin<MenuScreen> {
+    protected final IMachine machine;
+    private final IMachineConfig machineConfig;
 
-    public ElectricStoragePlugin(M menu) {
-        this.menu = menu;
+    protected ElectricStoragePlugin(IMenu menu) {
+        super(menu, SLOT_SIZE + SPACING);
+        this.machine = MACHINE.get(menu.blockEntity());
+        this.machineConfig = machine.config();
 
-        this.buttonY = menu.getHeight() + MARGIN_VERTICAL;
-        menu.setHeight(buttonY + SLOT_SIZE);
+        menu.setValidPredicate(() -> machine.canPlayerInteract(menu.player()));
+        menu.onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
+    }
 
-        var machine = AllCapabilities.MACHINE.get(menu.blockEntity);
-        this.machineConfig = machine.config;
-        menu.onEventPacket(MenuEventHandler.SET_MACHINE_CONFIG, machine::setConfig);
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public Class<MenuScreen> menuScreenClass() {
+        return MenuScreen.class;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -89,7 +92,7 @@ public class ElectricStoragePlugin<M extends Menu<?, M>> implements IMenuPlugin<
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             super.onMouseClicked(mouseX, mouseY, button);
             var val = !machineConfig.getBoolean(configKey);
-            menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG,
+            menu.triggerEvent(SET_MACHINE_CONFIG,
                 SetMachineConfigPacket.builder().set(configKey, val));
         }
     }
@@ -130,7 +133,7 @@ public class ElectricStoragePlugin<M extends Menu<?, M>> implements IMenuPlugin<
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             super.onMouseClicked(mouseX, mouseY, button);
             var val = !machineConfig.getBoolean(configKey);
-            menu.triggerEvent(MenuEventHandler.SET_MACHINE_CONFIG,
+            menu.triggerEvent(SET_MACHINE_CONFIG,
                 SetMachineConfigPacket.builder().set(configKey, val));
         }
     }
@@ -140,9 +143,12 @@ public class ElectricStoragePlugin<M extends Menu<?, M>> implements IMenuPlugin<
     private static final Texture GLOBAL_TEX = new Texture(
         gregtech("gui/widget/button_distinct_buses"), 18, 36);
 
-    @OnlyIn(Dist.CLIENT)
     @Override
-    public void applyMenuScreen(MenuScreen<M> screen) {
+    @OnlyIn(Dist.CLIENT)
+    public void applyMenuScreen(MenuScreen screen) {
+        super.applyMenuScreen(screen);
+
+        var buttonY = layout.rect.endY() + SPACING;
         var offset = new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE);
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
         screen.addWidget(anchor, offset, new SwitchButton("unlockChest", LOCK_TEX,

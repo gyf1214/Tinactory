@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -8,45 +7,52 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+
+import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StackProcessingContainer extends CapabilityProvider
-    implements IContainer, INBTSerializable<CompoundTag> {
+    implements IContainer, ILayoutProvider, INBTSerializable<CompoundTag> {
+    public static final String ID = "logistics/stack_container";
+
     private record PortInfo(SlotType type, IPort externalPort, IPort internalPort) {
         public static final PortInfo EMPTY = new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
     }
 
     private final BlockEntity blockEntity;
+    private final Layout layout;
     private final WrapperItemHandler internalItems;
     private final CombinedFluidTank combinedFluids;
     private final List<PortInfo> ports;
@@ -55,8 +61,10 @@ public class StackProcessingContainer extends CapabilityProvider
     private final LazyOptional<?> menuItemHandlerCap;
     private final LazyOptional<?> fluidHandlerCap;
 
-    private StackProcessingContainer(BlockEntity blockEntity, List<Layout.PortInfo> portInfo) {
+    private StackProcessingContainer(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
+        this.layout = layout;
+        var portInfo = layout.ports;
         this.ports = new ArrayList<>(portInfo.size());
 
         var itemSlots = 0;
@@ -136,8 +144,12 @@ public class StackProcessingContainer extends CapabilityProvider
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
     }
 
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
+        return $ -> $.capability(ID, be -> new StackProcessingContainer(be, layout));
+    }
+
     private void onUpdate() {
-        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE);
+        invoke(blockEntity, CONTAINER_CHANGE);
         blockEntity.setChanged();
     }
 
@@ -148,8 +160,7 @@ public class StackProcessingContainer extends CapabilityProvider
         if (world.isClientSide) {
             return TechManager.localTeam();
         } else {
-            return AllCapabilities.MACHINE.tryGet(blockEntity)
-                .flatMap(Machine::getOwnerTeam);
+            return MACHINE.tryGet(blockEntity).flatMap(IMachine::owner);
         }
     }
 
@@ -178,16 +189,20 @@ public class StackProcessingContainer extends CapabilityProvider
         return internal ? portInfo.internalPort : portInfo.externalPort;
     }
 
-    @Nonnull
+    @Override
+    public Layout getLayout() {
+        return layout;
+    }
+
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.CONTAINER.get()) {
+        if (cap == LAYOUT_PROVIDER.get() || cap == CONTAINER.get()) {
             return myself();
-        } else if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
+        } else if (cap == FLUID_STACK_HANDLER.get()) {
             return fluidHandlerCap.cast();
-        } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        } else if (cap == ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
-        } else if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
+        } else if (cap == MENU_ITEM_HANDLER.get()) {
             return menuItemHandlerCap.cast();
         }
         return LazyOptional.empty();
@@ -205,33 +220,5 @@ public class StackProcessingContainer extends CapabilityProvider
     public void deserializeNBT(CompoundTag tag) {
         StackHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
-    }
-
-    public static class Builder<P> extends CapabilityProviderBuilder<BlockEntity, P> {
-        private final List<Layout.PortInfo> ports = new ArrayList<>();
-
-        public Builder(P parent) {
-            super(parent, "logistics/stack_container");
-        }
-
-        public Builder<P> layout(Layout layout) {
-            ports.clear();
-            ports.addAll(layout.ports);
-            return this;
-        }
-
-        @Override
-        protected Function<BlockEntity, ICapabilityProvider> createObject() {
-            var ports = this.ports;
-            return be -> new StackProcessingContainer(be, ports);
-        }
-    }
-
-    public static <P> Builder<P> builder(P parent) {
-        return new Builder<>(parent);
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Layout layout) {
-        return p -> builder(p).layout(layout);
     }
 }

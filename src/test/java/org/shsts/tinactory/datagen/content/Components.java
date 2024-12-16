@@ -21,7 +21,7 @@ import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;
 import java.util.Map;
@@ -110,11 +110,11 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
 import static org.shsts.tinactory.datagen.content.Models.solidBlock;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -171,12 +171,13 @@ public final class Components {
                 .build();
         }
 
-        Stream.concat(BOULES.stream(), RAW_WAFERS.stream()).forEach(entry -> DATA_GEN.item(entry)
-            .model(basicItem("metaitems/" + entry.id
-                .replace('/', '.')
-                .replace("wafer_raw.", "wafer.")
-                .replace("glowstone", "phosphorus")))
-            .build());
+        Stream.concat(BOULES.stream(), RAW_WAFERS.stream())
+            .forEach(entry -> DATA_GEN.item(entry)
+                .model(basicItem("metaitems/" + entry.id()
+                    .replace('/', '.')
+                    .replace("wafer_raw.", "wafer.")
+                    .replace("glowstone", "phosphorus")))
+                .build());
 
         chip("integrated_circuit", "integrated_logic_circuit");
         chip("cpu", "central_processing_unit");
@@ -198,17 +199,18 @@ public final class Components {
     }
 
     private static void chip(String name, String tex) {
-        List.of(WAFERS.get(name), CHIPS.get(name)).forEach(entry -> DATA_GEN.item(entry)
-            .model(basicItem("metaitems/" + entry.id
-                .replace('/', '.')
-                .replace("chip.", "plate.")
-                .replace(name, tex)))
-            .build());
+        List.of(WAFERS.get(name), CHIPS.get(name))
+            .forEach(entry -> DATA_GEN.item(entry)
+                .model(basicItem("metaitems/" + entry.id()
+                    .replace('/', '.')
+                    .replace("chip.", "plate.")
+                    .replace(name, tex)))
+                .build());
     }
 
     private static void circuits() {
         Circuits.forEach((tier, level, item) -> DATA_GEN.item(item)
-            .model(basicItem("metaitems/" + item.id.replace('/', '.')))
+            .model(basicItem("metaitems/" + item.id().replace('/', '.')))
             .tag(AllTags.circuit(Circuits.getVoltage(tier, level)))
             .build());
         Circuits.forEachComponent((component, tier, item) -> {
@@ -245,13 +247,13 @@ public final class Components {
             .build();
 
         SOLID_CASING.forEach(block -> DATA_GEN.block(block)
-            .blockState(solidBlock("casings/solid/machine_casing_" + name(block.id, -1)))
+            .blockState(solidBlock("casings/solid/machine_casing_" + name(block.id(), -1)))
             .tag(MINEABLE_WITH_WRENCH)
             .build());
 
         COIL_BLOCKS.forEach(coil -> DATA_GEN.block(coil)
-            .blockState(solidBlock("casings/coils/machine_coil_" + name(coil.id, -1)))
-            .tag(COIL, MINEABLE_WITH_WRENCH)
+            .blockState(solidBlock("casings/coils/machine_coil_" + name(coil.id(), -1)))
+            .tag(List.of(COIL, MINEABLE_WITH_WRENCH))
             .build());
 
         DATA_GEN.block(GRATE_MACHINE_CASING)
@@ -261,7 +263,7 @@ public final class Components {
 
         FLUID_CELL.forEach((v, item) -> {
             var texBase = v == Voltage.ULV ? "metaitems/fluid_cell" :
-                "metaitems/large_fluid_cell." + name(item.id, -1);
+                "metaitems/large_fluid_cell." + name(item.id(), -1);
             DATA_GEN.item(item)
                 .model(basicItem(texBase + "/base", texBase + "/overlay"))
                 .build();
@@ -345,7 +347,7 @@ public final class Components {
         }
 
         public AssemblyRecipeBuilder<ComponentRecipeFactory> recipe(
-            Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> component, int count) {
+            Map<Voltage, ? extends IEntry<? extends ItemLike>> component, int count) {
             if (!component.containsKey(voltage)) {
                 return new AssemblyRecipeBuilder<>(this);
             }
@@ -357,7 +359,7 @@ public final class Components {
         }
 
         public AssemblyRecipeBuilder<ComponentRecipeFactory> recipe(
-            Map<Voltage, ? extends RegistryEntry<? extends ItemLike>> component) {
+            Map<Voltage, ? extends IEntry<? extends ItemLike>> component) {
             return recipe(component, 1);
         }
     }
@@ -459,7 +461,7 @@ public final class Components {
             .voltage(voltage);
     }
 
-    private static void buzzsawRecipe(RegistryEntry<Item> item, MaterialSet material, Voltage v) {
+    private static void buzzsawRecipe(IEntry<Item> item, MaterialSet material, Voltage v) {
         LATHE.recipe(DATA_GEN, item)
             .outputItem(1, item, 1)
             .inputItem(0, material.tag("gear"), 1)
@@ -655,7 +657,7 @@ public final class Components {
             }
             var j = i - level;
             var raw = RAW_WAFERS.get(i);
-            LASER_ENGRAVER.recipe(DATA_GEN, suffix(wafer.loc, "_from_" + name(raw.id, -1)))
+            LASER_ENGRAVER.recipe(DATA_GEN, suffix(wafer.loc(), "_from_" + name(raw.id(), -1)))
                 .outputItem(2, wafer, 1 << j)
                 .inputItem(0, raw, 1)
                 .inputItemNotConsumed(1, lens.tag("lens"))
@@ -741,7 +743,7 @@ public final class Components {
             .build();
     }
 
-    private static void solidRecipe(RegistryEntry<Block> block, Voltage v, MaterialSet mat,
+    private static void solidRecipe(IEntry<Block> block, Voltage v, MaterialSet mat,
         ResourceLocation tech) {
         ASSEMBLER.recipe(DATA_GEN, block)
             .outputItem(2, block, 1)
@@ -755,7 +757,7 @@ public final class Components {
             .build();
     }
 
-    private static void coilRecipe(RegistryEntry<CoilBlock> coil, Voltage v,
+    private static void coilRecipe(IEntry<CoilBlock> coil, Voltage v,
         MaterialSet wire, MaterialSet foil, ResourceLocation tech) {
         ASSEMBLER.recipe(DATA_GEN, coil)
             .outputItem(2, coil, 1)

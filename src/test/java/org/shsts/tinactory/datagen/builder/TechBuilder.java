@@ -10,8 +10,10 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.datagen.DataGen;
-import org.shsts.tinactory.datagen.handler.TechProvider;
+import org.shsts.tinactory.core.builder.Builder;
+import org.shsts.tinactory.datagen.provider.TechProvider;
+import org.shsts.tinycorelib.api.core.ILoc;
+import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,11 +22,12 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
+public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> implements ILoc {
+    private final ResourceLocation loc;
     private final List<ResourceLocation> depends = new ArrayList<>();
     private long maxProgress = 0;
     private final Map<String, Integer> modifiers = new HashMap<>();
@@ -35,12 +38,15 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     @Nullable
     private Voltage researchVoltage;
 
-    public TechBuilder(DataGen dataGen, P parent, String id) {
-        super(dataGen, parent, id);
+    public TechBuilder(P parent, ResourceLocation loc) {
+        super(parent);
+        this.loc = loc;
     }
 
-    public TechBuilder(DataGen dataGen, P parent, ResourceLocation loc) {
-        super(dataGen, parent, loc);
+    public static <P> TechBuilder<P> factory(IDataHandler<TechProvider> handler,
+        P parent, ResourceLocation loc) {
+        var builder = new TechBuilder<>(parent, loc);
+        return builder.onBuild(() -> builder.onRegister(handler));
     }
 
     public TechBuilder<P> depends(ResourceLocation... loc) {
@@ -83,23 +89,7 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
     }
 
     @Override
-    protected void register() {
-        assert maxProgress > 0;
-        dataGen.techHandler.addTech(this);
-        var description = ITechnology.getDescriptionId(loc);
-        var details = ITechnology.getDetailsId(loc);
-        dataGen.trackLang(description);
-        dataGen.trackLang(details);
-
-        if (researchVoltage != null) {
-            RESEARCH_BENCH.recipe(DATA_GEN, loc)
-                .target(loc)
-                .defaultInput(researchVoltage)
-                .build();
-        }
-    }
-
-    public JsonObject serialize() {
+    protected JsonObject createObject() {
         assert maxProgress > 0;
         var jo = new JsonObject();
         jo.addProperty("max_progress", maxProgress);
@@ -127,5 +117,31 @@ public class TechBuilder<P> extends DataBuilder<P, TechBuilder<P>> {
                 throw new IllegalStateException("Technology at %s does not exist".formatted(loc));
             }
         }
+    }
+
+    @Override
+    public ResourceLocation loc() {
+        return loc;
+    }
+
+    private void onRegister(IDataHandler<TechProvider> handler) {
+        var dataGen = handler.dataGen();
+        handler.addCallback(p -> p.addTech(this));
+        var description = ITechnology.getDescriptionId(loc);
+        var details = ITechnology.getDetailsId(loc);
+        dataGen.trackLang(description);
+        dataGen.trackLang(details);
+
+        if (researchVoltage != null) {
+            RESEARCH_BENCH.recipe(DATA_GEN, loc)
+                .target(loc)
+                .defaultInput(researchVoltage)
+                .build();
+        }
+    }
+
+    public ResourceLocation register() {
+        build();
+        return loc;
     }
 }

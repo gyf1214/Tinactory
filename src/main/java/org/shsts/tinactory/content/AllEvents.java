@@ -6,37 +6,45 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import org.shsts.tinactory.core.common.Event;
-import org.shsts.tinactory.core.common.ReturnEvent;
-import org.shsts.tinactory.core.network.Network;
-import org.shsts.tinactory.core.network.NetworkComponent;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinycorelib.api.blockentity.IEvent;
+import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllRegistries.EVENTS;
+import static org.shsts.tinycorelib.api.CoreLibKeys.CLIENT_LOAD_LOC;
+import static org.shsts.tinycorelib.api.CoreLibKeys.REMOVED_BY_CHUNK_LOC;
+import static org.shsts.tinycorelib.api.CoreLibKeys.REMOVED_IN_WORLD_LOC;
+import static org.shsts.tinycorelib.api.CoreLibKeys.SERVER_LOAD_LOC;
+import static org.shsts.tinycorelib.api.CoreLibKeys.SERVER_TICK_LOC;
 
 public final class AllEvents {
+    public static final IEntry<IEvent<Level>> SERVER_LOAD;
+    public static final IEntry<IEvent<Level>> CLIENT_LOAD;
+    public static final IEntry<IEvent<Level>> REMOVED_IN_WORLD;
+    public static final IEntry<IEvent<Level>> REMOVED_BY_CHUNK;
+    public static final IEntry<IEvent<Level>> SERVER_TICK;
+
     public record OnUseArg(Player player, InteractionHand hand, BlockHitResult hitResult) {}
 
-    public static final RegistryEntry<Event<Level>> SERVER_LOAD;
-    public static final RegistryEntry<Event<Level>> CLIENT_LOAD;
-    public static final RegistryEntry<Event<Level>> REMOVED_IN_WORLD;
-    public static final RegistryEntry<Event<Level>> REMOVED_BY_CHUNK;
-    public static final RegistryEntry<Event<Level>> SERVER_TICK;
-    public static final RegistryEntry<ReturnEvent<OnUseArg, InteractionResult>> SERVER_USE;
+    public static final IEntry<IReturnEvent<AllEvents.OnUseArg, InteractionResult>> SERVER_USE;
+    public static final IEntry<IEvent<Unit>> CONTAINER_CHANGE;
+    public static final IEntry<IEvent<INetwork>> CONNECT;
+    public static final IEntry<IEvent<INetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
+    public static final IEntry<IEvent<Unit>> SET_MACHINE_CONFIG;
 
-    public static final RegistryEntry<Event<Unit>> CONTAINER_CHANGE;
-    public static final RegistryEntry<Event<Network>> CONNECT;
-    public static final RegistryEntry<Event<NetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
-    public static final RegistryEntry<Event<Unit>> SET_MACHINE_CONFIG;
+    private AllEvents() {}
 
     static {
-        SERVER_LOAD = REGISTRATE.event("server_load");
-        CLIENT_LOAD = REGISTRATE.event("client_load");
-        REMOVED_IN_WORLD = REGISTRATE.event("removed_in_world");
-        REMOVED_BY_CHUNK = REGISTRATE.event("removed_by_chunk");
-        SERVER_TICK = REGISTRATE.event("server_tick");
-        SERVER_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
+        SERVER_LOAD = EVENTS.getEntry(SERVER_LOAD_LOC);
+        CLIENT_LOAD = EVENTS.getEntry(CLIENT_LOAD_LOC);
+        REMOVED_IN_WORLD = EVENTS.getEntry(REMOVED_IN_WORLD_LOC);
+        REMOVED_BY_CHUNK = EVENTS.getEntry(REMOVED_BY_CHUNK_LOC);
+        SERVER_TICK = EVENTS.getEntry(SERVER_TICK_LOC);
 
+        SERVER_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
         CONTAINER_CHANGE = REGISTRATE.event("logistics/container_change");
         CONNECT = REGISTRATE.event("network/connect");
         BUILD_SCHEDULING = REGISTRATE.event("network/build_scheduling");

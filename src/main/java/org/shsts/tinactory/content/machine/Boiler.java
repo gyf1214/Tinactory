@@ -6,7 +6,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.ForgeHooks;
@@ -19,22 +18,24 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.List;
-import java.util.function.Function;
 
-import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_TICK;
+import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.core.machine.MachineProcessor.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Boiler extends CapabilityProvider implements
     IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
+    private static final String ID = "machine/boiler";
     private static final double BASE_HEAT = 20d;
     private static final double BURN_HEAT = 100d;
     private static final double BASE_DECAY = 0.0002d;
@@ -53,16 +54,21 @@ public class Boiler extends CapabilityProvider implements
     private long currentBurn = 0L;
     private double leftSteam = 0d;
 
-    public Boiler(BlockEntity blockEntity, double burnSpeed) {
+    private Boiler(BlockEntity blockEntity, double burnSpeed) {
         this.blockEntity = blockEntity;
         this.burnSpeed = burnSpeed;
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
+        double burnSpeed) {
+        return $ -> $.capability(ID, be -> new Boiler(be, burnSpeed));
     }
 
     public double getHeat() {
         return heat;
     }
 
-    private void onLoad(Level world) {
+    private void onLoad() {
         var container = AllCapabilities.CONTAINER.get(blockEntity);
         fuelPort = container.getPort(0, true).asItem();
         waterPort = container.getPort(1, true).asFluid();
@@ -73,9 +79,9 @@ public class Boiler extends CapabilityProvider implements
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onLoad);
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, this::onLoad);
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
     }
 
     @Override
@@ -159,9 +165,5 @@ public class Boiler extends CapabilityProvider implements
         maxBurn = tag.getLong("maxBurn");
         currentBurn = tag.getLong("currentBurn");
         leftSteam = tag.getDouble("leftSteam");
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(double burnSpeed) {
-        return CapabilityProviderBuilder.fromFactory("machine/boiler", be -> new Boiler(be, burnSpeed));
     }
 }

@@ -10,33 +10,40 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinactory.core.machine.ILayoutProvider;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FlexibleStackContainer extends CapabilityProvider
-    implements IFlexibleContainer, INBTSerializable<CompoundTag> {
+    implements IFlexibleContainer, ILayoutProvider, INBTSerializable<CompoundTag> {
+    private static final String ID = StackProcessingContainer.ID;
+
     private final BlockEntity blockEntity;
     private final WrapperItemHandler internalItems;
     private final WrapperItemHandler menuItems;
@@ -48,6 +55,8 @@ public class FlexibleStackContainer extends CapabilityProvider
     private final LazyOptional<?> itemHandlerCap;
     private final LazyOptional<?> menuItemHandlerCap;
     private final LazyOptional<?> fluidHandlerCap;
+
+    private Layout layout = Layout.EMPTY;
 
     public FlexibleStackContainer(BlockEntity blockEntity, int maxItemSlots, int maxFluidSlots) {
         this.blockEntity = blockEntity;
@@ -75,6 +84,11 @@ public class FlexibleStackContainer extends CapabilityProvider
         this.itemHandlerCap = LazyOptional.of(() -> externalItems);
         this.menuItemHandlerCap = LazyOptional.of(() -> menuItems);
         this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, be -> new FlexibleStackContainer(be, 16, 8));
     }
 
     private record PortInfo(SlotType type, IPort port, IPort internal) {}
@@ -121,6 +135,11 @@ public class FlexibleStackContainer extends CapabilityProvider
     }
 
     @Override
+    public Layout getLayout() {
+        return layout;
+    }
+
+    @Override
     public void setLayout(Layout layout) {
         resetLayout();
 
@@ -136,10 +155,12 @@ public class FlexibleStackContainer extends CapabilityProvider
 
             ports.add(portInfo);
         }
+        this.layout = layout;
     }
 
     @Override
     public void resetLayout() {
+        layout = Layout.EMPTY;
         for (var i = 0; i < menuItems.getSlots(); i++) {
             menuItems.disallowInput(i);
             externalItems.setAllowOutput(i, true);
@@ -152,13 +173,13 @@ public class FlexibleStackContainer extends CapabilityProvider
     }
 
     private void onUpdate() {
-        EventManager.invoke(blockEntity, AllEvents.CONTAINER_CHANGE);
+        invoke(blockEntity, CONTAINER_CHANGE);
         blockEntity.setChanged();
     }
 
     @Override
     public Optional<? extends ITeamProfile> getOwnerTeam() {
-        return AllCapabilities.MACHINE.tryGet(blockEntity).flatMap(Machine::getOwnerTeam);
+        return MACHINE.tryGet(blockEntity).flatMap(IMachine::owner);
     }
 
     @Override
@@ -185,13 +206,13 @@ public class FlexibleStackContainer extends CapabilityProvider
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.CONTAINER.get()) {
+        if (cap == LAYOUT_PROVIDER.get() || cap == CONTAINER.get()) {
             return myself();
-        } else if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
+        } else if (cap == FLUID_STACK_HANDLER.get()) {
             return fluidHandlerCap.cast();
-        } else if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        } else if (cap == ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
-        } else if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
+        } else if (cap == MENU_ITEM_HANDLER.get()) {
             return menuItemHandlerCap.cast();
         }
         return LazyOptional.empty();
@@ -209,10 +230,5 @@ public class FlexibleStackContainer extends CapabilityProvider
     public void deserializeNBT(CompoundTag tag) {
         StackHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
         combinedFluids.deserializeNBT(tag.getCompound("fluid"));
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, "logistics/stack_container",
-            be -> new FlexibleStackContainer(be, 16, 8));
     }
 }

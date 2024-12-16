@@ -5,11 +5,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
+import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -17,7 +17,7 @@ import org.shsts.tinactory.core.util.MathUtil;
 public class ProgressBar extends MenuWidget {
     private final Texture texture;
     private final Texture texture2;
-    private final int syncIndex;
+    private final String syncName;
 
     public enum Direction {
         HORIZONTAL, VERTICAL
@@ -25,21 +25,21 @@ public class ProgressBar extends MenuWidget {
 
     public Direction direction = Direction.HORIZONTAL;
 
-    public ProgressBar(Menu<?, ?> menu, Texture texture, Texture texture2, int syncIndex) {
+    public ProgressBar(IMenu menu, Texture texture, Texture texture2, String syncName) {
         super(menu);
         this.texture = texture;
         this.texture2 = texture2;
-        this.syncIndex = syncIndex;
+        this.syncName = syncName;
     }
 
-    public ProgressBar(Menu<?, ?> menu, Texture texture, int syncIndex) {
-        this(menu, texture, texture, syncIndex);
+    public ProgressBar(IMenu menu, Texture texture, String syncName) {
+        this(menu, texture, texture, syncName);
     }
 
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var progress = MathUtil.clamp(menu.getSyncPacket(syncIndex, MenuSyncPacket.Double.class)
-            .map(MenuSyncPacket.Double::getData).orElse(0d), 0d, 1d);
+        var progress = MathUtil.clamp(menu.getSyncPacket(syncName, SyncPackets.Double.class)
+            .map(SyncPackets.Double::getData).orElse(0d), 0d, 1d);
         var z = getBlitOffset();
         var h = rect.height();
 

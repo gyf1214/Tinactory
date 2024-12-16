@@ -23,7 +23,7 @@ import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CellItem;
 import org.shsts.tinactory.core.common.SimpleFluid;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +41,7 @@ import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
 import static org.shsts.tinactory.content.electric.Circuits.circuit;
 import static org.shsts.tinactory.content.electric.Circuits.circuitComponent;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
@@ -48,21 +49,21 @@ import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllItems {
-    public static final Set<RegistryEntry<Item>> COMPONENT_ITEMS;
-    public static final Map<Voltage, RegistryEntry<Item>> ELECTRIC_MOTOR;
-    public static final Map<Voltage, RegistryEntry<Item>> ELECTRIC_PUMP;
-    public static final Map<Voltage, RegistryEntry<Item>> ELECTRIC_PISTON;
-    public static final Map<Voltage, RegistryEntry<Item>> CONVEYOR_MODULE;
-    public static final Map<Voltage, RegistryEntry<Item>> ROBOT_ARM;
-    public static final Map<Voltage, RegistryEntry<Item>> SENSOR;
-    public static final Map<Voltage, RegistryEntry<Item>> EMITTER;
-    public static final Map<Voltage, RegistryEntry<Item>> FIELD_GENERATOR;
-    public static final Map<Voltage, RegistryEntry<Item>> MACHINE_HULL;
-    public static final Map<Voltage, RegistryEntry<Item>> RESEARCH_EQUIPMENT;
-    public static final Map<Voltage, RegistryEntry<BatteryItem>> BATTERY;
-    public static final Map<Voltage, RegistryEntry<CableBlock>> CABLE;
-    public static final Map<Voltage, RegistryEntry<SubnetBlock>> TRANSFORMER;
-    public static final Map<Voltage, RegistryEntry<SubnetBlock>> ELECTRIC_BUFFER;
+    public static final Set<IEntry<Item>> COMPONENT_ITEMS;
+    public static final Map<Voltage, IEntry<Item>> ELECTRIC_MOTOR;
+    public static final Map<Voltage, IEntry<Item>> ELECTRIC_PUMP;
+    public static final Map<Voltage, IEntry<Item>> ELECTRIC_PISTON;
+    public static final Map<Voltage, IEntry<Item>> CONVEYOR_MODULE;
+    public static final Map<Voltage, IEntry<Item>> ROBOT_ARM;
+    public static final Map<Voltage, IEntry<Item>> SENSOR;
+    public static final Map<Voltage, IEntry<Item>> EMITTER;
+    public static final Map<Voltage, IEntry<Item>> FIELD_GENERATOR;
+    public static final Map<Voltage, IEntry<Item>> MACHINE_HULL;
+    public static final Map<Voltage, IEntry<Item>> RESEARCH_EQUIPMENT;
+    public static final Map<Voltage, IEntry<BatteryItem>> BATTERY;
+    public static final Map<Voltage, IEntry<CableBlock>> CABLE;
+    public static final Map<Voltage, IEntry<SubnetBlock>> TRANSFORMER;
+    public static final Map<Voltage, IEntry<SubnetBlock>> ELECTRIC_BUFFER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> BUZZSAW;
 
@@ -81,23 +82,24 @@ public final class AllItems {
     public static final Circuits.CircuitComponent DIODE;
     public static final Circuits.CircuitComponent TRANSISTOR;
 
-    public static final RegistryEntry<Item> STICKY_RESIN;
-    public static final RegistryEntry<SimpleFluid> STEAM;
-    public static final RegistryEntry<RubberLogBlock> RUBBER_LOG;
-    public static final RegistryEntry<LeavesBlock> RUBBER_LEAVES;
-    public static final RegistryEntry<SaplingBlock> RUBBER_SAPLING;
-    public static final RegistryEntry<Item> GOOD_GRINDER;
-    public static final RegistryEntry<Item> ADVANCED_GRINDER;
-    public static final RegistryEntry<Item> BASIC_BUZZSAW;
-    public static final RegistryEntry<Item> GOOD_BUZZSAW;
-    public static final RegistryEntry<Item> ADVANCED_BUZZSAW;
-    public static final List<RegistryEntry<Item>> BOULES;
-    public static final List<RegistryEntry<Item>> RAW_WAFERS;
-    public static final Map<String, RegistryEntry<Item>> WAFERS;
-    public static final Map<String, RegistryEntry<Item>> CHIPS;
+    // chips
+    public static final List<IEntry<Item>> BOULES;
+    public static final List<IEntry<Item>> RAW_WAFERS;
+    public static final Map<String, IEntry<Item>> WAFERS;
+    public static final Map<String, IEntry<Item>> CHIPS;
 
-    public static final Map<Voltage, RegistryEntry<CellItem>> FLUID_CELL;
-    public static final RegistryEntry<Item> ITEM_FILTER;
+    public static final IEntry<Item> STICKY_RESIN;
+    public static final IEntry<SimpleFluid> STEAM;
+    public static final IEntry<RubberLogBlock> RUBBER_LOG;
+    public static final IEntry<LeavesBlock> RUBBER_LEAVES;
+    public static final IEntry<SaplingBlock> RUBBER_SAPLING;
+    public static final IEntry<Item> GOOD_GRINDER;
+    public static final IEntry<Item> ADVANCED_GRINDER;
+    public static final IEntry<Item> BASIC_BUZZSAW;
+    public static final IEntry<Item> GOOD_BUZZSAW;
+    public static final IEntry<Item> ADVANCED_BUZZSAW;
+    public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
+    public static final IEntry<Item> ITEM_FILTER;
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
@@ -143,7 +145,7 @@ public final class AllItems {
             .renderType(() -> RenderType::cutout)
             .register();
 
-        STEAM = REGISTRATE.simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
+        STEAM = simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
 
         ELECTRIC_MOTOR = component("electric_motor");
         ELECTRIC_PUMP = component("electric_pump");
@@ -240,11 +242,11 @@ public final class AllItems {
 
     public static void init() {}
 
-    private static ComponentBuilder.DummyBuilder<Item, ?> componentBuilder(String name) {
+    private static ComponentBuilder.Simple<Item, ?> componentBuilder(String name) {
         return ComponentBuilder.simple(v -> simple("component/" + v.id + "/" + name));
     }
 
-    private static Map<Voltage, RegistryEntry<Item>> component(String name) {
+    private static Map<Voltage, IEntry<Item>> component(String name) {
         var ret = componentBuilder(name)
             .voltages(Voltage.LV, Voltage.IV)
             .buildObject();
@@ -252,7 +254,7 @@ public final class AllItems {
         return ret;
     }
 
-    private static RegistryEntry<Item> simple(String name) {
+    private static IEntry<Item> simple(String name) {
         return REGISTRATE.item(name, Item::new).register();
     }
 

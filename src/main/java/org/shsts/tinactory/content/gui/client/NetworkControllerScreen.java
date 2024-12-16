@@ -12,9 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -26,14 +24,19 @@ import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinycorelib.api.gui.IMenu;
 import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
+import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 import static org.shsts.tinactory.core.util.ClientUtil.INTEGER_FORMAT;
@@ -42,12 +45,12 @@ import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
+public class NetworkControllerScreen extends MenuScreen {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int WELCOME_BUTTON_WIDTH = 72;
     public static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
     public static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + FONT_HEIGHT +
-        MARGIN_VERTICAL * 3 + MARGIN_TOP;
+        MARGIN_VERTICAL * 2 + SPACING + PANEL_BORDER * 2;
 
     private final Panel welcomePanel;
     private final EditBox welcomeEdit;
@@ -60,8 +63,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         return I18n.tr("tinactory.gui.networkController." + key, args);
     }
 
-    public NetworkControllerScreen(NetworkControllerMenu menu, Inventory inventory,
-        Component title, int syncSlot) {
+    public NetworkControllerScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
 
         this.welcomePanel = new Panel(this);
@@ -80,28 +82,27 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
 
         this.techPanel = new TechPanel(this);
 
-        this.tabs = new Tab(this, statePanel, AllItems.CABLE.get(Voltage.LV),
-            techPanel, AllItems.RESEARCH_EQUIPMENT.get(Voltage.LV));
+        this.tabs = new Tab(this, statePanel, CABLE.get(Voltage.LV),
+            techPanel, RESEARCH_EQUIPMENT.get(Voltage.LV));
 
         rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
         rootPanel.addPanel(statePanel);
         rootPanel.addPanel(techPanel);
-        rootPanel.addPanel(new Rect(-MARGIN_HORIZONTAL, -MARGIN_TOP, 0, 0), tabs);
+        rootPanel.addPanel(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
 
-        menu.onSyncPacket(syncSlot, this::refresh);
+        menu.onSyncPacket("info", this::refresh);
         TechManager.client().onProgressChange(onTechChange);
         statePanel.setActive(false);
         welcomePanel.setActive(false);
 
-        this.imageWidth = WIDTH;
-        this.imageHeight = HEIGHT;
+        this.contentWidth = WIDTH;
+        this.contentHeight = HEIGHT;
     }
 
     @Override
-    protected void init() {
-        leftPos = (width - WIDTH) / 2;
-        topPos = (height - HEIGHT - Tab.BUTTON_OFFSET) / 2 + Tab.BUTTON_OFFSET;
-        initRect();
+    protected void centerWindow() {
+        leftPos = (width - imageWidth) / 2;
+        topPos = (height - imageHeight - Tab.BUTTON_OFFSET) / 2 + Tab.BUTTON_OFFSET;
     }
 
     @Override
@@ -152,7 +153,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     }
 
     private void onWelcomePressed() {
-        if (menu.player instanceof LocalPlayer player) {
+        if (iMenu.player() instanceof LocalPlayer player) {
             var name = welcomeEdit.getValue();
             var command = "/" + Tinactory.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
             player.chat(command);

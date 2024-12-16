@@ -9,9 +9,9 @@ import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.core.common.SimpleBuilder;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinycorelib.api.core.Transformer;
 
 import java.util.Map;
 import java.util.function.Supplier;

@@ -7,14 +7,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
@@ -24,38 +20,83 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
+
+import static net.minecraft.world.item.crafting.RecipeType.CRAFTING;
+import static org.shsts.tinactory.Tinactory.CORE;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Workbench extends CapabilityProvider implements INBTSerializable<CompoundTag>, IWorkbench {
+public class Workbench extends CapabilityProvider implements INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final String ID = "primitive/workbench_container";
 
     private static class CraftingStack extends CraftingContainer {
+        private final IItemHandlerModifiable items;
+
         @SuppressWarnings("ConstantConditions")
-        public CraftingStack(int width, int height) {
+        public CraftingStack(IItemHandlerModifiable items, int width, int height) {
             super(null, width, height);
+            this.items = items;
+        }
+
+        @Override
+        public int getContainerSize() {
+            return getWidth() * getHeight();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            for (var i = 0; i < items.getSlots(); i++) {
+                if (!items.getStackInSlot(i).isEmpty()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public ItemStack getItem(int index) {
+            return items.getStackInSlot(index);
+        }
+
+        @Override
+        public ItemStack removeItemNoUpdate(int index) {
+            var stack = getItem(index);
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            setItem(index, ItemStack.EMPTY);
+            return stack;
         }
 
         @Override
         public ItemStack removeItem(int index, int count) {
-            return ContainerHelper.removeItem(items, index, count);
+            var stack = items.getStackInSlot(index);
+            return stack.isEmpty() ? ItemStack.EMPTY : stack.split(count);
         }
 
         @Override
         public void setItem(int index, ItemStack stack) {
-            items.set(index, stack);
+            items.setStackInSlot(index, stack);
+        }
+
+        @Override
+        public void clearContent() {
+            for (var i = 0; i < items.getSlots(); i++) {
+                items.setStackInSlot(i, ItemStack.EMPTY);
+            }
         }
     }
 
@@ -79,20 +120,20 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
     private boolean initialized = false;
     private final BlockEntity blockEntity;
     private final CraftingStack craftingStack;
-    private final WrapperItemHandler craftingView;
+    private final ItemStackHandler craftingView;
     private final ToolItemHandler toolStorage;
     private ItemStack output;
     private final WrapperItemHandler itemView;
     @Nullable
-    private Recipe<?> currentRecipe = null;
+    private Object currentRecipe = null;
 
     private final LazyOptional<?> itemHandlerCap;
 
-    public Workbench(BlockEntity blockEntity) {
+    private Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
 
-        this.craftingStack = new CraftingStack(3, 3);
-        this.craftingView = new WrapperItemHandler(craftingStack);
+        this.craftingView = new ItemStackHandler(9);
+        this.craftingStack = new CraftingStack(craftingView, 3, 3);
 
         this.output = ItemStack.EMPTY;
 
@@ -105,45 +146,35 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         this.itemHandlerCap = LazyOptional.of(() -> itemView);
     }
 
-    @FunctionalInterface
-    private interface RecipeFunction<C extends Container, R extends Recipe<C>, V> {
-        V apply(R recipe, C container);
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, Workbench::new);
     }
 
-    @SuppressWarnings("unchecked")
-    private <C extends Container, R extends Recipe<C>, V> V applyRecipeFunc(RecipeFunction<C, R, V> func) {
-        if (currentRecipe instanceof CraftingRecipe) {
-            return func.apply((R) currentRecipe, (C) craftingStack);
-        } else if (currentRecipe instanceof ToolRecipe) {
-            return func.apply((R) currentRecipe, (C) new SmartRecipe.ContainerWrapper<>(this));
-        } else {
-            throw new IllegalStateException();
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
     private void onUpdate() {
         var world = blockEntity.getLevel();
         if (world == null || world.isClientSide) {
             return;
         }
 
-        var recipeManager = world.getRecipeManager();
+        var recipeManager = CORE.recipeManager(world);
+        var vanillaRecipes = world.getRecipeManager();
 
-        currentRecipe = SmartRecipe.getRecipeFor(AllRecipes.TOOL_CRAFTING.get(), this, world)
-            .map($ -> (Recipe) $)
-            .or(() -> recipeManager.getRecipeFor(RecipeType.CRAFTING, craftingStack, world))
+        currentRecipe = recipeManager.getRecipeFor(TOOL_CRAFTING, this, world)
+            .map($ -> (Object) $)
+            .or(() -> vanillaRecipes.getRecipeFor(CRAFTING, craftingStack, world))
             .orElse(null);
 
-        if (currentRecipe != null) {
-            output = applyRecipeFunc(Recipe::assemble);
+        if (currentRecipe instanceof ToolRecipe tool) {
+            output = tool.assemble();
+        } else if (currentRecipe instanceof CraftingRecipe crafting) {
+            output = crafting.assemble(craftingStack);
         } else {
             output = ItemStack.EMPTY;
         }
         blockEntity.setChanged();
     }
 
-    @Override
     public ItemStack getResult() {
         if (!initialized) {
             onUpdate();
@@ -152,7 +183,9 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         return output;
     }
 
-    @Override
+    /**
+     * Only called on client for the purpose of syncing.
+     */
     public void setResult(ItemStack stack) {
         var world = blockEntity.getLevel();
         if (world == null || !world.isClientSide) {
@@ -161,7 +194,6 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         output = stack;
     }
 
-    @Override
     public void onTake(Player player, ItemStack stack) {
         if (stack.isEmpty() || currentRecipe == null) {
             return;
@@ -173,11 +205,18 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         // vanilla logic of crafting triggers
         stack.onCraftedBy(player.level, player, amount);
         ForgeEventFactory.firePlayerCraftingEvent(player, stack, craftingStack);
-        if (!currentRecipe.isSpecial()) {
-            player.awardRecipes(List.of(currentRecipe));
+        if (currentRecipe instanceof CraftingRecipe crafting && !crafting.isSpecial()) {
+            player.awardRecipes(List.of(crafting));
         }
         ForgeHooks.setCraftingPlayer(player);
-        var remaining = applyRecipeFunc(Recipe::getRemainingItems);
+        List<ItemStack> remaining;
+        if (currentRecipe instanceof ToolRecipe tool) {
+            remaining = tool.getRemainingItems(this);
+        } else if (currentRecipe instanceof CraftingRecipe crafting) {
+            remaining = crafting.getRemainingItems(craftingStack);
+        } else {
+            throw new IllegalStateException();
+        }
         ForgeHooks.setCraftingPlayer(null);
 
         for (var i = 0; i < remaining.size(); i++) {
@@ -209,13 +248,10 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         return toolStorage;
     }
 
-    @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.MENU_ITEM_HANDLER.get()) {
+        if (cap == MENU_ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
-        } else if (cap == AllCapabilities.WORKBENCH.get()) {
-            return myself();
         }
         return LazyOptional.empty();
     }
@@ -230,7 +266,11 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
         StackHelper.deserializeItemHandler(itemView, tag);
     }
 
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> builder(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, "primitive/workbench_container", Workbench::new);
+    public static Optional<Workbench> tryGet(BlockEntity be) {
+        return tryGet(be, ID, Workbench.class);
+    }
+
+    public static Workbench get(BlockEntity be) {
+        return get(be, ID, Workbench.class);
     }
 }

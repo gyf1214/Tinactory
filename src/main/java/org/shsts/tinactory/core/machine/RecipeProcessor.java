@@ -9,8 +9,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
@@ -18,44 +16,51 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.electric.GeneratorProcessor;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
-import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
 import org.shsts.tinactory.content.multiblock.MultiBlockProcessor;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.IEventSubscriber;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
+
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityProvider implements
+public abstract class RecipeProcessor<T> extends CapabilityProvider implements
     IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    private static final String ID = "machine/recipe_processor";
     public static final long PROGRESS_PER_TICK = 256;
 
     protected final BlockEntity blockEntity;
-    public final RecipeType<? extends T> recipeType;
     private final boolean autoRecipe;
 
     /**
@@ -72,10 +77,47 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
 
     private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
 
-    protected RecipeProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, boolean autoRecipe) {
+    protected RecipeProcessor(BlockEntity blockEntity, boolean autoRecipe) {
         this.blockEntity = blockEntity;
-        this.recipeType = recipeType;
         this.autoRecipe = autoRecipe;
+    }
+
+    public static <P, R extends ProcessingRecipe,
+        B extends IRecipeBuilderBase<R>> Transformer<IBlockEntityTypeBuilder<P>> machine(
+        IRecipeType<B> type) {
+        return $ -> $.capability(ID, be -> new MachineProcessor<>(be, type, true));
+    }
+
+    public static <P, R extends ProcessingRecipe,
+        B extends IRecipeBuilderBase<R>> Transformer<IBlockEntityTypeBuilder<P>> noAutoRecipe(
+        IRecipeType<B> type) {
+        return $ -> $.capability(ID, be -> new MachineProcessor<>(be, type, false));
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> oreProcessor(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, OreAnalyzerProcessor::new);
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> generator(
+        IRecipeType<ProcessingRecipe.Builder> type) {
+        return $ -> $.capability(ID, be -> new GeneratorProcessor(be, type));
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> electricFurnace(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, ElectricFurnace::new);
+    }
+
+    public static <P, R extends ProcessingRecipe,
+        B extends IRecipeBuilderBase<R>> Transformer<IBlockEntityTypeBuilder<P>> multiBlock(
+        IRecipeType<B> type, boolean autoRecipe) {
+        return $ -> $.capability(ID, be -> new MultiBlockProcessor<>(be, type, autoRecipe));
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> blastFurnace(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, BlastFurnaceProcessor::new);
     }
 
     protected Level getWorld() {
@@ -84,17 +126,21 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         return world;
     }
 
-    protected abstract boolean matches(Level world, T recipe, IContainer container);
+    protected abstract boolean matches(Level world, T recipe, IMachine machine);
 
-    protected abstract Stream<? extends T> getMatchedRecipes(Level world, IContainer container);
+    protected abstract List<T> getMatchedRecipes(Level world, IMachine machine);
 
-    protected Optional<T> getNewRecipe(Level world, IContainer container) {
+    protected abstract Optional<T> fromLoc(Level world, ResourceLocation loc);
+
+    protected abstract ResourceLocation toLoc(T recipe);
+
+    protected Optional<T> getNewRecipe(Level world, IMachine machine) {
         if (targetRecipe != null) {
-            if (matches(world, targetRecipe, container)) {
+            if (matches(world, targetRecipe, machine)) {
                 return Optional.of(targetRecipe);
             }
         } else if (autoRecipe) {
-            var matches = getMatchedRecipes(world, container).toList();
+            var matches = getMatchedRecipes(world, machine);
             if (matches.size() == 1) {
                 return Optional.of(matches.get(0));
             }
@@ -108,11 +154,14 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         }
         var world = getWorld();
         assert currentRecipeLoc == null;
-        var container = getContainer().orElseThrow();
-        currentRecipe = getNewRecipe(world, container).orElse(null);
+        var machine = getMachine();
+        if (machine.isEmpty()) {
+            return;
+        }
+        currentRecipe = getNewRecipe(world, machine.get()).orElse(null);
         workProgress = 0;
         if (currentRecipe != null) {
-            onWorkBegin(currentRecipe, container);
+            onWorkBegin(currentRecipe, machine.get());
         }
         needUpdate = false;
         blockEntity.setChanged();
@@ -124,21 +173,19 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         }
     }
 
-    public abstract boolean allowTargetRecipe(Recipe<?> recipe);
+    protected abstract boolean allowTargetRecipe(Level world, ResourceLocation loc);
 
-    protected abstract void doSetTargetRecipe(Recipe<?> recipe);
+    protected abstract void doSetTargetRecipe(Level world, ResourceLocation loc);
 
     public void setTargetRecipe(ResourceLocation loc) {
-        var recipeManager = getWorld().getRecipeManager();
-
-        var recipe = recipeManager.byKey(loc).orElse(null);
-        if (recipe == null || !allowTargetRecipe(recipe)) {
+        var world = getWorld();
+        if (!allowTargetRecipe(world, loc)) {
             resetTargetRecipe();
             return;
         }
 
         LOGGER.debug("update target recipe = {}", loc);
-        doSetTargetRecipe(recipe);
+        doSetTargetRecipe(world, loc);
     }
 
     public void resetTargetRecipe() {
@@ -150,7 +197,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
                 if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
                     continue;
                 }
-                var port = container.getPort(i, false);
+                var port = container.getPort(i, true);
                 switch (port.type()) {
                     case ITEM -> port.asItem().resetItemFilter();
                     case FLUID -> port.asFluid().resetFluidFilter();
@@ -160,22 +207,22 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     private void updateTargetRecipe() {
-        var recipe = AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
+        var recipe = MultiBlock.tryGet(blockEntity)
             .flatMap(MultiBlock::getInterface)
-            .map($ -> (Machine) $)
-            .or(() -> AllCapabilities.MACHINE.tryGet(blockEntity))
-            .flatMap($ -> $.config.getLoc("targetRecipe"));
+            .map($ -> (IMachine) $)
+            .or(() -> MACHINE.tryGet(blockEntity))
+            .flatMap($ -> $.config().getLoc("targetRecipe"));
 
         recipe.ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
     }
 
-    protected abstract void onWorkBegin(T recipe, IContainer container);
+    protected abstract void onWorkBegin(T recipe, IMachine machine);
 
     protected void onWorkContinue(T recipe) {}
 
     protected abstract long onWorkProgress(T recipe, double partial);
 
-    protected abstract void onWorkDone(T recipe, IContainer container, Random random);
+    protected abstract void onWorkDone(T recipe, IMachine machine, Random random);
 
     protected abstract long getMaxWorkProgress(T recipe);
 
@@ -189,11 +236,14 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         if (currentRecipe == null) {
             return;
         }
-        var container = getContainer().orElseThrow();
+        var machine = getMachine();
+        if (machine.isEmpty()) {
+            return;
+        }
         var progress = onWorkProgress(currentRecipe, partial);
         workProgress += progress;
         if (workProgress >= getMaxWorkProgress(currentRecipe)) {
-            onWorkDone(currentRecipe, container, getWorld().random);
+            onWorkDone(currentRecipe, machine.get(), getWorld().random);
             currentRecipe = null;
             needUpdate = true;
         }
@@ -214,18 +264,20 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         }
     }
 
-    protected Optional<IContainer> getContainer() {
-        return AllCapabilities.MULTI_BLOCK.tryGet(blockEntity)
-            .flatMap(MultiBlock::getContainer)
-            .or(() -> AllCapabilities.CONTAINER.tryGet(blockEntity));
+    protected Optional<IMachine> getMachine() {
+        return MultiBlock.tryGet(blockEntity)
+            .flatMap(MultiBlock::getInterface)
+            .map($ -> (IMachine) $)
+            .or(() -> MACHINE.tryGet(blockEntity));
     }
 
-    @SuppressWarnings("unchecked")
+    protected Optional<IContainer> getContainer() {
+        return getMachine().flatMap(IMachine::container);
+    }
+
     public void onServerLoad(Level world) {
-        var recipeManager = world.getRecipeManager();
-        currentRecipe = (T) Optional.ofNullable(currentRecipeLoc)
-            .flatMap(recipeManager::byKey)
-            .filter(r -> r.getType() == recipeType)
+        currentRecipe = Optional.ofNullable(currentRecipeLoc)
+            .flatMap($ -> fromLoc(world, $))
             .orElse(null);
         currentRecipeLoc = null;
         if (currentRecipe != null) {
@@ -249,12 +301,12 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
-        eventManager.subscribe(AllEvents.SERVER_LOAD, this::onServerLoad);
-        eventManager.subscribe(AllEvents.REMOVED_BY_CHUNK, this::onRemoved);
-        eventManager.subscribe(AllEvents.REMOVED_IN_WORLD, this::onRemoved);
-        eventManager.subscribe(AllEvents.CONTAINER_CHANGE, this::setUpdateRecipe);
-        eventManager.subscribe(AllEvents.SET_MACHINE_CONFIG, this::onMachineConfig);
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
+        eventManager.subscribe(CONTAINER_CHANGE.get(), this::setUpdateRecipe);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }
 
     @Nonnull
@@ -270,7 +322,7 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
         if (currentRecipe != null) {
-            tag.putString("currentRecipe", currentRecipe.getId().toString());
+            tag.putString("currentRecipe", toLoc(currentRecipe).toString());
             tag.putLong("workProgress", workProgress);
         }
         return tag;
@@ -287,48 +339,8 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
         }
     }
 
-    private static final String ID = "machine/recipe_processor";
-
     public static Voltage getBlockVoltage(BlockEntity be) {
-        return be.getBlockState().getBlock() instanceof MachineBlock<?> machineBlock ?
+        return be.getBlockState().getBlock() instanceof MachineBlock machineBlock ?
             machineBlock.voltage : Voltage.PRIMITIVE;
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> machine(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be), true));
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> noAutoRecipe(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new MachineProcessor<>(be, type.get(), getBlockVoltage(be), false));
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> oreProcessor(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID,
-            be -> new OreAnalyzerProcessor(be, getBlockVoltage(be)));
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> generator(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new GeneratorProcessor(be, type.get(), getBlockVoltage(be)));
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> electricFurnace(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID,
-            be -> new ElectricFurnace(be, getBlockVoltage(be)));
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> multiBlock(
-        RecipeTypeEntry<? extends ProcessingRecipe, ?> type, boolean autoRecipe) {
-        return CapabilityProviderBuilder.fromFactory(ID,
-            be -> new MultiBlockProcessor<>(be, type.get(), autoRecipe));
-    }
-
-    public static <P> CapabilityProviderBuilder<BlockEntity, P> blastFurnace(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID, BlastFurnaceProcessor::new);
     }
 }

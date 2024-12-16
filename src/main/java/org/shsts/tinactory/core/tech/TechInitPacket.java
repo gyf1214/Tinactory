@@ -3,8 +3,8 @@ package org.shsts.tinactory.core.tech;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.common.IPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;

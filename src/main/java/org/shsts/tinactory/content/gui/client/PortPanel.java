@@ -4,29 +4,31 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
+import org.shsts.tinactory.core.gui.ProcessingPlugin;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.List;
 
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BUTTON_TOP_MARGIN;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_BORDER;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class PortPanel extends Panel {
@@ -40,7 +42,7 @@ public class PortPanel extends Panel {
     private class ConfigLabel extends Label {
         private final List<Layout.SlotInfo> slots;
 
-        public ConfigLabel(Menu<?, ?> menu, Component line, List<Layout.SlotInfo> slots) {
+        public ConfigLabel(IMenu menu, Component line, List<Layout.SlotInfo> slots) {
             super(menu, line);
             this.slots = slots;
             this.verticalAlign = Label.Alignment.MIDDLE;
@@ -63,9 +65,9 @@ public class PortPanel extends Panel {
 
     private final int xOffset;
 
-    public PortPanel(MenuScreen<?> screen, Layout layout) {
+    public PortPanel(ProcessingScreen screen, Layout layout) {
         super(screen);
-        var menu = screen.getMenu();
+        var menu = screen.menu();
         this.xOffset = layout.getXOffset();
 
         var background = new StretchImage(menu, RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);
@@ -79,7 +81,7 @@ public class PortPanel extends Panel {
                 continue;
             }
 
-            var label = new ConfigLabel(menu, ProcessingMenu.portLabel(type.portType, port), slots);
+            var label = new ConfigLabel(menu, ProcessingPlugin.portLabel(type.portType, port), slots);
             label.verticalAlign = Label.Alignment.MIDDLE;
             label.color = 0xFFFFAA00;
 
@@ -90,7 +92,7 @@ public class PortPanel extends Panel {
     }
 
     private void renderHoverOverlay(PoseStack poseStack, List<Layout.SlotInfo> slots) {
-        var bx = screen.getGuiLeft() + MARGIN_HORIZONTAL + xOffset;
+        var bx = screen.getGuiLeft() + MARGIN_X + xOffset;
         var by = screen.getGuiTop() + MARGIN_TOP;
         for (var slot : slots) {
             var x = slot.x() + 1 + bx;

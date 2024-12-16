@@ -13,8 +13,8 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
@@ -22,19 +22,26 @@ import org.shsts.tinactory.content.AllMultiBlocks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
+import org.shsts.tinactory.content.gui.client.ProcessingScreen;
+import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
+import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
+import org.shsts.tinactory.integration.jei.gui.NetworkControllerHandler;
+import org.shsts.tinactory.integration.jei.gui.ProcessingHandler;
+import org.shsts.tinactory.integration.jei.gui.ResearchBenchHandler;
+import org.shsts.tinactory.integration.jei.gui.WorkbenchHandler;
 import org.shsts.tinactory.integration.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientHelper;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @JeiPlugin
@@ -53,33 +61,39 @@ public class JEI implements IModPlugin {
 
     public final ToolCategory toolCategory;
 
-    private final List<RecipeCategory<?, ?>> categories;
-    private final Map<RecipeType<?>, RecipeCategory<?, ?>> processingCategories;
+    private final List<RecipeCategory<?>> categories;
+    private final Map<IRecipeType<?>, RecipeCategory<?>> processingCategories;
 
     public JEI() {
         this.categories = new ArrayList<>();
         this.processingCategories = new HashMap<>();
 
         this.toolCategory = new ToolCategory();
-        categories.add(toolCategory);
         for (var set : AllBlockEntities.getProcessingSets()) {
             var layout = set.layout(Voltage.MAXIMUM);
             var icon = set.icon();
-            addProcessingCategory(set.recipeType, layout, icon);
+            set.mapRecipeType(new ProcessingSet.RecipeTypeFunction<>() {
+                @Override
+                public <R extends ProcessingRecipe,
+                    B extends IRecipeBuilderBase<R>> Unit apply(IRecipeType<B> type) {
+                    addProcessingCategory(type, layout, icon);
+                    return Unit.INSTANCE;
+                }
+            });
         }
         addProcessingCategory(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE,
             AllMultiBlocks.BLAST_FURNACE.get());
         addProcessingCategory(AllRecipes.SIFTER, AllLayouts.SIFTER, AllMultiBlocks.SIFTER.get());
     }
 
-    private void addProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
-        Layout layout, Block icon) {
-        var category = new ProcessingCategory(recipeType, layout, icon);
+    private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(
+        IRecipeType<B> recipeType, Layout layout, Block icon) {
+        var category = new ProcessingCategory<>(recipeType, layout, icon);
         categories.add(category);
-        processingCategories.put(recipeType.get(), category);
+        processingCategories.put(recipeType, category);
     }
 
-    public Optional<RecipeCategory<?, ?>> processingCategory(RecipeType<?> recipeType) {
+    public Optional<RecipeCategory<?>> processingCategory(IRecipeType<?> recipeType) {
         return Optional.ofNullable(processingCategories.get(recipeType));
     }
 
@@ -96,6 +110,7 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
+        toolCategory.registerCategory(registration);
         for (var category : categories) {
             category.registerCategory(registration);
         }
@@ -103,7 +118,8 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        var recipeManager = ClientUtil.getRecipeManager();
+        var recipeManager = CORE.clientRecipeManager();
+        toolCategory.registerRecipes(registration, recipeManager);
         for (var category : categories) {
             category.registerRecipes(registration, recipeManager);
         }
@@ -111,6 +127,7 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        toolCategory.registerCatalysts(registration);
         for (var category : categories) {
             category.registerCatalysts(registration);
         }
@@ -121,14 +138,15 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addGenericGuiContainerHandler(MenuScreen.class, new MenuScreenHandler(this));
+        registration.addGuiContainerHandler(MenuScreen.class, MenuScreenHandler.fluid());
+        registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler(this));
+        registration.addGuiContainerHandler(NetworkControllerScreen.class, new NetworkControllerHandler());
+        registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchBenchHandler());
+        WorkbenchHandler.addWorkbenchClickArea(registration, toolCategory);
     }
 
     @Override
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-        for (var category : categories) {
-            category.registerRecipeTransferHandlers(registration);
-        }
-        registration.addRecipeTransferHandler(WorkbenchMenu.class, RecipeTypes.CRAFTING, 9, 9, 19, 36);
+        // TODO
     }
 }

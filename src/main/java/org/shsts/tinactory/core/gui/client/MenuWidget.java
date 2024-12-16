@@ -11,9 +11,8 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.common.ISelf;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,13 +21,13 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MenuWidget extends GuiComponent implements
-    Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
+    Widget, GuiEventListener, NarratableEntry {
 
-    protected final Menu<?, ?> menu;
+    protected final IMenu menu;
     protected Rect rect;
     protected boolean active = true;
 
-    public MenuWidget(Menu<?, ?> menu) {
+    public MenuWidget(IMenu menu) {
         this.menu = menu;
         this.setBlitOffset(0);
     }
@@ -67,7 +66,7 @@ public abstract class MenuWidget extends GuiComponent implements
     }
 
     protected boolean isClicking(double mouseX, double mouseY, int button) {
-        return active && canClick(button) && rect.in(mouseX, mouseY);
+        return active && rect.in(mouseX, mouseY) && canClick(button);
     }
 
     @Override

@@ -13,19 +13,22 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.TinactoryConfig;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Arrays;
-import java.util.function.Function;
+
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricTank extends ElectricStorage implements INBTSerializable<CompoundTag> {
+    private static final String ID = "machine/tank";
+
     private final int size;
     private final WrapperFluidTank[] innerTanks;
     private final WrapperFluidTank[] externalTanks;
@@ -35,7 +38,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     private final LazyOptional<IFluidStackHandler> fluidHandlerCap;
 
     public ElectricTank(BlockEntity blockEntity, Layout layout) {
-        super(blockEntity);
+        super(blockEntity, layout);
         this.size = layout.slots.size();
         var capacity = TinactoryConfig.INSTANCE.tankSize.get();
         this.innerTanks = new WrapperFluidTank[size];
@@ -52,6 +55,10 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         this.filters = new FluidStack[size];
 
         this.fluidHandlerCap = LazyOptional.of(() -> innerPort);
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
+        return $ -> $.capability(ID, be -> new ElectricTank(be, layout));
     }
 
     private boolean allowFluidInTank(int slot, FluidStack stack) {
@@ -82,12 +89,12 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
             externalTanks[i].allowInput = allowInput;
             externalTanks[i].allowOutput = allowOutput;
         }
-        machine.getNetwork().ifPresent(network -> registerPort(network, externalPort));
+        machine.network().ifPresent(network -> registerPort(network, externalPort));
     }
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.FLUID_STACK_HANDLER.get()) {
+        if (cap == FLUID_STACK_HANDLER.get()) {
             return fluidHandlerCap.cast();
         }
         return super.getCapability(cap, side);
@@ -121,9 +128,5 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
             var stack = FluidStack.loadFluidStackFromNBT(tag3);
             filters[slot] = stack;
         }
-    }
-
-    public static <P> Function<P, CapabilityProviderBuilder<BlockEntity, P>> builder(Layout layout) {
-        return CapabilityProviderBuilder.fromFactory("machine/tank", be -> new ElectricTank(be, layout));
     }
 }

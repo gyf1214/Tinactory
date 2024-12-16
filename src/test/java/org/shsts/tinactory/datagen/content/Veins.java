@@ -24,7 +24,6 @@ import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.datagen.DataGen.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -78,7 +77,7 @@ public final class Veins {
 
     private static class VeinFactory {
         public VeinBuilder<VeinFactory> vein(String id, double rate) {
-            return new VeinBuilder<>(DATA_GEN, this, id, rate);
+            return VeinBuilder.factory(this, id, rate);
         }
     }
 

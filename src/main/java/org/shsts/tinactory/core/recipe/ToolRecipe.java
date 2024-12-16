@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.network.FriendlyByteBuf;
@@ -25,9 +24,10 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.tool.ToolItem;
-import org.shsts.tinactory.core.common.SmartRecipe;
-import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinactory.core.builder.VanillaRecipeBuilder;
+import org.shsts.tinycorelib.api.recipe.IRecipe;
+import org.shsts.tinycorelib.api.recipe.IVanillaRecipeSerializer;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,15 +37,18 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static net.minecraft.world.item.crafting.RecipeSerializer.SHAPED_RECIPE;
+
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ToolRecipe extends SmartRecipe<Workbench> {
+public class ToolRecipe implements IRecipe<Workbench> {
+    private final ResourceLocation loc;
     public final ShapedRecipe shapedRecipe;
     public final List<Ingredient> toolIngredients;
 
-    public ToolRecipe(RecipeTypeEntry<ToolRecipe, Builder> type, ResourceLocation loc, ShapedRecipe shapedRecipe,
+    public ToolRecipe(ResourceLocation loc, ShapedRecipe shapedRecipe,
         List<Ingredient> toolIngredients) {
-        super(type, loc);
+        this.loc = loc;
         this.shapedRecipe = shapedRecipe;
         this.toolIngredients = toolIngredients;
     }
@@ -73,6 +76,19 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
             matchTools(container.getToolStorage());
     }
 
+    public ItemStack assemble() {
+        return shapedRecipe.getResultItem().copy();
+    }
+
+    public List<ItemStack> getRemainingItems(Workbench container) {
+        return shapedRecipe.getRemainingItems(container.getCraftingContainer());
+    }
+
+    @Override
+    public ResourceLocation loc() {
+        return loc;
+    }
+
     public void doDamage(IItemHandlerModifiable toolStorage) {
         var damages = new int[toolStorage.getSlots()];
         Arrays.fill(damages, 0);
@@ -98,30 +114,10 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
         }
     }
 
-    @Override
-    public ItemStack assemble(Workbench container) {
-        return shapedRecipe.assemble(container.getCraftingContainer());
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return shapedRecipe.canCraftInDimensions(width, height);
-    }
-
-    @Override
-    public ItemStack getResultItem() {
-        return shapedRecipe.getResultItem();
-    }
-
-    @Override
-    public NonNullList<ItemStack> getRemainingItems(Workbench container) {
-        return shapedRecipe.getRemainingItems(container.getCraftingContainer());
-    }
-
     private static class FinishedShaped extends ShapedRecipeBuilder.Result {
         @SuppressWarnings("ConstantConditions")
-        public FinishedShaped(ResourceLocation loc, Item result, int count, List<String> patterns,
-            Map<Character, Ingredient> keys) {
+        public FinishedShaped(ResourceLocation loc, Item result,
+            int count, List<String> patterns, Map<Character, Ingredient> keys) {
             super(loc, result, count, "", patterns, keys, null, null);
         }
 
@@ -138,15 +134,28 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
         }
     }
 
-    private static class Finished extends SimpleFinished {
+    private static class Finished implements FinishedRecipe {
+        private final ResourceLocation loc;
+        private final IRecipeType<?> type;
         private final FinishedRecipe shaped;
         private final List<Ingredient> tools;
 
-        public Finished(ResourceLocation loc, RecipeTypeEntry<ToolRecipe, Builder> type,
-            FinishedRecipe shaped, List<Ingredient> tools) {
-            super(loc, type.getSerializer());
-            this.shaped = shaped;
-            this.tools = tools;
+        public Finished(Builder builder) {
+            this.loc = builder.loc;
+            this.type = builder.getType();
+            this.shaped = builder.createShaped();
+            this.tools = builder.tools.stream()
+                .map(Supplier::get).toList();
+        }
+
+        @Override
+        public ResourceLocation getId() {
+            return loc;
+        }
+
+        @Override
+        public RecipeSerializer<?> getType() {
+            return type.getSerializer();
         }
 
         @Override
@@ -156,9 +165,21 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
             tools.stream().map(Ingredient::toJson).forEach(toolTags::add);
             jo.add("tools", toolTags);
         }
+
+        @Nullable
+        @Override
+        public JsonObject serializeAdvancement() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public ResourceLocation getAdvancementId() {
+            return null;
+        }
     }
 
-    public static class Builder extends SimpleRecipeBuilder<RecipeTypeEntry<ToolRecipe, Builder>, Builder> {
+    public static class Builder extends VanillaRecipeBuilder<ToolRecipe, Builder> {
         @Nullable
         private Supplier<? extends ItemLike> result = null;
         private int count = 0;
@@ -166,9 +187,8 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
         private final Map<Character, Supplier<Ingredient>> keys = new HashMap<>();
         private final List<Supplier<Ingredient>> tools = new ArrayList<>();
 
-        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<ToolRecipe, Builder> parent,
-            ResourceLocation loc) {
-            super(consumer, parent, loc);
+        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         public Builder result(Supplier<? extends ItemLike> result, int count) {
@@ -216,51 +236,49 @@ public class ToolRecipe extends SmartRecipe<Workbench> {
             return self();
         }
 
-        @Override
-        protected FinishedRecipe createObject() {
+        private IRecipeType<?> getType() {
+            return parent;
+        }
+
+        private FinishedRecipe createShaped() {
             assert result != null;
             var key = keys.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
-            var tools = this.tools.stream().map(Supplier::get).toList();
-            var shaped = new FinishedShaped(loc, result.get().asItem(), count, rows, key);
-            return new Finished(loc, parent, shaped, tools);
+            return new FinishedShaped(loc, result.get().asItem(), count, rows, key);
+        }
+
+        @Override
+        protected FinishedRecipe createObject() {
+            return new Finished(this);
         }
     }
 
-    private static class Serializer extends SmartRecipeSerializer<ToolRecipe, Builder> {
-        private static final RecipeSerializer<ShapedRecipe> SHAPED_SERIALIZER = RecipeSerializer.SHAPED_RECIPE;
-
-        private Serializer(RecipeTypeEntry<ToolRecipe, Builder> type) {
-            super(type);
-        }
-
+    private static class Serializer implements IVanillaRecipeSerializer<ToolRecipe> {
         @Override
-        public ToolRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
-            var shaped = SHAPED_SERIALIZER.fromJson(loc, jo, context);
+        public ToolRecipe fromJson(ResourceLocation loc,
+            JsonObject jo, ICondition.IContext context) {
+            var shaped = SHAPED_RECIPE.fromJson(loc, jo, context);
             var tools = Streams.stream(GsonHelper.getAsJsonArray(jo, "tools"))
                 .map(Ingredient::fromJson)
                 .toList();
-            return new ToolRecipe(type, loc, shaped, tools);
+            return new ToolRecipe(loc, shaped, tools);
         }
 
         @Override
-        public void toJson(JsonObject jo, ToolRecipe recipe) {}
-
-        @Override
         public ToolRecipe fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
-            var shaped = SHAPED_SERIALIZER.fromNetwork(loc, buf);
+            var shaped = SHAPED_RECIPE.fromNetwork(loc, buf);
             assert shaped != null;
             var tools = buf.readCollection(ArrayList::new, Ingredient::fromNetwork);
-            return new ToolRecipe(type, loc, shaped, tools);
+            return new ToolRecipe(loc, shaped, tools);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, ToolRecipe recipe) {
-            SHAPED_SERIALIZER.toNetwork(buf, recipe.shapedRecipe);
-            buf.writeCollection(recipe.toolIngredients, (buf1, ingredient) -> ingredient.toNetwork(buf1));
+            SHAPED_RECIPE.toNetwork(buf, recipe.shapedRecipe);
+            buf.writeCollection(recipe.toolIngredients,
+                (buf1, ingredient) -> ingredient.toNetwork(buf1));
         }
     }
 
-    public static final SmartRecipeSerializer.Factory<ToolRecipe, Builder>
-        SERIALIZER = Serializer::new;
+    public static final IVanillaRecipeSerializer<ToolRecipe> SERIALIZER = new Serializer();
 }

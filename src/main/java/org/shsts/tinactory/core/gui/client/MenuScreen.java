@@ -8,50 +8,55 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.core.gui.Menu.CONTENT_WIDTH;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.WIDTH;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.gui.Texture.BACKGROUND;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M> implements IWidgetConsumer {
-    private static final Texture BACKGROUND = new Texture(gregtech("gui/base/background"), WIDTH, 166);
-
+public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
     protected final Panel rootPanel;
-    protected final List<GuiComponent> hoverables = new ArrayList<>();
+    protected final List<Widget> hoverables = new ArrayList<>();
 
-    public MenuScreen(M menu, Inventory inventory, Component title) {
+    public int contentWidth;
+    public int contentHeight;
+
+    public MenuScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.titleLabelX = MARGIN_HORIZONTAL;
+        this.titleLabelX = MARGIN_X;
         this.titleLabelY = MARGIN_VERTICAL;
-        this.imageWidth = WIDTH;
-        this.imageHeight = menu.getHeight();
+        this.contentWidth = CONTENT_WIDTH;
+        this.contentHeight = 0;
 
         this.rootPanel = new Panel(this);
-        for (var slot : menu.slots) {
-            int x = slot.x - 1 - MARGIN_HORIZONTAL;
+        for (var slot : menu.getMenu().slots) {
+            int x = slot.x - 1 - MARGIN_X;
             int y = slot.y - 1 - MARGIN_TOP;
             var slotBg = new StaticWidget(menu, Texture.SLOT_BACKGROUND);
             rootPanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
         }
+    }
+
+    public IMenu menu() {
+        return iMenu;
     }
 
     @Override
@@ -59,21 +64,28 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         rootPanel.addGuiComponent(anchor, offset, widget);
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidgetToScreen(
+    @Override
+    public <T extends GuiEventListener & Widget & NarratableEntry> void addWidgetToScreen(
         T widget) {
-        addRenderableWidget(widget);
+        super.addWidgetToScreen(widget);
         hoverables.add(widget);
+    }
+
+    protected void centerWindow() {
+        super.init();
     }
 
     @Override
     protected void init() {
-        super.init();
+        imageWidth = contentWidth + MARGIN_X * 2;
+        imageHeight = contentHeight + MARGIN_TOP + MARGIN_VERTICAL;
+        centerWindow();
         initRect();
     }
 
     protected void initRect() {
-        var rect = new Rect(leftPos + MARGIN_HORIZONTAL, topPos + MARGIN_TOP,
-            imageWidth - MARGIN_HORIZONTAL * 2, imageHeight - MARGIN_TOP - MARGIN_VERTICAL);
+        var rect = new Rect(leftPos + MARGIN_X, topPos + MARGIN_TOP,
+            imageWidth - MARGIN_X * 2, imageHeight - MARGIN_TOP - MARGIN_VERTICAL);
         rootPanel.init(rect);
     }
 
@@ -84,24 +96,11 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
     }
 
     @Override
-    public void removed() {
-        super.removed();
-        menu.removeScreenPlugin();
-    }
-
-    @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        renderBackground(poseStack);
-        super.render(poseStack, mouseX, mouseY, partialTick);
-        renderTooltip(poseStack, mouseX, mouseY);
-    }
-
-    @Override
     protected void renderBg(PoseStack poseStack, float partialTick, int mouseX, int mouseY) {
         var tex = BACKGROUND;
         var rect = new Rect(leftPos, topPos, imageWidth, imageHeight);
         var texRect = new Rect(0, 0, tex.width(), tex.height());
-        StretchImage.render(poseStack, BACKGROUND, 0, rect, texRect, MARGIN_VERTICAL);
+        StretchImage.render(poseStack, tex, 0, rect, texRect, MARGIN_VERTICAL);
     }
 
     @Override
@@ -109,7 +108,7 @@ public class MenuScreen<M extends Menu<?, M>> extends AbstractContainerScreen<M>
         font.draw(poseStack, title, (float) titleLabelX, (float) titleLabelY, RenderUtil.TEXT_COLOR);
     }
 
-    public Optional<GuiComponent> getHovered(int mouseX, int mouseY) {
+    public Optional<Widget> getHovered(int mouseX, int mouseY) {
         for (var hoverable : hoverables) {
             if (hoverable instanceof MenuWidget widget && widget.isHovering(mouseX, mouseY)) {
                 return Optional.of(hoverable);

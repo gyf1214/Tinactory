@@ -4,15 +4,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.Transformer;
+import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
-import org.shsts.tinactory.registrate.builder.BlockEntityBuilder;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,21 +20,21 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMultiBlocks {
-    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> BLAST_FURNACE;
-    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> SIFTER;
-    public static final RegistryEntry<PrimitiveBlock<SmartBlockEntity>> VACUUM_FREEZER;
+    public static final IEntry<PrimitiveBlock> BLAST_FURNACE;
+    public static final IEntry<PrimitiveBlock> SIFTER;
+    public static final IEntry<PrimitiveBlock> VACUUM_FREEZER;
 
     // solid blocks
-    public static final Set<RegistryEntry<Block>> SOLID_CASING;
-    public static final RegistryEntry<Block> HEATPROOF_CASING;
-    public static final RegistryEntry<Block> SOLID_STEEL_CASING;
-    public static final RegistryEntry<Block> FROST_PROOF_CASING;
+    public static final Set<IEntry<Block>> SOLID_CASING;
+    public static final IEntry<Block> HEATPROOF_CASING;
+    public static final IEntry<Block> SOLID_STEEL_CASING;
+    public static final IEntry<Block> FROST_PROOF_CASING;
     // coil blocks
-    public static final Set<RegistryEntry<CoilBlock>> COIL_BLOCKS;
-    public static final RegistryEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
-    public static final RegistryEntry<CoilBlock> KANTHAL_COIL_BLOCK;
+    public static final Set<IEntry<CoilBlock>> COIL_BLOCKS;
+    public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
+    public static final IEntry<CoilBlock> KANTHAL_COIL_BLOCK;
     // misc
-    public static final RegistryEntry<Block> GRATE_MACHINE_CASING;
+    public static final IEntry<Block> GRATE_MACHINE_CASING;
 
     private static final Transformer<BlockBehaviour.Properties> CASING_PROPERTY;
 
@@ -52,13 +50,15 @@ public final class AllMultiBlocks {
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
         KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
 
-        GRATE_MACHINE_CASING = REGISTRATE.block("multi_block/grate_machine_casing", Block::new)
+        GRATE_MACHINE_CASING = REGISTRATE.block(
+                "multi_block/grate_machine_casing", Block::new)
             .properties(CASING_PROPERTY)
             .register();
 
         BLAST_FURNACE = multiBlock("blast_furnace")
             .blockEntity()
-            .capability(MultiBlock.builder(BlastFurnace::new))
+            .transform(RecipeProcessor::blastFurnace)
+            .child(MultiBlock::blastFurnace)
             .layout(AllLayouts.BLAST_FURNACE)
             .appearanceBlock(HEATPROOF_CASING)
             .spec()
@@ -79,13 +79,14 @@ public final class AllMultiBlocks {
             .block('T', HEATPROOF_CASING)
             .build()
             .build()
-            .simpleCapability(RecipeProcessor::blastFurnace)
-            .build()
+            .end()
             .buildObject();
 
         SIFTER = multiBlock("sifter")
             .blockEntity()
-            .capability(MultiBlock::simple)
+            .transform(RecipeProcessor.multiBlock(
+                AllRecipes.SIFTER, true))
+            .child(MultiBlock::simple)
             .layout(AllLayouts.SIFTER)
             .appearanceBlock(SOLID_STEEL_CASING)
             .spec()
@@ -125,13 +126,14 @@ public final class AllMultiBlocks {
             .air('A')
             .build()
             .build()
-            .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.SIFTER, true))
-            .build()
+            .end()
             .buildObject();
 
         VACUUM_FREEZER = multiBlock("vacuum_freezer")
             .blockEntity()
-            .capability(MultiBlock::simple)
+            .transform(RecipeProcessor.multiBlock(
+                AllRecipes.VACUUM_FREEZER, true))
+            .child(MultiBlock::simple)
             .appearanceBlock(FROST_PROOF_CASING)
             .spec()
             .layer()
@@ -154,20 +156,16 @@ public final class AllMultiBlocks {
             .air('A')
             .build()
             .build()
-            .simpleCapability(RecipeProcessor.multiBlock(AllRecipes.VACUUM_FREEZER, true))
-            .build()
+            .end()
             .buildObject();
     }
 
-    private static BlockEntityBuilder<SmartBlockEntity, PrimitiveBlock<SmartBlockEntity>, ?> multiBlock(String name) {
-        return REGISTRATE.blockEntity("multi_block/" + name, PrimitiveBlock<SmartBlockEntity>::new)
-            .blockEntity()
-            .eventManager().ticking()
-            .build()
+    private static BlockEntityBuilder<PrimitiveBlock, ?> multiBlock(String name) {
+        return BlockEntityBuilder.builder("multi_block/" + name, PrimitiveBlock::new)
             .translucent();
     }
 
-    private static RegistryEntry<Block> solid(String name) {
+    private static IEntry<Block> solid(String name) {
         var ret = REGISTRATE.block("multi_block/solid/" + name, Block::new)
             .properties(CASING_PROPERTY)
             .register();
@@ -175,7 +173,7 @@ public final class AllMultiBlocks {
         return ret;
     }
 
-    private static RegistryEntry<CoilBlock> coil(String name, int temperature) {
+    private static IEntry<CoilBlock> coil(String name, int temperature) {
         var ret = REGISTRATE.block("multi_block/coil/" + name, CoilBlock.factory(temperature))
             .properties(CASING_PROPERTY)
             .register();

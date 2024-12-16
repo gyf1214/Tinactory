@@ -4,11 +4,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
@@ -37,10 +35,6 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         this.allowOutputs = new boolean[size];
         Arrays.fill(filters, TRUE);
         Arrays.fill(allowOutputs, true);
-    }
-
-    public WrapperItemHandler(Container inv) {
-        this(new InvWrapper(inv));
     }
 
     public void setFilter(int idx, Predicate<ItemStack> sth) {

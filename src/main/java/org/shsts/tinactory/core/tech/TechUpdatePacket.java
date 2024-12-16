@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.core.common.IPacket;
+import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Map;
 import java.util.Optional;

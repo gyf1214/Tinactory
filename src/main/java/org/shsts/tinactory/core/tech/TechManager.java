@@ -13,9 +13,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
-import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.IClientTechManager;
 import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
@@ -38,6 +35,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+
+import static org.shsts.tinactory.Tinactory.CHANNEL;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -152,7 +151,7 @@ public class TechManager implements ITechManager {
 
         private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
             var p = team.fullUpdatePacket();
-            Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
+            CHANNEL.sendToPlayer(player, p);
         }
 
         @Override
@@ -184,7 +183,7 @@ public class TechManager implements ITechManager {
 
         public void onPlayerJoin(ServerPlayer player) {
             var p = new TechInitPacket(technologies.values());
-            Tinactory.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), p);
+            CHANNEL.sendToPlayer(player, p);
             teamByPlayer(player).ifPresent(profile -> sendFullUpdatePacket(player, profile));
         }
     }
@@ -223,7 +222,7 @@ public class TechManager implements ITechManager {
             localTeam = null;
         }
 
-        private void handleTechInit(TechInitPacket p, NetworkEvent.Context ctx) {
+        private void handleTechInit(TechInitPacket p) {
             technologies.clear();
             var techs = p.getTechs();
             for (var tech : techs) {
@@ -233,7 +232,7 @@ public class TechManager implements ITechManager {
             LOGGER.debug("reload {} techs", technologies.size());
         }
 
-        private void handleTechUpdate(TechUpdatePacket p, NetworkEvent.Context ctx) {
+        private void handleTechUpdate(TechUpdatePacket p) {
             var team = getLocalTeam();
             if (team == null) {
                 return;
@@ -278,10 +277,10 @@ public class TechManager implements ITechManager {
     public static void init() {
         server = new Server();
         LOGGER.debug("create server tech manager {}", server);
-        Tinactory.registryClientPacket(TechInitPacket.class, TechInitPacket::new,
-            (p, ctx) -> client().handleTechInit(p, ctx));
-        Tinactory.registryClientPacket(TechUpdatePacket.class, TechUpdatePacket::new,
-            (p, ctx) -> client().handleTechUpdate(p, ctx));
+        CHANNEL.registerClientPacket(TechInitPacket.class, TechInitPacket::new,
+            (p, ctx) -> client().handleTechInit(p));
+        CHANNEL.registerClientPacket(TechUpdatePacket.class, TechUpdatePacket::new,
+            (p, ctx) -> client().handleTechUpdate(p));
     }
 
     public static void initClient() {

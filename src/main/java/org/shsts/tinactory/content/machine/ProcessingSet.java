@@ -3,25 +3,26 @@ package org.shsts.tinactory.content.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.MachinePlugin;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
-import org.shsts.tinactory.core.common.Transformer;
-import org.shsts.tinactory.core.gui.IMenuPlugin;
+import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
 import org.shsts.tinactory.core.multiblock.client.MultiBlockInterfaceRenderer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
-import org.shsts.tinactory.registrate.common.RegistryEntry;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilder;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.IRegistrate;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Collection;
 import java.util.Map;
@@ -32,85 +33,100 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingSet extends MachineSet {
-    public final RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType;
+    public final IRecipeType<?> recipeType;
 
-    private ProcessingSet(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
-        Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-        Map<Voltage, RegistryEntry<? extends Block>> machines) {
-        super(voltages, layoutSet, machines);
-        this.recipeType = recipeType;
+    @FunctionalInterface
+    public interface RecipeTypeFunction<T> {
+        <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> T apply(
+            IRecipeType<B> type);
     }
 
-    public static class Builder<T extends ProcessingRecipe, P> extends
-        BuilderBase<ProcessingSet, P, Builder<T, P>> {
-        public final RecipeTypeEntry<T, ?> recipeType;
-        private boolean hasProcessor = false;
-        private boolean hasPlugin = false;
+    private record RecipeTypeWrapper<R extends ProcessingRecipe,
+        B extends IRecipeBuilderBase<R>>(IRecipeType<B> type) {
+        public <T> T apply(RecipeTypeFunction<T> func) {
+            return func.apply(type);
+        }
+    }
 
-        public Builder(Registrate registrate, RecipeTypeEntry<T, ?> recipeType, P parent) {
+    private final RecipeTypeWrapper<?, ?> typeWrapper;
+
+    private ProcessingSet(RecipeTypeWrapper<?, ?> typeWrapper,
+        Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
+        Map<Voltage, IEntry<? extends Block>> machines) {
+        super(voltages, layoutSet, machines);
+        this.typeWrapper = typeWrapper;
+        this.recipeType = typeWrapper.type;
+    }
+
+    public <T> T mapRecipeType(RecipeTypeFunction<T> func) {
+        return typeWrapper.apply(func);
+    }
+
+    public static class Builder<R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>, P> extends
+        BuilderBase<ProcessingSet, P, Builder<R, B, P>> {
+        public final IRecipeType<B> recipeType;
+        private boolean hasProcessor = false;
+        private boolean hasMenu = false;
+
+        public Builder(IRegistrate registrate, P parent, IRecipeType<B> recipeType) {
             super(registrate, parent);
             this.recipeType = recipeType;
 
-            machine(v -> "machine/" + v.id + "/" + recipeType.id, MachineBlock::factory);
-            machine(v -> $ -> $.blockEntity()
-                .simpleCapability(StackProcessingContainer.builder(getLayout(v)))
-                .menu(ProcessingMenu.machine(getLayout(v), recipeType))
-                .title(ProcessingMenu::getTitle)
-                .build()
-                .build());
-        }
-
-        public <B> Builder<T, P> processor(Function<RecipeTypeEntry<? extends ProcessingRecipe, ?>,
-            Function<B, ? extends CapabilityProviderBuilder<? super SmartBlockEntity, B>>> factory) {
-            hasProcessor = true;
-            return capability(factory.apply(recipeType));
-        }
-
-        public Builder<T, P> processingPlugin(Function<RecipeTypeEntry<? extends ProcessingRecipe, ?>,
-            IMenuPlugin.Factory<?>> factory) {
-            hasPlugin = true;
-            return plugin(factory.apply(recipeType));
+            machine(v -> "machine/" + v.id + "/" + recipeType.id(), MachineBlock::factory);
+            layoutMachine(StackProcessingContainer::factory);
         }
 
         @Override
-        protected RegistryEntry<? extends Block> createMachine(Voltage voltage) {
+        public Builder<R, B, P> menu(IMenuType menu) {
+            hasMenu = true;
+            return super.menu(menu);
+        }
+
+        public <V> Builder<R, B, P> processor(
+            Function<IRecipeType<B>, Transformer<IBlockEntityTypeBuilder<V>>> factory) {
+            hasProcessor = true;
+            return machine(factory.apply(recipeType));
+        }
+
+        @Override
+        protected IEntry<? extends Block> createMachine(Voltage voltage) {
             if (!hasProcessor) {
                 processor(RecipeProcessor::machine);
             }
-            if (!hasPlugin) {
-                processingPlugin(MachinePlugin::processing);
+            if (!hasMenu) {
+                menu(AllMenus.PROCESSING_MACHINE);
             }
             return super.createMachine(voltage);
         }
 
         @Override
         protected ProcessingSet createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-            Map<Voltage, RegistryEntry<? extends Block>> machines) {
-            return new ProcessingSet(recipeType, voltages, layoutSet, machines);
+            Map<Voltage, IEntry<? extends Block>> machines) {
+            var typeWrapper = new RecipeTypeWrapper<>(recipeType);
+            return new ProcessingSet(typeWrapper, voltages, layoutSet, machines);
         }
     }
 
-    public static <T extends ProcessingRecipe, P> Transformer<Builder<T, P>> marker(boolean includeNormal) {
-        return $ -> $.processingPlugin(r -> MachinePlugin.marker(r, includeNormal));
+    public static <P, R extends ProcessingRecipe,
+        B extends IRecipeBuilder<R, B>> Builder<R, B, P> builder(
+        P parent, IRecipeType<B> recipeType) {
+        return new Builder<>(REGISTRATE, parent, recipeType);
     }
 
-    public static RegistryEntry<MachineBlock<SmartBlockEntity>> multiblockInterface(Voltage voltage) {
+    public static IEntry<MachineBlock> multiblockInterface(Voltage voltage) {
         var id = "multi_block/" + voltage.id + "/interface";
-        return REGISTRATE.blockEntity(id, MachineBlock.multiBlockInterface(voltage))
+        return BlockEntityBuilder.builder(id, MachineBlock.multiBlockInterface(voltage))
+            .menu(AllMenus.MULTIBLOCK)
             .blockEntity()
-            .eventManager()
-            .simpleCapability(MultiBlockInterface::basic)
-            .simpleCapability(FlexibleStackContainer::builder)
-            .menu(ProcessingMenu.multiBlock())
-            .title(ProcessingMenu::getTitle)
-            .plugin(MachinePlugin::multiBlock)
-            .build()
+            .transform(MultiBlockInterface::factory)
+            .transform(FlexibleStackContainer::factory)
             .renderer(() -> () -> MultiBlockInterfaceRenderer::new)
-            .build()
+            .end()
             .block()
-            .tint(() -> () -> (state, $2, $3, i) -> MultiBlockInterfaceBlock.tint(voltage, state, i))
-            .build()
+            .tint(() -> () -> (state, $2, $3, i) -> MultiBlockInterfaceBlock
+                .tint(voltage, state, i))
             .translucent()
+            .end()
             .buildObject();
     }
 }

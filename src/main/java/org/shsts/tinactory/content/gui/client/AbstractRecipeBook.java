@@ -9,15 +9,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.machine.MachineConfig;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
@@ -30,11 +27,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_HORIZONTAL;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.sync.MenuEventHandler.SET_MACHINE_CONFIG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -46,8 +44,8 @@ public abstract class AbstractRecipeBook<T> extends Panel {
     public static final int PANEL_BORDER = 8;
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
     public static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
-    public static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_HORIZONTAL - PANEL_WIDTH,
-        -MARGIN_TOP, -MARGIN_HORIZONTAL, MARGIN_VERTICAL);
+    public static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_X - PANEL_WIDTH,
+        -MARGIN_TOP, -MARGIN_X, MARGIN_VERTICAL);
     public static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
     private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER, PANEL_BORDER + BUTTON_TOP_MARGIN,
         -PANEL_BORDER, -PANEL_BORDER);
@@ -101,9 +99,11 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             var recipe = getRecipe(loc);
             ghostRecipe.clear();
             if (recipe == null) {
-                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder().reset("targetRecipe"));
+                menu.triggerEvent(SET_MACHINE_CONFIG,
+                    SetMachineConfigPacket.builder().reset("targetRecipe"));
             } else {
-                menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder().set("targetRecipe", loc));
+                menu.triggerEvent(SET_MACHINE_CONFIG,
+                    SetMachineConfigPacket.builder().set("targetRecipe", loc));
                 selectRecipe(recipe);
             }
         }
@@ -120,7 +120,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
     }
 
     protected final BlockEntity blockEntity;
-    protected final MachineConfig machineConfig;
+    protected final IMachineConfig machineConfig;
     protected final Panel bookPanel;
     protected final ButtonPanel buttonPanel;
     protected final GhostRecipe ghostRecipe;
@@ -128,12 +128,13 @@ public abstract class AbstractRecipeBook<T> extends Panel {
     protected final Map<ResourceLocation, T> recipes = new HashMap<>();
     private final List<ResourceLocation> recipeList = new ArrayList<>();
 
-    public AbstractRecipeBook(MenuScreen<? extends Menu<?, ?>> screen, int xOffset) {
+    public AbstractRecipeBook(ProcessingScreen screen, int xOffset) {
         super(screen);
-        this.blockEntity = screen.getMenu().blockEntity;
-        this.machineConfig = AllCapabilities.MACHINE.get(blockEntity).config;
+        var menu = screen.menu();
+        this.blockEntity = menu.blockEntity();
+        this.machineConfig = MACHINE.get(blockEntity).config();
         this.bookPanel = new Panel(screen);
-        this.ghostRecipe = new GhostRecipe(screen.getMenu());
+        this.ghostRecipe = new GhostRecipe(menu);
 
         buttonPanel = new RecipeButtonPanel();
         var panelBg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);

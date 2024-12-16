@@ -2,20 +2,22 @@ package org.shsts.tinactory.core.gui.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
-import org.shsts.tinactory.core.gui.sync.MenuEventHandler;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -25,16 +27,31 @@ public class FluidSlot extends MenuWidget {
 
     private final int tank;
     private final int syncSlot;
+    @Nullable
+    private final String syncName;
 
-    public FluidSlot(Menu<?, ?> menu, int tank, int syncSlot) {
+    public FluidSlot(IMenu menu, int tank, int syncSlot) {
         super(menu);
         this.tank = tank;
         this.syncSlot = syncSlot;
+        this.syncName = null;
+    }
+
+    public FluidSlot(IMenu menu, int tank, String syncName) {
+        super(menu);
+        this.tank = tank;
+        this.syncSlot = 0;
+        this.syncName = syncName;
     }
 
     public FluidStack getFluidStack() {
-        return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
-            .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
+        if (syncName != null) {
+            return menu.getSyncPacket(syncName, FluidSyncPacket.class)
+                .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
+        } else {
+            return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
+                .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
+        }
     }
 
     @Override
@@ -53,13 +70,12 @@ public class FluidSlot extends MenuWidget {
 
     @Override
     protected boolean canClick(int button) {
-        return (button == 0 || button == 1) && !menu.getCarried().isEmpty();
+        return (button == 0 || button == 1) && !menu.getMenu().getCarried().isEmpty();
     }
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
-        menu.triggerEvent(MenuEventHandler.FLUID_SLOT_CLICK, (containerId, eventId) ->
-            new SlotEventPacket(containerId, eventId, tank, button));
+        menu.triggerEvent(FLUID_SLOT_CLICK, () -> new SlotEventPacket(tank, button));
     }
 
     @Override

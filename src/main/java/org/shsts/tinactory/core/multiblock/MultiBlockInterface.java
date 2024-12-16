@@ -9,28 +9,35 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.IFlexibleContainer;
-import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.core.common.EventManager;
-import org.shsts.tinactory.core.common.SmartBlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.machine.Machine;
+import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.registrate.builder.CapabilityProviderBuilder;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
 import java.util.Optional;
+
+import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -46,11 +53,16 @@ public class MultiBlockInterface extends Machine {
     @Nullable
     private IElectricMachine electricMachine = null;
     @Nullable
-    private RecipeType<?> recipeType = null;
+    private IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>> recipeType = null;
 
-    public MultiBlockInterface(SmartBlockEntity be) {
+    public MultiBlockInterface(BlockEntity be) {
         super(be);
         this.voltage = RecipeProcessor.getBlockVoltage(be);
+    }
+
+    public static <P> IBlockEntityTypeBuilder<P> factory(
+        IBlockEntityTypeBuilder<P> builder) {
+        return builder.capability(ID, MultiBlockInterface::new);
     }
 
     /**
@@ -68,7 +80,7 @@ public class MultiBlockInterface extends Machine {
     }
 
     private void setJoined(Level world, boolean value) {
-        blockEntity.getRealBlockState().ifPresent(state -> {
+        getRealBlockState(world, blockEntity).ifPresent(state -> {
             var newState = state.setValue(MultiBlockInterfaceBlock.JOINED, value);
             world.setBlock(blockEntity.getBlockPos(), newState, 3);
         });
@@ -82,8 +94,7 @@ public class MultiBlockInterface extends Machine {
         multiBlock = target;
         processor = target.getProcessor();
         electricMachine = target.getElectric();
-        recipeType = processor instanceof RecipeProcessor<?> recipeProcessor ?
-            recipeProcessor.recipeType : null;
+        recipeType = processor instanceof MachineProcessor<?> machine ? machine.recipeType : null;
         container.setLayout(target.layout);
         var world = blockEntity.getLevel();
         assert world != null;
@@ -113,15 +124,15 @@ public class MultiBlockInterface extends Machine {
 
     private void onContainerChange() {
         if (multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents.CONTAINER_CHANGE);
+            invoke(multiBlock.blockEntity, CONTAINER_CHANGE);
         }
     }
 
     @Override
-    public void setConfig(SetMachineConfigPacket packet, boolean invokeEvent) {
+    public void setConfig(ISetMachineConfigPacket packet, boolean invokeEvent) {
         super.setConfig(packet, invokeEvent);
         if (invokeEvent && multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
+            invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);
         }
     }
 
@@ -131,11 +142,11 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public void subscribeEvents(EventManager eventManager) {
+    public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
-        eventManager.subscribe(AllEvents.SERVER_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CLIENT_LOAD, $ -> onLoad());
-        eventManager.subscribe(AllEvents.CONTAINER_CHANGE, this::onContainerChange);
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CONTAINER_CHANGE.get(), this::onContainerChange);
     }
 
     @Override
@@ -143,7 +154,7 @@ public class MultiBlockInterface extends Machine {
         if (multiBlock == null) {
             return Optional.empty();
         }
-        return multiBlock.blockEntity.getRealBlockState();
+        return getRealBlockState(world, multiBlock.blockEntity);
     }
 
     @Override
@@ -155,24 +166,24 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public Optional<IProcessor> getProcessor() {
+    public Optional<IProcessor> processor() {
         return Optional.ofNullable(processor);
     }
 
     @Override
-    public Optional<IContainer> getContainer() {
+    public Optional<IContainer> container() {
         return Optional.of(container);
     }
 
     @Override
-    public Optional<IElectricMachine> getElectric() {
+    public Optional<IElectricMachine> electric() {
         return Optional.ofNullable(electricMachine);
     }
 
     @Override
-    public Component getTitle() {
-        if (config.hasString("name") || multiBlock == null) {
-            return super.getTitle();
+    public Component title() {
+        if (config.contains("name", Tag.TAG_STRING) || multiBlock == null) {
+            return super.title();
         }
         return I18n.name(multiBlock.blockEntity.getBlockState().getBlock());
     }
@@ -181,7 +192,7 @@ public class MultiBlockInterface extends Machine {
         return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.layout);
     }
 
-    public Optional<RecipeType<?>> getRecipeType() {
+    public Optional<IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>>> getRecipeType() {
         return Optional.ofNullable(recipeType);
     }
 
@@ -190,9 +201,9 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public ItemStack getIcon() {
+    public ItemStack icon() {
         if (multiBlock == null) {
-            return super.getIcon();
+            return super.icon();
         }
         var block = multiBlock.blockEntity.getBlockState().getBlock();
         return new ItemStack(block);
@@ -220,18 +231,14 @@ public class MultiBlockInterface extends Machine {
             if (be1 == null) {
                 return;
             }
-            AllCapabilities.MULTI_BLOCK.tryGet(be1)
+            MultiBlock.tryGet(be1)
                 .ifPresentOrElse(this::setMultiBlock, this::resetMultiBlock);
         } else {
             resetMultiBlock();
         }
 
         if (multiBlock != null) {
-            EventManager.invoke(multiBlock.blockEntity, AllEvents.SET_MACHINE_CONFIG);
+            invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);
         }
-    }
-
-    public static <P> CapabilityProviderBuilder<SmartBlockEntity, P> basic(P parent) {
-        return CapabilityProviderBuilder.fromFactory(parent, ID, MultiBlockInterface::new);
     }
 }

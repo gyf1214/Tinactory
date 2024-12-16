@@ -1,17 +1,18 @@
 package org.shsts.tinactory.content.network;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import org.shsts.tinactory.core.common.SmartBlockEntityType;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
@@ -22,11 +23,12 @@ import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class PrimitiveBlock<T extends BlockEntity> extends SmartEntityBlock<T> {
+public class PrimitiveBlock extends SmartEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public PrimitiveBlock(Properties properties, Supplier<SmartBlockEntityType<T>> entityType) {
-        super(properties.strength(2f, 6f), entityType);
+    public PrimitiveBlock(Properties properties,
+        Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu) {
+        super(properties.strength(2f, 6f), entityType, menu);
     }
 
     @Override

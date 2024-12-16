@@ -3,30 +3,33 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.content.AllNetworks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.electric.ElectricComponent;
-import org.shsts.tinactory.core.gui.sync.MenuSyncPacket;
 import org.shsts.tinactory.core.network.NetworkBase;
 import org.shsts.tinactory.core.network.NetworkController;
+import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;
 
+import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class NetworkControllerSyncPacket extends MenuSyncPacket {
+public class NetworkControllerSyncPacket implements IPacket {
     private boolean present;
     private NetworkBase.State state;
     private ElectricComponent.Metrics electricMetrics;
 
     public NetworkControllerSyncPacket() {}
 
-    public NetworkControllerSyncPacket(int containerId, int index, NetworkController be) {
-        super(containerId, index);
-        this.present = be.getNetwork().isPresent();
+    public NetworkControllerSyncPacket(BlockEntity be) {
+        var network = NetworkController.tryGet(be)
+            .flatMap(NetworkController::getNetwork);
+        this.present = network.isPresent();
         if (present) {
-            var network = be.getNetwork().get();
-            this.state = network.getState();
-            this.electricMetrics = network.getComponent(AllNetworks.ELECTRIC_COMPONENT)
+            this.state = network.get().getState();
+            this.electricMetrics = network.get()
+                .getComponent(ELECTRIC_COMPONENT.get())
                 .getMetrics();
         }
     }
@@ -46,7 +49,6 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        super.serializeToBuf(buf);
         buf.writeBoolean(present);
         if (present) {
             buf.writeEnum(state);
@@ -56,7 +58,6 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        super.deserializeFromBuf(buf);
         present = buf.readBoolean();
         if (present) {
             state = buf.readEnum(NetworkBase.State.class);
@@ -70,9 +71,6 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
             return true;
         }
         if (!(o instanceof NetworkControllerSyncPacket that)) {
-            return false;
-        }
-        if (!super.equals(o)) {
             return false;
         }
         if (!Objects.equals(present, that.present)) {
@@ -89,9 +87,9 @@ public class NetworkControllerSyncPacket extends MenuSyncPacket {
     @Override
     public int hashCode() {
         if (present) {
-            return Objects.hash(super.hashCode(), present);
+            return Objects.hash(true);
         } else {
-            return Objects.hash(super.hashCode(), present, state, electricMetrics);
+            return Objects.hash(false, state, electricMetrics);
         }
     }
 }

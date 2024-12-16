@@ -7,11 +7,13 @@ import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
@@ -75,6 +77,14 @@ public class Layout {
         this.rect = new Rect(0, 0, maxX, maxY);
     }
 
+    public static <P> LayoutSetBuilder<P> builder(P parent) {
+        return new LayoutSetBuilder<>(parent);
+    }
+
+    public static LayoutSetBuilder<?> builder() {
+        return new LayoutSetBuilder<>(Unit.INSTANCE);
+    }
+
     public int getXOffset() {
         return (Menu.CONTENT_WIDTH - rect.width()) / 2;
     }
@@ -107,11 +117,7 @@ public class Layout {
         return getSlotWithInfo(recipe.outputs, ProcessingRecipe.Output::port, ProcessingRecipe.Output::result);
     }
 
-    public static <P> LayoutSetBuilder<P> builder(P parent) {
-        return new LayoutSetBuilder<>(parent);
-    }
+    public static final Layout EMPTY = builder().buildLayout();
 
-    public static LayoutSetBuilder<?> builder() {
-        return new LayoutSetBuilder<>(Unit.INSTANCE);
-    }
+    public static final Map<Voltage, Layout> EMPTY_SET = builder().buildObject();
 }

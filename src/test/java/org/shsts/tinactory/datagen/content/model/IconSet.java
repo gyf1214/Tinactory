@@ -9,7 +9,7 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import org.shsts.tinactory.datagen.context.RegistryDataContext;
+import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -41,7 +41,8 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         this(subfolder, DULL);
     }
 
-    private Optional<ResourceLocation> getTex(ResourceLocation baseLoc, ExistingFileHelper helper, String sub) {
+    private Optional<ResourceLocation> getTex(ResourceLocation baseLoc,
+        ExistingFileHelper helper, String sub) {
         if (sub.equals("magnetic_overlay")) {
             return Optional.of(MAGNETIC_LOC);
         }
@@ -54,10 +55,10 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         return Optional.empty();
     }
 
-    public <U extends Item, P extends ItemModelProvider> Consumer<RegistryDataContext<Item, U, P>> itemModel(
-        String sub) {
+    public <U extends Item, P extends ItemModelProvider> Consumer<IEntryDataContext<Item,
+        U, P>> itemModel(String sub) {
         return ctx -> {
-            var helper = ctx.provider.existingFileHelper;
+            var helper = ctx.provider().existingFileHelper;
 
             var sub1 = sub.equals("sheet") ? "plate" : sub;
             var baseSub = sub1.equals("magnetic") ? "stick" : sub1;
@@ -65,13 +66,14 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
                 "No icon %s for icon set %s".formatted(baseSub, subfolder)));
             var overlay = getTex(ITEM_LOC, helper, sub1 + "_overlay");
 
-            var model = ctx.provider.withExistingParent(ctx.id, "item/generated")
+            var model = ctx.provider().withExistingParent(ctx.id(), "item/generated")
                 .texture("layer0", base);
             overlay.ifPresent(loc -> model.texture("layer1", loc));
         };
     }
 
-    public <T extends ModelBuilder<T>> T blockOverlay(ModelProvider<T> prov, String id, String sub) {
+    public <T extends ModelBuilder<T>> T blockOverlay(ModelProvider<T> prov,
+        String id, String sub) {
         var tex = getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() ->
             new IllegalArgumentException("No block overlay %s for icon set %s"
                 .formatted(sub, subfolder)));

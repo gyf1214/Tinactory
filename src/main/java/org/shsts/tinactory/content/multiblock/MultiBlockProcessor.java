@@ -1,20 +1,21 @@
 package org.shsts.tinactory.content.multiblock;
 
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.machine.MachineProcessor;
+import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-public class MultiBlockProcessor<T extends ProcessingRecipe> extends MachineProcessor<T> {
-    public MultiBlockProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType, boolean autoRecipe) {
+public class MultiBlockProcessor<R extends ProcessingRecipe> extends MachineProcessor<R> {
+    public MultiBlockProcessor(BlockEntity blockEntity,
+        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType, boolean autoRecipe) {
         super(blockEntity, recipeType, Voltage.PRIMITIVE, autoRecipe);
     }
 
     protected MultiBlock getMultiBlock() {
-        return AllCapabilities.MULTI_BLOCK.get(blockEntity);
+        return MultiBlock.get(blockEntity);
     }
 
     @Override
