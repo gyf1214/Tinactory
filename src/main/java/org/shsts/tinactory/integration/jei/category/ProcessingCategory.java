@@ -6,18 +6,15 @@ import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.core.gui.Layout;
@@ -34,11 +31,13 @@ import org.shsts.tinactory.integration.jei.ComposeDrawable;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientRenderer;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
 import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.shsts.tinactory.content.AllTags.machineTag;
 import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -48,28 +47,28 @@ import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingCategory extends RecipeCategory1<ProcessingRecipe, AbstractContainerMenu> {
+public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCategory<R> {
     private static final int EXTRA_HEIGHT = FONT_HEIGHT * 3 + SPACING * 2 + SLOT_SIZE / 2;
 
-    public ProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
+    public ProcessingCategory(
+        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
         Layout layout, Block icon) {
-        super(recipeType, layout, Ingredient.of(AllTags.machineTag(recipeType)),
-            new ItemStack(icon), AbstractContainerMenu.class);
+        super(recipeType, layout, Ingredient.of(machineTag(recipeType)), new ItemStack(icon));
     }
 
     @Override
-    protected ComposeDrawable.Builder buildBackground(ComposeDrawable.Builder builder,
+    protected void buildBackground(ComposeDrawable.Builder builder,
         IGuiHelper helper, int xOffset) {
         var extraHeight = EXTRA_HEIGHT;
-        if (AssemblyRecipe.class.isAssignableFrom(recipeType.clazz)) {
+        if (AssemblyRecipe.class.isAssignableFrom(recipeType.recipeClass())) {
             extraHeight += BUTTON_SIZE + SPACING;
-        } else if (ResearchRecipe.class.isAssignableFrom(recipeType.clazz)) {
+        } else if (ResearchRecipe.class.isAssignableFrom(recipeType.recipeClass())) {
             extraHeight += BUTTON_SIZE + FONT_HEIGHT + SPACING * 2;
-        } else if (BlastFurnaceRecipe.class.isAssignableFrom(recipeType.clazz)) {
+        } else if (BlastFurnaceRecipe.class.isAssignableFrom(recipeType.recipeClass())) {
             extraHeight += FONT_HEIGHT + SPACING;
         }
-        return super.buildBackground(builder, helper, xOffset)
-            .add(helper.createBlankDrawable(WIDTH, extraHeight), 0, layout.rect.endY());
+        super.buildBackground(builder, helper, xOffset);
+        builder.add(helper.createBlankDrawable(WIDTH, extraHeight), 0, layout.rect.endY());
     }
 
     private int drawTextLine(PoseStack stack, Component text, int y) {
@@ -192,20 +191,5 @@ public class ProcessingCategory extends RecipeCategory1<ProcessingRecipe, Abstra
             addTechIngredient(builder, RecipeIngredientRole.OUTPUT, x, y, loc);
             x += BUTTON_SIZE;
         }
-    }
-
-    @Override
-    protected boolean canTransfer(AbstractContainerMenu menu, ProcessingRecipe recipe) {
-        // TODO
-//        return AllCapabilities.PROCESSOR.tryGet(menu.blockEntity)
-//            .map(p -> p instanceof MachineProcessor<?> processor &&
-//                processor.recipeType == recipe.getType())
-//            .orElse(false);
-        return false;
-    }
-
-    @Override
-    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-        // TODO: auto transfer of processing recipe is too buggy, disable now
     }
 }

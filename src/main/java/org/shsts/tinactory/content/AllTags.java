@@ -9,9 +9,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.electric.CircuitComponentTier;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.LocHelper;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -38,8 +37,8 @@ public final class AllTags {
     public static final TagKey<Item> MACHINE = modItem("machine");
     public static final TagKey<Block> COIL = modBlock("coil");
 
-    public static TagKey<Item> machineTag(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType) {
-        return extend(MACHINE, recipeType.id);
+    public static TagKey<Item> machineTag(IRecipeType<?> recipeType) {
+        return extend(MACHINE, recipeType.id());
     }
 
     public static TagKey<Item> circuit(Voltage v) {

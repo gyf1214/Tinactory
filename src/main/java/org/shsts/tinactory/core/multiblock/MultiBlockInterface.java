@@ -9,7 +9,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,12 +20,16 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -50,7 +53,7 @@ public class MultiBlockInterface extends Machine {
     @Nullable
     private IElectricMachine electricMachine = null;
     @Nullable
-    private RecipeType<?> recipeType = null;
+    private IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>> recipeType = null;
 
     public MultiBlockInterface(BlockEntity be) {
         super(be);
@@ -91,8 +94,7 @@ public class MultiBlockInterface extends Machine {
         multiBlock = target;
         processor = target.getProcessor();
         electricMachine = target.getElectric();
-        recipeType = processor instanceof RecipeProcessor<?> recipeProcessor ?
-            recipeProcessor.recipeType : null;
+        recipeType = processor instanceof MachineProcessor<?> machine ? machine.recipeType : null;
         container.setLayout(target.layout);
         var world = blockEntity.getLevel();
         assert world != null;
@@ -190,7 +192,7 @@ public class MultiBlockInterface extends Machine {
         return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.layout);
     }
 
-    public Optional<RecipeType<?>> getRecipeType() {
+    public Optional<IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>>> getRecipeType() {
         return Optional.ofNullable(recipeType);
     }
 

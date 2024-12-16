@@ -5,17 +5,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BlastFurnaceRecipe extends ProcessingRecipe {
     public final int temperature;
 
-    protected BlastFurnaceRecipe(Builder builder) {
+    private BlastFurnaceRecipe(Builder builder) {
         super(builder);
         this.temperature = builder.temperature;
     }
@@ -23,10 +22,8 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
     public static class Builder extends BuilderBase<BlastFurnaceRecipe, Builder> {
         private int temperature = 0;
 
-        public Builder(IRecipeDataConsumer consumer,
-            RecipeTypeEntry<BlastFurnaceRecipe, Builder> parent,
-            ResourceLocation loc) {
-            super(consumer, parent, loc);
+        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         public Builder temperature(int value) {
@@ -40,15 +37,10 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
         }
     }
 
-    private static class Serializer extends
-        ProcessingRecipe.Serializer<BlastFurnaceRecipe, BlastFurnaceRecipe.Builder> {
-        private Serializer(RecipeTypeEntry<BlastFurnaceRecipe, Builder> type) {
-            super(type);
-        }
-
+    private static class Serializer extends ProcessingRecipe.Serializer<BlastFurnaceRecipe, Builder> {
         @Override
-        protected Builder buildFromJson(ResourceLocation loc, JsonObject jo) {
-            return super.buildFromJson(loc, jo)
+        protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
+            return super.buildFromJson(type, loc, jo)
                 .temperature(GsonHelper.getAsInt(jo, "temperature"));
         }
 
@@ -59,6 +51,5 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
         }
     }
 
-    public static final SmartRecipeSerializer.Factory<BlastFurnaceRecipe, Builder> SERIALIZER =
-        Serializer::new;
+    public static final IRecipeSerializer<BlastFurnaceRecipe, Builder> SERIALIZER = new Serializer();
 }

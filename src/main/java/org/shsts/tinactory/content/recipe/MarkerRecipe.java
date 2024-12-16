@@ -12,10 +12,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
-import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
 
@@ -24,7 +23,7 @@ import java.util.Optional;
 public class MarkerRecipe extends ProcessingRecipe {
     public final RecipeType<?> baseType;
 
-    public MarkerRecipe(BuilderBase<?, ?> builder, RecipeType<?> baseType) {
+    private MarkerRecipe(BuilderBase<?, ?> builder, RecipeType<?> baseType) {
         super(builder);
         this.baseType = baseType;
     }
@@ -38,9 +37,8 @@ public class MarkerRecipe extends ProcessingRecipe {
         @Nullable
         private ResourceLocation baseType;
 
-        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<MarkerRecipe, Builder> parent,
-            ResourceLocation loc) {
-            super(consumer, parent, loc);
+        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         public Builder baseType(ResourceLocation value) {
@@ -48,8 +46,8 @@ public class MarkerRecipe extends ProcessingRecipe {
             return this;
         }
 
-        public Builder baseType(RecipeTypeEntry<?, ?> value) {
-            baseType = value.loc;
+        public Builder baseType(IRecipeType<?> value) {
+            baseType = value.loc();
             return this;
         }
 
@@ -78,13 +76,9 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     private static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
-        private Serializer(RecipeTypeEntry<MarkerRecipe, Builder> type) {
-            super(type);
-        }
-
         @Override
-        protected Builder buildFromJson(ResourceLocation loc, JsonObject jo) {
-            return super.buildFromJson(loc, jo)
+        protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
+            return super.buildFromJson(type, loc, jo)
                 .baseType(new ResourceLocation(GsonHelper.getAsString(jo, "base_type")));
         }
 
@@ -95,6 +89,5 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
     }
 
-    public static final SmartRecipeSerializer.Factory<MarkerRecipe, MarkerRecipe.Builder>
-        SERIALIZER = Serializer::new;
+    public static final IRecipeSerializer<MarkerRecipe, Builder> SERIALIZER = new Serializer();
 }

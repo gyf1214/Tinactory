@@ -18,9 +18,10 @@ import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -43,10 +44,8 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public boolean canCraftIn(IContainer container) {
-        return container.getOwnerTeam()
-            .map(this::canResearch)
-            .orElse(false);
+    protected boolean matchTeam(Optional<ITeamProfile> team) {
+        return team.filter(this::canResearch).isPresent();
     }
 
     @Override
@@ -60,9 +59,8 @@ public class ResearchRecipe extends ProcessingRecipe {
         private ResourceLocation target = null;
         private long progress = 1;
 
-        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<ResearchRecipe, Builder> parent,
-            ResourceLocation loc) {
-            super(consumer, parent, loc);
+        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         public Builder input(IProcessingIngredient ingredient) {
@@ -107,13 +105,10 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
     }
 
-    private static class Serializer extends SmartRecipeSerializer<ResearchRecipe, Builder> {
-        private Serializer(RecipeTypeEntry<ResearchRecipe, Builder> type) {
-            super(type);
-        }
-
+    private static class Serializer implements IRecipeSerializer<ResearchRecipe, Builder> {
         @Override
-        public ResearchRecipe fromJson(ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
+        public ResearchRecipe fromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo,
+            ICondition.IContext context) {
             var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                 .map(je -> ProcessingIngredients.fromJson(je.getAsJsonObject()))
@@ -141,6 +136,5 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
     }
 
-    public static final SmartRecipeSerializer.Factory<ResearchRecipe, ResearchRecipe.Builder>
-        SERIALIZER = ResearchRecipe.Serializer::new;
+    public static final IRecipeSerializer<ResearchRecipe, Builder> SERIALIZER = new Serializer();
 }

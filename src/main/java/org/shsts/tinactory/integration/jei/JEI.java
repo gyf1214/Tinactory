@@ -14,7 +14,6 @@ import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
@@ -28,9 +27,8 @@ import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
-import org.shsts.tinactory.integration.jei.category.RecipeCategory1;
+import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
 import org.shsts.tinactory.integration.jei.gui.NetworkControllerHandler;
@@ -40,7 +38,8 @@ import org.shsts.tinactory.integration.jei.gui.WorkbenchHandler;
 import org.shsts.tinactory.integration.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientHelper;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,8 +59,8 @@ public class JEI implements IModPlugin {
 
     public final ToolCategory toolCategory;
 
-    private final List<RecipeCategory1<?, ?>> categories;
-    private final Map<RecipeType<?>, RecipeCategory1<?, ?>> processingCategories;
+    private final List<RecipeCategory<?>> categories;
+    private final Map<IRecipeType<?>, RecipeCategory<?>> processingCategories;
 
     public JEI() {
         this.categories = new ArrayList<>();
@@ -78,14 +77,14 @@ public class JEI implements IModPlugin {
         addProcessingCategory(AllRecipes.SIFTER, AllLayouts.SIFTER, AllMultiBlocks.SIFTER.get());
     }
 
-    private void addProcessingCategory(RecipeTypeEntry<? extends ProcessingRecipe, ?> recipeType,
-        Layout layout, Block icon) {
-        var category = new ProcessingCategory(recipeType, layout, icon);
+    private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(
+        IRecipeType<B> recipeType, Layout layout, Block icon) {
+        var category = new ProcessingCategory<>(recipeType, layout, icon);
         categories.add(category);
-        processingCategories.put(recipeType.get(), category);
+        processingCategories.put(recipeType, category);
     }
 
-    public Optional<RecipeCategory1<?, ?>> processingCategory(RecipeType<?> recipeType) {
+    public Optional<RecipeCategory<?>> processingCategory(IRecipeType<?> recipeType) {
         return Optional.ofNullable(processingCategories.get(recipeType));
     }
 
@@ -110,11 +109,10 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        var recipeManager1 = ClientUtil.getRecipeManager();
         var recipeManager = CORE.clientRecipeManager();
         toolCategory.registerRecipes(registration, recipeManager);
         for (var category : categories) {
-            category.registerRecipes(registration, recipeManager1);
+            category.registerRecipes(registration, recipeManager);
         }
     }
 

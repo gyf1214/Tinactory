@@ -24,6 +24,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.tool.ToolItem;
+import org.shsts.tinactory.core.builder.VanillaRecipeBuilder;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IVanillaRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;

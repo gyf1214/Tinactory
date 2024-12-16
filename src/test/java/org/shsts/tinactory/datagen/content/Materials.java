@@ -323,14 +323,14 @@ public final class Materials {
     private static void ores() {
         // stone generator
         for (var variant : OreVariant.values()) {
-            STONE_GENERATOR.recipe(_DATA_GEN, variant.baseItem)
+            STONE_GENERATOR.recipe(DATA_GEN, variant.baseItem)
                 .outputItem(0, variant.baseItem, 1)
                 .voltage(variant == OreVariant.STONE ? Voltage.PRIMITIVE : variant.voltage)
                 .build();
         }
         // generate water
         STONE_GENERATOR
-            .recipe(_DATA_GEN, Fluids.WATER)
+            .recipe(DATA_GEN, Fluids.WATER)
             .outputFluid(1, Fluids.WATER, 1000)
             .voltage(Voltage.ULV)
             .build();
@@ -450,7 +450,7 @@ public final class Materials {
         // generate steam
         for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
             var consume = (int) voltage.value / 8 * (14 - voltage.rank);
-            STEAM_TURBINE.recipe(_DATA_GEN, voltage.id)
+            STEAM_TURBINE.recipe(DATA_GEN, voltage.id)
                 .voltage(voltage)
                 .inputFluid(0, STEAM, consume)
                 .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
@@ -464,21 +464,21 @@ public final class Materials {
             .toolTag(TOOL_MORTAR)
             .build();
 
-        EXTRACTOR.recipe(_DATA_GEN, RAW_RUBBER.loc("dust"))
+        EXTRACTOR.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
             .outputItem(1, RAW_RUBBER.entry("dust"), 3)
             .inputItem(0, STICKY_RESIN, 1)
             .workTicks(160L)
             .voltage(Voltage.LV)
             .build();
 
-        EXTRACTOR.recipe(_DATA_GEN, suffix(RAW_RUBBER.loc("dust"), "_from_log"))
+        EXTRACTOR.recipe(DATA_GEN, suffix(RAW_RUBBER.loc("dust"), "_from_log"))
             .outputItem(1, RAW_RUBBER.entry("dust"), 1)
             .inputItem(0, RUBBER_LOG, 1)
             .workTicks(320L)
             .voltage(Voltage.LV)
             .build();
 
-        ALLOY_SMELTER.recipe(_DATA_GEN, RUBBER.loc("sheet"))
+        ALLOY_SMELTER.recipe(DATA_GEN, RUBBER.loc("sheet"))
             .inputItem(0, RAW_RUBBER.entry("dust"), 3)
             .inputItem(0, SULFUR.entry("dust"), 1)
             .outputItem(1, RUBBER.entry("sheet"), 3)

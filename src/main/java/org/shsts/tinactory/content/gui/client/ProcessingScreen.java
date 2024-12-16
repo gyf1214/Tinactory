@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -18,7 +17,10 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
 
@@ -31,7 +33,7 @@ public class ProcessingScreen extends MenuScreen {
     public final Layout layout;
     protected final Panel layoutPanel;
     @Nullable
-    private RecipeType<?> recipeType = null;
+    private IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>> recipeType = null;
 
     public ProcessingScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -62,11 +64,11 @@ public class ProcessingScreen extends MenuScreen {
         addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
     }
 
-    public Optional<RecipeType<?>> getRecipeType() {
+    public Optional<IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>>> getRecipeType() {
         return Optional.ofNullable(recipeType);
     }
 
-    public void setRecipeType(RecipeType<?> recipeType) {
+    public void setRecipeType(IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>> recipeType) {
         this.recipeType = recipeType;
     }
 }

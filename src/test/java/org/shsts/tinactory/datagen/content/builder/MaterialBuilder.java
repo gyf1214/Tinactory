@@ -26,8 +26,8 @@ import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.model.IconSet;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 import org.slf4j.Logger;
@@ -75,6 +75,7 @@ import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.oreBlock;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -164,12 +165,12 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             return Math.round(ticks * factor);
         }
 
-        private void process(RecipeTypeEntry<?, ? extends ProcessingRecipe.BuilderBase<?, ?>> recipeType,
+        private void process(IRecipeType<ProcessingRecipe.Builder> recipeType,
             String result, int count, String input, long workTicks) {
             if (!material.hasItem(result) || !material.hasItem(input)) {
                 return;
             }
-            recipeType.recipe(_DATA_GEN, material.loc(result))
+            recipeType.recipe(DATA_GEN, material.loc(result))
                 .outputItem(1, material.entry(result), count)
                 .inputItem(0, material.tag(input), 1)
                 .voltage(voltage)
@@ -193,7 +194,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                 k = k1;
                 i = 1;
             }
-            var builder = ASSEMBLER.recipe(_DATA_GEN, material.loc(sub))
+            var builder = ASSEMBLER.recipe(DATA_GEN, material.loc(sub))
                 .outputItem(2, material.entry(sub), k)
                 .voltage(voltage)
                 .workTicks(ticks(workTicks));
@@ -222,7 +223,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             if (material.loc(sub).equals(material.loc(result))) {
                 return;
             }
-            MACERATOR.recipe(_DATA_GEN, suffix(material.loc(result), "_from_" + sub))
+            MACERATOR.recipe(DATA_GEN, suffix(material.loc(result), "_from_" + sub))
                 .outputItem(1, material.entry(result), amount)
                 .inputItem(0, material.tag(sub), 1)
                 .voltage(voltage)
@@ -267,7 +268,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             }
             var fluid = material.fluidEntry();
 
-            EXTRACTOR.recipe(_DATA_GEN, suffix(material.fluidLoc(), "_from_" + sub))
+            EXTRACTOR.recipe(DATA_GEN, suffix(material.fluidLoc(), "_from_" + sub))
                 .outputFluid(2, fluid, material.fluidAmount(amount))
                 .inputItem(0, material.tag(sub), 1)
                 .voltage(v)
@@ -275,7 +276,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                 .build();
 
             if (solidifier) {
-                FLUID_SOLIDIFIER.recipe(_DATA_GEN, material.loc(sub))
+                FLUID_SOLIDIFIER.recipe(DATA_GEN, material.loc(sub))
                     .outputItem(1, material.entry(sub), 1)
                     .inputFluid(0, fluid, material.fluidAmount(amount))
                     .voltage(v)
@@ -309,7 +310,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
         private void extrude(String target, int outCount, int inCount) {
             if (material.hasItem(target) && material.hasItem("ingot")) {
-                EXTRUDER.recipe(_DATA_GEN, material.loc(target))
+                EXTRUDER.recipe(DATA_GEN, material.loc(target))
                     .outputItem(1, material.entry(target), outCount)
                     .inputItem(0, material.tag("ingot"), inCount)
                     .voltage(Voltage.fromRank(voltage.rank + 1))
@@ -343,7 +344,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             process(LATHE, "lens", 1, "gem_exquisite", 600L);
 
             if (material.hasItem("bolt") && material.hasItem("stick")) {
-                CUTTER.recipe(_DATA_GEN, material.loc("bolt"))
+                CUTTER.recipe(DATA_GEN, material.loc("bolt"))
                     .outputItem(2, material.entry("bolt"), 4)
                     .inputItem(0, material.tag("stick"), 1)
                     .inputFluid(1, Fluids.WATER, 5)
@@ -353,7 +354,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             }
 
             if (material.hasItem("gem_flawless") && material.hasItem("gem")) {
-                CUTTER.recipe(_DATA_GEN, material.loc("gem"))
+                CUTTER.recipe(DATA_GEN, material.loc("gem"))
                     .outputItem(2, material.entry("gem"), 8)
                     .inputItem(0, material.tag("gem_flawless"), 1)
                     .inputFluid(1, Fluids.WATER, 80)
@@ -408,7 +409,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             source = mat;
             suffix = "_from_" + source.name;
         }
-        BLAST_FURNACE.recipe(_DATA_GEN, suffix(material.loc("ingot"), suffix))
+        BLAST_FURNACE.recipe(DATA_GEN, suffix(material.loc("ingot"), suffix))
             .outputItem(2, material.entry("ingot"), 1)
             .inputItem(0, source.tag("dust"), 1)
             .voltage(v)
@@ -418,9 +419,8 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return this;
     }
 
-    private <U extends ProcessingRecipe, B extends ProcessingRecipe.BuilderBase<U, B>> void compose(
-        Voltage v, RecipeTypeEntry<U, B> recipeType, int outputPort,
-        boolean decompose, long workTicks, String output, Object... components) {
+    private void compose(Voltage v, IRecipeType<ProcessingRecipe.Builder> recipeType,
+        int outputPort, boolean decompose, long workTicks, String output, Object... components) {
         var loc = output.equals("fluid") ? material.fluidLoc() : material.loc(output);
 
         var alloyCount = 0;
@@ -432,7 +432,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             i = 1;
         }
 
-        var builder = recipeType.recipe(_DATA_GEN, loc)
+        var builder = recipeType.recipe(DATA_GEN, loc)
             .voltage(v);
 
         for (; i < components.length; i += 2) {
@@ -725,7 +725,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         }
 
         private void crush(String output, String input) {
-            MACERATOR.recipe(_DATA_GEN, suffix(material.loc(output), "_from_centrifuged"))
+            MACERATOR.recipe(DATA_GEN, suffix(material.loc(output), "_from_centrifuged"))
                 .inputItem(0, material.tag(input), 1)
                 .outputItem(1, material.entry(output), input.equals("raw") ? 2 * amount : 1)
                 .voltage(Voltage.LV)
@@ -738,7 +738,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             if (input.equals("dust_pure")) {
                 loc = suffix(loc, "_from_pure");
             }
-            var builder = ORE_WASHER.recipe(_DATA_GEN, loc)
+            var builder = ORE_WASHER.recipe(DATA_GEN, loc)
                 .inputItem(0, material.tag(input), 1)
                 .outputItem(2, material.entry(output), 1);
             if (input.equals("crushed")) {
@@ -777,7 +777,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             wash("dust", "dust_impure");
             wash("dust", "dust_pure");
 
-            CENTRIFUGE.recipe(_DATA_GEN, material.loc("dust_pure"))
+            CENTRIFUGE.recipe(DATA_GEN, material.loc("dust_pure"))
                 .inputItem(0, material.tag("dust_pure"), 1)
                 .outputItem(2, material.entry("dust"), 1)
                 .outputItem(2, byproduct1, 1, 0.3d)
@@ -785,14 +785,14 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                 .workTicks(80)
                 .build();
 
-            THERMAL_CENTRIFUGE.recipe(_DATA_GEN, material.loc("crushed_centrifuged"))
+            THERMAL_CENTRIFUGE.recipe(DATA_GEN, material.loc("crushed_centrifuged"))
                 .inputItem(0, material.tag("crushed_purified"), 1)
                 .outputItem(1, material.entry("crushed_centrifuged"), 1)
                 .outputItem(1, byproduct2, 1, 0.4d)
                 .build();
 
             if (material.hasItem("gem")) {
-                SIFTER.recipe(_DATA_GEN, material.loc("crushed_purified"))
+                SIFTER.recipe(DATA_GEN, material.loc("crushed_purified"))
                     .inputItem(0, material.tag("crushed_purified"), 1)
                     .outputItem(1, material.entry("gem_flawless"), 1, 0.1d)
                     .outputItem(1, material.entry("gem"), 1, 0.35d)
@@ -801,7 +801,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                     .workTicks(600L)
                     .build();
             } else if (hammerPrimary) {
-                SIFTER.recipe(_DATA_GEN, material.loc("crushed_purified"))
+                SIFTER.recipe(DATA_GEN, material.loc("crushed_purified"))
                     .inputItem(0, material.tag("crushed_purified"), 1)
                     .outputItem(1, material.entry("primary"), 1, 0.8d)
                     .outputItem(1, material.entry("primary"), 1, 0.35d)

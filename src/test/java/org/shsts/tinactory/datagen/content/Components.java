@@ -305,7 +305,7 @@ public final class Components {
 
         CABLE.forEach((v, cable) -> {
             if (v != Voltage.ULV) {
-                ASSEMBLER.recipe(_DATA_GEN, cable)
+                ASSEMBLER.recipe(DATA_GEN, cable)
                     .outputItem(2, cable, 1)
                     .input(0, () -> new ProcessingIngredients.TagIngredient(cable.get().material.tag("wire"), 4))
                     .inputFluid(1, RUBBER.fluidEntry(), RUBBER.fluidAmount(2))
@@ -352,7 +352,7 @@ public final class Components {
             if (!component.containsKey(voltage)) {
                 return new AssemblyRecipeBuilder<>(this);
             }
-            var builder = ASSEMBLER.recipe(_DATA_GEN, component.get(voltage))
+            var builder = ASSEMBLER.recipe(DATA_GEN, component.get(voltage))
                 .outputItem(2, component.get(voltage), count)
                 .voltage(baseVoltage)
                 .workTicks(ASSEMBLY_TICKS);
@@ -440,7 +440,7 @@ public final class Components {
         var wires = voltage.rank - 1;
         var plates = wires * wires;
 
-        var builder = ASSEMBLER.recipe(_DATA_GEN, BATTERY.get(voltage))
+        var builder = ASSEMBLER.recipe(DATA_GEN, BATTERY.get(voltage))
             .outputItem(2, BATTERY.get(voltage), 1);
         if (voltage.rank > Voltage.LV.rank) {
             var bat1 = AllTags.battery(Voltage.fromRank(voltage.rank - 1));
@@ -456,14 +456,14 @@ public final class Components {
     }
 
     private static AssemblyRecipe.Builder researchRecipe(Voltage voltage) {
-        return ASSEMBLER.recipe(_DATA_GEN, RESEARCH_EQUIPMENT.get(voltage))
+        return ASSEMBLER.recipe(DATA_GEN, RESEARCH_EQUIPMENT.get(voltage))
             .outputItem(2, RESEARCH_EQUIPMENT.get(voltage), 1)
             .workTicks(200L)
             .voltage(voltage);
     }
 
     private static void buzzsawRecipe(IEntry<Item> item, MaterialSet material, Voltage v) {
-        LATHE.recipe(_DATA_GEN, item)
+        LATHE.recipe(DATA_GEN, item)
             .outputItem(1, item, 1)
             .inputItem(0, material.tag("gear"), 1)
             .voltage(v)
@@ -480,7 +480,7 @@ public final class Components {
             .define('B', IRON.tag("bolt"))
             .unlockedBy("has_wire", has(COPPER.tag("wire"))));
 
-        ASSEMBLER.recipe(_DATA_GEN, VACUUM_TUBE.item())
+        ASSEMBLER.recipe(DATA_GEN, VACUUM_TUBE.item())
             .outputItem(2, VACUUM_TUBE.item(), 1)
             .inputItem(0, GLASS.tag("primary"), 1)
             .inputItem(0, COPPER.tag("wire"), 1)
@@ -529,7 +529,7 @@ public final class Components {
             .define('C', COAL.tag("dust"))
             .unlockedBy("has_resin", has(STICKY_RESIN.get())));
 
-        ASSEMBLER.recipe(_DATA_GEN, RESISTOR.loc(CircuitComponentTier.NORMAL))
+        ASSEMBLER.recipe(DATA_GEN, RESISTOR.loc(CircuitComponentTier.NORMAL))
             .outputItem(2, RESISTOR.item(CircuitComponentTier.NORMAL), 1)
             .inputItem(0, COAL.tag("dust"), 1)
             .inputItem(0, STICKY_RESIN, 1)
@@ -538,7 +538,7 @@ public final class Components {
             .voltage(Voltage.ULV)
             .build();
 
-        ASSEMBLER.recipe(_DATA_GEN, DIODE.loc(CircuitComponentTier.NORMAL))
+        ASSEMBLER.recipe(DATA_GEN, DIODE.loc(CircuitComponentTier.NORMAL))
             .outputItem(2, DIODE.item(CircuitComponentTier.NORMAL), 1)
             .inputItem(0, GALLIUM_ARSENIDE.tag("dust"), 1)
             .inputItem(0, GLASS.tag("primary"), 1)
@@ -547,7 +547,7 @@ public final class Components {
             .voltage(Voltage.LV)
             .build();
 
-        ASSEMBLER.recipe(_DATA_GEN, suffix(DIODE.loc(CircuitComponentTier.NORMAL), "_from_wafer"))
+        ASSEMBLER.recipe(DATA_GEN, suffix(DIODE.loc(CircuitComponentTier.NORMAL), "_from_wafer"))
             .outputItem(2, DIODE.item(CircuitComponentTier.NORMAL), 1)
             .inputItem(0, RAW_WAFERS.get(0), 1)
             .inputItem(0, GLASS.tag("primary"), 1)
@@ -564,7 +564,7 @@ public final class Components {
             .define('W', ItemTags.PLANKS)
             .unlockedBy("has_resin", has(STICKY_RESIN.get())));
 
-        ASSEMBLER.recipe(_DATA_GEN, Circuits.board(CircuitTier.ELECTRONIC))
+        ASSEMBLER.recipe(DATA_GEN, Circuits.board(CircuitTier.ELECTRONIC))
             .outputItem(2, Circuits.board(CircuitTier.ELECTRONIC), 1)
             .inputItem(0, ItemTags.PLANKS, 1)
             .inputItem(0, STICKY_RESIN, 2)
@@ -572,7 +572,7 @@ public final class Components {
             .voltage(Voltage.ULV)
             .build();
 
-        ASSEMBLER.recipe(_DATA_GEN, Circuits.board(CircuitTier.INTEGRATED))
+        ASSEMBLER.recipe(DATA_GEN, Circuits.board(CircuitTier.INTEGRATED))
             .outputItem(2, Circuits.board(CircuitTier.INTEGRATED), 1)
             .inputItem(0, Circuits.board(CircuitTier.ELECTRONIC), 2)
             .inputItem(0, RED_ALLOY.tag("wire"), 8)
@@ -590,7 +590,7 @@ public final class Components {
             .define('W', COPPER.tag("wire"))
             .unlockedBy("has_board", has(Circuits.board(CircuitTier.ELECTRONIC).get())));
 
-        ASSEMBLER.recipe(_DATA_GEN, Circuits.circuitBoard(CircuitTier.ELECTRONIC))
+        ASSEMBLER.recipe(DATA_GEN, Circuits.circuitBoard(CircuitTier.ELECTRONIC))
             .outputItem(2, Circuits.circuitBoard(CircuitTier.ELECTRONIC), 1)
             .inputItem(0, Circuits.board(CircuitTier.ELECTRONIC), 1)
             .inputItem(0, COPPER.tag("wire"), 8)
@@ -599,7 +599,7 @@ public final class Components {
             .voltage(Voltage.ULV)
             .build();
 
-        ASSEMBLER.recipe(_DATA_GEN, Circuits.circuitBoard(CircuitTier.INTEGRATED))
+        ASSEMBLER.recipe(DATA_GEN, Circuits.circuitBoard(CircuitTier.INTEGRATED))
             .outputItem(2, Circuits.circuitBoard(CircuitTier.INTEGRATED), 1)
             .inputItem(0, Circuits.board(CircuitTier.INTEGRATED), 1)
             .inputItem(0, SILVER.tag("wire"), 8)
@@ -610,7 +610,7 @@ public final class Components {
             .build();
 
         // boules
-        BLAST_FURNACE.recipe(_DATA_GEN, BOULES.get(0))
+        BLAST_FURNACE.recipe(DATA_GEN, BOULES.get(0))
             .outputItem(2, BOULES.get(0), 1)
             .inputItem(0, SILICON.tag("dust"), 32)
             .inputItem(0, GALLIUM_ARSENIDE.tag("dust"), 1)
@@ -623,7 +623,7 @@ public final class Components {
         for (var i = 0; i < RAW_WAFERS.size(); i++) {
             var boule = BOULES.get(i);
             var wafer = RAW_WAFERS.get(i);
-            CUTTER.recipe(_DATA_GEN, wafer)
+            CUTTER.recipe(DATA_GEN, wafer)
                 .outputItem(2, wafer, 8 << i)
                 .inputItem(0, boule, 1)
                 .inputFluid(1, Fluids.WATER, 1000 << i)
@@ -640,7 +640,7 @@ public final class Components {
         for (var entry : CHIPS.entrySet()) {
             var wafer = WAFERS.get(entry.getKey());
             var chip = entry.getValue();
-            CUTTER.recipe(_DATA_GEN, chip)
+            CUTTER.recipe(DATA_GEN, chip)
                 .outputItem(2, chip, 6)
                 .inputItem(0, wafer, 1)
                 .inputFluid(1, Fluids.WATER, 750)
@@ -658,7 +658,7 @@ public final class Components {
             }
             var j = i - level;
             var raw = RAW_WAFERS.get(i);
-            LASER_ENGRAVER.recipe(_DATA_GEN, suffix(wafer.loc(), "_from_" + name(raw.id(), -1)))
+            LASER_ENGRAVER.recipe(DATA_GEN, suffix(wafer.loc(), "_from_" + name(raw.id(), -1)))
                 .outputItem(2, wafer, 1 << j)
                 .inputItem(0, raw, 1)
                 .inputItemNotConsumed(1, lens.tag("lens"))
@@ -676,7 +676,7 @@ public final class Components {
             output = k;
             i++;
         }
-        var builder = CIRCUIT_ASSEMBLER.recipe(_DATA_GEN, circuit.item())
+        var builder = CIRCUIT_ASSEMBLER.recipe(DATA_GEN, circuit.item())
             .outputItem(2, circuit.item(), output);
 
         if (circuit.level().voltageOffset < 2) {
@@ -723,7 +723,7 @@ public final class Components {
         coilRecipe(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, CUPRONICKEL, BRONZE, Technologies.STEEL);
         coilRecipe(KANTHAL_COIL_BLOCK, Voltage.LV, KANTHAL, SILVER, Technologies.KANTHAL);
 
-        ASSEMBLER.recipe(_DATA_GEN, ITEM_FILTER)
+        ASSEMBLER.recipe(DATA_GEN, ITEM_FILTER)
             .outputItem(2, ITEM_FILTER, 1)
             .inputItem(0, STEEL.tag("plate"), 1)
             .inputItem(0, ZINC.tag("foil"), 8)
@@ -731,7 +731,7 @@ public final class Components {
             .workTicks(ASSEMBLY_TICKS)
             .requireTech(Technologies.SIFTING)
             .build()
-            .recipe(_DATA_GEN, GRATE_MACHINE_CASING)
+            .recipe(DATA_GEN, GRATE_MACHINE_CASING)
             .outputItem(2, GRATE_MACHINE_CASING, 2)
             .inputItem(0, STEEL.tag("stick"), 4)
             .inputItem(0, ELECTRIC_MOTOR.get(Voltage.LV), 1)
@@ -746,7 +746,7 @@ public final class Components {
 
     private static void solidRecipe(IEntry<Block> block, Voltage v, MaterialSet mat,
         ResourceLocation tech) {
-        ASSEMBLER.recipe(_DATA_GEN, block)
+        ASSEMBLER.recipe(DATA_GEN, block)
             .outputItem(2, block, 1)
             .inputItem(0, mat.entry("plate"), 3)
             .inputItem(0, mat.entry("stick"), 2)
@@ -760,7 +760,7 @@ public final class Components {
 
     private static void coilRecipe(IEntry<CoilBlock> coil, Voltage v,
         MaterialSet wire, MaterialSet foil, ResourceLocation tech) {
-        ASSEMBLER.recipe(_DATA_GEN, coil)
+        ASSEMBLER.recipe(DATA_GEN, coil)
             .outputItem(2, coil, 1)
             .inputItem(0, wire.entry("wire"), 8 * v.rank)
             .inputItem(0, foil.entry("foil"), 8 * v.rank)

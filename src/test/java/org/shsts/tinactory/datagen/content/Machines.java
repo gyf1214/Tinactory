@@ -21,11 +21,10 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 import java.util.Map;
@@ -212,7 +211,7 @@ public final class Machines {
     }
 
     private static void multiBlockItem(IEntry<? extends Block> block, String casing,
-        String overlay, RecipeTypeEntry<? extends ProcessingRecipe, ?> type) {
+        String overlay, IRecipeType<?> type) {
         DATA_GEN.block(block)
             .blockState(multiBlock(casing, overlay))
             .tag(MINEABLE_WITH_WRENCH)
@@ -293,7 +292,7 @@ public final class Machines {
             .toolTag(TOOL_WRENCH)
             .build();
 
-        ASSEMBLER.recipe(_DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
+        ASSEMBLER.recipe(DATA_GEN, ALLOY_SMELTER.entry(Voltage.ULV))
             .outputItem(2, ALLOY_SMELTER.entry(Voltage.ULV), 1)
             .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 1)
             .inputItem(0, circuit(Voltage.ULV), 2)
@@ -302,7 +301,7 @@ public final class Machines {
             .voltage(Voltage.ULV)
             .workTicks(ASSEMBLE_TICKS)
             .build()
-            .recipe(_DATA_GEN, BLAST_FURNACE)
+            .recipe(DATA_GEN, BLAST_FURNACE)
             .outputItem(2, BLAST_FURNACE, 1)
             .inputItem(0, HEATPROOF_CASING, 1)
             .inputItem(0, ELECTRIC_FURNACE.entry(Voltage.ULV), 3)
@@ -312,7 +311,7 @@ public final class Machines {
             .voltage(Voltage.ULV)
             .workTicks(ASSEMBLE_TICKS)
             .build()
-            .recipe(_DATA_GEN, MULTI_BLOCK_INTERFACE.get(Voltage.ULV))
+            .recipe(DATA_GEN, MULTI_BLOCK_INTERFACE.get(Voltage.ULV))
             .outputItem(2, MULTI_BLOCK_INTERFACE.get(Voltage.ULV), 1)
             .inputItem(0, MACHINE_HULL.get(Voltage.ULV), 1)
             .inputItem(0, circuit(Voltage.ULV), 2)
@@ -329,7 +328,7 @@ public final class Machines {
         machineRecipe(Voltage.LV, STEEL, COPPER, TIN, BRONZE, TIN);
         machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
 
-        ASSEMBLER.recipe(_DATA_GEN, SIFTER)
+        ASSEMBLER.recipe(DATA_GEN, SIFTER)
             .outputItem(2, SIFTER, 1)
             .inputItem(0, SOLID_STEEL_CASING, 1)
             .inputItem(0, circuit(Voltage.MV), 3)
@@ -450,7 +449,7 @@ public final class Machines {
     }
 
     private static void machine(ProcessingSet set) {
-        machine(set, "machines/" + set.recipeType.id);
+        machine(set, "machines/" + set.recipeType.id());
     }
 
     private static void primitiveMachine(MachineSet set, IEntry<? extends Block> primitive,
@@ -504,7 +503,7 @@ public final class Machines {
 
         private AssemblyRecipeBuilder<RecipeFactory> recipe(
             IEntry<? extends ItemLike> item, Voltage v1) {
-            var builder = ASSEMBLER.recipe(_DATA_GEN, item)
+            var builder = ASSEMBLER.recipe(DATA_GEN, item)
                 .outputItem(2, item, 1)
                 .voltage(v1)
                 .workTicks(ASSEMBLE_TICKS)

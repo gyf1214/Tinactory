@@ -6,94 +6,113 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.recipe.MarkerRecipe;
-import org.shsts.tinactory.core.common.SmartRecipe;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
+import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MachineProcessor<T extends ProcessingRecipe>
-    extends RecipeProcessor<T> implements IElectricMachine {
-
+public class MachineProcessor<R extends ProcessingRecipe>
+    extends RecipeProcessor<R> implements IElectricMachine {
+    public final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
     protected final Voltage voltage;
 
     protected double workFactor = 1d;
     protected double energyFactor = 1d;
 
-    public MachineProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType,
-        boolean autoRecipe) {
+    public MachineProcessor(BlockEntity blockEntity,
+        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType, boolean autoRecipe) {
         this(blockEntity, recipeType, getBlockVoltage(blockEntity), autoRecipe);
     }
 
-    public MachineProcessor(BlockEntity blockEntity, RecipeType<? extends T> recipeType,
+    public MachineProcessor(BlockEntity blockEntity,
+        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
         Voltage voltage, boolean autoRecipe) {
-        super(blockEntity, recipeType, autoRecipe);
+        super(blockEntity, autoRecipe);
+        this.recipeType = recipeType;
         this.voltage = voltage;
     }
 
-    protected boolean matchesRecipe(T recipe) {
-        return recipe.canCraftInVoltage(getVoltage());
+    @Override
+    protected boolean matches(Level world, R recipe, IMachine machine) {
+        return recipe.matches(machine, world);
     }
 
     @Override
-    protected boolean matches(Level world, T recipe, IContainer container) {
-        return matchesRecipe(recipe) && recipe.matches(container, world);
+    protected List<R> getMatchedRecipes(Level world, IMachine machine) {
+        return CORE.recipeManager(world).getRecipesFor(recipeType, machine, world);
     }
 
     @Override
-    protected Stream<? extends T> getMatchedRecipes(Level world, IContainer container) {
-        return SmartRecipe.getRecipesFor(recipeType, container, world)
-            .stream().filter(this::matchesRecipe);
+    protected Optional<R> fromLoc(Level world, ResourceLocation loc) {
+        return CORE.recipeManager(world).byLoc(recipeType, loc);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public boolean allowTargetRecipe(Recipe<?> recipe) {
-        var type = recipe.getType();
-        if (type == MARKER.get()) {
-            return ((MarkerRecipe) recipe).baseType == recipeType;
+    protected ResourceLocation toLoc(R recipe) {
+        return recipe.loc();
+    }
+
+    @Override
+    public boolean allowTargetRecipe(Level world, ResourceLocation loc) {
+        var manager = CORE.recipeManager(world);
+
+        var recipe = manager.byLoc(recipeType, loc);
+        if (recipe.isPresent()) {
+            return getMachine()
+                .filter(recipe.get()::canCraft)
+                .isPresent();
         }
-        return type == recipeType && matchesRecipe((T) recipe);
+
+        var marker = manager.byLoc(MARKER, loc);
+        return marker.filter($ -> $.baseType == recipeType.get()).isPresent();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected void doSetTargetRecipe(Recipe<?> recipe) {
-        var recipe1 = (ProcessingRecipe) recipe;
+    protected void doSetTargetRecipe(Level world, ResourceLocation loc) {
+        var manager = CORE.recipeManager(world);
 
-        if (recipe.getType() == MARKER.get()) {
-            targetRecipe = null;
+        ProcessingRecipe marker;
+        var recipe = manager.byLoc(recipeType, loc);
+        if (recipe.isPresent()) {
+            marker = recipe.get();
+            targetRecipe = recipe.get();
         } else {
-            targetRecipe = (T) recipe1;
+            targetRecipe = null;
+            marker = manager.byLoc(MARKER, loc).orElse(null);
         }
 
+        if (marker == null) {
+            return;
+        }
         getContainer().ifPresent(container -> {
             var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
             var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
 
-            for (var input : recipe1.inputs) {
+            for (var input : marker.inputs) {
                 var idx = input.port();
                 var ingredient = input.ingredient();
                 if (!container.hasPort(idx)) {
@@ -126,7 +145,7 @@ public class MachineProcessor<T extends ProcessingRecipe>
         });
     }
 
-    protected void calculateFactors(T recipe) {
+    protected void calculateFactors(R recipe) {
         var baseVoltage = recipe.voltage == 0 ? Voltage.ULV.value : recipe.voltage;
         var voltage = getVoltage();
         var voltageFactor = 1L;
@@ -140,28 +159,28 @@ public class MachineProcessor<T extends ProcessingRecipe>
     }
 
     @Override
-    protected void onWorkBegin(T recipe, IContainer container) {
-        recipe.consumeInputs(container);
+    protected void onWorkBegin(R recipe, IMachine machine) {
+        recipe.consumeInputs(machine.container().orElseThrow());
         calculateFactors(recipe);
     }
 
     @Override
-    protected void onWorkContinue(T recipe) {
+    protected void onWorkContinue(R recipe) {
         calculateFactors(recipe);
     }
 
     @Override
-    protected long onWorkProgress(T recipe, double partial) {
+    protected long onWorkProgress(R recipe, double partial) {
         return (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
     }
 
     @Override
-    protected void onWorkDone(T recipe, IContainer container, Random random) {
-        recipe.insertOutputs(container, random);
+    protected void onWorkDone(R recipe, IMachine machine, Random random) {
+        recipe.insertOutputs(machine.container().orElseThrow(), random);
     }
 
     @Override
-    protected long getMaxWorkProgress(T recipe) {
+    protected long getMaxWorkProgress(R recipe) {
         return recipe.workTicks * PROGRESS_PER_TICK;
     }
 

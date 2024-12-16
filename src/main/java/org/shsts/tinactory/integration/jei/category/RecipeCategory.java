@@ -38,10 +38,10 @@ import static org.shsts.tinactory.core.util.LocHelper.prepend;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class RecipeCategory<R extends IRecipe<?>> {
-    private static final int WIDTH = Menu.CONTENT_WIDTH;
+    protected static final int WIDTH = Menu.CONTENT_WIDTH;
 
     private final ResourceLocation loc;
-    private final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
+    protected final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
     public final RecipeType<R> type;
     protected final Layout layout;
     protected final int xOffset;
@@ -189,5 +189,9 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
     public void registerRecipes(IRecipeRegistration registration, IRecipeManager recipeManager) {
         var list = recipeManager.getAllRecipesFor(recipeType);
         registration.addRecipes(type, list);
+    }
+
+    public static String categoryTitleId(ResourceLocation loc) {
+        return loc.getNamespace() + "." + loc.getPath() + ".jei.category";
     }
 }

@@ -2,16 +2,16 @@ package org.shsts.tinactory.content.electric;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class GeneratorProcessor extends MachineProcessor<ProcessingRecipe> {
     public GeneratorProcessor(BlockEntity blockEntity,
-        RecipeType<? extends ProcessingRecipe> recipeType) {
+        IRecipeType<ProcessingRecipe.Builder> recipeType) {
         super(blockEntity, recipeType, true);
     }
 

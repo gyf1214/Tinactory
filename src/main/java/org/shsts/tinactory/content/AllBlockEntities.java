@@ -24,9 +24,10 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
 import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.HashSet;
 import java.util.List;
@@ -464,15 +465,15 @@ public final class AllBlockEntities {
             return MachineSet.builder(this);
         }
 
-        public <T extends ProcessingRecipe> ProcessingSet.Builder<T, SetFactory> processing(
-            RecipeTypeEntry<T, ?> recipeType) {
+        public <R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>> ProcessingSet.Builder<R,
+            B, SetFactory> processing(IRecipeType<B> recipeType) {
             return ProcessingSet.builder(this, recipeType)
                 .tintVoltage(2)
                 .onCreateObject(PROCESSING_SETS::add);
         }
 
-        public <T extends ProcessingRecipe> ProcessingSet simpleMachine(
-            RecipeTypeEntry<T, ?> recipeType, Texture progressBar) {
+        public <R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>> ProcessingSet simpleMachine(
+            IRecipeType<B> recipeType, Texture progressBar) {
             return processing(recipeType)
                 .transform(simpleLayout(progressBar))
                 .buildObject();
@@ -481,7 +482,7 @@ public final class AllBlockEntities {
 
     private static IEntry<PrimitiveBlock> primitive(ProcessingSet set) {
         var recipeType = set.recipeType;
-        var id = "primitive/" + recipeType.id;
+        var id = "primitive/" + recipeType.id();
         var layout = set.layout(Voltage.PRIMITIVE);
         return BlockEntityBuilder.builder(set, id, PrimitiveBlock::new)
             .menu(AllMenus.PRIMITIVE_MACHINE)

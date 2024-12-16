@@ -8,13 +8,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.core.common.SmartRecipeSerializer;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -27,19 +28,17 @@ public class AssemblyRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public boolean canCraftIn(IContainer container) {
-        return container.getOwnerTeam()
-            .map(team -> requiredTech.stream().allMatch(team::isTechFinished))
+    protected boolean matchTeam(Optional<ITeamProfile> team) {
+        return team.map($ -> requiredTech.stream().allMatch($::isTechFinished))
             .orElse(requiredTech.isEmpty());
     }
 
-    public abstract static class BuilderBase<U extends AssemblyRecipe, S extends BuilderBase<U, S>> extends
+    protected abstract static class BuilderBase<U extends AssemblyRecipe, S extends BuilderBase<U, S>> extends
         ProcessingRecipe.BuilderBase<U, S> {
         protected final List<ResourceLocation> requiredTech = new ArrayList<>();
 
-        public BuilderBase(IRecipeDataConsumer consumer, RecipeTypeEntry<U, S> parent,
-            ResourceLocation loc) {
-            super(consumer, parent, loc);
+        protected BuilderBase(IRecipeType<S> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         public S requireTech(ResourceLocation... loc) {
@@ -49,9 +48,8 @@ public class AssemblyRecipe extends ProcessingRecipe {
     }
 
     public static class Builder extends BuilderBase<AssemblyRecipe, Builder> {
-        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<AssemblyRecipe, Builder> parent,
-            ResourceLocation loc) {
-            super(consumer, parent, loc);
+        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         @Override
@@ -62,13 +60,9 @@ public class AssemblyRecipe extends ProcessingRecipe {
 
     protected static class Serializer<T extends AssemblyRecipe, B extends BuilderBase<T, B>> extends
         ProcessingRecipe.Serializer<T, B> {
-        protected Serializer(RecipeTypeEntry<T, B> type) {
-            super(type);
-        }
-
         @Override
-        protected B buildFromJson(ResourceLocation loc, JsonObject jo) {
-            var builder = super.buildFromJson(loc, jo);
+        protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
+            var builder = super.buildFromJson(type, loc, jo);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "required_tech"))
                 .map(JsonElement::getAsString)
                 .forEach(s -> builder.requireTech(new ResourceLocation(s)));
@@ -86,6 +80,5 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
     }
 
-    public static final SmartRecipeSerializer.Factory<AssemblyRecipe, Builder> SERIALIZER =
-        Serializer::new;
+    public static final IRecipeSerializer<AssemblyRecipe, Builder> SERIALIZER = new Serializer<>();
 }

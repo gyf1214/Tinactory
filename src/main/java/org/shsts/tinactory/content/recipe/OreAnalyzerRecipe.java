@@ -8,10 +8,9 @@ import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.material.OreVariant;
-import org.shsts.tinactory.core.common.SmartRecipeSerializer;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
-import org.shsts.tinactory.core.recipe.IRecipeDataConsumer;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Random;
 
@@ -45,9 +44,8 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
     public static class Builder extends AssemblyRecipe.BuilderBase<OreAnalyzerRecipe, Builder> {
         public double rate = 0d;
 
-        public Builder(IRecipeDataConsumer consumer, RecipeTypeEntry<OreAnalyzerRecipe, Builder> parent,
-            ResourceLocation loc) {
-            super(consumer, parent, loc);
+        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+            super(parent, loc);
         }
 
         public Builder rate(double value) {
@@ -67,13 +65,9 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
     }
 
     private static class Serializer extends AssemblyRecipe.Serializer<OreAnalyzerRecipe, Builder> {
-        private Serializer(RecipeTypeEntry<OreAnalyzerRecipe, Builder> type) {
-            super(type);
-        }
-
         @Override
-        protected Builder buildFromJson(ResourceLocation loc, JsonObject jo) {
-            return super.buildFromJson(loc, jo)
+        protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
+            return super.buildFromJson(type, loc, jo)
                 .rate(GsonHelper.getAsDouble(jo, "rate"));
         }
 
@@ -84,6 +78,5 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         }
     }
 
-    public static final SmartRecipeSerializer.Factory<OreAnalyzerRecipe, OreAnalyzerRecipe.Builder>
-        SERIALIZER = Serializer::new;
+    public static final IRecipeSerializer<OreAnalyzerRecipe, Builder> SERIALIZER = new Serializer();
 }

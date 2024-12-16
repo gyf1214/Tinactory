@@ -11,7 +11,7 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 @MethodsReturnNonnullByDefault
 public class BlastFurnaceProcessor extends MultiBlockProcessor<BlastFurnaceRecipe> {
     public BlastFurnaceProcessor(BlockEntity blockEntity) {
-        super(blockEntity, AllRecipes.BLAST_FURNACE.get(), true);
+        super(blockEntity, AllRecipes.BLAST_FURNACE, true);
     }
 
     @Override
@@ -21,11 +21,6 @@ public class BlastFurnaceProcessor extends MultiBlockProcessor<BlastFurnaceRecip
 
     private int getTemperature() {
         return getMultiBlock().getTemperature().orElse(0);
-    }
-
-    @Override
-    protected boolean matchesRecipe(BlastFurnaceRecipe recipe) {
-        return super.matchesRecipe(recipe) && recipe.temperature <= getTemperature();
     }
 
     @Override

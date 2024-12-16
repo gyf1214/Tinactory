@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 
@@ -17,12 +17,12 @@ public class OreAnalyzerProcessor extends MachineProcessor<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
     public OreAnalyzerProcessor(BlockEntity blockEntity) {
-        super(blockEntity, AllRecipes.ORE_ANALYZER.get(), true);
+        super(blockEntity, AllRecipes.ORE_ANALYZER, true);
     }
 
     @Override
-    protected Optional<OreAnalyzerRecipe> getNewRecipe(Level world, IContainer container) {
-        var matches = getMatchedRecipes(world, container).toList();
+    protected Optional<OreAnalyzerRecipe> getNewRecipe(Level world, IMachine machine) {
+        var matches = getMatchedRecipes(world, machine);
         var size = matches.size();
         if (size == 0) {
             return Optional.empty();
@@ -57,9 +57,9 @@ public class OreAnalyzerProcessor extends MachineProcessor<OreAnalyzerRecipe> {
     }
 
     @Override
-    protected void onWorkDone(OreAnalyzerRecipe recipe, IContainer container, Random random) {
+    protected void onWorkDone(OreAnalyzerRecipe recipe, IMachine machine, Random random) {
         if (!emptyRecipe) {
-            recipe.doInsertOutputs(container, random);
+            machine.container().ifPresent(container -> recipe.doInsertOutputs(container, random));
         }
     }
 }

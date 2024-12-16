@@ -14,9 +14,9 @@ import java.util.List;
 
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
-import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Technologies.BASE_ORE;
 import static org.shsts.tinactory.datagen.content.Technologies.TECHS;
+import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -33,7 +33,7 @@ public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
         super(parent);
         this.id = id;
         this.rate = rate;
-        this.builder = ORE_ANALYZER.recipe(_DATA_GEN, id).rate(rate);
+        this.builder = ORE_ANALYZER.recipe(DATA_GEN, id).rate(rate);
     }
 
     public static <P> VeinBuilder<P> factory(P parent, String id, double rate) {
@@ -85,7 +85,7 @@ public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
                 .depends(tech)
                 .register();
 
-            RESEARCH_BENCH.recipe(_DATA_GEN, tech)
+            RESEARCH_BENCH.recipe(DATA_GEN, tech)
                 .target(tech)
                 .defaultInput(variant.voltage)
                 .build();

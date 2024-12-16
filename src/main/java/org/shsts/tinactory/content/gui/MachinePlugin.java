@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.client.AbstractRecipeBook;
@@ -11,6 +10,7 @@ import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.MarkerRecipeBook;
 import org.shsts.tinactory.content.gui.client.PortPanel;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
+import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.core.common.ValueHolder;
 import org.shsts.tinactory.core.gui.ProcessingPlugin;
 import org.shsts.tinactory.core.gui.Rect;
@@ -18,11 +18,13 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.IMenu;
 import org.shsts.tinycorelib.api.gui.IMenuPlugin;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -53,10 +55,10 @@ public class MachinePlugin extends ProcessingPlugin {
         return Optional.of(new MachineRecipeBook(screen, layout));
     }
 
-    protected Optional<RecipeType<?>> getRecipeType() {
+    protected Optional<IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>>> getRecipeType() {
         var processor = PROCESSOR.tryGet(menu.blockEntity()).orElse(null);
-        if (processor instanceof RecipeProcessor<?> recipeProcessor) {
-            return Optional.of(recipeProcessor.recipeType);
+        if (processor instanceof MachineProcessor<?> machine) {
+            return Optional.of(machine.recipeType);
         }
         return Optional.empty();
     }
@@ -145,7 +147,7 @@ public class MachinePlugin extends ProcessingPlugin {
     public static IMenuPlugin<ProcessingScreen> multiBlock(IMenu menu) {
         return new MachinePlugin(menu) {
             @Override
-            protected Optional<RecipeType<?>> getRecipeType() {
+            protected Optional<IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>>> getRecipeType() {
                 var multiBlockInterface = (MultiBlockInterface) MACHINE.get(menu.blockEntity());
                 return multiBlockInterface.getRecipeType();
             }

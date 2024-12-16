@@ -17,60 +17,56 @@ import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
-import org.shsts.tinactory.core.recipe.SmartRecipeBuilder;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
-import org.shsts.tinactory.registrate.Registrate;
-import org.shsts.tinactory.registrate.builder.RecipeTypeBuilder;
-import org.shsts.tinactory.registrate.common.RecipeTypeEntry;
+import org.shsts.tinycorelib.api.registrate.IRegistrate;
+import org.shsts.tinycorelib.api.registrate.builder.IRecipeTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.Tinactory._REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
     public static final IRecipeType<ToolRecipe.Builder> TOOL_CRAFTING;
-    public static final RecipeTypeEntry<ResearchRecipe, ResearchRecipe.Builder> RESEARCH_BENCH;
-    public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> LASER_ENGRAVER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CIRCUIT_ASSEMBLER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STONE_GENERATOR;
-    public static final RecipeTypeEntry<OreAnalyzerRecipe, OreAnalyzerRecipe.Builder> ORE_ANALYZER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MACERATOR;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ORE_WASHER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CENTRIFUGE;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> SIFTER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ALLOY_SMELTER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> MIXER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> POLARIZER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> WIREMILL;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> BENDER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> COMPRESSOR;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> LATHE;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> CUTTER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRUDER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> EXTRACTOR;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> ELECTROLYZER;
-    public static final RecipeTypeEntry<AssemblyRecipe, AssemblyRecipe.Builder> CHEMICAL_REACTOR;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> STEAM_TURBINE;
-    public static final RecipeTypeEntry<BlastFurnaceRecipe, BlastFurnaceRecipe.Builder> BLAST_FURNACE;
-    public static final RecipeTypeEntry<ProcessingRecipe, ProcessingRecipe.Builder> VACUUM_FREEZER;
+    public static final IRecipeType<ResearchRecipe.Builder> RESEARCH_BENCH;
+    public static final IRecipeType<AssemblyRecipe.Builder> ASSEMBLER;
+    public static final IRecipeType<ProcessingRecipe.Builder> LASER_ENGRAVER;
+    public static final IRecipeType<ProcessingRecipe.Builder> CIRCUIT_ASSEMBLER;
+    public static final IRecipeType<ProcessingRecipe.Builder> STONE_GENERATOR;
+    public static final IRecipeType<OreAnalyzerRecipe.Builder> ORE_ANALYZER;
+    public static final IRecipeType<ProcessingRecipe.Builder> MACERATOR;
+    public static final IRecipeType<ProcessingRecipe.Builder> ORE_WASHER;
+    public static final IRecipeType<ProcessingRecipe.Builder> CENTRIFUGE;
+    public static final IRecipeType<ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
+    public static final IRecipeType<ProcessingRecipe.Builder> SIFTER;
+    public static final IRecipeType<ProcessingRecipe.Builder> ALLOY_SMELTER;
+    public static final IRecipeType<ProcessingRecipe.Builder> MIXER;
+    public static final IRecipeType<ProcessingRecipe.Builder> POLARIZER;
+    public static final IRecipeType<ProcessingRecipe.Builder> WIREMILL;
+    public static final IRecipeType<ProcessingRecipe.Builder> BENDER;
+    public static final IRecipeType<ProcessingRecipe.Builder> COMPRESSOR;
+    public static final IRecipeType<ProcessingRecipe.Builder> LATHE;
+    public static final IRecipeType<ProcessingRecipe.Builder> CUTTER;
+    public static final IRecipeType<ProcessingRecipe.Builder> EXTRUDER;
+    public static final IRecipeType<ProcessingRecipe.Builder> EXTRACTOR;
+    public static final IRecipeType<ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
+    public static final IRecipeType<ProcessingRecipe.Builder> ELECTROLYZER;
+    public static final IRecipeType<AssemblyRecipe.Builder> CHEMICAL_REACTOR;
+    public static final IRecipeType<ProcessingRecipe.Builder> STEAM_TURBINE;
+    public static final IRecipeType<BlastFurnaceRecipe.Builder> BLAST_FURNACE;
+    public static final IRecipeType<ProcessingRecipe.Builder> VACUUM_FREEZER;
     // Recipes only used to mark input for recipe book purpose
-    public static final RecipeTypeEntry<MarkerRecipe, MarkerRecipe.Builder> MARKER;
+    public static final IRecipeType<MarkerRecipe.Builder> MARKER;
 
     static {
-        TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting",
-                ToolRecipe.Builder::new)
+        TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)
             .recipeClass(ToolRecipe.class)
             .serializer(ToolRecipe.SERIALIZER)
             .register();
 
-        RESEARCH_BENCH = _REGISTRATE.recipeType("research_bench", ResearchRecipe.SERIALIZER)
-            .clazz(ResearchRecipe.class)
-            .builder(ResearchRecipe.Builder::new)
+        RESEARCH_BENCH = REGISTRATE.recipeType("research_bench", ResearchRecipe.Builder::new)
+            .recipeClass(ResearchRecipe.class)
+            .serializer(ResearchRecipe.SERIALIZER)
             .defaults($ -> $.amperage(0.25d).workTicks(200L))
             .register();
 
@@ -90,9 +86,9 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.125d).workTicks(20L))
             .register();
 
-        ORE_ANALYZER = _REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.SERIALIZER)
-            .clazz(OreAnalyzerRecipe.class)
-            .builder(OreAnalyzerRecipe.Builder::new)
+        ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.Builder::new)
+            .recipeClass(OreAnalyzerRecipe.class)
+            .serializer(OreAnalyzerRecipe.SERIALIZER)
             .defaults($ -> $.amperage(0.125d).workTicks(32L))
             .register();
 
@@ -109,9 +105,7 @@ public final class AllRecipes {
             .register();
 
         THERMAL_CENTRIFUGE = displayInput("thermal_centrifuge")
-            .defaults($ -> $.voltage(Voltage.LV)
-                .workTicks(400L)
-                .amperage(1d))
+            .defaults($ -> $.voltage(Voltage.LV).workTicks(400L).amperage(1d))
             .register();
 
         SIFTER = displayInput("sifter")
@@ -171,12 +165,12 @@ public final class AllRecipes {
             .register();
 
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)
-            .defaults($ -> $.autoVoid().amperage(1d).workTicks(100))
+            .defaults($ -> $.amperage(1d).workTicks(100))
             .register();
 
-        BLAST_FURNACE = _REGISTRATE.recipeType("blast_furnace", BlastFurnaceRecipe.SERIALIZER)
-            .clazz(BlastFurnaceRecipe.class)
-            .builder(BlastFurnaceRecipe.Builder::new)
+        BLAST_FURNACE = REGISTRATE.recipeType("blast_furnace", BlastFurnaceRecipe.Builder::new)
+            .recipeClass(BlastFurnaceRecipe.class)
+            .serializer(BlastFurnaceRecipe.SERIALIZER)
             .defaults($ -> $.amperage(4d))
             .register();
 
@@ -184,9 +178,8 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.75d))
             .register();
 
-        MARKER = _REGISTRATE.recipeType("marker", MarkerRecipe.SERIALIZER)
-            .clazz(MarkerRecipe.class)
-            .builder(MarkerRecipe.Builder::new)
+        MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
+            .serializer(MarkerRecipe.SERIALIZER)
             .register();
     }
 
@@ -203,25 +196,28 @@ public final class AllRecipes {
             MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
     }
 
-    private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate> processing(String id) {
+    private static IRecipeTypeBuilder<ProcessingRecipe,
+        ProcessingRecipe.Builder, IRegistrate> processing(String id) {
         return processing(id, ProcessingRecipe.Builder::new);
     }
 
-    private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate> displayInput(String id) {
+    private static IRecipeTypeBuilder<ProcessingRecipe,
+        ProcessingRecipe.Builder, IRegistrate> displayInput(String id) {
         return processing(id, DisplayInputRecipe::builder);
     }
 
-    private static RecipeTypeBuilder<AssemblyRecipe, AssemblyRecipe.Builder, Registrate> assembly(String id) {
-        return _REGISTRATE.recipeType(id, AssemblyRecipe.SERIALIZER)
-            .clazz(AssemblyRecipe.class)
-            .builder(AssemblyRecipe.Builder::new);
+    private static IRecipeTypeBuilder<AssemblyRecipe,
+        AssemblyRecipe.Builder, IRegistrate> assembly(String id) {
+        return REGISTRATE.recipeType(id, AssemblyRecipe.Builder::new)
+            .recipeClass(AssemblyRecipe.class)
+            .serializer(AssemblyRecipe.SERIALIZER);
     }
 
-    private static RecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, Registrate> processing(
-        String id, SmartRecipeBuilder.Factory<ProcessingRecipe, ProcessingRecipe.Builder> builderFactory) {
-        return _REGISTRATE.recipeType(id, ProcessingRecipe.SERIALIZER)
-            .clazz(ProcessingRecipe.class)
-            .builder(builderFactory);
+    private static IRecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, IRegistrate> processing(
+        String id, IRecipeType.BuilderFactory<ProcessingRecipe.Builder> builderFactory) {
+        return REGISTRATE.recipeType(id, builderFactory)
+            .recipeClass(ProcessingRecipe.class)
+            .serializer(ProcessingRecipe.SERIALIZER);
     }
 
     public static void init() {}

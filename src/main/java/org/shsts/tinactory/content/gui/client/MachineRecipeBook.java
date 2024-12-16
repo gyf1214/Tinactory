@@ -5,58 +5,47 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import static org.shsts.tinactory.Tinactory.CORE;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     @Nullable
-    protected final RecipeType<? extends ProcessingRecipe> recipeType;
+    protected final IRecipeType<?> recipeType;
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
     private final Layout layout;
 
-    private MachineRecipeBook(ProcessingScreen screen, Layout layout,
-        @Nullable RecipeType<? extends ProcessingRecipe> recipeType) {
+    private MachineRecipeBook(ProcessingScreen screen, Layout layout, @Nullable IRecipeType<?> recipeType) {
         super(screen, layout.getXOffset());
         this.recipeType = recipeType;
         this.layout = layout;
         TechManager.client().onProgressChange(onTechChange);
     }
 
-    @SuppressWarnings("unchecked")
     public MachineRecipeBook(ProcessingScreen screen, Layout layout) {
-        this(screen, layout, (RecipeType<? extends ProcessingRecipe>)
-            screen.getRecipeType().orElse(null));
+        this(screen, layout, screen.getRecipeType().orElse(null));
     }
 
     public void remove() {
         TechManager.client().removeProgressChangeListener(onTechChange);
-    }
-
-    protected boolean canCraft(Recipe<?> recipe) {
-        return Machine.getProcessor(blockEntity)
-            .flatMap(p -> p instanceof RecipeProcessor<?> p1 ? Optional.of(p1) : Optional.empty())
-            .map(p -> p.allowTargetRecipe(recipe))
-            .orElse(false);
     }
 
     @Override
@@ -64,18 +53,18 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
         if (recipeType == null) {
             return;
         }
-        var container = AllCapabilities.CONTAINER.get(blockEntity);
-        for (var recipe : ClientUtil.getRecipeManager().getAllRecipesFor(recipeType)) {
-            if (!recipe.canCraftIn(container) || !canCraft(recipe)) {
-                continue;
+        var machine = MACHINE.get(blockEntity);
+        for (var recipe : CORE.clientRecipeManager().getAllRecipesFor(recipeType)) {
+            if (recipe instanceof ProcessingRecipe processingRecipe &&
+                processingRecipe.canCraft(machine)) {
+                recipes.put(recipe.loc(), processingRecipe);
             }
-            recipes.put(recipe.getId(), recipe);
         }
     }
 
     @Override
     protected int compareRecipes(ProcessingRecipe r1, ProcessingRecipe r2) {
-        return r1.getId().compareNamespaced(r2.getId());
+        return r1.loc().compareNamespaced(r2.loc());
     }
 
     @Override
@@ -89,8 +78,8 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     @Override
     protected Optional<List<Component>> buttonToolTip(ProcessingRecipe recipe) {
         return recipe.getDescription().map(List::of)
-            .or(() -> ProcessingResults.mapItemOrFluid(recipe.getDisplay(), ClientUtil::itemTooltip,
-                fluid -> ClientUtil.fluidTooltip(fluid, false)));
+            .or(() -> ProcessingResults.mapItemOrFluid(recipe.getDisplay(),
+                ClientUtil::itemTooltip, fluid -> ClientUtil.fluidTooltip(fluid, false)));
     }
 
     @Override
