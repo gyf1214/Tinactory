@@ -110,7 +110,6 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.machineItem;
 import static org.shsts.tinactory.datagen.content.Models.solidBlock;
@@ -272,7 +271,7 @@ public final class Components {
     }
 
     private static void ulvRecipes() {
-        _DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
             .shapeless(CABLE.get(Voltage.ULV).get())
             .requires(Ingredient.of(IRON.tag("wire")), 4)
             .unlockedBy("has_wire", has(IRON.tag("wire"))));
@@ -472,7 +471,7 @@ public final class Components {
     }
 
     private static void circuitRecipes() {
-        _DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(VACUUM_TUBE.getItem())
             .pattern("BGB").pattern("WWW")
             .define('G', GLASS.tag("primary"))
@@ -489,7 +488,7 @@ public final class Components {
             .voltage(Voltage.ULV)
             .build();
 
-        _DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(ELECTRONIC_CIRCUIT.getItem())
             .pattern("RPR").pattern("TBT").pattern("WWW")
             .define('R', RESISTOR.getItem(CircuitComponentTier.NORMAL))
@@ -501,7 +500,7 @@ public final class Components {
 
         circuitRecipe(ELECTRONIC_CIRCUIT, VACUUM_TUBE, 2, RESISTOR, 2, RED_ALLOY.tag("wire"), 2);
 
-        _DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(GOOD_ELECTRONIC.getItem())
             .pattern("DPD").pattern("EBE").pattern("WEW")
             .define('D', DIODE.getItem(CircuitComponentTier.NORMAL))
@@ -521,7 +520,7 @@ public final class Components {
             CHIPS.get("ram"), 2, TRANSISTOR, 4, ELECTRUM.tag("wire_fine"), 8, COPPER.tag("bolt"), 8);
 
         // circuit components
-        _DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(RESISTOR.getItem(CircuitComponentTier.NORMAL))
             .pattern(" R ").pattern("WCW").pattern(" R ")
             .define('R', STICKY_RESIN.get())
@@ -557,7 +556,7 @@ public final class Components {
             .build();
 
         // boards
-        _DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(Circuits.board(CircuitTier.ELECTRONIC).get(), 3)
             .pattern("SSS").pattern("WWW").pattern("SSS")
             .define('S', STICKY_RESIN.get())
@@ -583,7 +582,7 @@ public final class Components {
             .build();
 
         // circuit boards
-        _DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
             .pattern("WWW").pattern("WBW").pattern("WWW")
             .define('B', Circuits.board(CircuitTier.ELECTRONIC).get())

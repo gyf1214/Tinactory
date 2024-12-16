@@ -109,7 +109,6 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
@@ -151,7 +150,7 @@ public final class Materials {
         woodRecipes("warped");
 
         // disable wooden and iron tools
-        _DATA_GEN.nullRecipe(Items.WOODEN_AXE)
+        DATA_GEN.nullRecipe(Items.WOODEN_AXE)
             .nullRecipe(Items.WOODEN_HOE)
             .nullRecipe(Items.WOODEN_PICKAXE)
             .nullRecipe(Items.WOODEN_SHOVEL)
@@ -169,7 +168,7 @@ public final class Materials {
             .define('#', ItemTags.PLANKS)
             .toolTag(TOOL_SAW)
             .build();
-        _DATA_GEN.replaceVanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.replaceVanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(Items.STICK, 2)
             .define('#', ItemTags.PLANKS)
             .pattern("#").pattern("#")
@@ -421,7 +420,7 @@ public final class Materials {
         disableVanillaOres("lapis", "lazuli");
 
         // smelt wrought iron nugget
-        _DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(IRON.tag("nugget")), WROUGHT_IRON.item("nugget"), 0, 200)
             .unlockedBy("has_material", has(IRON.tag("nugget"))), "_from_iron");
 
@@ -492,24 +491,24 @@ public final class Materials {
     private static void disableVanillaOres(String name, String suffix) {
         var fullName = name + (suffix.isEmpty() ? "" : "_" + suffix);
 
-        _DATA_GEN.nullRecipe(name + "_block");
+        DATA_GEN.nullRecipe(name + "_block");
 
         if (suffix.equals("ingot")) {
-            _DATA_GEN.nullRecipe("raw_" + name)
+            DATA_GEN.nullRecipe("raw_" + name)
                 .nullRecipe("raw_" + name + "_block");
             if (name.equals("copper")) {
-                _DATA_GEN.nullRecipe(fullName)
+                DATA_GEN.nullRecipe(fullName)
                     .nullRecipe(fullName + "_from_waxed_copper_block");
             } else {
-                _DATA_GEN.nullRecipe(fullName + "_from_" + name + "_block")
+                DATA_GEN.nullRecipe(fullName + "_from_" + name + "_block")
                     .nullRecipe(fullName + "_from_nuggets")
                     .nullRecipe(name + "_nugget");
                 for (var method : VANILLA_METHODS) {
-                    _DATA_GEN.nullRecipe(name + "_nugget_from_" + method);
+                    DATA_GEN.nullRecipe(name + "_nugget_from_" + method);
                 }
             }
         } else {
-            _DATA_GEN.nullRecipe(fullName);
+            DATA_GEN.nullRecipe(fullName);
         }
 
         var ores = new ArrayList<>(List.of("", "_deepslate"));
@@ -519,10 +518,10 @@ public final class Materials {
 
         for (var method : VANILLA_METHODS) {
             for (var ore : ores) {
-                _DATA_GEN.nullRecipe(fullName + "_from_" + method + ore + "_" + name + "_ore");
+                DATA_GEN.nullRecipe(fullName + "_from_" + method + ore + "_" + name + "_ore");
             }
             if (suffix.equals("ingot")) {
-                _DATA_GEN.nullRecipe(fullName + "_from_" + method + "_raw_" + name);
+                DATA_GEN.nullRecipe(fullName + "_from_" + method + "_raw_" + name);
             }
         }
     }
@@ -562,7 +561,7 @@ public final class Materials {
             .build();
 
         // disable wood and woodStripped recipes
-        _DATA_GEN.nullRecipe(wood)
+        DATA_GEN.nullRecipe(wood)
             .nullRecipe(woodStripped)
             // reduce vanilla recipe to 2 planks
             .replaceVanillaRecipe(() -> ShapelessRecipeBuilder

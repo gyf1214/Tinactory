@@ -105,7 +105,6 @@ import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.content.AllTags.circuit;
 import static org.shsts.tinactory.content.AllTags.machineTag;
-import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
 import static org.shsts.tinactory.datagen.content.Models.multiBlock;
@@ -221,7 +220,7 @@ public final class Machines {
 
     private static void primitiveRecipes() {
         // workbench
-        _DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
                 .shaped(WORKBENCH.get())
                 .pattern("WSW")
                 .pattern("SCS")
@@ -354,7 +353,7 @@ public final class Machines {
             .build();
 
         // disable vanilla recipes
-        _DATA_GEN.nullRecipe(Items.BLAST_FURNACE)
+        DATA_GEN.nullRecipe(Items.BLAST_FURNACE)
             .nullRecipe(Items.SMOKER)
             .nullRecipe(Items.STONECUTTER)
             .nullRecipe(Items.FLETCHING_TABLE)

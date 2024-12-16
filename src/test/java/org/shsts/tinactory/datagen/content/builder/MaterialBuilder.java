@@ -71,7 +71,6 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.DataGen._DATA_GEN;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.oreBlock;
@@ -396,7 +395,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
     }
 
     public MaterialBuilder<P> smelt(MaterialSet to) {
-        _DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(material.tag("dust")), to.item("ingot"), 0, 200)
             .unlockedBy("has_material", has(material.tag("dust"))), "_from_" + material.name);
         return this;
@@ -664,7 +663,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         if (args.length > materialCount) {
             toolProcess(result, count, patterns, materialCount, args);
         } else {
-            _DATA_GEN.vanillaRecipe(() -> shapedProcess(result, count, patterns, args));
+            DATA_GEN.vanillaRecipe(() -> shapedProcess(result, count, patterns, args));
         }
     }
 
@@ -676,7 +675,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         if (!material.hasItem(output) || !material.hasItem(input)) {
             return;
         }
-        _DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
+        DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(material.tag(input)), material.item(output), 0, 200)
             .unlockedBy("has_material", has(material.tag(input))));
     }
@@ -841,11 +840,11 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         }
 
         if (material.hasItem("dust") && material.hasItem("dust_tiny")) {
-            _DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
+            DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(material.item("dust_tiny"), 9)
                 .requires(material.tag("dust"))
                 .unlockedBy("has_dust", has(material.tag("dust"))));
-            _DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
+            DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(material.item("dust"))
                 .requires(Ingredient.of(material.tag("dust_tiny")), 9)
                 .unlockedBy("has_dust_small", has(material.tag("dust_tiny"))));
