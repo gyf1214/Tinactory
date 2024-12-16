@@ -38,7 +38,6 @@ public final class AllEvents {
     private AllEvents() {}
 
     static {
-
         SERVER_LOAD = EVENTS.getEntry(SERVER_LOAD_LOC);
         CLIENT_LOAD = EVENTS.getEntry(CLIENT_LOAD_LOC);
         REMOVED_IN_WORLD = EVENTS.getEntry(REMOVED_IN_WORLD_LOC);
