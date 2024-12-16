@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.electric;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.content.machine.MachineProcessor;
+import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 

@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
+import org.shsts.tinactory.core.machine.MachineProcessor;
 
 import java.util.Optional;
 import java.util.Random;

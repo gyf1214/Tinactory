@@ -28,7 +28,6 @@ import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllRegistries;
 import org.shsts.tinactory.content.AllWorldGens;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.registrate.Registrate;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
 import org.shsts.tinycorelib.api.network.IChannel;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
@@ -42,7 +41,6 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 public class Tinactory {
     public static final String ID = "tinactory";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final Registrate _REGISTRATE = new Registrate(ID);
 
     public static ITinyCoreLib CORE;
     public static IRegistrate REGISTRATE;
@@ -85,7 +83,6 @@ public class Tinactory {
             AllWorldGens.init();
 
             REGISTRATE.register(modEventBus);
-            _REGISTRATE.register(modEventBus);
             modEventBus.addListener(Tinactory::init);
             MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);
         } catch (Throwable e) {

@@ -11,9 +11,9 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
+import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinycorelib.api.gui.IMenu;
 
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;

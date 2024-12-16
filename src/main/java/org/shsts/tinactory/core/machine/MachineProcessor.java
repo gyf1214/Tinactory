@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.core.machine;
 
 import com.google.common.collect.ArrayListMultimap;
 import javax.annotation.Nonnull;
@@ -19,7 +19,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;

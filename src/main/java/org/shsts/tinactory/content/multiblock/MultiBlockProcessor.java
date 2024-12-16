@@ -2,7 +2,7 @@ package org.shsts.tinactory.content.multiblock;
 
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.machine.MachineProcessor;
+import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;

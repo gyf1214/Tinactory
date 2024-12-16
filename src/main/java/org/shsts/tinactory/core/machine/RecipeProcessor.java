@@ -23,7 +23,6 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.GeneratorProcessor;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
-import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
 import org.shsts.tinactory.content.multiblock.MultiBlockProcessor;

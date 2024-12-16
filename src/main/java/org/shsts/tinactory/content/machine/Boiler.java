@@ -29,7 +29,7 @@ import java.util.List;
 
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.machine.MachineProcessor.PROGRESS_PER_TICK;
+import static org.shsts.tinactory.core.machine.MachineProcessor.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
+import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
