@@ -192,6 +192,6 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
     }
 
     public static String categoryTitleId(ResourceLocation loc) {
-        return loc.getNamespace() + "." + loc.getPath() + ".jei.category";
+        return loc.getNamespace() + ".jei.category." + loc.getPath();
     }
 }

@@ -257,14 +257,6 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
-    public void sendUpdate() {
-        var level = blockEntity.getLevel();
-        if (level != null && !level.isClientSide) {
-            sendUpdate(blockEntity);
-        }
-    }
-
-    @Override
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
         eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);

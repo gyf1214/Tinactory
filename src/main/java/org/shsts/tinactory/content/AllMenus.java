@@ -33,6 +33,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import static org.shsts.tinactory.Tinactory.CHANNEL;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -74,7 +75,7 @@ public final class AllMenus {
             SetMachineConfigPacket::new);
 
         WORKBENCH = REGISTRATE.menu("primitive/workbench")
-            .title("tinactory.gui.networkController.title")
+            .title("tinactory.gui.workbench.title")
             .screen(() -> () -> WorkbenchScreen::new)
             .plugin(WorkbenchPlugin::new)
             .register();
@@ -105,7 +106,10 @@ public final class AllMenus {
         LOGISTIC_WORKER = REGISTRATE.menu("network/logistic_worker")
             .title("tinactory.gui.logisticWorker.title")
             .screen(() -> () -> LogisticWorkerScreen::new)
-            .dummyPlugin(menu -> menu.addSyncSlot("info", LogisticWorkerSyncPacket::new))
+            .dummyPlugin(menu -> {
+                menu.addSyncSlot("info", LogisticWorkerSyncPacket::new);
+                menu.onEventPacket(SET_MACHINE_CONFIG, p -> MACHINE.get(menu.blockEntity()).setConfig(p));
+            })
             .register();
 
         PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive")

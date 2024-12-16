@@ -136,8 +136,6 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
             menu.addSlot(slot);
         }
         menu.onEventPacket(CHEST_SLOT_CLICK, this::onClickSlot);
-
-        machine.sendUpdate();
     }
 
     private Function<BlockEntity, ChestItemSyncPacket> itemSyncPacket(int slot) {

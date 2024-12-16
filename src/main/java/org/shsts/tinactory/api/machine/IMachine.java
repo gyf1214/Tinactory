@@ -60,9 +60,4 @@ public interface IMachine {
     void onDisconnectFromNetwork();
 
     void buildSchedulings(INetworkComponent.SchedulingBuilder builder);
-
-    /**
-     * Only called on server.
-     */
-    void sendUpdate();
 }

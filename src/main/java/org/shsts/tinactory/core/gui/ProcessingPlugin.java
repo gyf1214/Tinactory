@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -13,7 +14,6 @@ import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
-import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.IMenu;
 
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
@@ -48,7 +48,7 @@ public class ProcessingPlugin extends LayoutPlugin<ProcessingScreen> {
     public static Component getTitle(BlockEntity be) {
         return MACHINE.tryGet(be)
             .map(IMachine::title)
-            .orElseGet(() -> I18n.name(be.getBlockState().getBlock()));
+            .orElse(TextComponent.EMPTY);
     }
 
     public static Component portLabel(PortType type, int index) {
