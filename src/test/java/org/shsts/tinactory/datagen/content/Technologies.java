@@ -11,7 +11,7 @@ import org.shsts.tinactory.content.AllMultiBlocks;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
-import org.shsts.tinactory.datagen.handler.TechProvider;
+import org.shsts.tinactory.datagen.provider.TechProvider;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
 import java.util.HashMap;

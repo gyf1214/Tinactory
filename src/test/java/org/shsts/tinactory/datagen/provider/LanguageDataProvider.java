@@ -1,4 +1,4 @@
-package org.shsts.tinactory.datagen.handler;
+package org.shsts.tinactory.datagen.provider;
 
 import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;

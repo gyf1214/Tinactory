@@ -11,7 +11,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.builder.Builder;
-import org.shsts.tinactory.datagen.handler.TechProvider;
+import org.shsts.tinactory.datagen.provider.TechProvider;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 

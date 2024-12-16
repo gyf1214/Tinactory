@@ -17,8 +17,8 @@ import org.shsts.tinactory.datagen.content.Models;
 import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.Veins;
 import org.shsts.tinactory.datagen.handler.DataHandler;
-import org.shsts.tinactory.datagen.handler.LanguageDataProvider;
 import org.shsts.tinactory.datagen.handler.RecipeHandler;
+import org.shsts.tinactory.datagen.provider.LanguageDataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
