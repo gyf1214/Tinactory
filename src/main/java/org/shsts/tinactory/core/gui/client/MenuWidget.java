@@ -11,7 +11,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.common.ISelf;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinycorelib.api.gui.IMenu;
 
@@ -22,7 +21,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MenuWidget extends GuiComponent implements
-    Widget, GuiEventListener, NarratableEntry, ISelf<MenuWidget> {
+    Widget, GuiEventListener, NarratableEntry {
 
     protected final IMenu menu;
     protected Rect rect;

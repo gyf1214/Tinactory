@@ -19,7 +19,7 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class CodecHelper {
-    public static Gson GSON = new Gson();
+    public static final Gson GSON = new Gson();
 
     public static JsonObject jsonFromStr(String s) {
         return GSON.fromJson(s, JsonObject.class);

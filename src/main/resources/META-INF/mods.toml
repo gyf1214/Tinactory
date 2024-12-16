@@ -5,7 +5,7 @@ license="All rights reserved"
 
 [[mods]]
 modId="tinactory"
-version="${file.jarVersion}"
+version = "${mod_version}"
 displayName="Tinactory"
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional

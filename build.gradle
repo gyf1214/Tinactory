@@ -19,8 +19,8 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
 group = 'org.shsts.tinactory'
-archivesBaseName = "tinactory-${minecraft_version}"
-version = "${mod_version}"
+archivesBaseName = "tinactory"
+version = "${minecraft_version}-${mod_version}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -136,6 +136,26 @@ checkstyle {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+        include 'META-INF/mods.toml'
+
+        expand 'mod_version': "${version}"
+    }
+}
+
+processTestResources {
+    from(sourceSets.test.resources.srcDirs) {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+        include 'META-INF/mods.toml'
+
+        expand 'mod_version': "${version}"
+    }
 }
 
 jar.finalizedBy('reobfJar')

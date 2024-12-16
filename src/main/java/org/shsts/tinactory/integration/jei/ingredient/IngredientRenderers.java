@@ -40,7 +40,7 @@ public final class IngredientRenderers {
         };
     }
 
-    public static IIngredientRenderer<ItemStack> ITEM_NOT_CONSUMED = new ItemIngredientRenderer() {
+    public static final IIngredientRenderer<ItemStack> ITEM_NOT_CONSUMED = new ItemIngredientRenderer() {
         @Override
         public List<Component> getTooltip(ItemStack ingredient, TooltipFlag tooltipFlag) {
             return addNotConsumed(super.getTooltip(ingredient, tooltipFlag));

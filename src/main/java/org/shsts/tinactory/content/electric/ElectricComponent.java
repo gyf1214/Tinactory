@@ -36,7 +36,7 @@ public class ElectricComponent extends NetworkComponent {
         public double bGen, bCons;
         public double pGen, pCons;
 
-        public List<Subnet> children = new ArrayList<>();
+        public final List<Subnet> children = new ArrayList<>();
 
         public Subnet(BlockPos center) {
             this.center = center;

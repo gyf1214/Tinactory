@@ -27,7 +27,8 @@ public class MarkerRecipeBook extends MachineRecipeBook {
     protected void doRefreshRecipes() {
         var machine = MACHINE.get(blockEntity);
         for (var recipe : CORE.clientRecipeManager().getAllRecipesFor(MARKER)) {
-            if (recipe.baseType == recipeType && recipe.canCraft(machine)) {
+            if (recipeType != null && recipe.baseType == recipeType.get() &&
+                recipe.canCraft(machine)) {
                 recipes.put(recipe.loc(), recipe);
             }
         }
