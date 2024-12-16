@@ -28,10 +28,10 @@ public class TinactoryTest {
         var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addListener(this::onGatherData);
-        modEventBus.addListener(TinactoryTest::init);
+        modEventBus.addListener(this::init);
     }
 
-    private static void init(FMLCommonSetupEvent event) {
+    private void init(FMLCommonSetupEvent event) {
         LOGGER.info("hello TinactoryTest!");
     }
 
