@@ -100,7 +100,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     protected void doSetTargetRecipe(Level world, ResourceLocation loc) {
         targetRecipe = (SmeltingRecipe) world.getRecipeManager().byKey(loc).orElseThrow();
         getContainer().ifPresent(container -> {
-            if (container.hasPort(0) && container.getPort(0, false) instanceof IItemCollection itemPort) {
+            if (container.hasPort(0) && container.getPort(0, true) instanceof IItemCollection itemPort) {
                 itemPort.setItemFilter(targetRecipe.getIngredients());
             }
         });
