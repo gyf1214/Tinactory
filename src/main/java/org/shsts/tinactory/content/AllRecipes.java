@@ -179,6 +179,7 @@ public final class AllRecipes {
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
+            .recipeClass(MarkerRecipe.class)
             .serializer(MarkerRecipe.SERIALIZER)
             .register();
     }

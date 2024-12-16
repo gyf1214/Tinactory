@@ -54,7 +54,7 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
             return;
         }
         var machine = MACHINE.get(blockEntity);
-        for (var recipe : CORE.clientRecipeManager().getAllRecipesFor(recipeType)) {
+        for (var recipe : CORE.clientRecipeManager().getRawRecipesFor(recipeType)) {
             if (recipe instanceof ProcessingRecipe processingRecipe &&
                 processingRecipe.canCraft(machine)) {
                 recipes.put(recipe.loc(), processingRecipe);

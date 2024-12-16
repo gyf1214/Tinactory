@@ -481,14 +481,13 @@ public final class AllBlockEntities {
     }
 
     private static IEntry<PrimitiveBlock> primitive(ProcessingSet set) {
-        var recipeType = set.recipeType;
-        var id = "primitive/" + recipeType.id();
+        var id = "primitive/" + set.recipeType.id();
         var layout = set.layout(Voltage.PRIMITIVE);
         return BlockEntityBuilder.builder(set, id, PrimitiveBlock::new)
             .menu(AllMenus.PRIMITIVE_MACHINE)
             .blockEntity()
             .transform(PrimitiveMachine::factory)
-            .transform(RecipeProcessor.machine(recipeType))
+            .transform(set.mapRecipeType(RecipeProcessor::machine))
             .transform(StackProcessingContainer.factory(layout))
             .end()
             .translucent()

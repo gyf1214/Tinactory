@@ -33,13 +33,33 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingSet extends MachineSet {
-    public final IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>> recipeType;
+    public final IRecipeType<?> recipeType;
 
-    private ProcessingSet(IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>> recipeType,
+    @FunctionalInterface
+    public interface RecipeTypeFunction<T> {
+        <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> T apply(
+            IRecipeType<B> type);
+    }
+
+    private record RecipeTypeWrapper<R extends ProcessingRecipe,
+        B extends IRecipeBuilderBase<R>>(IRecipeType<B> type) {
+        public <T> T apply(RecipeTypeFunction<T> func) {
+            return func.apply(type);
+        }
+    }
+
+    private final RecipeTypeWrapper<?, ?> typeWrapper;
+
+    private ProcessingSet(RecipeTypeWrapper<?, ?> typeWrapper,
         Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
         Map<Voltage, IEntry<? extends Block>> machines) {
         super(voltages, layoutSet, machines);
-        this.recipeType = recipeType;
+        this.typeWrapper = typeWrapper;
+        this.recipeType = typeWrapper.type;
+    }
+
+    public <T> T mapRecipeType(RecipeTypeFunction<T> func) {
+        return typeWrapper.apply(func);
     }
 
     public static class Builder<R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>, P> extends
@@ -82,7 +102,8 @@ public class ProcessingSet extends MachineSet {
         @Override
         protected ProcessingSet createSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
             Map<Voltage, IEntry<? extends Block>> machines) {
-            return new ProcessingSet(recipeType, voltages, layoutSet, machines);
+            var typeWrapper = new RecipeTypeWrapper<>(recipeType);
+            return new ProcessingSet(typeWrapper, voltages, layoutSet, machines);
         }
     }
 

@@ -13,6 +13,7 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllBlockEntities;
@@ -24,6 +25,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
+import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -70,7 +72,14 @@ public class JEI implements IModPlugin {
         for (var set : AllBlockEntities.getProcessingSets()) {
             var layout = set.layout(Voltage.MAXIMUM);
             var icon = set.icon();
-            addProcessingCategory(set.recipeType, layout, icon);
+            set.mapRecipeType(new ProcessingSet.RecipeTypeFunction<>() {
+                @Override
+                public <R extends ProcessingRecipe,
+                    B extends IRecipeBuilderBase<R>> Unit apply(IRecipeType<B> type) {
+                    addProcessingCategory(type, layout, icon);
+                    return Unit.INSTANCE;
+                }
+            });
         }
         addProcessingCategory(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE,
             AllMultiBlocks.BLAST_FURNACE.get());

@@ -10,8 +10,8 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
-import org.shsts.tinactory.core.common.Transformer1;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinycorelib.api.core.Transformer;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -82,7 +82,7 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
         return this;
     }
 
-    public AssemblyRecipeBuilder<P> transformBuilder(Transformer1<AssemblyRecipe.Builder> trans) {
+    public AssemblyRecipeBuilder<P> transformBuilder(Transformer<AssemblyRecipe.Builder> trans) {
         if (builder != null) {
             builder.transform(trans);
         }
