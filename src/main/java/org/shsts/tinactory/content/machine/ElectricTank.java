@@ -89,7 +89,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
             externalTanks[i].allowInput = allowInput;
             externalTanks[i].allowOutput = allowOutput;
         }
-        machine.getNetwork().ifPresent(network -> registerPort(network, externalPort));
+        machine.network().ifPresent(network -> registerPort(network, externalPort));
     }
 
     @Override

@@ -159,7 +159,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
             externalItems.setFilter(i, $ -> allowInput);
             externalItems.setAllowOutput(i, allowOutput);
         }
-        machine.getNetwork().ifPresent(network -> registerPort(network, externalPort));
+        machine.network().ifPresent(network -> registerPort(network, externalPort));
     }
 
     @Override

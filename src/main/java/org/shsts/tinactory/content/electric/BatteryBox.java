@@ -13,8 +13,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
@@ -45,7 +45,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     private final Layout layout;
     private final BlockEntity blockEntity;
     private final Voltage voltage;
-    private Machine machine;
+    private IMachine machine;
     private final WrapperItemHandler handler;
     private final LazyOptional<IItemHandler> itemHandlerCap;
 
@@ -75,8 +75,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public void onWorkTick(double partial) {
-        var factor = machine.getNetwork().orElseThrow()
-            .getComponent(ELECTRIC_COMPONENT)
+        var factor = machine.network().orElseThrow()
+            .getComponent(ELECTRIC_COMPONENT.get())
             .getBufferFactor();
         var sign = MathUtil.compare(factor);
         if (sign == 0) {

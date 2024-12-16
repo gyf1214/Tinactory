@@ -8,12 +8,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllNetworks;
+import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
-import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
@@ -24,6 +25,7 @@ import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -32,8 +34,8 @@ public abstract class ElectricStorage extends CapabilityProvider
     protected final BlockEntity blockEntity;
     public final Layout layout;
 
-    protected MachineConfig machineConfig;
-    protected Machine machine;
+    protected IMachineConfig machineConfig;
+    protected IMachine machine;
 
     public ElectricStorage(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
@@ -56,8 +58,8 @@ public abstract class ElectricStorage extends CapabilityProvider
         return machineConfig.getBoolean("global");
     }
 
-    protected void registerPort(Network network, IPort port) {
-        var logistics = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
+    protected void registerPort(INetwork network, IPort port) {
+        var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.unregisterPort(machine, 0);
 
         if (isGlobal()) {
@@ -74,10 +76,10 @@ public abstract class ElectricStorage extends CapabilityProvider
 
     private void onLoad() {
         machine = MACHINE.get(blockEntity);
-        machineConfig = machine.config;
+        machineConfig = machine.config();
     }
 
-    protected void onConnect(Network network) {
+    protected void onConnect(INetwork network) {
         onMachineConfig();
     }
 

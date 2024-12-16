@@ -9,6 +9,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.network.ComponentType;
@@ -25,7 +26,7 @@ import static org.shsts.tinycorelib.api.CoreLibKeys.EVENT_REGISTRY_KEY;
 @MethodsReturnNonnullByDefault
 public final class AllRegistries {
     public static final IRegistry<IScheduling> SCHEDULINGS;
-    public static final IRegistry<ComponentType<?>> COMPONENT_TYPES;
+    public static final IRegistry<IComponentType<?>> COMPONENT_TYPES;
 
     public static final IEntryHandler<IEvent<?>> EVENTS;
     public static final IEntryHandler<Block> BLOCKS;
@@ -38,7 +39,7 @@ public final class AllRegistries {
         SCHEDULINGS = REGISTRATE.registry("scheduling", IScheduling.class)
             .onBake(SchedulingManager::onBake)
             .register();
-        COMPONENT_TYPES = REGISTRATE.<ComponentType<?>>genericRegistry("component_type", ComponentType.class)
+        COMPONENT_TYPES = REGISTRATE.<IComponentType<?>>genericRegistry("component_type", IComponentType.class)
             .onBake((registry, stage) -> ComponentType.onBake(registry))
             .register();
 

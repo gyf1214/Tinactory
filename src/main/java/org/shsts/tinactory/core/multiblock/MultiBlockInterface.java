@@ -164,24 +164,24 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public Optional<IProcessor> getProcessor() {
+    public Optional<IProcessor> processor() {
         return Optional.ofNullable(processor);
     }
 
     @Override
-    public Optional<IContainer> getContainer() {
+    public Optional<IContainer> container() {
         return Optional.of(container);
     }
 
     @Override
-    public Optional<IElectricMachine> getElectric() {
+    public Optional<IElectricMachine> electric() {
         return Optional.ofNullable(electricMachine);
     }
 
     @Override
-    public Component getTitle() {
+    public Component title() {
         if (config.contains("name", Tag.TAG_STRING) || multiBlock == null) {
-            return super.getTitle();
+            return super.title();
         }
         return I18n.name(multiBlock.blockEntity.getBlockState().getBlock());
     }
@@ -199,9 +199,9 @@ public class MultiBlockInterface extends Machine {
     }
 
     @Override
-    public ItemStack getIcon() {
+    public ItemStack icon() {
         if (multiBlock == null) {
-            return super.getIcon();
+            return super.icon();
         }
         var block = multiBlock.blockEntity.getBlockState().getBlock();
         return new ItemStack(block);

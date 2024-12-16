@@ -10,12 +10,12 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
-import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
@@ -53,7 +53,7 @@ public class LogisticWorkerScreen extends MenuScreen {
     private record MachineInfo(UUID id, Component name, ItemStack icon) {}
 
     private final int workerSlots;
-    private final MachineConfig machineConfig;
+    private final IMachineConfig machineConfig;
     private final Map<UUID, MachineInfo> machines = new HashMap<>();
     private final List<MachineInfo> machineList = new ArrayList<>();
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
@@ -267,7 +267,7 @@ public class LogisticWorkerScreen extends MenuScreen {
     public LogisticWorkerScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         var blockEntity = menu.blockEntity();
-        this.machineConfig = MACHINE.get(blockEntity).config;
+        this.machineConfig = MACHINE.get(blockEntity).config();
         this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
 
         var configPanel = new ConfigPanel();

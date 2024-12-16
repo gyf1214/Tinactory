@@ -1,7 +1,6 @@
 package org.shsts.tinactory.content.machine;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -21,16 +20,17 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
-import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.network.Network;
-import org.shsts.tinactory.core.network.NetworkComponent;
-import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -42,6 +42,8 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
@@ -50,14 +52,18 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
+import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.content.AllNetworks.PRE_WORK_SCHEDULING;
+import static org.shsts.tinactory.content.AllNetworks.WORK_SCHEDULING;
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Machine extends UpdatableCapabilityProvider
-    implements IEventSubscriber, INBTSerializable<CompoundTag> {
-    protected static final String ID = "network/machine";
+public class Machine extends UpdatableCapabilityProvider implements IMachine,
+    IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
+    protected static final String ID = "network/machine";
 
     public final BlockEntity blockEntity;
 
@@ -76,33 +82,37 @@ public class Machine extends UpdatableCapabilityProvider
         return builder.capability(ID, Machine::new);
     }
 
-    private void onRemoved(Level world) {
-        if (network != null) {
-            network.invalidate();
-        }
-        LOGGER.debug("{}: removed in world", this);
+    @Override
+    public UUID uuid() {
+        return uuid;
     }
 
-    /**
-     * Called only on server.
-     */
+    @Override
+    public Optional<ITeamProfile> owner() {
+        if (network == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(network.team);
+        }
+    }
+
+    @Override
+    public boolean canPlayerInteract(Player player) {
+        return network != null && network.team.hasPlayer(player);
+    }
+
+    @Override
+    public IMachineConfig config() {
+        return config;
+    }
+
+    @Override
     public void setConfig(ISetMachineConfigPacket packet, boolean invokeEvent) {
         config.apply(packet);
         sendUpdate(blockEntity);
         if (invokeEvent) {
             invoke(blockEntity, SET_MACHINE_CONFIG);
         }
-    }
-
-    /**
-     * Called only on server.
-     */
-    public void setConfig(ISetMachineConfigPacket packet) {
-        setConfig(packet, true);
-    }
-
-    public boolean canPlayerInteract(Player player) {
-        return network != null && network.team.hasPlayer(player);
     }
 
     protected void onServerUse(AllEvents.OnUseArg arg,
@@ -128,17 +138,11 @@ public class Machine extends UpdatableCapabilityProvider
         result.set(InteractionResult.PASS);
     }
 
-    public Component getTitle() {
-        return config.getString("name")
-            .map(Component.Serializer::fromJson)
-            .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
-    }
-
-    @Override
-    public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
-        eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
-        eventManager.subscribe(SERVER_USE.get(), this::onServerUse);
+    private void onRemoved(Level world) {
+        if (network != null) {
+            network.invalidate();
+        }
+        LOGGER.debug("{}: removed in world", this);
     }
 
     protected static Optional<BlockState> getRealBlockState(Level world, BlockEntity be) {
@@ -167,16 +171,47 @@ public class Machine extends UpdatableCapabilityProvider
             .ifPresent(state -> setWorkBlock(world, state.setValue(WORKING, working)));
     }
 
-    /**
-     * Called when connect to the network
-     */
-    public void onConnectToNetwork(Network network) {
-        LOGGER.debug("{}: connect to network {}", this, network);
-        this.network = network;
+    @Override
+    public Component title() {
+        return config.getString("name")
+            .map(Component.Serializer::fromJson)
+            .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
+    }
 
-        getContainer().ifPresent(container -> {
+    @Override
+    public ItemStack icon() {
+        var block = blockEntity.getBlockState().getBlock();
+        return new ItemStack(block);
+    }
+
+    @Override
+    public Optional<IProcessor> processor() {
+        return PROCESSOR.tryGet(blockEntity);
+    }
+
+    @Override
+    public Optional<IContainer> container() {
+        return CONTAINER.tryGet(blockEntity);
+    }
+
+    @Override
+    public Optional<IElectricMachine> electric() {
+        return ELECTRIC_MACHINE.tryGet(blockEntity);
+    }
+
+    @Override
+    public Optional<INetwork> network() {
+        return Optional.ofNullable(network);
+    }
+
+    @Override
+    public void onConnectToNetwork(INetwork network) {
+        LOGGER.debug("{}: connect to network {}", this, network);
+        this.network = (Network) network;
+
+        container().ifPresent(container -> {
             var subnet = network.getSubnet(blockEntity.getBlockPos());
-            var logistics = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
+            var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
             for (var i = 0; i < container.portSize(); i++) {
                 if (!container.hasPort(i)) {
                     continue;
@@ -188,9 +223,7 @@ public class Machine extends UpdatableCapabilityProvider
         invoke(blockEntity, CONNECT, network);
     }
 
-    /**
-     * Called when disconnect from the network
-     */
+    @Override
     public void onDisconnectFromNetwork() {
         network = null;
         LOGGER.trace("{}: disconnect from network", this);
@@ -199,60 +232,31 @@ public class Machine extends UpdatableCapabilityProvider
         updateWorkBlock(world, false);
     }
 
-    private void onPreWork(Level world, Network network) {
+    private void onPreWork(Level world, INetwork network) {
         assert this.network == network;
-        getProcessor().ifPresent(IProcessor::onPreWork);
+        processor().ifPresent(IProcessor::onPreWork);
     }
 
-    private void onWork(Level world, Network network) {
+    private void onWork(Level world, INetwork network) {
         assert this.network == network;
-        var workFactor = network.getComponent(AllNetworks.ELECTRIC_COMPONENT).getWorkFactor();
+        var workFactor = network
+            .getComponent(ELECTRIC_COMPONENT.get())
+            .getWorkFactor();
         var machineSpeed = MathUtil.safePow(workFactor, TinactoryConfig.INSTANCE.workFactorExponent.get());
-        getProcessor().ifPresent(processor -> {
+        processor().ifPresent(processor -> {
             processor.onWorkTick(machineSpeed);
             updateWorkBlock(world, processor.getProgress() > 0d);
         });
     }
 
-    public void buildSchedulings(NetworkComponent.SchedulingBuilder builder) {
-        builder.add(AllNetworks.PRE_WORK_SCHEDULING, this::onPreWork);
-        builder.add(AllNetworks.WORK_SCHEDULING, this::onWork);
+    @Override
+    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(PRE_WORK_SCHEDULING.get(), this::onPreWork);
+        builder.add(WORK_SCHEDULING.get(), this::onWork);
         invoke(blockEntity, BUILD_SCHEDULING, builder);
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public Optional<Network> getNetwork() {
-        return Optional.ofNullable(network);
-    }
-
-    public Optional<TeamProfile> getOwnerTeam() {
-        if (network == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(network.team);
-        }
-    }
-
-    public Optional<IProcessor> getProcessor() {
-        return PROCESSOR.tryGet(blockEntity);
-    }
-
-    public Optional<IContainer> getContainer() {
-        return AllCapabilities.CONTAINER.tryGet(blockEntity);
-    }
-
-    public Optional<IElectricMachine> getElectric() {
-        return AllCapabilities.ELECTRIC_MACHINE.tryGet(blockEntity);
-    }
-
-    public ItemStack getIcon() {
-        var block = blockEntity.getBlockState().getBlock();
-        return new ItemStack(block);
-    }
-
+    @Override
     public void sendUpdate() {
         var level = blockEntity.getLevel();
         if (level != null && !level.isClientSide) {
@@ -260,7 +264,13 @@ public class Machine extends UpdatableCapabilityProvider
         }
     }
 
-    @Nonnull
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
+        eventManager.subscribe(SERVER_USE.get(), this::onServerUse);
+    }
+
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == MACHINE.get()) {
@@ -296,7 +306,7 @@ public class Machine extends UpdatableCapabilityProvider
 
     public static Optional<IProcessor> getProcessor(BlockEntity be) {
         var machine = MACHINE.tryGet(be);
-        return machine.map(Machine::getProcessor)
+        return machine.map(IMachine::processor)
             .orElseGet(() -> PROCESSOR.tryGet(be));
     }
 }

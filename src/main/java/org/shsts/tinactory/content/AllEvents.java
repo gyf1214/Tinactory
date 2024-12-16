@@ -6,8 +6,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import org.shsts.tinactory.core.network.Network;
-import org.shsts.tinactory.core.network.NetworkComponent;
+import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinycorelib.api.blockentity.IEvent;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -31,8 +31,8 @@ public final class AllEvents {
 
     public static final IEntry<IReturnEvent<AllEvents.OnUseArg, InteractionResult>> SERVER_USE;
     public static final IEntry<IEvent<Unit>> CONTAINER_CHANGE;
-    public static final IEntry<IEvent<Network>> CONNECT;
-    public static final IEntry<IEvent<NetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
+    public static final IEntry<IEvent<INetwork>> CONNECT;
+    public static final IEntry<IEvent<INetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
     public static final IEntry<IEvent<Unit>> SET_MACHINE_CONFIG;
 
     private AllEvents() {}

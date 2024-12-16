@@ -6,9 +6,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.machine.Machine;
-import org.shsts.tinactory.content.machine.MachineConfig;
 import org.shsts.tinactory.core.gui.LayoutPlugin;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -32,13 +32,13 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricStoragePlugin extends LayoutPlugin<MenuScreen> {
-    protected final Machine machine;
-    private final MachineConfig machineConfig;
+    protected final IMachine machine;
+    private final IMachineConfig machineConfig;
 
     protected ElectricStoragePlugin(IMenu menu) {
         super(menu, SLOT_SIZE + SPACING);
         this.machine = MACHINE.get(menu.blockEntity());
-        this.machineConfig = machine.config;
+        this.machineConfig = machine.config();
 
         menu.setValidPredicate(() -> machine.canPlayerInteract(menu.player()));
         menu.onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);

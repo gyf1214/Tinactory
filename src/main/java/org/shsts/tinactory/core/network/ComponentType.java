@@ -4,35 +4,41 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.shsts.tinactory.api.network.IComponentType;
+import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ComponentType<T extends NetworkComponent> extends ForgeRegistryEntry<ComponentType<?>> {
-    private final Class<T> componentClass;
+public class ComponentType<T extends INetworkComponent>
+    extends ForgeRegistryEntry<IComponentType<?>> implements IComponentType<T> {
+    private final Class<T> clazz;
     private final NetworkComponent.Factory<T> factory;
 
-    public ComponentType(Class<T> componentClass, NetworkComponent.Factory<T> factory) {
-        this.componentClass = componentClass;
+    public ComponentType(Class<T> clazz, NetworkComponent.Factory<T> factory) {
+        this.clazz = clazz;
         this.factory = factory;
     }
 
-    public T create(Network network) {
+    @Override
+    public Class<T> clazz() {
+        return clazz;
+    }
+
+    @Override
+    public T create(INetwork network) {
         return factory.create(this, network);
     }
 
-    public T cast(NetworkComponent networkComponent) {
-        return componentClass.cast(networkComponent);
-    }
+    private static Collection<IComponentType<?>> componentTypes;
 
-    private static Collection<ComponentType<?>> componentTypes;
-
-    public static void onBake(IForgeRegistry<ComponentType<?>> registry) {
+    public static void onBake(IForgeRegistry<IComponentType<?>> registry) {
         componentTypes = registry.getValues();
     }
 
-    public static Collection<ComponentType<?>> getComponentTypes() {
+    public static Collection<IComponentType<?>> getComponentTypes() {
         return componentTypes;
     }
 }

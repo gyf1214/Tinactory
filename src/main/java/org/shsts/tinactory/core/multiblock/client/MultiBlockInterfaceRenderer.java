@@ -12,11 +12,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
 
 import java.util.Objects;
+
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -39,7 +40,7 @@ public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<BlockEnt
         var world = be.getLevel();
         assert world != null;
         var pos = be.getBlockPos();
-        var cap = AllCapabilities.MACHINE.tryGet(be);
+        var cap = MACHINE.tryGet(be);
         if (cap.isEmpty() || !(cap.get() instanceof MultiBlockInterface multiBlockInterface)) {
             return;
         }

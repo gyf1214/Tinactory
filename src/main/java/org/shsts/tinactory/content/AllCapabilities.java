@@ -6,8 +6,8 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -26,7 +26,7 @@ public final class AllCapabilities {
     public static final ICapability<IItemHandlerModifiable> MENU_ITEM_HANDLER;
 
     public static final ICapability<ILayoutProvider> LAYOUT_PROVIDER;
-    public static final ICapability<Machine> MACHINE;
+    public static final ICapability<IMachine> MACHINE;
 
     static {
         ITEM_HANDLER = REGISTRATE.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
@@ -39,7 +39,7 @@ public final class AllCapabilities {
         MENU_ITEM_HANDLER = REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
 
         LAYOUT_PROVIDER = REGISTRATE.capability(ILayoutProvider.class, new CapabilityToken<>() {});
-        MACHINE = REGISTRATE.capability(Machine.class, new CapabilityToken<>() {});
+        MACHINE = REGISTRATE.capability(IMachine.class, new CapabilityToken<>() {});
     }
 
     public static void init() {}

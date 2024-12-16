@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.IMenu;
 
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.util.I18n.tr;
 
@@ -45,8 +46,8 @@ public class ProcessingPlugin extends LayoutPlugin<ProcessingScreen> {
     }
 
     public static Component getTitle(BlockEntity be) {
-        return AllCapabilities.MACHINE.tryGet(be)
-            .map(Machine::getTitle)
+        return MACHINE.tryGet(be)
+            .map(IMachine::title)
             .orElseGet(() -> I18n.name(be.getBlockState().getBlock()));
     }
 

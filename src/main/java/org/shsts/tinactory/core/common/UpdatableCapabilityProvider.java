@@ -23,7 +23,7 @@ public abstract class UpdatableCapabilityProvider extends CapabilityProvider
         world.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
     }
 
-    public void forceUpdate() {
+    protected void forceUpdate() {
         isUpdateForced = true;
     }
 

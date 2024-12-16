@@ -15,9 +15,8 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
@@ -38,6 +37,7 @@ import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 
@@ -160,8 +160,7 @@ public class StackProcessingContainer extends CapabilityProvider
         if (world.isClientSide) {
             return TechManager.localTeam();
         } else {
-            return AllCapabilities.MACHINE.tryGet(blockEntity)
-                .flatMap(Machine::getOwnerTeam);
+            return MACHINE.tryGet(blockEntity).flatMap(IMachine::owner);
         }
     }
 

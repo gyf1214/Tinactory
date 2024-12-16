@@ -8,11 +8,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.network.IScheduling;
-import org.shsts.tinactory.content.AllNetworks;
-import org.shsts.tinactory.content.machine.Machine;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.network.NetworkComponent;
 
 import java.util.ArrayList;
@@ -23,38 +22,38 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+
+import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LogisticComponent extends NetworkComponent {
-    public LogisticComponent(ComponentType<LogisticComponent> type, Network network) {
+    public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
     }
 
     public record PortKey(UUID machineId, int portIndex) {}
 
-    public record PortInfo(Machine machine, int portIndex, IPort port, @Nullable BlockPos subnet) {}
+    public record PortInfo(IMachine machine, int portIndex, IPort port, @Nullable BlockPos subnet) {}
 
     private final Map<PortKey, PortInfo> ports = new HashMap<>();
     private final Multimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
     private final Set<PortKey> globalPorts = new HashSet<>();
 
-    public void registerPort(BlockPos subnet, Machine machine, int index, IPort port) {
-        var key = new PortKey(machine.getUuid(), index);
+    public void registerPort(BlockPos subnet, IMachine machine, int index, IPort port) {
+        var key = new PortKey(machine.uuid(), index);
         ports.put(key, new PortInfo(machine, index, port, subnet));
         subnetPorts.put(subnet, key);
     }
 
-    public void registerGlobalPort(Machine machine, int index, IPort port) {
-        var key = new PortKey(machine.getUuid(), index);
+    public void registerGlobalPort(IMachine machine, int index, IPort port) {
+        var key = new PortKey(machine.uuid(), index);
         ports.put(key, new PortInfo(machine, index, port, null));
         globalPorts.add(key);
     }
 
-    public void unregisterPort(Machine machine, int index) {
-        var key = new PortKey(machine.getUuid(), index);
+    public void unregisterPort(IMachine machine, int index) {
+        var key = new PortKey(machine.uuid(), index);
         if (ports.containsKey(key)) {
             var info = ports.get(key);
             ports.remove(key);
@@ -94,10 +93,10 @@ public class LogisticComponent extends NetworkComponent {
         subnetPorts.clear();
     }
 
-    private void onTick(Level world, Network network) {}
+    private void onTick(Level world, INetwork network) {}
 
     @Override
-    public void buildSchedulings(BiConsumer<Supplier<IScheduling>, Ticker> cons) {
-        cons.accept(AllNetworks.LOGISTICS_SCHEDULING, this::onTick);
+    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(LOGISTICS_SCHEDULING.get(), this::onTick);
     }
 }

@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
@@ -179,7 +180,7 @@ public class MultiBlock extends MultiBlockBase {
     }
 
     public Optional<IContainer> getContainer() {
-        return getInterface().flatMap(MultiBlockInterface::getContainer);
+        return getInterface().flatMap(MultiBlockInterface::container);
     }
 
     public IProcessor getProcessor() {
@@ -218,7 +219,7 @@ public class MultiBlock extends MultiBlockBase {
             if (be1 == null) {
                 return;
             }
-            AllCapabilities.MACHINE.tryGet(be1).ifPresent(machine ->
+            MACHINE.tryGet(be1).ifPresent(machine ->
                 multiBlockInterface = (MultiBlockInterface) machine);
         } else {
             multiBlockInterface = null;

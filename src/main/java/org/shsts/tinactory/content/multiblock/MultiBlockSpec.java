@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.multiblock.MultiBlockCheckCtx;
@@ -19,6 +18,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -176,7 +177,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
             if (be.isEmpty()) {
                 return false;
             }
-            var machine = AllCapabilities.MACHINE.tryGet(be.get());
+            var machine = MACHINE.tryGet(be.get());
             if (machine.isEmpty() || !(machine.get() instanceof MultiBlockInterface inter)) {
                 return false;
             }

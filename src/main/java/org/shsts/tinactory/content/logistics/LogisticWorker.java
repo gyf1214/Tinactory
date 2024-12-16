@@ -16,16 +16,13 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllNetworks;
+import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
-import org.shsts.tinactory.core.network.Network;
-import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -36,8 +33,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
+import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.ProcessingPlugin.portLabel;
 
@@ -99,32 +99,27 @@ public class LogisticWorker extends CapabilityProvider
         }
     }
 
-    public Optional<Network> getNetwork() {
-        return AllCapabilities.MACHINE.tryGet(blockEntity)
-            .flatMap(Machine::getNetwork);
-    }
-
     public List<LogisticWorkerSyncPacket.PortInfo> getVisiblePorts() {
         var ret = new ArrayList<LogisticWorkerSyncPacket.PortInfo>();
-        var machine = AllCapabilities.MACHINE.get(blockEntity);
-        machine.getNetwork().ifPresent(network -> {
-            var logistics = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
+        var machine = MACHINE.get(blockEntity);
+        machine.network().ifPresent(network -> {
+            var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
             var subnet = network.getSubnet(blockEntity.getBlockPos());
             for (var info : logistics.getVisiblePorts(subnet)) {
                 var machine1 = info.machine();
                 var index = info.portIndex();
                 var portName = portLabel(info.port().type(), index);
 
-                ret.add(new LogisticWorkerSyncPacket.PortInfo(machine1.getUuid(),
-                    index, machine1.getTitle(), machine1.getIcon(), portName));
+                ret.add(new LogisticWorkerSyncPacket.PortInfo(machine1.uuid(),
+                    index, machine1.title(), machine1.icon(), portName));
             }
         });
         return ret;
     }
 
     private Optional<LogisticWorkerConfig> getConfig(int index) {
-        var machine = AllCapabilities.MACHINE.get(blockEntity);
-        return machine.config.getCompound(PREFIX + index)
+        var machine = MACHINE.get(blockEntity);
+        return machine.config().getCompound(PREFIX + index)
             .map(LogisticWorkerConfig::fromTag);
     }
 
@@ -155,12 +150,12 @@ public class LogisticWorker extends CapabilityProvider
         if (world == null || world.isClientSide) {
             return;
         }
-        var machine = AllCapabilities.MACHINE.get(blockEntity);
-        var network = machine.getNetwork();
+        var machine = MACHINE.get(blockEntity);
+        var network = machine.network();
         if (network.isEmpty()) {
             return;
         }
-        var logistic = network.get().getComponent(AllNetworks.LOGISTIC_COMPONENT);
+        var logistic = network.get().getComponent(LOGISTIC_COMPONENT.get());
         var subnet = network.get().getSubnet(blockEntity.getBlockPos());
 
         var packet = SetMachineConfigPacket.builder();
@@ -216,14 +211,14 @@ public class LogisticWorker extends CapabilityProvider
         }
     }
 
-    private void onTick(Level world, Network network) {
+    private void onTick(Level world, INetwork network) {
         if (tick < workerInterval) {
             tick++;
             return;
         }
         getConfig(currentSlot).filter(LogisticWorkerConfig::isValid).ifPresent(entry -> {
-            var machine = AllCapabilities.MACHINE.get(blockEntity);
-            var logistic = network.getComponent(AllNetworks.LOGISTIC_COMPONENT);
+            var machine = MACHINE.get(blockEntity);
+            var logistic = network.getComponent(LOGISTIC_COMPONENT.get());
             var subnet = network.getSubnet(blockEntity.getBlockPos());
 
             if (validateConfig(logistic, subnet, entry)) {
@@ -253,8 +248,8 @@ public class LogisticWorker extends CapabilityProvider
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::validateConfigs);
     }
 
-    private void buildScheduling(NetworkComponent.SchedulingBuilder builder) {
-        builder.add(AllNetworks.LOGISTICS_SCHEDULING, this::onTick);
+    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(LOGISTICS_SCHEDULING.get(), this::onTick);
     }
 
     @Override

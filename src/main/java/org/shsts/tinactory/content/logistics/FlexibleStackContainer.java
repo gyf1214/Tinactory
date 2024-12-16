@@ -14,8 +14,8 @@ import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
@@ -179,7 +179,7 @@ public class FlexibleStackContainer extends CapabilityProvider
 
     @Override
     public Optional<? extends ITeamProfile> getOwnerTeam() {
-        return MACHINE.tryGet(blockEntity).flatMap(Machine::getOwnerTeam);
+        return MACHINE.tryGet(blockEntity).flatMap(IMachine::owner);
     }
 
     @Override

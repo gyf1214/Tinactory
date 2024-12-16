@@ -4,13 +4,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.core.network.NetworkBase;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;
+
+import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -28,7 +29,7 @@ public class NetworkControllerSyncPacket implements IPacket {
         if (present) {
             this.state = network.get().getState();
             this.electricMetrics = network.get()
-                .getComponent(AllNetworks.ELECTRIC_COMPONENT)
+                .getComponent(ELECTRIC_COMPONENT.get())
                 .getMetrics();
         }
     }

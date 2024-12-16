@@ -8,9 +8,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.network.IComponentType;
+import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.IScheduling;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.util.BiKeyHashMap;
@@ -19,61 +21,60 @@ import org.slf4j.Logger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
+
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Network extends NetworkBase {
+public class Network extends NetworkBase implements INetwork {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Map<ComponentType<?>, NetworkComponent> components = new HashMap<>();
-    private final Multimap<BlockPos, Machine> subnetMachines = ArrayListMultimap.create();
+    private final Map<IComponentType<?>, INetworkComponent> components = new HashMap<>();
+    private final Multimap<BlockPos, IMachine> subnetMachines = ArrayListMultimap.create();
     private final Map<BlockPos, BlockPos> blockSubnets = new HashMap<>();
-    private final BiKeyHashMap<IScheduling, ComponentType<?>, NetworkComponent.Ticker> componentSchedulings =
-        new BiKeyHashMap<>();
-    private final Multimap<IScheduling, NetworkComponent.Ticker> machineSchedulings = ArrayListMultimap.create();
+    private final BiKeyHashMap<IScheduling, IComponentType<?>,
+        INetworkComponent.Ticker> componentSchedulings = new BiKeyHashMap<>();
+    private final Multimap<IScheduling, INetworkComponent.Ticker> machineSchedulings =
+        ArrayListMultimap.create();
 
     public Network(Level world, BlockPos center, TeamProfile team) {
         super(world, center, team);
         attachComponents();
     }
 
-    public <T extends NetworkComponent> T getComponent(Supplier<ComponentType<T>> typeSupp) {
-        var type = typeSupp.get();
-        return type.cast(components.get(type));
+    @Override
+    public <T extends INetworkComponent> T getComponent(IComponentType<T> type) {
+        return type.clazz().cast(components.get(type));
     }
 
-    protected void attachComponent(ComponentType<?> type) {
+    protected void attachComponent(IComponentType<?> type) {
         assert !components.containsKey(type);
         var component = type.create(this);
         components.put(type, component);
         component.buildSchedulings(((scheduling, ticker) ->
-            componentSchedulings.put(scheduling.get(), type, ticker)));
+            componentSchedulings.put(scheduling, type, ticker)));
     }
 
     protected void attachComponents() {
         ComponentType.getComponentTypes().forEach(this::attachComponent);
     }
 
-    /**
-     * @return map subnet -> machine
-     */
-    public Multimap<BlockPos, Machine> getAllMachines() {
+    @Override
+    public Multimap<BlockPos, IMachine> allMachines() {
         return subnetMachines;
     }
 
+    @Override
     public BlockPos getSubnet(BlockPos pos) {
         return blockSubnets.get(pos);
     }
 
-    /**
-     * @return entrySet subnet -> block
-     */
-    public Collection<Map.Entry<BlockPos, BlockPos>> getAllBlocks() {
+    @Override
+    public Collection<Map.Entry<BlockPos, BlockPos>> allBlocks() {
         return blockSubnets.entrySet();
     }
 
-    protected void putMachine(BlockPos subnet, Machine machine) {
+    protected void putMachine(BlockPos subnet, IMachine machine) {
         LOGGER.trace("{}: put machine {}", this, machine);
         subnetMachines.put(subnet, machine);
     }
@@ -87,7 +88,7 @@ public class Network extends NetworkBase {
         }
         if (state.getBlock() instanceof SmartEntityBlock entityBlock) {
             entityBlock.getBlockEntity(world, pos)
-                .flatMap(AllCapabilities.MACHINE::tryGet)
+                .flatMap(MACHINE::tryGet)
                 .ifPresent(machine -> putMachine(subnet, machine));
         }
     }
@@ -102,8 +103,7 @@ public class Network extends NetworkBase {
             machine.onConnectToNetwork(this);
         }
         for (var machine : subnetMachines.values()) {
-            machine.buildSchedulings((scheduling, ticker) ->
-                machineSchedulings.put(scheduling.get(), ticker));
+            machine.buildSchedulings(machineSchedulings::put);
         }
     }
 

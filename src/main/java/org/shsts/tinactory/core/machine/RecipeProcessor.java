@@ -18,13 +18,13 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.GeneratorProcessor;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
-import org.shsts.tinactory.content.machine.Machine;
 import org.shsts.tinactory.content.machine.MachineProcessor;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
@@ -211,9 +211,9 @@ public abstract class RecipeProcessor<T extends Recipe<?>> extends CapabilityPro
     private void updateTargetRecipe() {
         var recipe = MultiBlock.tryGet(blockEntity)
             .flatMap(MultiBlock::getInterface)
-            .map($ -> (Machine) $)
+            .map($ -> (IMachine) $)
             .or(() -> MACHINE.tryGet(blockEntity))
-            .flatMap($ -> $.config.getLoc("targetRecipe"));
+            .flatMap($ -> $.config().getLoc("targetRecipe"));
 
         recipe.ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
     }
