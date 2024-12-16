@@ -23,11 +23,9 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
@@ -53,7 +51,7 @@ public class MultiBlockInterface extends Machine {
     @Nullable
     private IElectricMachine electricMachine = null;
     @Nullable
-    private IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>> recipeType = null;
+    private IRecipeType<?> recipeType = null;
 
     public MultiBlockInterface(BlockEntity be) {
         super(be);
@@ -192,7 +190,7 @@ public class MultiBlockInterface extends Machine {
         return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.layout);
     }
 
-    public Optional<IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>>> getRecipeType() {
+    public Optional<IRecipeType<?>> getRecipeType() {
         return Optional.ofNullable(recipeType);
     }
 

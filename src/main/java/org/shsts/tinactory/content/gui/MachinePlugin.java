@@ -19,11 +19,9 @@ import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.IMenu;
 import org.shsts.tinycorelib.api.gui.IMenuPlugin;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
@@ -55,7 +53,7 @@ public class MachinePlugin extends ProcessingPlugin {
         return Optional.of(new MachineRecipeBook(screen, layout));
     }
 
-    protected Optional<IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>>> getRecipeType() {
+    protected Optional<IRecipeType<?>> getRecipeType() {
         var processor = PROCESSOR.tryGet(menu.blockEntity()).orElse(null);
         if (processor instanceof MachineProcessor<?> machine) {
             return Optional.of(machine.recipeType);
@@ -147,7 +145,7 @@ public class MachinePlugin extends ProcessingPlugin {
     public static IMenuPlugin<ProcessingScreen> multiBlock(IMenu menu) {
         return new MachinePlugin(menu) {
             @Override
-            protected Optional<IRecipeType<? extends IRecipeBuilderBase<? extends ProcessingRecipe>>> getRecipeType() {
+            protected Optional<IRecipeType<?>> getRecipeType() {
                 var multiBlockInterface = (MultiBlockInterface) MACHINE.get(menu.blockEntity());
                 return multiBlockInterface.getRecipeType();
             }
