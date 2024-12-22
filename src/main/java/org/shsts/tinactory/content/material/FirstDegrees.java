@@ -34,6 +34,7 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
@@ -113,6 +114,12 @@ public final class FirstDegrees {
         ELECTRUM = set("electrum")
             .color(0xFFFFFF64)
             .metalExt().wireFine().foil()
+            .buildObject();
+
+        STAINLESS_STEEL = set("stainless_steel")
+            .color(0xFFC8C8DC)
+            .mechanical().gear().molten()
+            .toolSet(1200, Tiers.IRON)
             .buildObject();
 
         SODIUM_CHLORIDE = dust("sodium_chloride", 0xFFFAFAFA);

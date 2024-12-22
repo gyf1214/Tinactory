@@ -65,6 +65,7 @@ public final class AllMaterials {
     public static MaterialSet GALLIUM_ARSENIDE;
     public static MaterialSet KANTHAL;
     public static MaterialSet ELECTRUM;
+    public static MaterialSet STAINLESS_STEEL;
     public static MaterialSet SODIUM_CHLORIDE;
     public static MaterialSet POTASSIUM_CHLORIDE;
     public static MaterialSet MAGNESIUM_CHLORIDE;

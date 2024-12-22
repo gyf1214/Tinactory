@@ -96,6 +96,7 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
+import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
@@ -328,6 +329,11 @@ public final class Materials {
             .material(ELECTRUM, SHINY)
             .machineProcess(Voltage.LV, 0.75d).smelt()
             .alloy(Voltage.LV, GOLD, 1, SILVER, 1)
+            .build()
+            .material(STAINLESS_STEEL, SHINY)
+            .machineProcess(Voltage.MV)
+            .blast(Voltage.MV, 1700, 1100)
+            .mix(Voltage.MV, IRON, 6, NICKEL, 1, MANGANESE, 1, CHROME, 1)
             .build()
             .material(SODIUM_CHLORIDE, FINE).build()
             .material(POTASSIUM_CHLORIDE, FINE).build()

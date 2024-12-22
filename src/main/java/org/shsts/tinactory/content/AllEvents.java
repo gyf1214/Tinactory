@@ -1,9 +1,12 @@
 package org.shsts.tinactory.content;
 
+import javax.annotation.Nullable;
 import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.api.network.INetwork;
@@ -29,7 +32,10 @@ public final class AllEvents {
 
     public record OnUseArg(Player player, InteractionHand hand, BlockHitResult hitResult) {}
 
-    public static final IEntry<IReturnEvent<AllEvents.OnUseArg, InteractionResult>> SERVER_USE;
+    public record OnPlaceArg(@Nullable LivingEntity placer, ItemStack stack) {}
+
+    public static final IEntry<IReturnEvent<OnUseArg, InteractionResult>> SERVER_USE;
+    public static final IEntry<IEvent<OnPlaceArg>> SERVER_PLACE;
     public static final IEntry<IEvent<Unit>> CONTAINER_CHANGE;
     public static final IEntry<IEvent<INetwork>> CONNECT;
     public static final IEntry<IEvent<INetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
@@ -45,6 +51,7 @@ public final class AllEvents {
         SERVER_TICK = EVENTS.getEntry(SERVER_TICK_LOC);
 
         SERVER_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
+        SERVER_PLACE = REGISTRATE.event("server_place");
         CONTAINER_CHANGE = REGISTRATE.event("logistics/container_change");
         CONNECT = REGISTRATE.event("network/connect");
         BUILD_SCHEDULING = REGISTRATE.event("network/build_scheduling");

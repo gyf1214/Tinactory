@@ -7,7 +7,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -24,6 +26,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllEvents.SERVER_PLACE;
 import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
 
 @MethodsReturnNonnullByDefault
@@ -72,6 +75,16 @@ public class SmartEntityBlock extends Block implements EntityBlock {
     public <T1 extends BlockEntity> BlockEntityTicker<T1> getTicker(
         Level world, BlockState state, BlockEntityType<T1> type) {
         return type == getType() ? entityType.get().ticker() : null;
+    }
+
+    @Override
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state,
+        @Nullable LivingEntity placer, ItemStack stack) {
+        var be = getBlockEntity(world, pos);
+        if (be.isPresent() && !world.isClientSide) {
+            CapabilityProvider.invoke(be.get(), SERVER_PLACE,
+                new AllEvents.OnPlaceArg(placer, stack));
+        }
     }
 
     @Override

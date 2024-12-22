@@ -50,6 +50,7 @@ import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_PLACE;
 import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
@@ -115,8 +116,19 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
     }
 
-    protected void onServerUse(AllEvents.OnUseArg arg,
-        IReturnEvent.Result<InteractionResult> result) {
+    private void setName(Component name) {
+        var jo = Component.Serializer.toJson(name);
+        setConfig(SetMachineConfigPacket.builder().set("name", jo).get());
+    }
+
+    private void onServerPlace(AllEvents.OnPlaceArg arg) {
+        var item = arg.stack();
+        if (item.hasCustomHoverName()) {
+            setName(item.getHoverName());
+        }
+    }
+
+    private void onServerUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
         var player = arg.player();
         if (!canPlayerInteract(player)) {
             result.set(InteractionResult.FAIL);
@@ -126,8 +138,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         var item = player.getItemInHand(arg.hand());
         if (item.is(Items.NAME_TAG) && item.hasCustomHoverName()) {
             if (!player.level.isClientSide) {
-                var name = Component.Serializer.toJson(item.getHoverName());
-                setConfig(SetMachineConfigPacket.builder().set("name", name).get());
+                setName(item.getHoverName());
                 item.shrink(1);
             }
 
@@ -260,6 +271,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
         eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
+        eventManager.subscribe(SERVER_PLACE.get(), this::onServerPlace);
         eventManager.subscribe(SERVER_USE.get(), this::onServerUse);
     }
 
