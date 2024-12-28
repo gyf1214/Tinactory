@@ -20,6 +20,7 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
+import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.content.multiblock.MultiBlockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
@@ -48,7 +49,7 @@ public class MultiBlock extends MultiBlockBase {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "multi_block";
 
-    public final Layout layout;
+    protected Layout layout;
     private final Consumer<MultiBlockCheckCtx> checker;
     private final Supplier<BlockState> appearance;
 
@@ -69,6 +70,10 @@ public class MultiBlock extends MultiBlockBase {
         return appearance.get();
     }
 
+    public Layout getLayout() {
+        return layout;
+    }
+
     protected static class CheckContext implements MultiBlockCheckCtx {
         protected boolean failed = false;
         protected final Level world;
@@ -87,8 +92,8 @@ public class MultiBlock extends MultiBlockBase {
         }
 
         @Override
-        public void setFailed() {
-            failed = true;
+        public void setFailed(boolean val) {
+            failed = val;
         }
 
         @Override
@@ -278,6 +283,10 @@ public class MultiBlock extends MultiBlockBase {
 
     public static <P> Builder<P> blastFurnace(IBlockEntityTypeBuilder<P> parent) {
         return new Builder<>(parent, BlastFurnace::new);
+    }
+
+    public static <P> Builder<P> distillationTower(IBlockEntityTypeBuilder<P> parent) {
+        return new Builder<>(parent, DistillationTower::new);
     }
 
     public static Optional<MultiBlock> tryGet(BlockEntity be) {

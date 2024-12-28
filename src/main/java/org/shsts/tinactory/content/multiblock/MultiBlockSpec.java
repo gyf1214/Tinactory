@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -29,11 +30,13 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
 
     public static class Layer {
         private final List<String> rows;
-        private final int height;
+        private final int minHeight;
+        private final int maxHeight;
 
         public Layer(LayerBuilder<?> builder) {
             this.rows = builder.rows;
-            this.height = builder.height;
+            this.minHeight = builder.minHeight;
+            this.maxHeight = builder.maxHeight;
         }
 
         public char get(int w, int d) {
@@ -68,26 +71,32 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
             return false;
         }
 
+        Direction dirW;
+        Direction dirD;
         if (!blockState.get().hasProperty(PrimitiveBlock.FACING)) {
-            ctx.setProperty("dirW", Direction.EAST);
-            ctx.setProperty("dirD", Direction.SOUTH);
+            dirW = Direction.EAST;
+            dirD = Direction.SOUTH;
         } else {
-            var dir = blockState.get().getValue(PrimitiveBlock.FACING);
-            var dir1 = switch (dir) {
+            dirD = blockState.get().getValue(PrimitiveBlock.FACING);
+            dirW = switch (dirD) {
                 case SOUTH -> Direction.EAST;
                 case EAST -> Direction.NORTH;
                 case NORTH -> Direction.WEST;
                 case WEST -> Direction.SOUTH;
                 default -> throw new IllegalStateException();
             };
-            ctx.setProperty("dirW", dir1);
-            ctx.setProperty("dirD", dir);
         }
+        ctx.setProperty("dirW", dirW);
+        ctx.setProperty("dirD", dirD);
+        ctx.setProperty("base", ctx.getCenter()
+            .relative(dirW, -centerW)
+            .relative(dirD, -centerD));
         return true;
     }
 
-    private boolean checkLayer(MultiBlockCheckCtx ctx, Layer layer, BlockPos base,
+    private Optional<List<BlockPos>> checkLayer(MultiBlockCheckCtx ctx, Layer layer, BlockPos base,
         int y, Direction dirW, Direction dirD) {
+        var blocks = new ArrayList<BlockPos>();
         for (var d = 0; d < depth; d++) {
             for (var w = 0; w < width; w++) {
                 if (w == centerW && d == centerD && layer == centerLayer) {
@@ -99,13 +108,44 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
                 }
                 var pos = base.above(y).relative(dirW, w).relative(dirD, d);
                 var checker = checkers.get(ch);
+                if (checker == null) {
+                    ctx.setFailed();
+                    return Optional.empty();
+                }
                 checker.accept(ctx, pos);
                 if (ctx.isFailed()) {
-                    return false;
+                    return Optional.empty();
                 }
-                ctx.addBlock(pos);
+                blocks.add(pos);
             }
         }
+        return Optional.of(blocks);
+    }
+
+    private boolean checkLayer(MultiBlockCheckCtx ctx, Layer layer, boolean reverse) {
+        var dirW = (Direction) ctx.getProperty("dirW");
+        var dirD = (Direction) ctx.getProperty("dirD");
+        var base = (BlockPos) ctx.getProperty("base");
+        var y = (int) ctx.getProperty("y");
+        var h = 0;
+        for (; h < layer.maxHeight; h++) {
+            var y1 = reverse ? y - h - 1 : y + h;
+            var result = checkLayer(ctx, layer, base, y1, dirW, dirD);
+            if (result.isPresent()) {
+                for (var pos : result.get()) {
+                    ctx.addBlock(pos);
+                }
+            } else {
+                if (h < layer.minHeight) {
+                    ctx.setFailed();
+                    return false;
+                } else {
+                    ctx.setFailed(false);
+                    break;
+                }
+            }
+        }
+        ctx.setProperty("y", reverse ? y - h : y + h);
         return true;
     }
 
@@ -114,29 +154,21 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         if (!getDirections(ctx)) {
             return;
         }
-        var dirW = (Direction) ctx.getProperty("dirW");
-        var dirD = (Direction) ctx.getProperty("dirD");
-        var base = ctx.getCenter().relative(dirW, -centerW).relative(dirD, -centerD);
-        var y = 0;
+        ctx.setProperty("y", 0);
         for (var i = centerLayerIdx; i < layers.size(); i++) {
-            var layer = layers.get(i);
-            for (var h = 0; h < layer.height; h++) {
-                if (!checkLayer(ctx, layer, base, y + h, dirW, dirD)) {
-                    return;
-                }
+            if (!checkLayer(ctx, layers.get(i), false)) {
+                return;
             }
-            y += layer.height;
         }
-        y = 0;
+        var h1 = (int) ctx.getProperty("y");
+        ctx.setProperty("y", 0);
         for (var i = centerLayerIdx - 1; i >= 0; i--) {
-            var layer = layers.get(i);
-            y -= layer.height;
-            for (var h = 0; h < layer.height; h++) {
-                if (!checkLayer(ctx, layer, base, y + h, dirW, dirD)) {
-                    return;
-                }
+            if (!checkLayer(ctx, layers.get(i), true)) {
+                return;
             }
         }
+        var h2 = (int) ctx.getProperty("y");
+        ctx.setProperty("height", h1 - h2);
     }
 
     public static class Builder<P> extends SimpleBuilder<MultiBlockSpec, P, Builder<P>> {
@@ -265,14 +297,22 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
 
     public static class LayerBuilder<P> extends SimpleBuilder<Layer, Builder<P>, LayerBuilder<P>> {
         private final List<String> rows = new ArrayList<>();
-        private int height = 1;
+        private int minHeight = 1;
+        private int maxHeight = 1;
 
         private LayerBuilder(Builder<P> parent) {
             super(parent);
         }
 
         public LayerBuilder<P> height(int val) {
-            this.height = val;
+            minHeight = val;
+            maxHeight = val;
+            return this;
+        }
+
+        public LayerBuilder<P> height(int min, int max) {
+            minHeight = min;
+            maxHeight = max;
             return this;
         }
 

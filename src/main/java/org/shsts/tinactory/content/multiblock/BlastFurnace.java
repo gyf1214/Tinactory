@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.multiblock.MultiBlock;
 
 import java.util.OptionalInt;
 
+import static org.shsts.tinactory.content.AllLayouts.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
@@ -20,7 +21,7 @@ public class BlastFurnace extends MultiBlock {
     private CoilBlock coilBlock = null;
 
     public BlastFurnace(BlockEntity blockEntity, Builder<?> builder) {
-        super(blockEntity, builder);
+        super(blockEntity, builder.layout(BLAST_FURNACE));
     }
 
     @Override

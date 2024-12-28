@@ -55,6 +55,7 @@ public final class AllRecipes {
     public static final IRecipeType<ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final IRecipeType<BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     public static final IRecipeType<ProcessingRecipe.Builder> VACUUM_FREEZER;
+    public static final IRecipeType<ProcessingRecipe.Builder> DISTILLATION;
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
 
@@ -176,6 +177,10 @@ public final class AllRecipes {
 
         VACUUM_FREEZER = processing("vacuum_freezer")
             .defaults($ -> $.amperage(0.75d))
+            .register();
+
+        DISTILLATION = displayInput("distillation")
+            .defaults($ -> $.amperage(1.5d))
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)

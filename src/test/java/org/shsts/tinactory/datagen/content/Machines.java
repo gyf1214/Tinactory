@@ -93,6 +93,7 @@ import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMultiBlocks.BLAST_FURNACE;
+import static org.shsts.tinactory.content.AllMultiBlocks.DISTILLATION_TOWER;
 import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.SIFTER;
 import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_STEEL_CASING;
@@ -193,6 +194,8 @@ public final class Machines {
         multiBlockItem(BLAST_FURNACE, "heatproof", "blast_furnace", AllRecipes.BLAST_FURNACE);
         multiBlockItem(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
         multiBlockItem(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
+        multiBlockItem(DISTILLATION_TOWER, "clean_stainless_steel", "distillation_tower",
+            AllRecipes.DISTILLATION);
 
         MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
             .blockState(multiBlockInterface(IO_TEX))

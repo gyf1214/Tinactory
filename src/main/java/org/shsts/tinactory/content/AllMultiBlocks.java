@@ -23,12 +23,14 @@ public final class AllMultiBlocks {
     public static final IEntry<PrimitiveBlock> BLAST_FURNACE;
     public static final IEntry<PrimitiveBlock> SIFTER;
     public static final IEntry<PrimitiveBlock> VACUUM_FREEZER;
+    public static final IEntry<PrimitiveBlock> DISTILLATION_TOWER;
 
     // solid blocks
     public static final Set<IEntry<Block>> SOLID_CASING;
     public static final IEntry<Block> HEATPROOF_CASING;
     public static final IEntry<Block> SOLID_STEEL_CASING;
     public static final IEntry<Block> FROST_PROOF_CASING;
+    public static final IEntry<Block> CLEAN_STAINLESS_CASING;
     // coil blocks
     public static final Set<IEntry<CoilBlock>> COIL_BLOCKS;
     public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
@@ -45,6 +47,7 @@ public final class AllMultiBlocks {
         HEATPROOF_CASING = solid("heatproof");
         SOLID_STEEL_CASING = solid("solid_steel");
         FROST_PROOF_CASING = solid("frost_proof");
+        CLEAN_STAINLESS_CASING = solid("clean_stainless_steel");
 
         COIL_BLOCKS = new HashSet<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
@@ -59,7 +62,6 @@ public final class AllMultiBlocks {
             .blockEntity()
             .transform(RecipeProcessor::blastFurnace)
             .child(MultiBlock::blastFurnace)
-            .layout(AllLayouts.BLAST_FURNACE)
             .appearanceBlock(HEATPROOF_CASING)
             .spec()
             .layer()
@@ -134,6 +136,7 @@ public final class AllMultiBlocks {
             .transform(RecipeProcessor.multiBlock(
                 AllRecipes.VACUUM_FREEZER, true))
             .child(MultiBlock::simple)
+            .layout(AllLayouts.VACUUM_FREEZER)
             .appearanceBlock(FROST_PROOF_CASING)
             .spec()
             .layer()
@@ -153,6 +156,36 @@ public final class AllMultiBlocks {
             .build()
             .blockOrInterface('B', FROST_PROOF_CASING)
             .block('C', FROST_PROOF_CASING)
+            .air('A')
+            .build()
+            .build()
+            .end()
+            .buildObject();
+
+        DISTILLATION_TOWER = multiBlock("distillation_tower")
+            .blockEntity()
+            .transform(RecipeProcessor.multiBlock(
+                AllRecipes.DISTILLATION, true))
+            .child(MultiBlock::distillationTower)
+            .appearanceBlock(CLEAN_STAINLESS_CASING)
+            .spec()
+            .layer()
+            .row("BBB")
+            .row("BBB")
+            .row("B$B")
+            .build()
+            .layer().height(1, 6)
+            .row("CCC")
+            .row("CAC")
+            .row("CCC")
+            .build()
+            .layer()
+            .row("CCC")
+            .row("CCC")
+            .row("CCC")
+            .build()
+            .blockOrInterface('B', CLEAN_STAINLESS_CASING)
+            .block('C', CLEAN_STAINLESS_CASING)
             .air('A')
             .build()
             .build()

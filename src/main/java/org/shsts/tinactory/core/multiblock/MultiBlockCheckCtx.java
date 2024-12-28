@@ -9,7 +9,11 @@ import java.util.Optional;
 public interface MultiBlockCheckCtx {
     boolean isFailed();
 
-    void setFailed();
+    void setFailed(boolean val);
+
+    default void setFailed() {
+        setFailed(true);
+    }
 
     BlockPos getCenter();
 

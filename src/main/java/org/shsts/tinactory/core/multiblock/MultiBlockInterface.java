@@ -93,7 +93,7 @@ public class MultiBlockInterface extends Machine {
         processor = target.getProcessor();
         electricMachine = target.getElectric();
         recipeType = processor instanceof MachineProcessor<?> machine ? machine.recipeType : null;
-        container.setLayout(target.layout);
+        container.setLayout(target.getLayout());
         var world = blockEntity.getLevel();
         assert world != null;
         setJoined(world, true);
@@ -187,7 +187,7 @@ public class MultiBlockInterface extends Machine {
     }
 
     public Optional<Layout> getLayout() {
-        return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.layout);
+        return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.getLayout());
     }
 
     public Optional<IRecipeType<?>> getRecipeType() {
