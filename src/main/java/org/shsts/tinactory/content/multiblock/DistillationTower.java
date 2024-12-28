@@ -24,7 +24,7 @@ public class DistillationTower extends MultiBlock {
         super.doCheckMultiBlock(ctx);
         if (!ctx.isFailed()) {
             height = (int) ctx.getProperty("height");
-            layout = DISTILLATION_TOWER.get(height - 3);
+            setLayout(DISTILLATION_TOWER.get(height - 3));
         }
     }
 
@@ -42,7 +42,7 @@ public class DistillationTower extends MultiBlock {
         super.deserializeOnUpdate(tag);
         if (tag.contains("height", Tag.TAG_INT)) {
             height = tag.getInt("height");
-            layout = DISTILLATION_TOWER.get(height - 3);
+            setLayout(DISTILLATION_TOWER.get(height - 3));
         }
     }
 }

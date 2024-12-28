@@ -49,7 +49,7 @@ public class MultiBlock extends MultiBlockBase {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "multi_block";
 
-    protected Layout layout;
+    private Layout layout;
     private final Consumer<MultiBlockCheckCtx> checker;
     private final Supplier<BlockState> appearance;
 
@@ -72,6 +72,13 @@ public class MultiBlock extends MultiBlockBase {
 
     public Layout getLayout() {
         return layout;
+    }
+
+    protected void setLayout(Layout val) {
+        layout = val;
+        if (multiBlockInterface != null) {
+            multiBlockInterface.setLayout(val);
+        }
     }
 
     protected static class CheckContext implements MultiBlockCheckCtx {

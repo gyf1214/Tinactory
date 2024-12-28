@@ -84,6 +84,10 @@ public class MultiBlockInterface extends Machine {
         });
     }
 
+    public void setLayout(Layout val) {
+        container.setLayout(val);
+    }
+
     public void setMultiBlock(MultiBlock target) {
         if (multiBlock == target) {
             return;
@@ -93,7 +97,7 @@ public class MultiBlockInterface extends Machine {
         processor = target.getProcessor();
         electricMachine = target.getElectric();
         recipeType = processor instanceof MachineProcessor<?> machine ? machine.recipeType : null;
-        container.setLayout(target.getLayout());
+        setLayout(target.getLayout());
         var world = blockEntity.getLevel();
         assert world != null;
         setJoined(world, true);
