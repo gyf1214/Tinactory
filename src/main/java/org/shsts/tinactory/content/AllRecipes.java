@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.DisplayInputRecipe;
+import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -179,7 +180,7 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.75d))
             .register();
 
-        DISTILLATION = displayInput("distillation")
+        DISTILLATION = processing("distillation", DistillationRecipe::builder)
             .defaults($ -> $.amperage(1.5d))
             .register();
 

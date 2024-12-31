@@ -19,6 +19,10 @@ public class DistillationTower extends MultiBlock {
         super(blockEntity, builder.layout(Layout.EMPTY));
     }
 
+    public int getHeight() {
+        return height;
+    }
+
     @Override
     protected void doCheckMultiBlock(CheckContext ctx) {
         super.doCheckMultiBlock(ctx);

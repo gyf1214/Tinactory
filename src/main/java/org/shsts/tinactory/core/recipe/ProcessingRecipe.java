@@ -107,6 +107,10 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
     }
 
+    public void insertOutputs(IMachine machine, Random random) {
+        insertOutputs(machine.container().orElseThrow(), random);
+    }
+
     public void insertOutputs(IContainer container, Random random) {
         for (var output : outputs) {
             insertOutput(container, output, random, false);

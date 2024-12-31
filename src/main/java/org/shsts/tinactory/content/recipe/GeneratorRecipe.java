@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -14,7 +13,7 @@ import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class GeneratorRecipe extends ProcessingRecipe {
+public class GeneratorRecipe extends DisplayInputRecipe {
     private GeneratorRecipe(BuilderBase<?, ?> builder) {
         super(builder);
     }
@@ -28,11 +27,6 @@ public class GeneratorRecipe extends ProcessingRecipe {
     @Override
     protected boolean matchElectric(Optional<IElectricMachine> electric) {
         return electric.filter($ -> $.getVoltage() == voltage).isPresent();
-    }
-
-    @Override
-    public IProcessingObject getDisplay() {
-        return inputs.get(0).ingredient();
     }
 
     public static Builder builder(IRecipeType<Builder> parent, ResourceLocation loc) {

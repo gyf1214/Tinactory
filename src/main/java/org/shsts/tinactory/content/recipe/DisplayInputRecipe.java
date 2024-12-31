@@ -10,7 +10,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DisplayInputRecipe extends ProcessingRecipe {
-    private DisplayInputRecipe(BuilderBase<?, ?> builder) {
+    protected DisplayInputRecipe(BuilderBase<?, ?> builder) {
         super(builder);
     }
 

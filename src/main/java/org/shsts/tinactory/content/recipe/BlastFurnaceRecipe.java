@@ -5,9 +5,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.content.multiblock.BlastFurnace;
+import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+
+import java.util.OptionalInt;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -17,6 +22,23 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
     private BlastFurnaceRecipe(Builder builder) {
         super(builder);
         this.temperature = builder.temperature;
+    }
+
+    private OptionalInt getTemperature(IMachine machine) {
+        if (!(machine instanceof MultiBlockInterface multiBlockInterface)) {
+            return OptionalInt.empty();
+        }
+        return multiBlockInterface.getMultiBlock()
+            .filter($ -> $ instanceof BlastFurnace)
+            .map($ -> ((BlastFurnace) $).getTemperature())
+            .orElse(OptionalInt.empty());
+    }
+
+    @Override
+    public boolean canCraft(IMachine machine) {
+        var machineTemp = getTemperature(machine);
+        return super.canCraft(machine) && machineTemp.isPresent() &&
+            temperature <= machineTemp.getAsInt();
     }
 
     public static class Builder extends BuilderBase<BlastFurnaceRecipe, Builder> {

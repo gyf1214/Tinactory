@@ -202,6 +202,10 @@ public class MultiBlockInterface extends Machine {
         return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.getAppearanceBlock());
     }
 
+    public Optional<MultiBlock> getMultiBlock() {
+        return Optional.ofNullable(multiBlock);
+    }
+
     @Override
     public ItemStack icon() {
         if (multiBlock == null) {

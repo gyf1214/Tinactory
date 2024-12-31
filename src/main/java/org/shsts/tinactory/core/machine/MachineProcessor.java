@@ -175,7 +175,7 @@ public class MachineProcessor<R extends ProcessingRecipe>
 
     @Override
     protected void onWorkDone(R recipe, IMachine machine, Random random) {
-        recipe.insertOutputs(machine.container().orElseThrow(), random);
+        recipe.insertOutputs(machine, random);
     }
 
     @Override
