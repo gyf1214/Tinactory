@@ -19,8 +19,8 @@ public class DistillationTower extends MultiBlock {
         super(blockEntity, builder.layout(Layout.EMPTY));
     }
 
-    public int getHeight() {
-        return height;
+    public int getSlots() {
+        return height - 2;
     }
 
     @Override

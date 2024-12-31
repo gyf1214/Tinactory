@@ -63,7 +63,7 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
 
     public AssemblyRecipeBuilder<P> materialFluid(MaterialSet material, float count) {
         if (builder != null) {
-            builder.inputFluid(1, material.fluidEntry(), material.fluidAmount(count));
+            builder.inputFluid(1, material.fluid(), material.fluidAmount(count));
         }
         return this;
     }

@@ -20,30 +20,30 @@ public class DistillationRecipe extends ProcessingRecipe {
         super(builder);
     }
 
-    private int getHeight(IMachine machine) {
+    private int getSlots(IMachine machine) {
         if (!(machine instanceof MultiBlockInterface multiBlockInterface)) {
             return 0;
         }
         return multiBlockInterface.getMultiBlock()
             .filter($ -> $ instanceof DistillationTower)
-            .map($ -> ((DistillationTower) $).getHeight())
+            .map($ -> ((DistillationTower) $).getSlots())
             .orElse(0);
     }
 
     private boolean matchOutputs(IMachine machine, IContainer container, Random random) {
-        var height = getHeight(machine);
+        var slots = getSlots(machine);
         var fluids = 0;
         var items = 0;
         for (var output : outputs) {
             if (output.port() == 1) {
-                if (fluids < height) {
+                if (fluids < slots) {
                     if (!insertOutput(container, output, random, true)) {
                         return false;
                     }
                     fluids++;
                 }
             } else {
-                if (items < height) {
+                if (items < slots) {
                     if (!insertOutput(container, output, random, true)) {
                         return false;
                     }
@@ -65,7 +65,7 @@ public class DistillationRecipe extends ProcessingRecipe {
     @Override
     public void insertOutputs(IMachine machine, Random random) {
         var container = machine.container().orElseThrow();
-        var height = getHeight(machine);
+        var height = getSlots(machine);
         var fluids = 0;
         var items = 0;
         for (var output : outputs) {

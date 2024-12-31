@@ -199,7 +199,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                 .workTicks(ticks(workTicks));
 
             if (soldering) {
-                builder.inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(0.5f));
+                builder.inputFluid(1, SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(0.5f));
             }
 
             for (; i < inputs.length; i++) {
@@ -265,7 +265,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             if (!material.hasItem(sub) || !material.hasFluid()) {
                 return;
             }
-            var fluid = material.fluidEntry();
+            var fluid = material.fluid();
 
             EXTRACTOR.recipe(DATA_GEN, suffix(material.fluidLoc(), "_from_" + sub))
                 .outputFluid(2, fluid, material.fluidAmount(amount))
@@ -445,9 +445,9 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
             if (sub.equals("fluid")) {
                 if (decompose) {
-                    builder.outputFluid(outputPort + 1, component.fluidEntry(), component.fluidAmount(count));
+                    builder.outputFluid(outputPort + 1, component.fluid(), component.fluidAmount(count));
                 } else {
-                    builder.inputFluid(1, component.fluidEntry(), component.fluidAmount(count));
+                    builder.inputFluid(1, component.fluid(), component.fluidAmount(count));
                 }
             } else {
                 if (decompose) {
@@ -465,9 +465,9 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
         if (output.equals("fluid")) {
             if (decompose) {
-                builder.inputFluid(1, material.fluidEntry(), material.fluidAmount(alloyCount));
+                builder.inputFluid(1, material.fluid(), material.fluidAmount(alloyCount));
             } else {
-                builder.outputFluid(outputPort + 1, material.fluidEntry(), material.fluidAmount(alloyCount));
+                builder.outputFluid(outputPort + 1, material.fluid(), material.fluidAmount(alloyCount));
             }
         } else {
             if (decompose) {

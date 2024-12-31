@@ -307,7 +307,7 @@ public final class Components {
                 ASSEMBLER.recipe(DATA_GEN, cable)
                     .outputItem(2, cable, 1)
                     .input(0, () -> new ProcessingIngredients.TagIngredient(cable.get().material.tag("wire"), 4))
-                    .inputFluid(1, RUBBER.fluidEntry(), RUBBER.fluidAmount(2))
+                    .inputFluid(1, RUBBER.fluid(), RUBBER.fluidAmount(2))
                     .voltage(v == Voltage.LV ? Voltage.ULV : Voltage.LV)
                     .requireTech(Technologies.HOT_WORKING)
                     .workTicks(100L)
@@ -448,7 +448,7 @@ public final class Components {
         builder.inputItem(0, CABLE.get(voltage), wires)
             .inputItem(0, BATTERY_ALLOY.tag("plate"), plates)
             .inputItem(0, material.tag("dust"), plates)
-            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(wires))
+            .inputFluid(1, SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(wires))
             .voltage(Voltage.LV)
             .workTicks(ASSEMBLY_TICKS)
             .build();
@@ -575,7 +575,7 @@ public final class Components {
             .outputItem(2, Circuits.board(CircuitTier.INTEGRATED), 1)
             .inputItem(0, Circuits.board(CircuitTier.ELECTRONIC), 2)
             .inputItem(0, RED_ALLOY.tag("wire"), 8)
-            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(1f))
+            .inputFluid(1, SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(1f))
             .workTicks(200L)
             .voltage(Voltage.LV)
             .requireTech(Technologies.INTEGRATED_CIRCUIT)
@@ -593,7 +593,7 @@ public final class Components {
             .outputItem(2, Circuits.circuitBoard(CircuitTier.ELECTRONIC), 1)
             .inputItem(0, Circuits.board(CircuitTier.ELECTRONIC), 1)
             .inputItem(0, COPPER.tag("wire"), 8)
-            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(0.5f))
+            .inputFluid(1, SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(0.5f))
             .workTicks(200L)
             .voltage(Voltage.ULV)
             .build();
@@ -602,7 +602,7 @@ public final class Components {
             .outputItem(2, Circuits.circuitBoard(CircuitTier.INTEGRATED), 1)
             .inputItem(0, Circuits.board(CircuitTier.INTEGRATED), 1)
             .inputItem(0, SILVER.tag("wire"), 8)
-            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(0.5f))
+            .inputFluid(1, SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(0.5f))
             .workTicks(200L)
             .voltage(Voltage.LV)
             .requireTech(Technologies.INTEGRATED_CIRCUIT)
@@ -709,7 +709,7 @@ public final class Components {
             voltage = Voltage.LV;
         }
         builder.voltage(voltage)
-            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(),
+            .inputFluid(1, SOLDERING_ALLOY.fluid(),
                 SOLDERING_ALLOY.fluidAmount((1 << (level - 1)) / 2f))
             .workTicks(200L * level)
             .build();
@@ -736,7 +736,7 @@ public final class Components {
             .inputItem(0, ELECTRIC_MOTOR.get(Voltage.LV), 1)
             .inputItem(0, TIN.tag("rotor"), 1)
             .inputItem(0, ITEM_FILTER, 6)
-            .inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(2))
+            .inputFluid(1, SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(2))
             .voltage(Voltage.LV)
             .workTicks(140L)
             .requireTech(Technologies.SIFTING)
@@ -752,7 +752,7 @@ public final class Components {
             .workTicks(140L)
             .voltage(v)
             .transform($ -> v != Voltage.ULV ?
-                $.inputFluid(1, SOLDERING_ALLOY.fluidEntry(), SOLDERING_ALLOY.fluidAmount(2)) : $)
+                $.inputFluid(1, SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(2)) : $)
             .requireTech(tech)
             .build();
     }

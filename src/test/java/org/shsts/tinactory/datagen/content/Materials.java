@@ -26,6 +26,7 @@ import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
 import static org.shsts.tinactory.content.AllItems.STEAM;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
+import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
@@ -67,6 +68,8 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
+import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
+import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
@@ -89,10 +92,12 @@ import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
+import static org.shsts.tinactory.content.AllRecipes.DISTILLATION;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
+import static org.shsts.tinactory.content.AllRecipes.VACUUM_FREEZER;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllRegistries.ITEMS;
 import static org.shsts.tinactory.content.AllTags.TOOL;
@@ -483,6 +488,21 @@ public final class Materials {
             .outputItem(1, RUBBER.entry("sheet"), 3)
             .workTicks(300)
             .voltage(Voltage.ULV)
+            .build();
+
+        VACUUM_FREEZER.recipe(DATA_GEN, AIR.fluidLoc("liquid"))
+            .inputFluid(1, AIR.fluid(), AIR.fluidAmount(1))
+            .outputFluid(3, AIR.fluid("liquid"), AIR.fluidAmount("liquid", 1))
+            .workTicks(200)
+            .voltage(Voltage.MV)
+            .build();
+
+        DISTILLATION.recipe(DATA_GEN, AIR.fluidLoc("liquid"))
+            .inputFluid(0, AIR.fluid("liquid"), AIR.fluidAmount(1))
+            .outputFluid(1, NITROGEN.fluid(), NITROGEN.fluidAmount(0.78f))
+            .outputFluid(1, OXYGEN.fluid(), OXYGEN.fluidAmount(0.21f))
+            .workTicks(60)
+            .voltage(Voltage.MV)
             .build();
     }
 
