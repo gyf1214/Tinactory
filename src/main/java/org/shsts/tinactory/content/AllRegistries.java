@@ -9,6 +9,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.common.SimpleFluid;
@@ -54,7 +55,9 @@ public final class AllRegistries {
     public static void init() {}
 
     public static IEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex, int color) {
-        return REGISTRATE.registryEntry(FLUIDS, id, () -> new SimpleFluid(tex, color));
+        var ret = REGISTRATE.registryEntry(FLUIDS, id, () -> new SimpleFluid(tex, color));
+        REGISTRATE.trackLang("fluid." + Tinactory.ID + "." + id.replace("/", "."));
+        return ret;
     }
 
     public static IEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex) {

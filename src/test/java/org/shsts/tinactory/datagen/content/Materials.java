@@ -29,6 +29,7 @@ import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
+import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
@@ -501,6 +502,7 @@ public final class Materials {
             .inputFluid(0, AIR.fluid("liquid"), AIR.fluidAmount(1))
             .outputFluid(1, NITROGEN.fluid(), NITROGEN.fluidAmount(0.78f))
             .outputFluid(1, OXYGEN.fluid(), OXYGEN.fluidAmount(0.21f))
+            .outputFluid(1, ARGON.fluid(), ARGON.fluidAmount(0.01f))
             .workTicks(60)
             .voltage(Voltage.MV)
             .build();

@@ -119,8 +119,12 @@ public class LanguageProcessor {
             fmt("%s Furnace Coil", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]multi_block[.]solid[.](.*)", matcher ->
             fmt("%s Machine Casing", normalize(matcher, 1)));
+        pattern("fluid[.]tinactory[.]material[.]gas[.](.*)", matcher ->
+            fmt("%s", normalize(matcher, 1)));
         pattern("fluid[.]tinactory[.]material[.]molten[.](.*)", matcher ->
             fmt("Molten %s", normalize(matcher, 1)));
+        pattern("fluid[.]tinactory[.]material[.]liquid[.](.*)", matcher ->
+            fmt("Liquid %s", normalize(matcher, 1)));
         pattern("tinactory[.]technology[.]ore[.](.*)[.]details", matcher ->
             fmt("Allow analyzing Raw %s Ore from base stones.", normalize(matcher, 1)));
         pattern("tinactory[.]technology[.]ore[.](.*)", matcher ->

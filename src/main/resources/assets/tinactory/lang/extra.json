@@ -5,6 +5,8 @@
   "block.tinactory.primitive.workbench": "Workbench",
   "block.tinactory.multi_block.blast_furnace": "Electric Blast Furnace",
   "block.tinactory.multi_block.sifter": "Large Sifting Funnel",
+  "block.tinactory.multi_block.vacuum_freezer": "Vacuum Freezer",
+  "block.tinactory.multi_block.distillation_tower": "Distillation Tower",
   "block.tinactory.multi_block.grate_machine_casing": "Grate Machine Casing",
   "block.tinactory.rubber_tree.leaves": "Rubber Tree Leaves",
   "block.tinactory.rubber_tree.log": "Rubber Tree Log",

@@ -8,6 +8,7 @@ import net.minecraftforge.common.Tags;
 
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
+import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
@@ -21,6 +22,8 @@ import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
+import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
+import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
@@ -152,6 +155,21 @@ public final class Elements {
         SILICON = set("silicon")
             .color(0xFF3C3C50)
             .dustPrimary().molten()
+            .buildObject();
+
+        OXYGEN = set("oxygen")
+            .color(0xFF6688DD)
+            .gas()
+            .buildObject();
+
+        NITROGEN = set("nitrogen")
+            .color(0xFF00BFC1)
+            .gas()
+            .buildObject();
+
+        ARGON = set("argon")
+            .color(0xFF00FF00)
+            .gas()
             .buildObject();
     }
 

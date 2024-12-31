@@ -43,6 +43,9 @@ public final class AllMaterials {
     public static MaterialSet MANGANESE;
     public static MaterialSet ARSENIC;
     public static MaterialSet SILICON;
+    public static MaterialSet OXYGEN;
+    public static MaterialSet NITROGEN;
+    public static MaterialSet ARGON;
 
     // First Degree
     public static MaterialSet WROUGHT_IRON;
@@ -62,6 +65,7 @@ public final class AllMaterials {
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;
+    public static MaterialSet AIR;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
@@ -91,9 +95,6 @@ public final class AllMaterials {
     public static MaterialSet GLOWSTONE;
     public static MaterialSet RARE_EARTH;
     public static MaterialSet GLASS;
-    public static MaterialSet AIR;
-    public static MaterialSet OXYGEN;
-    public static MaterialSet NITROGEN;
 
     static {
         SET = new HashMap<>();
@@ -149,22 +150,6 @@ public final class AllMaterials {
             .color(0xFFFAFAFA)
             .existing("gem", Items.GLASS)
             .alias("primary", "gem")
-            .buildObject();
-
-        AIR = set("air")
-            .color(0xFFFFFFFF)
-            .gas()
-            .fluid("liquid", "liquid_air", 1000)
-            .buildObject();
-
-        OXYGEN = set("oxygen")
-            .color(0xFF6688DD)
-            .gas()
-            .buildObject();
-
-        NITROGEN = set("nitrogen")
-            .color(0xFF00BFC1)
-            .gas()
             .buildObject();
     }
 
