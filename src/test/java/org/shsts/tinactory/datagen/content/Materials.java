@@ -28,6 +28,7 @@ import static org.shsts.tinactory.content.AllItems.STEAM;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
@@ -37,6 +38,9 @@ import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
@@ -65,12 +69,17 @@ import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
+import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
@@ -81,6 +90,9 @@ import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
@@ -118,6 +130,7 @@ import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
+import static org.shsts.tinactory.datagen.content.model.IconSet.FINE;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
 import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
 import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
@@ -315,7 +328,19 @@ public final class Materials {
             .material(ELECTRUM, SHINY)
             .machineProcess(Voltage.LV, 0.75d).smelt()
             .alloy(Voltage.LV, GOLD, 1, SILVER, 1)
-            .build();
+            .build()
+            .material(SODIUM_CHLORIDE, FINE).build()
+            .material(POTASSIUM_CHLORIDE, FINE).build()
+            .material(MAGNESIUM_CHLORIDE, DULL).build()
+            .material(CALCIUM_CHLORIDE, FINE).build()
+            .material(LITHIUM_CHLORIDE, FINE).build()
+            .material(AMMONIUM_CHLORIDE, DULL).build()
+            .material(SODIUM_CARBONATE, DULL).build()
+            .material(POTASSIUM_CARBONATE, DULL).build()
+            .material(CALCIUM_CARBONATE, DULL).build()
+            .material(LITHIUM_CARBONATE, DULL).build()
+            .material(SODIUM_HYDROXIDE, DULL).build()
+            .material(CALCIUM_HYDROXIDE, DULL).build();
     }
 
     private static void higherDegrees() {
@@ -334,8 +359,7 @@ public final class Materials {
                 .build();
         }
         // generate water
-        STONE_GENERATOR
-            .recipe(DATA_GEN, Fluids.WATER)
+        STONE_GENERATOR.recipe(DATA_GEN, Fluids.WATER)
             .outputFluid(1, Fluids.WATER, 1000)
             .voltage(Voltage.ULV)
             .build();
@@ -489,6 +513,11 @@ public final class Materials {
             .outputItem(1, RUBBER.entry("sheet"), 3)
             .workTicks(300)
             .voltage(Voltage.ULV)
+            .build();
+
+        STONE_GENERATOR.recipe(DATA_GEN, AIR.fluidLoc())
+            .outputFluid(1, AIR.fluid(), AIR.fluidAmount(1))
+            .voltage(Voltage.MV)
             .build();
 
         VACUUM_FREEZER.recipe(DATA_GEN, AIR.fluidLoc("liquid"))

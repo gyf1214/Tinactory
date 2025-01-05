@@ -46,6 +46,7 @@ public final class AllMaterials {
     public static MaterialSet OXYGEN;
     public static MaterialSet NITROGEN;
     public static MaterialSet ARGON;
+    public static MaterialSet HYDROGEN;
 
     // First Degree
     public static MaterialSet WROUGHT_IRON;
@@ -62,10 +63,30 @@ public final class AllMaterials {
     public static MaterialSet GALLIUM_ARSENIDE;
     public static MaterialSet KANTHAL;
     public static MaterialSet ELECTRUM;
+    public static MaterialSet SODIUM_CHLORIDE;
+    public static MaterialSet POTASSIUM_CHLORIDE;
+    public static MaterialSet MAGNESIUM_CHLORIDE;
+    public static MaterialSet CALCIUM_CHLORIDE;
+    public static MaterialSet LITHIUM_CHLORIDE;
+    public static MaterialSet AMMONIUM_CHLORIDE;
+    public static MaterialSet SODIUM_CARBONATE;
+    public static MaterialSet POTASSIUM_CARBONATE;
+    public static MaterialSet CALCIUM_CARBONATE;
+    public static MaterialSet LITHIUM_CARBONATE;
+    public static MaterialSet SODIUM_HYDROXIDE;
+    public static MaterialSet CALCIUM_HYDROXIDE;
+    public static MaterialSet LITHIUM_BRINE;
+    public static MaterialSet CARBON_DIOXIDE;
+    public static MaterialSet HYDROGEN_CHLORIDE;
+    public static MaterialSet HYDROGEN_SULFIDE;
+    public static MaterialSet SULFURIC_ACID;
+    public static MaterialSet NITRIC_ACID;
+    public static MaterialSet AMMONIA;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;
     public static MaterialSet AIR;
+    public static MaterialSet SALT_WATER;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
@@ -126,10 +147,7 @@ public final class AllMaterials {
             .tool(16).mortar().build()
             .buildObject();
 
-        RAW_RUBBER = set("raw_rubber")
-            .color(0xFFCCC789)
-            .dust()
-            .buildObject();
+        RAW_RUBBER = dust("raw_rubber", 0xFFCCC789);
 
         RUBBER = set("rubber")
             .color(0xFF000000)
@@ -141,10 +159,7 @@ public final class AllMaterials {
             .existing("dust", Tags.Items.DUSTS_GLOWSTONE, Items.GLOWSTONE_DUST)
             .buildObject();
 
-        RARE_EARTH = set("rare_earth")
-            .color(0xFF808064)
-            .dust()
-            .buildObject();
+        RARE_EARTH = dust("rare_earth", 0xFF808064);
 
         GLASS = set("glass")
             .color(0xFFFAFAFA)
@@ -158,6 +173,39 @@ public final class AllMaterials {
     public static MaterialSet.Builder<?> set(String id) {
         return MaterialSet.builder(Unit.INSTANCE, id)
             .onCreateObject(mat -> SET.put(mat.name, mat));
+    }
+
+    public static MaterialSet dust(String id, int color) {
+        return set(id)
+            .color(color)
+            .dustPrimary()
+            .buildObject();
+    }
+
+    public static MaterialSet gas(String id, int color) {
+        return set(id)
+            .color(color)
+            .gas()
+            .buildObject();
+    }
+
+    public static MaterialSet liquid(String id, int color) {
+        return set(id)
+            .color(color)
+            .liquid()
+            .buildObject();
+    }
+
+    public static MaterialSet fluid(String id, String sub, String tex) {
+        return set(id)
+            .color(0xFFFFFFFF)
+            .fluid(sub, tex, 1000)
+            .fluidPrimary(sub)
+            .buildObject();
+    }
+
+    public static MaterialSet fluid(String id, String sub) {
+        return fluid(id, sub, id);
     }
 
     public static TagKey<Item> tag(String sub) {

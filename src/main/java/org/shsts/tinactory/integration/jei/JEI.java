@@ -29,6 +29,7 @@ import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.integration.jei.category.DistillationCategory;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
@@ -86,15 +87,19 @@ public class JEI implements IModPlugin {
         addProcessingCategory(AllRecipes.SIFTER, AllLayouts.SIFTER, AllMultiBlocks.SIFTER.get());
         addProcessingCategory(AllRecipes.VACUUM_FREEZER, AllLayouts.VACUUM_FREEZER,
             AllMultiBlocks.VACUUM_FREEZER.get());
-        addProcessingCategory(AllRecipes.DISTILLATION, AllLayouts.DISTILLATION_TOWER.get(5),
-            AllMultiBlocks.DISTILLATION_TOWER.get());
+        addProcessingCategory(AllRecipes.DISTILLATION, new DistillationCategory());
+    }
+
+    private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(
+        IRecipeType<B> recipeType, ProcessingCategory<R> category) {
+        categories.add(category);
+        processingCategories.put(recipeType, category);
     }
 
     private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(
         IRecipeType<B> recipeType, Layout layout, Block icon) {
         var category = new ProcessingCategory<>(recipeType, layout, icon);
-        categories.add(category);
-        processingCategories.put(recipeType, category);
+        addProcessingCategory(recipeType, category);
     }
 
     public Optional<RecipeCategory<?>> processingCategory(IRecipeType<?> recipeType) {

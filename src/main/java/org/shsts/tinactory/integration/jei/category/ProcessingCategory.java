@@ -117,7 +117,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         drawTextLine(stack, I18n.tr("tinactory.jei.processing.duration", duration), y);
     }
 
-    private void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
+    protected void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
         if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
             builder.itemInput(slot, item.stack());
         } else if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {

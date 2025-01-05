@@ -17,6 +17,7 @@ import static org.shsts.tinactory.content.AllMaterials.COBALT;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
+import static org.shsts.tinactory.content.AllMaterials.HYDROGEN;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
@@ -31,6 +32,8 @@ import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
+import static org.shsts.tinactory.content.AllMaterials.dust;
+import static org.shsts.tinactory.content.AllMaterials.gas;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
 @ParametersAreNonnullByDefault
@@ -65,10 +68,7 @@ public final class Elements {
             .ore(OreVariant.STONE)
             .buildObject();
 
-        SULFUR = set("sulfur")
-            .color(0xFFC8C800)
-            .dust()
-            .buildObject();
+        SULFUR = dust("sulfur", 0xFFC8C800);
 
         COBALT = set("cobalt")
             .color(0xFF5050FA)
@@ -76,10 +76,7 @@ public final class Elements {
             .toolSet(600, Tiers.IRON)
             .buildObject();
 
-        CADMIUM = set("cadmium")
-            .color(0xFF32323C)
-            .dust()
-            .buildObject();
+        CADMIUM = dust("cadmium", 0xFF32323C);
 
         NICKEL = set("nickel")
             .color(0xFFC8C8FA)
@@ -91,20 +88,14 @@ public final class Elements {
             .dustPrimary().molten()
             .buildObject();
 
-        THORIUM = set("thorium")
-            .color(0xFF001E00)
-            .dust()
-            .buildObject();
+        THORIUM = dust("thorium", 0xFF001E00);
 
         CHROME = set("chrome")
             .color(0xFFEAC4D8)
             .dustPrimary().molten()
             .buildObject();
 
-        ANTIMONY = set("antimony")
-            .color(0xFFDCDCF0)
-            .dust()
-            .buildObject();
+        ANTIMONY = dust("antimony", 0xFFDCDCF0);
 
         SILVER = set("silver")
             .color(0xFFDCDCFF)
@@ -142,35 +133,18 @@ public final class Elements {
             .dustPrimary().molten()
             .buildObject();
 
-        MANGANESE = set("manganese")
-            .color(0xFFCDE1B9)
-            .dust()
-            .buildObject();
-
-        ARSENIC = set("arsenic")
-            .color(0xFF676756)
-            .dust()
-            .buildObject();
+        MANGANESE = dust("manganese", 0xFFCDE1B9);
+        ARSENIC = dust("arsenic", 0xFF676756);
 
         SILICON = set("silicon")
             .color(0xFF3C3C50)
             .dustPrimary().molten()
             .buildObject();
 
-        OXYGEN = set("oxygen")
-            .color(0xFF6688DD)
-            .gas()
-            .buildObject();
-
-        NITROGEN = set("nitrogen")
-            .color(0xFF00BFC1)
-            .gas()
-            .buildObject();
-
-        ARGON = set("argon")
-            .color(0xFF00FF00)
-            .gas()
-            .buildObject();
+        OXYGEN = gas("oxygen", 0xFF6688DD);
+        NITROGEN = gas("nitrogen", 0xFF00BFC1);
+        ARGON = gas("argon", 0xFF00FF00);
+        HYDROGEN = gas("hydrogen", 0xFF0000B5);
     }
 
     public static void init() {}

@@ -32,26 +32,8 @@ public class DistillationRecipe extends ProcessingRecipe {
 
     private boolean matchOutputs(IMachine machine, IContainer container, Random random) {
         var slots = getSlots(machine);
-        var fluids = 0;
-        var items = 0;
-        for (var output : outputs) {
-            if (output.port() == 1) {
-                if (fluids < slots) {
-                    if (!insertOutput(container, output, random, true)) {
-                        return false;
-                    }
-                    fluids++;
-                }
-            } else {
-                if (items < slots) {
-                    if (!insertOutput(container, output, random, true)) {
-                        return false;
-                    }
-                    items++;
-                }
-            }
-        }
-        return true;
+        return outputs.stream().limit(slots)
+            .allMatch(output -> insertOutput(container, output, random, true));
     }
 
     @Override
@@ -65,21 +47,9 @@ public class DistillationRecipe extends ProcessingRecipe {
     @Override
     public void insertOutputs(IMachine machine, Random random) {
         var container = machine.container().orElseThrow();
-        var height = getSlots(machine);
-        var fluids = 0;
-        var items = 0;
-        for (var output : outputs) {
-            if (output.port() == 1) {
-                if (fluids < height) {
-                    insertOutput(container, output, random, false);
-                    fluids++;
-                }
-            } else {
-                if (items < height) {
-                    insertOutput(container, output, random, false);
-                    items++;
-                }
-            }
+        var slots = Math.min(outputs.size(), getSlots(machine));
+        for (var i = 0; i < slots; i++) {
+            insertOutput(container, outputs.get(i), random, false);
         }
     }
 

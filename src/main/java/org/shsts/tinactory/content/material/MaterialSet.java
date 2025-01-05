@@ -149,7 +149,7 @@ public class MaterialSet {
     }
 
     public boolean hasFluid() {
-        return hasFluid("main");
+        return hasFluid("primary");
     }
 
     public ResourceLocation fluidLoc(String sub) {
@@ -158,7 +158,7 @@ public class MaterialSet {
     }
 
     public ResourceLocation fluidLoc() {
-        return fluidLoc("main");
+        return fluidLoc("primary");
     }
 
     public Supplier<? extends Fluid> fluid(String sub) {
@@ -167,7 +167,7 @@ public class MaterialSet {
     }
 
     public Supplier<? extends Fluid> fluid() {
-        return fluid("main");
+        return fluid("primary");
     }
 
     public int fluidAmount(String sub, float amount) {
@@ -176,7 +176,7 @@ public class MaterialSet {
     }
 
     public int fluidAmount(float amount) {
-        return fluidAmount("main", amount);
+        return fluidAmount("primary", amount);
     }
 
     public OreVariant oreVariant() {
@@ -372,20 +372,25 @@ public class MaterialSet {
             return fluid(sub, gregtech("blocks/fluids/fluid." + tex), baseAmount);
         }
 
-        public Builder<P> mainFluid(String sub) {
+        public Builder<P> fluidPrimary(String sub) {
             assert fluids.containsKey(sub);
-            fluids.put("main", fluids.get(sub));
+            fluids.put("primary", fluids.get(sub));
             return this;
         }
 
         public Builder<P> molten() {
             return fluid("molten", gregtech("blocks/material_sets/dull/liquid"), 144)
-                .mainFluid("molten");
+                .fluidPrimary("molten");
+        }
+
+        public Builder<P> liquid() {
+            return fluid("liquid", gregtech("blocks/material_sets/dull/liquid"), 1000)
+                .fluidPrimary("liquid");
         }
 
         public Builder<P> gas() {
             return fluid("gas", gregtech("blocks/material_sets/dull/gas"), 1000)
-                .mainFluid("gas");
+                .fluidPrimary("gas");
         }
 
         public Builder<P> ore(OreVariant variant) {

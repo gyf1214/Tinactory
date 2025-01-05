@@ -2,20 +2,43 @@ package org.shsts.tinactory.content.material;
 
 import net.minecraft.world.item.Tiers;
 
+import static org.shsts.tinactory.content.AllMaterials.AMMONIA;
+import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
+import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
+import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_SULFIDE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM_BRINE;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.NITRIC_ACID;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
+import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
+import static org.shsts.tinactory.content.AllMaterials.dust;
+import static org.shsts.tinactory.content.AllMaterials.fluid;
+import static org.shsts.tinactory.content.AllMaterials.gas;
+import static org.shsts.tinactory.content.AllMaterials.liquid;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
 public final class FirstDegrees {
@@ -31,10 +54,7 @@ public final class FirstDegrees {
             .foil().pipe().rotor().molten()
             .buildObject();
 
-        COBALTITE = set("cobaltite")
-            .color(0xFF5050FA)
-            .dust()
-            .buildObject();
+        COBALTITE = dust("cobaltite", 0xFF5050FA);
 
         INVAR = set("invar")
             .color(0xFFB4B478)
@@ -67,20 +87,14 @@ public final class FirstDegrees {
             .molten()
             .buildObject();
 
-        RUTILE = set("rutile")
-            .color(0xFFD40D5C)
-            .dust()
-            .buildObject();
+        RUTILE = dust("rutile", 0xFFD40D5C);
 
         BRASS = set("brass")
             .color(0xFFFFB400)
             .metal().stick().pipe()
             .buildObject();
 
-        GALLIUM_ARSENIDE = set("gallium_arsenide")
-            .color(0xFFA0A0A0)
-            .dust()
-            .buildObject();
+        GALLIUM_ARSENIDE = dust("gallium_arsenide", 0xFFA0A0A0);
 
         KANTHAL = set("kanthal")
             .color(0xFFC2D2DF)
@@ -91,6 +105,27 @@ public final class FirstDegrees {
             .color(0xFFFFFF64)
             .metalExt().wireFine().foil()
             .buildObject();
+
+        SODIUM_CHLORIDE = dust("sodium_chloride", 0xFFFAFAFA);
+        POTASSIUM_CHLORIDE = dust("potassium_chloride", 0xFFF0C8C8);
+        MAGNESIUM_CHLORIDE = dust("magnesium_chloride", 0xFFD40D5C);
+        CALCIUM_CHLORIDE = dust("calcium_chloride", 0xFFEBEBFA);
+        LITHIUM_CHLORIDE = dust("lithium_chloride", 0xFFDEDEFA);
+        AMMONIUM_CHLORIDE = dust("ammonium_chloride", 0xFF9711A6);
+        SODIUM_CARBONATE = dust("sodium_carbonate", 0xFFDCDCFF);
+        POTASSIUM_CARBONATE = dust("potassium_carbonate", 0xFF784137);
+        CALCIUM_CARBONATE = dust("calcium_carbonate", 0xFFFAE6DC);
+        LITHIUM_CARBONATE = dust("lithium_carbonate", 0xFFBEBEDA);
+        SODIUM_HYDROXIDE = dust("sodium_hydroxide", 0xFF003380);
+        CALCIUM_HYDROXIDE = dust("calcium_hydroxide", 0xFFF0F0F0);
+
+        LITHIUM_BRINE = liquid("lithium_brine", 0xFF4200C7);
+        CARBON_DIOXIDE = gas("carbon_dioxide", 0xFFA9D0F5);
+        HYDROGEN_CHLORIDE = fluid("hydrogen_chloride", "gas", "hydrochloric_acid");
+        HYDROGEN_SULFIDE = fluid("hydrogen_sulfide", "gas");
+        SULFURIC_ACID = fluid("sulfuric_acid", "liquid");
+        NITRIC_ACID = liquid("nitric_acid", 0xFFCCCC00);
+        AMMONIA = gas("ammonia", 0xFF3F3480);
     }
 
     public static void init() {}
