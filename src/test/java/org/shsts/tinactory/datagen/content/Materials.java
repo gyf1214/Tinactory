@@ -69,6 +69,7 @@ import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM_BRINE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
@@ -88,6 +89,7 @@ import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
+import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
@@ -533,6 +535,16 @@ public final class Materials {
             .outputFluid(1, OXYGEN.fluid(), OXYGEN.fluidAmount(0.21f))
             .outputFluid(1, ARGON.fluid(), ARGON.fluidAmount(0.01f))
             .workTicks(60)
+            .voltage(Voltage.MV)
+            .build()
+            .recipe(DATA_GEN, SEA_WATER.fluidLoc())
+            .inputFluid(0, SEA_WATER.fluid(), SEA_WATER.fluidAmount(10))
+            .outputItem(2, SODIUM_CHLORIDE.entry("dust"), 10)
+            .outputItem(2, POTASSIUM_CHLORIDE.entry("dust"), 2)
+            .outputItem(2, MAGNESIUM_CHLORIDE.entry("dust"), 1)
+            .outputItem(2, CALCIUM_CHLORIDE.entry("dust"), 1, 0.4)
+            .outputFluid(1, LITHIUM_BRINE.fluid(), LITHIUM_BRINE.fluidAmount(0.2f))
+            .workTicks(600)
             .voltage(Voltage.MV)
             .build();
     }

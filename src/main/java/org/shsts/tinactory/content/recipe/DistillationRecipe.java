@@ -15,7 +15,7 @@ import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DistillationRecipe extends ProcessingRecipe {
+public class DistillationRecipe extends DisplayInputRecipe {
     private DistillationRecipe(BuilderBase<?, ?> builder) {
         super(builder);
     }

@@ -5,6 +5,7 @@ import net.minecraft.world.item.Tiers;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
+import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
 import static org.shsts.tinactory.content.AllMaterials.liquid;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
@@ -24,6 +25,7 @@ public final class HigherDegrees {
             .buildObject();
 
         SALT_WATER = liquid("salt_water", 0xFF0000C8);
+        SEA_WATER = liquid("sea_water", 0xFF0042c8);
     }
 
     public static void init() {}

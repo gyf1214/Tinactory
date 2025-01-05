@@ -87,6 +87,7 @@ public final class AllMaterials {
     public static MaterialSet COBALT_BRASS;
     public static MaterialSet AIR;
     public static MaterialSet SALT_WATER;
+    public static MaterialSet SEA_WATER;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
