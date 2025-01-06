@@ -16,6 +16,7 @@ public final class AllData {
         Models.init();
         Technologies.init();
         Materials.init();
+        Chemistry.init();
         Components.init();
         Machines.init();
         Veins.init();

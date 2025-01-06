@@ -26,11 +26,9 @@ import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
 import static org.shsts.tinactory.content.AllItems.STEAM;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
-import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
-import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
@@ -69,7 +67,6 @@ import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
-import static org.shsts.tinactory.content.AllMaterials.LITHIUM_BRINE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
@@ -77,8 +74,6 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
-import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
-import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
@@ -89,7 +84,7 @@ import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
-import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
+import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
@@ -104,15 +99,14 @@ import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
+import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
-import static org.shsts.tinactory.content.AllRecipes.DISTILLATION;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
-import static org.shsts.tinactory.content.AllRecipes.VACUUM_FREEZER;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllRegistries.ITEMS;
 import static org.shsts.tinactory.content.AllTags.TOOL;
@@ -287,7 +281,7 @@ public final class Materials {
             .build()
             .material(COBALTITE, METALLIC)
             .smelt(COBALT)
-            .decompose(Voltage.LV, COBALT, 1, ARSENIC, 1, SULFUR, 1)
+            .centrifuge(Voltage.LV, COBALT, 1, ARSENIC, 1, SULFUR, 1)
             .build()
             .material(INVAR, METALLIC)
             .toolProcess(1.25d).smelt()
@@ -349,6 +343,9 @@ public final class Materials {
         FACTORY.material(COBALT_BRASS, METALLIC)
             .machineProcess(Voltage.LV, 2d).smelt()
             .mix(Voltage.LV, BRASS, 7, ALUMINIUM, 1, COBALT, 1)
+            .build()
+            .material(SALT_WATER, DULL)
+            .fluidMix(Voltage.MV, WATER, 1, SODIUM_CHLORIDE, 1)
             .build();
     }
 
@@ -394,7 +391,7 @@ public final class Materials {
             .build()
             .material(REDSTONE, DULL)
             .oreProcess(5, GLOWSTONE, GLOWSTONE, RARE_EARTH)
-            .decompose(Voltage.LV, PYRITE, 6, RUBY, 3, SILICON, 1)
+            .centrifuge(Voltage.LV, PYRITE, 6, RUBY, 3, SILICON, 1)
             .build()
             .material(CINNABAR, SHINY)
             .oreProcess(RARE_EARTH, GLOWSTONE, RARE_EARTH)
@@ -515,37 +512,6 @@ public final class Materials {
             .outputItem(1, RUBBER.entry("sheet"), 3)
             .workTicks(300)
             .voltage(Voltage.ULV)
-            .build();
-
-        STONE_GENERATOR.recipe(DATA_GEN, AIR.fluidLoc())
-            .outputFluid(1, AIR.fluid(), AIR.fluidAmount(1))
-            .voltage(Voltage.MV)
-            .build();
-
-        VACUUM_FREEZER.recipe(DATA_GEN, AIR.fluidLoc("liquid"))
-            .inputFluid(1, AIR.fluid(), AIR.fluidAmount(1))
-            .outputFluid(3, AIR.fluid("liquid"), AIR.fluidAmount("liquid", 1))
-            .workTicks(200)
-            .voltage(Voltage.MV)
-            .build();
-
-        DISTILLATION.recipe(DATA_GEN, AIR.fluidLoc("liquid"))
-            .inputFluid(0, AIR.fluid("liquid"), AIR.fluidAmount(1))
-            .outputFluid(1, NITROGEN.fluid(), NITROGEN.fluidAmount(0.78f))
-            .outputFluid(1, OXYGEN.fluid(), OXYGEN.fluidAmount(0.21f))
-            .outputFluid(1, ARGON.fluid(), ARGON.fluidAmount(0.01f))
-            .workTicks(60)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, SEA_WATER.fluidLoc())
-            .inputFluid(0, SEA_WATER.fluid(), SEA_WATER.fluidAmount(10))
-            .outputItem(2, SODIUM_CHLORIDE.entry("dust"), 10)
-            .outputItem(2, POTASSIUM_CHLORIDE.entry("dust"), 2)
-            .outputItem(2, MAGNESIUM_CHLORIDE.entry("dust"), 1)
-            .outputItem(2, CALCIUM_CHLORIDE.entry("dust"), 1, 0.4)
-            .outputFluid(1, LITHIUM_BRINE.fluid(), LITHIUM_BRINE.fluidAmount(0.2f))
-            .workTicks(600)
-            .voltage(Voltage.MV)
             .build();
     }
 

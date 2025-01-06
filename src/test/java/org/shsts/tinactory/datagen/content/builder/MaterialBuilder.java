@@ -418,7 +418,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return this;
     }
 
-    private void compose(Voltage v, IRecipeType<ProcessingRecipe.Builder> recipeType,
+    private MaterialBuilder<P> compose(Voltage v, IRecipeType<ProcessingRecipe.Builder> recipeType,
         int outputPort, boolean decompose, long workTicks, String output, Object... components) {
         var loc = output.equals("fluid") ? material.fluidLoc() : material.loc(output);
 
@@ -437,17 +437,17 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         for (; i < components.length; i += 2) {
             var component = (MaterialSet) components[i];
             var sub = component.hasItem("dust") ? "dust" : "fluid";
-            if (components[i] instanceof String sub1) {
+            if (components[i + 1] instanceof String sub1) {
                 sub = sub1;
                 i++;
             }
             var count = (int) components[i + 1];
 
-            if (sub.equals("fluid")) {
+            if (component.hasFluid(sub)) {
                 if (decompose) {
-                    builder.outputFluid(outputPort + 1, component.fluid(), component.fluidAmount(count));
+                    builder.outputFluid(outputPort + 1, component.fluid(sub), component.fluidAmount(sub, count));
                 } else {
-                    builder.inputFluid(1, component.fluid(), component.fluidAmount(count));
+                    builder.inputFluid(1, component.fluid(sub), component.fluidAmount(sub, count));
                 }
             } else {
                 if (decompose) {
@@ -463,11 +463,11 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             alloyCount = totalCount;
         }
 
-        if (output.equals("fluid")) {
+        if (material.hasFluid(output)) {
             if (decompose) {
-                builder.inputFluid(1, material.fluid(), material.fluidAmount(alloyCount));
+                builder.inputFluid(1, material.fluid(output), material.fluidAmount(output, alloyCount));
             } else {
-                builder.outputFluid(outputPort + 1, material.fluid(), material.fluidAmount(alloyCount));
+                builder.outputFluid(outputPort + 1, material.fluid(output), material.fluidAmount(output, alloyCount));
             }
         } else {
             if (decompose) {
@@ -478,21 +478,24 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         }
 
         builder.workTicks(workTicks * totalCount).build();
+        return this;
     }
 
-    public MaterialBuilder<P> decompose(Voltage voltage, Object... components) {
-        compose(voltage, CENTRIFUGE, 2, true, 60L, "dust", components);
-        return this;
+    public MaterialBuilder<P> centrifuge(Voltage voltage, Object... components) {
+        return compose(voltage, CENTRIFUGE, 2, true, 60L, "dust", components);
     }
 
     public MaterialBuilder<P> mix(Voltage voltage, Object... components) {
-        compose(voltage, MIXER, 2, false, 20L, "dust", components);
-        return decompose(voltage, components);
+        return compose(voltage, MIXER, 2, false, 20L, "dust", components)
+            .centrifuge(voltage, components);
+    }
+
+    public MaterialBuilder<P> fluidMix(Voltage voltage, Object... components) {
+        return compose(voltage, MIXER, 2, false, 20L, "fluid", components);
     }
 
     public MaterialBuilder<P> alloyOnly(Voltage voltage, Object... components) {
-        compose(voltage, ALLOY_SMELTER, 1, false, 40L, "ingot", components);
-        return this;
+        return compose(voltage, ALLOY_SMELTER, 1, false, 40L, "ingot", components);
     }
 
     public MaterialBuilder<P> alloy(Voltage voltage, Object... components) {
@@ -501,8 +504,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
     }
 
     public MaterialBuilder<P> fluidAlloy(Voltage voltage, Object... components) {
-        compose(voltage, ALLOY_SMELTER, 1, false, 40L, "fluid", components);
-        return this;
+        return compose(voltage, ALLOY_SMELTER, 1, false, 40L, "fluid", components);
     }
 
     public OreRecipeBuilder oreBuilder(MaterialSet... byproduct) {

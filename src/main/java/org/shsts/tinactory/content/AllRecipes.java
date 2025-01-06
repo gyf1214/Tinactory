@@ -177,11 +177,11 @@ public final class AllRecipes {
             .register();
 
         VACUUM_FREEZER = processing("vacuum_freezer")
-            .defaults($ -> $.amperage(0.75d))
+            .defaults($ -> $.amperage(1.5d))
             .register();
 
         DISTILLATION = processing("distillation", DistillationRecipe::builder)
-            .defaults($ -> $.amperage(1.5d))
+            .defaults($ -> $.amperage(2.5d))
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)

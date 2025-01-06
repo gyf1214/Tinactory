@@ -63,7 +63,7 @@ public class MaterialSet {
 
     private record BlockEntry(ResourceLocation loc, Supplier<? extends Block> block) {}
 
-    private record FluidEntry(IEntry<? extends Fluid> fluid, int baseAmount) {}
+    private record FluidEntry(ResourceLocation loc, Supplier<? extends Fluid> fluid, int baseAmount) {}
 
     private final Map<String, ItemEntry> items;
     private final Map<String, BlockEntry> blocks;
@@ -149,16 +149,16 @@ public class MaterialSet {
     }
 
     public boolean hasFluid() {
-        return hasFluid("primary");
+        return hasFluid("fluid");
     }
 
     public ResourceLocation fluidLoc(String sub) {
         assert fluids.containsKey(sub);
-        return fluids.get(sub).fluid.loc();
+        return fluids.get(sub).loc;
     }
 
     public ResourceLocation fluidLoc() {
-        return fluidLoc("primary");
+        return fluidLoc("fluid");
     }
 
     public Supplier<? extends Fluid> fluid(String sub) {
@@ -167,7 +167,7 @@ public class MaterialSet {
     }
 
     public Supplier<? extends Fluid> fluid() {
-        return fluid("primary");
+        return fluid("fluid");
     }
 
     public int fluidAmount(String sub, float amount) {
@@ -176,7 +176,7 @@ public class MaterialSet {
     }
 
     public int fluidAmount(float amount) {
-        return fluidAmount("primary", amount);
+        return fluidAmount("fluid", amount);
     }
 
     public OreVariant oreVariant() {
@@ -254,6 +254,14 @@ public class MaterialSet {
             var loc = item.getRegistryName();
             assert loc != null;
             items.put(sub, new ItemEntry(loc, tag, () -> item, targetTag));
+            return this;
+        }
+
+        public Builder<P> existing(String sub, Fluid fluid, int baseAmount) {
+            assert !fluids.containsKey(sub);
+            var loc = fluid.getRegistryName();
+            assert loc != null;
+            fluids.put(sub, new FluidEntry(loc, () -> fluid, baseAmount));
             return this;
         }
 
@@ -365,7 +373,7 @@ public class MaterialSet {
         public Builder<P> fluid(String sub, ResourceLocation tex,
             int texColor, int displayColor, int baseAmount) {
             var fluid = simpleFluid("material/" + sub + "/" + name, tex, texColor, displayColor);
-            fluids.put(sub, new FluidEntry(fluid, baseAmount));
+            fluids.put(sub, new FluidEntry(fluid.loc(), fluid, baseAmount));
             return this;
         }
 
@@ -383,7 +391,7 @@ public class MaterialSet {
 
         public Builder<P> fluidPrimary(String sub) {
             assert fluids.containsKey(sub);
-            fluids.put("primary", fluids.get(sub));
+            fluids.put("fluid", fluids.get(sub));
             return this;
         }
 

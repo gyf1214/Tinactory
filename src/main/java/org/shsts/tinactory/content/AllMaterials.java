@@ -49,6 +49,7 @@ public final class AllMaterials {
     public static MaterialSet HYDROGEN;
 
     // First Degree
+    public static MaterialSet WATER;
     public static MaterialSet WROUGHT_IRON;
     public static MaterialSet BRONZE;
     public static MaterialSet COBALTITE;

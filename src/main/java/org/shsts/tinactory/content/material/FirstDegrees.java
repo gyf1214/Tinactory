@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.material;
 
 import net.minecraft.world.item.Tiers;
+import net.minecraft.world.level.material.Fluids;
 
 import static org.shsts.tinactory.content.AllMaterials.AMMONIA;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
@@ -34,6 +35,7 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
+import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.dust;
 import static org.shsts.tinactory.content.AllMaterials.fluid;
@@ -43,6 +45,12 @@ import static org.shsts.tinactory.content.AllMaterials.set;
 
 public final class FirstDegrees {
     static {
+        WATER = set("water")
+            .color(0xFF0000FF)
+            .existing("liquid", Fluids.WATER, 1000)
+            .fluidPrimary("liquid")
+            .buildObject();
+
         WROUGHT_IRON = set("wrought_iron")
             .color(0xFFC8B4B4)
             .metalExt().nugget()
