@@ -18,9 +18,9 @@ public final class HigherDegrees {
             .buildObject();
 
         AIR = set("air")
-            .color(0xFFFFFFFF)
+            .color(0xFFA9D0F5)
             .fluid("gas", "air", 1000)
-            .fluid("liquid", "liquid_air", 1000)
+            .fluid("liquid", "liquid_air", 0xFF84BCFC, 1000)
             .fluidPrimary("gas")
             .buildObject();
 

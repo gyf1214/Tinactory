@@ -49,8 +49,11 @@ public class CellItem extends CapabilityItem {
         var fluid = getFluid(item);
         if (fluid.isEmpty()) {
             return 0xFF000000;
+        } else if (fluid.getFluid() instanceof SimpleFluid simpleFluid) {
+            return simpleFluid.displayColor;
+        } else {
+            return fluid.getFluid().getAttributes().getColor();
         }
-        return fluid.getFluid().getAttributes().getColor();
     }
 
     @Override

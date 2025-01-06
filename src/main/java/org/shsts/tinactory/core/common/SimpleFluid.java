@@ -12,11 +12,13 @@ import net.minecraftforge.fluids.FluidAttributes;
 @MethodsReturnNonnullByDefault
 public class SimpleFluid extends EmptyFluid {
     private final FluidAttributes.Builder builder;
+    public final int displayColor;
 
-    public SimpleFluid(ResourceLocation stillTexture, int color) {
-        this.builder = FluidAttributes.builder(stillTexture, null)
+    public SimpleFluid(ResourceLocation tex, int color, int displayColor) {
+        this.builder = FluidAttributes.builder(tex, null)
             .color(color)
             .sound(SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
+        this.displayColor = displayColor;
     }
 
     @Override

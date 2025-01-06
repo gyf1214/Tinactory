@@ -121,9 +121,9 @@ public final class FirstDegrees {
 
         LITHIUM_BRINE = liquid("lithium_brine", 0xFF4200C7);
         CARBON_DIOXIDE = gas("carbon_dioxide", 0xFFA9D0F5);
-        HYDROGEN_CHLORIDE = fluid("hydrogen_chloride", "gas", "hydrochloric_acid");
-        HYDROGEN_SULFIDE = fluid("hydrogen_sulfide", "gas");
-        SULFURIC_ACID = fluid("sulfuric_acid", "liquid");
+        HYDROGEN_CHLORIDE = fluid("hydrogen_chloride", 0xFFBCBCB5, "gas", "hydrochloric_acid");
+        HYDROGEN_SULFIDE = fluid("hydrogen_sulfide", 0xFFFC5304, "gas");
+        SULFURIC_ACID = fluid("sulfuric_acid", 0xFFFC5304, "liquid");
         NITRIC_ACID = liquid("nitric_acid", 0xFFCCCC00);
         AMMONIA = gas("ammonia", 0xFF3F3480);
     }

@@ -54,10 +54,15 @@ public final class AllRegistries {
 
     public static void init() {}
 
-    public static IEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex, int color) {
-        var ret = REGISTRATE.registryEntry(FLUIDS, id, () -> new SimpleFluid(tex, color));
+    public static IEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex,
+        int color, int displayColor) {
+        var ret = REGISTRATE.registryEntry(FLUIDS, id, () -> new SimpleFluid(tex, color, displayColor));
         REGISTRATE.trackLang("fluid." + Tinactory.ID + "." + id.replace("/", "."));
         return ret;
+    }
+
+    public static IEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex, int color) {
+        return simpleFluid(id, tex, color, color);
     }
 
     public static IEntry<SimpleFluid> simpleFluid(String id, ResourceLocation tex) {

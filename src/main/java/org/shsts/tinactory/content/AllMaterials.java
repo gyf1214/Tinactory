@@ -197,16 +197,16 @@ public final class AllMaterials {
             .buildObject();
     }
 
-    public static MaterialSet fluid(String id, String sub, String tex) {
+    public static MaterialSet fluid(String id, int color, String sub, String tex) {
         return set(id)
-            .color(0xFFFFFFFF)
+            .color(color)
             .fluid(sub, tex, 1000)
             .fluidPrimary(sub)
             .buildObject();
     }
 
-    public static MaterialSet fluid(String id, String sub) {
-        return fluid(id, sub, id);
+    public static MaterialSet fluid(String id, int color, String sub) {
+        return fluid(id, color, sub, id);
     }
 
     public static TagKey<Item> tag(String sub) {

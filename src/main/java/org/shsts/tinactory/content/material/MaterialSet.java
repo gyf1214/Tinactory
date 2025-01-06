@@ -362,14 +362,23 @@ public class MaterialSet {
                 .alias("primary", "gem");
         }
 
-        public Builder<P> fluid(String sub, ResourceLocation tex, int baseAmount) {
-            var fluid = simpleFluid("material/" + sub + "/" + name, tex, color);
+        public Builder<P> fluid(String sub, ResourceLocation tex,
+            int texColor, int displayColor, int baseAmount) {
+            var fluid = simpleFluid("material/" + sub + "/" + name, tex, texColor, displayColor);
             fluids.put(sub, new FluidEntry(fluid, baseAmount));
             return this;
         }
 
+        public Builder<P> fluid(String sub, ResourceLocation tex, int baseAmount) {
+            return fluid(sub, tex, color, color, baseAmount);
+        }
+
+        public Builder<P> fluid(String sub, String tex, int displayColor, int baseAmount) {
+            return fluid(sub, gregtech("blocks/fluids/fluid." + tex), 0xFFFFFFFF, displayColor, baseAmount);
+        }
+
         public Builder<P> fluid(String sub, String tex, int baseAmount) {
-            return fluid(sub, gregtech("blocks/fluids/fluid." + tex), baseAmount);
+            return fluid(sub, tex, color, baseAmount);
         }
 
         public Builder<P> fluidPrimary(String sub) {
