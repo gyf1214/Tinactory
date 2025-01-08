@@ -7,9 +7,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -23,7 +21,6 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -68,20 +65,9 @@ public class ResearchRecipe extends ProcessingRecipe {
             return input(port, ingredient);
         }
 
-        public Builder inputItem(Supplier<? extends Item> item, int amount) {
-            return inputItem(0, item, amount);
-        }
-
-        public Builder inputItem(Supplier<? extends Item> item) {
-            return inputItem(item, 1);
-        }
-
-        public Builder inputItem(TagKey<Item> item) {
-            return inputItem(0, item, 1);
-        }
-
-        public Builder defaultInput(Voltage voltage) {
-            return voltage(voltage).inputItem(AllItems.RESEARCH_EQUIPMENT.get(voltage));
+        @Override
+        public Builder voltage(Voltage value) {
+            return super.voltage(value).inputItem(AllItems.RESEARCH_EQUIPMENT.get(value), 1);
         }
 
         public Builder target(ResourceLocation value) {

@@ -70,123 +70,107 @@ public final class AllRecipes {
         RESEARCH_BENCH = REGISTRATE.recipeType("research_bench", ResearchRecipe.Builder::new)
             .recipeClass(ResearchRecipe.class)
             .serializer(ResearchRecipe.SERIALIZER)
-            .defaults($ -> $.amperage(0.25d).workTicks(200L))
+            .defaults($ -> $.amperage(0.25d).workTicks(200L).defaultInputItem(0))
             .register();
 
         ASSEMBLER = REGISTRATE.recipeType("assembler", AssemblyRecipe.Builder::new)
             .recipeClass(AssemblyRecipe.class)
             .serializer(AssemblyRecipe.SERIALIZER)
-            .defaults($ -> $.amperage(0.375d))
+            .defaults($ -> $.amperage(0.375d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(2))
             .register();
 
         LASER_ENGRAVER = processing("laser_engraver")
-            .defaults($ -> $.amperage(0.625d))
+            .defaults($ -> $.amperage(0.625d).defaultOutputItem(2))
             .register();
 
         CIRCUIT_ASSEMBLER = processing("circuit_assembler")
-            .defaults($ -> $.amperage(0.25d))
+            .defaults($ -> $.amperage(0.25d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(2))
             .register();
 
         STONE_GENERATOR = processing("stone_generator")
-            .defaults($ -> $.amperage(0.125d).workTicks(20L))
+            .defaults($ -> $.amperage(0.125d).workTicks(20L).defaultOutputItem(0).defaultOutputFluid(1))
             .register();
 
         ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.Builder::new)
             .recipeClass(OreAnalyzerRecipe.class)
             .serializer(OreAnalyzerRecipe.SERIALIZER)
-            .defaults($ -> $.amperage(0.125d).workTicks(32L))
+            .defaults($ -> $.amperage(0.125d).workTicks(32L).transform(AllRecipes::simpleDefaults))
             .register();
 
         MACERATOR = displayInput("macerator")
-            .defaults($ -> $.amperage(0.25d))
+            .defaults($ -> $.amperage(0.25d).transform(AllRecipes::simpleDefaults))
             .register();
 
         ORE_WASHER = displayInput("ore_washer")
-            .defaults($ -> $.amperage(0.125d))
+            .defaults($ -> $.amperage(0.125d).defaultInputItem(0).defaultInputFluid(1))
             .register();
 
         CENTRIFUGE = displayInput("centrifuge")
-            .defaults($ -> $.amperage(0.5d))
+            .defaults($ -> $.amperage(0.5d).transform(AllRecipes::fullDefaults))
             .register();
 
         THERMAL_CENTRIFUGE = displayInput("thermal_centrifuge")
-            .defaults($ -> $.voltage(Voltage.LV).workTicks(400L).amperage(1d))
+            .defaults($ -> $.voltage(Voltage.LV).workTicks(400L).amperage(1d).defaultInputItem(0))
             .register();
 
         SIFTER = displayInput("sifter")
-            .defaults($ -> $.amperage(0.25d))
+            .defaults($ -> $.amperage(0.25d).transform(AllRecipes::simpleDefaults))
             .register();
 
         ALLOY_SMELTER = processing("alloy_smelter")
-            .defaults($ -> $.amperage(0.75d))
+            .defaults($ -> $.amperage(0.75d).defaultInputItem(0).defaultOutputItem(1).defaultOutputFluid(2))
             .register();
 
         MIXER = processing("mixer")
-            .defaults($ -> $.amperage(0.5d))
+            .defaults($ -> $.amperage(0.5d).transform(AllRecipes::fullDefaults))
             .register();
 
-        POLARIZER = processing("polarizer")
-            .defaults($ -> $.amperage(0.25d))
-            .register();
-
-        WIREMILL = processing("wiremill")
-            .defaults($ -> $.amperage(0.25d))
-            .register();
-
-        BENDER = processing("bender")
-            .defaults($ -> $.amperage(0.25d))
-            .register();
-
-        COMPRESSOR = processing("compressor")
-            .defaults($ -> $.amperage(0.5d))
-            .register();
-
-        LATHE = processing("lathe")
-            .defaults($ -> $.amperage(0.375d))
-            .register();
+        POLARIZER = simpleProcessing("polarizer", 0.25d);
+        WIREMILL = simpleProcessing("wiremill", 0.25d);
+        BENDER = simpleProcessing("bender", 0.25d);
+        COMPRESSOR = simpleProcessing("compressor", 0.5d);
+        LATHE = simpleProcessing("lathe", 0.375d);
 
         CUTTER = processing("cutter")
-            .defaults($ -> $.amperage(0.375d))
+            .defaults($ -> $.amperage(0.375d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(2))
             .register();
 
-        EXTRUDER = processing("extruder")
-            .defaults($ -> $.amperage(0.625d))
-            .register();
+        EXTRUDER = simpleProcessing("extruder", 0.625d);
 
         EXTRACTOR = displayInput("extractor")
-            .defaults($ -> $.amperage(0.5d))
+            .defaults($ -> $.amperage(0.5d).defaultInputItem(0).defaultOutputItem(1).defaultOutputFluid(2))
             .register();
 
         FLUID_SOLIDIFIER = processing("fluid_solidifier")
-            .defaults($ -> $.amperage(0.25d))
+            .defaults($ -> $.amperage(0.25d).defaultInputFluid(0).defaultOutputItem(1))
             .register();
 
         ELECTROLYZER = displayInput("electrolyzer")
-            .defaults($ -> $.amperage(0.75d))
+            .defaults($ -> $.amperage(0.75d).transform(AllRecipes::fullDefaults))
             .register();
 
         CHEMICAL_REACTOR = REGISTRATE.recipeType("chemical_reactor", ChemicalReactorRecipe.Builder::new)
             .recipeClass(ChemicalReactorRecipe.class)
             .serializer(ChemicalReactorRecipe.SERIALIZER)
-            .defaults($ -> $.amperage(0.375d))
+            .defaults($ -> $.amperage(0.375d).transform(AllRecipes::fullDefaults))
             .register();
 
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)
-            .defaults($ -> $.amperage(1d).workTicks(100))
+            .defaults($ -> $.amperage(1d).workTicks(100).defaultInputFluid(0).defaultOutputFluid(1))
             .register();
 
         BLAST_FURNACE = REGISTRATE.recipeType("blast_furnace", BlastFurnaceRecipe.Builder::new)
             .recipeClass(BlastFurnaceRecipe.class)
             .serializer(BlastFurnaceRecipe.SERIALIZER)
-            .defaults($ -> $.amperage(4d))
+            .defaults($ -> $.amperage(4d).transform(AllRecipes::fullDefaults))
             .register();
 
         VACUUM_FREEZER = processing("vacuum_freezer")
-            .defaults($ -> $.amperage(1.5d))
+            .defaults($ -> $.amperage(1.5d).transform(AllRecipes::fullDefaults))
             .register();
 
         DISTILLATION = processing("distillation", DistillationRecipe::builder)
-            .defaults($ -> $.amperage(2.5d))
+            .defaults($ -> $.amperage(2.5d).defaultInputFluid(0).defaultOutputFluid(1).defaultOutputItem(2))
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
@@ -223,6 +207,21 @@ public final class AllRecipes {
         return REGISTRATE.recipeType(id, builderFactory)
             .recipeClass(ProcessingRecipe.class)
             .serializer(ProcessingRecipe.SERIALIZER);
+    }
+
+    private static IRecipeType<ProcessingRecipe.Builder> simpleProcessing(String id, double amperage) {
+        return processing(id)
+            .defaults($ -> $.amperage(amperage).transform(AllRecipes::simpleDefaults))
+            .register();
+    }
+
+    private static <S extends ProcessingRecipe.BuilderBase<?, S>> S simpleDefaults(S builder) {
+        return builder.defaultInputItem(0).defaultOutputItem(1);
+    }
+
+    private static <S extends ProcessingRecipe.BuilderBase<?, S>> S fullDefaults(S builder) {
+        return builder.defaultInputItem(0).defaultInputFluid(1)
+            .defaultOutputItem(2).defaultOutputFluid(3);
     }
 
     public static void init() {}

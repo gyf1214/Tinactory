@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
-import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -51,10 +50,6 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         public Builder rate(double value) {
             rate = value;
             return this;
-        }
-
-        public Builder inputOre(OreVariant variant) {
-            return inputItem(0, () -> variant.baseItem, 1);
         }
 
         @Override

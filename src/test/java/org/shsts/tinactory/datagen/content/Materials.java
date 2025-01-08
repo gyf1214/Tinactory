@@ -353,13 +353,13 @@ public final class Materials {
         // stone generator
         for (var variant : OreVariant.values()) {
             STONE_GENERATOR.recipe(DATA_GEN, variant.baseItem)
-                .outputItem(0, variant.baseItem, 1)
+                .outputItem(() -> variant.baseItem, 1)
                 .voltage(variant == OreVariant.STONE ? Voltage.PRIMITIVE : variant.voltage)
                 .build();
         }
         // generate water
         STONE_GENERATOR.recipe(DATA_GEN, Fluids.WATER)
-            .outputFluid(1, Fluids.WATER, 1000)
+            .outputFluid(() -> Fluids.WATER, 1000)
             .voltage(Voltage.ULV)
             .build();
 
@@ -480,8 +480,8 @@ public final class Materials {
             var consume = (int) voltage.value / 8 * (14 - voltage.rank);
             STEAM_TURBINE.recipe(DATA_GEN, voltage.id)
                 .voltage(voltage)
-                .inputFluid(0, STEAM, consume)
-                .outputFluid(1, Fluids.WATER, (int) voltage.value / 8 * 5)
+                .inputFluid(STEAM, consume)
+                .outputFluid(() -> Fluids.WATER, (int) voltage.value / 8 * 5)
                 .build();
         }
 
@@ -493,23 +493,23 @@ public final class Materials {
             .build();
 
         EXTRACTOR.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
-            .outputItem(1, RAW_RUBBER.entry("dust"), 3)
-            .inputItem(0, STICKY_RESIN, 1)
+            .outputItem(RAW_RUBBER.entry("dust"), 3)
+            .inputItem(STICKY_RESIN, 1)
             .workTicks(160L)
             .voltage(Voltage.LV)
             .build();
 
         EXTRACTOR.recipe(DATA_GEN, suffix(RAW_RUBBER.loc("dust"), "_from_log"))
-            .outputItem(1, RAW_RUBBER.entry("dust"), 1)
-            .inputItem(0, RUBBER_LOG, 1)
+            .outputItem(RAW_RUBBER.entry("dust"), 1)
+            .inputItem(RUBBER_LOG, 1)
             .workTicks(320L)
             .voltage(Voltage.LV)
             .build();
 
         ALLOY_SMELTER.recipe(DATA_GEN, RUBBER.loc("sheet"))
-            .inputItem(0, RAW_RUBBER.entry("dust"), 3)
-            .inputItem(0, SULFUR.entry("dust"), 1)
-            .outputItem(1, RUBBER.entry("sheet"), 3)
+            .inputItem(RAW_RUBBER.entry("dust"), 3)
+            .inputItem(SULFUR.entry("dust"), 1)
+            .outputItem(RUBBER.entry("sheet"), 3)
             .workTicks(300)
             .voltage(Voltage.ULV)
             .build();

@@ -37,7 +37,7 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
 
     public AssemblyRecipeBuilder<P> circuit(Voltage v, int count) {
         if (builder != null) {
-            builder.inputItem(0, AllTags.circuit(v), count);
+            builder.inputItem(AllTags.circuit(v), count);
         }
         return this;
     }
@@ -49,21 +49,21 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
     public AssemblyRecipeBuilder<P> component(
         Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
         if (builder != null) {
-            builder.inputItem(0, component.get(voltage), count);
+            builder.inputItem(component.get(voltage), count);
         }
         return this;
     }
 
     public AssemblyRecipeBuilder<P> material(MaterialSet material, String sub, int count) {
         if (builder != null) {
-            builder.inputItem(0, material.tag(sub), count);
+            builder.inputItem(material.tag(sub), count);
         }
         return this;
     }
 
     public AssemblyRecipeBuilder<P> materialFluid(MaterialSet material, float count) {
         if (builder != null) {
-            builder.inputFluid(1, material.fluid(), material.fluidAmount(count));
+            builder.inputFluid(material.fluid(), material.fluidAmount(count));
         }
         return this;
     }
@@ -77,7 +77,7 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
 
     public AssemblyRecipeBuilder<P> item(Supplier<? extends ItemLike> item, int count) {
         if (builder != null) {
-            builder.inputItem(0, item, count);
+            builder.inputItem(item, count);
         }
         return this;
     }

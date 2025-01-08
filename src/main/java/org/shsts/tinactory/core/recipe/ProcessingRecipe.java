@@ -146,7 +146,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
     }
 
-    protected abstract static class BuilderBase<R extends ProcessingRecipe, S extends BuilderBase<R, S>>
+    public abstract static class BuilderBase<R extends ProcessingRecipe, S extends BuilderBase<R, S>>
         extends RecipeBuilder<R, S> {
         protected final List<Supplier<Input>> inputs = new ArrayList<>();
         protected final List<Supplier<Output>> outputs = new ArrayList<>();
@@ -154,18 +154,33 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         protected long voltage = 0;
         protected long power = 0;
         protected double amperage = 0d;
+        protected int defaultInputItem = -1;
+        protected int defaultInputFluid = -1;
+        protected int defaultOutputItem = -1;
+        protected int defaultOutputFluid = -1;
 
         protected BuilderBase(IRecipeType<S> parent, ResourceLocation loc) {
             super(parent, loc);
         }
 
         public S input(int port, Supplier<IProcessingIngredient> ingredient) {
+            assert port >= 0;
             inputs.add(() -> new Input(port, ingredient.get()));
             return self();
         }
 
         public S input(int port, IProcessingIngredient ingredient) {
             return input(port, () -> ingredient);
+        }
+
+        public S defaultInputItem(int port) {
+            defaultInputItem = port;
+            return self();
+        }
+
+        public S defaultInputFluid(int port) {
+            defaultInputFluid = port;
+            return self();
         }
 
         public S inputItem(int port, Supplier<? extends ItemLike> item, int amount) {
@@ -181,14 +196,31 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             return input(port, () -> new ProcessingIngredients.TagIngredient(tag, 0));
         }
 
+        public S inputItem(Supplier<? extends ItemLike> item, int amount) {
+            return inputItem(defaultInputItem, item, amount);
+        }
+
+        public S inputItem(TagKey<Item> tag, int amount) {
+            return inputItem(defaultInputItem, tag, amount);
+        }
+
         public S inputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
             return input(port, () -> new ProcessingIngredients.FluidIngredient(
                 new FluidStack(fluid.get(), amount)));
         }
 
-        public S inputFluid(int port, Fluid fluid, int amount) {
-            return input(port, new ProcessingIngredients.FluidIngredient(
-                new FluidStack(fluid, amount)));
+        public S inputFluid(Supplier<? extends Fluid> fluid, int amount) {
+            return inputFluid(defaultInputFluid, fluid, amount);
+        }
+
+        public S defaultOutputItem(int port) {
+            defaultOutputItem = port;
+            return self();
+        }
+
+        public S defaultOutputFluid(int port) {
+            defaultOutputFluid = port;
+            return self();
         }
 
         public S output(int port, Supplier<IProcessingResult> result) {
@@ -209,8 +241,12 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             return outputItem(port, item, amount, 1d);
         }
 
-        public S outputItem(int port, Item item, int amount) {
-            return outputItem(port, () -> item, amount);
+        public S outputItem(Supplier<? extends ItemLike> item, int amount, double rate) {
+            return outputItem(defaultOutputItem, item, amount, rate);
+        }
+
+        public S outputItem(Supplier<? extends ItemLike> item, int amount) {
+            return outputItem(item, amount, 1d);
         }
 
         public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount, double rate) {
@@ -222,8 +258,12 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             return outputFluid(port, fluid, amount, 1d);
         }
 
-        public S outputFluid(int port, Fluid fluid, int amount) {
-            return outputFluid(port, () -> fluid, amount);
+        public S outputFluid(Supplier<? extends Fluid> fluid, int amount, double rate) {
+            return outputFluid(defaultOutputFluid, fluid, amount, rate);
+        }
+
+        public S outputFluid(Supplier<? extends Fluid> fluid, int amount) {
+            return outputFluid(fluid, amount, 1d);
         }
 
         public S workTicks(long value) {

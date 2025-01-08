@@ -60,7 +60,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
 
         public Builder inputFluid(int port, Fluid fluid) {
-            return inputFluid(port, fluid, 1);
+            return inputFluid(port, () -> fluid, 1);
         }
 
         @Override

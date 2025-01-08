@@ -42,11 +42,11 @@ public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
     }
 
     public VeinBuilder<P> ore(MaterialSet material, double rate) {
-        builder.outputItem(1, material.entry("raw"), 1, rate);
+        builder.outputItem(material.entry("raw"), 1, rate);
         ores.add(material);
         if (variant == null) {
             variant = material.oreVariant();
-            builder.inputOre(variant);
+            builder.inputItem(() -> variant.baseItem, 1);
         }
         assert variant == material.oreVariant();
         return this;
@@ -87,7 +87,7 @@ public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
 
             RESEARCH_BENCH.recipe(DATA_GEN, tech)
                 .target(tech)
-                .defaultInput(variant.voltage)
+                .voltage(variant.voltage)
                 .build();
         }
 

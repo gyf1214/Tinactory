@@ -135,7 +135,7 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         if (researchVoltage != null) {
             RESEARCH_BENCH.recipe(DATA_GEN, loc)
                 .target(loc)
-                .defaultInput(researchVoltage)
+                .voltage(researchVoltage)
                 .build();
         }
     }
