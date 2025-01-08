@@ -12,6 +12,7 @@ import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
+import static org.shsts.tinactory.content.AllMaterials.CHLORINE;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
 import static org.shsts.tinactory.content.AllMaterials.COBALT;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
@@ -145,6 +146,7 @@ public final class Elements {
         NITROGEN = gas("nitrogen", 0xFF00BFC1);
         ARGON = gas("argon", 0xFF00FF00);
         HYDROGEN = gas("hydrogen", 0xFF0000B5);
+        CHLORINE = gas("chlorine", 0xFF2D8C8C);
     }
 
     public static void init() {}

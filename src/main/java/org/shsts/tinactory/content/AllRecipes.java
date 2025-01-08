@@ -10,6 +10,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
+import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
@@ -52,7 +53,7 @@ public final class AllRecipes {
     public static final IRecipeType<ProcessingRecipe.Builder> EXTRACTOR;
     public static final IRecipeType<ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
     public static final IRecipeType<ProcessingRecipe.Builder> ELECTROLYZER;
-    public static final IRecipeType<AssemblyRecipe.Builder> CHEMICAL_REACTOR;
+    public static final IRecipeType<ChemicalReactorRecipe.Builder> CHEMICAL_REACTOR;
     public static final IRecipeType<ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final IRecipeType<BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     public static final IRecipeType<ProcessingRecipe.Builder> VACUUM_FREEZER;
@@ -72,7 +73,9 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.25d).workTicks(200L))
             .register();
 
-        ASSEMBLER = assembly("assembler")
+        ASSEMBLER = REGISTRATE.recipeType("assembler", AssemblyRecipe.Builder::new)
+            .recipeClass(AssemblyRecipe.class)
+            .serializer(AssemblyRecipe.SERIALIZER)
             .defaults($ -> $.amperage(0.375d))
             .register();
 
@@ -159,11 +162,13 @@ public final class AllRecipes {
             .register();
 
         ELECTROLYZER = displayInput("electrolyzer")
-            .defaults($ -> $.amperage(0.5d))
+            .defaults($ -> $.amperage(0.75d))
             .register();
 
-        CHEMICAL_REACTOR = assembly("chemical_reactor")
-            .defaults($ -> $.amperage(0.25d))
+        CHEMICAL_REACTOR = REGISTRATE.recipeType("chemical_reactor", ChemicalReactorRecipe.Builder::new)
+            .recipeClass(ChemicalReactorRecipe.class)
+            .serializer(ChemicalReactorRecipe.SERIALIZER)
+            .defaults($ -> $.amperage(0.375d))
             .register();
 
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)
@@ -211,13 +216,6 @@ public final class AllRecipes {
     private static IRecipeTypeBuilder<ProcessingRecipe,
         ProcessingRecipe.Builder, IRegistrate> displayInput(String id) {
         return processing(id, DisplayInputRecipe::builder);
-    }
-
-    private static IRecipeTypeBuilder<AssemblyRecipe,
-        AssemblyRecipe.Builder, IRegistrate> assembly(String id) {
-        return REGISTRATE.recipeType(id, AssemblyRecipe.Builder::new)
-            .recipeClass(AssemblyRecipe.class)
-            .serializer(AssemblyRecipe.SERIALIZER);
     }
 
     private static IRecipeTypeBuilder<ProcessingRecipe, ProcessingRecipe.Builder, IRegistrate> processing(

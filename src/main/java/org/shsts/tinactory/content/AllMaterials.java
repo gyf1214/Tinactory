@@ -47,6 +47,7 @@ public final class AllMaterials {
     public static MaterialSet NITROGEN;
     public static MaterialSet ARGON;
     public static MaterialSet HYDROGEN;
+    public static MaterialSet CHLORINE;
 
     // First Degree
     public static MaterialSet WATER;

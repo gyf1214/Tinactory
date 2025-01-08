@@ -33,8 +33,8 @@ public class AssemblyRecipe extends ProcessingRecipe {
             .orElse(requiredTech.isEmpty());
     }
 
-    protected abstract static class BuilderBase<U extends AssemblyRecipe, S extends BuilderBase<U, S>> extends
-        ProcessingRecipe.BuilderBase<U, S> {
+    protected abstract static class BuilderBase<R extends AssemblyRecipe, S extends BuilderBase<R, S>> extends
+        ProcessingRecipe.BuilderBase<R, S> {
         protected final List<ResourceLocation> requiredTech = new ArrayList<>();
 
         protected BuilderBase(IRecipeType<S> parent, ResourceLocation loc) {
@@ -58,8 +58,8 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
     }
 
-    protected static class Serializer<T extends AssemblyRecipe, B extends BuilderBase<T, B>> extends
-        ProcessingRecipe.Serializer<T, B> {
+    protected static class Serializer<R extends AssemblyRecipe, B extends BuilderBase<R, B>> extends
+        ProcessingRecipe.Serializer<R, B> {
         @Override
         protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
             var builder = super.buildFromJson(type, loc, jo);
@@ -70,7 +70,7 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
 
         @Override
-        public void toJson(JsonObject jo, T recipe) {
+        public void toJson(JsonObject jo, R recipe) {
             super.toJson(jo, recipe);
             var ja = new JsonArray();
             for (var tech : recipe.requiredTech) {

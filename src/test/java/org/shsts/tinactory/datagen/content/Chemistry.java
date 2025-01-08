@@ -8,7 +8,13 @@ import org.shsts.tinactory.content.electric.Voltage;
 import static org.shsts.tinactory.content.AllItems.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.ARGON;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.CARBON;
+import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
+import static org.shsts.tinactory.content.AllMaterials.CHLORINE;
+import static org.shsts.tinactory.content.AllMaterials.HYDROGEN;
+import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_BRINE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
@@ -16,7 +22,10 @@ import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
+import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.DISTILLATION;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.VACUUM_FREEZER;
@@ -76,6 +85,36 @@ public class Chemistry {
             .inputFluid(0, Fluids.WATER, 1000)
             .outputFluid(1, STEAM, 1000)
             .workTicks(400)
+            .voltage(Voltage.MV)
+            .build();
+
+        CHEMICAL_REACTOR.recipe(DATA_GEN, HYDROGEN_CHLORIDE.fluidLoc())
+            .inputFluid(1, HYDROGEN.fluid(), HYDROGEN.fluidAmount(1))
+            .inputFluid(1, CHLORINE.fluid(), CHLORINE.fluidAmount(1))
+            .outputFluid(3, HYDROGEN_CHLORIDE.fluid(), HYDROGEN_CHLORIDE.fluidAmount(1))
+            .workTicks(128)
+            .voltage(Voltage.MV)
+            .build()
+            .recipe(DATA_GEN, CARBON_DIOXIDE.fluidLoc())
+            .inputItem(0, CARBON.entry("dust"), 1)
+            .inputFluid(1, OXYGEN.fluid(), OXYGEN.fluidAmount(1))
+            .outputFluid(3, CARBON_DIOXIDE.fluid(), CARBON_DIOXIDE.fluidAmount(1))
+            .workTicks(320)
+            .voltage(Voltage.MV)
+            .build()
+            .recipe(DATA_GEN, SODIUM_CARBONATE.loc("dust"))
+            .inputItem(0, SODIUM_HYDROXIDE.entry("dust"), 1)
+            .inputFluid(1, CARBON_DIOXIDE.fluid(), CARBON_DIOXIDE.fluidAmount(1))
+            .outputItem(2, SODIUM_CARBONATE.entry("dust"), 1)
+            .workTicks(128)
+            .voltage(Voltage.MV)
+            .build()
+            .recipe(DATA_GEN, CALCIUM_CARBONATE.loc("dust"))
+            .inputItem(0, SODIUM_CARBONATE.entry("dust"), 1)
+            .inputItem(0, CALCIUM_CHLORIDE.entry("dust"), 1)
+            .outputItem(2, CALCIUM_CARBONATE.entry("dust"), 1)
+            .outputItem(2, SODIUM_CHLORIDE.entry("dust"), 1)
+            .workTicks(128)
             .voltage(Voltage.MV)
             .build();
     }
