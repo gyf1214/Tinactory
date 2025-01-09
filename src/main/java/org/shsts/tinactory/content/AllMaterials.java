@@ -75,6 +75,7 @@ public final class AllMaterials {
     public static MaterialSet POTASSIUM_CARBONATE;
     public static MaterialSet CALCIUM_CARBONATE;
     public static MaterialSet LITHIUM_CARBONATE;
+    public static MaterialSet POTASSIUM_NITRATE;
     public static MaterialSet SODIUM_HYDROXIDE;
     public static MaterialSet CALCIUM_HYDROXIDE;
     public static MaterialSet LITHIUM_BRINE;

@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -24,6 +25,38 @@ public class ChemicalReactorRecipe extends AssemblyRecipe {
 
         public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
             super(parent, loc);
+        }
+
+        public Builder input(MaterialSet material, String sub, float amount) {
+            if (material.hasItem(sub)) {
+                return inputItem(material.tag(sub), (int) amount);
+            } else {
+                return inputFluid(material.fluid(sub), material.fluidAmount(sub, amount));
+            }
+        }
+
+        public Builder input(MaterialSet material, float amount) {
+            return material.hasItem("dust") ? input(material, "dust", amount) : input(material, "fluid", amount);
+        }
+
+        public Builder input(MaterialSet material) {
+            return input(material, 1f);
+        }
+
+        public Builder output(MaterialSet material, String sub, float amount) {
+            if (material.hasItem(sub)) {
+                return inputItem(material.tag(sub), (int) amount);
+            } else {
+                return inputFluid(material.fluid(sub), material.fluidAmount(sub, amount));
+            }
+        }
+
+        public Builder output(MaterialSet material, float amount) {
+            return material.hasItem("dust") ? output(material, "dust", amount) : output(material, "fluid", amount);
+        }
+
+        public Builder output(MaterialSet material) {
+            return output(material, 1f);
         }
 
         public Builder requireLarge(boolean val) {

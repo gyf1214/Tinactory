@@ -27,6 +27,7 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.NITRIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
@@ -124,6 +125,7 @@ public final class FirstDegrees {
         POTASSIUM_CARBONATE = dust("potassium_carbonate", 0xFF784137);
         CALCIUM_CARBONATE = dust("calcium_carbonate", 0xFFFAE6DC);
         LITHIUM_CARBONATE = dust("lithium_carbonate", 0xFFBEBEDA);
+        POTASSIUM_NITRATE = dust("potassium_nitrate", 0xFFE6E6E6);
         SODIUM_HYDROXIDE = dust("sodium_hydroxide", 0xFF003380);
         CALCIUM_HYDROXIDE = dust("calcium_hydroxide", 0xFFF0F0F0);
 

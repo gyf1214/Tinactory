@@ -76,6 +76,7 @@ import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
@@ -335,6 +336,7 @@ public final class Materials {
             .material(POTASSIUM_CARBONATE, DULL).build()
             .material(CALCIUM_CARBONATE, DULL).build()
             .material(LITHIUM_CARBONATE, DULL).build()
+            .material(POTASSIUM_NITRATE, FINE).build()
             .material(SODIUM_HYDROXIDE, DULL).build()
             .material(CALCIUM_HYDROXIDE, DULL).build();
     }
