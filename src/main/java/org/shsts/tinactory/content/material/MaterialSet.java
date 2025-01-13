@@ -283,7 +283,7 @@ public class MaterialSet {
                 .register());
         }
 
-        private Builder<P> dummies(String... subs) {
+        public Builder<P> dummies(String... subs) {
             for (var sub : subs) {
                 dummy(sub);
             }
@@ -403,6 +403,10 @@ public class MaterialSet {
         public Builder<P> liquid() {
             return fluid("liquid", gregtech("blocks/material_sets/dull/liquid"), 1000)
                 .fluidPrimary("liquid");
+        }
+
+        public Builder<P> gas(String sub, int color) {
+            return fluid(sub, gregtech("blocks/material_sets/dull/gas"), color, color, 1000);
         }
 
         public Builder<P> gas() {

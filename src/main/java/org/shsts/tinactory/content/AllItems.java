@@ -90,6 +90,7 @@ public final class AllItems {
 
     public static final IEntry<Item> STICKY_RESIN;
     public static final IEntry<SimpleFluid> STEAM;
+    public static final IEntry<SimpleFluid> BIOMASS;
     public static final IEntry<RubberLogBlock> RUBBER_LOG;
     public static final IEntry<LeavesBlock> RUBBER_LEAVES;
     public static final IEntry<SaplingBlock> RUBBER_SAPLING;
@@ -146,6 +147,7 @@ public final class AllItems {
             .register();
 
         STEAM = simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
+        BIOMASS = simpleFluid("biomass", gregtech("blocks/fluids/fluid.biomass"));
 
         ELECTRIC_MOTOR = component("electric_motor");
         ELECTRIC_PUMP = component("electric_pump");

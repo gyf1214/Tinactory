@@ -16,6 +16,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.AllMaterials;
@@ -523,6 +524,17 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
     public MaterialBuilder<P> primitiveOreProcess(MaterialSet... byproduct) {
         return oreBuilder(byproduct).primitive().build();
+    }
+
+    public MaterialBuilder<P> oilOre(int workTicks) {
+        CENTRIFUGE.recipe(DATA_GEN, material.loc("raw"))
+            .inputItem(material.tag("raw"), 1)
+            .outputItem(() -> Blocks.SAND, 1)
+            .outputFluid(material.fluid(), material.fluidAmount(1f))
+            .workTicks(workTicks)
+            .voltage(Voltage.MV)
+            .build();
+        return this;
     }
 
     private <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> toolModel(String sub) {

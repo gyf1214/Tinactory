@@ -91,6 +91,10 @@ public final class AllMaterials {
     public static MaterialSet AIR;
     public static MaterialSet SALT_WATER;
     public static MaterialSet SEA_WATER;
+    public static MaterialSet REFINERY_GAS;
+    public static MaterialSet NAPHTHA;
+    public static MaterialSet LIGHT_FUEL;
+    public static MaterialSet HEAVY_FUEL;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
@@ -110,6 +114,8 @@ public final class AllMaterials {
     public static MaterialSet DIAMOND;
     public static MaterialSet BAUXITE;
     public static MaterialSet ILMENITE;
+    public static MaterialSet LIGHT_OIL;
+    public static MaterialSet HEAVY_OIL;
 
     // misc
     public static MaterialSet TEST;

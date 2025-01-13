@@ -14,9 +14,9 @@ public class SimpleFluid extends EmptyFluid {
     private final FluidAttributes.Builder builder;
     public final int displayColor;
 
-    public SimpleFluid(ResourceLocation tex, int color, int displayColor) {
+    public SimpleFluid(ResourceLocation tex, int texColor, int displayColor) {
         this.builder = FluidAttributes.builder(tex, null)
-            .color(color)
+            .color(texColor)
             .sound(SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
         this.displayColor = displayColor;
     }

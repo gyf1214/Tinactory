@@ -21,6 +21,7 @@ import org.shsts.tinactory.datagen.content.model.IconSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.content.AllItems.BIOMASS;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
@@ -61,11 +62,13 @@ import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.GLOWSTONE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
+import static org.shsts.tinactory.content.AllMaterials.HEAVY_OIL;
 import static org.shsts.tinactory.content.AllMaterials.ILMENITE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
+import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
@@ -426,7 +429,9 @@ public final class Materials {
             .build()
             .material(ILMENITE, METALLIC)
             .oreProcess(MANGANESE, MANGANESE, RUTILE)
-            .build();
+            .build()
+            .material(LIGHT_OIL, DULL).oilOre(240).build()
+            .material(HEAVY_OIL, DULL).oilOre(512).build();
     }
 
     private static void misc() {
@@ -509,8 +514,8 @@ public final class Materials {
             .build();
 
         ALLOY_SMELTER.recipe(DATA_GEN, RUBBER.loc("sheet"))
-            .inputItem(RAW_RUBBER.entry("dust"), 3)
-            .inputItem(SULFUR.entry("dust"), 1)
+            .inputItem(RAW_RUBBER.tag("dust"), 3)
+            .inputItem(SULFUR.tag("dust"), 1)
             .outputItem(RUBBER.entry("sheet"), 3)
             .workTicks(300)
             .voltage(Voltage.ULV)
@@ -600,5 +605,15 @@ public final class Materials {
                 .requires(logTag)
                 .group("planks")
                 .unlockedBy("has_logs", has(logTag)));
+
+        if (!nether) {
+            var leaves = ITEMS.getEntry(mcLoc(prefix + "_leaves"));
+            EXTRACTOR.recipe(DATA_GEN, leaves)
+                .inputItem(leaves, 10)
+                .outputFluid(BIOMASS, 300)
+                .workTicks(128)
+                .voltage(Voltage.MV)
+                .build();
+        }
     }
 }

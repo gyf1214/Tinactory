@@ -746,8 +746,8 @@ public final class Components {
         ResourceLocation tech) {
         ASSEMBLER.recipe(DATA_GEN, block)
             .outputItem(block, 1)
-            .inputItem(mat.entry("plate"), 3)
-            .inputItem(mat.entry("stick"), 2)
+            .inputItem(mat.tag("plate"), 3)
+            .inputItem(mat.tag("stick"), 2)
             .workTicks(140L)
             .voltage(v)
             .transform($ -> v != Voltage.ULV ?
@@ -760,8 +760,8 @@ public final class Components {
         MaterialSet wire, MaterialSet foil, ResourceLocation tech) {
         ASSEMBLER.recipe(DATA_GEN, coil)
             .outputItem(coil, 1)
-            .inputItem(wire.entry("wire"), 8 * v.rank)
-            .inputItem(foil.entry("foil"), 8 * v.rank)
+            .inputItem(wire.tag("wire"), 8 * v.rank)
+            .inputItem(foil.tag("foil"), 8 * v.rank)
             .workTicks(200L)
             .voltage(v)
             .requireTech(tech)

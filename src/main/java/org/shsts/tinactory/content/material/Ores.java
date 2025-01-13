@@ -15,7 +15,9 @@ import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
+import static org.shsts.tinactory.content.AllMaterials.HEAVY_OIL;
 import static org.shsts.tinactory.content.AllMaterials.ILMENITE;
+import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
@@ -116,6 +118,20 @@ public final class Ores {
         ILMENITE = set("ilmenite")
             .color(0xFF463732)
             .ore(OreVariant.DEEPSLATE)
+            .buildObject();
+
+        LIGHT_OIL = set("light_oil")
+            // TODO
+            .color(0xFF000000)
+            .dummies("raw")
+            .fluid("fluid", "oil_light", 1000)
+            .buildObject();
+
+        HEAVY_OIL = set("heavy_oil")
+            // TODO
+            .color(0xFF000000)
+            .dummies("raw")
+            .fluid("fluid", "oil_heavy", 1000)
             .buildObject();
     }
 
