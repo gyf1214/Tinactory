@@ -20,6 +20,7 @@ import static org.shsts.tinactory.content.AllMaterials.ILMENITE;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
+import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
@@ -120,17 +121,21 @@ public final class Ores {
             .ore(OreVariant.DEEPSLATE)
             .buildObject();
 
+        NATURAL_GAS = set("natural_gas")
+            .color(0xFFDCDCDC)
+            .rawOre(OreVariant.DEEPSLATE)
+            .fluid("fluid", "natural_gas", 1000)
+            .buildObject();
+
         LIGHT_OIL = set("light_oil")
-            // TODO
-            .color(0xFF000000)
-            .dummies("raw")
+            .color(0xFF0F0F0F)
+            .rawOre(OreVariant.DEEPSLATE)
             .fluid("fluid", "oil_light", 1000)
             .buildObject();
 
         HEAVY_OIL = set("heavy_oil")
-            // TODO
             .color(0xFF000000)
-            .dummies("raw")
+            .rawOre(OreVariant.DEEPSLATE)
             .fluid("fluid", "oil_heavy", 1000)
             .buildObject();
     }

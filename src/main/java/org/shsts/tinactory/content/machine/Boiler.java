@@ -18,7 +18,6 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
@@ -29,6 +28,7 @@ import java.util.List;
 
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.core.machine.MachineProcessor.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
@@ -122,7 +122,7 @@ public class Boiler extends CapabilityProvider implements
             var amount1 = drained.getAmount();
             if (!drained.isEmpty()) {
                 waterPort.drain(drained, false);
-                outputPort.fill(new FluidStack(AllItems.STEAM.get(), amount1), false);
+                outputPort.fill(new FluidStack(STEAM.get(), amount1), false);
                 leftSteam1 -= amount1;
             }
 

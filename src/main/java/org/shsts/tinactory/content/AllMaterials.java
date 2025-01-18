@@ -13,13 +13,20 @@ import org.shsts.tinactory.content.material.FirstDegrees;
 import org.shsts.tinactory.content.material.HigherDegrees;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.Ores;
+import org.shsts.tinactory.core.common.SimpleFluid;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMaterials {
+    public static final IEntry<SimpleFluid> STEAM;
+
     // Element
     public static MaterialSet IRON;
     public static MaterialSet GOLD;
@@ -86,6 +93,11 @@ public final class AllMaterials {
     public static MaterialSet SULFURIC_ACID;
     public static MaterialSet NITRIC_ACID;
     public static MaterialSet AMMONIA;
+    public static MaterialSet METHANE;
+    public static MaterialSet ETHANE;
+    public static MaterialSet PROPANE;
+    public static MaterialSet ETHYLENE;
+    public static MaterialSet PROPENE;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;
@@ -115,6 +127,7 @@ public final class AllMaterials {
     public static MaterialSet DIAMOND;
     public static MaterialSet BAUXITE;
     public static MaterialSet ILMENITE;
+    public static MaterialSet NATURAL_GAS;
     public static MaterialSet LIGHT_OIL;
     public static MaterialSet HEAVY_OIL;
 
@@ -129,6 +142,8 @@ public final class AllMaterials {
     public static MaterialSet GLASS;
 
     static {
+        STEAM = simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
+
         SET = new HashMap<>();
         Elements.init();
         FirstDegrees.init();

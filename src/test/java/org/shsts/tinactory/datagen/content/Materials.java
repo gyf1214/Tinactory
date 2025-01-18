@@ -25,7 +25,6 @@ import static org.shsts.tinactory.content.AllItems.BIOMASS;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
-import static org.shsts.tinactory.content.AllItems.STEAM;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
@@ -76,6 +75,7 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
+import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
@@ -97,6 +97,7 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
+import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
@@ -436,6 +437,7 @@ public final class Materials {
             .material(ILMENITE, METALLIC)
             .oreProcess(MANGANESE, MANGANESE, RUTILE)
             .build()
+            .material(NATURAL_GAS, DULL).oilOre(192).build()
             .material(LIGHT_OIL, DULL).oilOre(240).build()
             .material(HEAVY_OIL, DULL).oilOre(512).build();
     }

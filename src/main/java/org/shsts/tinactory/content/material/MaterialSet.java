@@ -265,6 +265,13 @@ public class MaterialSet {
             return this;
         }
 
+        public Builder<P> existing(String sub, IEntry<? extends Fluid> fluid, int baseAmount) {
+            assert !fluids.containsKey(sub);
+            var loc = fluid.loc();
+            fluids.put(sub, new FluidEntry(loc, fluid, baseAmount));
+            return this;
+        }
+
         public Builder<P> alias(String sub, String sub2) {
             var entry = items.get(sub2);
             assert entry != null;
@@ -414,7 +421,7 @@ public class MaterialSet {
                 .fluidPrimary("gas");
         }
 
-        public Builder<P> ore(OreVariant variant) {
+        public Builder<P> rawOre(OreVariant variant) {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
@@ -426,8 +433,14 @@ public class MaterialSet {
                     .register();
                 blocks.put("ore", new BlockEntry(ore.loc(), ore));
             }
-            return dummies("raw", "crushed", "crushed_centrifuged", "crushed_purified")
-                .dummies("dust_impure", "dust_pure").dust();
+            return dummies("raw");
+        }
+
+        public Builder<P> ore(OreVariant variant) {
+            return rawOre(variant)
+                .dummies("crushed", "crushed_centrifuged", "crushed_purified")
+                .dummies("dust_impure", "dust_pure")
+                .dust();
         }
 
         public class ToolBuilder extends SimpleBuilder<Unit, Builder<P>, ToolBuilder> {

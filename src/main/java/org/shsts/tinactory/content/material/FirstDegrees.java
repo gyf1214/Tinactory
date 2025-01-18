@@ -15,6 +15,8 @@ import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
+import static org.shsts.tinactory.content.AllMaterials.ETHANE;
+import static org.shsts.tinactory.content.AllMaterials.ETHYLENE;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_SULFIDE;
@@ -24,10 +26,13 @@ import static org.shsts.tinactory.content.AllMaterials.LITHIUM_BRINE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.METHANE;
 import static org.shsts.tinactory.content.AllMaterials.NITRIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
+import static org.shsts.tinactory.content.AllMaterials.PROPANE;
+import static org.shsts.tinactory.content.AllMaterials.PROPENE;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
@@ -35,6 +40,7 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
+import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
@@ -50,6 +56,7 @@ public final class FirstDegrees {
         WATER = set("water")
             .color(0xFF0000FF)
             .existing("liquid", Fluids.WATER, 1000)
+            .existing("gas", STEAM, 1000)
             .fluidPrimary("liquid")
             .buildObject();
 
@@ -143,6 +150,11 @@ public final class FirstDegrees {
         SULFURIC_ACID = fluid("sulfuric_acid", 0xFFFC5304, "liquid");
         NITRIC_ACID = liquid("nitric_acid", 0xFFCCCC00);
         AMMONIA = gas("ammonia", 0xFF3F3480);
+        METHANE = gas("methane", 0xFFFF0078);
+        ETHANE = gas("ethane", 0xFFC8C8FF);
+        PROPANE = gas("propane", 0xFFFAE250);
+        ETHYLENE = gas("ethylene", 0xFFE1E1E1);
+        PROPENE = gas("propene", 0xFFFFDD55);
     }
 
     public static void init() {}

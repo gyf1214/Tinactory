@@ -45,6 +45,7 @@ public final class Technologies {
     public static ResourceLocation COLD_WORKING;
     public static ResourceLocation ELECTROLYZING;
     public static ResourceLocation CHEMISTRY;
+    public static ResourceLocation OIL_PROCESSING;
 
     public static void init() {
         TECHS = DATA_GEN.createHandler(TechProvider::new);
@@ -146,9 +147,14 @@ public final class Technologies {
             .displayItem(AllMaterials.GOLD.entry("wire"))
             .register();
 
-        CHEMISTRY = factory.tech("chemistry")
+        CHEMISTRY = factory.child("chemistry")
             .maxProgress(40L)
             .displayItem(AllItems.RESEARCH_EQUIPMENT.get(Voltage.LV))
+            .register();
+
+        OIL_PROCESSING = factory.tech("old_processing")
+            .maxProgress(60L)
+            .displayItem(AllMaterials.SULFUR.entry("dust"))
             .register();
     }
 

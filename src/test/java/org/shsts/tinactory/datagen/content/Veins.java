@@ -15,9 +15,12 @@ import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
+import static org.shsts.tinactory.content.AllMaterials.HEAVY_OIL;
 import static org.shsts.tinactory.content.AllMaterials.ILMENITE;
+import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
+import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
@@ -72,6 +75,11 @@ public final class Veins {
             .vein("bauxite", 0.5)
             .ore(BAUXITE, 0.8)
             .ore(ILMENITE, 0.6)
+            .build()
+            .vein("oil", 0.3)
+            .ore(NATURAL_GAS, 0.3)
+            .ore(LIGHT_OIL, 0.4)
+            .ore(HEAVY_OIL, 0.7)
             .build();
     }
 
