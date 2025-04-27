@@ -407,9 +407,12 @@ public class MaterialSet {
                 .fluidPrimary("molten");
         }
 
+        public Builder<P> liquid(String sub, int color) {
+            return fluid(sub, gregtech("blocks/material_sets/dull/liquid"), color, color, 1000);
+        }
+
         public Builder<P> liquid() {
-            return fluid("liquid", gregtech("blocks/material_sets/dull/liquid"), 1000)
-                .fluidPrimary("liquid");
+            return liquid("liquid", color).fluidPrimary("liquid");
         }
 
         public Builder<P> gas(String sub, int color) {
@@ -417,8 +420,7 @@ public class MaterialSet {
         }
 
         public Builder<P> gas() {
-            return fluid("gas", gregtech("blocks/material_sets/dull/gas"), 1000)
-                .fluidPrimary("gas");
+            return gas("gas", color).fluidPrimary("gas");
         }
 
         public Builder<P> rawOre(OreVariant variant) {

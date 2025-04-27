@@ -147,7 +147,15 @@ public final class FirstDegrees {
         CARBON_DIOXIDE = gas("carbon_dioxide", 0xFFA9D0F5);
         HYDROGEN_CHLORIDE = fluid("hydrogen_chloride", 0xFFBCBCB5, "gas", "hydrochloric_acid");
         HYDROGEN_SULFIDE = fluid("hydrogen_sulfide", 0xFFFC5304, "gas");
-        SULFURIC_ACID = fluid("sulfuric_acid", 0xFFFC5304, "liquid");
+
+        SULFURIC_ACID = set("sulfuric_acid")
+            .color(0xFFFC5304)
+            .fluid("liquid", "sulfuric_acid", 1000)
+            .liquid("dilute", 0xC07820)
+            .gas("gas", 0xA0A014)
+            .fluidPrimary("liquid")
+            .buildObject();
+
         NITRIC_ACID = liquid("nitric_acid", 0xFFCCCC00);
         AMMONIA = gas("ammonia", 0xFF3F3480);
         METHANE = gas("methane", 0xFFFF0078);
