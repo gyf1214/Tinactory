@@ -421,7 +421,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
     private MaterialBuilder<P> compose(Voltage v, IRecipeType<ProcessingRecipe.Builder> recipeType,
         boolean decompose, long workTicks, String output, Object... components) {
-        var loc = output.equals("fluid") ? material.fluidLoc() : material.loc(output);
+        var loc = material.hasItem(output) ? material.loc(output) : material.fluidLoc(output);
 
         var alloyCount = 0;
         var totalCount = 0;
@@ -491,8 +491,12 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             .centrifuge(voltage, components);
     }
 
+    public MaterialBuilder<P> fluidMix(Voltage voltage, String sub, Object... components) {
+        return compose(voltage, MIXER, false, 20L, sub, components);
+    }
+
     public MaterialBuilder<P> fluidMix(Voltage voltage, Object... components) {
-        return compose(voltage, MIXER, false, 20L, "fluid", components);
+        return fluidMix(voltage, "fluid", components);
     }
 
     public MaterialBuilder<P> alloyOnly(Voltage voltage, Object... components) {

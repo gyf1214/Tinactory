@@ -101,6 +101,7 @@ import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
+import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
@@ -348,7 +349,10 @@ public final class Materials {
             .material(LITHIUM_CARBONATE, DULL).build()
             .material(POTASSIUM_NITRATE, FINE).build()
             .material(SODIUM_HYDROXIDE, DULL).build()
-            .material(CALCIUM_HYDROXIDE, DULL).build();
+            .material(CALCIUM_HYDROXIDE, DULL).build()
+            .material(SULFURIC_ACID, DULL)
+            .fluidMix(Voltage.MV, "dilute", SULFURIC_ACID, 1, WATER, 1)
+            .build();
     }
 
     private static void higherDegrees() {
@@ -357,7 +361,7 @@ public final class Materials {
             .mix(Voltage.LV, BRASS, 7, ALUMINIUM, 1, COBALT, 1)
             .build()
             .material(SALT_WATER, DULL)
-            .fluidMix(Voltage.MV, WATER, 1, SODIUM_CHLORIDE, 1)
+            .fluidMix(Voltage.MV, SODIUM_CHLORIDE, 1, WATER, 1)
             .build();
     }
 
