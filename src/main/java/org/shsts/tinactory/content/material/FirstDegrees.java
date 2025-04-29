@@ -151,8 +151,8 @@ public final class FirstDegrees {
         SULFURIC_ACID = set("sulfuric_acid")
             .color(0xFFFC5304)
             .fluid("liquid", "sulfuric_acid", 1000)
-            .liquid("dilute", 0xC07820)
-            .gas("gas", 0xA0A014)
+            .liquid("dilute", 0xFFC07820)
+            .gas("gas", 0xFFA0A014)
             .fluidPrimary("liquid")
             .buildObject();
 
