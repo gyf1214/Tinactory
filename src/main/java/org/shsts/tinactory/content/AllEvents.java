@@ -18,6 +18,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllRegistries.EVENTS;
 import static org.shsts.tinycorelib.api.CoreLibKeys.CLIENT_LOAD_LOC;
+import static org.shsts.tinycorelib.api.CoreLibKeys.CLIENT_TICK_LOC;
 import static org.shsts.tinycorelib.api.CoreLibKeys.REMOVED_BY_CHUNK_LOC;
 import static org.shsts.tinycorelib.api.CoreLibKeys.REMOVED_IN_WORLD_LOC;
 import static org.shsts.tinycorelib.api.CoreLibKeys.SERVER_LOAD_LOC;
@@ -29,6 +30,7 @@ public final class AllEvents {
     public static final IEntry<IEvent<Level>> REMOVED_IN_WORLD;
     public static final IEntry<IEvent<Level>> REMOVED_BY_CHUNK;
     public static final IEntry<IEvent<Level>> SERVER_TICK;
+    public static final IEntry<IEvent<Level>> CLIENT_TICK;
 
     public record OnUseArg(Player player, InteractionHand hand, BlockHitResult hitResult) {}
 
@@ -49,6 +51,7 @@ public final class AllEvents {
         REMOVED_IN_WORLD = EVENTS.getEntry(REMOVED_IN_WORLD_LOC);
         REMOVED_BY_CHUNK = EVENTS.getEntry(REMOVED_BY_CHUNK_LOC);
         SERVER_TICK = EVENTS.getEntry(SERVER_TICK_LOC);
+        CLIENT_TICK = EVENTS.getEntry(CLIENT_TICK_LOC);
 
         SERVER_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
         SERVER_PLACE = REGISTRATE.event("server_place");

@@ -7,6 +7,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.common.WeakMap;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -27,12 +28,10 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider
     implements IEventSubscriber {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final int CHECK_CYCLE = 40;
-
     public final BlockEntity blockEntity;
     protected MultiBlockManager manager;
     @Nullable
-    protected WeakMap.Ref<MultiBlockBase> ref = null;
+    private WeakMap.Ref<MultiBlockBase> ref = null;
     private int checkTick = 0;
     private boolean preInvalid = false;
 
@@ -59,9 +58,10 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider
 
     public void invalidate() {
         if (ref != null) {
+            LOGGER.debug("{} invalidate", this);
             ref.invalidate();
             ref = null;
-            checkTick = 0;
+            checkTick = TinactoryConfig.INSTANCE.multiblockCheckCycle.get();
             onInvalidate();
         }
     }
@@ -76,7 +76,7 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider
         invalidate();
     }
 
-    private void onServerTick() {
+    protected void onServerTick() {
         if (preInvalid && checkMultiBlock().isEmpty()) {
             invalidate();
         }
@@ -84,12 +84,12 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider
         if (ref != null) {
             return;
         }
-        if (++checkTick > CHECK_CYCLE) {
+        if (--checkTick < 0) {
             checkMultiBlock().ifPresent(blocks -> {
                 manager.register(this, blocks);
                 onRegister();
             });
-            checkTick = 0;
+            checkTick = TinactoryConfig.INSTANCE.multiblockCheckCycle.get();
         }
     }
 

@@ -173,7 +173,7 @@ public class NetworkBase {
     }
 
     protected void connectConflict(BlockPos pos) {
-        LOGGER.debug("{}: conflict detected at {}:{}", this, world.dimension(), pos);
+        LOGGER.debug("{}: conflict detected at {}:{}", this, world.dimension().location(), pos);
         state = State.CONFLICT;
         bfsContext.reset();
     }

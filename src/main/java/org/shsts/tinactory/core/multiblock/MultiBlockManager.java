@@ -50,7 +50,7 @@ public final class MultiBlockManager {
     }
 
     public static void onUnload(Level world) {
-        LOGGER.debug("remove multi block manager for {}", world.dimension());
+        LOGGER.debug("remove multi block manager for {}", world.dimension().location());
         var manager = INSTANCES.get(world.dimension());
         if (manager != null) {
             manager.destroy();

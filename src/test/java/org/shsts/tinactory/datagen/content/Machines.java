@@ -93,6 +93,7 @@ import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMultiBlocks.BLAST_FURNACE;
+import static org.shsts.tinactory.content.AllMultiBlocks.CLEANROOM;
 import static org.shsts.tinactory.content.AllMultiBlocks.DISTILLATION_TOWER;
 import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.SIFTER;
@@ -108,7 +109,6 @@ import static org.shsts.tinactory.content.AllTags.circuit;
 import static org.shsts.tinactory.content.AllTags.machineTag;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
-import static org.shsts.tinactory.datagen.content.Models.multiBlock;
 import static org.shsts.tinactory.datagen.content.Models.multiBlockInterface;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_OUT_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
@@ -191,11 +191,14 @@ public final class Machines {
             .tag(MINEABLE_WITH_WRENCH)
             .build();
 
-        multiBlockItem(BLAST_FURNACE, "heatproof", "blast_furnace", AllRecipes.BLAST_FURNACE);
-        multiBlockItem(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
-        multiBlockItem(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
-        multiBlockItem(DISTILLATION_TOWER, "clean_stainless_steel", "distillation_tower",
-            AllRecipes.DISTILLATION);
+        multiBlock(BLAST_FURNACE, "heatproof", "blast_furnace", AllRecipes.BLAST_FURNACE);
+        multiBlock(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
+        multiBlock(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
+        multiBlock(DISTILLATION_TOWER, "clean_stainless_steel", "distillation_tower", AllRecipes.DISTILLATION);
+        DATA_GEN.block(CLEANROOM)
+            .blockState(machineBlock("casings/cleanroom/plascrete", "multiblock/cleanroom"))
+            .tag(MINEABLE_WITH_WRENCH)
+            .build();
 
         MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
             .blockState(multiBlockInterface(IO_TEX))
@@ -212,10 +215,10 @@ public final class Machines {
                 .build());
     }
 
-    private static void multiBlockItem(IEntry<? extends Block> block, String casing,
+    private static void multiBlock(IEntry<? extends Block> block, String casing,
         String overlay, IRecipeType<?> type) {
         DATA_GEN.block(block)
-            .blockState(multiBlock(casing, overlay))
+            .blockState(Models.multiBlock(casing, overlay))
             .tag(MINEABLE_WITH_WRENCH)
             .itemTag(machineTag(type))
             .build();

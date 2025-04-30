@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.content.AllEvents.CLIENT_TICK;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
@@ -44,6 +46,9 @@ public class MultiBlockInterface extends Machine {
 
     public final Voltage voltage;
     private IFlexibleContainer container;
+    private boolean firstTick = false;
+    @Nullable
+    private BlockPos multiBlockPos = null;
     @Nullable
     private MultiBlock multiBlock = null;
     @Nullable
@@ -143,11 +148,42 @@ public class MultiBlockInterface extends Machine {
         return super.canPlayerInteract(player) && multiBlock != null;
     }
 
+    private void updateMultiBlock() {
+        var world = blockEntity.getLevel();
+        assert world != null && world.isClientSide;
+
+        LOGGER.debug("update multiBlock current={}, pos={}, firstTick={}",
+            multiBlock, multiBlockPos, firstTick);
+
+        if (multiBlockPos != null) {
+            var be1 = world.getBlockEntity(multiBlockPos);
+            if (be1 == null) {
+                LOGGER.debug("cannot get blockEntity {}:{}", world.dimension().location(), multiBlockPos);
+                return;
+            }
+            MultiBlock.tryGet(be1).ifPresentOrElse(this::setMultiBlock, this::resetMultiBlock);
+        } else {
+            resetMultiBlock();
+        }
+
+        if (multiBlock != null) {
+            invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);
+        }
+    }
+
+    private void onClientTick() {
+        if (!firstTick) {
+            updateMultiBlock();
+            firstTick = true;
+        }
+    }
+
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
         eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CLIENT_TICK.get(), $ -> onClientTick());
         eventManager.subscribe(CONTAINER_CHANGE.get(), this::onContainerChange);
     }
 
@@ -228,23 +264,11 @@ public class MultiBlockInterface extends Machine {
     @Override
     public void deserializeOnUpdate(CompoundTag tag) {
         super.deserializeOnUpdate(tag);
-        var world = blockEntity.getLevel();
-        assert world != null;
 
-        if (tag.contains("multiBlockPos", Tag.TAG_COMPOUND)) {
-            var pos = CodecHelper.parseBlockPos(tag.getCompound("multiBlockPos"));
-            var be1 = world.getBlockEntity(pos);
-            if (be1 == null) {
-                return;
-            }
-            MultiBlock.tryGet(be1)
-                .ifPresentOrElse(this::setMultiBlock, this::resetMultiBlock);
-        } else {
-            resetMultiBlock();
-        }
-
-        if (multiBlock != null) {
-            invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);
+        multiBlockPos = tag.contains("multiBlockPos", Tag.TAG_COMPOUND) ?
+            CodecHelper.parseBlockPos(tag.getCompound("multiBlockPos")) : null;
+        if (firstTick) {
+            updateMultiBlock();
         }
     }
 }

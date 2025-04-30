@@ -41,7 +41,7 @@ public class SmartEntityBlock extends Block implements EntityBlock {
         U create(Properties properties, Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu);
     }
 
-    protected SmartEntityBlock(Properties properties,
+    public SmartEntityBlock(Properties properties,
         Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu) {
         super(properties);
         this.entityType = Lazy.of(entityType);

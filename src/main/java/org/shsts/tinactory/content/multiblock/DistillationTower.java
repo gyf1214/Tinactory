@@ -42,11 +42,16 @@ public class DistillationTower extends MultiBlock {
     }
 
     @Override
+    protected void updateMultiBlockInterface() {
+        super.updateMultiBlockInterface();
+        setLayout(DISTILLATION_TOWER.get(height - 3));
+    }
+
+    @Override
     public void deserializeOnUpdate(CompoundTag tag) {
-        super.deserializeOnUpdate(tag);
         if (tag.contains("height", Tag.TAG_INT)) {
             height = tag.getInt("height");
-            setLayout(DISTILLATION_TOWER.get(height - 3));
         }
+        super.deserializeOnUpdate(tag);
     }
 }

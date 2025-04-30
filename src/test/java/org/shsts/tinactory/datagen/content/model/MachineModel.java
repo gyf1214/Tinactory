@@ -11,10 +11,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
@@ -217,6 +219,17 @@ public class MachineModel {
         }
     }
 
+    private void fixed(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var prov = ctx.provider().models();
+        var model = blockModel(ctx.id(), ctx.object(), false, prov);
+        var workingModel = blockModel(ctx.id() + "_active", ctx.object(), true, prov);
+
+        ctx.provider().getVariantBuilder(ctx.object())
+            .forAllStates(state -> ConfiguredModel.builder()
+                .modelFile(state.getValue(MachineBlock.WORKING) ? workingModel : model)
+                .build());
+    }
+
     public <U extends Block> Consumer<IEntryDataContext<Block, U, BlockStateProvider>> blockState() {
         return ctx -> {
             if (ctx.object() instanceof PrimitiveBlock) {
@@ -226,6 +239,8 @@ public class MachineModel {
                 sided(ctx);
             } else if (ctx.object() instanceof MachineBlock) {
                 machine(ctx);
+            } else if (ctx.object() instanceof FixedBlock) {
+                fixed(ctx);
             } else {
                 throw new IllegalArgumentException();
             }

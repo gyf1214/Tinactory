@@ -46,6 +46,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
         gregtech("gui/progress_bar/progress_bar_boiler_fuel_steel"), 18, 36);
     public static final Texture PROGRESS_LATH_BASE = new Texture(
         gregtech("gui/progress_bar/progress_bar_lathe_base"), 5, 18);
+    public static final Texture PROGRESS_CLEANROOM = new Texture(
+        gregtech("gui/progress_bar/progress_bar_turbine_rotor_speed"), 62, 14);
 
     public static final Texture HEAT_EMPTY = new Texture(
         gregtech("gui/progress_bar/progress_bar_boiler_empty_steel"), 10, 54);

@@ -25,7 +25,7 @@ public final class NetworkManager {
     private final Map<String, NetworkBase> teamNetworks = new HashMap<>();
 
     public NetworkManager(Level world) {
-        LOGGER.debug("create network manager for {}", world.dimension());
+        LOGGER.debug("create network manager for {}", world.dimension().location());
         this.world = world;
     }
 
@@ -39,7 +39,7 @@ public final class NetworkManager {
 
     public void putNetworkAtPos(BlockPos pos, NetworkBase network) {
         assert !hasNetworkAtPos(pos);
-        LOGGER.trace("track block at {}:{} to network {}", world.dimension(), pos, network);
+        LOGGER.trace("track block at {}:{} to network {}", world.dimension().location(), pos, network);
         network.addToMap(networkPosMap, pos);
     }
 
@@ -55,7 +55,7 @@ public final class NetworkManager {
             }
             teamNetworks.put(teamName, network);
 
-            LOGGER.debug("register network {} at center {}:{}", network, world.dimension(), center);
+            LOGGER.debug("register network {} at center {}:{}", network, world.dimension().location(), center);
             invalidatePos(center);
             networks.put(center, network);
             return true;
@@ -98,7 +98,7 @@ public final class NetworkManager {
     }
 
     public static void onUnload(Level world) {
-        LOGGER.debug("remove network manager for {}", world.dimension());
+        LOGGER.debug("remove network manager for {}", world.dimension().location());
         var manager = INSTANCES.get(world.dimension());
         if (manager != null) {
             manager.destroy();

@@ -4,10 +4,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import org.shsts.tinactory.content.multiblock.CleanRoom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
+import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -24,13 +26,16 @@ public final class AllMultiBlocks {
     public static final IEntry<PrimitiveBlock> SIFTER;
     public static final IEntry<PrimitiveBlock> VACUUM_FREEZER;
     public static final IEntry<PrimitiveBlock> DISTILLATION_TOWER;
+    public static final IEntry<FixedBlock> CLEANROOM;
 
     // solid blocks
-    public static final Set<IEntry<Block>> SOLID_CASING;
+    public static final Set<IEntry<Block>> SOLID_CASINGS;
     public static final IEntry<Block> HEATPROOF_CASING;
     public static final IEntry<Block> SOLID_STEEL_CASING;
     public static final IEntry<Block> FROST_PROOF_CASING;
     public static final IEntry<Block> CLEAN_STAINLESS_CASING;
+    public static final IEntry<Block> PLASCRETE;
+    public static final IEntry<Block> FILTER_CASING;
     // coil blocks
     public static final Set<IEntry<CoilBlock>> COIL_BLOCKS;
     public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
@@ -43,11 +48,13 @@ public final class AllMultiBlocks {
     static {
         CASING_PROPERTY = $ -> $.strength(2f, 8f).requiresCorrectToolForDrops();
 
-        SOLID_CASING = new HashSet<>();
+        SOLID_CASINGS = new HashSet<>();
         HEATPROOF_CASING = solid("heatproof");
         SOLID_STEEL_CASING = solid("solid_steel");
         FROST_PROOF_CASING = solid("frost_proof");
         CLEAN_STAINLESS_CASING = solid("clean_stainless_steel");
+        PLASCRETE = solid("plascrete", false);
+        FILTER_CASING = solid("filter_casing", false);
 
         COIL_BLOCKS = new HashSet<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
@@ -60,7 +67,6 @@ public final class AllMultiBlocks {
 
         BLAST_FURNACE = multiBlock("blast_furnace")
             .blockEntity()
-            .transform(RecipeProcessor::blastFurnace)
             .child(MultiBlock::blastFurnace)
             .appearanceBlock(HEATPROOF_CASING)
             .spec()
@@ -86,9 +92,7 @@ public final class AllMultiBlocks {
 
         SIFTER = multiBlock("sifter")
             .blockEntity()
-            .transform(RecipeProcessor.multiBlock(
-                AllRecipes.SIFTER, true))
-            .child(MultiBlock::simple)
+            .child(MultiBlock.simple(AllRecipes.SIFTER, true))
             .layout(AllLayouts.SIFTER)
             .appearanceBlock(SOLID_STEEL_CASING)
             .spec()
@@ -133,9 +137,7 @@ public final class AllMultiBlocks {
 
         VACUUM_FREEZER = multiBlock("vacuum_freezer")
             .blockEntity()
-            .transform(RecipeProcessor.multiBlock(
-                AllRecipes.VACUUM_FREEZER, true))
-            .child(MultiBlock::simple)
+            .child(MultiBlock.simple(AllRecipes.VACUUM_FREEZER, true))
             .layout(AllLayouts.VACUUM_FREEZER)
             .appearanceBlock(FROST_PROOF_CASING)
             .spec()
@@ -164,8 +166,6 @@ public final class AllMultiBlocks {
 
         DISTILLATION_TOWER = multiBlock("distillation_tower")
             .blockEntity()
-            .transform(RecipeProcessor.multiBlock(
-                AllRecipes.DISTILLATION, true))
             .child(MultiBlock::distillationTower)
             .appearanceBlock(CLEAN_STAINLESS_CASING)
             .spec()
@@ -191,6 +191,21 @@ public final class AllMultiBlocks {
             .build()
             .end()
             .buildObject();
+
+        CLEANROOM = BlockEntityBuilder.builder("multi_block/cleanroom", FixedBlock::new)
+            .translucent()
+            .blockEntity()
+            .child(MultiBlock::cleanRoom)
+            .appearanceBlock(PLASCRETE)
+            .spec(CleanRoom::spec)
+            .baseBlock(PLASCRETE)
+            .ceilingBlock(FILTER_CASING)
+            .wallTag(CLEANROOM_WALL)
+            .maxSize(7)
+            .build()
+            .build()
+            .end()
+            .buildObject();
     }
 
     private static BlockEntityBuilder<PrimitiveBlock, ?> multiBlock(String name) {
@@ -198,12 +213,18 @@ public final class AllMultiBlocks {
             .translucent();
     }
 
-    private static IEntry<Block> solid(String name) {
+    private static IEntry<Block> solid(String name, boolean addToSet) {
         var ret = REGISTRATE.block("multi_block/solid/" + name, Block::new)
             .properties(CASING_PROPERTY)
             .register();
-        SOLID_CASING.add(ret);
+        if (addToSet) {
+            SOLID_CASINGS.add(ret);
+        }
         return ret;
+    }
+
+    private static IEntry<Block> solid(String name) {
+        return solid(name, true);
     }
 
     private static IEntry<CoilBlock> coil(String name, int temperature) {

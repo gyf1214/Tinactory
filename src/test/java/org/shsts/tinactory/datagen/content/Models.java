@@ -162,8 +162,7 @@ public final class Models {
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> solidBlock(
-        String tex) {
+        U, BlockStateProvider>> solidBlock(String tex) {
         return ctx -> {
             var model = ctx.provider().models()
                 .cubeAll(ctx.id(), gregtech("blocks/" + tex));

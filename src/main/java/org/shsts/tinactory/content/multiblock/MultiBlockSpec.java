@@ -171,6 +171,23 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         ctx.setProperty("height", h1 - h2);
     }
 
+    public static boolean checkInterface(MultiBlockCheckCtx ctx, BlockPos pos) {
+        var be = ctx.getBlockEntity(pos);
+        if (be.isEmpty()) {
+            return false;
+        }
+        var machine = MACHINE.tryGet(be.get());
+        if (machine.isEmpty() || !(machine.get() instanceof MultiBlockInterface inter)) {
+            return false;
+        }
+        if (ctx.hasProperty("interface")) {
+            ctx.setFailed();
+        } else {
+            ctx.setProperty("interface", inter);
+        }
+        return true;
+    }
+
     public static class Builder<P> extends SimpleBuilder<MultiBlockSpec, P, Builder<P>> {
         private final List<Layer> layers = new ArrayList<>();
         private final Map<Character, BiConsumer<MultiBlockCheckCtx, BlockPos>> checkers = new HashMap<>();
@@ -202,23 +219,6 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         public Builder<P> check(char ch, BiConsumer<MultiBlockCheckCtx, BlockPos> checker) {
             checkers.put(ch, checker);
             return this;
-        }
-
-        private static boolean checkInterface(MultiBlockCheckCtx ctx, BlockPos pos) {
-            var be = ctx.getBlockEntity(pos);
-            if (be.isEmpty()) {
-                return false;
-            }
-            var machine = MACHINE.tryGet(be.get());
-            if (machine.isEmpty() || !(machine.get() instanceof MultiBlockInterface inter)) {
-                return false;
-            }
-            if (ctx.hasProperty("interface")) {
-                ctx.setFailed();
-            } else {
-                ctx.setProperty("interface", inter);
-            }
-            return true;
         }
 
         public Builder<P> block(char ch, Supplier<Block> block, boolean allowInterface) {

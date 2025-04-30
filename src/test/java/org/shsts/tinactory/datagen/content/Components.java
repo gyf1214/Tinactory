@@ -88,10 +88,12 @@ import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMultiBlocks.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllMultiBlocks.CUPRONICKEL_COIL_BLOCK;
+import static org.shsts.tinactory.content.AllMultiBlocks.FILTER_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.GRATE_MACHINE_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiBlocks.KANTHAL_COIL_BLOCK;
-import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_CASING;
+import static org.shsts.tinactory.content.AllMultiBlocks.PLASCRETE;
+import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_CASINGS;
 import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
@@ -101,12 +103,14 @@ import static org.shsts.tinactory.content.AllRecipes.LASER_ENGRAVER;
 import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
+import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
 import static org.shsts.tinactory.content.AllTags.COIL;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
+import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
@@ -245,10 +249,25 @@ public final class Components {
             .model(basicItem("metaitems/rubber_drop"))
             .build();
 
-        SOLID_CASING.forEach(block -> DATA_GEN.block(block)
+        SOLID_CASINGS.forEach(block -> DATA_GEN.block(block)
             .blockState(solidBlock("casings/solid/machine_casing_" + name(block.id(), -1)))
             .tag(MINEABLE_WITH_WRENCH)
             .build());
+
+        DATA_GEN.block(PLASCRETE)
+            .blockState(solidBlock("casings/cleanroom/plascrete"))
+            .tag(MINEABLE_WITH_WRENCH)
+            .tag(CLEANROOM_WALL)
+            .build()
+            .block(FILTER_CASING)
+            .blockState(ctx -> {
+                var model = ctx.provider().models()
+                    .cubeColumn(ctx.id(), gregtech("blocks/casings/cleanroom/plascrete"),
+                        gregtech("blocks/casings/cleanroom/filter_casing"));
+                ctx.provider().simpleBlock(ctx.object(), model);
+            })
+            .tag(MINEABLE_WITH_WRENCH)
+            .build();
 
         COIL_BLOCKS.forEach(coil -> DATA_GEN.block(coil)
             .blockState(solidBlock("casings/coils/machine_coil_" + name(coil.id(), -1)))

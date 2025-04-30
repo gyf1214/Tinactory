@@ -1,7 +1,6 @@
 package org.shsts.tinactory.core.multiblock;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -19,13 +18,21 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
+import org.shsts.tinactory.content.multiblock.CleanRoom;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.content.multiblock.MultiBlockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.core.IBuilder;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -41,6 +48,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllEvents.CLIENT_TICK;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
@@ -53,6 +61,9 @@ public class MultiBlock extends MultiBlockBase {
     private final Consumer<MultiBlockCheckCtx> checker;
     private final Supplier<BlockState> appearance;
 
+    private boolean firstTick = false;
+    @Nullable
+    protected BlockPos multiBlockInterfacePos = null;
     /**
      * must set this during checkMultiBlock, or fail
      */
@@ -203,7 +214,44 @@ public class MultiBlock extends MultiBlockBase {
         return AllCapabilities.ELECTRIC_MACHINE.get(blockEntity);
     }
 
-    @Nonnull
+    /**
+     * Should only be called on Client
+     */
+    protected void updateMultiBlockInterface() {
+        var world = blockEntity.getLevel();
+        assert world != null && world.isClientSide;
+
+        LOGGER.debug("update multiBlockInterface current={}, pos={}, firstTick={}",
+            multiBlockInterface, multiBlockInterfacePos, firstTick);
+
+        if (multiBlockInterfacePos != null) {
+            var be1 = world.getBlockEntity(multiBlockInterfacePos);
+            if (be1 == null) {
+                LOGGER.debug("cannot get blockEntity {}:{}",
+                    world.dimension().location(), multiBlockInterfacePos);
+                return;
+            }
+            MACHINE.tryGet(be1).ifPresent(machine ->
+                multiBlockInterface = (MultiBlockInterface) machine);
+        } else {
+            multiBlockInterface = null;
+        }
+        invoke(blockEntity, SET_MACHINE_CONFIG);
+    }
+
+    private void onClientTick() {
+        if (!firstTick) {
+            updateMultiBlockInterface();
+            firstTick = true;
+        }
+    }
+
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        super.subscribeEvents(eventManager);
+        eventManager.subscribe(CLIENT_TICK.get(), $ -> onClientTick());
+    }
+
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         return LazyOptional.empty();
@@ -221,23 +269,11 @@ public class MultiBlock extends MultiBlockBase {
 
     @Override
     public void deserializeOnUpdate(CompoundTag tag) {
-        var world = blockEntity.getLevel();
-        assert world != null;
-
-        if (tag.contains("interfacePos", Tag.TAG_COMPOUND)) {
-            var pos = CodecHelper.parseBlockPos(tag.getCompound("interfacePos"));
-
-            var be1 = world.getBlockEntity(pos);
-            if (be1 == null) {
-                return;
-            }
-            MACHINE.tryGet(be1).ifPresent(machine ->
-                multiBlockInterface = (MultiBlockInterface) machine);
-        } else {
-            multiBlockInterface = null;
+        multiBlockInterfacePos = tag.contains("interfacePos", Tag.TAG_COMPOUND) ?
+            CodecHelper.parseBlockPos(tag.getCompound("interfacePos")) : null;
+        if (firstTick) {
+            updateMultiBlockInterface();
         }
-
-        invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 
     public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, MultiBlock>,
@@ -273,9 +309,13 @@ public class MultiBlock extends MultiBlockBase {
             return appearance(() -> val.get().defaultBlockState());
         }
 
+        public <S extends IBuilder<? extends Consumer<MultiBlockCheckCtx>, Builder<P>, S>> S spec(
+            Function<Builder<P>, S> child) {
+            return child(child).onCreateObject($ -> this.checker = $);
+        }
+
         public MultiBlockSpec.Builder<Builder<P>> spec() {
-            return child(MultiBlockSpec::builder)
-                .onCreateObject(spec -> this.checker = spec);
+            return spec(MultiBlockSpec::builder);
         }
 
         @Override
@@ -284,16 +324,25 @@ public class MultiBlock extends MultiBlockBase {
         }
     }
 
-    public static <P> Builder<P> simple(IBlockEntityTypeBuilder<P> parent) {
-        return new Builder<>(parent, MultiBlock::new);
+    public static <P, R extends ProcessingRecipe,
+        B extends IRecipeBuilderBase<R>> Function<IBlockEntityTypeBuilder<P>, Builder<P>> simple(
+        IRecipeType<B> recipeType, boolean autoRecipe) {
+
+        return p -> new Builder<>(p.transform(RecipeProcessor.multiBlock(recipeType, autoRecipe)),
+            MultiBlock::new);
     }
 
     public static <P> Builder<P> blastFurnace(IBlockEntityTypeBuilder<P> parent) {
-        return new Builder<>(parent, BlastFurnace::new);
+        return new Builder<>(parent.transform(RecipeProcessor::blastFurnace), BlastFurnace::new);
     }
 
     public static <P> Builder<P> distillationTower(IBlockEntityTypeBuilder<P> parent) {
-        return new Builder<>(parent, DistillationTower::new);
+        return new Builder<>(parent.transform(RecipeProcessor.multiBlock(AllRecipes.DISTILLATION, true)),
+            DistillationTower::new);
+    }
+
+    public static <P> Builder<P> cleanRoom(IBlockEntityTypeBuilder<P> parent) {
+        return new Builder<>(parent, CleanRoom::new);
     }
 
     public static Optional<MultiBlock> tryGet(BlockEntity be) {

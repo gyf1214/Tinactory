@@ -26,6 +26,7 @@ public final class AllLayouts {
     public static final Layout SIFTER;
     public static final Layout VACUUM_FREEZER;
     public static final List<Layout> DISTILLATION_TOWER;
+    public static final Layout CLEANROOM;
 
     static {
         WORKBENCH = Layout.builder()
@@ -81,6 +82,10 @@ public final class AllLayouts {
         for (var k = 0; k < 6; k++) {
             DISTILLATION_TOWER.add(distillationLayout(k + 1));
         }
+
+        CLEANROOM = Layout.builder()
+            .progressBar(Texture.PROGRESS_CLEANROOM, 0, SLOT_SIZE / 2)
+            .buildLayout();
     }
 
     private static Layout distillationLayout(int slots) {

@@ -152,7 +152,7 @@ public final class Technologies {
             .displayItem(AllItems.RESEARCH_EQUIPMENT.get(Voltage.LV))
             .register();
 
-        OIL_PROCESSING = factory.tech("old_processing")
+        OIL_PROCESSING = factory.tech("oil_processing")
             .maxProgress(60L)
             .displayItem(AllMaterials.SULFUR.entry("dust"))
             .register();

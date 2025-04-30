@@ -24,8 +24,13 @@ public final class TinactoryConfig {
     public final ConfigValue<Double> cableResistanceFactor;
     public final ConfigValue<Double> workFactorExponent;
     public final ConfigValue<Double> blastFurnaceTempFactor;
+    public final ConfigValue<Double> cleanroomAmperage;
+    public final ConfigValue<Double> cleanroomBaseClean;
+    public final ConfigValue<Double> cleanroomBaseDecay;
+    public final ConfigValue<Double> cleanroomOpenDecay;
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
+    public final ConfigValue<Integer> multiblockCheckCycle;
 
     public TinactoryConfig(ForgeConfigSpec.Builder builder) {
         builder.push("logistics");
@@ -60,6 +65,14 @@ public final class TinactoryConfig {
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
         blastFurnaceTempFactor = builder.comment("Temperature factor for blast furnace")
             .defineInRange("blast_furnace_temp_factor", 1000d, 0d, Double.POSITIVE_INFINITY);
+        cleanroomAmperage = builder.comment("Cleanroom amperage usage")
+            .defineInRange("cleanroom_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
+        cleanroomBaseClean = builder.comment("Cleanroom base clean speed in ULV")
+            .defineInRange("cleanroom_base_clean", 1d / 20000, 0d, Double.POSITIVE_INFINITY);
+        cleanroomBaseDecay = builder.comment("Cleanroom base decay")
+            .defineInRange("cleanroom_base_decay", 1d / 7500, 0d, 1d);
+        cleanroomOpenDecay = builder.comment("Cleanroom decay when open")
+            .defineInRange("cleanroom_open_decay", 0.05d, 0d, 1d);
         builder.pop();
 
         builder.push("network");
@@ -67,6 +80,11 @@ public final class TinactoryConfig {
             .defineInRange("connect_delay", 5, 0, Integer.MAX_VALUE);
         networkMaxConnectsPerTick = builder.comment("Max connection iteration for network reconnects per tick")
             .defineInRange("max_connects", 100, 1, Integer.MAX_VALUE);
+        builder.pop();
+
+        builder.push("multiblock");
+        multiblockCheckCycle = builder.comment("Interval for multiblock to do check")
+            .defineInRange("check_cycle", 20, 1, Integer.MAX_VALUE);
         builder.pop();
     }
 
