@@ -309,11 +309,21 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         }
 
         private void extrude(String target, int outCount, int inCount) {
-            if (material.hasItem(target) && material.hasItem("ingot")) {
+            String sub;
+            Voltage v;
+            if (material.hasItem("sheet")) {
+                sub = "sheet";
+                v = voltage;
+            } else {
+                sub = "ingot";
+                v = Voltage.fromRank(voltage.rank + 1);
+            }
+
+            if (material.hasItem(target) && material.hasItem(sub)) {
                 EXTRUDER.recipe(DATA_GEN, material.loc(target))
                     .outputItem(material.entry(target), outCount)
-                    .inputItem(material.tag("ingot"), inCount)
-                    .voltage(Voltage.fromRank(voltage.rank + 1))
+                    .inputItem(material.tag(sub), inCount)
+                    .voltage(v)
                     .workTicks(ticks(96L))
                     .build();
             }
@@ -322,7 +332,6 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         private void extrude() {
             extrude("stick", 2, 1);
             extrude("plate", 1, 1);
-            extrude("sheet", 1, 1);
             extrude("foil", 4, 1);
             extrude("ring", 4, 1);
             extrude("wire", 2, 1);
@@ -339,6 +348,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             process(WIREMILL, "ring", 1, "stick", 64L);
             process(BENDER, "plate", 1, "ingot", 72L);
             process(BENDER, "foil", 4, "plate", 40L);
+            process(BENDER, "foil", 4, "sheet", 40L);
             process(LATHE, "stick", 1, "ingot", 64L);
             process(LATHE, "screw", 1, "bolt", 16L);
             process(LATHE, "lens", 1, "gem_exquisite", 600L);

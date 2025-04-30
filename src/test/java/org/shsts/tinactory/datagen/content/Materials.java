@@ -77,6 +77,7 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
+import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
@@ -443,7 +444,10 @@ public final class Materials {
             .build()
             .material(NATURAL_GAS, DULL).oilOre(192).build()
             .material(LIGHT_OIL, DULL).oilOre(240).build()
-            .material(HEAVY_OIL, DULL).oilOre(512).build();
+            .material(HEAVY_OIL, DULL).oilOre(512).build()
+            .material(PE, DULL)
+            .machineProcess(Voltage.LV, 0.5d)
+            .build();
     }
 
     private static void misc() {

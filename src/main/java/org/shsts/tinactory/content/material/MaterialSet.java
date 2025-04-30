@@ -367,9 +367,17 @@ public class MaterialSet {
         }
 
         public Builder<P> polymer() {
-            return dummies("sheet", "ring")
+            return dummies("sheet")
                 .alias("primary", "sheet")
                 .molten();
+        }
+
+        public Builder<P> polymerRing() {
+            return polymer().dummies("ring");
+        }
+
+        public Builder<P> polymerFoil() {
+            return polymer().dummies("foil");
         }
 
         public Builder<P> gem() {

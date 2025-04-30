@@ -7,6 +7,7 @@ import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.NAPHTHA;
+import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
@@ -67,6 +68,11 @@ public final class HigherDegrees {
             .fluid("sulfuric", "sulfuric_heavy_fuel", 0xFFFCEC94, 1000)
             .fluid("lightly_hydro_cracked", "lightly_hydrocracked_heavy_fuel", 0xFFD4C494, 1000)
             .fluid("severely_hydro_cracked", "severely_hydrocracked_heavy_fuel", 0xFFBCAC84, 1000)
+            .buildObject();
+
+        PE = set("polyethylene")
+            .color(0xFFC8C8C8)
+            .polymerFoil()
             .buildObject();
     }
 

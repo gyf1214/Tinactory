@@ -108,6 +108,7 @@ public final class AllMaterials {
     public static MaterialSet NAPHTHA;
     public static MaterialSet LIGHT_FUEL;
     public static MaterialSet HEAVY_FUEL;
+    public static MaterialSet PE;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
@@ -177,7 +178,7 @@ public final class AllMaterials {
 
         RUBBER = set("rubber")
             .color(0xFF000000)
-            .polymer()
+            .polymerRing()
             .buildObject();
 
         GLOWSTONE = set("glowstone")
