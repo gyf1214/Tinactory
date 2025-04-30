@@ -36,9 +36,19 @@ import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 public class CleanRoom extends MultiBlock implements IProcessor, IElectricMachine,
     INBTSerializable<CompoundTag> {
     private double cleanness = 0d;
+    private double size;
 
     public CleanRoom(BlockEntity blockEntity, Builder<?> builder) {
         super(blockEntity, builder.layout(AllLayouts.CLEANROOM));
+    }
+
+    @Override
+    protected void doCheckMultiBlock(CheckContext ctx) {
+        super.doCheckMultiBlock(ctx);
+        var w = (int) ctx.getProperty("w");
+        var h = (int) ctx.getProperty("h");
+        var y = (int) ctx.getProperty("y");
+        size = (2 * w - 1d) * (2 * h - 1d) * (y - 1d);
     }
 
     @Override
@@ -71,7 +81,8 @@ public class CleanRoom extends MultiBlock implements IProcessor, IElectricMachin
             return;
         }
         var workFactor = partial * Math.sqrt((double) voltage / (double) Voltage.ULV.value);
-        cleanness = Math.min(1d, cleanness + workFactor * TinactoryConfig.INSTANCE.cleanroomBaseClean.get());
+        var clean = TinactoryConfig.INSTANCE.cleanroomBaseClean.get() / Math.max(1d, size);
+        cleanness = Math.min(1d, cleanness + workFactor * clean);
     }
 
     @Override
@@ -291,7 +302,7 @@ public class CleanRoom extends MultiBlock implements IProcessor, IElectricMachin
         private void checkLayers(MultiBlockCheckCtx ctx) {
             for (var y = 1; y < maxSize; y++) {
                 if (!checkLayer(ctx, y)) {
-                    ctx.isFailed();
+                    ctx.setProperty("y", y);
                     return;
                 }
             }

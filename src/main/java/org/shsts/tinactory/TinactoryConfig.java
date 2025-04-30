@@ -68,11 +68,11 @@ public final class TinactoryConfig {
         cleanroomAmperage = builder.comment("Cleanroom amperage usage")
             .defineInRange("cleanroom_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
         cleanroomBaseClean = builder.comment("Cleanroom base clean speed in ULV")
-            .defineInRange("cleanroom_base_clean", 1d / 20000, 0d, Double.POSITIVE_INFINITY);
+            .defineInRange("cleanroom_base_clean", 1d / 1000, 0d, Double.POSITIVE_INFINITY);
         cleanroomBaseDecay = builder.comment("Cleanroom base decay")
-            .defineInRange("cleanroom_base_decay", 1d / 7500, 0d, 1d);
+            .defineInRange("cleanroom_base_decay", 1d / 10000, 0d, 1d);
         cleanroomOpenDecay = builder.comment("Cleanroom decay when open")
-            .defineInRange("cleanroom_open_decay", 0.05d, 0d, 1d);
+            .defineInRange("cleanroom_open_decay", 0.01d, 0d, 1d);
         builder.pop();
 
         builder.push("network");
