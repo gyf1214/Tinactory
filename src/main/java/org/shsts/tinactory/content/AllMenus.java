@@ -166,10 +166,10 @@ public final class AllMenus {
             .plugin(LayoutPlugin::simple)
             .register();
 
-        MULTIBLOCK = REGISTRATE.menu("multi_block")
+        MULTIBLOCK = REGISTRATE.menu("multiblock")
             .title(ProcessingPlugin::getTitle)
             .screen(() -> () -> ProcessingScreen::new)
-            .plugin(MachinePlugin::multiBlock)
+            .plugin(MachinePlugin::multiblock)
             .register();
     }
 

@@ -19,10 +19,10 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class MultiBlockInterfaceBlock extends SidedMachineBlock {
+public class MultiblockInterfaceBlock extends SidedMachineBlock {
     public static final BooleanProperty JOINED = BooleanProperty.create("joined");
 
-    public MultiBlockInterfaceBlock(Properties properties,
+    public MultiblockInterfaceBlock(Properties properties,
         Supplier<IBlockEntityType> entityType,
         @Nullable IMenuType menu, Voltage voltage) {
         super(properties, entityType, menu, voltage);

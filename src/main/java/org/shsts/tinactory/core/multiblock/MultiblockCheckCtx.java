@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
 
-public interface MultiBlockCheckCtx {
+public interface MultiblockCheckCtx {
     boolean isFailed();
 
     void setFailed(boolean val);

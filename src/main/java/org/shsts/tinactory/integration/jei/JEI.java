@@ -18,7 +18,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
-import org.shsts.tinactory.content.AllMultiBlocks;
+import org.shsts.tinactory.content.AllMultiblocks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -83,10 +83,10 @@ public class JEI implements IModPlugin {
             });
         }
         addProcessingCategory(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE,
-            AllMultiBlocks.BLAST_FURNACE.get());
-        addProcessingCategory(AllRecipes.SIFTER, AllLayouts.SIFTER, AllMultiBlocks.SIFTER.get());
+            AllMultiblocks.BLAST_FURNACE.get());
+        addProcessingCategory(AllRecipes.SIFTER, AllLayouts.SIFTER, AllMultiblocks.SIFTER.get());
         addProcessingCategory(AllRecipes.VACUUM_FREEZER, AllLayouts.VACUUM_FREEZER,
-            AllMultiBlocks.VACUUM_FREEZER.get());
+            AllMultiblocks.VACUUM_FREEZER.get());
         addProcessingCategory(AllRecipes.DISTILLATION, new DistillationCategory());
     }
 

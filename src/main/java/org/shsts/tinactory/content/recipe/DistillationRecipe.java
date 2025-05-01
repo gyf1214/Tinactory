@@ -7,7 +7,7 @@ import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -21,10 +21,10 @@ public class DistillationRecipe extends DisplayInputRecipe {
     }
 
     private int getSlots(IMachine machine) {
-        if (!(machine instanceof MultiBlockInterface multiBlockInterface)) {
+        if (!(machine instanceof MultiblockInterface multiblockInterface)) {
             return 0;
         }
-        return multiBlockInterface.getMultiBlock()
+        return multiblockInterface.getMultiblock()
             .filter($ -> $ instanceof DistillationTower)
             .map($ -> ((DistillationTower) $).getSlots())
             .orElse(0);

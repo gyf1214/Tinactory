@@ -22,7 +22,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
@@ -59,9 +59,9 @@ public class MachineBlock extends SmartEntityBlock
             new SidedMachineBlock(properties, entityType, menu, voltage);
     }
 
-    public static Factory<MachineBlock> multiBlockInterface(Voltage voltage) {
+    public static Factory<MachineBlock> multiblockInterface(Voltage voltage) {
         return (properties, entityType, menu) ->
-            new MultiBlockInterfaceBlock(properties, entityType, menu, voltage);
+            new MultiblockInterfaceBlock(properties, entityType, menu, voltage);
     }
 
     @Override

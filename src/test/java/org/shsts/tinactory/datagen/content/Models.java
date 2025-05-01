@@ -19,7 +19,7 @@ import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.datagen.content.model.CableModel;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
@@ -221,12 +221,12 @@ public final class Models {
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> multiBlock(String casing, String overlay) {
+        U, BlockStateProvider>> multiblock(String casing, String overlay) {
         return machineBlock("casings/solid/machine_casing_" + casing, "multiblock/" + overlay);
     }
 
     public static Consumer<IEntryDataContext<Block,
-        MachineBlock, BlockStateProvider>> multiBlockInterface(String ioTex) {
+        MachineBlock, BlockStateProvider>> multiblockInterface(String ioTex) {
         return ctx -> {
             var models = ctx.provider().models();
             var model = MachineModel.builder()
@@ -238,7 +238,7 @@ public final class Models {
             ctx.provider().getVariantBuilder(ctx.object())
                 .forAllStates(state -> {
                     var dir = state.getValue(MachineBlock.IO_FACING);
-                    var baseModel = state.getValue(MultiBlockInterfaceBlock.JOINED) ?
+                    var baseModel = state.getValue(MultiblockInterfaceBlock.JOINED) ?
                         ioModel : fullModel;
                     return rotateModel(baseModel, dir);
                 });

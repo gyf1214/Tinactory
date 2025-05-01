@@ -3,7 +3,7 @@ package org.shsts.tinactory.integration.jei.category;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.content.AllLayouts;
-import org.shsts.tinactory.content.AllMultiBlocks;
+import org.shsts.tinactory.content.AllMultiblocks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 public class DistillationCategory extends ProcessingCategory<ProcessingRecipe> {
     public DistillationCategory() {
         super(AllRecipes.DISTILLATION, AllLayouts.DISTILLATION_TOWER.get(5),
-            AllMultiBlocks.DISTILLATION_TOWER.get());
+            AllMultiblocks.DISTILLATION_TOWER.get());
     }
 
     @Override

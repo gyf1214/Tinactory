@@ -25,10 +25,10 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
-import org.shsts.tinactory.content.multiblock.MultiBlockProcessor;
+import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.multiblock.MultiBlock;
+import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -110,9 +110,9 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
     }
 
     public static <P, R extends ProcessingRecipe,
-        B extends IRecipeBuilderBase<R>> Transformer<IBlockEntityTypeBuilder<P>> multiBlock(
+        B extends IRecipeBuilderBase<R>> Transformer<IBlockEntityTypeBuilder<P>> multiblock(
         IRecipeType<B> type, boolean autoRecipe) {
-        return $ -> $.capability(ID, be -> new MultiBlockProcessor<>(be, type, autoRecipe));
+        return $ -> $.capability(ID, be -> new MultiblockProcessor<>(be, type, autoRecipe));
     }
 
     public static <P> IBlockEntityTypeBuilder<P> blastFurnace(
@@ -207,8 +207,8 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
     }
 
     private void updateTargetRecipe() {
-        var recipe = MultiBlock.tryGet(blockEntity)
-            .flatMap(MultiBlock::getInterface)
+        var recipe = Multiblock.tryGet(blockEntity)
+            .flatMap(Multiblock::getInterface)
             .map($ -> (IMachine) $)
             .or(() -> MACHINE.tryGet(blockEntity))
             .flatMap($ -> $.config().getLoc("targetRecipe"));
@@ -265,8 +265,8 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
     }
 
     protected Optional<IMachine> getMachine() {
-        return MultiBlock.tryGet(blockEntity)
-            .flatMap(MultiBlock::getInterface)
+        return Multiblock.tryGet(blockEntity)
+            .flatMap(Multiblock::getInterface)
             .map($ -> (IMachine) $)
             .or(() -> MACHINE.tryGet(blockEntity));
     }

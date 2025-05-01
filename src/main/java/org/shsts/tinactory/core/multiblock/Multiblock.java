@@ -22,7 +22,7 @@ import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.CleanRoom;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
-import org.shsts.tinactory.content.multiblock.MultiBlockSpec;
+import org.shsts.tinactory.content.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
@@ -53,24 +53,24 @@ import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MultiBlock extends MultiBlockBase {
+public class Multiblock extends MultiblockBase {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String ID = "multi_block";
+    private static final String ID = "multiblock";
 
     private Layout layout;
-    private final Consumer<MultiBlockCheckCtx> checker;
+    private final Consumer<MultiblockCheckCtx> checker;
     private final Supplier<BlockState> appearance;
 
     private boolean firstTick = false;
     @Nullable
-    protected BlockPos multiBlockInterfacePos = null;
+    protected BlockPos multiblockInterfacePos = null;
     /**
-     * must set this during checkMultiBlock, or fail
+     * must set this during checkMultiblock, or fail
      */
     @Nullable
-    protected MultiBlockInterface multiBlockInterface = null;
+    protected MultiblockInterface multiblockInterface = null;
 
-    public MultiBlock(BlockEntity blockEntity, Builder<?> builder) {
+    public Multiblock(BlockEntity blockEntity, Builder<?> builder) {
         super(blockEntity);
         this.layout = Objects.requireNonNull(builder.layout);
         this.checker = Objects.requireNonNull(builder.checker);
@@ -87,12 +87,12 @@ public class MultiBlock extends MultiBlockBase {
 
     protected void setLayout(Layout val) {
         layout = val;
-        if (multiBlockInterface != null) {
-            multiBlockInterface.setLayout(val);
+        if (multiblockInterface != null) {
+            multiblockInterface.setLayout(val);
         }
     }
 
-    protected static class CheckContext implements MultiBlockCheckCtx {
+    protected static class CheckContext implements MultiblockCheckCtx {
         protected boolean failed = false;
         protected final Level world;
         protected final BlockPos center;
@@ -158,22 +158,22 @@ public class MultiBlock extends MultiBlockBase {
         }
     }
 
-    protected void doCheckMultiBlock(CheckContext ctx) {
+    protected void doCheckMultiblock(CheckContext ctx) {
         checker.accept(ctx);
     }
 
     @Override
-    protected Optional<Collection<BlockPos>> checkMultiBlock() {
+    protected Optional<Collection<BlockPos>> checkMultiblock() {
         LOGGER.debug("{}: check multiblock", this.blockEntity);
 
         var world = blockEntity.getLevel();
         assert world != null;
         var context = new CheckContext(world, blockEntity.getBlockPos());
-        doCheckMultiBlock(context);
+        doCheckMultiblock(context);
         var ok = !context.failed && context.hasProperty("interface") &&
-            (multiBlockInterface == null || context.getProperty("interface") == multiBlockInterface);
+            (multiblockInterface == null || context.getProperty("interface") == multiblockInterface);
         if (ok) {
-            multiBlockInterface = (MultiBlockInterface) context.getProperty("interface");
+            multiblockInterface = (MultiblockInterface) context.getProperty("interface");
             return Optional.of(context.blocks);
         } else {
             return Optional.empty();
@@ -182,28 +182,28 @@ public class MultiBlock extends MultiBlockBase {
 
     @Override
     protected void onRegister() {
-        assert multiBlockInterface != null;
-        multiBlockInterface.setMultiBlock(this);
+        assert multiblockInterface != null;
+        multiblockInterface.setMultiblock(this);
         sendUpdate(blockEntity);
         invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 
     @Override
     protected void onInvalidate() {
-        if (multiBlockInterface != null) {
-            multiBlockInterface.resetMultiBlock();
+        if (multiblockInterface != null) {
+            multiblockInterface.resetMultiblock();
         }
-        multiBlockInterface = null;
+        multiblockInterface = null;
         sendUpdate(blockEntity);
         invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 
-    public Optional<MultiBlockInterface> getInterface() {
-        return Optional.ofNullable(multiBlockInterface);
+    public Optional<MultiblockInterface> getInterface() {
+        return Optional.ofNullable(multiblockInterface);
     }
 
     public Optional<IContainer> getContainer() {
-        return getInterface().flatMap(MultiBlockInterface::container);
+        return getInterface().flatMap(MultiblockInterface::container);
     }
 
     public IProcessor getProcessor() {
@@ -217,31 +217,31 @@ public class MultiBlock extends MultiBlockBase {
     /**
      * Should only be called on Client
      */
-    protected void updateMultiBlockInterface() {
+    protected void updateMultiblockInterface() {
         var world = blockEntity.getLevel();
         assert world != null && world.isClientSide;
 
-        LOGGER.debug("update multiBlockInterface current={}, pos={}, firstTick={}",
-            multiBlockInterface, multiBlockInterfacePos, firstTick);
+        LOGGER.debug("update multiblockInterface current={}, pos={}, firstTick={}",
+            multiblockInterface, multiblockInterfacePos, firstTick);
 
-        if (multiBlockInterfacePos != null) {
-            var be1 = world.getBlockEntity(multiBlockInterfacePos);
+        if (multiblockInterfacePos != null) {
+            var be1 = world.getBlockEntity(multiblockInterfacePos);
             if (be1 == null) {
                 LOGGER.debug("cannot get blockEntity {}:{}",
-                    world.dimension().location(), multiBlockInterfacePos);
+                    world.dimension().location(), multiblockInterfacePos);
                 return;
             }
             MACHINE.tryGet(be1).ifPresent(machine ->
-                multiBlockInterface = (MultiBlockInterface) machine);
+                multiblockInterface = (MultiblockInterface) machine);
         } else {
-            multiBlockInterface = null;
+            multiblockInterface = null;
         }
         invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 
     private void onClientTick() {
         if (!firstTick) {
-            updateMultiBlockInterface();
+            updateMultiblockInterface();
             firstTick = true;
         }
     }
@@ -260,8 +260,8 @@ public class MultiBlock extends MultiBlockBase {
     @Override
     public CompoundTag serializeOnUpdate() {
         var tag = new CompoundTag();
-        if (multiBlockInterface != null) {
-            var pos = multiBlockInterface.blockEntity.getBlockPos();
+        if (multiblockInterface != null) {
+            var pos = multiblockInterface.blockEntity.getBlockPos();
             tag.put("interfacePos", CodecHelper.encodeBlockPos(pos));
         }
         return tag;
@@ -269,26 +269,26 @@ public class MultiBlock extends MultiBlockBase {
 
     @Override
     public void deserializeOnUpdate(CompoundTag tag) {
-        multiBlockInterfacePos = tag.contains("interfacePos", Tag.TAG_COMPOUND) ?
+        multiblockInterfacePos = tag.contains("interfacePos", Tag.TAG_COMPOUND) ?
             CodecHelper.parseBlockPos(tag.getCompound("interfacePos")) : null;
         if (firstTick) {
-            updateMultiBlockInterface();
+            updateMultiblockInterface();
         }
     }
 
-    public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, MultiBlock>,
+    public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, Multiblock>,
         IBlockEntityTypeBuilder<P>, Builder<P>> {
 
-        private final BiFunction<BlockEntity, Builder<P>, MultiBlock> factory;
+        private final BiFunction<BlockEntity, Builder<P>, Multiblock> factory;
         @Nullable
         private Supplier<BlockState> appearance = null;
         @Nullable
         private Layout layout = null;
         @Nullable
-        private Consumer<MultiBlockCheckCtx> checker = null;
+        private Consumer<MultiblockCheckCtx> checker = null;
 
         public Builder(IBlockEntityTypeBuilder<P> parent,
-            BiFunction<BlockEntity, Builder<P>, MultiBlock> factory) {
+            BiFunction<BlockEntity, Builder<P>, Multiblock> factory) {
             super(parent);
             this.factory = factory;
 
@@ -309,17 +309,17 @@ public class MultiBlock extends MultiBlockBase {
             return appearance(() -> val.get().defaultBlockState());
         }
 
-        public <S extends IBuilder<? extends Consumer<MultiBlockCheckCtx>, Builder<P>, S>> S spec(
+        public <S extends IBuilder<? extends Consumer<MultiblockCheckCtx>, Builder<P>, S>> S spec(
             Function<Builder<P>, S> child) {
             return child(child).onCreateObject($ -> this.checker = $);
         }
 
-        public MultiBlockSpec.Builder<Builder<P>> spec() {
-            return spec(MultiBlockSpec::builder);
+        public MultiblockSpec.Builder<Builder<P>> spec() {
+            return spec(MultiblockSpec::builder);
         }
 
         @Override
-        protected Function<BlockEntity, MultiBlock> createObject() {
+        protected Function<BlockEntity, Multiblock> createObject() {
             return be -> factory.apply(be, this);
         }
     }
@@ -328,8 +328,8 @@ public class MultiBlock extends MultiBlockBase {
         B extends IRecipeBuilderBase<R>> Function<IBlockEntityTypeBuilder<P>, Builder<P>> simple(
         IRecipeType<B> recipeType, boolean autoRecipe) {
 
-        return p -> new Builder<>(p.transform(RecipeProcessor.multiBlock(recipeType, autoRecipe)),
-            MultiBlock::new);
+        return p -> new Builder<>(p.transform(RecipeProcessor.multiblock(recipeType, autoRecipe)),
+            Multiblock::new);
     }
 
     public static <P> Builder<P> blastFurnace(IBlockEntityTypeBuilder<P> parent) {
@@ -337,7 +337,7 @@ public class MultiBlock extends MultiBlockBase {
     }
 
     public static <P> Builder<P> distillationTower(IBlockEntityTypeBuilder<P> parent) {
-        return new Builder<>(parent.transform(RecipeProcessor.multiBlock(AllRecipes.DISTILLATION, true)),
+        return new Builder<>(parent.transform(RecipeProcessor.multiblock(AllRecipes.DISTILLATION, true)),
             DistillationTower::new);
     }
 
@@ -345,11 +345,11 @@ public class MultiBlock extends MultiBlockBase {
         return new Builder<>(parent, CleanRoom::new);
     }
 
-    public static Optional<MultiBlock> tryGet(BlockEntity be) {
-        return tryGet(be, ID, MultiBlock.class);
+    public static Optional<Multiblock> tryGet(BlockEntity be) {
+        return tryGet(be, ID, Multiblock.class);
     }
 
-    public static MultiBlock get(BlockEntity be) {
-        return get(be, ID, MultiBlock.class);
+    public static Multiblock get(BlockEntity be) {
+        return get(be, ID, Multiblock.class);
     }
 }

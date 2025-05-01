@@ -74,7 +74,7 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
     public static final MachineSet LOGISTIC_WORKER;
-    public static final Map<Voltage, IEntry<MachineBlock>> MULTI_BLOCK_INTERFACE;
+    public static final Map<Voltage, IEntry<MachineBlock>> MULTIBLOCK_INTERFACE;
 
     public static final IEntry<MachineBlock> NETWORK_CONTROLLER;
     public static final IEntry<PrimitiveBlock> WORKBENCH;
@@ -362,7 +362,7 @@ public final class AllBlockEntities {
         LOW_PRESSURE_BOILER = boiler("low", 5d);
         HIGH_PRESSURE_BOILER = boiler("high", 17d);
 
-        MULTI_BLOCK_INTERFACE = ComponentBuilder
+        MULTIBLOCK_INTERFACE = ComponentBuilder
             .simple(ProcessingSet::multiblockInterface)
             .voltages(Voltage.ULV, Voltage.LuV)
             .buildObject();

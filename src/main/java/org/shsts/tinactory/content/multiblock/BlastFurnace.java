@@ -7,7 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.core.multiblock.MultiBlock;
+import org.shsts.tinactory.core.multiblock.Multiblock;
 
 import java.util.OptionalInt;
 
@@ -16,7 +16,7 @@ import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class BlastFurnace extends MultiBlock {
+public class BlastFurnace extends Multiblock {
     @Nullable
     private CoilBlock coilBlock = null;
 
@@ -25,8 +25,8 @@ public class BlastFurnace extends MultiBlock {
     }
 
     @Override
-    protected void doCheckMultiBlock(CheckContext ctx) {
-        super.doCheckMultiBlock(ctx);
+    protected void doCheckMultiblock(CheckContext ctx) {
+        super.doCheckMultiblock(ctx);
         if (ctx.hasProperty("coil") && ctx.getProperty("coil") instanceof CoilBlock coil) {
             coilBlock = coil;
         } else {

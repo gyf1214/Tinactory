@@ -24,22 +24,22 @@ import static org.shsts.tinactory.content.AllEvents.SERVER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class MultiBlockBase extends UpdatableCapabilityProvider
+public abstract class MultiblockBase extends UpdatableCapabilityProvider
     implements IEventSubscriber {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final BlockEntity blockEntity;
-    protected MultiBlockManager manager;
+    protected MultiblockManager manager;
     @Nullable
-    private WeakMap.Ref<MultiBlockBase> ref = null;
+    private WeakMap.Ref<MultiblockBase> ref = null;
     private int checkTick = 0;
     private boolean preInvalid = false;
 
-    public MultiBlockBase(BlockEntity blockEntity) {
+    public MultiblockBase(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
     }
 
-    public <K> void addToMap(WeakMap<K, MultiBlockBase> map, K key) {
+    public <K> void addToMap(WeakMap<K, MultiblockBase> map, K key) {
         if (ref == null) {
             ref = map.put(key, this);
         } else {
@@ -47,7 +47,7 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider
         }
     }
 
-    protected abstract Optional<Collection<BlockPos>> checkMultiBlock();
+    protected abstract Optional<Collection<BlockPos>> checkMultiblock();
 
     protected void onInvalidate() {}
 
@@ -69,7 +69,7 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider
     protected void onRegister() {}
 
     private void onServerLoad(Level world) {
-        manager = MultiBlockManager.get(world);
+        manager = MultiblockManager.get(world);
     }
 
     private void onRemove() {
@@ -77,7 +77,7 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider
     }
 
     protected void onServerTick() {
-        if (preInvalid && checkMultiBlock().isEmpty()) {
+        if (preInvalid && checkMultiblock().isEmpty()) {
             invalidate();
         }
         preInvalid = false;
@@ -85,7 +85,7 @@ public abstract class MultiBlockBase extends UpdatableCapabilityProvider
             return;
         }
         if (--checkTick < 0) {
-            checkMultiBlock().ifPresent(blocks -> {
+            checkMultiblock().ifPresent(blocks -> {
                 manager.register(this, blocks);
                 onRegister();
             });

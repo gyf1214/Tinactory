@@ -6,13 +6,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.multiblock.MultiBlock;
+import org.shsts.tinactory.core.multiblock.Multiblock;
 
 import static org.shsts.tinactory.content.AllLayouts.DISTILLATION_TOWER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DistillationTower extends MultiBlock {
+public class DistillationTower extends Multiblock {
     private int height = 0;
 
     public DistillationTower(BlockEntity blockEntity, Builder<?> builder) {
@@ -24,8 +24,8 @@ public class DistillationTower extends MultiBlock {
     }
 
     @Override
-    protected void doCheckMultiBlock(CheckContext ctx) {
-        super.doCheckMultiBlock(ctx);
+    protected void doCheckMultiblock(CheckContext ctx) {
+        super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
             height = (int) ctx.getProperty("height");
             setLayout(DISTILLATION_TOWER.get(height - 3));
@@ -35,15 +35,15 @@ public class DistillationTower extends MultiBlock {
     @Override
     public CompoundTag serializeOnUpdate() {
         var tag = super.serializeOnUpdate();
-        if (multiBlockInterface != null) {
+        if (multiblockInterface != null) {
             tag.putInt("height", height);
         }
         return tag;
     }
 
     @Override
-    protected void updateMultiBlockInterface() {
-        super.updateMultiBlockInterface();
+    protected void updateMultiblockInterface() {
+        super.updateMultiblockInterface();
         setLayout(DISTILLATION_TOWER.get(height - 3));
     }
 

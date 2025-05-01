@@ -9,7 +9,7 @@ import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
-import org.shsts.tinactory.core.multiblock.MultiBlock;
+import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
@@ -21,7 +21,7 @@ import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class AllMultiBlocks {
+public final class AllMultiblocks {
     public static final IEntry<PrimitiveBlock> BLAST_FURNACE;
     public static final IEntry<PrimitiveBlock> SIFTER;
     public static final IEntry<PrimitiveBlock> VACUUM_FREEZER;
@@ -61,13 +61,13 @@ public final class AllMultiBlocks {
         KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
 
         GRATE_MACHINE_CASING = REGISTRATE.block(
-                "multi_block/grate_machine_casing", Block::new)
+                "multiblock/grate_machine_casing", Block::new)
             .properties(CASING_PROPERTY)
             .register();
 
-        BLAST_FURNACE = multiBlock("blast_furnace")
+        BLAST_FURNACE = multiblock("blast_furnace")
             .blockEntity()
-            .child(MultiBlock::blastFurnace)
+            .child(Multiblock::blastFurnace)
             .appearanceBlock(HEATPROOF_CASING)
             .spec()
             .layer()
@@ -90,9 +90,9 @@ public final class AllMultiBlocks {
             .end()
             .buildObject();
 
-        SIFTER = multiBlock("sifter")
+        SIFTER = multiblock("sifter")
             .blockEntity()
-            .child(MultiBlock.simple(AllRecipes.SIFTER, true))
+            .child(Multiblock.simple(AllRecipes.SIFTER, true))
             .layout(AllLayouts.SIFTER)
             .appearanceBlock(SOLID_STEEL_CASING)
             .spec()
@@ -135,9 +135,9 @@ public final class AllMultiBlocks {
             .end()
             .buildObject();
 
-        VACUUM_FREEZER = multiBlock("vacuum_freezer")
+        VACUUM_FREEZER = multiblock("vacuum_freezer")
             .blockEntity()
-            .child(MultiBlock.simple(AllRecipes.VACUUM_FREEZER, true))
+            .child(Multiblock.simple(AllRecipes.VACUUM_FREEZER, true))
             .layout(AllLayouts.VACUUM_FREEZER)
             .appearanceBlock(FROST_PROOF_CASING)
             .spec()
@@ -164,9 +164,9 @@ public final class AllMultiBlocks {
             .end()
             .buildObject();
 
-        DISTILLATION_TOWER = multiBlock("distillation_tower")
+        DISTILLATION_TOWER = multiblock("distillation_tower")
             .blockEntity()
-            .child(MultiBlock::distillationTower)
+            .child(Multiblock::distillationTower)
             .appearanceBlock(CLEAN_STAINLESS_CASING)
             .spec()
             .layer()
@@ -192,10 +192,10 @@ public final class AllMultiBlocks {
             .end()
             .buildObject();
 
-        CLEANROOM = BlockEntityBuilder.builder("multi_block/cleanroom", FixedBlock::new)
+        CLEANROOM = BlockEntityBuilder.builder("multiblock/cleanroom", FixedBlock::new)
             .translucent()
             .blockEntity()
-            .child(MultiBlock::cleanRoom)
+            .child(Multiblock::cleanRoom)
             .appearanceBlock(PLASCRETE)
             .spec(CleanRoom::spec)
             .baseBlock(PLASCRETE)
@@ -208,13 +208,13 @@ public final class AllMultiBlocks {
             .buildObject();
     }
 
-    private static BlockEntityBuilder<PrimitiveBlock, ?> multiBlock(String name) {
-        return BlockEntityBuilder.builder("multi_block/" + name, PrimitiveBlock::new)
+    private static BlockEntityBuilder<PrimitiveBlock, ?> multiblock(String name) {
+        return BlockEntityBuilder.builder("multiblock/" + name, PrimitiveBlock::new)
             .translucent();
     }
 
     private static IEntry<Block> solid(String name, boolean addToSet) {
-        var ret = REGISTRATE.block("multi_block/solid/" + name, Block::new)
+        var ret = REGISTRATE.block("multiblock/solid/" + name, Block::new)
             .properties(CASING_PROPERTY)
             .register();
         if (addToSet) {
@@ -228,7 +228,7 @@ public final class AllMultiBlocks {
     }
 
     private static IEntry<CoilBlock> coil(String name, int temperature) {
-        var ret = REGISTRATE.block("multi_block/coil/" + name, CoilBlock.factory(temperature))
+        var ret = REGISTRATE.block("multiblock/coil/" + name, CoilBlock.factory(temperature))
             .properties(CASING_PROPERTY)
             .register();
         COIL_BLOCKS.add(ret);

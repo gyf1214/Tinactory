@@ -18,7 +18,7 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.machine.MachineProcessor;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.IMenu;
 import org.shsts.tinycorelib.api.gui.IMenuPlugin;
@@ -142,12 +142,12 @@ public class MachinePlugin extends ProcessingPlugin {
         };
     }
 
-    public static IMenuPlugin<ProcessingScreen> multiBlock(IMenu menu) {
+    public static IMenuPlugin<ProcessingScreen> multiblock(IMenu menu) {
         return new MachinePlugin(menu) {
             @Override
             protected Optional<IRecipeType<?>> getRecipeType() {
-                var multiBlockInterface = (MultiBlockInterface) MACHINE.get(menu.blockEntity());
-                return multiBlockInterface.getRecipeType();
+                var multiblockInterface = (MultiblockInterface) MACHINE.get(menu.blockEntity());
+                return multiblockInterface.getRecipeType();
             }
         };
     }

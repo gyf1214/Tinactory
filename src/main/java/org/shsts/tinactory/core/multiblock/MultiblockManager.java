@@ -15,38 +15,38 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class MultiBlockManager {
+public final class MultiblockManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final WeakMap<BlockPos, MultiBlockBase> posMap = new WeakMap<>();
+    private final WeakMap<BlockPos, MultiblockBase> posMap = new WeakMap<>();
 
     public void destroy() {
         posMap.clear();
     }
 
-    public boolean register(MultiBlockBase multiBlock, Collection<BlockPos> blocks) {
-        LOGGER.debug("register new multi block {}", multiBlock);
+    public boolean register(MultiblockBase multiblock, Collection<BlockPos> blocks) {
+        LOGGER.debug("register new multi block {}", multiblock);
         for (var pos : blocks) {
             if (posMap.get(pos).isPresent()) {
                 return false;
             }
         }
         for (var pos : blocks) {
-            multiBlock.addToMap(posMap, pos);
+            multiblock.addToMap(posMap, pos);
         }
         return true;
     }
 
     public void invalidate(BlockPos pos) {
-        posMap.get(pos).ifPresent(MultiBlockBase::markPreInvalid);
+        posMap.get(pos).ifPresent(MultiblockBase::markPreInvalid);
     }
 
-    private static final Map<ResourceKey<Level>, MultiBlockManager> INSTANCES = new HashMap<>();
+    private static final Map<ResourceKey<Level>, MultiblockManager> INSTANCES = new HashMap<>();
 
-    public static MultiBlockManager get(Level world) {
+    public static MultiblockManager get(Level world) {
         assert !world.isClientSide;
         var dimension = world.dimension();
-        return INSTANCES.computeIfAbsent(dimension, $ -> new MultiBlockManager());
+        return INSTANCES.computeIfAbsent(dimension, $ -> new MultiblockManager());
     }
 
     public static void onUnload(Level world) {

@@ -11,9 +11,9 @@ import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
-import org.shsts.tinactory.core.multiblock.client.MultiBlockInterfaceRenderer;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
+import org.shsts.tinactory.core.multiblock.client.MultiblockInterfaceRenderer;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilder;
@@ -114,16 +114,16 @@ public class ProcessingSet extends MachineSet {
     }
 
     public static IEntry<MachineBlock> multiblockInterface(Voltage voltage) {
-        var id = "multi_block/" + voltage.id + "/interface";
-        return BlockEntityBuilder.builder(id, MachineBlock.multiBlockInterface(voltage))
+        var id = "multiblock/" + voltage.id + "/interface";
+        return BlockEntityBuilder.builder(id, MachineBlock.multiblockInterface(voltage))
             .menu(AllMenus.MULTIBLOCK)
             .blockEntity()
-            .transform(MultiBlockInterface::factory)
+            .transform(MultiblockInterface::factory)
             .transform(FlexibleStackContainer::factory)
-            .renderer(() -> () -> MultiBlockInterfaceRenderer::new)
+            .renderer(() -> () -> MultiblockInterfaceRenderer::new)
             .end()
             .block()
-            .tint(() -> () -> (state, $2, $3, i) -> MultiBlockInterfaceBlock
+            .tint(() -> () -> (state, $2, $3, i) -> MultiblockInterfaceBlock
                 .tint(voltage, state, i))
             .translucent()
             .end()

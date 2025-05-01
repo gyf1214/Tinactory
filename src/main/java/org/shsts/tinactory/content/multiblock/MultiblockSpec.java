@@ -8,8 +8,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
-import org.shsts.tinactory.core.multiblock.MultiBlockCheckCtx;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
+import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
+public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
     public static final char IGNORED_CHAR = ' ';
     public static final char CENTER_CHAR = '$';
 
@@ -45,7 +45,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
     }
 
     private final List<Layer> layers;
-    private final Map<Character, BiConsumer<MultiBlockCheckCtx, BlockPos>> checkers;
+    private final Map<Character, BiConsumer<MultiblockCheckCtx, BlockPos>> checkers;
     private final Layer centerLayer;
     private final int centerLayerIdx;
     private final int centerW;
@@ -53,7 +53,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
     private final int width;
     private final int depth;
 
-    private MultiBlockSpec(Builder<?> builder) {
+    private MultiblockSpec(Builder<?> builder) {
         this.layers = builder.layers;
         this.checkers = builder.checkers;
         this.centerLayerIdx = builder.centerLayerIdx;
@@ -64,7 +64,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         this.depth = builder.depth;
     }
 
-    private boolean getDirections(MultiBlockCheckCtx ctx) {
+    private boolean getDirections(MultiblockCheckCtx ctx) {
         var blockState = ctx.getBlock(ctx.getCenter());
         if (blockState.isEmpty()) {
             ctx.setFailed();
@@ -94,7 +94,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         return true;
     }
 
-    private Optional<List<BlockPos>> checkLayer(MultiBlockCheckCtx ctx, Layer layer, BlockPos base,
+    private Optional<List<BlockPos>> checkLayer(MultiblockCheckCtx ctx, Layer layer, BlockPos base,
         int y, Direction dirW, Direction dirD) {
         var blocks = new ArrayList<BlockPos>();
         for (var d = 0; d < depth; d++) {
@@ -122,7 +122,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         return Optional.of(blocks);
     }
 
-    private boolean checkLayer(MultiBlockCheckCtx ctx, Layer layer, boolean reverse) {
+    private boolean checkLayer(MultiblockCheckCtx ctx, Layer layer, boolean reverse) {
         var dirW = (Direction) ctx.getProperty("dirW");
         var dirD = (Direction) ctx.getProperty("dirD");
         var base = (BlockPos) ctx.getProperty("base");
@@ -150,7 +150,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
     }
 
     @Override
-    public void accept(MultiBlockCheckCtx ctx) {
+    public void accept(MultiblockCheckCtx ctx) {
         if (!getDirections(ctx)) {
             return;
         }
@@ -171,13 +171,13 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         ctx.setProperty("height", h1 - h2);
     }
 
-    public static boolean checkInterface(MultiBlockCheckCtx ctx, BlockPos pos) {
+    public static boolean checkInterface(MultiblockCheckCtx ctx, BlockPos pos) {
         var be = ctx.getBlockEntity(pos);
         if (be.isEmpty()) {
             return false;
         }
         var machine = MACHINE.tryGet(be.get());
-        if (machine.isEmpty() || !(machine.get() instanceof MultiBlockInterface inter)) {
+        if (machine.isEmpty() || !(machine.get() instanceof MultiblockInterface inter)) {
             return false;
         }
         if (ctx.hasProperty("interface")) {
@@ -188,9 +188,9 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         return true;
     }
 
-    public static class Builder<P> extends SimpleBuilder<MultiBlockSpec, P, Builder<P>> {
+    public static class Builder<P> extends SimpleBuilder<MultiblockSpec, P, Builder<P>> {
         private final List<Layer> layers = new ArrayList<>();
-        private final Map<Character, BiConsumer<MultiBlockCheckCtx, BlockPos>> checkers = new HashMap<>();
+        private final Map<Character, BiConsumer<MultiblockCheckCtx, BlockPos>> checkers = new HashMap<>();
         private int centerLayerIdx = -1;
         private int centerW;
         private int centerD;
@@ -216,7 +216,7 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
                 });
         }
 
-        public Builder<P> check(char ch, BiConsumer<MultiBlockCheckCtx, BlockPos> checker) {
+        public Builder<P> check(char ch, BiConsumer<MultiblockCheckCtx, BlockPos> checker) {
             checkers.put(ch, checker);
             return this;
         }
@@ -289,9 +289,9 @@ public class MultiBlockSpec implements Consumer<MultiBlockCheckCtx> {
         }
 
         @Override
-        protected MultiBlockSpec createObject() {
+        protected MultiblockSpec createObject() {
             validate();
-            return new MultiBlockSpec(this);
+            return new MultiblockSpec(this);
         }
     }
 

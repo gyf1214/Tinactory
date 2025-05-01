@@ -41,16 +41,16 @@ import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MultiBlockInterface extends Machine {
+public class MultiblockInterface extends Machine {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final Voltage voltage;
     private IFlexibleContainer container;
     private boolean firstTick = false;
     @Nullable
-    private BlockPos multiBlockPos = null;
+    private BlockPos multiblockPos = null;
     @Nullable
-    private MultiBlock multiBlock = null;
+    private Multiblock multiblock = null;
     @Nullable
     private IProcessor processor = null;
     @Nullable
@@ -58,20 +58,20 @@ public class MultiBlockInterface extends Machine {
     @Nullable
     private IRecipeType<?> recipeType = null;
 
-    public MultiBlockInterface(BlockEntity be) {
+    public MultiblockInterface(BlockEntity be) {
         super(be);
         this.voltage = RecipeProcessor.getBlockVoltage(be);
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, MultiBlockInterface::new);
+        return builder.capability(ID, MultiblockInterface::new);
     }
 
     /**
      * Only called on server.
      */
-    private void onMultiBlockUpdate() {
+    private void onMultiblockUpdate() {
         var world = blockEntity.getLevel();
         if (world == null || world.isClientSide) {
             return;
@@ -84,7 +84,7 @@ public class MultiBlockInterface extends Machine {
 
     private void setJoined(Level world, boolean value) {
         getRealBlockState(world, blockEntity).ifPresent(state -> {
-            var newState = state.setValue(MultiBlockInterfaceBlock.JOINED, value);
+            var newState = state.setValue(MultiblockInterfaceBlock.JOINED, value);
             world.setBlock(blockEntity.getBlockPos(), newState, 3);
         });
     }
@@ -93,12 +93,12 @@ public class MultiBlockInterface extends Machine {
         container.setLayout(val);
     }
 
-    public void setMultiBlock(MultiBlock target) {
-        if (multiBlock == target) {
+    public void setMultiblock(Multiblock target) {
+        if (multiblock == target) {
             return;
         }
-        LOGGER.debug("{} set multiBlock = {}", this, target);
-        multiBlock = target;
+        LOGGER.debug("{} set multiblock = {}", this, target);
+        multiblock = target;
         processor = target.getProcessor();
         electricMachine = target.getElectric();
         recipeType = processor instanceof MachineProcessor<?> machine ? machine.recipeType : null;
@@ -106,23 +106,23 @@ public class MultiBlockInterface extends Machine {
         var world = blockEntity.getLevel();
         assert world != null;
         setJoined(world, true);
-        onMultiBlockUpdate();
+        onMultiblockUpdate();
     }
 
-    public void resetMultiBlock() {
-        if (multiBlock == null) {
+    public void resetMultiblock() {
+        if (multiblock == null) {
             return;
         }
-        LOGGER.debug("{} reset multiBlock", this);
+        LOGGER.debug("{} reset multiblock", this);
         var world = blockEntity.getLevel();
         assert world != null;
         updateWorkBlock(world, false);
         setJoined(world, false);
-        multiBlock = null;
+        multiblock = null;
         processor = null;
         electricMachine = null;
         container.resetLayout();
-        onMultiBlockUpdate();
+        onMultiblockUpdate();
     }
 
     private void onLoad() {
@@ -130,50 +130,50 @@ public class MultiBlockInterface extends Machine {
     }
 
     private void onContainerChange() {
-        if (multiBlock != null) {
-            invoke(multiBlock.blockEntity, CONTAINER_CHANGE);
+        if (multiblock != null) {
+            invoke(multiblock.blockEntity, CONTAINER_CHANGE);
         }
     }
 
     @Override
     public void setConfig(ISetMachineConfigPacket packet, boolean invokeEvent) {
         super.setConfig(packet, invokeEvent);
-        if (invokeEvent && multiBlock != null) {
-            invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);
+        if (invokeEvent && multiblock != null) {
+            invoke(multiblock.blockEntity, SET_MACHINE_CONFIG);
         }
     }
 
     @Override
     public boolean canPlayerInteract(Player player) {
-        return super.canPlayerInteract(player) && multiBlock != null;
+        return super.canPlayerInteract(player) && multiblock != null;
     }
 
-    private void updateMultiBlock() {
+    private void updateMultiblock() {
         var world = blockEntity.getLevel();
         assert world != null && world.isClientSide;
 
-        LOGGER.debug("update multiBlock current={}, pos={}, firstTick={}",
-            multiBlock, multiBlockPos, firstTick);
+        LOGGER.debug("update multiblock current={}, pos={}, firstTick={}",
+            multiblock, multiblockPos, firstTick);
 
-        if (multiBlockPos != null) {
-            var be1 = world.getBlockEntity(multiBlockPos);
+        if (multiblockPos != null) {
+            var be1 = world.getBlockEntity(multiblockPos);
             if (be1 == null) {
-                LOGGER.debug("cannot get blockEntity {}:{}", world.dimension().location(), multiBlockPos);
+                LOGGER.debug("cannot get blockEntity {}:{}", world.dimension().location(), multiblockPos);
                 return;
             }
-            MultiBlock.tryGet(be1).ifPresentOrElse(this::setMultiBlock, this::resetMultiBlock);
+            Multiblock.tryGet(be1).ifPresentOrElse(this::setMultiblock, this::resetMultiblock);
         } else {
-            resetMultiBlock();
+            resetMultiblock();
         }
 
-        if (multiBlock != null) {
-            invoke(multiBlock.blockEntity, SET_MACHINE_CONFIG);
+        if (multiblock != null) {
+            invoke(multiblock.blockEntity, SET_MACHINE_CONFIG);
         }
     }
 
     private void onClientTick() {
         if (!firstTick) {
-            updateMultiBlock();
+            updateMultiblock();
             firstTick = true;
         }
     }
@@ -189,18 +189,18 @@ public class MultiBlockInterface extends Machine {
 
     @Override
     protected Optional<BlockState> getWorkBlock(Level world) {
-        if (multiBlock == null) {
+        if (multiblock == null) {
             return Optional.empty();
         }
-        return getRealBlockState(world, multiBlock.blockEntity);
+        return getRealBlockState(world, multiblock.blockEntity);
     }
 
     @Override
     protected void setWorkBlock(Level world, BlockState state) {
-        if (multiBlock == null) {
+        if (multiblock == null) {
             return;
         }
-        world.setBlock(multiBlock.blockEntity.getBlockPos(), state, 3);
+        world.setBlock(multiblock.blockEntity.getBlockPos(), state, 3);
     }
 
     @Override
@@ -220,14 +220,14 @@ public class MultiBlockInterface extends Machine {
 
     @Override
     public Component title() {
-        if (config.contains("name", Tag.TAG_STRING) || multiBlock == null) {
+        if (config.contains("name", Tag.TAG_STRING) || multiblock == null) {
             return super.title();
         }
-        return I18n.name(multiBlock.blockEntity.getBlockState().getBlock());
+        return I18n.name(multiblock.blockEntity.getBlockState().getBlock());
     }
 
     public Optional<Layout> getLayout() {
-        return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.getLayout());
+        return multiblock == null ? Optional.empty() : Optional.of(multiblock.getLayout());
     }
 
     public Optional<IRecipeType<?>> getRecipeType() {
@@ -235,28 +235,28 @@ public class MultiBlockInterface extends Machine {
     }
 
     public Optional<BlockState> getAppearanceBlock() {
-        return multiBlock == null ? Optional.empty() : Optional.of(multiBlock.getAppearanceBlock());
+        return multiblock == null ? Optional.empty() : Optional.of(multiblock.getAppearanceBlock());
     }
 
-    public Optional<MultiBlock> getMultiBlock() {
-        return Optional.ofNullable(multiBlock);
+    public Optional<Multiblock> getMultiblock() {
+        return Optional.ofNullable(multiblock);
     }
 
     @Override
     public ItemStack icon() {
-        if (multiBlock == null) {
+        if (multiblock == null) {
             return super.icon();
         }
-        var block = multiBlock.blockEntity.getBlockState().getBlock();
+        var block = multiblock.blockEntity.getBlockState().getBlock();
         return new ItemStack(block);
     }
 
     @Override
     public CompoundTag serializeOnUpdate() {
         var tag = super.serializeOnUpdate();
-        if (multiBlock != null) {
-            var pos = multiBlock.blockEntity.getBlockPos();
-            tag.put("multiBlockPos", CodecHelper.encodeBlockPos(pos));
+        if (multiblock != null) {
+            var pos = multiblock.blockEntity.getBlockPos();
+            tag.put("multiblockPos", CodecHelper.encodeBlockPos(pos));
         }
         return tag;
     }
@@ -265,10 +265,10 @@ public class MultiBlockInterface extends Machine {
     public void deserializeOnUpdate(CompoundTag tag) {
         super.deserializeOnUpdate(tag);
 
-        multiBlockPos = tag.contains("multiBlockPos", Tag.TAG_COMPOUND) ?
-            CodecHelper.parseBlockPos(tag.getCompound("multiBlockPos")) : null;
+        multiblockPos = tag.contains("multiblockPos", Tag.TAG_COMPOUND) ?
+            CodecHelper.parseBlockPos(tag.getCompound("multiblockPos")) : null;
         if (firstTick) {
-            updateMultiBlock();
+            updateMultiblock();
         }
     }
 }

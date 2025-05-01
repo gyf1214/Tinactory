@@ -12,8 +12,8 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterface;
-import org.shsts.tinactory.core.multiblock.MultiBlockInterfaceBlock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 
 import java.util.Objects;
 
@@ -21,11 +21,11 @@ import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<BlockEntity> {
+public class MultiblockInterfaceRenderer implements BlockEntityRenderer<BlockEntity> {
     private final BlockRenderDispatcher blockRenderDispatcher;
     private final ModelBlockRenderer blockRenderer;
 
-    public MultiBlockInterfaceRenderer(BlockEntityRendererProvider.Context context) {
+    public MultiblockInterfaceRenderer(BlockEntityRendererProvider.Context context) {
         this.blockRenderDispatcher = context.getBlockRenderDispatcher();
         this.blockRenderer = blockRenderDispatcher.getModelRenderer();
     }
@@ -34,17 +34,17 @@ public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<BlockEnt
     public void render(BlockEntity be, float partialTick, PoseStack poseStack,
         MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         var blockState = be.getBlockState();
-        if (!blockState.getValue(MultiBlockInterfaceBlock.JOINED)) {
+        if (!blockState.getValue(MultiblockInterfaceBlock.JOINED)) {
             return;
         }
         var world = be.getLevel();
         assert world != null;
         var pos = be.getBlockPos();
         var cap = MACHINE.tryGet(be);
-        if (cap.isEmpty() || !(cap.get() instanceof MultiBlockInterface multiBlockInterface)) {
+        if (cap.isEmpty() || !(cap.get() instanceof MultiblockInterface multiblockInterface)) {
             return;
         }
-        var appearanceBlock = multiBlockInterface.getAppearanceBlock();
+        var appearanceBlock = multiblockInterface.getAppearanceBlock();
 
         var random = world.getRandom();
         var seed = blockState.getSeed(pos);
@@ -62,7 +62,7 @@ public class MultiBlockInterfaceRenderer implements BlockEntityRenderer<BlockEnt
                 poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);
         } else {
             var model = blockRenderDispatcher.getBlockModel(
-                blockState.setValue(MultiBlockInterfaceBlock.JOINED, false));
+                blockState.setValue(MultiblockInterfaceBlock.JOINED, false));
 
             blockRenderer.tesselateBlock(world, model, blockState, pos,
                 poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);

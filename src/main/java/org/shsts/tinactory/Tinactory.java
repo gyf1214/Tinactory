@@ -22,7 +22,7 @@ import org.shsts.tinactory.content.AllForgeEvents;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.AllMenus;
-import org.shsts.tinactory.content.AllMultiBlocks;
+import org.shsts.tinactory.content.AllMultiblocks;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllRegistries;
@@ -77,7 +77,7 @@ public class Tinactory {
             AllMenus.init();
             AllItems.init();
             AllBlockEntities.init();
-            AllMultiBlocks.init();
+            AllMultiblocks.init();
 
             TechManager.init();
             AllWorldGens.init();

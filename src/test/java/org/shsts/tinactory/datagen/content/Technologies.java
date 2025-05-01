@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
-import org.shsts.tinactory.content.AllMultiBlocks;
+import org.shsts.tinactory.content.AllMultiblocks;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
@@ -123,7 +123,7 @@ public final class Technologies {
 
         KANTHAL = factory.tech("kanthal")
             .maxProgress(10L)
-            .displayItem(AllMultiBlocks.KANTHAL_COIL_BLOCK)
+            .displayItem(AllMultiblocks.KANTHAL_COIL_BLOCK)
             .register();
 
         SIFTING = factory.tech("sifting")

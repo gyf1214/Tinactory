@@ -53,7 +53,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.MIXER;
-import static org.shsts.tinactory.content.AllBlockEntities.MULTI_BLOCK_INTERFACE;
+import static org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE;
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER;
@@ -92,13 +92,13 @@ import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.content.AllMultiBlocks.BLAST_FURNACE;
-import static org.shsts.tinactory.content.AllMultiBlocks.CLEANROOM;
-import static org.shsts.tinactory.content.AllMultiBlocks.DISTILLATION_TOWER;
-import static org.shsts.tinactory.content.AllMultiBlocks.HEATPROOF_CASING;
-import static org.shsts.tinactory.content.AllMultiBlocks.SIFTER;
-import static org.shsts.tinactory.content.AllMultiBlocks.SOLID_STEEL_CASING;
-import static org.shsts.tinactory.content.AllMultiBlocks.VACUUM_FREEZER;
+import static org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE;
+import static org.shsts.tinactory.content.AllMultiblocks.CLEANROOM;
+import static org.shsts.tinactory.content.AllMultiblocks.DISTILLATION_TOWER;
+import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
+import static org.shsts.tinactory.content.AllMultiblocks.SIFTER;
+import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
+import static org.shsts.tinactory.content.AllMultiblocks.VACUUM_FREEZER;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
@@ -109,7 +109,7 @@ import static org.shsts.tinactory.content.AllTags.circuit;
 import static org.shsts.tinactory.content.AllTags.machineTag;
 import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
 import static org.shsts.tinactory.datagen.content.Models.machineBlock;
-import static org.shsts.tinactory.datagen.content.Models.multiBlockInterface;
+import static org.shsts.tinactory.datagen.content.Models.multiblockInterface;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_OUT_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS;
@@ -191,17 +191,17 @@ public final class Machines {
             .tag(MINEABLE_WITH_WRENCH)
             .build();
 
-        multiBlock(BLAST_FURNACE, "heatproof", "blast_furnace", AllRecipes.BLAST_FURNACE);
-        multiBlock(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
-        multiBlock(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
-        multiBlock(DISTILLATION_TOWER, "clean_stainless_steel", "distillation_tower", AllRecipes.DISTILLATION);
+        multiblock(BLAST_FURNACE, "heatproof", "blast_furnace", AllRecipes.BLAST_FURNACE);
+        multiblock(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
+        multiblock(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
+        multiblock(DISTILLATION_TOWER, "clean_stainless_steel", "distillation_tower", AllRecipes.DISTILLATION);
         DATA_GEN.block(CLEANROOM)
             .blockState(machineBlock("casings/cleanroom/plascrete", "multiblock/cleanroom"))
             .tag(MINEABLE_WITH_WRENCH)
             .build();
 
-        MULTI_BLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
-            .blockState(multiBlockInterface(IO_TEX))
+        MULTIBLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
+            .blockState(multiblockInterface(IO_TEX))
             .tag(MINEABLE_WITH_WRENCH)
             .build());
 
@@ -215,10 +215,10 @@ public final class Machines {
                 .build());
     }
 
-    private static void multiBlock(IEntry<? extends Block> block, String casing,
+    private static void multiblock(IEntry<? extends Block> block, String casing,
         String overlay, IRecipeType<?> type) {
         DATA_GEN.block(block)
-            .blockState(Models.multiBlock(casing, overlay))
+            .blockState(Models.multiblock(casing, overlay))
             .tag(MINEABLE_WITH_WRENCH)
             .itemTag(machineTag(type))
             .build();
@@ -316,8 +316,8 @@ public final class Machines {
             .voltage(Voltage.ULV)
             .workTicks(ASSEMBLE_TICKS)
             .build()
-            .recipe(DATA_GEN, MULTI_BLOCK_INTERFACE.get(Voltage.ULV))
-            .outputItem(MULTI_BLOCK_INTERFACE.get(Voltage.ULV), 1)
+            .recipe(DATA_GEN, MULTIBLOCK_INTERFACE.get(Voltage.ULV))
+            .outputItem(MULTIBLOCK_INTERFACE.get(Voltage.ULV), 1)
             .inputItem(MACHINE_HULL.get(Voltage.ULV), 1)
             .inputItem(circuit(Voltage.ULV), 2)
             .inputItem(CABLE.get(Voltage.ULV), 2)
@@ -766,7 +766,7 @@ public final class Machines {
             .circuit(2)
             .tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             .build()
-            .recipe(MULTI_BLOCK_INTERFACE)
+            .recipe(MULTIBLOCK_INTERFACE)
             .circuit(2)
             .component(CONVEYOR_MODULE, 1)
             .component(ELECTRIC_PUMP, 1)
