@@ -81,8 +81,9 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
             return;
         }
         var workFactor = partial * Math.sqrt((double) voltage / (double) Voltage.ULV.value);
-        var clean = TinactoryConfig.INSTANCE.cleanroomBaseClean.get() / Math.max(1d, size);
-        cleanness = Math.min(1d, cleanness + workFactor * clean);
+        var clean = workFactor * TinactoryConfig.INSTANCE.cleanroomBaseClean.get() / Math.max(1d, size);
+
+        cleanness = Math.min(1d, cleanness + clean - cleanness * clean);
     }
 
     @Override
