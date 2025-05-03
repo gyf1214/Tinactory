@@ -654,8 +654,8 @@ public final class Components {
         }
 
         // engraving
-        engravingRecipe("integrated_circuit", RUBY, 0, Voltage.LV);
-        engravingRecipe("cpu", DIAMOND, 0, Voltage.LV);
+        engravingRecipe("integrated_circuit", RUBY, 0, Voltage.LV, -1d, 0d);
+        engravingRecipe("cpu", DIAMOND, 0, Voltage.LV, 0d, 0.5d);
 
         // chips
         for (var entry : CHIPS.entrySet()) {
@@ -671,7 +671,8 @@ public final class Components {
         }
     }
 
-    private static void engravingRecipe(String name, MaterialSet lens, int level, Voltage voltage) {
+    private static void engravingRecipe(String name, MaterialSet lens, int level, Voltage voltage,
+        double minCleanness, double maxCleanness) {
         var wafer = WAFERS.get(name);
         for (var i = 0; i < RAW_WAFERS.size(); i++) {
             if (i < level) {
@@ -679,12 +680,16 @@ public final class Components {
             }
             var j = i - level;
             var raw = RAW_WAFERS.get(i);
+
+            var minC = 1d - (1d - minCleanness) / (1 << i);
+            var maxC = 1d - (1d - maxCleanness) / (1 << i);
             LASER_ENGRAVER.recipe(DATA_GEN, suffix(wafer.loc(), "_from_" + name(raw.id(), -1)))
                 .outputItem(wafer, 1 << j)
                 .inputItem(0, raw, 1)
                 .inputItemNotConsumed(1, lens.tag("lens"))
                 .voltage(Voltage.fromRank(voltage.rank + j * 2))
                 .workTicks(1000L << level)
+                .requireCleanness(minC, maxC)
                 .build();
         }
     }

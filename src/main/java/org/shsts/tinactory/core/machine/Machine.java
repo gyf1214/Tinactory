@@ -66,7 +66,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     private static final Logger LOGGER = LogUtils.getLogger();
     protected static final String ID = "network/machine";
 
-    public final BlockEntity blockEntity;
+    protected final BlockEntity blockEntity;
 
     @Nullable
     protected Network network;
@@ -193,6 +193,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     public ItemStack icon() {
         var block = blockEntity.getBlockState().getBlock();
         return new ItemStack(block);
+    }
+
+    @Override
+    public BlockEntity blockEntity() {
+        return blockEntity;
     }
 
     @Override

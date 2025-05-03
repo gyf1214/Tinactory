@@ -261,7 +261,7 @@ public class Multiblock extends MultiblockBase {
     public CompoundTag serializeOnUpdate() {
         var tag = new CompoundTag();
         if (multiblockInterface != null) {
-            var pos = multiblockInterface.blockEntity.getBlockPos();
+            var pos = multiblockInterface.blockEntity().getBlockPos();
             tag.put("interfacePos", CodecHelper.encodeBlockPos(pos));
         }
         return tag;

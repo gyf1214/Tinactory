@@ -57,7 +57,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             w = (int) ctx.getProperty("w");
             d = (int) ctx.getProperty("d");
             h = (int) ctx.getProperty("h");
-            size = (2 * w - 1) * (2 * d - 1) * (h - 1);
+            size = (2 * w - 1) * (2 * d - 1);
             doors = (List<DoorState>) ctx.getProperty("doors");
         }
     }
@@ -85,7 +85,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     public double getPowerCons() {
-        return TinactoryConfig.INSTANCE.cleanroomAmperage.get() * getVoltage();
+        return TinactoryConfig.INSTANCE.cleanroomAmperage.get() * getVoltage() * Math.sqrt(size);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return;
         }
         var workFactor = partial * Math.sqrt((double) voltage / (double) Voltage.ULV.value);
-        var clean = workFactor * TinactoryConfig.INSTANCE.cleanroomBaseClean.get() / Math.max(1d, size);
+        var clean = workFactor * TinactoryConfig.INSTANCE.cleanroomBaseClean.get() / Math.max(1d, h - 1);
 
         cleanness = Math.min(1d, cleanness + clean - cleanness * clean);
     }

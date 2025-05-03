@@ -14,6 +14,7 @@ import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
+import org.shsts.tinactory.content.recipe.LaserEngravingRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
@@ -32,7 +33,7 @@ public final class AllRecipes {
     public static final IRecipeType<ToolRecipe.Builder> TOOL_CRAFTING;
     public static final IRecipeType<ResearchRecipe.Builder> RESEARCH_BENCH;
     public static final IRecipeType<AssemblyRecipe.Builder> ASSEMBLER;
-    public static final IRecipeType<ProcessingRecipe.Builder> LASER_ENGRAVER;
+    public static final IRecipeType<LaserEngravingRecipe.Builder> LASER_ENGRAVER;
     public static final IRecipeType<ProcessingRecipe.Builder> CIRCUIT_ASSEMBLER;
     public static final IRecipeType<ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final IRecipeType<OreAnalyzerRecipe.Builder> ORE_ANALYZER;
@@ -79,7 +80,9 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.375d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(2))
             .register();
 
-        LASER_ENGRAVER = processing("laser_engraver")
+        LASER_ENGRAVER = REGISTRATE.recipeType("laser_engraver", LaserEngravingRecipe.Builder::new)
+            .recipeClass(LaserEngravingRecipe.class)
+            .serializer(LaserEngravingRecipe.SERIALIZER)
             .defaults($ -> $.amperage(0.625d).defaultOutputItem(2))
             .register();
 

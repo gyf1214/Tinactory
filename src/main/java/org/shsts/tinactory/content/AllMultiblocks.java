@@ -56,16 +56,13 @@ public final class AllMultiblocks {
         FROST_PROOF_CASING = solid("frost_proof");
         CLEAN_STAINLESS_CASING = solid("clean_stainless_steel");
         PLASCRETE = solid("plascrete", false);
-        FILTER_CASING = solid("filter_casing", false);
 
         COIL_BLOCKS = new HashSet<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
         KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
 
-        GRATE_MACHINE_CASING = REGISTRATE.block(
-                "multiblock/grate_machine_casing", Block::new)
-            .properties(CASING_PROPERTY)
-            .register();
+        FILTER_CASING = misc("filter_casing");
+        GRATE_MACHINE_CASING = misc("grate_machine_casing");
 
         BLAST_FURNACE = multiblock("blast_furnace")
             .blockEntity()
@@ -239,6 +236,12 @@ public final class AllMultiblocks {
             .register();
         COIL_BLOCKS.add(ret);
         return ret;
+    }
+
+    private static IEntry<Block> misc(String name) {
+        return REGISTRATE.block("multiblock/misc/" + name, Block::new)
+            .properties(CASING_PROPERTY)
+            .register();
     }
 
     public static void init() {}

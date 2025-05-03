@@ -54,7 +54,7 @@ public final class MultiblockManager {
         for (var x = -w + 1; x <= w - 1; x++) {
             for (var z = -d + 1; z <= d - 1; z++) {
                 for (var y = 1; y < h; y++) {
-                    var pos = center.offset(x, y, z);
+                    var pos = center.offset(x, -y, z);
                     if (cleanroomMap.get(pos).isPresent()) {
                         LOGGER.warn("Cleanroom conflict at {}:{}", dimension.location(), pos);
                     }

@@ -137,6 +137,11 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
     }
 
     @Override
+    public BlockEntity blockEntity() {
+        return blockEntity;
+    }
+
+    @Override
     public Optional<IProcessor> processor() {
         return PROCESSOR.tryGet(blockEntity);
     }
