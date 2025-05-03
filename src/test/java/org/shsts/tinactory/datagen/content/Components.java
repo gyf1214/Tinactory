@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -103,6 +104,7 @@ import static org.shsts.tinactory.content.AllRecipes.LASER_ENGRAVER;
 import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
+import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
 import static org.shsts.tinactory.content.AllTags.COIL;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
@@ -286,6 +288,8 @@ public final class Components {
                 .model(basicItem(texBase + "/base", texBase + "/overlay"))
                 .build();
         });
+
+        DATA_GEN.tag(BlockTags.DOORS, CLEANROOM_DOOR);
     }
 
     private static void ulvRecipes() {

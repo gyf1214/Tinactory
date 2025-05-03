@@ -36,7 +36,9 @@ public final class AllTags {
 
     public static final TagKey<Item> MACHINE = modItem("machine");
     public static final TagKey<Block> COIL = modBlock("multiblock/coil");
-    public static final TagKey<Block> CLEANROOM_WALL = modBlock("cleanroom_wall");
+    public static final TagKey<Block> CLEANROOM_WALL = modBlock("multiblock/cleanroom_wall");
+    public static final TagKey<Block> CLEANROOM_CONNECTOR = modBlock("multiblock/cleanroom_connector");
+    public static final TagKey<Block> CLEANROOM_DOOR = modBlock("multiblock/cleanroom_door");
 
     public static TagKey<Item> machineTag(IRecipeType<?> recipeType) {
         return extend(MACHINE, recipeType.id());

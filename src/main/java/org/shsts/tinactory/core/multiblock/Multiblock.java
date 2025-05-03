@@ -20,7 +20,7 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
-import org.shsts.tinactory.content.multiblock.CleanRoom;
+import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.content.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
@@ -341,8 +341,8 @@ public class Multiblock extends MultiblockBase {
             DistillationTower::new);
     }
 
-    public static <P> Builder<P> cleanRoom(IBlockEntityTypeBuilder<P> parent) {
-        return new Builder<>(parent, CleanRoom::new);
+    public static <P> Builder<P> cleanroom(IBlockEntityTypeBuilder<P> parent) {
+        return new Builder<>(parent, Cleanroom::new);
     }
 
     public static Optional<Multiblock> tryGet(BlockEntity be) {

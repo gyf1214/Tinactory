@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import org.shsts.tinactory.content.multiblock.CleanRoom;
+import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
+import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
 
 @ParametersAreNonnullByDefault
@@ -195,13 +197,17 @@ public final class AllMultiblocks {
         CLEANROOM = BlockEntityBuilder.builder("multiblock/cleanroom", FixedBlock::new)
             .translucent()
             .blockEntity()
-            .child(Multiblock::cleanRoom)
+            .child(Multiblock::cleanroom)
             .appearanceBlock(PLASCRETE)
-            .spec(CleanRoom::spec)
+            .spec(Cleanroom::spec)
             .baseBlock(PLASCRETE)
             .ceilingBlock(FILTER_CASING)
             .wallTag(CLEANROOM_WALL)
+            .connectorTag(CLEANROOM_CONNECTOR)
+            .doorTag(CLEANROOM_DOOR)
             .maxSize(7)
+            .maxConnector(1)
+            .maxDoor(2)
             .build()
             .build()
             .end()

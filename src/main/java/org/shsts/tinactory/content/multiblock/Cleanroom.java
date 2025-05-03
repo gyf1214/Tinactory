@@ -7,7 +7,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -21,6 +23,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
+import org.shsts.tinactory.core.multiblock.MultiblockManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,22 +36,36 @@ import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CleanRoom extends Multiblock implements IProcessor, IElectricMachine,
+public class Cleanroom extends Multiblock implements IProcessor, IElectricMachine,
     INBTSerializable<CompoundTag> {
-    private double cleanness = 0d;
-    private double size;
+    private record DoorState(BlockPos pos, Direction facing) {}
 
-    public CleanRoom(BlockEntity blockEntity, Builder<?> builder) {
+    private double cleanness = 0d;
+    private int w, d, h;
+    private int size;
+    private List<DoorState> doors;
+
+    public Cleanroom(BlockEntity blockEntity, Builder<?> builder) {
         super(blockEntity, builder.layout(AllLayouts.CLEANROOM));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void doCheckMultiblock(CheckContext ctx) {
         super.doCheckMultiblock(ctx);
-        var w = (int) ctx.getProperty("w");
-        var h = (int) ctx.getProperty("h");
-        var y = (int) ctx.getProperty("y");
-        size = (2 * w - 1d) * (2 * h - 1d) * (y - 1d);
+        if (!ctx.isFailed()) {
+            w = (int) ctx.getProperty("w");
+            d = (int) ctx.getProperty("d");
+            h = (int) ctx.getProperty("h");
+            size = (2 * w - 1) * (2 * d - 1) * (h - 1);
+            doors = (List<DoorState>) ctx.getProperty("doors");
+        }
+    }
+
+    @Override
+    protected void onRegister() {
+        super.onRegister();
+        manager.registerCleanroom(this, blockEntity.getBlockPos(), w, d, h);
     }
 
     @Override
@@ -92,7 +109,24 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
     }
 
     private boolean isOpen() {
-        return multiblockInterface == null;
+        if (multiblockInterface == null) {
+            return true;
+        }
+        var world = blockEntity.getLevel();
+        assert world != null;
+        for (var doorState : doors) {
+            if (!world.isLoaded(doorState.pos)) {
+                return true;
+            }
+            var state = world.getBlockState(doorState.pos);
+            var axis = state.getOptionalValue(DoorBlock.FACING).map(Direction::getAxis);
+            var open = state.getOptionalValue(DoorBlock.OPEN);
+            if (axis.isEmpty() || open.isEmpty() ||
+                ((axis.get() == doorState.facing.getAxis()) == open.get())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -157,23 +191,23 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
         private boolean getSizes(MultiblockCheckCtx ctx) {
             var center = ctx.getCenter();
             var w = 1;
-            var h = 1;
+            var d = 1;
             for (; w < maxSize; w++) {
                 if (ctx.getBlock(center.east(w)).filter($ -> $.is(ceilingBlock.get())).isEmpty()) {
                     break;
                 }
             }
-            for (; h < maxSize; h++) {
-                if (ctx.getBlock(center.south(h)).filter($ -> $.is(ceilingBlock.get())).isEmpty()) {
+            for (; d < maxSize; d++) {
+                if (ctx.getBlock(center.south(d)).filter($ -> $.is(ceilingBlock.get())).isEmpty()) {
                     break;
                 }
             }
             for (var x = -w; x <= w; x++) {
-                for (var z = -h; z <= h; z++) {
+                for (var z = -d; z <= d; z++) {
                     if (x == 0 && z == 0) {
                         continue;
                     }
-                    var edge = x == -w || x == w || z == -h || z == h;
+                    var edge = x == -w || x == w || z == -d || z == d;
                     var block = ctx.getBlock(center.offset(x, 0, z));
                     if (block.isEmpty()) {
                         ctx.setFailed();
@@ -191,8 +225,8 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
                 }
             }
             ctx.setProperty("w", w);
-            ctx.setProperty("h", h);
-            ctx.setProperty("doors", new ArrayList<BlockPos>());
+            ctx.setProperty("d", d);
+            ctx.setProperty("doors", new ArrayList<DoorState>());
             ctx.setProperty("connectors", 0);
             return true;
         }
@@ -203,10 +237,10 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
             }
             var center = ctx.getCenter().below(y);
             var w = (int) ctx.getProperty("w");
-            var h = (int) ctx.getProperty("h");
+            var d = (int) ctx.getProperty("d");
             var blocks = new ArrayList<BlockPos>();
             for (var x = -w; x <= w; x++) {
-                for (var z = -h; z <= h; z++) {
+                for (var z = -d; z <= d; z++) {
                     var pos = center.offset(x, 0, z);
                     var block = ctx.getBlock(pos);
                     if (block.isEmpty() || !block.get().is(baseBlock.get())) {
@@ -222,11 +256,12 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
         }
 
         @SuppressWarnings("unchecked")
-        private boolean checkWallBlock(MultiblockCheckCtx ctx, BlockPos pos, BlockState block) {
+        private boolean checkWallBlock(MultiblockCheckCtx ctx, BlockPos pos, BlockState block, Direction face) {
             if (doorTag != null && block.is(doorTag)) {
-                var doors = (List<BlockPos>) ctx.getProperty("doors");
+                var doors = (List<DoorState>) ctx.getProperty("doors");
                 if (doors.size() < maxDoor) {
-                    doors.add(pos);
+                    ctx.setProperty("doorFace", face);
+                    doors.add(new DoorState(pos, face));
                     return true;
                 } else {
                     return false;
@@ -250,12 +285,12 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
         private boolean checkWall(MultiblockCheckCtx ctx, int y) {
             var center = ctx.getCenter().below(y);
             var w = (int) ctx.getProperty("w");
-            var h = (int) ctx.getProperty("h");
+            var d = (int) ctx.getProperty("d");
             for (var x = -w; x <= w; x++) {
                 var corner = x == -w || x == w;
-                var pos1 = center.offset(x, 0, -h);
+                var pos1 = center.offset(x, 0, -d);
                 var block1 = ctx.getBlock(pos1);
-                var pos2 = center.offset(x, 0, h);
+                var pos2 = center.offset(x, 0, d);
                 var block2 = ctx.getBlock(pos2);
                 if (block1.isEmpty() || block2.isEmpty()) {
                     return false;
@@ -265,7 +300,8 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
                         return false;
                     }
                 } else {
-                    if (!checkWallBlock(ctx, pos1, block1.get()) || !checkWallBlock(ctx, pos2, block2.get())) {
+                    if (!checkWallBlock(ctx, pos1, block1.get(), Direction.NORTH) ||
+                        !checkWallBlock(ctx, pos2, block2.get(), Direction.SOUTH)) {
                         return false;
                     }
                 }
@@ -273,13 +309,14 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
                 ctx.addBlock(pos2);
             }
 
-            for (var z = -h + 1; z <= h - 1; z++) {
+            for (var z = -d + 1; z <= d - 1; z++) {
                 var pos1 = center.offset(w, 0, z);
                 var block1 = ctx.getBlock(pos1);
                 var pos2 = center.offset(-w, 0, z);
                 var block2 = ctx.getBlock(pos2);
                 if (block1.isEmpty() || block2.isEmpty() ||
-                    !checkWallBlock(ctx, pos1, block1.get()) || !checkWallBlock(ctx, pos2, block2.get())) {
+                    !checkWallBlock(ctx, pos1, block1.get(), Direction.EAST) ||
+                    !checkWallBlock(ctx, pos2, block2.get(), Direction.WEST)) {
                     return false;
                 }
                 ctx.addBlock(pos1);
@@ -303,7 +340,7 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
         private void checkLayers(MultiblockCheckCtx ctx) {
             for (var y = 1; y < maxSize; y++) {
                 if (!checkLayer(ctx, y)) {
-                    ctx.setProperty("y", y);
+                    ctx.setProperty("h", y);
                     return;
                 }
             }
@@ -382,5 +419,11 @@ public class CleanRoom extends Multiblock implements IProcessor, IElectricMachin
 
     public static <P> SpecBuilder<P> spec(P parent) {
         return new SpecBuilder<>(parent);
+    }
+
+    public static double getCleanness(Level world, BlockPos pos) {
+        assert !world.isClientSide;
+        return MultiblockManager.get(world).getCleanroom(pos)
+            .map($ -> ((Cleanroom) $).cleanness).orElse(0d);
     }
 }

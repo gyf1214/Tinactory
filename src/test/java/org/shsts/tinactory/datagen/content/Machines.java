@@ -102,6 +102,7 @@ import static org.shsts.tinactory.content.AllMultiblocks.VACUUM_FREEZER;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
+import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
@@ -212,6 +213,7 @@ public final class Machines {
                 .overlay(Direction.SOUTH, IO_OUT_TEX)
                 .build()
                 .tag(MINEABLE_WITH_WRENCH)
+                .tag(CLEANROOM_CONNECTOR)
                 .build());
     }
 
