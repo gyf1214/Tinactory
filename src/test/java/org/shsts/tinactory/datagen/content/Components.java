@@ -77,19 +77,25 @@ import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
+import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
+import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
+import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllMultiblocks.CUPRONICKEL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiblocks.FILTER_CASING;
+import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.GRATE_MACHINE_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.KANTHAL_COIL_BLOCK;
@@ -98,6 +104,7 @@ import static org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
+import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.LASER_ENGRAVER;
@@ -112,6 +119,8 @@ import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
+import static org.shsts.tinactory.content.electric.Circuits.board;
+import static org.shsts.tinactory.content.electric.Circuits.circuitBoard;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
@@ -136,7 +145,7 @@ public final class Components {
         ulvRecipes();
         componentRecipes();
         circuitRecipes();
-        miscRecipes();
+        multiblockRecipes();
     }
 
     private static void components() {
@@ -237,10 +246,10 @@ public final class Components {
                 default -> tier.board;
             };
 
-            DATA_GEN.item(Circuits.board(tier))
+            DATA_GEN.item(board(tier))
                 .model(basicItem("metaitems/board." + boardName))
                 .build()
-                .item(Circuits.circuitBoard(tier))
+                .item(circuitBoard(tier))
                 .model(basicItem("metaitems/circuit_board." + tier.circuitBoard))
                 .build();
         }
@@ -339,6 +348,8 @@ public final class Components {
 
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, GLASS);
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, ELECTRUM, RUBY);
+        // TODO: sensor and emitter
+        componentRecipe(Voltage.HV, STAINLESS_STEEL, ELECTRUM, STAINLESS_STEEL, STEEL, STEEL, ELECTRUM, RUBY);
 
         batteryRecipe(Voltage.LV, CADMIUM);
         // TODO: Na
@@ -356,6 +367,11 @@ public final class Components {
         researchRecipe(Voltage.LV)
             .inputItem(ELECTRIC_MOTOR.get(Voltage.LV), 1)
             .inputItem(STEEL.tag("gear"), 1)
+            .build();
+
+        researchRecipe(Voltage.MV)
+            .inputItem(ELECTRIC_PUMP.get(Voltage.MV), 1)
+            .inputItem(circuitBoard(CircuitTier.CPU), 1)
             .build();
     }
 
@@ -516,9 +532,9 @@ public final class Components {
             .define('R', RESISTOR.getItem(CircuitComponentTier.NORMAL))
             .define('P', STEEL.tag("plate"))
             .define('T', VACUUM_TUBE.getItem())
-            .define('B', Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
+            .define('B', circuitBoard(CircuitTier.ELECTRONIC).get())
             .define('W', RED_ALLOY.tag("wire"))
-            .unlockedBy("has_board", has(Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())));
+            .unlockedBy("has_board", has(circuitBoard(CircuitTier.ELECTRONIC).get())));
 
         circuitRecipe(ELECTRONIC_CIRCUIT, VACUUM_TUBE, 2, RESISTOR, 2, RED_ALLOY.tag("wire"), 2);
 
@@ -528,7 +544,7 @@ public final class Components {
             .define('D', DIODE.getItem(CircuitComponentTier.NORMAL))
             .define('P', STEEL.tag("plate"))
             .define('E', ELECTRONIC_CIRCUIT.getItem())
-            .define('B', Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
+            .define('B', circuitBoard(CircuitTier.ELECTRONIC).get())
             .define('W', COPPER.tag("wire"))
             .unlockedBy("has_circuit", has(ELECTRONIC_CIRCUIT.getItem())));
 
@@ -579,23 +595,23 @@ public final class Components {
 
         // boards
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-            .shaped(Circuits.board(CircuitTier.ELECTRONIC).get(), 3)
+            .shaped(board(CircuitTier.ELECTRONIC).get(), 3)
             .pattern("SSS").pattern("WWW").pattern("SSS")
             .define('S', STICKY_RESIN.get())
             .define('W', ItemTags.PLANKS)
             .unlockedBy("has_resin", has(STICKY_RESIN.get())));
 
-        ASSEMBLER.recipe(DATA_GEN, Circuits.board(CircuitTier.ELECTRONIC))
-            .outputItem(Circuits.board(CircuitTier.ELECTRONIC), 1)
+        ASSEMBLER.recipe(DATA_GEN, board(CircuitTier.ELECTRONIC))
+            .outputItem(board(CircuitTier.ELECTRONIC), 1)
             .inputItem(ItemTags.PLANKS, 1)
             .inputItem(STICKY_RESIN, 2)
             .workTicks(200L)
             .voltage(Voltage.ULV)
             .build();
 
-        ASSEMBLER.recipe(DATA_GEN, Circuits.board(CircuitTier.INTEGRATED))
-            .outputItem(Circuits.board(CircuitTier.INTEGRATED), 1)
-            .inputItem(Circuits.board(CircuitTier.ELECTRONIC), 2)
+        ASSEMBLER.recipe(DATA_GEN, board(CircuitTier.INTEGRATED))
+            .outputItem(board(CircuitTier.INTEGRATED), 1)
+            .inputItem(board(CircuitTier.ELECTRONIC), 2)
             .inputItem(RED_ALLOY.tag("wire"), 8)
             .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(1f))
             .workTicks(200L)
@@ -603,31 +619,51 @@ public final class Components {
             .requireTech(Technologies.INTEGRATED_CIRCUIT)
             .build();
 
+        CHEMICAL_REACTOR.recipe(DATA_GEN, board(CircuitTier.CPU))
+            .input(PE, "sheet", 1)
+            .input(COPPER, "foil", 4)
+            .input(SULFURIC_ACID, "dilute", 0.25f)
+            .outputItem(board(CircuitTier.CPU), 1)
+            .workTicks(240L)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CPU)
+            .build();
+
         // circuit boards
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-            .shaped(Circuits.circuitBoard(CircuitTier.ELECTRONIC).get())
+            .shaped(circuitBoard(CircuitTier.ELECTRONIC).get())
             .pattern("WWW").pattern("WBW").pattern("WWW")
-            .define('B', Circuits.board(CircuitTier.ELECTRONIC).get())
+            .define('B', board(CircuitTier.ELECTRONIC).get())
             .define('W', COPPER.tag("wire"))
-            .unlockedBy("has_board", has(Circuits.board(CircuitTier.ELECTRONIC).get())));
+            .unlockedBy("has_board", has(board(CircuitTier.ELECTRONIC).get())));
 
-        ASSEMBLER.recipe(DATA_GEN, Circuits.circuitBoard(CircuitTier.ELECTRONIC))
-            .outputItem(Circuits.circuitBoard(CircuitTier.ELECTRONIC), 1)
-            .inputItem(Circuits.board(CircuitTier.ELECTRONIC), 1)
+        ASSEMBLER.recipe(DATA_GEN, circuitBoard(CircuitTier.ELECTRONIC))
+            .outputItem(circuitBoard(CircuitTier.ELECTRONIC), 1)
+            .inputItem(board(CircuitTier.ELECTRONIC), 1)
             .inputItem(COPPER.tag("wire"), 8)
             .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(0.5f))
             .workTicks(200L)
             .voltage(Voltage.ULV)
             .build();
 
-        ASSEMBLER.recipe(DATA_GEN, Circuits.circuitBoard(CircuitTier.INTEGRATED))
-            .outputItem(Circuits.circuitBoard(CircuitTier.INTEGRATED), 1)
-            .inputItem(Circuits.board(CircuitTier.INTEGRATED), 1)
+        ASSEMBLER.recipe(DATA_GEN, circuitBoard(CircuitTier.INTEGRATED))
+            .outputItem(circuitBoard(CircuitTier.INTEGRATED), 1)
+            .inputItem(board(CircuitTier.INTEGRATED), 1)
             .inputItem(SILVER.tag("wire"), 8)
             .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(0.5f))
             .workTicks(200L)
             .voltage(Voltage.LV)
             .requireTech(Technologies.INTEGRATED_CIRCUIT)
+            .build();
+
+        CHEMICAL_REACTOR.recipe(DATA_GEN, circuitBoard(CircuitTier.CPU))
+            .inputItem(board(CircuitTier.CPU), 1)
+            .input(COPPER, "foil", 6)
+            .input(IRON_CHLORIDE, 0.25f)
+            .outputItem(circuitBoard(CircuitTier.CPU), 1)
+            .workTicks(320L)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CPU)
             .build();
 
         // boules
@@ -742,9 +778,11 @@ public final class Components {
             .build();
     }
 
-    private static void miscRecipes() {
+    private static void multiblockRecipes() {
         solidRecipe(HEATPROOF_CASING, Voltage.ULV, INVAR, Technologies.STEEL);
         solidRecipe(SOLID_STEEL_CASING, Voltage.LV, STEEL, Technologies.STEEL);
+        solidRecipe(FROST_PROOF_CASING, Voltage.LV, ALUMINIUM, Technologies.VACUUM_FREEZER);
+        solidRecipe(CLEAN_STAINLESS_CASING, Voltage.MV, STAINLESS_STEEL, Technologies.DISTILLATION);
 
         coilRecipe(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, CUPRONICKEL, BRONZE, Technologies.STEEL);
         coilRecipe(KANTHAL_COIL_BLOCK, Voltage.LV, KANTHAL, SILVER, Technologies.KANTHAL);
@@ -767,6 +805,26 @@ public final class Components {
             .voltage(Voltage.LV)
             .workTicks(140L)
             .requireTech(Technologies.SIFTING)
+            .build()
+            .recipe(DATA_GEN, PLASCRETE)
+            .outputItem(PLASCRETE, 1)
+            .inputItem(STEEL.tag("stick"), 2)
+            .inputItem(PE.tag("sheet"), 3)
+            .workTicks(200L)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CLEANROOM)
+            .build()
+            .recipe(DATA_GEN, FILTER_CASING)
+            .outputItem(FILTER_CASING, 2)
+            .inputItem(STEEL.tag("stick"), 4)
+            .inputItem(ELECTRIC_MOTOR.get(Voltage.MV), 1)
+            .inputItem(BRONZE.tag("rotor"), 1)
+            .inputItem(ITEM_FILTER, 3)
+            .inputItem(PE.tag("sheet"), 3)
+            .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(2))
+            .voltage(Voltage.MV)
+            .workTicks(200L)
+            .requireTech(Technologies.CLEANROOM)
             .build();
     }
 
@@ -774,8 +832,8 @@ public final class Components {
         ResourceLocation tech) {
         ASSEMBLER.recipe(DATA_GEN, block)
             .outputItem(block, 1)
-            .inputItem(mat.tag("plate"), 3)
             .inputItem(mat.tag("stick"), 2)
+            .inputItem(mat.tag("plate"), 3)
             .workTicks(140L)
             .voltage(v)
             .transform($ -> v != Voltage.ULV ?

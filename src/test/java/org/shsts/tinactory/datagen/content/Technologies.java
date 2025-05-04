@@ -44,8 +44,13 @@ public final class Technologies {
     public static ResourceLocation INTEGRATED_CIRCUIT;
     public static ResourceLocation COLD_WORKING;
     public static ResourceLocation ELECTROLYZING;
+    public static ResourceLocation VACUUM_FREEZER;
     public static ResourceLocation CHEMISTRY;
     public static ResourceLocation OIL_PROCESSING;
+    public static ResourceLocation ORGANIC_CHEMISTRY;
+    public static ResourceLocation CPU;
+    public static ResourceLocation DISTILLATION;
+    public static ResourceLocation CLEANROOM;
 
     public static void init() {
         TECHS = DATA_GEN.createHandler(TechProvider::new);
@@ -147,6 +152,16 @@ public final class Technologies {
             .displayItem(AllMaterials.GOLD.entry("wire"))
             .register();
 
+        VACUUM_FREEZER = factory.tech("vacuum_freezer")
+            .maxProgress(50L)
+            .displayItem(AllMultiblocks.VACUUM_FREEZER)
+            .register();
+
+        DISTILLATION = factory.tech("distillation")
+            .maxProgress(50L)
+            .displayItem(AllMultiblocks.DISTILLATION_TOWER)
+            .register();
+
         CHEMISTRY = factory.child("chemistry")
             .maxProgress(40L)
             .displayItem(AllItems.RESEARCH_EQUIPMENT.get(Voltage.LV))
@@ -155,6 +170,24 @@ public final class Technologies {
         OIL_PROCESSING = factory.tech("oil_processing")
             .maxProgress(60L)
             .displayItem(AllMaterials.SULFUR.entry("dust"))
+            .register();
+
+        ORGANIC_CHEMISTRY = factory.child("organic_chemistry")
+            .maxProgress(50L)
+            .displayItem(AllMaterials.PE.entry("sheet"))
+            .register();
+
+        CPU = factory.tech("cpu")
+            .maxProgress(100L)
+            .displayItem(AllItems.WAFERS.get("cpu"))
+            .depends(INTEGRATED_CIRCUIT)
+            .register();
+
+        factory.base(CHEMISTRY).voltage(Voltage.MV);
+
+        CLEANROOM = factory.tech("cleanroom")
+            .maxProgress(40L)
+            .displayItem(AllMultiblocks.CLEANROOM)
             .register();
     }
 
@@ -183,6 +216,11 @@ public final class Technologies {
 
         public TechFactory voltage(Voltage val) {
             baseVoltage = val;
+            return this;
+        }
+
+        public TechFactory base(ResourceLocation val) {
+            base = val;
             return this;
         }
 

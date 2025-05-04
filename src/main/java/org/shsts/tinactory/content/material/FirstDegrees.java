@@ -16,11 +16,13 @@ import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.ETHANE;
+import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.ETHYLENE;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_SULFIDE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
+import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_BRINE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
@@ -125,7 +127,7 @@ public final class FirstDegrees {
 
         STAINLESS_STEEL = set("stainless_steel")
             .color(0xFFC8C8DC)
-            .mechanical().gear().molten()
+            .mechanical().gear().molten().pipe()
             .toolSet(1200, Tiers.IRON)
             .buildObject();
 
@@ -163,6 +165,8 @@ public final class FirstDegrees {
         PROPANE = gas("propane", 0xFFFAE250);
         ETHYLENE = gas("ethylene", 0xFFE1E1E1);
         PROPENE = gas("propene", 0xFFFFDD55);
+        ETHANOL = fluid("ethanol", 0xFFFC4C04, "liquid");
+        IRON_CHLORIDE = liquid("iron_chloride", 0xFF060B0B);
     }
 
     public static void init() {}

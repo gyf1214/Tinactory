@@ -98,6 +98,8 @@ public final class AllMaterials {
     public static MaterialSet PROPANE;
     public static MaterialSet ETHYLENE;
     public static MaterialSet PROPENE;
+    public static MaterialSet ETHANOL;
+    public static MaterialSet IRON_CHLORIDE;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;

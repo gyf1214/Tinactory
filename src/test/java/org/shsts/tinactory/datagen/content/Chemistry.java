@@ -7,10 +7,14 @@ import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.content.AllItems.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
+import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ARGON;
+import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
@@ -18,12 +22,15 @@ import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CHLORINE;
 import static org.shsts.tinactory.content.AllMaterials.ETHANE;
+import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.ETHYLENE;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_OIL;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_SULFIDE;
+import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_BRINE;
@@ -34,12 +41,14 @@ import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.NITRIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
+import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
 import static org.shsts.tinactory.content.AllMaterials.PROPANE;
 import static org.shsts.tinactory.content.AllMaterials.PROPENE;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
+import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
@@ -47,6 +56,7 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
+import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
@@ -97,11 +107,17 @@ public class Chemistry {
             .recipe(SULFURIC_ACID, "dilute", 2f, 800, SULFURIC_ACID, 1f, WATER, "gas", 1f)
             .recipe(WATER, 1f, 400, WATER, "gas", 1f);
 
+        ELECTROLYZER.voltage(Voltage.MV)
+            .recipe(WATER, 1f, 1600, HYDROGEN, 1f, OXYGEN, 0.5f)
+            .recipe(SALT_WATER, 2f, 1600, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
+            .recipe(SEA_WATER, 2f, 3200, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
+            .recipe(BAUXITE, 15, 320, ALUMINIUM, "dust", 6, OXYGEN, 9f, RUTILE, 1);
+
         CHEMICAL_REACTOR.recipe(DATA_GEN, HYDROGEN_CHLORIDE.fluidLoc())
             .input(HYDROGEN, 0.5f)
             .input(CHLORINE, 0.5f)
             .output(HYDROGEN_CHLORIDE)
-            .workTicks(128)
+            .workTicks(64)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -109,7 +125,7 @@ public class Chemistry {
             .input(CARBON)
             .input(OXYGEN)
             .output(CARBON_DIOXIDE)
-            .workTicks(320)
+            .workTicks(240)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -118,7 +134,7 @@ public class Chemistry {
             .input(CALCIUM_CHLORIDE)
             .output(CALCIUM_CARBONATE)
             .output(SODIUM_CHLORIDE, 2f)
-            .workTicks(128)
+            .workTicks(64)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -128,7 +144,7 @@ public class Chemistry {
             .output(SODIUM_CHLORIDE, 2f)
             .output(WATER)
             .output(CARBON_DIOXIDE)
-            .workTicks(240)
+            .workTicks(160)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -146,7 +162,7 @@ public class Chemistry {
             .input(HYDROGEN_CHLORIDE)
             .output(SODIUM_CHLORIDE)
             .output(WATER)
-            .workTicks(128)
+            .workTicks(32)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -165,7 +181,7 @@ public class Chemistry {
             .output(CALCIUM_CHLORIDE)
             .output(WATER)
             .output(CARBON_DIOXIDE)
-            .workTicks(240)
+            .workTicks(160)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -174,7 +190,7 @@ public class Chemistry {
             .input(HYDROGEN_CHLORIDE, 2f)
             .output(CALCIUM_CHLORIDE)
             .output(WATER, 2f)
-            .workTicks(128)
+            .workTicks(32)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -192,15 +208,21 @@ public class Chemistry {
             .input(OXYGEN, 2f)
             .output(SULFURIC_ACID, "gas", 1f)
             .output(WATER)
-            .workTicks(480)
+            .workTicks(320)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(SULFURIC_ACID.fluidLoc("gas"), "_from_sulfur"))
+            .input(SULFUR)
+            .input(OXYGEN, 1.5f)
+            .output(SULFURIC_ACID, "gas", 1f)
+            .workTicks(480)
             .build()
             .recipe(DATA_GEN, SULFURIC_ACID.fluidLoc("dilute"))
             .input(SULFURIC_ACID, "gas", 1f)
             .input(WATER, 2f)
-            .output(SULFURIC_ACID, "dilute", 1f)
-            .workTicks(128)
+            .output(SULFURIC_ACID, "dilute", 2f)
+            .workTicks(64)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -209,7 +231,7 @@ public class Chemistry {
             .input(SODIUM_CARBONATE)
             .output(POTASSIUM_CARBONATE)
             .output(SODIUM_CHLORIDE, 2f)
-            .workTicks(240)
+            .workTicks(128)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
@@ -219,7 +241,16 @@ public class Chemistry {
             .output(POTASSIUM_NITRATE, 2f)
             .output(WATER)
             .output(CARBON_DIOXIDE)
-            .workTicks(240)
+            .workTicks(160)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, IRON_CHLORIDE.fluidLoc())
+            .input(IRON)
+            .input(HYDROGEN_CHLORIDE, 3f)
+            .output(IRON_CHLORIDE)
+            .output(HYDROGEN, 1.5f)
+            .workTicks(160)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build();
@@ -286,24 +317,56 @@ public class Chemistry {
             .inputItem(STONE.tag("dust"), 1)
             .inputFluid(BIOMASS, 1000)
             .outputItem(() -> Blocks.DIRT, 1)
+            .workTicks(160)
+            .voltage(Voltage.MV)
+            .build();
+
+        CHEMICAL_REACTOR.recipe(DATA_GEN, suffix(CARBON_DIOXIDE.fluidLoc(), "_from_methane"))
+            .input(METHANE)
+            .input(WATER, 2f)
+            .output(CARBON_DIOXIDE)
+            .output(HYDROGEN, 4f)
+            .workTicks(128)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, PE.fluidLoc())
+            .input(ETHYLENE, 0.144f)
+            .input(OXYGEN)
+            .output(PE)
+            .workTicks(160)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(ETHYLENE.fluidLoc(), "_from_ethanol"))
+            .input(ETHANOL)
+            .input(SULFURIC_ACID)
+            .output(ETHYLENE)
+            .output(SULFURIC_ACID, "dilute", 2f)
             .workTicks(240)
             .voltage(Voltage.MV)
+            .requireTech(Technologies.ORGANIC_CHEMISTRY)
             .build();
     }
 
-    private static class DistillationFactory {
+    private static class DecomposeFactory {
+        private final IRecipeType<ProcessingRecipe.Builder> recipeType;
         private Voltage voltage;
 
-        public DistillationFactory voltage(Voltage value) {
+        private DecomposeFactory(IRecipeType<ProcessingRecipe.Builder> recipeType) {
+            this.recipeType = recipeType;
+        }
+
+        public DecomposeFactory voltage(Voltage value) {
             voltage = value;
             return this;
         }
 
-        public DistillationFactory recipe(MaterialSet input, String sub, Number inputAmount, long workTicks,
+        public DecomposeFactory recipe(MaterialSet input, String sub, Number inputAmount, long workTicks,
             Object... components) {
             var isFluid = input.hasFluid(sub);
             var loc = isFluid ? input.fluidLoc(sub) : input.loc(sub);
-            var builder = AllRecipes.DISTILLATION.recipe(DATA_GEN, loc)
+            var builder = recipeType.recipe(DATA_GEN, loc)
                 .voltage(voltage)
                 .workTicks(workTicks);
             if (isFluid) {
@@ -336,11 +399,13 @@ public class Chemistry {
             return this;
         }
 
-        public DistillationFactory recipe(MaterialSet input, Number inputAmounts, long workTicks,
+        public DecomposeFactory recipe(MaterialSet input, Number inputAmounts, long workTicks,
             Object... components) {
             return recipe(input, input.hasFluid() ? "fluid" : "dust", inputAmounts, workTicks, components);
         }
     }
 
-    private static final DistillationFactory DISTILLATION = new DistillationFactory();
+    private static final DecomposeFactory DISTILLATION = new DecomposeFactory(AllRecipes.DISTILLATION);
+
+    private static final DecomposeFactory ELECTROLYZER = new DecomposeFactory(AllRecipes.ELECTROLYZER);
 }

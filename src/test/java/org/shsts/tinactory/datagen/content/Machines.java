@@ -89,12 +89,15 @@ import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllMultiblocks.CLEANROOM;
+import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.DISTILLATION_TOWER;
+import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.SIFTER;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
@@ -346,6 +349,29 @@ public final class Machines {
             .voltage(Voltage.LV)
             .workTicks(ASSEMBLE_TICKS)
             .requireTech(Technologies.SIFTING)
+            .build()
+            .recipe(DATA_GEN, VACUUM_FREEZER)
+            .outputItem(VACUUM_FREEZER, 1)
+            .inputItem(FROST_PROOF_CASING, 1)
+            .inputItem(circuit(Voltage.HV), 4)
+            .inputItem(ELECTRIC_PUMP.get(Voltage.MV), 4)
+            .inputItem(CABLE.get(Voltage.MV), 4)
+            .inputItem(ALUMINIUM.tag("plate"), 4)
+            .voltage(Voltage.MV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.VACUUM_FREEZER)
+            .build()
+            .recipe(DATA_GEN, DISTILLATION_TOWER)
+            .outputItem(DISTILLATION_TOWER, 1)
+            .inputItem(CLEAN_STAINLESS_CASING, 1)
+            .inputItem(circuit(Voltage.HV), 4)
+            .inputItem(ELECTRIC_PUMP.get(Voltage.HV), 2)
+            .inputItem(CABLE.get(Voltage.HV), 4)
+            .inputItem(STAINLESS_STEEL.tag("pipe"), 4)
+            .inputItem(STAINLESS_STEEL.tag("plate"), 4)
+            .voltage(Voltage.MV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.DISTILLATION)
             .build();
     }
 
