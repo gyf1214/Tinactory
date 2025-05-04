@@ -25,7 +25,6 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
@@ -155,13 +154,7 @@ public class StackProcessingContainer extends CapabilityProvider
 
     @Override
     public Optional<? extends ITeamProfile> getOwnerTeam() {
-        var world = blockEntity.getLevel();
-        assert world != null;
-        if (world.isClientSide) {
-            return TechManager.localTeam();
-        } else {
-            return MACHINE.tryGet(blockEntity).flatMap(IMachine::owner);
-        }
+        return MACHINE.tryGet(blockEntity).flatMap(IMachine::owner);
     }
 
     @Override

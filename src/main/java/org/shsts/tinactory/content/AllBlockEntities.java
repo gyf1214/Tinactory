@@ -252,6 +252,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         MIXER = set.processing(AllRecipes.MIXER)
+            .processor(RecipeProcessor::noAutoRecipe)
             .layoutSet()
             .port(ITEM_INPUT)
             .slots(0, 1, 2, 3)

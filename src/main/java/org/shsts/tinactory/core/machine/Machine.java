@@ -31,6 +31,7 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -90,11 +91,15 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Optional<ITeamProfile> owner() {
+        var world = blockEntity.getLevel();
+        assert world != null;
+        if (world.isClientSide) {
+            return TechManager.localTeam();
+        }
         if (network == null) {
             return Optional.empty();
-        } else {
-            return Optional.of(network.team);
         }
+        return Optional.of(network.team);
     }
 
     @Override

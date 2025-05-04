@@ -410,7 +410,7 @@ public final class Components {
 
         factory.recipe(ELECTRIC_MOTOR)
             .material(magnetic, "magnetic", 1)
-            .material(main, "stick", 1)
+            .material(main, "stick", 2)
             .material(heat, "wire", 2 * voltage.rank)
             .component(CABLE, 2)
             .tech(Technologies.MOTOR)

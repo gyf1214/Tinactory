@@ -87,7 +87,7 @@ public final class FirstDegrees {
 
         STEEL = set("steel")
             .color(0xFF808080)
-            .mechanical().magnetic().gear().molten()
+            .mechanical().magnetic().gear().rotor().molten()
             .toolSet(800, Tiers.IRON)
             .buildObject();
 
