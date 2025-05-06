@@ -241,8 +241,8 @@ public class TechManager implements ITechManager {
                 var oldProgress = team.technologies.getOrDefault(progress.getKey(), 0L);
                 team.technologies.put(progress.getKey(), progress.getValue());
                 techByKey(progress.getKey())
-                    .filter(tech -> oldProgress < tech.maxProgress &&
-                        progress.getValue() >= tech.maxProgress)
+                    .filter(tech -> oldProgress < tech.getMaxProgress() &&
+                        progress.getValue() >= tech.getMaxProgress())
                     .ifPresent(team::onTechComplete);
             }
 

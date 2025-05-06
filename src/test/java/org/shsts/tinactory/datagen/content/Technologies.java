@@ -20,6 +20,7 @@ import java.util.Map;
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.datagen.content.builder.VeinBuilder.VEIN_TECH_RANK;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -55,19 +56,9 @@ public final class Technologies {
     public static void init() {
         TECHS = DATA_GEN.createHandler(TechProvider::new);
 
+        baseOreTech();
+
         var factory = new TechFactory();
-
-        BASE_ORE = new HashMap<>();
-        for (var variant : OreVariant.values()) {
-            var tech = factory.child("ore_base/" + variant.name().toLowerCase())
-                .maxProgress(20L)
-                .displayItem(variant.baseItem)
-                .researchVoltage(variant.voltage)
-                .register();
-            BASE_ORE.put(variant, tech);
-        }
-
-        factory.reset().voltage(Voltage.ULV);
 
         ALLOY_SMELTING = factory.child("alloy_smelting")
             .maxProgress(20L)
@@ -191,11 +182,28 @@ public final class Technologies {
             .register();
     }
 
+    private static void baseOreTech() {
+        BASE_ORE = new HashMap<>();
+        ResourceLocation prev = null;
+        for (var variant : OreVariant.values()) {
+            var prev1 = prev;
+            var tech = TECHS.builder("ore_base/" + variant.name().toLowerCase(), TechBuilder::factory)
+                .maxProgress(20L)
+                .displayItem(variant.baseItem)
+                .researchVoltage(variant.voltage)
+                .rank(VEIN_TECH_RANK)
+                .transform($ -> prev1 != null ? $.depends(prev1) : $)
+                .register();
+            BASE_ORE.put(variant, tech);
+            prev = tech;
+        }
+    }
+
     private static class TechFactory {
         @Nullable
         private ResourceLocation base = null;
-        @Nullable
-        private Voltage baseVoltage = null;
+        private Voltage baseVoltage = Voltage.ULV;
+        private int rank = 0;
 
         public TechBuilder<TechFactory> child(String id) {
             var builder = tech(id);
@@ -204,13 +212,12 @@ public final class Technologies {
         }
 
         public TechBuilder<TechFactory> tech(String id) {
-            var builder = TECHS.builder(this, id, TechBuilder::factory);
+            var builder = TECHS.builder(this, id, TechBuilder::factory)
+                .rank(rank++);
             if (base != null) {
                 builder.depends(base);
             }
-            if (baseVoltage != null) {
-                builder.researchVoltage(baseVoltage);
-            }
+            builder.researchVoltage(baseVoltage);
             return builder;
         }
 

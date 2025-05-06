@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
-import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
+import static org.shsts.tinactory.datagen.builder.TechBuilder.RANK_PER_VOLTAGE;
 import static org.shsts.tinactory.datagen.content.Technologies.BASE_ORE;
 import static org.shsts.tinactory.datagen.content.Technologies.TECHS;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
@@ -21,7 +21,10 @@ import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
+    public static final int VEIN_TECH_RANK = RANK_PER_VOLTAGE / 2;
+
     private final String id;
+    private final int rank;
     private final double rate;
     private final OreAnalyzerRecipe.Builder builder;
     private final List<MaterialSet> ores = new ArrayList<>();
@@ -29,15 +32,16 @@ public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
     private boolean primitive = false;
     private OreVariant variant = null;
 
-    private VeinBuilder(P parent, String id, double rate) {
+    private VeinBuilder(P parent, String id, int rank, double rate) {
         super(parent);
         this.id = id;
+        this.rank = rank;
         this.rate = rate;
         this.builder = ORE_ANALYZER.recipe(DATA_GEN, id).rate(rate);
     }
 
-    public static <P> VeinBuilder<P> factory(P parent, String id, double rate) {
-        var builder = new VeinBuilder<>(parent, id, rate);
+    public static <P> VeinBuilder<P> factory(P parent, String id, int rank, double rate) {
+        var builder = new VeinBuilder<>(parent, id, rank, rate);
         return builder.onBuild(builder::onRegister);
     }
 
@@ -83,12 +87,9 @@ public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
                 .maxProgress(baseProgress)
                 .displayItem(ores.get(0).loc("raw"))
                 .depends(tech)
+                .rank(rank + VEIN_TECH_RANK + 1)
+                .researchVoltage(variant.voltage)
                 .register();
-
-            RESEARCH_BENCH.recipe(DATA_GEN, tech)
-                .target(tech)
-                .voltage(variant.voltage)
-                .build();
         }
 
         if (!primitive) {

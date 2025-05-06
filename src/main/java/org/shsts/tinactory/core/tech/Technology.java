@@ -28,20 +28,22 @@ public class Technology implements ITechnology {
     private ResourceLocation loc = null;
     private final List<ResourceLocation> dependIds;
     private final List<ITechnology> depends = new ArrayList<>();
-    public final Map<String, Integer> modifiers;
-    public final long maxProgress;
+    private final Map<String, Integer> modifiers;
+    private final long maxProgress;
     @Nullable
-    public final Item displayItem;
+    private final Item displayItem;
     @Nullable
-    public final ResourceLocation displayTexture;
+    private final ResourceLocation displayTexture;
+    private final int rank;
 
     public Technology(List<ResourceLocation> dependIds, long maxProgress, Map<String, Integer> modifiers,
-        Optional<Item> displayItem, Optional<ResourceLocation> displayTexture) {
+        Optional<Item> displayItem, Optional<ResourceLocation> displayTexture, int rank) {
         this.dependIds = dependIds;
         this.modifiers = modifiers;
         this.maxProgress = maxProgress;
         this.displayItem = displayItem.orElse(null);
         this.displayTexture = displayTexture.orElse(null);
+        this.rank = rank;
     }
 
     @Override
@@ -86,6 +88,14 @@ public class Technology implements ITechnology {
         return displayTexture != null ? displayTexture : modLoc("void");
     }
 
+    /**
+     * Only compares rank, does not imply equal.
+     */
+    @Override
+    public int compareTo(ITechnology o) {
+        return Integer.compare(rank, ((Technology) o).rank);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -116,6 +126,7 @@ public class Technology implements ITechnology {
         ForgeRegistries.ITEMS.getCodec().optionalFieldOf("display_item")
             .forGetter(tech -> Optional.ofNullable(tech.displayItem)),
         ResourceLocation.CODEC.optionalFieldOf("display_texture")
-            .forGetter(tech -> Optional.ofNullable(tech.displayTexture))
+            .forGetter(tech -> Optional.ofNullable(tech.displayTexture)),
+        Codec.INT.fieldOf("rank").forGetter(tech -> tech.rank)
     ).apply(instance, Technology::new));
 }

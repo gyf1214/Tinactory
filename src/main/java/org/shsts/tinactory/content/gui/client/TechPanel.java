@@ -29,7 +29,6 @@ import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -326,6 +325,13 @@ public class TechPanel extends Panel {
         }
     }
 
+    private int compareTech(ITechnology a, ITechnology b) {
+        assert team != null;
+        var xa = team.canResearch(a) ? 0 : (team.isTechFinished(a) ? 2 : 1);
+        var xb = team.canResearch(b) ? 0 : (team.isTechFinished(b) ? 2 : 1);
+        return xa == xb ? a.compareTo(b) : (xa < xb ? -1 : 1);
+    }
+
     @Override
     protected void doRefresh() {
         if (team == null) {
@@ -343,8 +349,7 @@ public class TechPanel extends Panel {
 
         availableTechs.clear();
         availableTechs.addAll(techManager.allTechs().stream()
-            .sorted(Comparator.comparing(tech -> team.canResearch(tech) ? 0 :
-                (team.isTechFinished(tech) ? 2 : 1)))
+            .sorted(this::compareTech)
             .toList());
         availableTechPanel.refresh();
     }

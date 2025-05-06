@@ -165,7 +165,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             var progress = tag2.getLong("progress");
             techManager.techByKey(loc).ifPresent(tech -> {
                 technologies.put(loc, progress);
-                if (progress >= tech.maxProgress) {
+                if (progress >= tech.getMaxProgress()) {
                     onTechComplete(tech);
                 }
             });

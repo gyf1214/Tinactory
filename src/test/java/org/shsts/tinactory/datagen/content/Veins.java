@@ -90,8 +90,10 @@ public final class Veins {
     }
 
     private static class VeinFactory {
+        private int rank = 0;
+
         public VeinBuilder<VeinFactory> vein(String id, double rate) {
-            return VeinBuilder.factory(this, id, rate);
+            return VeinBuilder.factory(this, id, rank++, rate);
         }
     }
 

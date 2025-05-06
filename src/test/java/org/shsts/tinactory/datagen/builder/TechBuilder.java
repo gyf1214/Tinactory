@@ -27,9 +27,12 @@ import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> implements ILoc {
+    public static final int RANK_PER_VOLTAGE = 1000;
+
     private final ResourceLocation loc;
     private final List<ResourceLocation> depends = new ArrayList<>();
     private long maxProgress = 0;
+    private int rank = 0;
     private final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     private Supplier<ResourceLocation> displayItem = null;
@@ -88,11 +91,18 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         return this;
     }
 
+    public TechBuilder<P> rank(int val) {
+        rank = val;
+        return this;
+    }
+
     @Override
     protected JsonObject createObject() {
         assert maxProgress > 0;
         var jo = new JsonObject();
         jo.addProperty("max_progress", maxProgress);
+        var rank1 = researchVoltage != null ? RANK_PER_VOLTAGE * researchVoltage.rank : 0;
+        jo.addProperty("rank", rank + rank1);
         var ja = new JsonArray();
         depends.forEach(d -> ja.add(d.toString()));
         jo.add("depends", ja);

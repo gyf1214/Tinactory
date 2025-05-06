@@ -104,7 +104,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
                 y = drawRequiredText(stack, tech.get().getDepends().isEmpty(), y);
                 var text = I18n.tr("tinactory.jei.processing.progress",
                     NUMBER_FORMAT.format(recipe1.progress),
-                    NUMBER_FORMAT.format(tech.get().maxProgress));
+                    NUMBER_FORMAT.format(tech.get().getMaxProgress()));
                 y = drawTextLine(stack, text, y);
             }
         } else if (recipe instanceof BlastFurnaceRecipe recipe1) {

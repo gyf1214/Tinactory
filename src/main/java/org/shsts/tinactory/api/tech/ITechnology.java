@@ -10,7 +10,7 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface ITechnology {
+public interface ITechnology extends Comparable<ITechnology> {
     ResourceLocation getLoc();
 
     List<ITechnology> getDepends();
