@@ -10,6 +10,7 @@ import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
+import static org.shsts.tinactory.content.AllMaterials.BERYLLIUM;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CHLORINE;
@@ -53,7 +54,7 @@ public final class Elements {
             .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
             .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
             .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
-            .nugget().wireFine().molten()
+            .bolt().wireFine().molten()
             .ore(OreVariant.DEEPSLATE)
             .buildObject();
 
@@ -65,7 +66,7 @@ public final class Elements {
 
         TIN = set("tin")
             .color(0xFFDCDCDC)
-            .wireAndPlate().bolt().rotor().molten()
+            .wireFine().bolt().rotor().molten()
             .ore(OreVariant.STONE)
             .buildObject();
 
@@ -111,7 +112,7 @@ public final class Elements {
 
         ALUMINIUM = set("aluminium")
             .color(0xFF80C8F0)
-            .mechanical().gear().wire().molten()
+            .mechanical().foil().gear().wire().molten()
             .buildObject();
 
         LEAD = set("lead")
@@ -147,6 +148,11 @@ public final class Elements {
         ARGON = gas("argon", 0xFF00FF00);
         HYDROGEN = gas("hydrogen", 0xFF0000B5);
         CHLORINE = gas("chlorine", 0xFF2D8C8C);
+
+        BERYLLIUM = set("beryllium")
+            .color(0xFF64B464)
+            .plate().molten()
+            .buildObject();
     }
 
     public static void init() {}

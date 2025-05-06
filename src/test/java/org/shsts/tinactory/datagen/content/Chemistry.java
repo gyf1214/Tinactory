@@ -47,6 +47,7 @@ import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
 import static org.shsts.tinactory.content.AllMaterials.PROPANE;
 import static org.shsts.tinactory.content.AllMaterials.PROPENE;
+import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
@@ -58,6 +59,7 @@ import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
+import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.MIXER;
@@ -335,6 +337,23 @@ public class Chemistry {
             .input(OXYGEN)
             .output(PE)
             .workTicks(160)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, VINYL_CHLORIDE.fluidLoc())
+            .input(ETHANE)
+            .input(CHLORINE, 2f)
+            .output(VINYL_CHLORIDE, 1f)
+            .output(HYDROGEN_CHLORIDE, 3f)
+            .workTicks(256)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, PVC.fluidLoc())
+            .input(VINYL_CHLORIDE, 0.144f)
+            .input(OXYGEN)
+            .output(PVC)
+            .workTicks(200)
             .voltage(Voltage.MV)
             .requireTech(Technologies.ORGANIC_CHEMISTRY)
             .build()

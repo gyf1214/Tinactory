@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.electric;
 public enum CircuitTier {
     ELECTRONIC(Voltage.ULV, CircuitComponentTier.NORMAL, "coated", "basic"),
     INTEGRATED(Voltage.LV, CircuitComponentTier.NORMAL, "phenolic", "good"),
-    CPU(Voltage.MV, CircuitComponentTier.SMD, "plastic", "plastic"),
+    CPU(Voltage.MV, CircuitComponentTier.NORMAL, "plastic", "plastic"),
     NANO(Voltage.HV, CircuitComponentTier.SMD, "advanced_plastic", "advanced"),
     QUANTUM(Voltage.EV, CircuitComponentTier.SMD, "epoxy", "extreme"),
     CRYSTAL(Voltage.IV, CircuitComponentTier.ADVANCED, "advanced_epoxy", "elite"),

@@ -36,6 +36,7 @@ import static org.shsts.tinactory.content.AllItems.BASIC_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.BATTERY;
 import static org.shsts.tinactory.content.AllItems.BOULES;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.CAPACITOR;
 import static org.shsts.tinactory.content.AllItems.CHIPS;
 import static org.shsts.tinactory.content.AllItems.COMPONENT_ITEMS;
 import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
@@ -50,8 +51,13 @@ import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
 import static org.shsts.tinactory.content.AllItems.GOOD_INTEGRATED;
+import static org.shsts.tinactory.content.AllItems.INDUCTOR;
+import static org.shsts.tinactory.content.AllItems.INTEGRATED_PROCESSOR;
 import static org.shsts.tinactory.content.AllItems.ITEM_FILTER;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
+import static org.shsts.tinactory.content.AllItems.MAINFRAME;
+import static org.shsts.tinactory.content.AllItems.MICROPROCESSOR;
+import static org.shsts.tinactory.content.AllItems.PROCESSOR_ASSEMBLY;
 import static org.shsts.tinactory.content.AllItems.RAW_WAFERS;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllItems.RESISTOR;
@@ -61,6 +67,7 @@ import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.TRANSISTOR;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllItems.WAFERS;
+import static org.shsts.tinactory.content.AllItems.WORKSTATION;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
@@ -72,6 +79,7 @@ import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
+import static org.shsts.tinactory.content.AllMaterials.EMERALD;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
@@ -79,10 +87,13 @@ import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
+import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.PE;
+import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
+import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
@@ -557,6 +568,17 @@ public final class Components {
         circuitRecipe(ADVANCED_INTEGRATED, GOOD_INTEGRATED, 2, CHIPS.get("integrated_circuit"), 2,
             CHIPS.get("ram"), 2, TRANSISTOR, 4, ELECTRUM.tag("wire_fine"), 8, COPPER.tag("bolt"), 8);
 
+        circuitRecipe(MICROPROCESSOR, 3, CHIPS.get("cpu"), RESISTOR, 2, CAPACITOR, 2,
+            TRANSISTOR, 2, COPPER.tag("wire_fine"), 2);
+        circuitRecipe(INTEGRATED_PROCESSOR, CHIPS.get("cpu"), RESISTOR, 2, CAPACITOR, 2,
+            TRANSISTOR, 2, RED_ALLOY.tag("wire_fine"), 4);
+        circuitRecipe(PROCESSOR_ASSEMBLY, INTEGRATED_PROCESSOR, 2, INDUCTOR, 2, CAPACITOR, 8,
+            CHIPS.get("ram"), 4, RED_ALLOY.tag("wire_fine"), 8);
+        circuitRecipe(WORKSTATION, PROCESSOR_ASSEMBLY, 2, DIODE, 4, CHIPS.get("ram"), 4,
+            ELECTRUM.tag("wire_fine"), 16, GOLD.tag("bolt"), 16);
+        circuitRecipe(MAINFRAME, ALUMINIUM.tag("stick"), 8, WORKSTATION, 2,
+            CHIPS.get("ram"), 16, INDUCTOR, 8, CAPACITOR, 16, COPPER.tag("wire"), 16);
+
         // circuit components
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
             .shaped(RESISTOR.getItem(CircuitComponentTier.NORMAL))
@@ -567,28 +589,59 @@ public final class Components {
             .unlockedBy("has_resin", has(STICKY_RESIN.get())));
 
         ASSEMBLER.recipe(DATA_GEN, RESISTOR.loc(CircuitComponentTier.NORMAL))
-            .outputItem(RESISTOR.item(CircuitComponentTier.NORMAL), 1)
+            .outputItem(RESISTOR.item(CircuitComponentTier.NORMAL), 2)
             .inputItem(COAL.tag("dust"), 1)
             .inputItem(STICKY_RESIN, 1)
             .inputItem(COPPER.tag("wire_fine"), 4)
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.ULV)
-            .build();
-
-        ASSEMBLER.recipe(DATA_GEN, DIODE.loc(CircuitComponentTier.NORMAL))
-            .outputItem(DIODE.item(CircuitComponentTier.NORMAL), 1)
+            .build()
+            .recipe(DATA_GEN, CAPACITOR.loc(CircuitComponentTier.NORMAL))
+            .outputItem(CAPACITOR.item(CircuitComponentTier.NORMAL), 8)
+            .inputItem(PVC.tag("foil"), 1)
+            .inputItem(ALUMINIUM.tag("foil"), 2)
+            .inputFluid(PE.fluid(), PE.fluidAmount(1f))
+            .workTicks(ASSEMBLY_TICKS)
+            .voltage(Voltage.LV)
+            .build()
+            .recipe(DATA_GEN, INDUCTOR.loc(CircuitComponentTier.NORMAL))
+            .outputItem(INDUCTOR.item(CircuitComponentTier.NORMAL), 4)
+            .inputItem(NICKEL_ZINC_FERRITE.tag("ring"), 1)
+            .inputItem(COPPER.tag("wire_fine"), 2)
+            .inputFluid(PE.fluid(), PE.fluidAmount(0.25f))
+            .workTicks(ASSEMBLY_TICKS)
+            .voltage(Voltage.LV)
+            .build()
+            .recipe(DATA_GEN, DIODE.loc(CircuitComponentTier.NORMAL))
+            .outputItem(DIODE.item(CircuitComponentTier.NORMAL), 4)
             .inputItem(GALLIUM_ARSENIDE.tag("dust"), 1)
             .inputItem(GLASS.tag("primary"), 1)
             .inputItem(COPPER.tag("wire_fine"), 4)
+            .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(2f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.LV)
-            .build();
-
-        ASSEMBLER.recipe(DATA_GEN, suffix(DIODE.loc(CircuitComponentTier.NORMAL), "_from_wafer"))
-            .outputItem(DIODE.item(CircuitComponentTier.NORMAL), 1)
+            .build()
+            .recipe(DATA_GEN, suffix(DIODE.loc(CircuitComponentTier.NORMAL), "_from_wafer"))
+            .outputItem(DIODE.item(CircuitComponentTier.NORMAL), 8)
             .inputItem(RAW_WAFERS.get(0), 1)
-            .inputItem(GLASS.tag("primary"), 1)
             .inputItem(COPPER.tag("wire_fine"), 4)
+            .inputFluid(PE.fluid(), PE.fluidAmount(1f))
+            .workTicks(ASSEMBLY_TICKS)
+            .voltage(Voltage.LV)
+            .build()
+            .recipe(DATA_GEN, TRANSISTOR.loc(CircuitComponentTier.NORMAL))
+            .outputItem(TRANSISTOR.item(CircuitComponentTier.NORMAL), 4)
+            .inputItem(GALLIUM_ARSENIDE.tag("dust"), 1)
+            .inputItem(TIN.tag("wire_fine"), 6)
+            .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(2f))
+            .workTicks(ASSEMBLY_TICKS)
+            .voltage(Voltage.LV)
+            .build()
+            .recipe(DATA_GEN, suffix(TRANSISTOR.loc(CircuitComponentTier.NORMAL), "_from_pe"))
+            .outputItem(TRANSISTOR.item(CircuitComponentTier.NORMAL), 8)
+            .inputItem(SILICON.tag("dust"), 1)
+            .inputItem(TIN.tag("wire_fine"), 6)
+            .inputFluid(PE.fluid(), PE.fluidAmount(1f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.LV)
             .build();
@@ -607,9 +660,8 @@ public final class Components {
             .inputItem(STICKY_RESIN, 2)
             .workTicks(200L)
             .voltage(Voltage.ULV)
-            .build();
-
-        ASSEMBLER.recipe(DATA_GEN, board(CircuitTier.INTEGRATED))
+            .build()
+            .recipe(DATA_GEN, board(CircuitTier.INTEGRATED))
             .outputItem(board(CircuitTier.INTEGRATED), 1)
             .inputItem(board(CircuitTier.ELECTRONIC), 2)
             .inputItem(RED_ALLOY.tag("wire"), 8)
@@ -624,6 +676,15 @@ public final class Components {
             .input(COPPER, "foil", 4)
             .input(SULFURIC_ACID, "dilute", 0.25f)
             .outputItem(board(CircuitTier.CPU), 1)
+            .workTicks(240L)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CPU)
+            .build()
+            .recipe(DATA_GEN, suffix(board(CircuitTier.CPU).loc(), "_from_pvc"))
+            .input(PVC, "sheet", 1)
+            .input(COPPER, "foil", 4)
+            .input(SULFURIC_ACID, "dilute", 0.25f)
+            .outputItem(board(CircuitTier.CPU), 2)
             .workTicks(240L)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CPU)
@@ -691,7 +752,9 @@ public final class Components {
 
         // engraving
         engravingRecipe("integrated_circuit", RUBY, 0, Voltage.LV, -1d, 0d);
-        engravingRecipe("cpu", DIAMOND, 0, Voltage.LV, 0d, 0.5d);
+        engravingRecipe("cpu", DIAMOND, 0, Voltage.MV, 0d, 0.5d);
+        engravingRecipe("ram", SAPPHIRE, 0, Voltage.MV, -0.25d, 0.25d);
+        engravingRecipe("low_pic", EMERALD, 0, Voltage.MV, -0.3d, 0.2d);
 
         // chips
         for (var entry : CHIPS.entrySet()) {
@@ -723,7 +786,7 @@ public final class Components {
                 .outputItem(wafer, 1 << j)
                 .inputItem(0, raw, 1)
                 .inputItemNotConsumed(1, lens.tag("lens"))
-                .voltage(Voltage.fromRank(voltage.rank + j * 2))
+                .voltage(Voltage.fromRank(voltage.rank + j))
                 .workTicks(1000L << level)
                 .requireCleanness(minC, maxC)
                 .build();

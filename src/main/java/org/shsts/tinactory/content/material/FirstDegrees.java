@@ -29,6 +29,7 @@ import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.METHANE;
+import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.NITRIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
@@ -45,6 +46,7 @@ import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
+import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.dust;
@@ -167,6 +169,12 @@ public final class FirstDegrees {
         PROPENE = gas("propene", 0xFFFFDD55);
         ETHANOL = fluid("ethanol", 0xFFFC4C04, "liquid");
         IRON_CHLORIDE = liquid("iron_chloride", 0xFF060B0B);
+        VINYL_CHLORIDE = gas("vinyl_chloride", 0xFFE1F0F0);
+
+        NICKEL_ZINC_FERRITE = set("nickel_zinc_ferrite")
+            .color(0xFF3C3C3C)
+            .ring()
+            .buildObject();
     }
 
     public static void init() {}

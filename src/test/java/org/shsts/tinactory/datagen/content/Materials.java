@@ -33,6 +33,7 @@ import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
+import static org.shsts.tinactory.content.AllMaterials.BERYLLIUM;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
@@ -52,6 +53,7 @@ import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
+import static org.shsts.tinactory.content.AllMaterials.EMERALD;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM;
@@ -77,10 +79,13 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
+import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
+import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
+import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
@@ -90,6 +95,7 @@ import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
+import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
@@ -135,6 +141,7 @@ import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.FINE;
+import static org.shsts.tinactory.datagen.content.model.IconSet.GEM_VERTICAL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
 import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
 import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
@@ -276,7 +283,11 @@ public final class Materials {
             .build()
             .material(MANGANESE, DULL).build()
             .material(ARSENIC, DULL).build()
-            .material(SILICON, METALLIC).build();
+            .material(SILICON, METALLIC).build()
+            .material(BERYLLIUM, METALLIC)
+            .machineProcess(Voltage.LV, 0.6d)
+            .smelt()
+            .build();
     }
 
     private static void firstDegrees() {
@@ -302,7 +313,7 @@ public final class Materials {
             .material(STEEL, METALLIC)
             .toolProcess(1.5d)
             .blast(Voltage.ULV, 1000, 800)
-            .blast(Voltage.ULV, 1000, 1000, IRON)
+            .blastFrom(Voltage.ULV, 1000, 1000, IRON)
             .build()
             .material(RED_ALLOY, DULL)
             .toolProcess(0.5d).smelt()
@@ -353,6 +364,11 @@ public final class Materials {
             .material(CALCIUM_HYDROXIDE, DULL).build()
             .material(SULFURIC_ACID, DULL)
             .fluidMix(Voltage.MV, "dilute", SULFURIC_ACID, 1, WATER, 1)
+            .build()
+            .material(NICKEL_ZINC_FERRITE, METALLIC)
+            .machineProcess(Voltage.MV, 1.25d)
+            .blast(Voltage.MV, 1500, 400, OXYGEN, 2f)
+            .mix(Voltage.MV, IRON, 4, NICKEL, 1, ZINC, 1)
             .build();
     }
 
@@ -363,6 +379,12 @@ public final class Materials {
             .build()
             .material(SALT_WATER, DULL)
             .fluidMix(Voltage.MV, SODIUM_CHLORIDE, 1, WATER, 1)
+            .build()
+            .material(PE, DULL)
+            .machineProcess(Voltage.LV, 0.5d)
+            .build()
+            .material(PVC, DULL)
+            .machineProcess(Voltage.LV, 0.5d)
             .build();
     }
 
@@ -432,7 +454,7 @@ public final class Materials {
             .material(GRAPHITE, DULL)
             .oreProcess(CARBON)
             .build()
-            .material(DIAMOND, IconSet.DIAMOND)
+            .material(DIAMOND, SHINY)
             .oreBuilder(CARBON).siftAndHammer().build()
             .machineProcess(Voltage.LV, 2d)
             .build()
@@ -445,8 +467,13 @@ public final class Materials {
             .material(NATURAL_GAS, DULL).oilOre(192).build()
             .material(LIGHT_OIL, DULL).oilOre(240).build()
             .material(HEAVY_OIL, DULL).oilOre(512).build()
-            .material(PE, DULL)
-            .machineProcess(Voltage.LV, 0.5d)
+            .material(EMERALD, SHINY)
+            .oreBuilder(ALUMINIUM, BERYLLIUM, THORIUM).siftAndHammer().build()
+            .machineProcess(Voltage.LV, 2d)
+            .build()
+            .material(SAPPHIRE, GEM_VERTICAL)
+            .oreBuilder(ALUMINIUM, RUTILE, RUTILE).siftAndHammer().build()
+            .machineProcess(Voltage.LV, 2d)
             .build();
     }
 

@@ -55,6 +55,7 @@ public final class AllMaterials {
     public static MaterialSet ARGON;
     public static MaterialSet HYDROGEN;
     public static MaterialSet CHLORINE;
+    public static MaterialSet BERYLLIUM;
 
     // First Degree
     public static MaterialSet WATER;
@@ -100,6 +101,8 @@ public final class AllMaterials {
     public static MaterialSet PROPENE;
     public static MaterialSet ETHANOL;
     public static MaterialSet IRON_CHLORIDE;
+    public static MaterialSet VINYL_CHLORIDE;
+    public static MaterialSet NICKEL_ZINC_FERRITE;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;
@@ -111,6 +114,7 @@ public final class AllMaterials {
     public static MaterialSet LIGHT_FUEL;
     public static MaterialSet HEAVY_FUEL;
     public static MaterialSet PE;
+    public static MaterialSet PVC;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
@@ -133,6 +137,8 @@ public final class AllMaterials {
     public static MaterialSet NATURAL_GAS;
     public static MaterialSet LIGHT_OIL;
     public static MaterialSet HEAVY_OIL;
+    public static MaterialSet EMERALD;
+    public static MaterialSet SAPPHIRE;
 
     // misc
     public static MaterialSet TEST;

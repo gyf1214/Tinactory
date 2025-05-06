@@ -8,6 +8,7 @@ import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.NAPHTHA;
 import static org.shsts.tinactory.content.AllMaterials.PE;
+import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
@@ -72,6 +73,11 @@ public final class HigherDegrees {
 
         PE = set("polyethylene")
             .color(0xFFC8C8C8)
+            .polymerFoil()
+            .buildObject();
+
+        PVC = set("polyvinyl_chloride")
+            .color(0xFFD7E6E6)
             .polymerFoil()
             .buildObject();
     }

@@ -11,6 +11,7 @@ import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
+import static org.shsts.tinactory.content.AllMaterials.EMERALD;
 import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
@@ -24,6 +25,7 @@ import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
+import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
@@ -80,6 +82,10 @@ public final class Veins {
             .ore(NATURAL_GAS, 0.3)
             .ore(LIGHT_OIL, 0.4)
             .ore(HEAVY_OIL, 0.7)
+            .build()
+            .vein("gem", 0.1)
+            .ore(EMERALD, 0.4)
+            .ore(SAPPHIRE, 0.7)
             .build();
     }
 

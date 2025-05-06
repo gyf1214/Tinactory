@@ -74,6 +74,12 @@ public final class AllItems {
     public static final Circuits.Circuit BASIC_INTEGRATED;
     public static final Circuits.Circuit GOOD_INTEGRATED;
     public static final Circuits.Circuit ADVANCED_INTEGRATED;
+    public static final Circuits.Circuit NAND_CHIP;
+    public static final Circuits.Circuit MICROPROCESSOR;
+    public static final Circuits.Circuit INTEGRATED_PROCESSOR;
+    public static final Circuits.Circuit PROCESSOR_ASSEMBLY;
+    public static final Circuits.Circuit WORKSTATION;
+    public static final Circuits.Circuit MAINFRAME;
 
     // circuit components
     public static final Circuits.CircuitComponent RESISTOR;
@@ -110,6 +116,12 @@ public final class AllItems {
         BASIC_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.NORMAL, "basic_integrated");
         GOOD_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.ASSEMBLY, "good_integrated");
         ADVANCED_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.WORKSTATION, "advanced_integrated");
+        NAND_CHIP = circuit(CircuitTier.CPU, CircuitLevel.MINI, "nand_chip");
+        MICROPROCESSOR = circuit(CircuitTier.CPU, CircuitLevel.MICRO, "microprocessor");
+        INTEGRATED_PROCESSOR = circuit(CircuitTier.CPU, CircuitLevel.NORMAL, "processor");
+        PROCESSOR_ASSEMBLY = circuit(CircuitTier.CPU, CircuitLevel.ASSEMBLY, "assembly");
+        WORKSTATION = circuit(CircuitTier.CPU, CircuitLevel.WORKSTATION, "workstation");
+        MAINFRAME = circuit(CircuitTier.CPU, CircuitLevel.MAINFRAME, "mainframe");
 
         RESISTOR = circuitComponent("resistor");
         CAPACITOR = circuitComponent("capacitor");
@@ -280,4 +292,3 @@ public final class AllItems {
             Voltage.HV, good, Voltage.EV, good, Voltage.IV, advanced);
     }
 }
-

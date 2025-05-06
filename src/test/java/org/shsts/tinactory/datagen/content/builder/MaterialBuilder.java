@@ -412,21 +412,41 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return this;
     }
 
-    public MaterialBuilder<P> blast(Voltage v, int temperature, long ticks, Object... extra) {
-        var source = material;
-        var suffix = "";
-        if (extra.length > 0 && extra[0] instanceof MaterialSet mat) {
-            source = mat;
-            suffix = "_from_" + source.name;
-        }
-        BLAST_FURNACE.recipe(DATA_GEN, suffix(material.loc("ingot"), suffix))
+    public MaterialBuilder<P> blastFrom(Voltage v, int temperature, long ticks,
+        MaterialSet source, Object... extra) {
+        var suffix = source == material ? "" : source.name;
+        var builder = BLAST_FURNACE.recipe(DATA_GEN, suffix(material.loc("ingot"), suffix))
             .outputItem(material.entry("ingot"), 1)
             .inputItem(source.tag("dust"), 1)
             .voltage(v)
             .temperature(temperature)
-            .workTicks(ticks)
-            .build();
+            .workTicks(ticks);
+
+        for (var i = 0; i < extra.length; i++) {
+            var mat = (MaterialSet) extra[i];
+            var sub = mat.hasItem("dust") ? "dust" : "fluid";
+            var amount = 1f;
+            if (i + 1 < extra.length && extra[i + 1] instanceof String sub1) {
+                sub = sub1;
+                i++;
+            }
+            if (i + 1 < extra.length && extra[i + 1] instanceof Number amount1) {
+                amount = amount1.floatValue();
+                i++;
+            }
+            if (mat.hasItem(sub)) {
+                builder.inputItem(mat.tag(sub), (int) amount);
+            } else {
+                builder.inputFluid(mat.fluid(sub), mat.fluidAmount(sub, amount));
+            }
+        }
+
+        builder.build();
         return this;
+    }
+
+    public MaterialBuilder<P> blast(Voltage v, int temperature, long ticks, Object... extra) {
+        return blastFrom(v, temperature, ticks, material, extra);
     }
 
     private MaterialBuilder<P> compose(Voltage v, IRecipeType<ProcessingRecipe.Builder> recipeType,

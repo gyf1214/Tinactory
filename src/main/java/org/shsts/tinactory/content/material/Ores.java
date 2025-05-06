@@ -12,6 +12,7 @@ import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
+import static org.shsts.tinactory.content.AllMaterials.EMERALD;
 import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GARNIERITE;
 import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
@@ -24,6 +25,7 @@ import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
+import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
@@ -137,6 +139,19 @@ public final class Ores {
             .color(0xFF000000)
             .rawOre(OreVariant.DEEPSLATE)
             .fluid("fluid", "oil_heavy", 1000)
+            .buildObject();
+
+        EMERALD = set("emerald")
+            .color(0xFF50FF50)
+            .existing("gem", Tags.Items.GEMS_EMERALD, Items.EMERALD)
+            .gem()
+            .ore(OreVariant.DEEPSLATE)
+            .buildObject();
+
+        SAPPHIRE = set("sapphire")
+            .color(0xFF6464C8)
+            .gem()
+            .ore(OreVariant.DEEPSLATE)
             .buildObject();
     }
 

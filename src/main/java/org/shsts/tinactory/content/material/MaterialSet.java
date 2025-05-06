@@ -318,6 +318,10 @@ public class MaterialSet {
             return metal().dummies("stick", "dust_tiny");
         }
 
+        public Builder<P> ring() {
+            return stick().dummies("ring");
+        }
+
         public Builder<P> nugget() {
             return metal().dummies("nugget", "dust_tiny");
         }

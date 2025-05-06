@@ -32,7 +32,7 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     public static final IconSet SHINY = new IconSet("shiny");
     public static final IconSet FINE = new IconSet("fine");
     public static final IconSet RUBY = new IconSet("ruby", SHINY);
-    public static final IconSet DIAMOND = new IconSet("diamond", SHINY);
+    public static final IconSet GEM_VERTICAL = new IconSet("gem_vertical", SHINY);
 
     private IconSet() {
         this("dull", null);
