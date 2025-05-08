@@ -20,6 +20,7 @@
   "fluid.tinactory.steam": "Steam",
   "fluid.tinactory.material.liquid.air": "Liquid Air",
   "fluid.tinactory.material.gas.sulfuric_acid": "Sulfur Trioxide",
+  "fluid.tinactory.biomass": "Biomass",
   "tinactory.tooltip.openRecipeBook": "Open recipe book",
   "tinactory.tooltip.unselectRecipe": "Clear recipe",
   "tinactory.tooltip.openPortPanel": "Show ports",
