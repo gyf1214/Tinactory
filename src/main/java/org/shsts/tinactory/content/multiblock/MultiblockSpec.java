@@ -6,18 +6,23 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.util.Lazy;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -221,7 +226,16 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
             return this;
         }
 
-        public Builder<P> block(char ch, Supplier<Block> block, boolean allowInterface) {
+        public Builder<P> checkBlock(char ch, Predicate<BlockState> pred) {
+            return check(ch, (ctx, pos) -> {
+                var block = ctx.getBlock(pos);
+                if (block.isEmpty() || !pred.test(block.get())) {
+                    ctx.setFailed();
+                }
+            });
+        }
+
+        private Builder<P> block(char ch, Supplier<? extends Block> block, boolean allowInterface) {
             return check(ch, (ctx, pos) -> {
                 var block1 = ctx.getBlock(pos);
                 if (allowInterface && checkInterface(ctx, pos)) {
@@ -233,8 +247,24 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
             });
         }
 
-        public Builder<P> block(char ch, Supplier<Block> block) {
+        public Builder<P> block(char ch, Supplier<? extends Block> block) {
             return block(ch, block, false);
+        }
+
+        public Builder<P> blocks(char ch, Collection<Supplier<? extends Block>> blocks) {
+            var blocks1 = Lazy.of(() -> {
+                var ret = new HashSet<Block>();
+                for (var block : blocks) {
+                    ret.add(block.get());
+                }
+                return ret;
+            });
+            return check(ch, (ctx, pos) -> {
+                var block1 = ctx.getBlock(pos);
+                if (block1.isEmpty() || !blocks1.get().contains(block1.get().getBlock())) {
+                    ctx.setFailed();
+                }
+            });
         }
 
         public Builder<P> sameBlockWithTag(char ch, String key, TagKey<Block> tag) {
@@ -252,16 +282,15 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
             });
         }
 
-        public Builder<P> air(char ch) {
-            return check(ch, (ctx, pos) -> {
-                var block1 = ctx.getBlock(pos);
-                if (block1.isEmpty() || !block1.get().isAir()) {
-                    ctx.setFailed();
-                }
-            });
+        public Builder<P> tag(char ch, TagKey<Block> tag) {
+            return checkBlock(ch, block -> block.is(tag));
         }
 
-        public Builder<P> blockOrInterface(char ch, Supplier<Block> block) {
+        public Builder<P> air(char ch) {
+            return checkBlock(ch, BlockState::isAir);
+        }
+
+        public Builder<P> blockOrInterface(char ch, Supplier<? extends Block> block) {
             return block(ch, block, true);
         }
 
@@ -318,6 +347,20 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
 
         public LayerBuilder<P> row(String str) {
             rows.add(str);
+            return this;
+        }
+
+        public LayerBuilder<P> row(String str, int repeat) {
+            for (var i = 0; i < repeat; i++) {
+                rows.add(str);
+            }
+            return this;
+        }
+
+        public LayerBuilder<P> row(char ch, int width, int depth) {
+            for (var i = 0; i < depth; i++) {
+                rows.add(String.valueOf(ch).repeat(width));
+            }
             return this;
         }
 

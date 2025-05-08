@@ -49,6 +49,7 @@ public final class Technologies {
     public static ResourceLocation CHEMISTRY;
     public static ResourceLocation OIL_PROCESSING;
     public static ResourceLocation ORGANIC_CHEMISTRY;
+    public static ResourceLocation AUTOFARM;
     public static ResourceLocation CPU;
     public static ResourceLocation DISTILLATION;
     public static ResourceLocation CLEANROOM;
@@ -125,6 +126,11 @@ public final class Technologies {
         SIFTING = factory.tech("sifting")
             .maxProgress(10L)
             .displayItem(AllItems.ITEM_FILTER)
+            .register();
+
+        AUTOFARM = factory.tech("autofarm")
+            .maxProgress(15L)
+            .displayItem(Items.WHEAT)
             .register();
 
         INTEGRATED_CIRCUIT = factory.tech("integrated_circuit")

@@ -89,16 +89,20 @@ import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM;
+import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE;
 import static org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllMultiblocks.CLEANROOM;
 import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.DISTILLATION_TOWER;
 import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
+import static org.shsts.tinactory.content.AllMultiblocks.PLASCRETE;
 import static org.shsts.tinactory.content.AllMultiblocks.SIFTER;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.VACUUM_FREEZER;
@@ -197,8 +201,10 @@ public final class Machines {
 
         multiblock(BLAST_FURNACE, "heatproof", "blast_furnace", AllRecipes.BLAST_FURNACE);
         multiblock(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
+        multiblock(AUTOFARM, "solid_steel", "blast_furnace", AllRecipes.AUTOFARM);
         multiblock(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
-        multiblock(DISTILLATION_TOWER, "clean_stainless_steel", "distillation_tower", AllRecipes.DISTILLATION);
+        multiblock(DISTILLATION_TOWER, "clean_stainless_steel", "distillation_tower",
+            AllRecipes.DISTILLATION);
         DATA_GEN.block(CLEANROOM)
             .blockState(machineBlock("casings/cleanroom/plascrete", "multiblock/cleanroom"))
             .tag(MINEABLE_WITH_WRENCH)
@@ -350,10 +356,22 @@ public final class Machines {
             .workTicks(ASSEMBLE_TICKS)
             .requireTech(Technologies.SIFTING)
             .build()
+            .recipe(DATA_GEN, AUTOFARM)
+            .outputItem(AUTOFARM, 1)
+            .inputItem(AUTOFARM_BASE, 1)
+            .inputItem(circuit(Voltage.MV), 4)
+            .inputItem(ELECTRIC_PUMP.get(Voltage.LV), 4)
+            .inputItem(CABLE.get(Voltage.LV), 4)
+            .inputItem(BRASS.tag("pipe"), 4)
+            .inputItem(STEEL.tag("plate"), 4)
+            .voltage(Voltage.LV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.AUTOFARM)
+            .build()
             .recipe(DATA_GEN, VACUUM_FREEZER)
             .outputItem(VACUUM_FREEZER, 1)
             .inputItem(FROST_PROOF_CASING, 1)
-            .inputItem(circuit(Voltage.HV), 4)
+            .inputItem(circuit(Voltage.HV), 3)
             .inputItem(ELECTRIC_PUMP.get(Voltage.MV), 4)
             .inputItem(CABLE.get(Voltage.MV), 4)
             .inputItem(ALUMINIUM.tag("plate"), 4)
@@ -372,6 +390,18 @@ public final class Machines {
             .voltage(Voltage.MV)
             .workTicks(ASSEMBLE_TICKS)
             .requireTech(Technologies.DISTILLATION)
+            .build()
+            .recipe(DATA_GEN, CLEANROOM)
+            .outputItem(CLEANROOM, 1)
+            .inputItem(PLASCRETE, 1)
+            .inputItem(circuit(Voltage.HV), 3)
+            .inputItem(ELECTRIC_MOTOR.get(Voltage.HV), 2)
+            .inputItem(CABLE.get(Voltage.HV), 4)
+            .inputItem(ITEM_FILTER, 4)
+            .inputItem(PE.tag("sheet"), 4)
+            .voltage(Voltage.MV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.CLEANROOM)
             .build();
     }
 

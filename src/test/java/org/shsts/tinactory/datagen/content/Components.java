@@ -12,7 +12,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.CircuitComponentTier;
 import org.shsts.tinactory.content.electric.CircuitTier;
@@ -102,7 +104,9 @@ import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
+import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE;
 import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
+import static org.shsts.tinactory.content.AllMultiblocks.CLEAR_GLASS;
 import static org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllMultiblocks.CUPRONICKEL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiblocks.FILTER_CASING;
@@ -133,6 +137,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.content.electric.Circuits.board;
 import static org.shsts.tinactory.content.electric.Circuits.circuitBoard;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
@@ -276,21 +281,6 @@ public final class Components {
             .tag(MINEABLE_WITH_WRENCH)
             .build());
 
-        DATA_GEN.block(PLASCRETE)
-            .blockState(solidBlock("casings/cleanroom/plascrete"))
-            .tag(MINEABLE_WITH_WRENCH)
-            .tag(CLEANROOM_WALL)
-            .build()
-            .block(FILTER_CASING)
-            .blockState(ctx -> {
-                var model = ctx.provider().models()
-                    .cubeColumn(ctx.id(), gregtech("blocks/casings/cleanroom/plascrete"),
-                        gregtech("blocks/casings/cleanroom/filter_casing"));
-                ctx.provider().simpleBlock(ctx.object(), model);
-            })
-            .tag(MINEABLE_WITH_WRENCH)
-            .build();
-
         COIL_BLOCKS.forEach(coil -> DATA_GEN.block(coil)
             .blockState(solidBlock("casings/coils/machine_coil_" + name(coil.id(), -1)))
             .tag(List.of(COIL, MINEABLE_WITH_WRENCH))
@@ -298,6 +288,31 @@ public final class Components {
 
         DATA_GEN.block(GRATE_MACHINE_CASING)
             .blockState(solidBlock("casings/pipe/grate_steel_front/top"))
+            .tag(MINEABLE_WITH_WRENCH)
+            .build()
+            .block(AUTOFARM_BASE)
+            .blockState(ctx -> ctx.provider().simpleBlock(ctx.object(),
+                ctx.provider().models().cubeTop(ctx.id(),
+                    gregtech("blocks/casings/solid/machine_casing_solid_steel"),
+                    mcLoc("block/farmland_moist"))))
+            .tag(MINEABLE_WITH_WRENCH)
+            .build()
+            .block(CLEAR_GLASS)
+            .blockState(solidBlock("casings/transparent/fusion_glass"))
+            .tag(MINEABLE_WITH_WRENCH)
+            .tag(CLEANROOM_WALL)
+            .tag(Tags.Blocks.GLASS)
+            .build()
+            .block(PLASCRETE)
+            .blockState(solidBlock("casings/cleanroom/plascrete"))
+            .tag(MINEABLE_WITH_WRENCH)
+            .tag(CLEANROOM_WALL)
+            .build()
+            .block(FILTER_CASING)
+            .blockState(ctx -> ctx.provider().simpleBlock(ctx.object(),
+                ctx.provider().models().cubeColumn(ctx.id(),
+                    gregtech("blocks/casings/cleanroom/plascrete"),
+                    gregtech("blocks/casings/cleanroom/filter_casing"))))
             .tag(MINEABLE_WITH_WRENCH)
             .build();
 
@@ -869,13 +884,33 @@ public final class Components {
             .workTicks(140L)
             .requireTech(Technologies.SIFTING)
             .build()
+            .recipe(DATA_GEN, AUTOFARM_BASE)
+            .outputItem(AUTOFARM_BASE, 1)
+            .inputItem(STEEL.tag("stick"), 2)
+            .inputItem(() -> Blocks.COARSE_DIRT, 2)
+            .inputItem(() -> Blocks.PODZOL, 2)
+            .inputItem(STEEL.tag("plate"), 3)
+            .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(2))
+            .workTicks(200L)
+            .voltage(Voltage.LV)
+            .requireTech(Technologies.AUTOFARM)
+            .build()
+            .recipe(DATA_GEN, CLEAR_GLASS)
+            .outputItem(CLEAR_GLASS, 1)
+            .inputItem(STEEL.tag("stick"), 2)
+            .inputItem(GLASS.tag("primary"), 1)
+            .inputFluid(PE.fluid(), PE.fluidAmount(3f))
+            .workTicks(200L)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .build()
             .recipe(DATA_GEN, PLASCRETE)
             .outputItem(PLASCRETE, 1)
             .inputItem(STEEL.tag("stick"), 2)
             .inputItem(PE.tag("sheet"), 3)
             .workTicks(200L)
             .voltage(Voltage.MV)
-            .requireTech(Technologies.CLEANROOM)
+            .requireTech(Technologies.ORGANIC_CHEMISTRY)
             .build()
             .recipe(DATA_GEN, FILTER_CASING)
             .outputItem(FILTER_CASING, 2)

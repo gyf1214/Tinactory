@@ -21,9 +21,11 @@ import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CHLORINE;
+import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.ETHANE;
 import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.ETHYLENE;
+import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_OIL;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN;
@@ -111,9 +113,11 @@ public class Chemistry {
 
         ELECTROLYZER.voltage(Voltage.MV)
             .recipe(WATER, 1f, 1600, HYDROGEN, 1f, OXYGEN, 0.5f)
-            .recipe(SALT_WATER, 2f, 1600, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
+            .recipe(SALT_WATER, 2f, 800, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
             .recipe(SEA_WATER, 2f, 3200, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
-            .recipe(BAUXITE, 15, 320, ALUMINIUM, "dust", 6, OXYGEN, 9f, RUTILE, 1);
+            .recipe(BAUXITE, 15, 320, ALUMINIUM, 6, OXYGEN, 9f, RUTILE, 1)
+            .recipe(COAL, 1, 40, CARBON, 2)
+            .recipe(GRAPHITE, 1, 64, CARBON, 4);
 
         CHEMICAL_REACTOR.recipe(DATA_GEN, HYDROGEN_CHLORIDE.fluidLoc())
             .input(HYDROGEN, 0.5f)
@@ -219,6 +223,8 @@ public class Chemistry {
             .input(OXYGEN, 1.5f)
             .output(SULFURIC_ACID, "gas", 1f)
             .workTicks(480)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CHEMISTRY)
             .build()
             .recipe(DATA_GEN, SULFURIC_ACID.fluidLoc("dilute"))
             .input(SULFURIC_ACID, "gas", 1f)
@@ -368,7 +374,7 @@ public class Chemistry {
             .recipe(DATA_GEN, PE.fluidLoc())
             .input(ETHYLENE, 0.144f)
             .input(OXYGEN)
-            .output(PE)
+            .output(PE, 1.5f)
             .workTicks(160)
             .voltage(Voltage.MV)
             .requireTech(Technologies.ORGANIC_CHEMISTRY)
@@ -385,7 +391,7 @@ public class Chemistry {
             .recipe(DATA_GEN, PVC.fluidLoc())
             .input(VINYL_CHLORIDE, 0.144f)
             .input(OXYGEN)
-            .output(PVC)
+            .output(PVC, 1.5f)
             .workTicks(200)
             .voltage(Voltage.MV)
             .requireTech(Technologies.ORGANIC_CHEMISTRY)
@@ -429,7 +435,7 @@ public class Chemistry {
             var i = 0;
             while (i < components.length) {
                 var output = (MaterialSet) components[i++];
-                var sub1 = output.hasFluid() ? "fluid" : "dust";
+                var sub1 = output.hasItem("dust") ? "dust" : "fluid";
                 if (i < components.length && components[i] instanceof String s) {
                     sub1 = s;
                     i++;
@@ -453,7 +459,7 @@ public class Chemistry {
 
         public DecomposeFactory recipe(MaterialSet input, Number inputAmounts, long workTicks,
             Object... components) {
-            return recipe(input, input.hasFluid() ? "fluid" : "dust", inputAmounts, workTicks, components);
+            return recipe(input, input.hasItem("dust") ? "dust" : "fluid", inputAmounts, workTicks, components);
         }
     }
 

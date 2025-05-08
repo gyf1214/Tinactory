@@ -59,6 +59,7 @@ public final class AllRecipes {
     public static final IRecipeType<BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     public static final IRecipeType<ProcessingRecipe.Builder> VACUUM_FREEZER;
     public static final IRecipeType<ProcessingRecipe.Builder> DISTILLATION;
+    public static final IRecipeType<ProcessingRecipe.Builder> AUTOFARM;
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
 
@@ -174,6 +175,10 @@ public final class AllRecipes {
 
         DISTILLATION = processing("distillation", DistillationRecipe::builder)
             .defaults($ -> $.amperage(2.5d).defaultInputFluid(0).defaultOutputFluid(1).defaultOutputItem(2))
+            .register();
+
+        AUTOFARM = processing("autofarm")
+            .defaults($ -> $.amperage(0.25d).defaultInputItem(0).defaultOutputItem(2))
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)

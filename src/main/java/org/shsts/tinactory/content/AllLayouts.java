@@ -27,6 +27,7 @@ public final class AllLayouts {
     public static final Layout VACUUM_FREEZER;
     public static final List<Layout> DISTILLATION_TOWER;
     public static final Layout CLEANROOM;
+    public static final Layout AUTOFARM;
 
     static {
         WORKBENCH = Layout.builder()
@@ -85,6 +86,16 @@ public final class AllLayouts {
 
         CLEANROOM = Layout.builder()
             .progressBar(Texture.PROGRESS_CLEANROOM, 0, SLOT_SIZE / 2)
+            .buildLayout();
+
+        AUTOFARM = Layout.builder()
+            .port(ITEM_INPUT)
+            .slot(0, 1 + SLOT_SIZE / 2)
+            .port(ITEM_INPUT)
+            .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
+            .port(ITEM_OUTPUT)
+            .slots(4 * SLOT_SIZE, 1, 2, 2)
+            .progressBar(Texture.PROGRESS_RECYCLER, 8 + 2 * SLOT_SIZE, SLOT_SIZE / 2)
             .buildLayout();
     }
 

@@ -138,7 +138,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE / 2)
+            .progressBar(Texture.PROGRESS_CIRCUIT_ASSEMBLER, 8 + SLOT_SIZE * 3, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -330,6 +330,7 @@ public final class AllBlockEntities {
             .slots(SLOT_SIZE * 4, 1, 1, 3)
             .port(FLUID_OUTPUT)
             .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 3)
+            .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -345,6 +346,7 @@ public final class AllBlockEntities {
             .slots(SLOT_SIZE * 4, 1, 1, 2)
             .port(FLUID_OUTPUT)
             .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 2)
+            .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 

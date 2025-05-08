@@ -3,12 +3,15 @@ package org.shsts.tinactory.content;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.electric.CircuitLevel;
 import org.shsts.tinactory.content.electric.CircuitTier;
@@ -142,9 +145,9 @@ public final class AllItems {
             .material(Material.LEAVES)
             .properties(p -> p.strength(0.2f).randomTicks()
                 .sound(SoundType.GRASS).noOcclusion()
-                .isValidSpawn(($1, $2, $3, $4) -> false)
-                .isSuffocating(($1, $2, $3) -> false)
-                .isViewBlocking(($1, $2, $3) -> false))
+                .isValidSpawn(AllItems::never)
+                .isSuffocating(AllItems::never)
+                .isViewBlocking(AllItems::never))
             .renderType(() -> RenderType::cutout)
             .tint(0xFF55FF55)
             .register();
@@ -290,5 +293,13 @@ public final class AllItems {
         Supplier<? extends ItemLike> advanced) {
         return Map.of(Voltage.LV, basic, Voltage.MV, basic,
             Voltage.HV, good, Voltage.EV, good, Voltage.IV, advanced);
+    }
+
+    public static <A> boolean never(BlockState state, BlockGetter world, BlockPos pos, A val) {
+        return false;
+    }
+
+    public static boolean never(BlockState state, BlockGetter world, BlockPos pos) {
+        return false;
     }
 }

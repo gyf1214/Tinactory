@@ -242,6 +242,9 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             for (var x = -w; x <= w; x++) {
                 for (var z = -d; z <= d; z++) {
                     var pos = center.offset(x, 0, z);
+                    if (MultiblockSpec.checkInterface(ctx, pos)) {
+                        return !ctx.isFailed();
+                    }
                     var block = ctx.getBlock(pos);
                     if (block.isEmpty() || !block.get().is(baseBlock.get())) {
                         return false;
@@ -275,9 +278,6 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
                 } else {
                     return false;
                 }
-            }
-            if (MultiblockSpec.checkInterface(ctx, pos)) {
-                return !ctx.isFailed();
             }
             return block.is(wallTag);
         }

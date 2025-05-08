@@ -32,6 +32,7 @@ public record Texture(ResourceLocation loc, int width, int height) {
     public static final Texture PROGRESS_SIFT = progressBar("sift");
     public static final Texture PROGRESS_EXTRACT = progressBar("extract");
     public static final Texture PROGRESS_CIRCUIT = progressBar("circuit");
+    public static final Texture PROGRESS_CIRCUIT_ASSEMBLER = progressBar("circuit_assembler");
     public static final Texture PROGRESS_GAS = progressBar("gas_collector");
     public static final Texture PROGRESS_MULTIPLE = progressBar("arrow_multiple");
     public static final Texture PROGRESS_BENDING = progressBar("bending");
@@ -42,6 +43,7 @@ public record Texture(ResourceLocation loc, int width, int height) {
     public static final Texture PROGRESS_COMPRESS = progressBar("compress");
     public static final Texture PROGRESS_MIXER = progressBar("mixer");
     public static final Texture PROGRESS_EXTRUDER = progressBar("extruder");
+    public static final Texture PROGRESS_RECYCLER = progressBar("recycler");
     public static final Texture PROGRESS_BURN = new Texture(
         gregtech("gui/progress_bar/progress_bar_boiler_fuel_steel"), 18, 36);
     public static final Texture PROGRESS_LATH_BASE = new Texture(

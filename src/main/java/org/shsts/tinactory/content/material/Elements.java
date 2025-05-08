@@ -35,6 +35,7 @@ import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMaterials.dust;
+import static org.shsts.tinactory.content.AllMaterials.fluid;
 import static org.shsts.tinactory.content.AllMaterials.gas;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
@@ -147,7 +148,7 @@ public final class Elements {
         NITROGEN = gas("nitrogen", 0xFF00BFC1);
         ARGON = gas("argon", 0xFF00FF00);
         HYDROGEN = gas("hydrogen", 0xFF0000B5);
-        CHLORINE = gas("chlorine", 0xFF2D8C8C);
+        CHLORINE = fluid("chlorine", 0xFF2D8C8C, "gas");
 
         BERYLLIUM = set("beryllium")
             .color(0xFF64B464)

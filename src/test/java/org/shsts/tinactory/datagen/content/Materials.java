@@ -452,7 +452,7 @@ public final class Materials {
             .build()
             .material(BRASS, METALLIC)
             .toolProcess(0.75d).smelt()
-            .alloy(Voltage.LV, ZINC, 1, COPPER, 3)
+            .alloy(Voltage.LV, COPPER, 3, ZINC, 1)
             .build()
             .material(GALLIUM_ARSENIDE, DULL)
             .mix(Voltage.LV, GALLIUM, 1, ARSENIC, 1)
