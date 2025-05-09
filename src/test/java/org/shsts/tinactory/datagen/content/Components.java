@@ -48,6 +48,7 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
 import static org.shsts.tinactory.content.AllItems.EMITTER;
+import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
 import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
@@ -224,6 +225,9 @@ public final class Components {
         chip("high_pic", "high_power_integrated_circuit");
 
         DATA_GEN.item(ITEM_FILTER)
+            .model(Models::simpleItem)
+            .build()
+            .item(FERTILIZER)
             .model(Models::simpleItem)
             .build();
     }
@@ -870,7 +874,7 @@ public final class Components {
             .inputItem(STEEL.tag("plate"), 1)
             .inputItem(ZINC.tag("foil"), 8)
             .voltage(Voltage.LV)
-            .workTicks(ASSEMBLY_TICKS)
+            .workTicks(200L)
             .requireTech(Technologies.SIFTING)
             .build()
             .recipe(DATA_GEN, GRATE_MACHINE_CASING)

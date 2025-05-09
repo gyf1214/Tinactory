@@ -91,11 +91,13 @@ public final class AllLayouts {
         AUTOFARM = Layout.builder()
             .port(ITEM_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
-            .port(ITEM_INPUT)
+            .port(FLUID_INPUT)
             .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
+            .port(ITEM_INPUT)
+            .slot(2 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
-            .slots(4 * SLOT_SIZE, 1, 2, 2)
-            .progressBar(Texture.PROGRESS_RECYCLER, 8 + 2 * SLOT_SIZE, SLOT_SIZE / 2)
+            .slots(5 * SLOT_SIZE, 1, 2, 2)
+            .progressBar(Texture.PROGRESS_RECYCLER, 8 + 3 * SLOT_SIZE, SLOT_SIZE / 2)
             .buildLayout();
     }
 

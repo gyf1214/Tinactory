@@ -7,9 +7,11 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllItems.BIOMASS;
+import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
@@ -117,7 +120,10 @@ import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
+import static org.shsts.tinactory.content.AllRecipes.AUTOFARM;
+import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
+import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
@@ -156,6 +162,7 @@ public final class Materials {
         firstDegrees();
         higherDegrees();
         ores();
+        crops();
         misc();
         tags();
     }
@@ -236,117 +243,9 @@ public final class Materials {
             .workTicks(128)
             .voltage(Voltage.MV)
             .build()
-            .recipe(DATA_GEN, Items.WHEAT)
-            .inputItem(() -> Items.WHEAT, 1)
+            .recipe(DATA_GEN, ItemTags.SAPLINGS.location())
+            .inputItem(ItemTags.SAPLINGS, 16)
             .outputFluid(BIOMASS, 100)
-            .workTicks(48)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.BEETROOT)
-            .inputItem(() -> Items.BEETROOT, 1)
-            .outputFluid(BIOMASS, 500)
-            .workTicks(48)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.CARROT)
-            .inputItem(() -> Items.CARROT, 2)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(96)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.POTATO)
-            .inputItem(() -> Items.POTATO, 2)
-            .outputFluid(BIOMASS, 150)
-            .workTicks(64)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.MELON)
-            .inputItem(() -> Items.MELON, 1)
-            .outputFluid(BIOMASS, 600)
-            .workTicks(256)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.PUMPKIN)
-            .inputItem(() -> Items.PUMPKIN, 1)
-            .outputFluid(BIOMASS, 300)
-            .workTicks(240)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.COCOA_BEANS)
-            .inputItem(() -> Items.COCOA_BEANS, 2)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.SUGAR_CANE)
-            .inputItem(() -> Items.SUGAR_CANE, 1)
-            .outputFluid(BIOMASS, 500)
-            .workTicks(48)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.SWEET_BERRIES)
-            .inputItem(() -> Items.SWEET_BERRIES, 1)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(32)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.CACTUS)
-            .inputItem(() -> Items.CACTUS, 1)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.BROWN_MUSHROOM)
-            .inputItem(() -> Items.BROWN_MUSHROOM, 6)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(96)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.RED_MUSHROOM)
-            .inputItem(() -> Items.RED_MUSHROOM, 6)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(96)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.KELP)
-            .inputItem(() -> Items.KELP, 2)
-            .outputFluid(BIOMASS, 150)
-            .workTicks(64)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.SEA_PICKLE)
-            .inputItem(() -> Items.SEA_PICKLE, 2)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(96)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.NETHER_WART)
-            .inputItem(() -> Items.NETHER_WART, 4)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(96)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.CHORUS_FRUIT)
-            .inputItem(() -> Items.CHORUS_FRUIT, 4)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.CRIMSON_FUNGUS)
-            .inputItem(() -> Items.CRIMSON_FUNGUS, 4)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.WARPED_FUNGUS)
-            .inputItem(() -> Items.WARPED_FUNGUS, 4)
-            .outputFluid(BIOMASS, 100)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .build()
-            .recipe(DATA_GEN, Items.GLOW_BERRIES)
-            .inputItem(() -> Items.GLOW_BERRIES, 2)
-            .outputFluid(BIOMASS, 150)
             .workTicks(64)
             .voltage(Voltage.MV)
             .build();
@@ -596,6 +495,129 @@ public final class Materials {
             .material(SAPPHIRE, GEM_VERTICAL)
             .oreBuilder(ALUMINIUM, RUTILE, RUTILE).siftAndHammer().build()
             .machineProcess(Voltage.LV, 2d)
+            .build();
+    }
+
+    private static void crops() {
+        crop(Items.WHEAT, Items.WHEAT_SEEDS, true);
+        crop(Items.BEETROOT, Items.BEETROOT_SEEDS, true);
+        crop(Items.PUMPKIN, Items.PUMPKIN_SEEDS, false);
+        crop(Items.MELON, Items.MELON_SEEDS, false);
+
+        crop(Items.CARROT);
+        crop(Items.POTATO);
+        crop(Items.COCOA_BEANS);
+        crop(Items.SUGAR_CANE);
+        crop(Items.SWEET_BERRIES);
+        crop(Items.CACTUS);
+        crop(Items.KELP);
+        crop(Items.SEA_PICKLE);
+        crop(Items.NETHER_WART);
+        crop(Items.CRIMSON_FUNGUS);
+        crop(Items.WARPED_FUNGUS);
+        crop(Items.GLOW_BERRIES);
+        crop(Items.BROWN_MUSHROOM);
+        crop(Items.RED_MUSHROOM);
+
+        // cut melon slice
+        CUTTER.recipe(DATA_GEN, Items.MELON_SLICE)
+            .outputItem(() -> Items.MELON_SLICE, 9)
+            .inputItem(() -> Items.MELON, 1)
+            .workTicks(128L)
+            .voltage(Voltage.LV)
+            .build();
+
+        // seed
+        cropToSeed(Items.WHEAT, Items.WHEAT_SEEDS);
+        cropToSeed(Items.BEETROOT, Items.BEETROOT_SEEDS);
+        cropToSeed(Items.PUMPKIN, Items.PUMPKIN_SEEDS, 4, 256);
+        cropToSeed(Items.MELON_SLICE, Items.MELON_SEEDS);
+
+        // biomass
+        cropToBiomass(Items.WHEAT, 1, 100, 48);
+        cropToBiomass(Items.BEETROOT, 1, 500, 48);
+        cropToBiomass(Items.CARROT, 2, 100, 96);
+        cropToBiomass(Items.POTATO, 2, 150, 64);
+        cropToBiomass(Items.MELON, 1, 600, 240);
+        cropToBiomass(Items.PUMPKIN, 1, 300, 256);
+        cropToBiomass(Items.COCOA_BEANS, 2, 100, 128);
+        cropToBiomass(Items.SUGAR_CANE, 1, 400, 48);
+        cropToBiomass(Items.SWEET_BERRIES, 1, 100, 32);
+        cropToBiomass(Items.CACTUS, 1, 100, 128);
+        cropToBiomass(Items.KELP, 2, 150, 64);
+        cropToBiomass(Items.SEA_PICKLE, 2, 100, 96);
+        cropToBiomass(Items.NETHER_WART, 4, 100, 96);
+        cropToBiomass(Items.CRIMSON_FUNGUS, 4, 100, 128);
+        cropToBiomass(Items.WARPED_FUNGUS, 4, 100, 128);
+        cropToBiomass(Items.GLOW_BERRIES, 2, 150, 64);
+
+        cropToBiomass(Items.WHEAT_SEEDS, 16, 100, 64);
+        cropToBiomass(Items.BEETROOT_SEEDS, 16, 100, 64);
+        cropToBiomass(Items.MELON_SEEDS, 16, 100, 64);
+        cropToBiomass(Items.PUMPKIN_SEEDS, 16, 100, 64);
+
+        EXTRACTOR.recipe(DATA_GEN, Tags.Items.MUSHROOMS.location())
+            .inputItem(Tags.Items.MUSHROOMS, 6)
+            .outputFluid(BIOMASS, 100)
+            .workTicks(96)
+            .voltage(Voltage.MV)
+            .build();
+    }
+
+    private static void crop(Item crop, Item seed, boolean outputSeed) {
+        var loc = crop.getRegistryName();
+        assert loc != null;
+        AUTOFARM.recipe(DATA_GEN, loc)
+            .inputItem(() -> seed, 1)
+            .inputFluid(BIOMASS, 500)
+            .outputItem(() -> crop, crop == seed ? 3 : 1)
+            .transform($ -> outputSeed ? $.outputItem(() -> seed, 2) : $)
+            .voltage(Voltage.LV)
+            .workTicks(800)
+            .build()
+            .recipe(DATA_GEN, suffix(loc, "_with_bone_meal"))
+            .inputItem(() -> seed, 1)
+            .inputFluid(() -> Fluids.WATER, 500)
+            .inputItem(2, () -> Items.BONE_MEAL, 1)
+            .outputItem(() -> crop, crop == seed ? 3 : 1)
+            .transform($ -> outputSeed ? $.outputItem(() -> seed, 2) : $)
+            .voltage(Voltage.LV)
+            .workTicks(300)
+            .build()
+            .recipe(DATA_GEN, suffix(loc, "_with_fertilizer"))
+            .inputItem(() -> seed, 1)
+            .inputFluid(() -> Fluids.WATER, 500)
+            .inputItem(2, FERTILIZER, 1)
+            .outputItem(() -> crop, crop == seed ? 6 : 2)
+            .transform($ -> outputSeed ? $.outputItem(() -> seed, 4) : $)
+            .voltage(Voltage.MV)
+            .workTicks(300)
+            .build();
+    }
+
+    private static void crop(Item crop) {
+        crop(crop, crop, false);
+    }
+
+    private static void cropToBiomass(Item crop, int amount, int fluidAmount, long workTicks) {
+        EXTRACTOR.recipe(DATA_GEN, crop)
+            .inputItem(() -> crop, amount)
+            .outputFluid(BIOMASS, fluidAmount)
+            .workTicks(workTicks)
+            .voltage(Voltage.LV)
+            .build();
+    }
+
+    private static void cropToSeed(Item crop, Item seed) {
+        cropToSeed(crop, seed, 1, 64);
+    }
+
+    private static void cropToSeed(Item crop, Item seed, int amount, long workTicks) {
+        MACERATOR.recipe(DATA_GEN, crop)
+            .inputItem(() -> crop, 1)
+            .outputItem(() -> seed, amount)
+            .voltage(Voltage.LV)
+            .workTicks(workTicks)
             .build();
     }
 

@@ -88,6 +88,8 @@ public class JEI implements IModPlugin {
         addProcessingCategory(AllRecipes.VACUUM_FREEZER, AllLayouts.VACUUM_FREEZER,
             AllMultiblocks.VACUUM_FREEZER.get());
         addProcessingCategory(AllRecipes.DISTILLATION, new DistillationCategory());
+        addProcessingCategory(AllRecipes.AUTOFARM, AllLayouts.AUTOFARM,
+            AllMultiblocks.AUTOFARM.get());
     }
 
     private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(

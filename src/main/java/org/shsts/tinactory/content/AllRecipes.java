@@ -178,7 +178,7 @@ public final class AllRecipes {
             .register();
 
         AUTOFARM = processing("autofarm")
-            .defaults($ -> $.amperage(0.25d).defaultInputItem(0).defaultOutputItem(2))
+            .defaults($ -> $.amperage(0.25d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(3))
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)

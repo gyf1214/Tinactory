@@ -143,7 +143,7 @@ public final class AllMultiblocks {
 
         AUTOFARM = multiblock("autofarm")
             .blockEntity()
-            .child(Multiblock.simple(AllRecipes.AUTOFARM, false))
+            .child(Multiblock.simple(AllRecipes.AUTOFARM, true))
             .layout(AllLayouts.AUTOFARM)
             .appearanceBlock(SOLID_STEEL_CASING)
             .spec()

@@ -109,6 +109,7 @@ public final class AllItems {
     public static final IEntry<Item> ADVANCED_BUZZSAW;
     public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
     public static final IEntry<Item> ITEM_FILTER;
+    public static final IEntry<Item> FERTILIZER;
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
@@ -160,7 +161,7 @@ public final class AllItems {
             .renderType(() -> RenderType::cutout)
             .register();
 
-        BIOMASS = simpleFluid("biomass", gregtech("blocks/fluids/fluid.biomass"));
+        BIOMASS = simpleFluid("biomass", gregtech("blocks/fluids/fluid.biomass"), 0xFF14CC04);
 
         ELECTRIC_MOTOR = component("electric_motor");
         ELECTRIC_PUMP = component("electric_pump");
@@ -253,6 +254,7 @@ public final class AllItems {
             .buildObject();
 
         ITEM_FILTER = simple("component/item_filter");
+        FERTILIZER = simple("misc/fertilizer");
     }
 
     public static void init() {}

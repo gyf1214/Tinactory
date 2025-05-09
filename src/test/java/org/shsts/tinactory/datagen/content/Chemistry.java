@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllRecipes;
@@ -11,8 +12,10 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.content.AllItems.BIOMASS;
+import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
@@ -103,18 +106,18 @@ public class Chemistry {
             .build();
 
         DISTILLATION.voltage(Voltage.MV)
-            .recipe(AIR, "liquid", 1f, 100, NITROGEN, 0.78f, OXYGEN, 0.21f, ARGON, 0.01f)
-            .recipe(SEA_WATER, 10f, 4000,
+            .recipe(AIR, "liquid", 1f, 96, NITROGEN, 0.78f, OXYGEN, 0.21f, ARGON, 0.01f)
+            .recipe(SEA_WATER, 10f, 2000,
                 SODIUM_CHLORIDE, 5, POTASSIUM_CHLORIDE, 1, MAGNESIUM_CHLORIDE, 0.5,
                 CALCIUM_CHLORIDE, 0.2, WATER, "gas", 6.4f, LITHIUM_BRINE, 0.1f)
-            .recipe(SALT_WATER, 2f, 800, SODIUM_CHLORIDE, 1, WATER, "gas", 1f)
-            .recipe(SULFURIC_ACID, "dilute", 2f, 800, SULFURIC_ACID, 1f, WATER, "gas", 1f)
-            .recipe(WATER, 1f, 400, WATER, "gas", 1f);
+            .recipe(SALT_WATER, 2f, 320, SODIUM_CHLORIDE, 1, WATER, "gas", 1f)
+            .recipe(SULFURIC_ACID, "dilute", 2f, 320, SULFURIC_ACID, 1f, WATER, "gas", 1f)
+            .recipe(WATER, 1f, 300, WATER, "gas", 1f);
 
         ELECTROLYZER.voltage(Voltage.MV)
-            .recipe(WATER, 1f, 1600, HYDROGEN, 1f, OXYGEN, 0.5f)
-            .recipe(SALT_WATER, 2f, 800, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
-            .recipe(SEA_WATER, 2f, 3200, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
+            .recipe(WATER, 1f, 800, HYDROGEN, 1f, OXYGEN, 0.5f)
+            .recipe(SALT_WATER, 2f, 400, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
+            .recipe(SEA_WATER, 2f, 1600, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
             .recipe(BAUXITE, 15, 320, ALUMINIUM, 6, OXYGEN, 9f, RUTILE, 1)
             .recipe(COAL, 1, 40, CARBON, 2)
             .recipe(GRAPHITE, 1, 64, CARBON, 4);
@@ -328,27 +331,41 @@ public class Chemistry {
             .inputItem(STONE.tag("dust"), 1)
             .inputFluid(BIOMASS, 1000)
             .workTicks(160)
-            .voltage(Voltage.MV)
+            .voltage(Voltage.LV)
             .build()
             .recipe(DATA_GEN, Blocks.GRASS_BLOCK)
             .outputItem(() -> Blocks.GRASS_BLOCK, 1)
             .inputItem(() -> Blocks.DIRT, 1)
             .inputFluid(BIOMASS, 1000)
             .workTicks(160)
-            .voltage(Voltage.MV)
+            .voltage(Voltage.LV)
             .build()
             .recipe(DATA_GEN, Blocks.PODZOL)
             .outputItem(() -> Blocks.PODZOL, 1)
             .inputItem(() -> Blocks.DIRT, 1)
             .inputItem(CARBON.tag("dust"), 1)
             .workTicks(160)
-            .voltage(Voltage.MV)
+            .voltage(Voltage.LV)
             .build()
             .recipe(DATA_GEN, Blocks.COARSE_DIRT)
             .outputItem(() -> Blocks.COARSE_DIRT, 2)
             .inputItem(() -> Blocks.DIRT, 1)
             .inputItem(() -> Blocks.GRAVEL, 1)
             .workTicks(160)
+            .voltage(Voltage.LV)
+            .build()
+            .recipe(DATA_GEN, Items.BONE_MEAL)
+            .outputItem(() -> Items.BONE_MEAL, 1)
+            .inputItem(CALCIUM_CARBONATE.tag("dust"), 1)
+            .inputItem(POTASSIUM_CARBONATE.tag("dust"), 1)
+            .workTicks(64)
+            .voltage(Voltage.MV)
+            .build()
+            .recipe(DATA_GEN, FERTILIZER)
+            .outputItem(FERTILIZER, 1)
+            .inputItem(AMMONIUM_CHLORIDE.tag("dust"), 1)
+            .inputItem(POTASSIUM_NITRATE.tag("dust"), 1)
+            .workTicks(128)
             .voltage(Voltage.MV)
             .build();
 
