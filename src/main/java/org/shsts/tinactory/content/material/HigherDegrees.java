@@ -5,6 +5,7 @@ import net.minecraft.world.item.Tiers;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
+import static org.shsts.tinactory.content.AllMaterials.DIESEL;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LPG;
@@ -86,13 +87,16 @@ public final class HigherDegrees {
         BIOMASS = set("biomass")
             .color(0xFF14CC04)
             .fluid("fluid", "biomass", 1000)
-            .fluidPrimary("fluid")
             .buildObject();
 
         LPG = set("lpg")
             .color(0xFFFCFCAC)
             .fluid("fluid", "lpg", 1000)
-            .fluidPrimary("fluid")
+            .buildObject();
+
+        DIESEL = set("diesel")
+            .color(0xFFFCF404)
+            .fluid("fluid", "diesel", 1000)
             .buildObject();
     }
 

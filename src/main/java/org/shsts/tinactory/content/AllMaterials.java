@@ -110,6 +110,7 @@ public final class AllMaterials {
     public static MaterialSet PVC;
     public static MaterialSet BIOMASS;
     public static MaterialSet LPG;
+    public static MaterialSet DIESEL;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;

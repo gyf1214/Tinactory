@@ -56,8 +56,10 @@ import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
+import static org.shsts.tinactory.content.AllMaterials.DIESEL;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.EMERALD;
+import static org.shsts.tinactory.content.AllMaterials.ETHANE;
 import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GALENA;
@@ -68,12 +70,14 @@ import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.GLOWSTONE;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
+import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_OIL;
 import static org.shsts.tinactory.content.AllMaterials.ILMENITE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
+import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
@@ -92,6 +96,7 @@ import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
+import static org.shsts.tinactory.content.AllMaterials.PROPANE;
 import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
@@ -413,6 +418,12 @@ public final class Materials {
             .build()
             .material(PVC, DULL)
             .machineProcess(Voltage.LV, 0.5d)
+            .build()
+            .material(LPG, DULL)
+            .fluidMix(Voltage.MV, ETHANE, 1, PROPANE, 1)
+            .build()
+            .material(DIESEL, DULL)
+            .fluidMix(Voltage.MV, LIGHT_FUEL, 5, HEAVY_FUEL, 1)
             .build();
     }
 
