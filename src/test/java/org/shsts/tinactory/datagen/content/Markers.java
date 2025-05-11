@@ -2,7 +2,6 @@ package org.shsts.tinactory.datagen.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
@@ -11,6 +10,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.ArrayList;
 
 import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
+import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
@@ -66,7 +66,7 @@ public final class Markers {
         MARKER.recipe(DATA_GEN, "wash_" + sub)
             .baseType(ORE_WASHER)
             .inputItem(0, AllMaterials.tag(sub))
-            .inputFluid(1, Fluids.WATER)
+            .inputFluid(1, WATER.fluid())
             .build();
     }
 

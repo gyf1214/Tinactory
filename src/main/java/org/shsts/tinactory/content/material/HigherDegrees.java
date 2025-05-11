@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.material;
 import net.minecraft.world.item.Tiers;
 
 import static org.shsts.tinactory.content.AllMaterials.AIR;
+import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
@@ -79,6 +80,11 @@ public final class HigherDegrees {
         PVC = set("polyvinyl_chloride")
             .color(0xFFD7E6E6)
             .polymerFoil()
+            .buildObject();
+
+        BIOMASS = set("biomass")
+            .color(0xFF14CC04)
+            .fluid("fluid", "biomass", 1000)
             .buildObject();
     }
 

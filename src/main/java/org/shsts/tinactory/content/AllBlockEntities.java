@@ -61,7 +61,6 @@ public final class AllBlockEntities {
     public static final ProcessingSet POLARIZER;
     public static final ProcessingSet WIREMILL;
     public static final ProcessingSet BENDER;
-    public static final ProcessingSet COMPRESSOR;
     public static final ProcessingSet LATHE;
     public static final ProcessingSet CUTTER;
     public static final ProcessingSet EXTRUDER;
@@ -70,6 +69,8 @@ public final class AllBlockEntities {
     public static final ProcessingSet ELECTROLYZER;
     public static final ProcessingSet CHEMICAL_REACTOR;
     public static final ProcessingSet STEAM_TURBINE;
+    public static final ProcessingSet GAS_TURBINE;
+    public static final ProcessingSet COMBUSTION;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
@@ -269,7 +270,6 @@ public final class AllBlockEntities {
         POLARIZER = set.simpleMachine(AllRecipes.POLARIZER, Texture.PROGRESS_MAGNETIC);
         WIREMILL = set.simpleMachine(AllRecipes.WIREMILL, Texture.PROGRESS_WIREMILL);
         BENDER = set.simpleMachine(AllRecipes.BENDER, Texture.PROGRESS_BENDING);
-        COMPRESSOR = set.simpleMachine(AllRecipes.COMPRESSOR, Texture.PROGRESS_COMPRESS);
 
         LATHE = set.processing(AllRecipes.LATHE)
             .transform(simpleLayout(Texture.PROGRESS_LATHE))
@@ -346,7 +346,7 @@ public final class AllBlockEntities {
             .slots(SLOT_SIZE * 4, 1, 1, 2)
             .port(FLUID_OUTPUT)
             .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 2)
-            .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .progressBar(Texture.PROGRESS_MIXER, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -358,6 +358,26 @@ public final class AllBlockEntities {
             .slot(0, 1 + SLOT_SIZE / 2)
             .port(FLUID_OUTPUT)
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+            .progressBar(Texture.PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .build()
+            .buildObject();
+
+        GAS_TURBINE = set.processing(AllRecipes.GAS_TURBINE)
+            .processor(RecipeProcessor::generator)
+            .voltages(Voltage.LV, Voltage.HV)
+            .layoutSet()
+            .port(FLUID_INPUT)
+            .slot(0, 1 + SLOT_SIZE / 2)
+            .progressBar(Texture.PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .build()
+            .buildObject();
+
+        COMBUSTION = set.processing(AllRecipes.COMBUSTION)
+            .processor(RecipeProcessor::generator)
+            .voltages(Voltage.LV, Voltage.HV)
+            .layoutSet()
+            .port(FLUID_INPUT)
+            .slot(0, 1 + SLOT_SIZE / 2)
             .progressBar(Texture.PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();

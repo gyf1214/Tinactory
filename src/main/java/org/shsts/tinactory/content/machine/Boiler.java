@@ -7,7 +7,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -28,7 +27,7 @@ import java.util.List;
 
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllMaterials.STEAM;
+import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.core.machine.MachineProcessor.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
@@ -75,7 +74,7 @@ public class Boiler extends CapabilityProvider implements
         outputPort = container.getPort(2, true).asFluid();
 
         fuelPort.setItemFilter(List.of(item -> ForgeHooks.getBurnTime(item, null) > 0));
-        waterPort.setFluidFilter(List.of(fluid -> fluid.getFluid() == Fluids.WATER));
+        waterPort.setFluidFilter(List.of(fluid -> fluid.getFluid() == WATER.fluid().get()));
     }
 
     @Override
@@ -118,11 +117,11 @@ public class Boiler extends CapabilityProvider implements
             var absorb = (heat - BURN_HEAT) * BASE_ABSORB;
             var leftSteam1 = leftSteam + absorb * BURN_EFFICIENCY;
             var amount = (int) Math.floor(leftSteam1);
-            var drained = waterPort.drain(new FluidStack(Fluids.WATER, amount), true);
+            var drained = waterPort.drain(new FluidStack(WATER.fluid().get(), amount), true);
             var amount1 = drained.getAmount();
             if (!drained.isEmpty()) {
                 waterPort.drain(drained, false);
-                outputPort.fill(new FluidStack(STEAM.get(), amount1), false);
+                outputPort.fill(new FluidStack(WATER.fluid("gas").get(), amount1), false);
                 leftSteam1 -= amount1;
             }
 

@@ -13,20 +13,13 @@ import org.shsts.tinactory.content.material.FirstDegrees;
 import org.shsts.tinactory.content.material.HigherDegrees;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.Ores;
-import org.shsts.tinactory.core.common.SimpleFluid;
-import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMaterials {
-    public static final IEntry<SimpleFluid> STEAM;
-
     // Element
     public static MaterialSet IRON;
     public static MaterialSet GOLD;
@@ -115,6 +108,7 @@ public final class AllMaterials {
     public static MaterialSet HEAVY_FUEL;
     public static MaterialSet PE;
     public static MaterialSet PVC;
+    public static MaterialSet BIOMASS;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
@@ -151,8 +145,6 @@ public final class AllMaterials {
     public static MaterialSet GLASS;
 
     static {
-        STEAM = simpleFluid("steam", gregtech("blocks/fluids/fluid.steam"));
-
         SET = new HashMap<>();
         Elements.init();
         FirstDegrees.init();

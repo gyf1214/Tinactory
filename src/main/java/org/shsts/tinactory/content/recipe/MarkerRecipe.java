@@ -17,6 +17,7 @@ import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -59,8 +60,8 @@ public class MarkerRecipe extends ProcessingRecipe {
             return inputItem(port, () -> item, 1);
         }
 
-        public Builder inputFluid(int port, Fluid fluid) {
-            return inputFluid(port, () -> fluid, 1);
+        public Builder inputFluid(int port, Supplier<? extends Fluid> fluid) {
+            return inputFluid(port, fluid, 1);
         }
 
         @Override

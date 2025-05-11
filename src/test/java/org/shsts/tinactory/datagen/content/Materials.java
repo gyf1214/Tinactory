@@ -10,7 +10,6 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -23,7 +22,6 @@ import org.shsts.tinactory.datagen.content.model.IconSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.shsts.tinactory.content.AllItems.BIOMASS;
 import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
@@ -37,6 +35,7 @@ import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.BERYLLIUM;
+import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
@@ -107,7 +106,6 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
-import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
@@ -239,13 +237,13 @@ public final class Materials {
         // biomass
         EXTRACTOR.recipe(DATA_GEN, ItemTags.LEAVES.location())
             .inputItem(ItemTags.LEAVES, 16)
-            .outputFluid(BIOMASS, 300)
+            .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.3f))
             .workTicks(128)
             .voltage(Voltage.MV)
             .build()
             .recipe(DATA_GEN, ItemTags.SAPLINGS.location())
             .inputItem(ItemTags.SAPLINGS, 16)
-            .outputFluid(BIOMASS, 100)
+            .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.1f))
             .workTicks(64)
             .voltage(Voltage.MV)
             .build();
@@ -418,8 +416,8 @@ public final class Materials {
                 .build();
         }
         // generate water
-        STONE_GENERATOR.recipe(DATA_GEN, Fluids.WATER)
-            .outputFluid(() -> Fluids.WATER, 1000)
+        STONE_GENERATOR.recipe(DATA_GEN, WATER.fluidLoc())
+            .outputFluid(WATER.fluid(), WATER.fluidAmount(1f))
             .voltage(Voltage.ULV)
             .build();
 
@@ -534,31 +532,31 @@ public final class Materials {
         cropToSeed(Items.MELON_SLICE, Items.MELON_SEEDS);
 
         // biomass
-        cropToBiomass(Items.WHEAT, 1, 100, 48);
-        cropToBiomass(Items.BEETROOT, 1, 500, 48);
-        cropToBiomass(Items.CARROT, 2, 100, 96);
-        cropToBiomass(Items.POTATO, 2, 150, 64);
-        cropToBiomass(Items.MELON, 1, 600, 240);
-        cropToBiomass(Items.PUMPKIN, 1, 300, 256);
-        cropToBiomass(Items.COCOA_BEANS, 2, 100, 128);
-        cropToBiomass(Items.SUGAR_CANE, 1, 400, 48);
-        cropToBiomass(Items.SWEET_BERRIES, 1, 100, 32);
-        cropToBiomass(Items.CACTUS, 1, 100, 128);
-        cropToBiomass(Items.KELP, 2, 150, 64);
-        cropToBiomass(Items.SEA_PICKLE, 2, 100, 96);
-        cropToBiomass(Items.NETHER_WART, 4, 100, 96);
-        cropToBiomass(Items.CRIMSON_FUNGUS, 4, 100, 128);
-        cropToBiomass(Items.WARPED_FUNGUS, 4, 100, 128);
-        cropToBiomass(Items.GLOW_BERRIES, 2, 150, 64);
+        cropToBiomass(Items.WHEAT, 1, 0.1f, 48);
+        cropToBiomass(Items.BEETROOT, 1, 0.5f, 48);
+        cropToBiomass(Items.CARROT, 2, 0.1f, 96);
+        cropToBiomass(Items.POTATO, 2, 0.15f, 64);
+        cropToBiomass(Items.MELON, 1, 0.6f, 240);
+        cropToBiomass(Items.PUMPKIN, 1, 0.3f, 256);
+        cropToBiomass(Items.COCOA_BEANS, 2, 0.1f, 128);
+        cropToBiomass(Items.SUGAR_CANE, 1, 0.4f, 48);
+        cropToBiomass(Items.SWEET_BERRIES, 1, 0.1f, 32);
+        cropToBiomass(Items.CACTUS, 1, 0.1f, 128);
+        cropToBiomass(Items.KELP, 2, 0.15f, 64);
+        cropToBiomass(Items.SEA_PICKLE, 2, 0.1f, 96);
+        cropToBiomass(Items.NETHER_WART, 4, 0.1f, 96);
+        cropToBiomass(Items.CRIMSON_FUNGUS, 4, 0.1f, 128);
+        cropToBiomass(Items.WARPED_FUNGUS, 4, 0.1f, 128);
+        cropToBiomass(Items.GLOW_BERRIES, 2, 0.15f, 64);
 
-        cropToBiomass(Items.WHEAT_SEEDS, 16, 100, 64);
-        cropToBiomass(Items.BEETROOT_SEEDS, 16, 100, 64);
-        cropToBiomass(Items.MELON_SEEDS, 16, 100, 64);
-        cropToBiomass(Items.PUMPKIN_SEEDS, 16, 100, 64);
+        cropToBiomass(Items.WHEAT_SEEDS, 16, 0.1f, 64);
+        cropToBiomass(Items.BEETROOT_SEEDS, 16, 0.1f, 64);
+        cropToBiomass(Items.MELON_SEEDS, 16, 0.1f, 64);
+        cropToBiomass(Items.PUMPKIN_SEEDS, 16, 0.1f, 64);
 
         EXTRACTOR.recipe(DATA_GEN, Tags.Items.MUSHROOMS.location())
             .inputItem(Tags.Items.MUSHROOMS, 6)
-            .outputFluid(BIOMASS, 100)
+            .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.1f))
             .workTicks(96)
             .voltage(Voltage.MV)
             .build();
@@ -569,7 +567,7 @@ public final class Materials {
         assert loc != null;
         AUTOFARM.recipe(DATA_GEN, loc)
             .inputItem(() -> seed, 1)
-            .inputFluid(BIOMASS, 500)
+            .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.5f))
             .outputItem(() -> crop, crop == seed ? 3 : 1)
             .transform($ -> outputSeed ? $.outputItem(() -> seed, 2) : $)
             .voltage(Voltage.LV)
@@ -577,7 +575,7 @@ public final class Materials {
             .build()
             .recipe(DATA_GEN, suffix(loc, "_with_bone_meal"))
             .inputItem(() -> seed, 1)
-            .inputFluid(() -> Fluids.WATER, 500)
+            .inputFluid(WATER.fluid(), WATER.fluidAmount(0.5f))
             .inputItem(2, () -> Items.BONE_MEAL, 1)
             .outputItem(() -> crop, crop == seed ? 3 : 1)
             .transform($ -> outputSeed ? $.outputItem(() -> seed, 2) : $)
@@ -586,7 +584,7 @@ public final class Materials {
             .build()
             .recipe(DATA_GEN, suffix(loc, "_with_fertilizer"))
             .inputItem(() -> seed, 1)
-            .inputFluid(() -> Fluids.WATER, 500)
+            .inputFluid(WATER.fluid(), WATER.fluidAmount(0.5f))
             .inputItem(2, FERTILIZER, 1)
             .outputItem(() -> crop, crop == seed ? 6 : 2)
             .transform($ -> outputSeed ? $.outputItem(() -> seed, 4) : $)
@@ -599,10 +597,10 @@ public final class Materials {
         crop(crop, crop, false);
     }
 
-    private static void cropToBiomass(Item crop, int amount, int fluidAmount, long workTicks) {
+    private static void cropToBiomass(Item crop, int amount, float fluidAmount, long workTicks) {
         EXTRACTOR.recipe(DATA_GEN, crop)
             .inputItem(() -> crop, amount)
-            .outputFluid(BIOMASS, fluidAmount)
+            .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(fluidAmount))
             .workTicks(workTicks)
             .voltage(Voltage.LV)
             .build();
@@ -674,8 +672,8 @@ public final class Materials {
             var consume = (int) voltage.value / 8 * (14 - voltage.rank);
             STEAM_TURBINE.recipe(DATA_GEN, voltage.id)
                 .voltage(voltage)
-                .inputFluid(STEAM, consume)
-                .outputFluid(() -> Fluids.WATER, (int) voltage.value / 8 * 5)
+                .inputFluid(WATER.fluid("gas"), consume)
+                .outputFluid(WATER.fluid(), (int) voltage.value / 8 * 5)
                 .build();
         }
 
@@ -771,7 +769,8 @@ public final class Materials {
         var nether = prefix.equals("crimson") || prefix.equals("warped");
 
         var planks = ITEMS.getEntry(mcLoc(prefix + "_planks"));
-        var logTag = AllTags.item(prefix + (nether ? "_stems" : "_logs"));
+        var log = mcLoc(prefix + (nether ? "_stems" : "_logs"));
+        var logTag = AllTags.item(log);
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;
 
@@ -792,5 +791,9 @@ public final class Materials {
                 .requires(logTag)
                 .group("planks")
                 .unlockedBy("has_logs", has(logTag)));
+
+        if (!nether) {
+            var logItem = ITEMS.getEntry(log);
+        }
     }
 }

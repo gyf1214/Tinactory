@@ -60,10 +60,6 @@ public final class AllTags {
         return TagKey.create(Registry.ITEM_REGISTRY, loc);
     }
 
-    public static TagKey<Item> item(String id) {
-        return item(new ResourceLocation(id));
-    }
-
     public static TagKey<Item> modItem(String id) {
         return item(modLoc(id));
     }

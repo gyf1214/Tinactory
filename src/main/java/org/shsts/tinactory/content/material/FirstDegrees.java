@@ -43,7 +43,6 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
-import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
@@ -60,8 +59,8 @@ public final class FirstDegrees {
         WATER = set("water")
             .color(0xFF0000FF)
             .existing("liquid", Fluids.WATER, 1000)
-            .existing("gas", STEAM, 1000)
             .fluidPrimary("liquid")
+            .fluid("gas", "steam", 0xFFFFFFFF, 1000)
             .buildObject();
 
         WROUGHT_IRON = set("wrought_iron")

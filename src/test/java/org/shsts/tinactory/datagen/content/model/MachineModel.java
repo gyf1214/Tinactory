@@ -57,6 +57,7 @@ public class MachineModel {
 
     @Nullable
     private final ResourceLocation casing;
+    @Nullable
     private final ResourceLocation overlay;
     private final ResourceLocation ioTex;
     private final Map<Direction, ResourceLocation> dirOverlay;

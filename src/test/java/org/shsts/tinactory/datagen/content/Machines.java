@@ -37,7 +37,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.BENDER;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllBlockEntities.CIRCUIT_ASSEMBLER;
-import static org.shsts.tinactory.content.AllBlockEntities.COMPRESSOR;
+import static org.shsts.tinactory.content.AllBlockEntities.COMBUSTION;
 import static org.shsts.tinactory.content.AllBlockEntities.CUTTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
@@ -46,6 +46,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.ELECTROLYZER;
 import static org.shsts.tinactory.content.AllBlockEntities.EXTRACTOR;
 import static org.shsts.tinactory.content.AllBlockEntities.EXTRUDER;
 import static org.shsts.tinactory.content.AllBlockEntities.FLUID_SOLIDIFIER;
+import static org.shsts.tinactory.content.AllBlockEntities.GAS_TURBINE;
 import static org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.LASER_ENGRAVER;
 import static org.shsts.tinactory.content.AllBlockEntities.LATHE;
@@ -154,7 +155,6 @@ public final class Machines {
         machine(POLARIZER);
         machine(WIREMILL);
         machine(BENDER);
-        machine(COMPRESSOR);
         machine(LATHE);
         machine(CUTTER);
         machine(EXTRUDER);
@@ -165,6 +165,10 @@ public final class Machines {
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
             .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
             .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
+        machine(GAS_TURBINE, $ -> $.ioTex(IO_TEX)
+            .overlay(Direction.EAST, "generators/steam_turbine/overlay_side")
+            .overlay(Direction.WEST, "generators/steam_turbine/overlay_side"));
+        machine(COMBUSTION, "generators/combustion");
         machine(BATTERY_BOX, IO_OUT_TEX);
         machine(ELECTRIC_CHEST, $ -> $.ioTex(IO_TEX)
             .overlay(Direction.UP, "overlay/machine/overlay_qchest")
@@ -726,11 +730,6 @@ public final class Machines {
             .material(main, "plate", 1)
             .tech(Technologies.PUMP_AND_PISTON)
             .build()
-            .recipe(COMPRESSOR)
-            .circuit(2)
-            .component(ELECTRIC_PISTON, 4)
-            .tech(Technologies.PUMP_AND_PISTON)
-            .build()
             .recipe(LATHE)
             .circuit(3)
             .component(ELECTRIC_MOTOR, 1)
@@ -785,6 +784,20 @@ public final class Machines {
             .material(rotor, "rotor", 2)
             .material(pipe, "pipe", 2)
             .tech(Technologies.MOTOR)
+            .build()
+            .recipe(GAS_TURBINE)
+            .circuit(3)
+            .component(ELECTRIC_MOTOR, 1)
+            .component(ELECTRIC_PUMP, 1)
+            .material(rotor, "rotor", 2)
+            .tech(Technologies.PUMP_AND_PISTON)
+            .build()
+            .recipe(COMBUSTION)
+            .circuit(3)
+            .component(ELECTRIC_MOTOR, 1)
+            .component(ELECTRIC_PISTON, 1)
+            .material(main, "gear", 2)
+            .tech(Technologies.PUMP_AND_PISTON)
             .build()
             .recipe(ELECTRIC_CHEST)
             .circuit(4)

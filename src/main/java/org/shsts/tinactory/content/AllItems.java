@@ -25,7 +25,6 @@ import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CellItem;
-import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
@@ -44,10 +43,8 @@ import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
 import static org.shsts.tinactory.content.electric.Circuits.circuit;
 import static org.shsts.tinactory.content.electric.Circuits.circuitComponent;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -98,7 +95,6 @@ public final class AllItems {
     public static final Map<String, IEntry<Item>> CHIPS;
 
     public static final IEntry<Item> STICKY_RESIN;
-    public static final IEntry<SimpleFluid> BIOMASS;
     public static final IEntry<RubberLogBlock> RUBBER_LOG;
     public static final IEntry<LeavesBlock> RUBBER_LEAVES;
     public static final IEntry<SaplingBlock> RUBBER_SAPLING;
@@ -160,8 +156,6 @@ public final class AllItems {
                 .instabreak().sound(SoundType.GRASS))
             .renderType(() -> RenderType::cutout)
             .register();
-
-        BIOMASS = simpleFluid("biomass", gregtech("blocks/fluids/fluid.biomass"), 0xFF14CC04);
 
         ELECTRIC_MOTOR = component("electric_motor");
         ELECTRIC_PUMP = component("electric_pump");

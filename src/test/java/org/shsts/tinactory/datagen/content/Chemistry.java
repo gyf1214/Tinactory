@@ -4,20 +4,20 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Fluids;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import static org.shsts.tinactory.content.AllItems.BIOMASS;
 import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.AMMONIA;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
+import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
@@ -60,7 +60,6 @@ import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
-import static org.shsts.tinactory.content.AllMaterials.STEAM;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
@@ -84,23 +83,23 @@ public class Chemistry {
 
     private static void inorganic() {
         STONE_GENERATOR.recipe(DATA_GEN, AIR.fluidLoc())
-            .outputFluid(AIR.fluid(), AIR.fluidAmount(1))
+            .outputFluid(AIR.fluid(), AIR.fluidAmount(1f))
             .voltage(Voltage.MV)
             .build()
             .recipe(DATA_GEN, SEA_WATER.fluidLoc())
-            .outputFluid(SEA_WATER.fluid(), SEA_WATER.fluidAmount(1))
+            .outputFluid(SEA_WATER.fluid(), SEA_WATER.fluidAmount(1f))
             .voltage(Voltage.MV)
             .build();
 
         VACUUM_FREEZER.recipe(DATA_GEN, AIR.fluidLoc("liquid"))
-            .inputFluid(AIR.fluid(), AIR.fluidAmount(1))
-            .outputFluid(AIR.fluid("liquid"), AIR.fluidAmount("liquid", 1))
+            .inputFluid(AIR.fluid(), AIR.fluidAmount(1f))
+            .outputFluid(AIR.fluid("liquid"), AIR.fluidAmount("liquid", 1f))
             .workTicks(200)
             .voltage(Voltage.MV)
             .build()
-            .recipe(DATA_GEN, Fluids.WATER)
-            .inputFluid(STEAM, 1000)
-            .outputFluid(() -> Fluids.WATER, 1000)
+            .recipe(DATA_GEN, WATER.fluidLoc())
+            .inputFluid(WATER.fluid("gas"), WATER.fluidAmount("gas", 1f))
+            .outputFluid(WATER.fluid(), WATER.fluidAmount(1f))
             .workTicks(32)
             .voltage(Voltage.MV)
             .build();
@@ -177,7 +176,7 @@ public class Chemistry {
             .build()
             .recipe(DATA_GEN, CALCIUM_HYDROXIDE.loc("dust"))
             .input(CALCIUM_CARBONATE)
-            .inputFluid(STEAM, 1000)
+            .input(WATER)
             .output(CALCIUM_HYDROXIDE)
             .output(CARBON_DIOXIDE)
             .workTicks(400)
@@ -329,14 +328,14 @@ public class Chemistry {
         MIXER.recipe(DATA_GEN, Blocks.DIRT)
             .outputItem(() -> Blocks.DIRT, 1)
             .inputItem(STONE.tag("dust"), 1)
-            .inputFluid(BIOMASS, 1000)
+            .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(1f))
             .workTicks(160)
             .voltage(Voltage.LV)
             .build()
             .recipe(DATA_GEN, Blocks.GRASS_BLOCK)
             .outputItem(() -> Blocks.GRASS_BLOCK, 1)
             .inputItem(() -> Blocks.DIRT, 1)
-            .inputFluid(BIOMASS, 1000)
+            .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(1f))
             .workTicks(160)
             .voltage(Voltage.LV)
             .build()
@@ -362,18 +361,30 @@ public class Chemistry {
             .voltage(Voltage.MV)
             .build()
             .recipe(DATA_GEN, FERTILIZER)
-            .outputItem(FERTILIZER, 1)
+            .outputItem(FERTILIZER, 2)
+            .inputItem(() -> Items.BONE_MEAL, 1)
             .inputItem(AMMONIUM_CHLORIDE.tag("dust"), 1)
             .inputItem(POTASSIUM_NITRATE.tag("dust"), 1)
             .workTicks(128)
             .voltage(Voltage.MV)
             .build();
 
+        AllRecipes.DISTILLATION
+            .recipe(DATA_GEN, BIOMASS.fluidLoc())
+            .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(1f))
+            .outputItem(() -> Items.BONE_MEAL, 1)
+            .outputFluid(METHANE.fluid(), METHANE.fluidAmount(0.6f))
+            .outputFluid(AMMONIA.fluid(), AMMONIA.fluidAmount(0.3f))
+            .outputFluid(WATER.fluid("gas"), WATER.fluidAmount(0.3f))
+            .voltage(Voltage.MV)
+            .workTicks(96)
+            .build();
+
         CHEMICAL_REACTOR
             .recipe(DATA_GEN, ETHANOL.fluidLoc())
-            .inputFluid(BIOMASS, 3000)
+            .input(BIOMASS, 3f)
             .input(WATER, 2f)
-            .output(ETHANOL)
+            .output(ETHANOL, 2f)
             .output(CARBON_DIOXIDE)
             .workTicks(400)
             .voltage(Voltage.MV)

@@ -47,7 +47,6 @@ public final class AllRecipes {
     public static final IRecipeType<ProcessingRecipe.Builder> POLARIZER;
     public static final IRecipeType<ProcessingRecipe.Builder> WIREMILL;
     public static final IRecipeType<ProcessingRecipe.Builder> BENDER;
-    public static final IRecipeType<ProcessingRecipe.Builder> COMPRESSOR;
     public static final IRecipeType<ProcessingRecipe.Builder> LATHE;
     public static final IRecipeType<ProcessingRecipe.Builder> CUTTER;
     public static final IRecipeType<ProcessingRecipe.Builder> EXTRUDER;
@@ -56,6 +55,8 @@ public final class AllRecipes {
     public static final IRecipeType<ProcessingRecipe.Builder> ELECTROLYZER;
     public static final IRecipeType<ChemicalReactorRecipe.Builder> CHEMICAL_REACTOR;
     public static final IRecipeType<ProcessingRecipe.Builder> STEAM_TURBINE;
+    public static final IRecipeType<ProcessingRecipe.Builder> GAS_TURBINE;
+    public static final IRecipeType<ProcessingRecipe.Builder> COMBUSTION;
     public static final IRecipeType<BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     public static final IRecipeType<ProcessingRecipe.Builder> VACUUM_FREEZER;
     public static final IRecipeType<ProcessingRecipe.Builder> DISTILLATION;
@@ -132,7 +133,6 @@ public final class AllRecipes {
         POLARIZER = simpleProcessing("polarizer", 0.25d);
         WIREMILL = simpleProcessing("wiremill", 0.25d);
         BENDER = simpleProcessing("bender", 0.25d);
-        COMPRESSOR = simpleProcessing("compressor", 0.5d);
         LATHE = simpleProcessing("lathe", 0.375d);
 
         CUTTER = processing("cutter")
@@ -161,6 +161,14 @@ public final class AllRecipes {
 
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)
             .defaults($ -> $.amperage(1d).workTicks(100).defaultInputFluid(0).defaultOutputFluid(1))
+            .register();
+
+        GAS_TURBINE = processing("gas_turbine", GeneratorRecipe::builder)
+            .defaults($ -> $.amperage(1d).defaultInputFluid(0))
+            .register();
+
+        COMBUSTION = processing("combustion", GeneratorRecipe::builder)
+            .defaults($ -> $.amperage(1d).defaultInputFluid(0))
             .register();
 
         BLAST_FURNACE = REGISTRATE.recipeType("blast_furnace", BlastFurnaceRecipe.Builder::new)

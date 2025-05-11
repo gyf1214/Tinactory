@@ -13,7 +13,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.CircuitComponentTier;
@@ -104,6 +103,7 @@ import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE;
 import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
@@ -763,7 +763,7 @@ public final class Components {
             CUTTER.recipe(DATA_GEN, wafer)
                 .outputItem(wafer, 8 << i)
                 .inputItem(boule, 1)
-                .inputFluid(() -> Fluids.WATER, 1000 << i)
+                .inputFluid(WATER.fluid(), WATER.fluidAmount(1 << i))
                 .voltage(Voltage.fromRank(2 + 2 * i))
                 .workTicks(400L << i)
                 .build();
@@ -782,7 +782,7 @@ public final class Components {
             CUTTER.recipe(DATA_GEN, chip)
                 .outputItem(chip, 6)
                 .inputItem(wafer, 1)
-                .inputFluid(() -> Fluids.WATER, 750)
+                .inputFluid(WATER.fluid(), WATER.fluidAmount(0.75f))
                 .voltage(Voltage.LV)
                 .workTicks(300L)
                 .build();

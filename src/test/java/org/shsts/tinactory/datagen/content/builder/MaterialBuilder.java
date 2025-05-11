@@ -17,7 +17,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -41,6 +40,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
+import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BENDER;
@@ -357,7 +357,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                 CUTTER.recipe(DATA_GEN, material.loc("bolt"))
                     .outputItem(material.entry("bolt"), 4)
                     .inputItem(material.tag("stick"), 1)
-                    .inputFluid(() -> Fluids.WATER, 5)
+                    .inputFluid(WATER.fluid(), WATER.fluidAmount(0.05f))
                     .voltage(voltage)
                     .workTicks(128L)
                     .build();
@@ -367,7 +367,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                 CUTTER.recipe(DATA_GEN, material.loc("gem"))
                     .outputItem(material.entry("gem"), 8)
                     .inputItem(material.tag("gem_flawless"), 1)
-                    .inputFluid(() -> Fluids.WATER, 80)
+                    .inputFluid(WATER.fluid(), WATER.fluidAmount(0.8f))
                     .voltage(voltage)
                     .workTicks(480L)
                     .build();
@@ -789,12 +789,13 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                 .inputItem(material.tag(input), 1)
                 .outputItem(2, material.entry(output), 1);
             if (input.equals("crushed")) {
-                builder.inputFluid(() -> Fluids.WATER, 1000)
+                builder.inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
                     .outputItem(3, STONE.entry("dust"), 1)
                     .outputItem(4, byproduct0, 1, 0.3d)
                     .workTicks(200);
             } else {
-                builder.inputFluid(() -> Fluids.WATER, 100).workTicks(32);
+                builder.inputFluid(WATER.fluid(), WATER.fluidAmount(0.1f))
+                    .workTicks(32);
             }
             var voltage = primitive && input.equals("dust_impure") ?
                 Voltage.PRIMITIVE : Voltage.ULV;
