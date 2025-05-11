@@ -16,8 +16,10 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.material.RubberLogBlock;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.datagen.content.builder.MaterialBuilder;
 import org.shsts.tinactory.datagen.content.model.IconSet;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +58,7 @@ import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.EMERALD;
+import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GALENA;
 import static org.shsts.tinactory.content.AllMaterials.GALLIUM;
@@ -75,10 +78,12 @@ import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.LPG;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
+import static org.shsts.tinactory.content.AllMaterials.METHANE;
 import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
@@ -93,6 +98,7 @@ import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
@@ -119,8 +125,10 @@ import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.AUTOFARM;
+import static org.shsts.tinactory.content.AllRecipes.COMBUSTION_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
+import static org.shsts.tinactory.content.AllRecipes.GAS_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
@@ -194,7 +202,8 @@ public final class Materials {
             .nullRecipe(Items.IRON_HOE)
             .nullRecipe(Items.IRON_PICKAXE)
             .nullRecipe(Items.IRON_SHOVEL)
-            .nullRecipe(Items.IRON_SWORD);
+            .nullRecipe(Items.IRON_SWORD)
+            .nullRecipe(Items.COMPOSTER);
 
         // stick
         TOOL_CRAFTING.recipe(DATA_GEN, Items.STICK)
@@ -667,15 +676,12 @@ public final class Materials {
             .toolTag(TOOL_MORTAR)
             .build();
 
-        // generate steam
-        for (var voltage : Voltage.between(Voltage.ULV, Voltage.HV)) {
-            var consume = (int) voltage.value / 8 * (14 - voltage.rank);
-            STEAM_TURBINE.recipe(DATA_GEN, voltage.id)
-                .voltage(voltage)
-                .inputFluid(WATER.fluid("gas"), consume)
-                .outputFluid(WATER.fluid(), (int) voltage.value / 8 * 5)
-                .build();
-        }
+        generatorRecipes(STEAM_TURBINE, WATER, "gas", 80d, 100);
+        generatorRecipes(GAS_TURBINE, METHANE, 80d, 100);
+        generatorRecipes(GAS_TURBINE, LPG, 320d, 100);
+        generatorRecipes(GAS_TURBINE, REFINERY_GAS, 64d, 100);
+        generatorRecipes(GAS_TURBINE, NATURAL_GAS, 40d, 100);
+        generatorRecipes(COMBUSTION_GENERATOR, ETHANOL, 160d, 100);
 
         // rubber
         TOOL_CRAFTING.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
@@ -769,8 +775,8 @@ public final class Materials {
         var nether = prefix.equals("crimson") || prefix.equals("warped");
 
         var planks = ITEMS.getEntry(mcLoc(prefix + "_planks"));
-        var log = mcLoc(prefix + (nether ? "_stems" : "_logs"));
-        var logTag = AllTags.item(log);
+        var logs = mcLoc(prefix + (nether ? "_stems" : "_logs"));
+        var logsTag = AllTags.item(logs);
         var wood = prefix + (nether ? "_hyphae" : "_wood");
         var woodStripped = "stripped_" + wood;
 
@@ -778,7 +784,7 @@ public final class Materials {
         TOOL_CRAFTING.recipe(DATA_GEN, planks)
             .result(planks, 4)
             .pattern("X")
-            .define('X', logTag)
+            .define('X', logsTag)
             .toolTag(TOOL_SAW)
             .build();
 
@@ -788,12 +794,67 @@ public final class Materials {
             // reduce vanilla recipe to 2 planks
             .replaceVanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(planks.get(), 2)
-                .requires(logTag)
+                .requires(logsTag)
                 .group("planks")
-                .unlockedBy("has_logs", has(logTag)));
+                .unlockedBy("has_logs", has(logsTag)));
 
         if (!nether) {
+            var log = mcLoc(prefix + "_log");
             var logItem = ITEMS.getEntry(log);
+            var leavesItem = ITEMS.getEntry(mcLoc(prefix + "_leaves"));
+            var sapling = mcLoc(prefix + "_sapling");
+            var saplingItem = ITEMS.getEntry(sapling);
+
+            AUTOFARM.recipe(DATA_GEN, sapling)
+                .inputItem(saplingItem, 1)
+                .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(1f))
+                .outputItem(logItem, 6)
+                .outputItem(saplingItem, 2)
+                .voltage(Voltage.LV)
+                .workTicks(1600)
+                .build()
+                .recipe(DATA_GEN, suffix(sapling, "_with_bone_meal"))
+                .inputItem(saplingItem, 1)
+                .inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
+                .inputItem(2, () -> Items.BONE_MEAL, 2)
+                .outputItem(logItem, 6)
+                .outputItem(saplingItem, 2)
+                .outputItem(leavesItem, 16)
+                .voltage(Voltage.LV)
+                .workTicks(300)
+                .build()
+                .recipe(DATA_GEN, suffix(sapling, "_with_fertilizer"))
+                .inputItem(saplingItem, 1)
+                .inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
+                .inputItem(2, FERTILIZER, 2)
+                .outputItem(logItem, 12)
+                .outputItem(saplingItem, 4)
+                .outputItem(leavesItem, 32)
+                .voltage(Voltage.MV)
+                .workTicks(300)
+                .build();
         }
+    }
+
+    private static void generatorRecipes(IRecipeType<ProcessingRecipe.Builder> type,
+        MaterialSet material, String sub, double ratio, long ticks) {
+        var start = type == STEAM_TURBINE ? Voltage.ULV : Voltage.LV;
+        for (var v : Voltage.between(start, Voltage.HV)) {
+            var decay = 1.4d - v.rank * 0.1d;
+            var outputAmount = v.value * ticks / ratio;
+            var inputAmount = (int) Math.round(outputAmount * decay);
+            type.recipe(DATA_GEN, suffix(material.fluidLoc(sub), "_" + v.id))
+                .inputFluid(material.fluid(sub), inputAmount)
+                .transform($ -> type == STEAM_TURBINE ? $
+                    .outputFluid(WATER.fluid(), (int) Math.round(outputAmount)) : $)
+                .voltage(v)
+                .workTicks(ticks)
+                .build();
+        }
+    }
+
+    private static void generatorRecipes(IRecipeType<ProcessingRecipe.Builder> type,
+        MaterialSet material, double ratio, long ticks) {
+        generatorRecipes(type, material, "fluid", ratio, ticks);
     }
 }

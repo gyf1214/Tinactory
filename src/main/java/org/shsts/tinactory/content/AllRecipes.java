@@ -56,7 +56,7 @@ public final class AllRecipes {
     public static final IRecipeType<ChemicalReactorRecipe.Builder> CHEMICAL_REACTOR;
     public static final IRecipeType<ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final IRecipeType<ProcessingRecipe.Builder> GAS_TURBINE;
-    public static final IRecipeType<ProcessingRecipe.Builder> COMBUSTION;
+    public static final IRecipeType<ProcessingRecipe.Builder> COMBUSTION_GENERATOR;
     public static final IRecipeType<BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     public static final IRecipeType<ProcessingRecipe.Builder> VACUUM_FREEZER;
     public static final IRecipeType<ProcessingRecipe.Builder> DISTILLATION;
@@ -160,14 +160,14 @@ public final class AllRecipes {
             .register();
 
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)
-            .defaults($ -> $.amperage(1d).workTicks(100).defaultInputFluid(0).defaultOutputFluid(1))
+            .defaults($ -> $.amperage(1d).defaultInputFluid(0).defaultOutputFluid(1))
             .register();
 
         GAS_TURBINE = processing("gas_turbine", GeneratorRecipe::builder)
             .defaults($ -> $.amperage(1d).defaultInputFluid(0))
             .register();
 
-        COMBUSTION = processing("combustion", GeneratorRecipe::builder)
+        COMBUSTION_GENERATOR = processing("combustion_generator", GeneratorRecipe::builder)
             .defaults($ -> $.amperage(1d).defaultInputFluid(0))
             .register();
 

@@ -37,7 +37,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.BENDER;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllBlockEntities.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllBlockEntities.CIRCUIT_ASSEMBLER;
-import static org.shsts.tinactory.content.AllBlockEntities.COMBUSTION;
+import static org.shsts.tinactory.content.AllBlockEntities.COMBUSTION_GENERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.CUTTER;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST;
 import static org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE;
@@ -168,7 +168,7 @@ public final class Machines {
         machine(GAS_TURBINE, $ -> $.ioTex(IO_TEX)
             .overlay(Direction.EAST, "generators/steam_turbine/overlay_side")
             .overlay(Direction.WEST, "generators/steam_turbine/overlay_side"));
-        machine(COMBUSTION, "generators/combustion");
+        machine(COMBUSTION_GENERATOR, "generators/combustion");
         machine(BATTERY_BOX, IO_OUT_TEX);
         machine(ELECTRIC_CHEST, $ -> $.ioTex(IO_TEX)
             .overlay(Direction.UP, "overlay/machine/overlay_qchest")
@@ -792,7 +792,7 @@ public final class Machines {
             .material(rotor, "rotor", 2)
             .tech(Technologies.PUMP_AND_PISTON)
             .build()
-            .recipe(COMBUSTION)
+            .recipe(COMBUSTION_GENERATOR)
             .circuit(3)
             .component(ELECTRIC_MOTOR, 1)
             .component(ELECTRIC_PISTON, 1)

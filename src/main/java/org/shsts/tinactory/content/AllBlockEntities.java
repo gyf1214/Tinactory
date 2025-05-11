@@ -70,7 +70,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet CHEMICAL_REACTOR;
     public static final ProcessingSet STEAM_TURBINE;
     public static final ProcessingSet GAS_TURBINE;
-    public static final ProcessingSet COMBUSTION;
+    public static final ProcessingSet COMBUSTION_GENERATOR;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
@@ -372,7 +372,7 @@ public final class AllBlockEntities {
             .build()
             .buildObject();
 
-        COMBUSTION = set.processing(AllRecipes.COMBUSTION)
+        COMBUSTION_GENERATOR = set.processing(AllRecipes.COMBUSTION_GENERATOR)
             .processor(RecipeProcessor::generator)
             .voltages(Voltage.LV, Voltage.HV)
             .layoutSet()
