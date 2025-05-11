@@ -30,6 +30,7 @@ public final class Technologies {
 
     public static Map<OreVariant, ResourceLocation> BASE_ORE;
     public static ResourceLocation ALLOY_SMELTING;
+    public static ResourceLocation SOLDERING;
     public static ResourceLocation STEEL;
     public static ResourceLocation MOTOR;
     public static ResourceLocation PUMP_AND_PISTON;
@@ -66,6 +67,11 @@ public final class Technologies {
             .displayItem(ALLOY_SMELTER.entry(Voltage.ULV))
             .register();
 
+        SOLDERING = factory.tech("soldering")
+            .maxProgress(30L)
+            .displayItem(AllMaterials.STEEL.entry("tool/screwdriver"))
+            .register();
+
         STEEL = factory.child("steel")
             .maxProgress(30L)
             .displayItem(AllMaterials.STEEL.entry("ingot"))
@@ -73,7 +79,7 @@ public final class Technologies {
 
         ELECTRIC_HEATING = factory.tech("electric_heating")
             .maxProgress(30L)
-            .displayItem(AllMaterials.COPPER.item("wire"))
+            .displayItem(AllMaterials.COPPER.entry("wire"))
             .register();
 
         BATTERY = factory.tech("battery")

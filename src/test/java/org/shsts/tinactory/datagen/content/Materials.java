@@ -248,13 +248,13 @@ public final class Materials {
             .inputItem(ItemTags.LEAVES, 16)
             .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.3f))
             .workTicks(128)
-            .voltage(Voltage.MV)
+            .voltage(Voltage.LV)
             .build()
             .recipe(DATA_GEN, ItemTags.SAPLINGS.location())
             .inputItem(ItemTags.SAPLINGS, 16)
             .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.1f))
             .workTicks(64)
-            .voltage(Voltage.MV)
+            .voltage(Voltage.LV)
             .build();
     }
 

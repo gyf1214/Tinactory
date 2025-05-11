@@ -25,6 +25,7 @@ import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.datagen.content.Models;
+import org.shsts.tinactory.datagen.content.Technologies;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -200,7 +201,12 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                 .workTicks(ticks(workTicks));
 
             if (soldering) {
-                builder.inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(0.5f));
+                builder.inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(0.5f))
+                    .requireTech(Technologies.SOLDERING);
+            }
+
+            if (sub.equals("gem_exquisite")) {
+                builder.requireTech(Technologies.MATERIAL_CUTTING);
             }
 
             for (; i < inputs.length; i++) {

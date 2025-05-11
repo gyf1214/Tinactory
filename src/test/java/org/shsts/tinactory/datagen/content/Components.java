@@ -343,14 +343,23 @@ public final class Components {
             .define('#', IRON.tag("plate"))
             .define('W', CABLE.get(Voltage.ULV))
             .toolTag(TOOL_WRENCH)
-            .build();
-
-        TOOL_CRAFTING.recipe(DATA_GEN, FLUID_CELL.get(Voltage.ULV))
+            .build()
+            .recipe(DATA_GEN, FLUID_CELL.get(Voltage.ULV))
             .result(FLUID_CELL.get(Voltage.ULV), 1)
             .pattern("###").pattern("#G#").pattern(" # ")
             .define('#', IRON.tag("plate"))
             .define('G', GLASS.tag("primary"))
             .toolTag(TOOL_HAMMER, TOOL_WRENCH)
+            .build();
+
+        ASSEMBLER.recipe(DATA_GEN, FLUID_CELL.get(Voltage.ULV))
+            .outputItem(FLUID_CELL.get(Voltage.ULV), 1)
+            .inputItem(IRON.tag("plate"), 4)
+            .inputItem(GLASS.tag("primary"), 1)
+            .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(1f))
+            .workTicks(ASSEMBLY_TICKS)
+            .voltage(Voltage.LV)
+            .requireTech(Technologies.SOLDERING)
             .build();
     }
 
@@ -493,12 +502,14 @@ public final class Components {
             .recipe(MACHINE_HULL)
             .material(main, "plate", 8)
             .component(CABLE, 2)
-            // TODO: plastic
+            .transform($ -> voltage.rank >= Voltage.HV.rank ? $.materialFluid(PE, 2f) : $)
+            .tech(Technologies.SOLDERING)
             .build()
             .recipe(FLUID_CELL)
             .material(main, "plate", voltage.rank * 2)
             .material(rotor, "ring", voltage.rank)
             .materialFluid(SOLDERING_ALLOY, voltage.rank)
+            .tech(Technologies.SOLDERING)
             .transformBuilder($ -> $.voltage(Voltage.LV))
             .build();
     }
@@ -519,6 +530,7 @@ public final class Components {
             .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(wires))
             .voltage(Voltage.LV)
             .workTicks(ASSEMBLY_TICKS)
+            .requireTech(Technologies.BATTERY)
             .build();
     }
 
@@ -554,6 +566,7 @@ public final class Components {
             .inputItem(IRON.tag("bolt"), 1)
             .workTicks(120L)
             .voltage(Voltage.ULV)
+            .requireTech(Technologies.SOLDERING)
             .build();
 
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
@@ -610,10 +623,11 @@ public final class Components {
         ASSEMBLER.recipe(DATA_GEN, RESISTOR.loc(CircuitComponentTier.NORMAL))
             .outputItem(RESISTOR.item(CircuitComponentTier.NORMAL), 2)
             .inputItem(COAL.tag("dust"), 1)
-            .inputItem(STICKY_RESIN, 1)
             .inputItem(COPPER.tag("wire_fine"), 4)
+            .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(1f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.ULV)
+            .requireTech(Technologies.SOLDERING)
             .build()
             .recipe(DATA_GEN, CAPACITOR.loc(CircuitComponentTier.NORMAL))
             .outputItem(CAPACITOR.item(CircuitComponentTier.NORMAL), 8)
@@ -622,6 +636,7 @@ public final class Components {
             .inputFluid(PE.fluid(), PE.fluidAmount(1f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.LV)
+            .requireTech(Technologies.INTEGRATED_CIRCUIT)
             .build()
             .recipe(DATA_GEN, INDUCTOR.loc(CircuitComponentTier.NORMAL))
             .outputItem(INDUCTOR.item(CircuitComponentTier.NORMAL), 4)
@@ -630,6 +645,7 @@ public final class Components {
             .inputFluid(PE.fluid(), PE.fluidAmount(0.25f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.LV)
+            .requireTech(Technologies.INTEGRATED_CIRCUIT)
             .build()
             .recipe(DATA_GEN, DIODE.loc(CircuitComponentTier.NORMAL))
             .outputItem(DIODE.item(CircuitComponentTier.NORMAL), 4)
@@ -639,6 +655,7 @@ public final class Components {
             .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(2f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.LV)
+            .requireTech(Technologies.SOLDERING)
             .build()
             .recipe(DATA_GEN, suffix(DIODE.loc(CircuitComponentTier.NORMAL), "_from_wafer"))
             .outputItem(DIODE.item(CircuitComponentTier.NORMAL), 8)
@@ -647,6 +664,7 @@ public final class Components {
             .inputFluid(PE.fluid(), PE.fluidAmount(1f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.LV)
+            .requireTech(Technologies.INTEGRATED_CIRCUIT)
             .build()
             .recipe(DATA_GEN, TRANSISTOR.loc(CircuitComponentTier.NORMAL))
             .outputItem(TRANSISTOR.item(CircuitComponentTier.NORMAL), 4)
@@ -655,6 +673,7 @@ public final class Components {
             .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(2f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.LV)
+            .requireTech(Technologies.INTEGRATED_CIRCUIT)
             .build()
             .recipe(DATA_GEN, suffix(TRANSISTOR.loc(CircuitComponentTier.NORMAL), "_from_pe"))
             .outputItem(TRANSISTOR.item(CircuitComponentTier.NORMAL), 8)
@@ -663,6 +682,7 @@ public final class Components {
             .inputFluid(PE.fluid(), PE.fluidAmount(1f))
             .workTicks(ASSEMBLY_TICKS)
             .voltage(Voltage.LV)
+            .requireTech(Technologies.INTEGRATED_CIRCUIT)
             .build();
 
         // boards
@@ -679,6 +699,7 @@ public final class Components {
             .inputItem(STICKY_RESIN, 2)
             .workTicks(200L)
             .voltage(Voltage.ULV)
+            .requireTech(Technologies.SOLDERING)
             .build()
             .recipe(DATA_GEN, board(CircuitTier.INTEGRATED))
             .outputItem(board(CircuitTier.INTEGRATED), 1)
@@ -724,9 +745,9 @@ public final class Components {
             .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(0.5f))
             .workTicks(200L)
             .voltage(Voltage.ULV)
-            .build();
-
-        ASSEMBLER.recipe(DATA_GEN, circuitBoard(CircuitTier.INTEGRATED))
+            .requireTech(Technologies.SOLDERING)
+            .build()
+            .recipe(DATA_GEN, circuitBoard(CircuitTier.INTEGRATED))
             .outputItem(circuitBoard(CircuitTier.INTEGRATED), 1)
             .inputItem(board(CircuitTier.INTEGRATED), 1)
             .inputItem(SILVER.tag("wire"), 8)
