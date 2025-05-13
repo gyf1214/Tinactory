@@ -28,6 +28,7 @@ public final class AllLayouts {
     public static final List<Layout> DISTILLATION_TOWER;
     public static final Layout CLEANROOM;
     public static final Layout AUTOFARM;
+    public static final Layout PYROLYSE_OVEN;
 
     static {
         WORKBENCH = Layout.builder()
@@ -98,6 +99,18 @@ public final class AllLayouts {
             .port(ITEM_OUTPUT)
             .slots(5 * SLOT_SIZE, 1, 2, 2)
             .progressBar(Texture.PROGRESS_RECYCLER, 8 + 3 * SLOT_SIZE, SLOT_SIZE / 2)
+            .buildLayout();
+
+        PYROLYSE_OVEN = Layout.builder()
+            .port(ITEM_INPUT)
+            .slot(0, 1 + SLOT_SIZE / 2)
+            .port(FLUID_INPUT)
+            .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
+            .port(ITEM_OUTPUT)
+            .slot(4 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
+            .port(FLUID_OUTPUT)
+            .slot(5 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
+            .progressBar(Texture.PROGRESS_EXTRACT, 8 + 2 * SLOT_SIZE, SLOT_SIZE / 2)
             .buildLayout();
     }
 

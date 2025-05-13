@@ -10,9 +10,12 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
+import org.shsts.tinactory.content.multiblock.CoilMultiblock;
+import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
+import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -33,6 +36,7 @@ public final class AllMultiblocks {
     public static final IEntry<PrimitiveBlock> AUTOFARM;
     public static final IEntry<PrimitiveBlock> VACUUM_FREEZER;
     public static final IEntry<PrimitiveBlock> DISTILLATION_TOWER;
+    public static final IEntry<PrimitiveBlock> PYROLYSE_OVEN;
     public static final IEntry<FixedBlock> CLEANROOM;
 
     // solid blocks
@@ -84,7 +88,9 @@ public final class AllMultiblocks {
 
         BLAST_FURNACE = multiblock("blast_furnace")
             .blockEntity()
-            .child(Multiblock::blastFurnace)
+            .transform(RecipeProcessor::blastFurnace)
+            .child(Multiblock.builder(CoilMultiblock::new))
+            .layout(AllLayouts.BLAST_FURNACE)
             .appearanceBlock(HEATPROOF_CASING)
             .spec()
             .layer()
@@ -97,8 +103,9 @@ public final class AllMultiblocks {
             .layer()
             .row('T', 3, 3).build()
             .blockOrInterface('B', HEATPROOF_CASING)
-            .sameBlockWithTag('C', "coil", AllTags.COIL).air('A')
             .block('T', HEATPROOF_CASING)
+            .sameBlockWithTag('C', "coil", AllTags.COIL)
+            .air('A')
             .build()
             .build()
             .end()
@@ -178,16 +185,13 @@ public final class AllMultiblocks {
             .spec()
             .layer()
             .row('B', 3, 2)
-            .row("B$B")
-            .build()
+            .row("B$B").build()
             .layer()
             .row("CCC")
             .row("CAC")
-            .row("CCC")
-            .build()
+            .row("CCC").build()
             .layer()
-            .row('C', 3, 3)
-            .build()
+            .row('C', 3, 3).build()
             .blockOrInterface('B', FROST_PROOF_CASING)
             .block('C', FROST_PROOF_CASING)
             .air('A')
@@ -198,23 +202,49 @@ public final class AllMultiblocks {
 
         DISTILLATION_TOWER = multiblock("distillation_tower")
             .blockEntity()
-            .child(Multiblock::distillationTower)
+            .transform(RecipeProcessor.multiblock(AllRecipes.DISTILLATION, true))
+            .child(Multiblock.builder(DistillationTower::new))
             .appearanceBlock(CLEAN_STAINLESS_CASING)
             .spec()
             .layer()
             .row('B', 3, 2)
-            .row("B$B")
-            .build()
+            .row("B$B").build()
             .layer().height(1, 6)
             .row("CCC")
             .row("CAC")
-            .row("CCC")
-            .build()
+            .row("CCC").build()
             .layer()
-            .row('C', 3, 3)
-            .build()
+            .row('C', 3, 3).build()
             .blockOrInterface('B', CLEAN_STAINLESS_CASING)
             .block('C', CLEAN_STAINLESS_CASING)
+            .air('A')
+            .build()
+            .build()
+            .end()
+            .buildObject();
+
+        PYROLYSE_OVEN = multiblock("pyrolyse_oven")
+            .blockEntity()
+            .transform(RecipeProcessor.coil(AllRecipes.PYROLYSE_OVEN, false, 1500))
+            .child(Multiblock.builder(CoilMultiblock::new))
+            .layout(AllLayouts.PYROLYSE_OVEN)
+            .appearanceBlock(HEATPROOF_CASING)
+            .spec()
+            .layer()
+            .row("TTT")
+            .row("CCC")
+            .row("BBB").build()
+            .layer()
+            .row("TTT")
+            .row("CAC")
+            .row("B$B").build()
+            .layer()
+            .row("TTT")
+            .row("CCC")
+            .row("BBB").build()
+            .blockOrInterface('B', HEATPROOF_CASING)
+            .block('T', HEATPROOF_CASING)
+            .sameBlockWithTag('C', "coil", AllTags.COIL)
             .air('A')
             .build()
             .build()
@@ -224,7 +254,7 @@ public final class AllMultiblocks {
         CLEANROOM = BlockEntityBuilder.builder("multiblock/cleanroom", FixedBlock::new)
             .translucent()
             .blockEntity()
-            .child(Multiblock::cleanroom)
+            .child(Multiblock.builder(Cleanroom::new))
             .appearanceBlock(PLASCRETE)
             .spec(Cleanroom::spec)
             .baseBlock(PLASCRETE)

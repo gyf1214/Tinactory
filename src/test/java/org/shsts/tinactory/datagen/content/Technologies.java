@@ -43,16 +43,17 @@ public final class Technologies {
     public static ResourceLocation ROBOT_ARM;
     public static ResourceLocation KANTHAL;
     public static ResourceLocation SIFTING;
+    public static ResourceLocation AUTOFARM;
     public static ResourceLocation INTEGRATED_CIRCUIT;
     public static ResourceLocation COLD_WORKING;
     public static ResourceLocation ELECTROLYZING;
     public static ResourceLocation VACUUM_FREEZER;
+    public static ResourceLocation DISTILLATION;
     public static ResourceLocation CHEMISTRY;
+    public static ResourceLocation PYROLYSE_OVEN;
     public static ResourceLocation OIL_PROCESSING;
     public static ResourceLocation ORGANIC_CHEMISTRY;
-    public static ResourceLocation AUTOFARM;
     public static ResourceLocation CPU;
-    public static ResourceLocation DISTILLATION;
     public static ResourceLocation CLEANROOM;
 
     public static void init() {
@@ -168,6 +169,11 @@ public final class Technologies {
         CHEMISTRY = factory.child("chemistry")
             .maxProgress(40L)
             .displayItem(AllItems.RESEARCH_EQUIPMENT.get(Voltage.LV))
+            .register();
+
+        PYROLYSE_OVEN = factory.tech("pyrolyse_oven")
+            .maxProgress(40L)
+            .displayItem(AllMultiblocks.PYROLYSE_OVEN.get())
             .register();
 
         OIL_PROCESSING = factory.tech("oil_processing")

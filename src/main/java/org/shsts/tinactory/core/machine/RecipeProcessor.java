@@ -25,6 +25,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
+import org.shsts.tinactory.content.multiblock.CoilProcessor;
 import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.common.CapabilityProvider;
@@ -113,6 +114,17 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         B extends IRecipeBuilderBase<R>> Transformer<IBlockEntityTypeBuilder<P>> multiblock(
         IRecipeType<B> type, boolean autoRecipe) {
         return $ -> $.capability(ID, be -> new MultiblockProcessor<>(be, type, autoRecipe));
+    }
+
+    public static <P, R extends ProcessingRecipe,
+        B extends IRecipeBuilderBase<R>> Transformer<IBlockEntityTypeBuilder<P>> coil(
+        IRecipeType<B> type, boolean autoRecipe, int baseTemperature) {
+        return $ -> $.capability(ID, be -> new CoilProcessor<>(be, type, autoRecipe) {
+            @Override
+            protected int getRecipeTemperature(R recipe) {
+                return baseTemperature;
+            }
+        });
     }
 
     public static <P> IBlockEntityTypeBuilder<P> blastFurnace(

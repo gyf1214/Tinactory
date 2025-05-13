@@ -1,18 +1,22 @@
 package org.shsts.tinactory.content.material;
 
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.material.Fluids;
 
 import static org.shsts.tinactory.content.AllMaterials.AMMONIA;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
+import static org.shsts.tinactory.content.AllMaterials.BENZENE;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
+import static org.shsts.tinactory.content.AllMaterials.CHARCOAL;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
+import static org.shsts.tinactory.content.AllMaterials.COKE;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.ETHANE;
@@ -31,6 +35,7 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.METHANE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.NITRIC_ACID;
+import static org.shsts.tinactory.content.AllMaterials.PHENOL;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
@@ -45,6 +50,7 @@ import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
+import static org.shsts.tinactory.content.AllMaterials.TOLUENE;
 import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
@@ -167,12 +173,28 @@ public final class FirstDegrees {
         ETHYLENE = gas("ethylene", 0xFFE1E1E1);
         PROPENE = gas("propene", 0xFFFFDD55);
         ETHANOL = fluid("ethanol", 0xFFFC4C04, "liquid");
+        BENZENE = liquid("benzene", 0xFF1A1A1A);
+        PHENOL = liquid("phenol", 0xFF784421);
+        TOLUENE = fluid("toluene", 0xFF712400, "liquid");
         IRON_CHLORIDE = liquid("iron_chloride", 0xFF060B0B);
         VINYL_CHLORIDE = gas("vinyl_chloride", 0xFFE1F0F0);
 
         NICKEL_ZINC_FERRITE = set("nickel_zinc_ferrite")
             .color(0xFF3C3C3C)
             .ring()
+            .buildObject();
+
+        COKE = set("coke")
+            .color(0xFF666666)
+            .dust()
+            .dummies("gem")
+            .alias("primary", "gem")
+            .buildObject();
+
+        CHARCOAL = set("charcoal")
+            .color(0xFF644646)
+            .dust()
+            .existing("primary", Items.CHARCOAL)
             .buildObject();
     }
 

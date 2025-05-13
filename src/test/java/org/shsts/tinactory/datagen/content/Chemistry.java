@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.content.AllRecipes;
@@ -17,14 +18,18 @@ import static org.shsts.tinactory.content.AllMaterials.AMMONIA;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
+import static org.shsts.tinactory.content.AllMaterials.BENZENE;
 import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
+import static org.shsts.tinactory.content.AllMaterials.CHARCOAL;
 import static org.shsts.tinactory.content.AllMaterials.CHLORINE;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
+import static org.shsts.tinactory.content.AllMaterials.COKE;
+import static org.shsts.tinactory.content.AllMaterials.CREOSOTE_OIL;
 import static org.shsts.tinactory.content.AllMaterials.ETHANE;
 import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.ETHYLENE;
@@ -47,6 +52,7 @@ import static org.shsts.tinactory.content.AllMaterials.NITRIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.PE;
+import static org.shsts.tinactory.content.AllMaterials.PHENOL;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
@@ -63,10 +69,12 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
+import static org.shsts.tinactory.content.AllMaterials.TOLUENE;
 import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.MIXER;
+import static org.shsts.tinactory.content.AllRecipes.PYROLYSE_OVEN;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.VACUUM_FREEZER;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
@@ -118,7 +126,9 @@ public class Chemistry {
             .recipe(SALT_WATER, 2f, 400, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
             .recipe(SEA_WATER, 2f, 1600, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
             .recipe(BAUXITE, 15, 320, ALUMINIUM, 6, OXYGEN, 9f, RUTILE, 1)
+            .recipe(CHARCOAL, 1, 64, CARBON, 1)
             .recipe(COAL, 1, 40, CARBON, 2)
+            .recipe(COKE, 1, 32, CARBON, 2)
             .recipe(GRAPHITE, 1, 64, CARBON, 4);
 
         CHEMICAL_REACTOR.recipe(DATA_GEN, HYDROGEN_CHLORIDE.fluidLoc())
@@ -228,10 +238,10 @@ public class Chemistry {
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build()
-            .recipe(DATA_GEN, SULFURIC_ACID.fluidLoc("dilute"))
+            .recipe(DATA_GEN, SULFURIC_ACID.fluidLoc())
             .input(SULFURIC_ACID, "gas", 1f)
-            .input(WATER, 2f)
-            .output(SULFURIC_ACID, "dilute", 2f)
+            .input(WATER, 1f)
+            .output(SULFURIC_ACID, 1f)
             .workTicks(64)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
@@ -261,6 +271,14 @@ public class Chemistry {
             .output(IRON_CHLORIDE)
             .output(HYDROGEN, 1.5f)
             .workTicks(160)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, AMMONIUM_CHLORIDE.loc("dust"))
+            .input(AMMONIA)
+            .input(HYDROGEN_CHLORIDE)
+            .output(AMMONIUM_CHLORIDE)
+            .workTicks(64)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
             .build();
@@ -369,6 +387,10 @@ public class Chemistry {
             .voltage(Voltage.MV)
             .build();
 
+        DISTILLATION.voltage(Voltage.MV)
+            .recipe(CREOSOTE_OIL, 4f, 1200, CARBON, 1, AMMONIA, 1.2f, BENZENE, 1.4f,
+                TOLUENE, 0.3f, PHENOL, 0.3f);
+
         AllRecipes.DISTILLATION
             .recipe(DATA_GEN, BIOMASS.fluidLoc())
             .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(1f))
@@ -432,6 +454,37 @@ public class Chemistry {
             .workTicks(240)
             .voltage(Voltage.MV)
             .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .build();
+
+        PYROLYSE_OVEN.recipe(DATA_GEN, COKE.loc("primary"))
+            .inputItem(COAL.tag("primary"), 16)
+            .outputItem(COKE.entry("primary"), 16)
+            .outputFluid(CREOSOTE_OIL.fluid(), CREOSOTE_OIL.fluidAmount(8f))
+            .voltage(Voltage.LV)
+            .workTicks(1280)
+            .build()
+            .recipe(DATA_GEN, suffix(COKE.loc("primary"), "_with_nitrogen"))
+            .inputItem(COAL.tag("primary"), 16)
+            .inputFluid(NITROGEN.fluid(), NITROGEN.fluidAmount(4f))
+            .outputItem(COKE.entry("primary"), 16)
+            .outputFluid(CREOSOTE_OIL.fluid(), CREOSOTE_OIL.fluidAmount(8f))
+            .voltage(Voltage.LV)
+            .workTicks(320)
+            .build()
+            .recipe(DATA_GEN, CHARCOAL.loc("primary"))
+            .inputItem(ItemTags.LOGS_THAT_BURN, 16)
+            .outputItem(CHARCOAL.entry("primary"), 16)
+            .outputFluid(CREOSOTE_OIL.fluid(), CREOSOTE_OIL.fluidAmount(4f))
+            .voltage(Voltage.LV)
+            .workTicks(1280)
+            .build()
+            .recipe(DATA_GEN, suffix(CHARCOAL.loc("primary"), "_with_nitrogen"))
+            .inputItem(ItemTags.LOGS_THAT_BURN, 16)
+            .inputFluid(NITROGEN.fluid(), NITROGEN.fluidAmount(4f))
+            .outputItem(CHARCOAL.entry("primary"), 16)
+            .outputFluid(CREOSOTE_OIL.fluid(), CREOSOTE_OIL.fluidAmount(4f))
+            .voltage(Voltage.LV)
+            .workTicks(320)
             .build();
     }
 

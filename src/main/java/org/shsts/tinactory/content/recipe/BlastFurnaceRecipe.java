@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.multiblock.BlastFurnace;
+import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
@@ -29,8 +29,8 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
             return OptionalInt.empty();
         }
         return multiblockInterface.getMultiblock()
-            .filter($ -> $ instanceof BlastFurnace)
-            .map($ -> ((BlastFurnace) $).getTemperature())
+            .filter($ -> $ instanceof CoilMultiblock)
+            .map($ -> ((CoilMultiblock) $).getTemperature())
             .orElse(OptionalInt.empty());
     }
 

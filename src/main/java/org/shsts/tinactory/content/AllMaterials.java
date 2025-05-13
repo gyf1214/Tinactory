@@ -93,9 +93,14 @@ public final class AllMaterials {
     public static MaterialSet ETHYLENE;
     public static MaterialSet PROPENE;
     public static MaterialSet ETHANOL;
+    public static MaterialSet BENZENE;
+    public static MaterialSet PHENOL;
+    public static MaterialSet TOLUENE;
     public static MaterialSet IRON_CHLORIDE;
     public static MaterialSet VINYL_CHLORIDE;
     public static MaterialSet NICKEL_ZINC_FERRITE;
+    public static MaterialSet COKE;
+    public static MaterialSet CHARCOAL;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;
@@ -111,6 +116,7 @@ public final class AllMaterials {
     public static MaterialSet BIOMASS;
     public static MaterialSet LPG;
     public static MaterialSet DIESEL;
+    public static MaterialSet CREOSOTE_OIL;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;

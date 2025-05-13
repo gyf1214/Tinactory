@@ -5,6 +5,7 @@ import net.minecraft.world.item.Tiers;
 import static org.shsts.tinactory.content.AllMaterials.AIR;
 import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
+import static org.shsts.tinactory.content.AllMaterials.CREOSOTE_OIL;
 import static org.shsts.tinactory.content.AllMaterials.DIESEL;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
@@ -97,6 +98,11 @@ public final class HigherDegrees {
         DIESEL = set("diesel")
             .color(0xFFFCF404)
             .fluid("fluid", "diesel", 1000)
+            .buildObject();
+
+        CREOSOTE_OIL = set("creosote_oil")
+            .color(0xFF804000)
+            .fluid("fluid", "creosote", 1000)
             .buildObject();
     }
 

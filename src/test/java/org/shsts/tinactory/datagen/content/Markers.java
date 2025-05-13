@@ -11,15 +11,19 @@ import java.util.ArrayList;
 
 import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
+import static org.shsts.tinactory.content.AllRecipes.AUTOFARM;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
+import static org.shsts.tinactory.content.AllRecipes.DISTILLATION;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_ANALYZER;
 import static org.shsts.tinactory.content.AllRecipes.ORE_WASHER;
+import static org.shsts.tinactory.content.AllRecipes.PYROLYSE_OVEN;
 import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
+import static org.shsts.tinactory.content.AllRecipes.VACUUM_FREEZER;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -75,10 +79,14 @@ public final class Markers {
         for (var set : PROCESSING_SETS) {
             allTypes.add(set.recipeType);
         }
-        // TODO
+        // Multiblocks
         allTypes.add(TOOL_CRAFTING);
         allTypes.add(BLAST_FURNACE);
         allTypes.add(SIFTER);
+        allTypes.add(VACUUM_FREEZER);
+        allTypes.add(DISTILLATION);
+        allTypes.add(AUTOFARM);
+        allTypes.add(PYROLYSE_OVEN);
 
         for (var type : allTypes) {
             DATA_GEN.trackLang(RecipeCategory.categoryTitleId(type.loc()));

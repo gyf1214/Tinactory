@@ -47,12 +47,14 @@ import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
+import static org.shsts.tinactory.content.AllMaterials.CHARCOAL;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COBALT;
 import static org.shsts.tinactory.content.AllMaterials.COBALTITE;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
+import static org.shsts.tinactory.content.AllMaterials.COKE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
@@ -159,6 +161,7 @@ import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.FINE;
 import static org.shsts.tinactory.datagen.content.model.IconSet.GEM_VERTICAL;
+import static org.shsts.tinactory.datagen.content.model.IconSet.LIGNITE;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
 import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
 import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
@@ -402,6 +405,12 @@ public final class Materials {
             .machineProcess(Voltage.MV, 1.25d)
             .blast(Voltage.MV, 1500, 400, OXYGEN, 2f)
             .mix(Voltage.MV, IRON, 4, NICKEL, 1, ZINC, 1)
+            .build()
+            .material(COKE, LIGNITE)
+            .toolProcess()
+            .build()
+            .material(CHARCOAL, FINE)
+            .toolProcess()
             .build();
     }
 
@@ -693,6 +702,7 @@ public final class Materials {
         generatorRecipes(GAS_TURBINE, REFINERY_GAS, 64d, 100);
         generatorRecipes(GAS_TURBINE, NATURAL_GAS, 40d, 100);
         generatorRecipes(COMBUSTION_GENERATOR, ETHANOL, 160d, 100);
+        generatorRecipes(COMBUSTION_GENERATOR, DIESEL, 400d, 125);
 
         // rubber
         TOOL_CRAFTING.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))

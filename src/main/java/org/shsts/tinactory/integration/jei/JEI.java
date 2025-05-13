@@ -90,6 +90,8 @@ public class JEI implements IModPlugin {
         addProcessingCategory(AllRecipes.DISTILLATION, new DistillationCategory());
         addProcessingCategory(AllRecipes.AUTOFARM, AllLayouts.AUTOFARM,
             AllMultiblocks.AUTOFARM.get());
+        addProcessingCategory(AllRecipes.PYROLYSE_OVEN, AllLayouts.PYROLYSE_OVEN,
+            AllMultiblocks.PYROLYSE_OVEN.get());
     }
 
     private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(

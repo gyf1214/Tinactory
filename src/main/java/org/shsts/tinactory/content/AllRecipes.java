@@ -61,6 +61,7 @@ public final class AllRecipes {
     public static final IRecipeType<ProcessingRecipe.Builder> VACUUM_FREEZER;
     public static final IRecipeType<ProcessingRecipe.Builder> DISTILLATION;
     public static final IRecipeType<ProcessingRecipe.Builder> AUTOFARM;
+    public static final IRecipeType<ProcessingRecipe.Builder> PYROLYSE_OVEN;
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
 
@@ -187,6 +188,10 @@ public final class AllRecipes {
 
         AUTOFARM = processing("autofarm")
             .defaults($ -> $.amperage(0.25d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(3))
+            .register();
+
+        PYROLYSE_OVEN = processing("pyrolyse_ove")
+            .defaults($ -> $.amperage(2d).transform(AllRecipes::fullDefaults))
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)

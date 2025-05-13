@@ -89,6 +89,7 @@ import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
+import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
@@ -104,6 +105,7 @@ import static org.shsts.tinactory.content.AllMultiblocks.DISTILLATION_TOWER;
 import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.PLASCRETE;
+import static org.shsts.tinactory.content.AllMultiblocks.PYROLYSE_OVEN;
 import static org.shsts.tinactory.content.AllMultiblocks.SIFTER;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.VACUUM_FREEZER;
@@ -213,6 +215,7 @@ public final class Machines {
             .blockState(machineBlock("casings/cleanroom/plascrete", "multiblock/cleanroom"))
             .tag(MINEABLE_WITH_WRENCH)
             .build();
+        multiblock(PYROLYSE_OVEN, "heatproof", "pyrolyse_oven", AllRecipes.PYROLYSE_OVEN);
 
         MULTIBLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
             .blockState(multiblockInterface(IO_TEX))
@@ -394,6 +397,19 @@ public final class Machines {
             .voltage(Voltage.MV)
             .workTicks(ASSEMBLE_TICKS)
             .requireTech(Technologies.DISTILLATION)
+            .build()
+            .recipe(DATA_GEN, PYROLYSE_OVEN)
+            .outputItem(PYROLYSE_OVEN, 1)
+            .inputItem(HEATPROOF_CASING, 1)
+            .inputItem(circuit(Voltage.MV), 3)
+            .inputItem(ELECTRIC_PISTON.get(Voltage.MV), 2)
+            .inputItem(ELECTRIC_PUMP.get(Voltage.MV), 2)
+            .inputItem(CABLE.get(Voltage.MV), 4)
+            .inputItem(CUPRONICKEL.tag("wire"), 16)
+            .inputItem(INVAR.tag("plate"), 4)
+            .voltage(Voltage.MV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.PYROLYSE_OVEN)
             .build()
             .recipe(DATA_GEN, CLEANROOM)
             .outputItem(CLEANROOM, 1)

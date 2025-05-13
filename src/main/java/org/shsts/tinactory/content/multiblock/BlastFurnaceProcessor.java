@@ -3,32 +3,18 @@ package org.shsts.tinactory.content.multiblock;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class BlastFurnaceProcessor extends MultiblockProcessor<BlastFurnaceRecipe> {
+public class BlastFurnaceProcessor extends CoilProcessor<BlastFurnaceRecipe> {
     public BlastFurnaceProcessor(BlockEntity blockEntity) {
         super(blockEntity, AllRecipes.BLAST_FURNACE, true);
     }
 
     @Override
-    protected BlastFurnace getMultiblock() {
-        return (BlastFurnace) super.getMultiblock();
-    }
-
-    private int getTemperature() {
-        return getMultiblock().getTemperature().orElse(0);
-    }
-
-    @Override
-    protected void calculateFactors(BlastFurnaceRecipe recipe) {
-        super.calculateFactors(recipe);
-        var temp = getTemperature();
-        var factor = Math.max(1d, (temp - recipe.temperature) /
-            TinactoryConfig.INSTANCE.blastFurnaceTempFactor.get());
-        energyFactor /= factor;
+    protected int getRecipeTemperature(BlastFurnaceRecipe recipe) {
+        return recipe.temperature;
     }
 }

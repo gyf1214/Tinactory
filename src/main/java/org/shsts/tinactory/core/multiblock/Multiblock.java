@@ -18,10 +18,6 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllRecipes;
-import org.shsts.tinactory.content.multiblock.BlastFurnace;
-import org.shsts.tinactory.content.multiblock.Cleanroom;
-import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.content.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
@@ -324,25 +320,16 @@ public class Multiblock extends MultiblockBase {
         }
     }
 
+    public static <P> Function<IBlockEntityTypeBuilder<P>, Builder<P>> builder(
+        BiFunction<BlockEntity, Multiblock.Builder<P>, Multiblock> factory) {
+        return $ -> new Builder<>($, factory);
+    }
+
     public static <P, R extends ProcessingRecipe,
         B extends IRecipeBuilderBase<R>> Function<IBlockEntityTypeBuilder<P>, Builder<P>> simple(
         IRecipeType<B> recipeType, boolean autoRecipe) {
-
-        return p -> new Builder<>(p.transform(RecipeProcessor.multiblock(recipeType, autoRecipe)),
-            Multiblock::new);
-    }
-
-    public static <P> Builder<P> blastFurnace(IBlockEntityTypeBuilder<P> parent) {
-        return new Builder<>(parent.transform(RecipeProcessor::blastFurnace), BlastFurnace::new);
-    }
-
-    public static <P> Builder<P> distillationTower(IBlockEntityTypeBuilder<P> parent) {
-        return new Builder<>(parent.transform(RecipeProcessor.multiblock(AllRecipes.DISTILLATION, true)),
-            DistillationTower::new);
-    }
-
-    public static <P> Builder<P> cleanroom(IBlockEntityTypeBuilder<P> parent) {
-        return new Builder<>(parent, Cleanroom::new);
+        return $ -> $.transform(RecipeProcessor.multiblock(recipeType, autoRecipe))
+            .child(builder(Multiblock::new));
     }
 
     public static Optional<Multiblock> tryGet(BlockEntity be) {
