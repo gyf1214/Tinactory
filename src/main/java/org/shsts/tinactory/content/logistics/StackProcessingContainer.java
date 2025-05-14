@@ -25,6 +25,8 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
@@ -39,11 +41,12 @@ import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StackProcessingContainer extends CapabilityProvider
-    implements IContainer, ILayoutProvider, INBTSerializable<CompoundTag> {
+    implements IContainer, ILayoutProvider, IEventSubscriber, INBTSerializable<CompoundTag> {
     public static final String ID = "logistics/stack_container";
 
     private record PortInfo(SlotType type, IPort externalPort, IPort internalPort) {
@@ -185,6 +188,12 @@ public class StackProcessingContainer extends CapabilityProvider
     @Override
     public Layout getLayout() {
         return layout;
+    }
+
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(REMOVED_IN_WORLD.get(),
+            world -> StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), internalItems));
     }
 
     @Override

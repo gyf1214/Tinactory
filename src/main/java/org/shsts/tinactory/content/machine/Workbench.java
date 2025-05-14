@@ -25,6 +25,8 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
@@ -34,11 +36,13 @@ import java.util.Optional;
 import static net.minecraft.world.item.crafting.RecipeType.CRAFTING;
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Workbench extends CapabilityProvider implements INBTSerializable<CompoundTag> {
+public class Workbench extends CapabilityProvider implements
+    IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "primitive/workbench_container";
 
@@ -246,6 +250,12 @@ public class Workbench extends CapabilityProvider implements INBTSerializable<Co
 
     public IItemHandlerModifiable getToolStorage() {
         return toolStorage;
+    }
+
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
+            StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), itemView));
     }
 
     @Override

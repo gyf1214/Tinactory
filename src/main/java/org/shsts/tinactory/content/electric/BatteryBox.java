@@ -33,6 +33,7 @@ import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
 
@@ -46,7 +47,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     private final BlockEntity blockEntity;
     private final Voltage voltage;
     private IMachine machine;
-    private final WrapperItemHandler handler;
+    private final WrapperItemHandler items;
     private final LazyOptional<IItemHandler> itemHandlerCap;
 
     public BatteryBox(BlockEntity blockEntity, Layout layout) {
@@ -54,11 +55,11 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         this.blockEntity = blockEntity;
         this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
         var size = voltage.rank * voltage.rank;
-        this.handler = new WrapperItemHandler(size);
+        this.items = new WrapperItemHandler(size);
         for (var i = 0; i < size; i++) {
-            handler.setFilter(i, this::allowItem);
+            items.setFilter(i, this::allowItem);
         }
-        this.itemHandlerCap = LazyOptional.of(() -> handler);
+        this.itemHandlerCap = LazyOptional.of(() -> items);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
@@ -82,8 +83,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         if (sign == 0) {
             return;
         }
-        for (var i = 0; i < handler.getSlots(); i++) {
-            var stack = handler.getStackInSlot(i);
+        for (var i = 0; i < items.getSlots(); i++) {
+            var stack = items.getStackInSlot(i);
             if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
                 continue;
             }
@@ -112,8 +113,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     @Override
     public double getPowerGen() {
         var ret = 0d;
-        for (var i = 0; i < handler.getSlots(); i++) {
-            var stack = handler.getStackInSlot(i);
+        for (var i = 0; i < items.getSlots(); i++) {
+            var stack = items.getStackInSlot(i);
             if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
                 ret += Math.min(voltage.value, battery.getPowerLevel(stack));
             }
@@ -124,8 +125,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     @Override
     public double getPowerCons() {
         var ret = 0d;
-        for (var i = 0; i < handler.getSlots(); i++) {
-            var stack = handler.getStackInSlot(i);
+        for (var i = 0; i < items.getSlots(); i++) {
+            var stack = items.getStackInSlot(i);
             if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
                 ret += Math.min(voltage.value, battery.capacity - battery.getPowerLevel(stack));
             }
@@ -141,6 +142,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(SERVER_LOAD.get(), $ -> machine = MACHINE.get(blockEntity));
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
+            StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), items));
     }
 
     @Nonnull
@@ -157,11 +160,11 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public CompoundTag serializeNBT() {
-        return StackHelper.serializeItemHandler(handler);
+        return StackHelper.serializeItemHandler(items);
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(handler, tag);
+        StackHelper.deserializeItemHandler(items, tag);
     }
 }

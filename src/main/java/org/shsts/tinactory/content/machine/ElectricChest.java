@@ -21,11 +21,14 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Arrays;
 import java.util.Optional;
+
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -160,6 +163,13 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
             externalItems.setAllowOutput(i, allowOutput);
         }
         machine.network().ifPresent(network -> registerPort(network, externalPort));
+    }
+
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        super.subscribeEvents(eventManager);
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
+            StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), internalItems));
     }
 
     @Override

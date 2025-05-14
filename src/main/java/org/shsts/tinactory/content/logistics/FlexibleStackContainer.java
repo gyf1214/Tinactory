@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -24,6 +23,8 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.ArrayList;
@@ -37,11 +38,12 @@ import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FlexibleStackContainer extends CapabilityProvider
-    implements IFlexibleContainer, ILayoutProvider, INBTSerializable<CompoundTag> {
+    implements IFlexibleContainer, ILayoutProvider, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final String ID = StackProcessingContainer.ID;
 
     private final BlockEntity blockEntity;
@@ -203,7 +205,12 @@ public class FlexibleStackContainer extends CapabilityProvider
         return internal ? info.internal : info.port;
     }
 
-    @Nonnull
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(REMOVED_IN_WORLD.get(),
+            world -> StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), internalItems));
+    }
+
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == LAYOUT_PROVIDER.get() || cap == CONTAINER.get()) {
