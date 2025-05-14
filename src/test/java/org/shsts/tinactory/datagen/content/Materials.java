@@ -618,7 +618,6 @@ public final class Materials {
             .temperature(2000)
             .workTicks(400)
             .build();
-        ;
     }
 
     private static void crops() {

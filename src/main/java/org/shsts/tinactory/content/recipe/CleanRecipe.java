@@ -18,13 +18,13 @@ import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LaserEngravingRecipe extends ProcessingRecipe {
+public class CleanRecipe extends ProcessingRecipe {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final double minCleanness;
     public final double maxCleanness;
 
-    private LaserEngravingRecipe(Builder builder) {
+    private CleanRecipe(Builder builder) {
         super(builder);
         this.minCleanness = builder.minCleanness;
         this.maxCleanness = builder.maxCleanness;
@@ -57,7 +57,7 @@ public class LaserEngravingRecipe extends ProcessingRecipe {
         }
     }
 
-    public static class Builder extends BuilderBase<LaserEngravingRecipe, Builder> {
+    public static class Builder extends BuilderBase<CleanRecipe, Builder> {
         private double minCleanness = 0d;
         private double maxCleanness = 0d;
 
@@ -72,12 +72,12 @@ public class LaserEngravingRecipe extends ProcessingRecipe {
         }
 
         @Override
-        protected LaserEngravingRecipe createObject() {
-            return new LaserEngravingRecipe(this);
+        protected CleanRecipe createObject() {
+            return new CleanRecipe(this);
         }
     }
 
-    protected static class Serializer extends ProcessingRecipe.Serializer<LaserEngravingRecipe, Builder> {
+    protected static class Serializer extends ProcessingRecipe.Serializer<CleanRecipe, Builder> {
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(type, loc, jo)
@@ -86,12 +86,12 @@ public class LaserEngravingRecipe extends ProcessingRecipe {
         }
 
         @Override
-        public void toJson(JsonObject jo, LaserEngravingRecipe recipe) {
+        public void toJson(JsonObject jo, CleanRecipe recipe) {
             super.toJson(jo, recipe);
             jo.addProperty("min_cleanness", recipe.minCleanness);
             jo.addProperty("max_cleanness", recipe.maxCleanness);
         }
     }
 
-    public static IRecipeSerializer<LaserEngravingRecipe, Builder> SERIALIZER = new Serializer();
+    public static IRecipeSerializer<CleanRecipe, Builder> SERIALIZER = new Serializer();
 }

@@ -265,13 +265,6 @@ public class MaterialSet {
             return this;
         }
 
-        public Builder<P> existing(String sub, IEntry<? extends Fluid> fluid, int baseAmount) {
-            assert !fluids.containsKey(sub);
-            var loc = fluid.loc();
-            fluids.put(sub, new FluidEntry(loc, fluid, baseAmount));
-            return this;
-        }
-
         public Builder<P> alias(String sub, String sub2) {
             var entry = items.get(sub2);
             assert entry != null;

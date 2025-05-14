@@ -13,7 +13,6 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Unit;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllBlockEntities;
@@ -25,13 +24,18 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
-import org.shsts.tinactory.content.machine.ProcessingSet;
+import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.integration.jei.category.AssemblyCategory;
+import org.shsts.tinactory.integration.jei.category.BlastFurnaceCategory;
+import org.shsts.tinactory.integration.jei.category.CleanCategory;
 import org.shsts.tinactory.integration.jei.category.DistillationCategory;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
+import org.shsts.tinactory.integration.jei.category.ResearchCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
 import org.shsts.tinactory.integration.jei.gui.NetworkControllerHandler;
@@ -73,17 +77,19 @@ public class JEI implements IModPlugin {
         for (var set : AllBlockEntities.getProcessingSets()) {
             var layout = set.layout(Voltage.MAXIMUM);
             var icon = set.icon();
-            set.mapRecipeType(new ProcessingSet.RecipeTypeFunction<>() {
-                @Override
-                public <R extends ProcessingRecipe,
-                    B extends IRecipeBuilderBase<R>> Unit apply(IRecipeType<B> type) {
-                    addProcessingCategory(type, layout, icon);
-                    return Unit.INSTANCE;
-                }
-            });
+            var type = set.recipeType;
+
+            if (type == AllRecipes.RESEARCH_BENCH) {
+                addProcessingCategory(cast(type), new ResearchCategory(layout, icon));
+            } else if (AssemblyRecipe.class.isAssignableFrom(type.recipeClass())) {
+                addProcessingCategory(cast(type), new AssemblyCategory(cast(type), layout, icon));
+            } else if (CleanRecipe.class.isAssignableFrom(type.recipeClass())) {
+                addProcessingCategory(cast(type), new CleanCategory(cast(type), layout, icon));
+            } else {
+                addProcessingCategory(cast(type), layout, icon);
+            }
         }
-        addProcessingCategory(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE,
-            AllMultiblocks.BLAST_FURNACE.get());
+        addProcessingCategory(AllRecipes.BLAST_FURNACE, new BlastFurnaceCategory());
         addProcessingCategory(AllRecipes.SIFTER, AllLayouts.SIFTER, AllMultiblocks.SIFTER.get());
         addProcessingCategory(AllRecipes.VACUUM_FREEZER, AllLayouts.VACUUM_FREEZER,
             AllMultiblocks.VACUUM_FREEZER.get());
@@ -92,6 +98,12 @@ public class JEI implements IModPlugin {
             AllMultiblocks.AUTOFARM.get());
         addProcessingCategory(AllRecipes.PYROLYSE_OVEN, AllLayouts.PYROLYSE_OVEN,
             AllMultiblocks.PYROLYSE_OVEN.get());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <A extends IRecipeBuilderBase<?>,
+        B extends IRecipeBuilderBase<?>> IRecipeType<B> cast(IRecipeType<A> type) {
+        return (IRecipeType<B>) type;
     }
 
     private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(
