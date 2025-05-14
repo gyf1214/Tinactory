@@ -89,6 +89,7 @@ import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
+import static org.shsts.tinactory.content.AllMaterials.NICHROME;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.PVC;
@@ -115,6 +116,7 @@ import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.GRATE_MACHINE_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.KANTHAL_COIL_BLOCK;
+import static org.shsts.tinactory.content.AllMultiblocks.NICHROME_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiblocks.PLASCRETE;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
@@ -889,6 +891,7 @@ public final class Components {
 
         coilRecipe(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, CUPRONICKEL, BRONZE, Technologies.STEEL);
         coilRecipe(KANTHAL_COIL_BLOCK, Voltage.LV, KANTHAL, SILVER, Technologies.KANTHAL);
+        coilRecipe(NICHROME_COIL_BLOCK, Voltage.MV, NICHROME, STAINLESS_STEEL, Technologies.NICHROME);
 
         ASSEMBLER.recipe(DATA_GEN, ITEM_FILTER)
             .outputItem(ITEM_FILTER, 1)
@@ -971,6 +974,8 @@ public final class Components {
             .outputItem(coil, 1)
             .inputItem(wire.tag("wire"), 8 * v.rank)
             .inputItem(foil.tag("foil"), 8 * v.rank)
+            .transform($ -> v.rank >= Voltage.MV.rank ?
+                $.inputFluid(PE.fluid(), PE.fluidAmount(2f)) : $)
             .workTicks(200L)
             .voltage(v)
             .requireTech(tech)

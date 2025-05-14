@@ -370,6 +370,10 @@ public class MaterialSet {
             return mechanical().dummies("ring", "rotor");
         }
 
+        public Builder<P> hot() {
+            return metal().dummies("ingot_hot");
+        }
+
         public Builder<P> polymer() {
             return dummies("sheet")
                 .alias("primary", "sheet")

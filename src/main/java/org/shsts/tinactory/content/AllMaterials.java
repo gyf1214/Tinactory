@@ -101,6 +101,8 @@ public final class AllMaterials {
     public static MaterialSet NICKEL_ZINC_FERRITE;
     public static MaterialSet COKE;
     public static MaterialSet CHARCOAL;
+    public static MaterialSet SILICON_DIOXIDE;
+    public static MaterialSet NICHROME;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;

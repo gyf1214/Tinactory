@@ -63,6 +63,8 @@ import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
+import static org.shsts.tinactory.content.AllMaterials.SILICON;
+import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
@@ -125,11 +127,12 @@ public class Chemistry {
             .recipe(WATER, 1f, 800, HYDROGEN, 1f, OXYGEN, 0.5f)
             .recipe(SALT_WATER, 2f, 400, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
             .recipe(SEA_WATER, 2f, 1600, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
-            .recipe(BAUXITE, 15, 320, ALUMINIUM, 6, OXYGEN, 9f, RUTILE, 1)
+            .recipe(BAUXITE, 6, 640, ALUMINIUM, 6, OXYGEN, 4.5f, RUTILE, 1)
             .recipe(CHARCOAL, 1, 64, CARBON, 1)
             .recipe(COAL, 1, 40, CARBON, 2)
             .recipe(COKE, 1, 32, CARBON, 2)
-            .recipe(GRAPHITE, 1, 64, CARBON, 4);
+            .recipe(GRAPHITE, 1, 64, CARBON, 4)
+            .recipe(SILICON_DIOXIDE, 1, 480, SILICON, 1, OXYGEN, 1f);
 
         CHEMICAL_REACTOR.recipe(DATA_GEN, HYDROGEN_CHLORIDE.fluidLoc())
             .input(HYDROGEN, 0.5f)

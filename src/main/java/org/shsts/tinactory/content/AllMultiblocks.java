@@ -49,6 +49,7 @@ public final class AllMultiblocks {
     public static final Set<IEntry<CoilBlock>> COIL_BLOCKS;
     public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
     public static final IEntry<CoilBlock> KANTHAL_COIL_BLOCK;
+    public static final IEntry<CoilBlock> NICHROME_COIL_BLOCK;
     // misc
     public static final IEntry<Block> GRATE_MACHINE_CASING;
     public static final IEntry<Block> AUTOFARM_BASE;
@@ -72,6 +73,7 @@ public final class AllMultiblocks {
         COIL_BLOCKS = new HashSet<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
         KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
+        NICHROME_COIL_BLOCK = coil("nichrome", 3600);
 
         GRATE_MACHINE_CASING = misc("grate_machine_casing");
         AUTOFARM_BASE = misc("autofarm_base");

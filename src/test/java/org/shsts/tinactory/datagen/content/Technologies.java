@@ -55,6 +55,7 @@ public final class Technologies {
     public static ResourceLocation ORGANIC_CHEMISTRY;
     public static ResourceLocation CPU;
     public static ResourceLocation CLEANROOM;
+    public static ResourceLocation NICHROME;
 
     public static void init() {
         TECHS = DATA_GEN.createHandler(TechProvider::new);
@@ -197,6 +198,11 @@ public final class Technologies {
         CLEANROOM = factory.tech("cleanroom")
             .maxProgress(40L)
             .displayItem(AllMultiblocks.CLEANROOM)
+            .register();
+
+        NICHROME = factory.tech("nichrome")
+            .maxProgress(20L)
+            .displayItem(AllMultiblocks.NICHROME_COIL_BLOCK)
             .register();
     }
 

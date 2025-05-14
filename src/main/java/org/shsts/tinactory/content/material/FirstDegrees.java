@@ -33,6 +33,7 @@ import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.METHANE;
+import static org.shsts.tinactory.content.AllMaterials.NICHROME;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.NITRIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.PHENOL;
@@ -43,6 +44,7 @@ import static org.shsts.tinactory.content.AllMaterials.PROPANE;
 import static org.shsts.tinactory.content.AllMaterials.PROPENE;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
+import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
@@ -134,7 +136,7 @@ public final class FirstDegrees {
 
         STAINLESS_STEEL = set("stainless_steel")
             .color(0xFFC8C8DC)
-            .mechanical().gear().molten().pipe()
+            .mechanical().gear().foil().molten().pipe()
             .toolSet(1200, Tiers.IRON)
             .buildObject();
 
@@ -195,6 +197,16 @@ public final class FirstDegrees {
             .color(0xFF644646)
             .dust()
             .existing("primary", Items.CHARCOAL)
+            .buildObject();
+
+        SILICON_DIOXIDE = set("silicon_dioxide")
+            .color(0xFFC8C8C8)
+            .dust()
+            .buildObject();
+
+        NICHROME = set("nichrome")
+            .color(0xFFCDCEF6)
+            .hot().wire()
             .buildObject();
     }
 

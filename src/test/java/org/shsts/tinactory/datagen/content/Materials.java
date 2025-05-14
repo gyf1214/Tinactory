@@ -10,6 +10,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -45,6 +46,7 @@ import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
+import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CHARCOAL;
@@ -91,8 +93,10 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.METHANE;
 import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
+import static org.shsts.tinactory.content.AllMaterials.NICHROME;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
+import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
@@ -112,6 +116,7 @@ import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
+import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
@@ -132,11 +137,14 @@ import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
 import static org.shsts.tinactory.content.AllRecipes.AUTOFARM;
+import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
+import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.COMBUSTION_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
 import static org.shsts.tinactory.content.AllRecipes.GAS_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
+import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
@@ -163,6 +171,7 @@ import static org.shsts.tinactory.datagen.content.model.IconSet.FINE;
 import static org.shsts.tinactory.datagen.content.model.IconSet.GEM_VERTICAL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.LIGNITE;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
+import static org.shsts.tinactory.datagen.content.model.IconSet.QUARTZ;
 import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
 import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
@@ -295,7 +304,9 @@ public final class Materials {
             .material(THORIUM, SHINY).build()
             // TODO
             .material(CHROME, SHINY).build()
-            .material(ANTIMONY, SHINY).build()
+            .material(ANTIMONY, SHINY)
+            .machineProcess(Voltage.LV).smelt()
+            .build()
             .material(SILVER, SHINY)
             .machineProcess(Voltage.LV).smelt()
             .oreProcess(ANTIMONY, ANTIMONY, GALLIUM)
@@ -411,6 +422,14 @@ public final class Materials {
             .build()
             .material(CHARCOAL, FINE)
             .toolProcess()
+            .build()
+            .material(SILICON_DIOXIDE, QUARTZ)
+            .smelt(GLASS, "primary")
+            .build()
+            .material(NICHROME, METALLIC)
+            .machineProcess(Voltage.MV, 1.25d)
+            .blast(Voltage.HV, 2700, 880, NITROGEN, 1f)
+            .mix(Voltage.MV, NICKEL, 4, CHROME, 1)
             .build();
     }
 
@@ -523,6 +542,83 @@ public final class Materials {
             .oreBuilder(ALUMINIUM, RUTILE, RUTILE).siftAndHammer().build()
             .machineProcess(Voltage.LV, 2d)
             .build();
+
+        BLAST_FURNACE.recipe(DATA_GEN, CHALCOPYRITE.loc("dust"))
+            .inputItem(CHALCOPYRITE.tag("dust"), 2)
+            .inputFluid(OXYGEN.fluid(), OXYGEN.fluidAmount(9f))
+            .outputItem(IRON.entry("ingot"), 3)
+            .outputItem(COPPER.entry("ingot"), 3)
+            .outputFluid(SULFURIC_ACID.fluid("gas"), SULFURIC_ACID.fluidAmount("gas", 6f))
+            .voltage(Voltage.LV)
+            .temperature(2000)
+            .workTicks(400)
+            .build()
+            .recipe(DATA_GEN, PYRITE.loc("dust"))
+            .inputItem(PYRITE.tag("dust"), 2)
+            .inputFluid(OXYGEN.fluid(), OXYGEN.fluidAmount(4.5f))
+            .outputItem(IRON.entry("ingot"), 3)
+            .outputFluid(SULFURIC_ACID.fluid("gas"), SULFURIC_ACID.fluidAmount("gas", 3f))
+            .voltage(Voltage.LV)
+            .temperature(2000)
+            .workTicks(400)
+            .build()
+            .recipe(DATA_GEN, LIMONITE.loc("dust"))
+            .inputItem(LIMONITE.tag("dust"), 8)
+            .inputItem(CARBON.tag("dust"), 9)
+            .outputItem(IRON.entry("ingot"), 12)
+            .outputFluid(CARBON_DIOXIDE.fluid(), CARBON_DIOXIDE.fluidAmount(9f))
+            .voltage(Voltage.LV)
+            .temperature(2000)
+            .workTicks(1600)
+            .build()
+            .recipe(DATA_GEN, BANDED_IRON.loc("dust"))
+            .inputItem(BANDED_IRON.tag("dust"), 8)
+            .inputItem(CARBON.tag("dust"), 9)
+            .outputItem(IRON.entry("ingot"), 12)
+            .outputFluid(CARBON_DIOXIDE.fluid(), CARBON_DIOXIDE.fluidAmount(9f))
+            .voltage(Voltage.LV)
+            .temperature(2000)
+            .workTicks(1600)
+            .build()
+            .recipe(DATA_GEN, GARNIERITE.loc("dust"))
+            .inputItem(GARNIERITE.tag("dust"), 4)
+            .inputItem(CARBON.tag("dust"), 3)
+            .outputItem(NICKEL.entry("ingot"), 6)
+            .outputFluid(CARBON_DIOXIDE.fluid(), CARBON_DIOXIDE.fluidAmount(3f))
+            .voltage(Voltage.LV)
+            .temperature(2000)
+            .workTicks(800)
+            .build()
+            .recipe(DATA_GEN, CASSITERITE.loc("dust"))
+            .inputItem(CASSITERITE.tag("dust"), 2)
+            .inputItem(CARBON.tag("dust"), 3)
+            .outputItem(TIN.entry("ingot"), 3)
+            .outputFluid(CARBON_DIOXIDE.fluid(), CARBON_DIOXIDE.fluidAmount(3f))
+            .voltage(Voltage.LV)
+            .temperature(2000)
+            .workTicks(400)
+            .build()
+            .recipe(DATA_GEN, GALENA.loc("dust"))
+            .inputItem(GALENA.tag("dust"), 2)
+            .inputFluid(OXYGEN.fluid(), OXYGEN.fluidAmount(4.5f))
+            .outputItem(LEAD.entry("ingot"), 3)
+            .outputItem(ANTIMONY.entry("ingot"), 1)
+            .outputFluid(SULFURIC_ACID.fluid("gas"), SULFURIC_ACID.fluidAmount("gas", 3f))
+            .voltage(Voltage.LV)
+            .temperature(2000)
+            .workTicks(400)
+            .build()
+            .recipe(DATA_GEN, SPHALERITE.loc("dust"))
+            .inputItem(SPHALERITE.tag("dust"), 2)
+            .inputFluid(OXYGEN.fluid(), OXYGEN.fluidAmount(4.5f))
+            .outputItem(ZINC.entry("ingot"), 3)
+            .outputItem(SILVER.entry("ingot"), 1)
+            .outputFluid(SULFURIC_ACID.fluid("gas"), SULFURIC_ACID.fluidAmount("gas", 3f))
+            .voltage(Voltage.LV)
+            .temperature(2000)
+            .workTicks(400)
+            .build();
+        ;
     }
 
     private static void crops() {
@@ -689,8 +785,8 @@ public final class Materials {
             .toolTag(TOOL_HAMMER)
             .build()
             // gravel -> sand
-            .recipe(DATA_GEN, Items.SAND)
-            .result(Items.SAND, 1)
+            .recipe(DATA_GEN, Blocks.SAND)
+            .result(() -> Blocks.SAND, 1)
             .pattern("#")
             .define('#', Items.GRAVEL)
             .toolTag(TOOL_MORTAR)
@@ -716,9 +812,8 @@ public final class Materials {
             .inputItem(STICKY_RESIN, 1)
             .workTicks(160L)
             .voltage(Voltage.LV)
-            .build();
-
-        EXTRACTOR.recipe(DATA_GEN, suffix(RAW_RUBBER.loc("dust"), "_from_log"))
+            .build()
+            .recipe(DATA_GEN, suffix(RAW_RUBBER.loc("dust"), "_from_log"))
             .outputItem(RAW_RUBBER.entry("dust"), 1)
             .inputItem(RUBBER_LOG, 1)
             .workTicks(320L)
@@ -731,6 +826,64 @@ public final class Materials {
             .outputItem(RUBBER.entry("sheet"), 3)
             .workTicks(300)
             .voltage(Voltage.ULV)
+            .build();
+
+        // stones
+        var sandLoc = Blocks.SAND.getRegistryName();
+        assert sandLoc != null;
+        MACERATOR.recipe(DATA_GEN, SILICON_DIOXIDE.loc("dust"))
+            .inputItem(GLASS.tag("primary"), 1)
+            .outputItem(SILICON_DIOXIDE.entry("dust"), 1)
+            .voltage(Voltage.LV)
+            .workTicks(128L)
+            .build()
+            .recipe(DATA_GEN, suffix(SILICON_DIOXIDE.loc("dust"), "_from_flint"))
+            .inputItem(FLINT.tag("primary"), 1)
+            .outputItem(SILICON_DIOXIDE.entry("dust"), 1)
+            .voltage(Voltage.LV)
+            .workTicks(128L)
+            .build()
+            .recipe(DATA_GEN, sandLoc)
+            .inputItem(() -> Blocks.GRAVEL, 1)
+            .outputItem(() -> Blocks.SAND, 1)
+            .voltage(Voltage.LV)
+            .workTicks(64L)
+            .build()
+            .recipe(DATA_GEN, suffix(sandLoc, "_from_sandstone"))
+            .inputItem(() -> Blocks.SANDSTONE, 1)
+            .outputItem(() -> Blocks.SAND, 4)
+            .voltage(Voltage.LV)
+            .workTicks(240L)
+            .build();
+
+        CENTRIFUGE.recipe(DATA_GEN, sandLoc)
+            .inputItem(() -> Blocks.SAND, 1)
+            .outputItem(SILICON_DIOXIDE.entry("dust"), 1)
+            .voltage(Voltage.LV)
+            .workTicks(64L)
+            .build()
+            .recipe(DATA_GEN, STONE.loc("dust"))
+            .inputItem(STONE.tag("dust"), 2)
+            .outputItem(SILICON_DIOXIDE.entry("dust"), 1)
+            .outputItem(CALCIUM_CARBONATE.entry("dust"), 1)
+            .voltage(Voltage.LV)
+            .workTicks(128L)
+            .build()
+            .recipe(DATA_GEN, STONE.loc("block"))
+            .inputItem(STONE.tag("block"), 2)
+            .outputItem(() -> Blocks.GRAVEL, 1)
+            .outputItem(CALCIUM_CARBONATE.entry("dust"), 1)
+            .voltage(Voltage.LV)
+            .workTicks(240L)
+            .build();
+
+        SIFTER.recipe(DATA_GEN, Blocks.GRAVEL)
+            .inputItem(() -> Blocks.GRAVEL, 1)
+            .outputItem(FLINT.entry("primary"), 1, 0.8)
+            .outputItem(FLINT.entry("primary"), 1, 0.35)
+            .outputItem(() -> Blocks.SAND, 1, 0.65)
+            .voltage(Voltage.LV)
+            .workTicks(400L)
             .build();
     }
 

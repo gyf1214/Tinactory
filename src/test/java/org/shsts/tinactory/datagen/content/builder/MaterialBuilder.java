@@ -59,6 +59,7 @@ import static org.shsts.tinactory.content.AllRecipes.POLARIZER;
 import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
+import static org.shsts.tinactory.content.AllRecipes.VACUUM_FREEZER;
 import static org.shsts.tinactory.content.AllRecipes.WIREMILL;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.TOOL_FILE;
@@ -411,18 +412,23 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return this;
     }
 
-    public MaterialBuilder<P> smelt(MaterialSet to) {
+    public MaterialBuilder<P> smelt(MaterialSet to, String sub) {
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
-            .smelting(Ingredient.of(material.tag("dust")), to.item("ingot"), 0, 200)
+            .smelting(Ingredient.of(material.tag("dust")), to.item(sub), 0, 200)
             .unlockedBy("has_material", has(material.tag("dust"))), "_from_" + material.name);
         return this;
     }
 
+    public MaterialBuilder<P> smelt(MaterialSet to) {
+        return smelt(to, "ingot");
+    }
+
     public MaterialBuilder<P> blastFrom(Voltage v, int temperature, long ticks,
         MaterialSet source, Object... extra) {
-        var suffix = source == material ? "" : source.name;
-        var builder = BLAST_FURNACE.recipe(DATA_GEN, suffix(material.loc("ingot"), suffix))
-            .outputItem(material.entry("ingot"), 1)
+        var suffix = source == material ? "" : "_from_" + source.name;
+        var sub = material.hasItem("ingot_hot") ? "ingot_hot" : "ingot";
+        var builder = BLAST_FURNACE.recipe(DATA_GEN, suffix(material.loc(sub), suffix))
+            .outputItem(material.entry(sub), 1)
             .inputItem(source.tag("dust"), 1)
             .voltage(v)
             .temperature(temperature)
@@ -430,24 +436,34 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
         for (var i = 0; i < extra.length; i++) {
             var mat = (MaterialSet) extra[i];
-            var sub = mat.hasItem("dust") ? "dust" : "fluid";
+            var sub1 = mat.hasItem("dust") ? "dust" : "fluid";
             var amount = 1f;
-            if (i + 1 < extra.length && extra[i + 1] instanceof String sub1) {
-                sub = sub1;
+            if (i + 1 < extra.length && extra[i + 1] instanceof String sub2) {
+                sub1 = sub2;
                 i++;
             }
             if (i + 1 < extra.length && extra[i + 1] instanceof Number amount1) {
                 amount = amount1.floatValue();
                 i++;
             }
-            if (mat.hasItem(sub)) {
-                builder.inputItem(mat.tag(sub), (int) amount);
+            if (mat.hasItem(sub1)) {
+                builder.inputItem(mat.tag(sub1), (int) amount);
             } else {
-                builder.inputFluid(mat.fluid(sub), mat.fluidAmount(sub, amount));
+                builder.inputFluid(mat.fluid(sub1), mat.fluidAmount(sub1, amount));
             }
         }
 
         builder.build();
+
+        if (sub.equals("ingot_hot")) {
+            VACUUM_FREEZER.recipe(DATA_GEN, material.loc("ingot"))
+                .inputItem(material.tag("ingot_hot"), 1)
+                .outputItem(material.entry("ingot"), 1)
+                .voltage(v)
+                .workTicks(200)
+                .build();
+        }
+
         return this;
     }
 

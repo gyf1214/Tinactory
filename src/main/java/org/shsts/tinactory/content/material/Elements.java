@@ -98,7 +98,10 @@ public final class Elements {
             .dustPrimary().molten()
             .buildObject();
 
-        ANTIMONY = dust("antimony", 0xFFDCDCF0);
+        ANTIMONY = set("antimony")
+            .color(0xFFDCDCF0)
+            .metal()
+            .buildObject();
 
         SILVER = set("silver")
             .color(0xFFDCDCFF)
