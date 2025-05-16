@@ -119,6 +119,7 @@ public final class AllMaterials {
     public static MaterialSet LPG;
     public static MaterialSet DIESEL;
     public static MaterialSet CREOSOTE_OIL;
+    public static MaterialSet VANADIUM_STEEL;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;

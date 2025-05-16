@@ -43,6 +43,7 @@ import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
 import static org.shsts.tinactory.content.electric.Circuits.circuit;
 import static org.shsts.tinactory.content.electric.Circuits.circuitComponent;
 
@@ -221,8 +222,11 @@ public final class AllItems {
             .tint(COBALT_BRASS.color)
             .register();
 
-        // TODO: tint
-        GOOD_BUZZSAW = simple("component/buzzsaw/good");
+        GOOD_BUZZSAW = REGISTRATE.item("component/buzzsaw/good")
+            .tint(VANADIUM_STEEL.color)
+            .register();
+
+        // TODO
         ADVANCED_BUZZSAW = simple("component/buzzsaw/advanced");
 
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);

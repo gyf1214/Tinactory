@@ -132,6 +132,7 @@ import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
+import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
@@ -302,8 +303,10 @@ public final class Materials {
             .machineProcess(Voltage.LV)
             .build()
             .material(THORIUM, SHINY).build()
-            // TODO
-            .material(CHROME, SHINY).build()
+            .material(CHROME, SHINY)
+            .machineProcess(Voltage.MV, 1.5d)
+            .blast(Voltage.MV, 2200, 1024, NITROGEN, 1f)
+            .build()
             .material(ANTIMONY, SHINY)
             .machineProcess(Voltage.LV).smelt()
             .build()
@@ -452,6 +455,10 @@ public final class Materials {
             .build()
             .material(DIESEL, DULL)
             .fluidMix(Voltage.MV, LIGHT_FUEL, 5, HEAVY_FUEL, 1)
+            .build()
+            .material(VANADIUM_STEEL, METALLIC)
+            .machineProcess(Voltage.MV, 1.5d)
+            .blast(Voltage.MV, 2500, 1280, NITROGEN, 1)
             .build();
     }
 

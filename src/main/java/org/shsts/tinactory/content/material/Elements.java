@@ -76,7 +76,7 @@ public final class Elements {
         COBALT = set("cobalt")
             .color(0xFF5050FA)
             .metalExt()
-            .toolSet(600, Tiers.IRON)
+            .toolSet(400, Tiers.IRON)
             .buildObject();
 
         CADMIUM = dust("cadmium", 0xFF32323C);
@@ -95,7 +95,7 @@ public final class Elements {
 
         CHROME = set("chrome")
             .color(0xFFEAC4D8)
-            .dustPrimary().molten()
+            .hot().stick().molten()
             .buildObject();
 
         ANTIMONY = set("antimony")

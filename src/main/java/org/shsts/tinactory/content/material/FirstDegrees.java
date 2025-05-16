@@ -97,7 +97,6 @@ public final class FirstDegrees {
         STEEL = set("steel")
             .color(0xFF808080)
             .mechanical().magnetic().gear().rotor().molten()
-            .toolSet(800, Tiers.IRON)
             .buildObject();
 
         RED_ALLOY = set("red_alloy")
@@ -137,7 +136,6 @@ public final class FirstDegrees {
         STAINLESS_STEEL = set("stainless_steel")
             .color(0xFFC8C8DC)
             .mechanical().gear().foil().molten().pipe()
-            .toolSet(1200, Tiers.IRON)
             .buildObject();
 
         SODIUM_CHLORIDE = dust("sodium_chloride", 0xFFFAFAFA);

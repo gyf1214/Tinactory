@@ -75,6 +75,7 @@ import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
+import static org.shsts.tinactory.content.AllMaterials.CHROME;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
@@ -99,11 +100,13 @@ import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE;
@@ -389,16 +392,27 @@ public final class Components {
 
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, GLASS);
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, ELECTRUM, RUBY);
-        // TODO: sensor and emitter
-        componentRecipe(Voltage.HV, STAINLESS_STEEL, ELECTRUM, STAINLESS_STEEL, STEEL, STEEL, ELECTRUM, RUBY);
+        componentRecipe(Voltage.HV, STAINLESS_STEEL, ELECTRUM, STAINLESS_STEEL, STEEL, STEEL, CHROME, EMERALD);
 
         batteryRecipe(Voltage.LV, CADMIUM);
-        // TODO: Na
-        batteryRecipe(Voltage.MV, CADMIUM);
+        batteryRecipe(Voltage.MV, SODIUM_HYDROXIDE);
         // TODO: Li
         batteryRecipe(Voltage.HV, CADMIUM);
 
+        // TODO: advanced_buzzsaw
         buzzsawRecipe(BASIC_BUZZSAW, COBALT_BRASS, Voltage.LV);
+        buzzsawRecipe(GOOD_BUZZSAW, VANADIUM_STEEL, Voltage.MV);
+
+        // TODO: advanced_grinder
+        ASSEMBLER.recipe(DATA_GEN, GOOD_GRINDER)
+            .outputItem(GOOD_GRINDER, 1)
+            .inputItem(DIAMOND.tag("gem_flawless"), 1)
+            .inputItem(STEEL.tag("plate"), 8)
+            .inputItem(DIAMOND.tag("dust"), 4)
+            .voltage(Voltage.MV)
+            .workTicks(ASSEMBLY_TICKS)
+            .requireTech(Technologies.MATERIAL_CUTTING)
+            .build();
 
         researchRecipe(Voltage.ULV)
             .inputItem(IRON.tag("plate"), 1)
@@ -444,7 +458,7 @@ public final class Components {
     }
 
     private static void componentRecipe(Voltage voltage, MaterialSet main,
-        MaterialSet heat, MaterialSet pipe,
+        MaterialSet motor, MaterialSet pipe,
         MaterialSet rotor, MaterialSet magnetic,
         MaterialSet sensor, MaterialSet quartz) {
         var factory = new ComponentRecipeFactory(voltage);
@@ -452,7 +466,7 @@ public final class Components {
         factory.recipe(ELECTRIC_MOTOR)
             .material(magnetic, "magnetic", 1)
             .material(main, "stick", 2)
-            .material(heat, "wire", 2 * voltage.rank)
+            .material(motor, "wire", 2 * voltage.rank)
             .component(CABLE, 2)
             .tech(Technologies.MOTOR)
             .build()

@@ -35,6 +35,10 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
         this.builder = builder;
     }
 
+    public Voltage voltage() {
+        return voltage;
+    }
+
     public AssemblyRecipeBuilder<P> circuit(Voltage v, int count) {
         if (builder != null) {
             builder.inputItem(AllTags.circuit(v), count);

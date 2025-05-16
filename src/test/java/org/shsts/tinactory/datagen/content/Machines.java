@@ -70,6 +70,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.WIREMILL;
 import static org.shsts.tinactory.content.AllBlockEntities.WORKBENCH;
 import static org.shsts.tinactory.content.AllItems.BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.CABLE;
+import static org.shsts.tinactory.content.AllItems.CHIPS;
 import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_BUFFER;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
@@ -91,7 +92,9 @@ import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
+import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.PE;
+import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
@@ -350,6 +353,7 @@ public final class Machines {
     private static void basicRecipes() {
         machineRecipe(Voltage.LV, STEEL, COPPER, TIN, BRONZE, TIN);
         machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
+        machineRecipe(Voltage.HV, STAINLESS_STEEL, KANTHAL, SILVER, STAINLESS_STEEL, STEEL);
 
         ASSEMBLER.recipe(DATA_GEN, SIFTER)
             .outputItem(SIFTER, 1)
@@ -434,6 +438,16 @@ public final class Machines {
             .define('V', circuit(Voltage.ULV))
             .define('F', Blocks.FURNACE.asItem())
             .toolTag(TOOL_WRENCH)
+            .build();
+
+        ASSEMBLER.recipe(DATA_GEN, HIGH_PRESSURE_BOILER)
+            .inputItem(MACHINE_HULL.get(Voltage.MV), 1)
+            .inputItem(() -> Blocks.FURNACE, 1)
+            .inputItem(BRASS.tag("pipe"), 2)
+            .inputItem(IRON.tag("plate"), 4)
+            .voltage(Voltage.LV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.SOLDERING, Technologies.STEEL)
             .build();
 
         // disable vanilla recipes
@@ -608,8 +622,8 @@ public final class Machines {
 
                 @Override
                 protected Unit createObject() {
-                    if (!hasCable && components > 0) {
-                        component(CABLE, components);
+                    if (!hasCable) {
+                        component(CABLE, Math.max(2, components * 2));
                     }
                     return super.createObject();
                 }
@@ -714,12 +728,13 @@ public final class Machines {
             .recipe(ELECTRIC_FURNACE)
             .circuit(2)
             .material(heat, "wire", wireNumber)
-            .material(main, "plate", 1)
+            .material(main, "plate", 4)
             .tech(Technologies.ELECTRIC_HEATING)
             .build()
             .recipe(ALLOY_SMELTER)
             .circuit(4)
             .material(heat, "wire", wireNumber * 2)
+            .material(main, "plate", 8)
             .tech(Technologies.ELECTRIC_HEATING)
             .build()
             .recipe(MIXER)
@@ -743,7 +758,7 @@ public final class Machines {
             .circuit(2)
             .component(ELECTRIC_MOTOR, 2)
             .component(ELECTRIC_PISTON, 2)
-            .material(main, "plate", 1)
+            .material(main, "plate", 4)
             .tech(Technologies.PUMP_AND_PISTON)
             .build()
             .recipe(LATHE)
@@ -816,41 +831,44 @@ public final class Machines {
             .tech(Technologies.PUMP_AND_PISTON)
             .build()
             .recipe(ELECTRIC_CHEST)
-            .circuit(4)
+            .circuit(2)
             .component(CONVEYOR_MODULE, 1)
             .material(main, "plate", 2)
             .item(() -> Items.CHEST, 1)
             .tech(Technologies.CONVEYOR_MODULE)
             .build()
             .recipe(ELECTRIC_TANK)
-            .circuit(4)
+            .circuit(2)
             .component(ELECTRIC_PUMP, 1)
             .material(main, "plate", 2)
             .material(GLASS, "primary", 1)
             .tech(Technologies.PUMP_AND_PISTON)
             .build()
-            // TODO: PIC
             .recipe(BATTERY_BOX)
             .circuit(2)
+            .transform(Machines::pic)
             .component(CABLE, 4)
             .item(() -> Items.CHEST, 1)
             .tech(Technologies.BATTERY)
             .build()
-            // TODO: PIC
             .recipe(TRANSFORMER)
             .circuit(4)
+            .transform(Machines::pic)
             .component(CABLE, 1)
             .item(CABLE.get(Voltage.fromRank(v.rank - 1)), 4)
             .tech(Technologies.BATTERY)
             .build()
-            // TODO: PIC
             .recipe(ELECTRIC_BUFFER)
             .circuit(4)
+            .transform(Machines::pic)
             .component(CABLE, 2)
             .tech(Technologies.BATTERY)
             .build()
             .recipe(LOGISTIC_WORKER)
-            .circuit(2)
+            .circuit(4)
+            .component(CONVEYOR_MODULE, 2)
+            .component(ELECTRIC_PUMP, 2)
+            .material(main, "plate", 4)
             .tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             .build()
             .recipe(MULTIBLOCK_INTERFACE)
@@ -861,5 +879,18 @@ public final class Machines {
             .material(GLASS, "primary", 1)
             .tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             .build();
+    }
+
+    private static <P> AssemblyRecipeBuilder<P> pic(AssemblyRecipeBuilder<P> builder) {
+        var v = builder.voltage();
+        if (v.rank < Voltage.HV.rank) {
+            return builder;
+        } else if (v.rank < Voltage.IV.rank) {
+            return builder.item(CHIPS.get("low_pic"), 2);
+        } else if (v.rank < Voltage.ZPM.rank) {
+            return builder.item(CHIPS.get("pic"), 2);
+        } else {
+            return builder.item(CHIPS.get("high_pic"), 2);
+        }
     }
 }

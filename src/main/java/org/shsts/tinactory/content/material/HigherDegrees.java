@@ -16,6 +16,7 @@ import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
+import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.liquid;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
@@ -24,7 +25,7 @@ public final class HigherDegrees {
         COBALT_BRASS = set("cobalt_brass")
             .color(0xFFB4B4A0)
             .gear()
-            .toolSet(1000, Tiers.IRON)
+            .toolSet(600, Tiers.IRON)
             .buildObject();
 
         AIR = set("air")
@@ -103,6 +104,12 @@ public final class HigherDegrees {
         CREOSOTE_OIL = set("creosote_oil")
             .color(0xFF804000)
             .fluid("fluid", "creosote", 1000)
+            .buildObject();
+
+        VANADIUM_STEEL = set("vanadium_steel")
+            .color(0xFFC0C0C0)
+            .hot().gear()
+            .toolSet(1200, Tiers.DIAMOND)
             .buildObject();
     }
 

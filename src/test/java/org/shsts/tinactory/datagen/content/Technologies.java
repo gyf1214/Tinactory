@@ -71,7 +71,7 @@ public final class Technologies {
 
         SOLDERING = factory.tech("soldering")
             .maxProgress(30L)
-            .displayItem(AllMaterials.STEEL.entry("tool/screwdriver"))
+            .displayItem(AllMaterials.WROUGHT_IRON.entry("tool/screwdriver"))
             .register();
 
         STEEL = factory.child("steel")
