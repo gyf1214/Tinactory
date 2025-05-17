@@ -8,11 +8,13 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.gui.NetworkControllerPlugin;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -31,12 +33,10 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.AllItems.CABLE;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
-import static org.shsts.tinactory.content.gui.client.TechPanel.PANEL_BORDER;
-import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
+import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.HEIGHT;
+import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.WIDTH;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
-import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 import static org.shsts.tinactory.core.util.ClientUtil.INTEGER_FORMAT;
@@ -48,9 +48,6 @@ import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 public class NetworkControllerScreen extends MenuScreen {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int WELCOME_BUTTON_WIDTH = 72;
-    public static final int WIDTH = TechPanel.LEFT_OFFSET + TechPanel.RIGHT_WIDTH;
-    public static final int HEIGHT = TechPanel.BUTTON_SIZE * 6 + FONT_HEIGHT +
-        MARGIN_VERTICAL * 2 + SPACING + PANEL_BORDER * 2;
 
     private final Panel welcomePanel;
     private final EditBox welcomeEdit;
@@ -58,13 +55,30 @@ public class NetworkControllerScreen extends MenuScreen {
     private final Label stateLabel;
     public final TechPanel techPanel;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
+    private final NetworkControllerPlugin plugin;
 
     public static Component tr(String key, Object... args) {
         return I18n.tr("tinactory.gui.networkController." + key, args);
     }
 
+    private class RenamePanel extends Panel {
+        public RenamePanel() {
+            super(NetworkControllerScreen.this);
+        }
+
+        @Override
+        public void setActive(boolean value) {
+            super.setActive(value);
+            plugin.setRenameActive(value);
+        }
+    }
+
     public NetworkControllerScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
+
+        this.plugin = (NetworkControllerPlugin) menu.getPlugins().stream()
+            .filter($ -> $ instanceof NetworkControllerPlugin)
+            .findAny().orElseThrow();
 
         this.welcomePanel = new Panel(this);
         var welcomeLabel = new Label(menu, tr("welcome"));
@@ -83,7 +97,8 @@ public class NetworkControllerScreen extends MenuScreen {
         this.techPanel = new TechPanel(this);
 
         this.tabs = new Tab(this, statePanel, CABLE.get(Voltage.LV),
-            techPanel, RESEARCH_EQUIPMENT.get(Voltage.LV));
+            techPanel, RESEARCH_EQUIPMENT.get(Voltage.LV),
+            new RenamePanel(), Items.NAME_TAG);
 
         rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
         rootPanel.addPanel(statePanel);

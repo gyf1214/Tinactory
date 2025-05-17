@@ -48,10 +48,13 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
 
         this.rootPanel = new Panel(this);
         for (var slot : menu.getMenu().slots) {
-            int x = slot.x - 1 - MARGIN_X;
-            int y = slot.y - 1 - MARGIN_TOP;
-            var slotBg = new StaticWidget(menu, Texture.SLOT_BACKGROUND);
-            rootPanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
+            // TODO: need a more consistent way to determine whether the slot needs background
+            if (slot.isActive()) {
+                int x = slot.x - 1 - MARGIN_X;
+                int y = slot.y - 1 - MARGIN_TOP;
+                var slotBg = new StaticWidget(menu, Texture.SLOT_BACKGROUND);
+                rootPanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
+            }
         }
     }
 

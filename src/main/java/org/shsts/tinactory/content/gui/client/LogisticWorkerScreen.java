@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.content.gui.NetworkControllerPlugin;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
@@ -67,8 +68,8 @@ public class LogisticWorkerScreen extends MenuScreen {
     private UUID selectedMachine = null;
 
     private static final int BUTTON_SIZE = AbstractRecipeBook.BUTTON_SIZE;
-    private static final int IMAGE_WIDTH = NetworkControllerScreen.WIDTH;
-    private static final int IMAGE_HEIGHT = NetworkControllerScreen.HEIGHT;
+    private static final int IMAGE_WIDTH = NetworkControllerPlugin.WIDTH;
+    private static final int IMAGE_HEIGHT = NetworkControllerPlugin.HEIGHT;
     private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
     private static final int HORIZONTAL_SPACING = MARGIN_X * 2;
 

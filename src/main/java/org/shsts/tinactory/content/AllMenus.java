@@ -7,6 +7,7 @@ import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.gui.ElectricChestPlugin;
 import org.shsts.tinactory.content.gui.ElectricTankPlugin;
 import org.shsts.tinactory.content.gui.MachinePlugin;
+import org.shsts.tinactory.content.gui.NetworkControllerPlugin;
 import org.shsts.tinactory.content.gui.PrimitivePlugin;
 import org.shsts.tinactory.content.gui.WorkbenchPlugin;
 import org.shsts.tinactory.content.gui.client.BoilerScreen;
@@ -17,6 +18,7 @@ import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
+import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.gui.LayoutPlugin;
@@ -27,7 +29,6 @@ import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.core.machine.Machine;
-import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinycorelib.api.gui.IMenuEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -41,6 +42,7 @@ public final class AllMenus {
     public static final IMenuEvent<SlotEventPacket> FLUID_SLOT_CLICK;
     public static final IMenuEvent<SlotEventPacket> CHEST_SLOT_CLICK;
     public static final IMenuEvent<ISetMachineConfigPacket> SET_MACHINE_CONFIG;
+    public static final IMenuEvent<RenameEventPacket> RENAME;
 
     public static final IMenuType WORKBENCH;
     public static final IMenuType NETWORK_CONTROLLER;
@@ -73,6 +75,8 @@ public final class AllMenus {
             SlotEventPacket::new);
         SET_MACHINE_CONFIG = CHANNEL.registerMenuEventPacket(ISetMachineConfigPacket.class,
             SetMachineConfigPacket::new);
+        RENAME = CHANNEL.registerMenuEventPacket(RenameEventPacket.class,
+            RenameEventPacket::new);
 
         WORKBENCH = REGISTRATE.menu("primitive/workbench")
             .title("tinactory.gui.workbench.title")
@@ -94,13 +98,8 @@ public final class AllMenus {
 
         NETWORK_CONTROLLER = REGISTRATE.menu("network/controller")
             .title("tinactory.gui.networkController.title")
+            .plugin(NetworkControllerPlugin::new)
             .screen(() -> () -> NetworkControllerScreen::new)
-            .dummyPlugin(menu -> {
-                menu.setValidPredicate(() -> NetworkController
-                    .get(menu.blockEntity())
-                    .canPlayerInteract(menu.player()));
-                menu.addSyncSlot("info", NetworkControllerSyncPacket::new);
-            })
             .register();
 
         LOGISTIC_WORKER = REGISTRATE.menu("network/logistic_worker")

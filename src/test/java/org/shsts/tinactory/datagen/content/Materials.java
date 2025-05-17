@@ -770,6 +770,7 @@ public final class Materials {
         disableVanillaOres("diamond", "");
         disableVanillaOres("redstone", "");
         disableVanillaOres("lapis", "lazuli");
+        disableVanillaOres("emerald", "");
 
         // smelt wrought iron nugget
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder

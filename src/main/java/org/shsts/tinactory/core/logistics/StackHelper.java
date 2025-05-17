@@ -7,7 +7,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -178,5 +180,21 @@ public final class StackHelper {
             return Optional.empty();
         }
         return FluidUtil.getFluidHandler(stack).resolve();
+    }
+
+    public static void returnItemHandlerToPlayer(Player player, IItemHandlerModifiable itemHandler) {
+        if (!player.isAlive() || (player instanceof ServerPlayer serverPlayer &&
+            serverPlayer.hasDisconnected())) {
+            for (int i = 0; i < itemHandler.getSlots(); i++) {
+                player.drop(itemHandler.getStackInSlot(i), false);
+                itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+            }
+        } else if (player instanceof ServerPlayer) {
+            for (int i = 0; i < itemHandler.getSlots(); i++) {
+                var inventory = player.getInventory();
+                inventory.placeItemBackInInventory(itemHandler.getStackInSlot(i));
+                itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+            }
+        }
     }
 }
