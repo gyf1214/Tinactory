@@ -366,7 +366,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                     .inputItem(material.tag("stick"), 1)
                     .inputFluid(WATER.fluid(), WATER.fluidAmount(0.05f))
                     .voltage(voltage)
-                    .workTicks(128L)
+                    .workTicks(64L)
                     .build();
             }
 

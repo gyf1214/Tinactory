@@ -44,7 +44,9 @@ public class DistillationTower extends Multiblock {
     @Override
     protected void updateMultiblockInterface() {
         super.updateMultiblockInterface();
-        setLayout(DISTILLATION_TOWER.get(height - 3));
+        if (multiblockInterface != null) {
+            setLayout(DISTILLATION_TOWER.get(height - 3));
+        }
     }
 
     @Override

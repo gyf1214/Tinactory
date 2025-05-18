@@ -992,9 +992,52 @@ public final class Materials {
                 .group("planks")
                 .unlockedBy("has_logs", has(logsTag)));
 
-        // signs
+        // wood components
         var sign = ITEMS.getEntry(mcLoc(prefix + "_sign"));
-        DATA_GEN.nullRecipe(sign.loc());
+        var pressurePlate = ITEMS.getEntry(mcLoc(prefix + "_pressure_plate"));
+        var button = ITEMS.getEntry(mcLoc(prefix + "_button"));
+        var slab = ITEMS.getEntry(mcLoc(prefix + "_slab"));
+
+        DATA_GEN.nullRecipe(sign.loc())
+            .nullRecipe(pressurePlate.loc())
+            .nullRecipe(button.loc())
+            .nullRecipe(slab.loc());
+
+        TOOL_CRAFTING.recipe(DATA_GEN, slab)
+            .result(slab, 1)
+            .pattern("#")
+            .define('#', planks)
+            .toolTag(TOOL_SAW)
+            .build()
+            .recipe(DATA_GEN, button)
+            .result(button, 4)
+            .pattern("#")
+            .define('#', pressurePlate)
+            .toolTag(TOOL_SAW)
+            .build();
+ 
+        CUTTER.recipe(DATA_GEN, planks)
+            .outputItem(planks, 6)
+            .inputItem(logsTag, 1)
+            .inputFluid(WATER.fluid(), WATER.fluidAmount(0.6f))
+            .voltage(Voltage.LV)
+            .workTicks(240)
+            .build()
+            .recipe(DATA_GEN, slab)
+            .outputItem(slab, 2)
+            .inputItem(planks, 1)
+            .inputFluid(WATER.fluid(), WATER.fluidAmount(0.1f))
+            .voltage(Voltage.LV)
+            .workTicks(80)
+            .build()
+            .recipe(DATA_GEN, button)
+            .outputItem(button, 8)
+            .inputItem(pressurePlate, 1)
+            .inputFluid(WATER.fluid(), WATER.fluidAmount(0.05f))
+            .voltage(Voltage.LV)
+            .workTicks(64)
+            .build();
+
         ASSEMBLER.recipe(DATA_GEN, sign)
             .outputItem(sign, 1)
             .inputItem(planks, 1)
@@ -1002,12 +1045,18 @@ public final class Materials {
             .voltage(Voltage.ULV)
             .workTicks(64)
             .requireTech(Technologies.SOLDERING)
+            .build()
+            .recipe(DATA_GEN, pressurePlate)
+            .outputItem(pressurePlate, 1)
+            .inputItem(slab, 1)
+            .inputItem(IRON.tag("ring"), 1)
+            .inputItem(REDSTONE.tag("dust"), 1)
+            .voltage(Voltage.ULV)
+            .workTicks(128)
+            .requireTech(Technologies.SOLDERING)
             .build();
 
-        // pressure plate
-        DATA_GEN.nullRecipe(mcLoc(prefix + "_pressure_plate"))
-            .nullRecipe(mcLoc(prefix + "_button"));
-
+        // farm
         if (!nether) {
             var log = mcLoc(prefix + "_log");
             var logItem = ITEMS.getEntry(log);
