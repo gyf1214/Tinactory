@@ -441,6 +441,7 @@ public final class Machines {
             .build();
 
         ASSEMBLER.recipe(DATA_GEN, HIGH_PRESSURE_BOILER)
+            .outputItem(HIGH_PRESSURE_BOILER, 1)
             .inputItem(MACHINE_HULL.get(Voltage.MV), 1)
             .inputItem(() -> Blocks.FURNACE, 1)
             .inputItem(BRASS.tag("pipe"), 2)
@@ -496,7 +497,13 @@ public final class Machines {
             .nullRecipe(Items.RAIL)
             .nullRecipe(Items.POWERED_RAIL)
             .nullRecipe(Items.DETECTOR_RAIL)
-            .nullRecipe(Items.ACTIVATOR_RAIL);
+            .nullRecipe(Items.ACTIVATOR_RAIL)
+            .nullRecipe(Items.STONE_PRESSURE_PLATE)
+            .nullRecipe(Items.POLISHED_BLACKSTONE_PRESSURE_PLATE)
+            .nullRecipe(Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
+            .nullRecipe(Items.HEAVY_WEIGHTED_PRESSURE_PLATE)
+            .nullRecipe(Items.STONE_BUTTON)
+            .nullRecipe(Items.POLISHED_BLACKSTONE_BUTTON);
 
         TOOL_CRAFTING.recipe(DATA_GEN, Items.HOPPER)
             .result(Items.HOPPER, 1)

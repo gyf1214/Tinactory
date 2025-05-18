@@ -223,7 +223,6 @@ public class MaterialSet {
 
         private void put(String sub, ResourceLocation loc, Supplier<? extends Item> item) {
             if (items.containsKey(sub)) {
-                items.get(sub);
                 return;
             }
             var tag = newTag(sub);
@@ -233,7 +232,6 @@ public class MaterialSet {
 
         private void put(String sub, Supplier<IEntry<? extends Item>> item) {
             if (items.containsKey(sub)) {
-                items.get(sub);
                 return;
             }
             var entry = item.get();
@@ -277,10 +275,15 @@ public class MaterialSet {
             return prefix + sub + "/" + name;
         }
 
-        private void dummy(String sub) {
-            put(sub, () -> REGISTRATE.item(newId(sub), Item::new)
+        public Builder<P> dummy(String sub, Function<Item.Properties, ? extends Item> factory) {
+            put(sub, () -> REGISTRATE.item(newId(sub), factory)
                 .tint(color)
                 .register());
+            return this;
+        }
+
+        private void dummy(String sub) {
+            dummy(sub, Item::new);
         }
 
         public Builder<P> dummies(String... subs) {

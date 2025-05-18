@@ -58,6 +58,7 @@ import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.dust;
 import static org.shsts.tinactory.content.AllMaterials.fluid;
+import static org.shsts.tinactory.content.AllMaterials.fuelItem;
 import static org.shsts.tinactory.content.AllMaterials.gas;
 import static org.shsts.tinactory.content.AllMaterials.liquid;
 import static org.shsts.tinactory.content.AllMaterials.set;
@@ -187,7 +188,7 @@ public final class FirstDegrees {
         COKE = set("coke")
             .color(0xFF666666)
             .dust()
-            .dummies("gem")
+            .dummy("gem", fuelItem(3200))
             .alias("primary", "gem")
             .buildObject();
 

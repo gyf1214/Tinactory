@@ -10,7 +10,7 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_SIZE;
+import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault

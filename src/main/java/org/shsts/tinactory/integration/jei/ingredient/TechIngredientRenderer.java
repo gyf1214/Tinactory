@@ -14,7 +14,7 @@ import org.shsts.tinactory.core.util.I18n;
 
 import java.util.List;
 
-import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_SIZE;
+import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.BUTTON_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

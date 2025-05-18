@@ -32,6 +32,12 @@ public class GeneratorRecipe extends DisplayInputRecipe {
     public static Builder builder(IRecipeType<Builder> parent, ResourceLocation loc) {
         return new Builder(parent, loc) {
             @Override
+            protected void validate() {
+                assert power > 0 : loc;
+                assert workTicks > 0 : loc;
+            }
+
+            @Override
             protected ProcessingRecipe createObject() {
                 return new GeneratorRecipe(this);
             }

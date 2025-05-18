@@ -1,12 +1,15 @@
 package org.shsts.tinactory.content;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.material.Elements;
 import org.shsts.tinactory.content.material.FirstDegrees;
@@ -16,6 +19,7 @@ import org.shsts.tinactory.content.material.Ores;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -248,6 +252,15 @@ public final class AllMaterials {
 
     public static TagKey<Item> tag(String sub) {
         return MaterialSet.Builder.prefixTag(sub);
+    }
+
+    public static Function<Item.Properties, Item> fuelItem(int burnTime) {
+        return prop -> new Item(prop) {
+            @Override
+            public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
+                return burnTime;
+            }
+        };
     }
 
     public static void init() {}

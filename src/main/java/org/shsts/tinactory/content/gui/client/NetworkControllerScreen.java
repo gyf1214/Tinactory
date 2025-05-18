@@ -16,11 +16,14 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.NetworkControllerPlugin;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
+import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
+import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.client.Tab;
 import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -33,10 +36,17 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.AllItems.CABLE;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
+import static org.shsts.tinactory.content.AllMenus.RENAME;
 import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.HEIGHT;
+import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.RENAME_BASE_MARGIN;
+import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.RENAME_BASE_WIDTH;
+import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.RENAME_BASE_Y;
 import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.WIDTH;
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 import static org.shsts.tinactory.core.util.ClientUtil.INTEGER_FORMAT;
@@ -53,7 +63,8 @@ public class NetworkControllerScreen extends MenuScreen {
     private final EditBox welcomeEdit;
     private final Tab tabs;
     private final Label stateLabel;
-    public final TechPanel techPanel;
+    private final TechPanel techPanel;
+    private final EditBox renameEdit;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
     private final NetworkControllerPlugin plugin;
 
@@ -96,13 +107,31 @@ public class NetworkControllerScreen extends MenuScreen {
 
         this.techPanel = new TechPanel(this);
 
+        var renamePanel = new RenamePanel();
+        for (var slot : menu.getMenu().slots) {
+            int x = slot.x - 1 - MARGIN_X;
+            int y = slot.y - 1 - MARGIN_TOP;
+            var slotBg = new StaticWidget(menu, Texture.SLOT_BACKGROUND);
+            renamePanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
+        }
+        var rect = new Rect(RENAME_BASE_MARGIN, RENAME_BASE_Y, RENAME_BASE_WIDTH, 0);
+        this.renameEdit = Widgets.editBox();
+        renameEdit.setResponder(name -> menu.triggerEvent(RENAME, () -> new RenameEventPacket(name)));
+        renamePanel.addWidget(rect.enlarge(0, FONT_HEIGHT), new Label(menu, tr("rename")));
+        renamePanel.addVanillaWidget(rect.offset(0, FONT_HEIGHT + MARGIN_VERTICAL)
+            .enlarge(0, EDIT_BOX_LINE_HEIGHT), renameEdit);
+        renamePanel.addWidget(rect.offset(34, FONT_HEIGHT + EDIT_BOX_LINE_HEIGHT + MARGIN_VERTICAL * 2 + 1)
+                .enlarge(-RENAME_BASE_WIDTH + Texture.CRAFTING_ARROW.width(), Texture.CRAFTING_ARROW.height()),
+            new StaticWidget(menu, Texture.CRAFTING_ARROW));
+
         this.tabs = new Tab(this, statePanel, CABLE.get(Voltage.LV),
             techPanel, RESEARCH_EQUIPMENT.get(Voltage.LV),
-            new RenamePanel(), Items.NAME_TAG);
+            renamePanel, Items.NAME_TAG);
 
         rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
         rootPanel.addPanel(statePanel);
         rootPanel.addPanel(techPanel);
+        rootPanel.addPanel(renamePanel);
         rootPanel.addPanel(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
 
         menu.onSyncPacket("info", this::refresh);
@@ -112,6 +141,10 @@ public class NetworkControllerScreen extends MenuScreen {
 
         this.contentWidth = WIDTH;
         this.contentHeight = HEIGHT;
+    }
+
+    public void refreshName(String name) {
+        renameEdit.setValue(name);
     }
 
     @Override

@@ -86,6 +86,12 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
 
         @Override
+        protected void validate() {
+            assert power > 0 : loc;
+            assert workTicks > 0 : loc;
+        }
+
+        @Override
         protected ResearchRecipe createObject() {
             return new ResearchRecipe(this);
         }

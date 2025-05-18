@@ -307,6 +307,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         protected void validate() {
             assert power > 0 : loc;
             assert workTicks > 0 : loc;
+            assert !outputs.isEmpty() : loc;
         }
 
         @Override

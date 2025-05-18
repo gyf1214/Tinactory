@@ -137,6 +137,7 @@ import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
+import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.AUTOFARM;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CENTRIFUGE;
@@ -273,6 +274,16 @@ public final class Materials {
             .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.1f))
             .workTicks(64)
             .voltage(Voltage.LV)
+            .build();
+
+        // nameplate
+        ASSEMBLER.recipe(DATA_GEN, Items.NAME_TAG)
+            .outputItem(() -> Items.NAME_TAG, 1)
+            .inputItem(IRON.tag("plate"), 1)
+            .inputItem(TOOL_HANDLE, 1)
+            .voltage(Voltage.LV)
+            .workTicks(64)
+            .requireTech(Technologies.SOLDERING)
             .build();
     }
 
@@ -978,6 +989,22 @@ public final class Materials {
                 .requires(logsTag)
                 .group("planks")
                 .unlockedBy("has_logs", has(logsTag)));
+
+        // signs
+        var sign = ITEMS.getEntry(mcLoc(prefix + "_sign"));
+        DATA_GEN.nullRecipe(sign.loc());
+        ASSEMBLER.recipe(DATA_GEN, sign)
+            .outputItem(sign, 1)
+            .inputItem(planks, 1)
+            .inputItem(TOOL_HANDLE, 1)
+            .voltage(Voltage.ULV)
+            .workTicks(64)
+            .requireTech(Technologies.SOLDERING)
+            .build();
+
+        // pressure plate
+        DATA_GEN.nullRecipe(mcLoc(prefix + "_pressure_plate"))
+            .nullRecipe(mcLoc(prefix + "_button"));
 
         if (!nether) {
             var log = mcLoc(prefix + "_log");
