@@ -121,6 +121,7 @@ import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_SULFATE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
@@ -420,6 +421,7 @@ public final class Materials {
             .material(POTASSIUM_CARBONATE, DULL).build()
             .material(CALCIUM_CARBONATE, DULL).build()
             .material(LITHIUM_CARBONATE, DULL).build()
+            .material(SODIUM_SULFATE, DULL).build()
             .material(POTASSIUM_NITRATE, FINE).build()
             .material(SODIUM_HYDROXIDE, DULL).build()
             .material(CALCIUM_HYDROXIDE, DULL).build()

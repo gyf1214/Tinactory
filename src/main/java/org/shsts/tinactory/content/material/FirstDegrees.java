@@ -48,6 +48,7 @@ import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM_SULFATE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
@@ -149,6 +150,7 @@ public final class FirstDegrees {
         POTASSIUM_CARBONATE = dust("potassium_carbonate", 0xFF784137);
         CALCIUM_CARBONATE = dust("calcium_carbonate", 0xFFFAE6DC);
         LITHIUM_CARBONATE = dust("lithium_carbonate", 0xFFBEBEDA);
+        SODIUM_SULFATE = dust("sodium_sulfate", 0xFF004455);
         POTASSIUM_NITRATE = dust("potassium_nitrate", 0xFFE6E6E6);
         SODIUM_HYDROXIDE = dust("sodium_hydroxide", 0xFF003380);
         CALCIUM_HYDROXIDE = dust("calcium_hydroxide", 0xFFF0F0F0);
