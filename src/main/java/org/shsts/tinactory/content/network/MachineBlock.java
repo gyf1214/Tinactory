@@ -41,14 +41,12 @@ public class MachineBlock extends SmartEntityBlock
     public static final BooleanProperty WORKING = BooleanProperty.create("working");
 
     public final Voltage voltage;
-    protected final double resistance;
 
     public MachineBlock(Properties properties,
         Supplier<IBlockEntityType> entityType,
         @Nullable IMenuType menu, Voltage voltage) {
         super(properties.strength(2f, 6f).requiresCorrectToolForDrops(), entityType, menu);
         this.voltage = voltage;
-        this.resistance = listConfig(CONFIG.machineResistanceFactor, voltage.rank - 1);
     }
 
     public static Factory<MachineBlock> factory(Voltage voltage) {
@@ -121,7 +119,8 @@ public class MachineBlock extends SmartEntityBlock
 
     @Override
     public double getResistance(BlockState state) {
-        return resistance;
+        return voltage == Voltage.PRIMITIVE ? 0 :
+            listConfig(CONFIG.machineResistanceFactor, voltage.rank - 1);
     }
 
     @Override

@@ -24,15 +24,15 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CellItem extends CapabilityItem {
-    private final int capacity;
+    private final int capacityFactor;
 
-    public CellItem(Properties properties, int capacity) {
+    public CellItem(Properties properties, int capacityFactor) {
         super(properties);
-        this.capacity = capacity;
+        this.capacityFactor = capacityFactor;
     }
 
     public static Function<Properties, CellItem> factory(int capacityFactor) {
-        return prop -> new CellItem(prop, capacityFactor * CONFIG.baseFluidCellSize.get());
+        return prop -> new CellItem(prop, capacityFactor);
     }
 
     private static FluidStack getFluid(ItemStack item) {
@@ -55,12 +55,16 @@ public class CellItem extends CapabilityItem {
         }
     }
 
+    private int capacity() {
+        return capacityFactor * CONFIG.baseFluidCellSize.get();
+    }
+
     @Override
     public void appendHoverText(ItemStack item, @Nullable Level world,
         List<Component> components, TooltipFlag flag) {
         var fluid = getFluid(item);
         var amount = I18n.tr("tinactory.tooltip.fluidCell",
-            ClientUtil.fluidAmount(fluid), ClientUtil.fluidAmount(capacity));
+            ClientUtil.fluidAmount(fluid), ClientUtil.fluidAmount(capacity()));
         components.add(ClientUtil.fluidName(fluid).withStyle(ChatFormatting.GRAY));
         components.add(amount.withStyle(ChatFormatting.GRAY));
     }
@@ -68,6 +72,6 @@ public class CellItem extends CapabilityItem {
     @Override
     public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
         event.addCapability(modLoc("fluid_cell"),
-            new FluidHandlerItemStack(event.getObject(), capacity));
+            new FluidHandlerItemStack(event.getObject(), capacity()));
     }
 }

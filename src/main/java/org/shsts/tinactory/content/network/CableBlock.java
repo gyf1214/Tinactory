@@ -59,7 +59,6 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     private final int radius;
     public final Voltage voltage;
-    private final double resistance;
     private final Map<BlockState, VoxelShape> shapes;
     public final MaterialSet material;
 
@@ -67,7 +66,6 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         super(properties.strength(2f).requiresCorrectToolForDrops());
         this.radius = radius;
         this.voltage = voltage;
-        this.resistance = listConfig(CONFIG.cableResistanceFactor, voltage.rank - 1);
         this.shapes = makeShapes();
         this.material = mat;
 
@@ -203,7 +201,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     @Override
     public double getResistance(BlockState state) {
-        return resistance;
+        return listConfig(CONFIG.cableResistanceFactor, voltage.rank - 1);
     }
 
     @Override

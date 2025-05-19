@@ -43,7 +43,7 @@ public final class TinactoryConfig {
         tankSize = builder.comment("Size of the electric tank")
             .defineInRange("tank_size", 256000, 1, Integer.MAX_VALUE);
 
-        Predicate<Object> validator = i -> (int) i > 0;
+        Predicate<Object> validator = i -> ((Number) i).doubleValue() > 0d;
         workerSize = builder.comment("Worker sizes for logistics component")
             .defineList("worker_size", List.of(8, 8, 16, 16, 32), validator);
         workerDelay = builder.comment("Worker delays for logistics component")
@@ -58,9 +58,9 @@ public final class TinactoryConfig {
         primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
             .defineInRange("primitive_work_speed", 0.25, 0d, 1d);
         machineResistanceFactor = builder.comment("Machine resistance factor")
-            .defineList("machine_resistance_factor", List.of(0.01d, 0.02d, 0.02d, 0.04d, 0.04d, 0.08d), validator);
+            .defineList("machine_resistance_factor", List.of(0.05d, 0.1d, 0.1d, 0.2d, 0.2d, 0.4d), validator);
         cableResistanceFactor = builder.comment("Cable resistance factor")
-            .defineList("cable_resistance_factor", List.of(0.01d), validator);
+            .defineList("cable_resistance_factor", List.of(0.05d), validator);
         workFactorExponent = builder.comment("Work factor exponent")
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
         blastFurnaceTempFactor = builder.comment("Temperature factor for blast furnace")

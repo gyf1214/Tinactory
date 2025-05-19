@@ -49,6 +49,8 @@ public class Tinactory {
     private final IEventBus modEventBus;
 
     public Tinactory() {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
+
         this.modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::onConstructEvent);
     }
@@ -63,8 +65,6 @@ public class Tinactory {
             CORE = ITinyCoreLib.get();
             CHANNEL = CORE.createChannel(modLoc("channel"), "1");
             REGISTRATE = CORE.registrate(ID).setDefaultChannel(CHANNEL);
-
-            ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
 
             AllRegistries.init();
 

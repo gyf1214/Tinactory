@@ -30,13 +30,11 @@ import static org.shsts.tinactory.content.network.MachineBlock.IO_FACING;
 public class SubnetBlock extends Block implements IWrenchable, IConnector, IElectricBlock {
     public final Voltage voltage;
     private final Voltage subVoltage;
-    private final double resistance;
 
     public SubnetBlock(Properties properties, Voltage voltage, Voltage subVoltage) {
         super(properties.strength(2f, 6f).requiresCorrectToolForDrops());
         this.voltage = voltage;
         this.subVoltage = subVoltage;
-        this.resistance = listConfig(CONFIG.machineResistanceFactor, voltage.rank - 1);
 
         registerDefaultState(stateDefinition.any().setValue(IO_FACING, Direction.NORTH));
     }
@@ -79,7 +77,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
 
     @Override
     public double getResistance(BlockState state) {
-        return resistance;
+        return listConfig(CONFIG.machineResistanceFactor, voltage.rank - 1);
     }
 
     @Override
