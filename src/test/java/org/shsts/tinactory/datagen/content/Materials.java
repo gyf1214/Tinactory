@@ -1015,7 +1015,7 @@ public final class Materials {
             .define('#', pressurePlate)
             .toolTag(TOOL_SAW)
             .build();
- 
+
         CUTTER.recipe(DATA_GEN, planks)
             .outputItem(planks, 6)
             .inputItem(logsTag, 1)
