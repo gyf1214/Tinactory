@@ -14,7 +14,6 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.content.logistics.ItemSlotHandler;
 import org.shsts.tinactory.core.gui.Layout;
@@ -28,6 +27,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 
 @ParametersAreNonnullByDefault
@@ -90,7 +90,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     public ElectricChest(BlockEntity blockEntity, Layout layout) {
         super(blockEntity, layout);
         this.size = layout.slots.size() / 2;
-        this.capacity = TinactoryConfig.INSTANCE.chestSize.get();
+        this.capacity = CONFIG.chestSize.get();
 
         var inner = new ItemSlotHandler(size, capacity);
         this.internalItems = new WrapperItemHandler(inner);

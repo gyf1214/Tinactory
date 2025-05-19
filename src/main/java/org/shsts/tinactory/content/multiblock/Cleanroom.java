@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllLayouts;
@@ -31,6 +30,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 
@@ -85,7 +85,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     public double getPowerCons() {
-        return TinactoryConfig.INSTANCE.cleanroomAmperage.get() * getVoltage() * Math.sqrt(size);
+        return CONFIG.cleanroomAmperage.get() * getVoltage() * Math.sqrt(size);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return;
         }
         var workFactor = partial * Math.sqrt((double) voltage / (double) Voltage.ULV.value);
-        var clean = workFactor * TinactoryConfig.INSTANCE.cleanroomBaseClean.get() / Math.max(1d, h - 1);
+        var clean = workFactor * CONFIG.cleanroomBaseClean.get() / Math.max(1d, h - 1);
 
         cleanness = Math.min(1d, cleanness + clean - cleanness * clean);
     }
@@ -132,8 +132,8 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     @Override
     protected void onServerTick() {
         super.onServerTick();
-        var decay = isOpen() ? TinactoryConfig.INSTANCE.cleanroomOpenDecay.get() :
-            TinactoryConfig.INSTANCE.cleanroomBaseDecay.get();
+        var decay = isOpen() ? CONFIG.cleanroomOpenDecay.get() :
+            CONFIG.cleanroomBaseDecay.get();
         cleanness = cleanness * (1d - decay);
 
         blockEntity.setChanged();

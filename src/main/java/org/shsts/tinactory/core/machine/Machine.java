@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -43,6 +42,7 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -263,7 +263,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         var workFactor = network
             .getComponent(ELECTRIC_COMPONENT.get())
             .getWorkFactor();
-        var machineSpeed = MathUtil.safePow(workFactor, TinactoryConfig.INSTANCE.workFactorExponent.get());
+        var machineSpeed = MathUtil.safePow(workFactor, CONFIG.workFactorExponent.get());
         processor().ifPresent(processor -> {
             processor.onWorkTick(machineSpeed);
             updateWorkBlock(world, processor.getProgress() > 0d);

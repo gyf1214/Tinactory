@@ -6,7 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.state.BlockState;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.DoublePredicate;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_SCHEDULING;
 
 @ParametersAreNonnullByDefault
@@ -231,7 +231,7 @@ public class ElectricComponent extends NetworkComponent {
             buffer = bufferGen * bufferFactor;
         }
 
-        var workSpeed = MathUtil.safePow(workFactor, TinactoryConfig.INSTANCE.workFactorExponent.get());
+        var workSpeed = MathUtil.safePow(workFactor, CONFIG.workFactorExponent.get());
         metrics = new Metrics(workSpeed, gen, workCons, buffer);
     }
 

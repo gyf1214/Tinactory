@@ -12,7 +12,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
@@ -22,6 +21,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Arrays;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 
 @ParametersAreNonnullByDefault
@@ -40,7 +40,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     public ElectricTank(BlockEntity blockEntity, Layout layout) {
         super(blockEntity, layout);
         this.size = layout.slots.size();
-        var capacity = TinactoryConfig.INSTANCE.tankSize.get();
+        var capacity = CONFIG.tankSize.get();
         this.innerTanks = new WrapperFluidTank[size];
         this.externalTanks = new WrapperFluidTank[size];
         for (var i = 0; i < size; i++) {

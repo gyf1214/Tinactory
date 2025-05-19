@@ -12,13 +12,13 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 
 import java.util.List;
 import java.util.function.Function;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -32,8 +32,7 @@ public class CellItem extends CapabilityItem {
     }
 
     public static Function<Properties, CellItem> factory(int capacityFactor) {
-        return prop -> new CellItem(prop,
-            capacityFactor * TinactoryConfig.INSTANCE.baseFluidCellSize.get());
+        return prop -> new CellItem(prop, capacityFactor * CONFIG.baseFluidCellSize.get());
     }
 
     private static FluidStack getFluid(ItemStack item) {

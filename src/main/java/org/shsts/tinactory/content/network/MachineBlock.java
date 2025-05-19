@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -29,6 +28,9 @@ import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
+
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.TinactoryConfig.listConfig;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -46,7 +48,7 @@ public class MachineBlock extends SmartEntityBlock
         @Nullable IMenuType menu, Voltage voltage) {
         super(properties.strength(2f, 6f).requiresCorrectToolForDrops(), entityType, menu);
         this.voltage = voltage;
-        this.resistance = voltage.rank * TinactoryConfig.INSTANCE.machineResistanceFactor.get();
+        this.resistance = listConfig(CONFIG.machineResistanceFactor, voltage.rank - 1);
     }
 
     public static Factory<MachineBlock> factory(Voltage voltage) {

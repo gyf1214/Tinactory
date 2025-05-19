@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.core.common.WeakMap;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.slf4j.Logger;
@@ -18,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -211,8 +212,8 @@ public class NetworkBase {
     }
 
     private void doConnect() {
-        var connectDelay = TinactoryConfig.INSTANCE.networkConnectDelay.get();
-        var maxConnects = TinactoryConfig.INSTANCE.networkMaxConnectsPerTick.get();
+        var connectDelay = CONFIG.networkConnectDelay.get();
+        var maxConnects = CONFIG.networkMaxConnectsPerTick.get();
         if (delayTicks < connectDelay) {
             delayTicks++;
             return;

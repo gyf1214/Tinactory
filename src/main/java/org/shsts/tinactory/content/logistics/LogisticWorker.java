@@ -10,7 +10,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
@@ -32,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.TinactoryConfig.listConfig;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
@@ -63,10 +64,10 @@ public class LogisticWorker extends CapabilityProvider
         this.blockEntity = blockEntity;
         this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
         var idx = voltage.rank - 1;
-        this.workerSlots = TinactoryConfig.INSTANCE.workerSize.get().get(idx);
-        this.workerInterval = TinactoryConfig.INSTANCE.workerDelay.get().get(idx);
-        this.workerStack = TinactoryConfig.INSTANCE.workerStack.get().get(idx);
-        this.workerFluidStack = TinactoryConfig.INSTANCE.workerFluidStack.get().get(idx);
+        this.workerSlots = listConfig(CONFIG.workerSize, idx);
+        this.workerInterval = listConfig(CONFIG.workerDelay, idx);
+        this.workerStack = listConfig(CONFIG.workerStack, idx);
+        this.workerFluidStack = listConfig(CONFIG.workerFluidStack, idx);
 
         var electric = new Electric();
         this.electricCap = LazyOptional.of(() -> electric);

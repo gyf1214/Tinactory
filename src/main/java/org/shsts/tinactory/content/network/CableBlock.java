@@ -23,7 +23,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -38,6 +37,9 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.TinactoryConfig.listConfig;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -65,7 +67,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         super(properties.strength(2f).requiresCorrectToolForDrops());
         this.radius = radius;
         this.voltage = voltage;
-        this.resistance = TinactoryConfig.INSTANCE.cableResistanceFactor.get();
+        this.resistance = listConfig(CONFIG.cableResistanceFactor, voltage.rank - 1);
         this.shapes = makeShapes();
         this.material = mat;
 

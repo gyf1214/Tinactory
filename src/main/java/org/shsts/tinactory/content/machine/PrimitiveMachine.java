@@ -12,7 +12,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -31,6 +30,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
@@ -57,7 +57,7 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
     }
 
     private void onServerTick(Level world) {
-        var workSpeed = TinactoryConfig.INSTANCE.primitiveWorkSpeed.get();
+        var workSpeed = CONFIG.primitiveWorkSpeed.get();
         var processor = PROCESSOR.get(blockEntity);
         processor.onPreWork();
         processor.onWorkTick(workSpeed);

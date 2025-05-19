@@ -12,7 +12,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
@@ -22,6 +21,8 @@ import org.shsts.tinactory.core.network.NetworkManager;
 
 import java.util.function.Function;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.TinactoryConfig.listConfig;
 import static org.shsts.tinactory.content.network.MachineBlock.IO_FACING;
 
 @ParametersAreNonnullByDefault
@@ -35,8 +36,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
         super(properties.strength(2f, 6f).requiresCorrectToolForDrops());
         this.voltage = voltage;
         this.subVoltage = subVoltage;
-        this.resistance = voltage.rank *
-            TinactoryConfig.INSTANCE.machineResistanceFactor.get();
+        this.resistance = listConfig(CONFIG.machineResistanceFactor, voltage.rank - 1);
 
         registerDefaultState(stateDefinition.any().setValue(IO_FACING, Direction.NORTH));
     }

@@ -7,7 +7,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.common.WeakMap;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -17,6 +16,7 @@ import org.slf4j.Logger;
 import java.util.Collection;
 import java.util.Optional;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
@@ -61,7 +61,7 @@ public abstract class MultiblockBase extends UpdatableCapabilityProvider
             LOGGER.debug("{} invalidate", this);
             ref.invalidate();
             ref = null;
-            checkTick = TinactoryConfig.INSTANCE.multiblockCheckCycle.get();
+            checkTick = CONFIG.multiblockCheckCycle.get();
             onInvalidate();
         }
     }
@@ -89,7 +89,7 @@ public abstract class MultiblockBase extends UpdatableCapabilityProvider
                 manager.register(this, blocks);
                 onRegister();
             });
-            checkTick = TinactoryConfig.INSTANCE.multiblockCheckCycle.get();
+            checkTick = CONFIG.multiblockCheckCycle.get();
         }
     }
 

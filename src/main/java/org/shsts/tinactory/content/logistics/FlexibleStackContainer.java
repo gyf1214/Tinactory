@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
@@ -73,7 +73,7 @@ public class FlexibleStackContainer extends CapabilityProvider
 
         this.internalFluids = new WrapperFluidTank[maxFluidSlots];
         this.externalFluids = new WrapperFluidTank[maxFluidSlots];
-        var fluidSize = TinactoryConfig.INSTANCE.fluidSlotSize.get();
+        var fluidSize = CONFIG.fluidSlotSize.get();
         for (var i = 0; i < maxFluidSlots; i++) {
             internalFluids[i] = new WrapperFluidTank(fluidSize);
             internalFluids[i].onUpdate(this::onUpdate);

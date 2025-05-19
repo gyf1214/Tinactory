@@ -3,10 +3,11 @@ package org.shsts.tinactory.content.multiblock;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -33,7 +34,7 @@ public abstract class CoilProcessor<R extends ProcessingRecipe> extends Multiblo
         super.calculateFactors(recipe);
         var temp = getTemperature();
         var factor = Math.max(1d, (temp - getRecipeTemperature(recipe)) /
-            TinactoryConfig.INSTANCE.blastFurnaceTempFactor.get());
+            CONFIG.blastFurnaceTempFactor.get());
         energyFactor /= factor;
     }
 }

@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -34,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
@@ -117,7 +117,7 @@ public class StackProcessingContainer extends CapabilityProvider
                 var externalFluids = new WrapperFluidTank[slots];
 
                 for (var i = 0; i < slots; i++) {
-                    internalFluids[i] = new WrapperFluidTank(TinactoryConfig.INSTANCE.fluidSlotSize.get());
+                    internalFluids[i] = new WrapperFluidTank(CONFIG.fluidSlotSize.get());
                     internalFluids[i].onUpdate(this::onUpdate);
 
                     if (type.direction == PortDirection.INPUT) {
