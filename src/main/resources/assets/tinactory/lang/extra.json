@@ -104,5 +104,18 @@
   "tinactory.technology.robot_arm.details": "A versatile, programmable mechanical arm designed for precise movements, ideal for tasks such as assembly, welding, and material handling in high-efficiency production lines.",
   "tinactory.technology.kanthal.details": "A high-resistance metal alloy known for its durability and ability to withstand extreme temperatures, commonly used in heating elements and industrial furnaces for efficient, long-lasting performance.",
   "tinactory.technology.sifting.details": "A filtration process that separates materials based on particle size, essential for refining raw resources and ensuring quality in production by isolating unwanted elements.",
+  "tinactory.technology.autofarm.details": "A fully automated agricultural system that plants, harvests, and processes crops with minimal human input, maximizing food production and resource efficiency across your settlement.",
+  "tinactory.technology.chemistry.details": "The scientific foundation for creating new materials and compounds, enabling advanced manufacturing, fuel production, and the development of powerful industrial processes.",
+  "tinactory.technology.cleanroom.details": "A controlled environment with minimal contaminants, essential for producing high-precision components like microchips and pharmaceuticals where even microscopic particles can compromise quality.",
+  "tinactory.technology.cold_working.details": "A metal-forming process performed at room temperature, increasing material strength through deformation while maintaining precision and a smooth surface finish.",
+  "tinactory.technology.cpu.details": "The central processing unit that serves as the brain of automated systems, executing commands and managing complex operations with speed and precision.",
+  "tinactory.technology.distillation.details": "A separation process that uses heat to isolate and purify liquids based on boiling points, essential for refining fuels, chemicals, and other valuable resources.",
+  "tinactory.technology.electrolyzing.details": "A process that uses electric current to break down compounds into their elemental components, crucial for extracting pure materials like hydrogen, oxygen, and metals in advanced production chains.",
+  "tinactory.technology.nichrome.details": "A durable, high-resistance alloy commonly used in heating elements, valued for its ability to withstand high temperatures and maintain performance over prolonged use.",
+  "tinactory.technology.oil_processing.details": "The refinement of crude oil into usable products like fuel, lubricants, and chemicals, forming a critical backbone for powering machinery and producing advanced materials.",
+  "tinactory.technology.organic_chemistry.details": "The study and manipulation of carbon-based compounds, enabling the creation of plastics, pharmaceuticals, fuels, and other essential materials in advanced manufacturing and research.",
+  "tinactory.technology.pyrolyse_oven.details": "A high-temperature chamber that thermally decomposes organic materials in the absence of oxygen, used to recycle waste and produce valuable byproducts like creosote oil.",
+  "tinactory.technology.soldering.details": "A technique that joins metal components by melting a filler metal, creating strong electrical and mechanical connections essential for assembling electronic circuits and devices.",
+  "tinactory.technology.vacuum_freezer.details": "A specialized cooling system that removes air to lower pressure, allowing materials to freeze quickly at lower temperatures and preserving delicate items without ice crystal formation.",
   "generator.tinactory.void": "Void"
 }
