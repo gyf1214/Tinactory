@@ -138,21 +138,21 @@ public class NetworkControllerPlugin implements IMenuPlugin<NetworkControllerScr
             .canPlayerInteract(menu.player()));
         menu.addSyncSlot("info", NetworkControllerSyncPacket::new);
         menu.onEventPacket(RENAME, p -> refreshName(p.getName(), false));
-        menu.addSlot(new RenameInputSlot(MARGIN_X + RENAME_BASE_MARGIN + 1,
+        menu.addMenuSlot(new RenameInputSlot(MARGIN_X + RENAME_BASE_MARGIN + 1,
             MARGIN_TOP + RENAME_SLOT_Y + 1));
-        menu.addSlot(new RenameResultSlot(MARGIN_X + RENAME_BASE_MARGIN + SLOT_SIZE * 4 + 1,
+        menu.addMenuSlot(new RenameResultSlot(MARGIN_X + RENAME_BASE_MARGIN + SLOT_SIZE * 4 + 1,
             MARGIN_TOP + RENAME_SLOT_Y + 1));
 
         for (var j = 0; j < 9; j++) {
             var x = MARGIN_X + RENAME_INVENTORY_MARGIN + j * SLOT_SIZE;
             var y = MARGIN_TOP + RENAME_INVENTORY_BAR_Y;
-            menu.addSlot(new RenameInventorySlot(j, x + 1, y + 1));
+            menu.addMenuSlot(new RenameInventorySlot(j, x + 1, y + 1));
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 9; j++) {
                 var x = MARGIN_X + RENAME_INVENTORY_MARGIN + j * SLOT_SIZE;
                 var y = MARGIN_TOP + RENAME_INVENTORY_Y + i * SLOT_SIZE;
-                menu.addSlot(new RenameInventorySlot(9 + i * 9 + j, x + 1, y + 1));
+                menu.addMenuSlot(new RenameInventorySlot(9 + i * 9 + j, x + 1, y + 1));
             }
         }
     }

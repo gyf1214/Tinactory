@@ -29,7 +29,7 @@ public class WorkbenchPlugin extends LayoutPlugin<WorkbenchScreen> {
             if (slot.type() == SlotType.NONE) {
                 var x = slot.x() + layout.getXOffset() + MARGIN_X + 1;
                 var y = slot.y() + MARGIN_TOP + 1;
-                menu.addSlot(new WorkbenchResult(workbench, x, y));
+                menu.addMenuSlot(new WorkbenchResult(workbench, x, y));
             }
         }
     }

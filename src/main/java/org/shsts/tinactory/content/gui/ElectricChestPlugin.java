@@ -133,7 +133,7 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
             var y = slotInfo.y() + MARGIN_TOP + 1;
 
             var slot = i < size ? new InputSlot(i, x, y) : new OutputSlot(i - size, x, y);
-            menu.addSlot(slot);
+            menu.addMenuSlot(slot);
         }
         menu.onEventPacket(CHEST_SLOT_CLICK, this::onClickSlot);
     }

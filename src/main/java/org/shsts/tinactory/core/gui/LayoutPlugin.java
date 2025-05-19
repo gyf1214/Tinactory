@@ -35,7 +35,7 @@ public abstract class LayoutPlugin<S extends MenuScreen> extends InventoryPlugin
             var x = xOffset + slot.x() + MARGIN_X + 1;
             var y = slot.y() + MARGIN_TOP + 1;
             if (slot.type().portType == PortType.ITEM) {
-                menu.addSlot(new SlotItemHandler(items, slot.index(), x, y));
+                menu.addMenuSlot(new SlotItemHandler(items, slot.index(), x, y));
             }
         }
     }
