@@ -83,7 +83,7 @@ public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlug
             var amount = stack.getCount();
             for (var i = beginInvSlot == 0 ? endInvSlot : 0; i < menu.getSlotSize();
                 i = i + 1 == beginInvSlot ? endInvSlot : i + 1) {
-                var targetSlot = menu.getSlot(i);
+                var targetSlot = menu.getMenuSlot(i);
                 if (!targetSlot.mayPlace(stack)) {
                     continue;
                 }
