@@ -146,6 +146,7 @@ import static org.shsts.tinactory.content.AllRecipes.COMBUSTION_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
 import static org.shsts.tinactory.content.AllRecipes.GAS_TURBINE;
+import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
@@ -237,6 +238,12 @@ public final class Materials {
             .define('#', ItemTags.PLANKS)
             .pattern("#").pattern("#")
             .unlockedBy("has_planks", has(ItemTags.PLANKS)));
+        LATHE.recipe(DATA_GEN, Items.STICK)
+            .inputItem(ItemTags.PLANKS, 1)
+            .outputItem(() -> Items.STICK, 1)
+            .voltage(Voltage.LV)
+            .workTicks(32)
+            .build();
 
         // rubber
         DATA_GEN.block(RUBBER_LOG)
