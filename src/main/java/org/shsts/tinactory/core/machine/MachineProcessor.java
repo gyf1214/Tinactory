@@ -81,9 +81,7 @@ public class MachineProcessor<R extends ProcessingRecipe>
 
         var recipe = manager.byLoc(recipeType, loc);
         if (recipe.isPresent()) {
-            return getMachine()
-                .filter(recipe.get()::canCraft)
-                .isPresent();
+            return true;
         }
 
         var marker = manager.byLoc(MARKER, loc);

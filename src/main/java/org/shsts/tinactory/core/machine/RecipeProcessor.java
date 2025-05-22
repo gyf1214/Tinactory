@@ -189,19 +189,19 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
 
     protected abstract void doSetTargetRecipe(Level world, ResourceLocation loc);
 
-    public void setTargetRecipe(ResourceLocation loc) {
+    private void setTargetRecipe(ResourceLocation loc) {
         var world = getWorld();
         if (!allowTargetRecipe(world, loc)) {
             resetTargetRecipe();
             return;
         }
 
-        LOGGER.debug("update target recipe = {}", loc);
+        LOGGER.debug("{}: update target recipe = {}", blockEntity, loc);
         doSetTargetRecipe(world, loc);
     }
 
-    public void resetTargetRecipe() {
-        LOGGER.debug("update target recipe = <null>");
+    private void resetTargetRecipe() {
+        LOGGER.debug("{}: update target recipe = <null>", blockEntity);
         targetRecipe = null;
         getContainer().ifPresent(container -> {
             var portSize = container.portSize();

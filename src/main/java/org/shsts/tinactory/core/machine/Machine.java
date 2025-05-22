@@ -158,7 +158,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         if (network != null) {
             network.invalidate();
         }
-        LOGGER.debug("{}: removed in world", this);
+        LOGGER.debug("{}: removed in world", blockEntity);
     }
 
     protected static Optional<BlockState> getRealBlockState(Level world, BlockEntity be) {
@@ -227,7 +227,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public void onConnectToNetwork(INetwork network) {
-        LOGGER.debug("{}: connect to network {}", this, network);
+        LOGGER.debug("{}: connect to network {}", blockEntity, network);
         this.network = (Network) network;
 
         container().ifPresent(container -> {
@@ -247,7 +247,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     @Override
     public void onDisconnectFromNetwork() {
         network = null;
-        LOGGER.trace("{}: disconnect from network", this);
+        LOGGER.trace("{}: disconnect from network", blockEntity);
         var world = blockEntity.getLevel();
         assert world != null;
         updateWorkBlock(world, false);
@@ -303,6 +303,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
+        LOGGER.debug("{} deserializer machine NBT, tag={}", blockEntity, tag);
         config.deserializeNBT(tag.getCompound("config"));
         uuid = tag.getUUID("uuid");
     }
