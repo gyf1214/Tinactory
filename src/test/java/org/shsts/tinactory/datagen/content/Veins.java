@@ -2,10 +2,12 @@ package org.shsts.tinactory.datagen.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder;
 
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
+import static org.shsts.tinactory.content.AllMaterials.BLUE_TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
@@ -29,6 +31,7 @@ import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.TOPAZ;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -86,6 +89,12 @@ public final class Veins {
             .vein("gem", 0.1)
             .ore(EMERALD, 0.4)
             .ore(SAPPHIRE, 0.7)
+            .build()
+            .vein("gold", 0.2)
+            .variant(OreVariant.NETHERRACK)
+            .ore(GOLD, 0.5)
+            .ore(TOPAZ, 0.3)
+            .ore(BLUE_TOPAZ, 0.3)
             .build();
     }
 

@@ -45,14 +45,18 @@ public class VeinBuilder<P> extends Builder<Unit, P, VeinBuilder<P>> {
         return builder.onBuild(builder::onRegister);
     }
 
+    public VeinBuilder<P> variant(OreVariant val) {
+        variant = val;
+        builder.inputItem(() -> variant.baseItem, 1);
+        return this;
+    }
+
     public VeinBuilder<P> ore(MaterialSet material, double rate) {
         builder.outputItem(material.entry("raw"), 1, rate);
         ores.add(material);
         if (variant == null) {
-            variant = material.oreVariant();
-            builder.inputItem(() -> variant.baseItem, 1);
+            variant(material.oreVariant());
         }
-        assert variant == material.oreVariant();
         return this;
     }
 

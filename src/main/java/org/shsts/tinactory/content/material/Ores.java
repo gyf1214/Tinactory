@@ -7,6 +7,7 @@ import net.minecraftforge.common.Tags;
 
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
+import static org.shsts.tinactory.content.AllMaterials.BLUE_TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.CASSITERITE;
 import static org.shsts.tinactory.content.AllMaterials.CHALCOPYRITE;
 import static org.shsts.tinactory.content.AllMaterials.CINNABAR;
@@ -27,6 +28,7 @@ import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SPHALERITE;
+import static org.shsts.tinactory.content.AllMaterials.TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.set;
 
 @ParametersAreNonnullByDefault
@@ -152,6 +154,18 @@ public final class Ores {
             .color(0xFF6464C8)
             .gem()
             .ore(OreVariant.DEEPSLATE)
+            .buildObject();
+
+        TOPAZ = set("topaz")
+            .color(0xFFFF8000)
+            .gem()
+            .ore(OreVariant.NETHERRACK)
+            .buildObject();
+
+        BLUE_TOPAZ = set("blue_topaz")
+            .color(0xFF7B96DC)
+            .gem()
+            .ore(OreVariant.NETHERRACK)
             .buildObject();
     }
 

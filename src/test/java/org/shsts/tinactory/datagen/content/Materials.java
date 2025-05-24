@@ -31,6 +31,7 @@ import static org.shsts.tinactory.content.AllItems.RUBBER_LOG;
 import static org.shsts.tinactory.content.AllItems.RUBBER_SAPLING;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
+import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM_OXIDE;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
@@ -39,6 +40,7 @@ import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.BERYLLIUM;
 import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
+import static org.shsts.tinactory.content.AllMaterials.BLUE_TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
@@ -103,6 +105,7 @@ import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
 import static org.shsts.tinactory.content.AllMaterials.PROPANE;
+import static org.shsts.tinactory.content.AllMaterials.PTFE;
 import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.PYRITE;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
@@ -132,6 +135,7 @@ import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
@@ -172,6 +176,7 @@ import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.FINE;
+import static org.shsts.tinactory.datagen.content.model.IconSet.GEM_HORIZONTAL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.GEM_VERTICAL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.LIGNITE;
 import static org.shsts.tinactory.datagen.content.model.IconSet.METALLIC;
@@ -453,7 +458,8 @@ public final class Materials {
             .machineProcess(Voltage.MV, 1.25d)
             .blast(Voltage.HV, 2700, 880, NITROGEN, 1f)
             .mix(Voltage.MV, NICKEL, 4, CHROME, 1)
-            .build();
+            .build()
+            .material(ALUMINIUM_OXIDE, FINE).build();
     }
 
     private static void higherDegrees() {
@@ -479,6 +485,9 @@ public final class Materials {
             .material(VANADIUM_STEEL, METALLIC)
             .machineProcess(Voltage.MV, 1.5d)
             .blast(Voltage.MV, 2500, 1280, NITROGEN, 1)
+            .build()
+            .material(PTFE, DULL)
+            .machineProcess(Voltage.LV, 0.75d)
             .build();
     }
 
@@ -568,8 +577,15 @@ public final class Materials {
             .material(SAPPHIRE, GEM_VERTICAL)
             .oreBuilder(ALUMINIUM, RUTILE, RUTILE).siftAndHammer().build()
             .machineProcess(Voltage.LV, 2d)
+            .build()
+            .material(TOPAZ, GEM_HORIZONTAL)
+            .oreBuilder(BLUE_TOPAZ, ALUMINIUM, BLUE_TOPAZ).build()
+            .build()
+            .material(BLUE_TOPAZ, GEM_HORIZONTAL)
+            .oreBuilder(TOPAZ, ALUMINIUM, TOPAZ).build()
             .build();
 
+        // blast ores
         BLAST_FURNACE.recipe(DATA_GEN, CHALCOPYRITE.loc("dust"))
             .inputItem(CHALCOPYRITE.tag("dust"), 2)
             .inputFluid(OXYGEN.fluid(), OXYGEN.fluidAmount(9f))

@@ -29,6 +29,7 @@ public final class AllLayouts {
     public static final Layout CLEANROOM;
     public static final Layout AUTOFARM;
     public static final Layout PYROLYSE_OVEN;
+    public static final Layout LARGE_CHEMICAL_REACTOR;
 
     static {
         WORKBENCH = Layout.builder()
@@ -111,6 +112,18 @@ public final class AllLayouts {
             .port(FLUID_OUTPUT)
             .slot(5 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
             .progressBar(Texture.PROGRESS_EXTRACT, 8 + 2 * SLOT_SIZE, SLOT_SIZE / 2)
+            .buildLayout();
+
+        LARGE_CHEMICAL_REACTOR = Layout.builder()
+            .port(ITEM_INPUT)
+            .slots(0, 1, 1, 3)
+            .port(FLUID_INPUT)
+            .slots(SLOT_SIZE, 1 + SLOT_SIZE, 2, 2)
+            .port(ITEM_OUTPUT)
+            .slots(SLOT_SIZE * 5, 1, 1, 3)
+            .port(FLUID_OUTPUT)
+            .slots(SLOT_SIZE * 5, 1 + SLOT_SIZE, 2, 2)
+            .progressBar(Texture.PROGRESS_MIXER, 8 + SLOT_SIZE * 3, SLOT_SIZE)
             .buildLayout();
     }
 

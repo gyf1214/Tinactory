@@ -12,6 +12,7 @@ import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LPG;
 import static org.shsts.tinactory.content.AllMaterials.NAPHTHA;
 import static org.shsts.tinactory.content.AllMaterials.PE;
+import static org.shsts.tinactory.content.AllMaterials.PTFE;
 import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
@@ -110,6 +111,12 @@ public final class HigherDegrees {
             .color(0xFFC0C0C0)
             .hot().gear()
             .toolSet(1200, Tiers.DIAMOND)
+            .buildObject();
+
+        PTFE = set("ptfe")
+            .color(0xFF646464)
+            .polymer()
+            .dummies("pipe")
             .buildObject();
     }
 

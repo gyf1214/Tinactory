@@ -75,9 +75,10 @@ public class JEI implements IModPlugin {
 
         this.toolCategory = new ToolCategory();
         for (var set : AllBlockEntities.getProcessingSets()) {
-            var layout = set.layout(Voltage.MAXIMUM);
-            var icon = set.icon();
             var type = set.recipeType;
+            var icon = set.icon();
+            var layout = type == AllRecipes.CHEMICAL_REACTOR ? AllLayouts.LARGE_CHEMICAL_REACTOR :
+                set.layout(Voltage.MAXIMUM);
 
             if (type == AllRecipes.RESEARCH_BENCH) {
                 addProcessingCategory(cast(type), new ResearchCategory(layout, icon));

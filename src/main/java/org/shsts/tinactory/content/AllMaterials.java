@@ -108,6 +108,10 @@ public final class AllMaterials {
     public static MaterialSet CHARCOAL;
     public static MaterialSet SILICON_DIOXIDE;
     public static MaterialSet NICHROME;
+    public static MaterialSet ALUMINIUM_OXIDE;
+    public static MaterialSet HYDROGEN_FLUORIDE;
+    public static MaterialSet CHLOROFORM;
+    public static MaterialSet TETRA_FLUORO_ETHYLENE;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;
@@ -125,6 +129,7 @@ public final class AllMaterials {
     public static MaterialSet DIESEL;
     public static MaterialSet CREOSOTE_OIL;
     public static MaterialSet VANADIUM_STEEL;
+    public static MaterialSet PTFE;
 
     // Ore
     public static MaterialSet CHALCOPYRITE;
@@ -149,6 +154,8 @@ public final class AllMaterials {
     public static MaterialSet HEAVY_OIL;
     public static MaterialSet EMERALD;
     public static MaterialSet SAPPHIRE;
+    public static MaterialSet TOPAZ;
+    public static MaterialSet BLUE_TOPAZ;
 
     // misc
     public static MaterialSet TEST;
