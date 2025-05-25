@@ -158,6 +158,8 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         protected int defaultInputFluid = -1;
         protected int defaultOutputItem = -1;
         protected int defaultOutputFluid = -1;
+        protected List<Input> resolvedInputs = null;
+        protected List<Output> resolvedOutputs = null;
 
         protected BuilderBase(IRecipeType<S> parent, ResourceLocation loc) {
             super(parent, loc);
@@ -297,11 +299,17 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
 
         protected List<Input> getInputs() {
-            return inputs.stream().map(Supplier::get).toList();
+            if (resolvedInputs == null) {
+                resolvedInputs = inputs.stream().map(Supplier::get).toList();
+            }
+            return resolvedInputs;
         }
 
         protected List<Output> getOutputs() {
-            return outputs.stream().map(Supplier::get).toList();
+            if (resolvedOutputs == null) {
+                resolvedOutputs = outputs.stream().map(Supplier::get).toList();
+            }
+            return resolvedOutputs;
         }
 
         protected void validate() {

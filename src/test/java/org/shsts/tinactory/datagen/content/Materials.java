@@ -44,6 +44,7 @@ import static org.shsts.tinactory.content.AllMaterials.BLUE_TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
@@ -86,6 +87,7 @@ import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LIMONITE;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.LPG;
@@ -101,6 +103,7 @@ import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.PE;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
@@ -121,6 +124,7 @@ import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
@@ -361,7 +365,11 @@ public final class Materials {
             .material(BERYLLIUM, METALLIC)
             .machineProcess(Voltage.LV, 0.6d)
             .smelt()
-            .build();
+            .build()
+            .material(SODIUM, METALLIC).build()
+            .material(POTASSIUM, METALLIC).build()
+            .material(CALCIUM, METALLIC).build()
+            .material(LITHIUM, DULL).build();
     }
 
     private static void firstDegrees() {
@@ -520,7 +528,7 @@ public final class Materials {
             .oreProcess(NICKEL, COPPER, NICKEL).smelt(IRON)
             .build()
             .material(GARNIERITE, METALLIC)
-            .oreProcess(MAGNESIUM, MAGNESIUM, NICKEL)
+            .oreProcess(MAGNESIUM_CHLORIDE, MAGNESIUM_CHLORIDE, NICKEL)
             .smelt(NICKEL)
             .build()
             .material(COAL, DULL)

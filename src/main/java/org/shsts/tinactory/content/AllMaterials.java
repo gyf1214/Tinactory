@@ -53,6 +53,10 @@ public final class AllMaterials {
     public static MaterialSet HYDROGEN;
     public static MaterialSet CHLORINE;
     public static MaterialSet BERYLLIUM;
+    public static MaterialSet SODIUM;
+    public static MaterialSet POTASSIUM;
+    public static MaterialSet CALCIUM;
+    public static MaterialSet LITHIUM;
 
     // First Degree
     public static MaterialSet WATER;
@@ -112,6 +116,7 @@ public final class AllMaterials {
     public static MaterialSet HYDROGEN_FLUORIDE;
     public static MaterialSet CHLOROFORM;
     public static MaterialSet TETRA_FLUORO_ETHYLENE;
+    public static MaterialSet TITANIUM_TETRACHLORIDE;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;

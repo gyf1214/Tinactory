@@ -22,6 +22,7 @@ import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.BENZENE;
 import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.BLUE_TOPAZ;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
@@ -48,7 +49,11 @@ import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM_BRINE;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CARBONATE;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.METHANE;
 import static org.shsts.tinactory.content.AllMaterials.NAPHTHA;
@@ -58,6 +63,7 @@ import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
 import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.PHENOL;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
@@ -73,6 +79,7 @@ import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
 import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
@@ -81,6 +88,7 @@ import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TETRA_FLUORO_ETHYLENE;
+import static org.shsts.tinactory.content.AllMaterials.TITANIUM_TETRACHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.TOLUENE;
 import static org.shsts.tinactory.content.AllMaterials.TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
@@ -144,7 +152,13 @@ public class Chemistry {
             .recipe(COKE, 1, 32, CARBON, 2)
             .recipe(GRAPHITE, 1, 64, CARBON, 4)
             .recipe(SILICON_DIOXIDE, 1, 480, SILICON, 1, OXYGEN, 1f)
-            .recipe(ALUMINIUM_OXIDE, 1, 96, ALUMINIUM, 1, OXYGEN, 0.75f);
+            .recipe(ALUMINIUM_OXIDE, 1, 96, ALUMINIUM, 1, OXYGEN, 0.75f)
+            .voltage(Voltage.HV)
+            .recipe(SODIUM_CHLORIDE, 1, 400, SODIUM, 1, CHLORINE, 0.5f)
+            .recipe(POTASSIUM_CHLORIDE, 1, 480, POTASSIUM, 1, CHLORINE, 0.5f)
+            .recipe(MAGNESIUM_CHLORIDE, 1, 320, MAGNESIUM, 1, CHLORINE, 1f)
+            .recipe(CALCIUM_CHLORIDE, 1, 320, CALCIUM, 1, CHLORINE, 1f)
+            .recipe(LITHIUM_CHLORIDE, 1, 400, LITHIUM, 1, CHLORINE, 0.5f);
 
         CHEMICAL_REACTOR.recipe(DATA_GEN, HYDROGEN_CHLORIDE.fluidLoc())
             .input(HYDROGEN, 0.5f)
@@ -236,15 +250,6 @@ public class Chemistry {
             .requireTech(Technologies.CHEMISTRY)
             .build()
             .recipe(DATA_GEN, SULFURIC_ACID.fluidLoc("gas"))
-            .input(HYDROGEN_SULFIDE)
-            .input(OXYGEN, 2f)
-            .output(SULFURIC_ACID, "gas", 1f)
-            .output(WATER)
-            .workTicks(320)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(SULFURIC_ACID.fluidLoc("gas"), "_from_sulfur"))
             .input(SULFUR)
             .input(OXYGEN, 1.5f)
             .output(SULFURIC_ACID, "gas", 1f)
@@ -333,6 +338,24 @@ public class Chemistry {
             .workTicks(64)
             .voltage(Voltage.MV)
             .requireTech(Technologies.CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(AMMONIA.fluidLoc(), "_from_ammonium_chloride"))
+            .input(AMMONIUM_CHLORIDE)
+            .output(AMMONIA)
+            .output(HYDROGEN_CHLORIDE)
+            .workTicks(320)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, LITHIUM_CHLORIDE.loc("dust"))
+            .input(LITHIUM_CARBONATE)
+            .input(HYDROGEN_CHLORIDE, 2f)
+            .output(LITHIUM_CHLORIDE, 2f)
+            .output(WATER)
+            .output(CARBON_DIOXIDE)
+            .workTicks(160)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.CHEMISTRY)
             .build();
 
         // HV
@@ -380,6 +403,73 @@ public class Chemistry {
             .workTicks(480)
             .voltage(Voltage.HV)
             .requireTech(Technologies.HYDROMETALLURGY)
+            .build()
+            .recipe(DATA_GEN, AMMONIA.fluidLoc())
+            .input(NITROGEN, 0.5f)
+            .input(HYDROGEN, 1.5f)
+            .input(IRON, "dust_tiny", 1f)
+            .output(AMMONIA)
+            .workTicks(512)
+            .voltage(Voltage.HV)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(SULFURIC_ACID.fluidLoc(), "_from_hydrogen_sulfide"))
+            .input(HYDROGEN_SULFIDE)
+            .input(OXYGEN, 2f)
+            .output(SULFURIC_ACID)
+            .workTicks(160)
+            .voltage(Voltage.HV)
+            .requireMultiblock()
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(SULFURIC_ACID.fluidLoc(), "_from_sulfur"))
+            .input(SULFUR)
+            .input(WATER)
+            .input(OXYGEN, 1.5f)
+            .output(SULFURIC_ACID)
+            .workTicks(240)
+            .voltage(Voltage.HV)
+            .requireMultiblock()
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(SODIUM_CARBONATE.loc("dust"), "_from_salt_water"))
+            .input(SALT_WATER, 2f)
+            .input(AMMONIA)
+            .input(CARBON_DIOXIDE)
+            .output(SODIUM_CARBONATE)
+            .output(AMMONIUM_CHLORIDE)
+            .workTicks(160)
+            .voltage(Voltage.HV)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, NITRIC_ACID.fluidLoc())
+            .input(AMMONIA)
+            .input(OXYGEN, 2f)
+            .output(NITRIC_ACID)
+            .output(WATER)
+            .workTicks(256)
+            .voltage(Voltage.HV)
+            .requireMultiblock()
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, LITHIUM_CARBONATE.loc("dust"))
+            .input(LITHIUM_BRINE, 4f)
+            .input(SODIUM_CARBONATE)
+            .output(LITHIUM_CARBONATE)
+            .output(SALT_WATER, 4f)
+            .workTicks(128)
+            .voltage(Voltage.HV)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, TITANIUM_TETRACHLORIDE.fluidLoc())
+            .input(RUTILE)
+            .input(CHLORINE, 2f)
+            .input(CARBON)
+            .output(TITANIUM_TETRACHLORIDE)
+            .output(CARBON_DIOXIDE)
+            .workTicks(320)
+            .voltage(Voltage.HV)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
             .build();
     }
 
@@ -594,7 +684,7 @@ public class Chemistry {
             .output(HYDROGEN_CHLORIDE, 3f)
             .voltage(Voltage.HV)
             .workTicks(128)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
             .build()
             .recipe(DATA_GEN, TETRA_FLUORO_ETHYLENE.fluidLoc())
             .input(CHLOROFORM, 2f)
@@ -603,7 +693,7 @@ public class Chemistry {
             .output(HYDROGEN_CHLORIDE, 6f)
             .voltage(Voltage.HV)
             .workTicks(480)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
             .build()
             .recipe(DATA_GEN, PTFE.fluidLoc())
             .input(TETRA_FLUORO_ETHYLENE, 0.144f)
@@ -611,7 +701,54 @@ public class Chemistry {
             .output(PTFE, 1.5f)
             .voltage(Voltage.HV)
             .workTicks(160)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(VINYL_CHLORIDE.fluidLoc(), "_from_lcr"))
+            .input(ETHYLENE)
+            .input(HYDROGEN_CHLORIDE)
+            .input(OXYGEN, 0.5f)
+            .output(VINYL_CHLORIDE)
+            .output(WATER)
+            .voltage(Voltage.HV)
+            .workTicks(160)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(TETRA_FLUORO_ETHYLENE.fluidLoc(), "_from_lcr"))
+            .input(METHANE, 2f)
+            .input(CHLORINE, 6f)
+            .input(HYDROGEN_FLUORIDE, 4f)
+            .output(TETRA_FLUORO_ETHYLENE)
+            .output(HYDROGEN_CHLORIDE, 12f)
+            .voltage(Voltage.HV)
+            .workTicks(320)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(PE.fluidLoc(), "_from_lcr"))
+            .input(ETHYLENE, 2.16f)
+            .input(OXYGEN, 7.5f)
+            .input(TITANIUM_TETRACHLORIDE, 0.1f)
+            .output(PE, 30f)
+            .voltage(Voltage.HV)
+            .workTicks(256)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(PVC.fluidLoc(), "_from_lcr"))
+            .input(VINYL_CHLORIDE, 2.16f)
+            .input(OXYGEN, 7.5f)
+            .input(TITANIUM_TETRACHLORIDE, 0.1f)
+            .output(PVC, 30f)
+            .voltage(Voltage.HV)
+            .workTicks(320)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, suffix(PTFE.fluidLoc(), "_from_lcr"))
+            .input(TETRA_FLUORO_ETHYLENE, 2.16f)
+            .input(OXYGEN, 7.5f)
+            .input(TITANIUM_TETRACHLORIDE, 0.1f)
+            .output(PTFE, 30f)
+            .voltage(Voltage.HV)
+            .workTicks(512)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
             .build();
     }
 

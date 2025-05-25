@@ -195,21 +195,25 @@ public final class Technologies {
             .depends(INTEGRATED_CIRCUIT)
             .register();
 
-        factory.base(CHEMISTRY).voltage(Voltage.MV);
-
-        CLEANROOM = factory.tech("cleanroom")
-            .maxProgress(40L)
-            .displayItem(AllMultiblocks.CLEANROOM)
-            .register();
+        factory.reset().voltage(Voltage.MV);
 
         NICHROME = factory.tech("nichrome")
             .maxProgress(20L)
             .displayItem(AllMultiblocks.NICHROME_COIL_BLOCK)
+            .depends(KANTHAL)
             .register();
 
         HYDROMETALLURGY = factory.tech("hydrometallurgy")
             .maxProgress(30L)
             .displayItem(AllMaterials.ALUMINIUM_OXIDE.entry("dust"))
+            .depends(CHEMISTRY)
+            .register();
+
+        factory.base(ORGANIC_CHEMISTRY);
+
+        CLEANROOM = factory.tech("cleanroom")
+            .maxProgress(40L)
+            .displayItem(AllMultiblocks.CLEANROOM)
             .register();
 
         ADVANCED_CHEMISTRY = factory.tech("advanced_chemistry")

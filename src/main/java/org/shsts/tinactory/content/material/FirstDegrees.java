@@ -57,6 +57,7 @@ import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TETRA_FLUORO_ETHYLENE;
+import static org.shsts.tinactory.content.AllMaterials.TITANIUM_TETRACHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.TOLUENE;
 import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
@@ -222,6 +223,8 @@ public final class FirstDegrees {
         HYDROGEN_FLUORIDE = gas("hydrogen_fluoride", 0xFF0088AA);
         CHLOROFORM = liquid("chloroform", 0xFF892CA0);
         TETRA_FLUORO_ETHYLENE = gas("tetra_fluoro_ethylene", 0xFF7D7D7D);
+
+        TITANIUM_TETRACHLORIDE = fluid("titanium_tetrachloride", 0xFFD40D5C, "liquid");
     }
 
     public static void init() {}

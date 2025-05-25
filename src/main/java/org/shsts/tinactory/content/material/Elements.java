@@ -12,6 +12,7 @@ import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.BERYLLIUM;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
+import static org.shsts.tinactory.content.AllMaterials.CALCIUM;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CHLORINE;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
@@ -22,13 +23,16 @@ import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LEAD;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
+import static org.shsts.tinactory.content.AllMaterials.POTASSIUM;
 import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
+import static org.shsts.tinactory.content.AllMaterials.SODIUM;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
@@ -157,6 +161,11 @@ public final class Elements {
             .color(0xFF64B464)
             .plate().molten()
             .buildObject();
+
+        SODIUM = dust("sodium", 0xFF000096);
+        POTASSIUM = dust("potassium", 0xFFBEDCFF);
+        CALCIUM = dust("calcium", 0xFFFFF5DE);
+        LITHIUM = dust("lithium", 0xFFBDC7DB);
     }
 
     public static void init() {}
