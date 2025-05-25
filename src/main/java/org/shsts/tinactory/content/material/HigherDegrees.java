@@ -113,7 +113,7 @@ public final class HigherDegrees {
             .toolSet(1200, Tiers.DIAMOND)
             .buildObject();
 
-        PTFE = set("ptfe")
+        PTFE = set("polytetrafluoro_ethylene")
             .color(0xFF646464)
             .polymer()
             .dummies("pipe")
