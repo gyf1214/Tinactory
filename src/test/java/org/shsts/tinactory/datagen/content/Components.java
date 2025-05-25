@@ -93,6 +93,7 @@ import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.NICHROME;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.PE;
+import static org.shsts.tinactory.content.AllMaterials.PTFE;
 import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
@@ -118,9 +119,11 @@ import static org.shsts.tinactory.content.AllMultiblocks.FILTER_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.GRATE_MACHINE_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
+import static org.shsts.tinactory.content.AllMultiblocks.INERT_PTFE_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.KANTHAL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiblocks.NICHROME_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiblocks.PLASCRETE;
+import static org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
@@ -322,6 +325,10 @@ public final class Components {
                 ctx.provider().models().cubeColumn(ctx.id(),
                     gregtech("blocks/casings/cleanroom/plascrete"),
                     gregtech("blocks/casings/cleanroom/filter_casing"))))
+            .tag(MINEABLE_WITH_WRENCH)
+            .build()
+            .block(PTFE_PIPE_CASING)
+            .blockState(solidBlock("casings/pipe/machine_casing_pipe_polytetrafluoroethylene"))
             .tag(MINEABLE_WITH_WRENCH)
             .build();
 
@@ -952,7 +959,7 @@ public final class Components {
             .inputItem(PE.tag("sheet"), 3)
             .workTicks(200L)
             .voltage(Voltage.MV)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .requireTech(Technologies.CLEANROOM)
             .build()
             .recipe(DATA_GEN, FILTER_CASING)
             .outputItem(FILTER_CASING, 2)
@@ -962,9 +969,26 @@ public final class Components {
             .inputItem(ITEM_FILTER, 3)
             .inputItem(PE.tag("sheet"), 3)
             .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(2))
-            .voltage(Voltage.MV)
             .workTicks(200L)
+            .voltage(Voltage.MV)
             .requireTech(Technologies.CLEANROOM)
+            .build()
+            .recipe(DATA_GEN, INERT_PTFE_CASING)
+            .outputItem(INERT_PTFE_CASING, 1)
+            .inputItem(SOLID_STEEL_CASING, 1)
+            .inputFluid(PTFE.fluid(), PTFE.fluidAmount(1.5f))
+            .workTicks(200L)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, PTFE_PIPE_CASING)
+            .outputItem(PTFE_PIPE_CASING, 1)
+            .inputItem(STEEL.tag("stick"), 2)
+            .inputItem(PTFE.tag("pipe"), 2)
+            .inputItem(PTFE.tag("sheet"), 2)
+            .workTicks(200L)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
             .build();
     }
 

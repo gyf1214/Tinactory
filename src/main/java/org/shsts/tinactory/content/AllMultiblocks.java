@@ -38,6 +38,7 @@ public final class AllMultiblocks {
     public static final IEntry<PrimitiveBlock> DISTILLATION_TOWER;
     public static final IEntry<PrimitiveBlock> PYROLYSE_OVEN;
     public static final IEntry<FixedBlock> CLEANROOM;
+    public static final IEntry<PrimitiveBlock> LARGE_CHEMICAL_REACTOR;
 
     // solid blocks
     public static final Set<IEntry<Block>> SOLID_CASINGS;
@@ -45,6 +46,7 @@ public final class AllMultiblocks {
     public static final IEntry<Block> SOLID_STEEL_CASING;
     public static final IEntry<Block> FROST_PROOF_CASING;
     public static final IEntry<Block> CLEAN_STAINLESS_CASING;
+    public static final IEntry<Block> INERT_PTFE_CASING;
     // coil blocks
     public static final Set<IEntry<CoilBlock>> COIL_BLOCKS;
     public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
@@ -56,6 +58,7 @@ public final class AllMultiblocks {
     public static final IEntry<GlassBlock> CLEAR_GLASS;
     public static final IEntry<Block> PLASCRETE;
     public static final IEntry<Block> FILTER_CASING;
+    public static final IEntry<Block> PTFE_PIPE_CASING;
 
     private static final Transformer<BlockBehaviour.Properties> CASING_PROPERTY;
 
@@ -69,6 +72,7 @@ public final class AllMultiblocks {
         SOLID_STEEL_CASING = solid("solid_steel");
         FROST_PROOF_CASING = solid("frost_proof");
         CLEAN_STAINLESS_CASING = solid("clean_stainless_steel");
+        INERT_PTFE_CASING = solid("inert_ptfe");
 
         COIL_BLOCKS = new HashSet<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
@@ -87,6 +91,7 @@ public final class AllMultiblocks {
 
         PLASCRETE = misc("plascrete");
         FILTER_CASING = misc("filter_casing");
+        PTFE_PIPE_CASING = misc("ptfe_pipe_casing");
 
         BLAST_FURNACE = multiblock("blast_furnace")
             .blockEntity()
@@ -267,6 +272,30 @@ public final class AllMultiblocks {
             .maxSize(7)
             .maxConnector(1)
             .maxDoor(2)
+            .build()
+            .build()
+            .end()
+            .buildObject();
+
+        LARGE_CHEMICAL_REACTOR = multiblock("large_chemical_reactor")
+            .blockEntity()
+            .child(Multiblock.simple(AllRecipes.CHEMICAL_REACTOR, false))
+            .layout(AllLayouts.LARGE_CHEMICAL_REACTOR)
+            .appearanceBlock(INERT_PTFE_CASING)
+            .spec()
+            .layer()
+            .row("BBB")
+            .row("BCB")
+            .row("BBB").build()
+            .layer()
+            .row("BBB")
+            .row("BAB")
+            .row("B$B").build()
+            .layer()
+            .row('B', 3, 3).build()
+            .blockOrInterface('B', INERT_PTFE_CASING)
+            .sameBlockWithTag('C', "coil", AllTags.COIL)
+            .air('A')
             .build()
             .build()
             .end()

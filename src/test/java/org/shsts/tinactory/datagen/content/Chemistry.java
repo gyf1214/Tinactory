@@ -200,7 +200,7 @@ public class Chemistry {
             .build()
             .recipe(DATA_GEN, CALCIUM_HYDROXIDE.loc("dust"))
             .input(CALCIUM_CARBONATE)
-            .input(WATER)
+            .input(WATER, "gas", 1f)
             .output(CALCIUM_HYDROXIDE)
             .output(CARBON_DIOXIDE)
             .workTicks(400)

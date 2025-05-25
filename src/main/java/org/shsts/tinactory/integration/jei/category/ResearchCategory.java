@@ -11,7 +11,6 @@ import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.core.util.I18n;
 
 import java.util.List;
 
@@ -28,8 +27,8 @@ public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
     }
 
     @Override
-    protected int getExtraHeight() {
-        return super.getExtraHeight() + BUTTON_SIZE + FONT_HEIGHT + SPACING * 2;
+    protected int extraHeight() {
+        return super.extraHeight() + BUTTON_SIZE + FONT_HEIGHT + SPACING * 2;
     }
 
     @Override
@@ -37,8 +36,7 @@ public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
         var tech = TechManager.client().techByKey(recipe.target);
         if (tech.isPresent()) {
             y = drawRequiredTechText(stack, tech.get().getDepends().isEmpty(), y);
-            var text = I18n.tr("tinactory.jei.processing.progress",
-                NUMBER_FORMAT.format(recipe.progress),
+            var text = tr("progress", NUMBER_FORMAT.format(recipe.progress),
                 NUMBER_FORMAT.format(tech.get().getMaxProgress()));
             return drawTextLine(stack, text, y);
         } else {

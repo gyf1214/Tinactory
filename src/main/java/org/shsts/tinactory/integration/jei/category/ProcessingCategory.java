@@ -8,6 +8,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -51,7 +52,11 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         super(recipeType, layout, Ingredient.of(machineTag(recipeType)), new ItemStack(icon));
     }
 
-    protected int getExtraHeight() {
+    public static TranslatableComponent tr(String key, Object... args) {
+        return I18n.tr("tinactory.jei.processing." + key, args);
+    }
+
+    protected int extraHeight() {
         return EXTRA_HEIGHT;
     }
 
@@ -59,7 +64,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     protected void buildBackground(ComposeDrawable.Builder builder,
         IGuiHelper helper, int xOffset) {
         super.buildBackground(builder, helper, xOffset);
-        builder.add(helper.createBlankDrawable(WIDTH, getExtraHeight()),
+        builder.add(helper.createBlankDrawable(WIDTH, extraHeight()),
             0, layout.rect.endY());
     }
 
@@ -71,7 +76,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     protected int drawRequiredTechText(PoseStack stack, boolean empty, int y) {
         if (!empty) {
             y += (BUTTON_SIZE - FONT_HEIGHT) / 2 + 1;
-            drawTextLine(stack, I18n.tr("tinactory.jei.processing.requiredTech"), y);
+            drawTextLine(stack, tr("requiredTech"), y);
             y += (BUTTON_SIZE + FONT_HEIGHT) / 2 + SPACING;
         } else {
             y += BUTTON_SIZE + SPACING;
@@ -97,9 +102,9 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
 
         y = drawExtraText(recipe, y, stack);
 
-        y = drawTextLine(stack, I18n.tr("tinactory.jei.processing.total", total), y);
-        y = drawTextLine(stack, I18n.tr("tinactory.jei.processing.power", recipe.power, voltage), y);
-        drawTextLine(stack, I18n.tr("tinactory.jei.processing.duration", duration), y);
+        y = drawTextLine(stack, tr("total", total), y);
+        y = drawTextLine(stack, tr("power", recipe.power, voltage), y);
+        drawTextLine(stack, tr("duration", duration), y);
     }
 
     protected void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
@@ -147,8 +152,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     }
 
     protected void addRequiredTech(IRecipeLayoutBuilder builder, Collection<ResourceLocation> techs) {
-        var x = ClientUtil.getFont().width(I18n.tr("tinactory.jei.processing.requiredTech")) +
-            SPACING - layout.getXOffset();
+        var x = ClientUtil.getFont().width(tr("requiredTech")) + SPACING - layout.getXOffset();
         var y = layout.rect.endY() + SLOT_SIZE / 2;
         for (var tech : techs) {
             addTechIngredient(builder, RecipeIngredientRole.OUTPUT, x, y, tech);

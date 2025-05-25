@@ -57,6 +57,7 @@ public final class Technologies {
     public static ResourceLocation CLEANROOM;
     public static ResourceLocation NICHROME;
     public static ResourceLocation HYDROMETALLURGY;
+    public static ResourceLocation ADVANCED_CHEMISTRY;
 
     public static void init() {
         TECHS = DATA_GEN.createHandler(TechProvider::new);
@@ -209,6 +210,11 @@ public final class Technologies {
         HYDROMETALLURGY = factory.tech("hydrometallurgy")
             .maxProgress(30L)
             .displayItem(AllMaterials.ALUMINIUM_OXIDE.entry("dust"))
+            .register();
+
+        ADVANCED_CHEMISTRY = factory.tech("advanced_chemistry")
+            .maxProgress(60L)
+            .displayItem(AllMultiblocks.LARGE_CHEMICAL_REACTOR)
             .register();
     }
 

@@ -5,6 +5,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -12,28 +14,33 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ChemicalReactorRecipe extends AssemblyRecipe {
-    public final boolean requireLarge;
+    public final boolean requireMultiblock;
 
     private ChemicalReactorRecipe(Builder builder) {
         super(builder);
-        this.requireLarge = builder.requireLarge;
+        this.requireMultiblock = builder.requireMultiblock;
+    }
+
+    @Override
+    public boolean canCraft(IMachine machine) {
+        return super.canCraft(machine) && machine instanceof MultiblockInterface;
     }
 
     public static class Builder extends BuilderBase<ChemicalReactorRecipe, Builder>
         implements IMaterialRecipeBuilder<Builder> {
-        private boolean requireLarge = false;
+        private boolean requireMultiblock = false;
 
         public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
             super(parent, loc);
         }
 
-        public Builder requireLarge(boolean val) {
-            requireLarge = val;
+        public Builder requireMultiblock(boolean val) {
+            requireMultiblock = val;
             return this;
         }
 
-        public Builder requireLarge() {
-            return requireLarge(true);
+        public Builder requireMultiblock() {
+            return requireMultiblock(true);
         }
 
         @Override
@@ -46,13 +53,13 @@ public class ChemicalReactorRecipe extends AssemblyRecipe {
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(type, loc, jo)
-                .requireLarge(GsonHelper.getAsBoolean(jo, "require_large", false));
+                .requireMultiblock(GsonHelper.getAsBoolean(jo, "require_multiblock", false));
         }
 
         @Override
         public void toJson(JsonObject jo, ChemicalReactorRecipe recipe) {
             super.toJson(jo, recipe);
-            jo.addProperty("require_large", recipe.requireLarge);
+            jo.addProperty("require_multiblock", recipe.requireMultiblock);
         }
     }
 

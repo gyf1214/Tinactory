@@ -31,6 +31,7 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.jei.category.AssemblyCategory;
 import org.shsts.tinactory.integration.jei.category.BlastFurnaceCategory;
+import org.shsts.tinactory.integration.jei.category.ChemicalReactorCategory;
 import org.shsts.tinactory.integration.jei.category.CleanCategory;
 import org.shsts.tinactory.integration.jei.category.DistillationCategory;
 import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
@@ -82,8 +83,10 @@ public class JEI implements IModPlugin {
 
             if (type == AllRecipes.RESEARCH_BENCH) {
                 addProcessingCategory(cast(type), new ResearchCategory(layout, icon));
+            } else if (type == AllRecipes.CHEMICAL_REACTOR) {
+                addProcessingCategory(cast(type), new ChemicalReactorCategory(cast(type), layout, icon));
             } else if (AssemblyRecipe.class.isAssignableFrom(type.recipeClass())) {
-                addProcessingCategory(cast(type), new AssemblyCategory(cast(type), layout, icon));
+                addProcessingCategory(cast(type), new AssemblyCategory<>(cast(type), layout, icon));
             } else if (CleanRecipe.class.isAssignableFrom(type.recipeClass())) {
                 addProcessingCategory(cast(type), new CleanCategory(cast(type), layout, icon));
             } else {

@@ -15,25 +15,25 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AssemblyCategory extends ProcessingCategory<AssemblyRecipe> {
+public class AssemblyCategory<R extends AssemblyRecipe> extends ProcessingCategory<R> {
     public AssemblyCategory(
-        IRecipeType<? extends IRecipeBuilderBase<AssemblyRecipe>> recipeType,
+        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
         Layout layout, Block icon) {
         super(recipeType, layout, icon);
     }
 
     @Override
-    protected int getExtraHeight() {
-        return super.getExtraHeight() + BUTTON_SIZE + SPACING;
+    protected int extraHeight() {
+        return super.extraHeight() + BUTTON_SIZE + SPACING;
     }
 
     @Override
-    protected int drawExtraText(AssemblyRecipe recipe, int y, PoseStack stack) {
+    protected int drawExtraText(R recipe, int y, PoseStack stack) {
         return drawRequiredTechText(stack, recipe.requiredTech.isEmpty(), y);
     }
 
     @Override
-    protected void extraLayout(AssemblyRecipe recipe, IRecipeLayoutBuilder builder) {
+    protected void extraLayout(R recipe, IRecipeLayoutBuilder builder) {
         addRequiredTech(builder, recipe.requiredTech);
     }
 }

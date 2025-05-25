@@ -7,7 +7,6 @@ import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.AllMultiblocks;
 import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
-import org.shsts.tinactory.core.util.I18n;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
@@ -21,14 +20,13 @@ public class BlastFurnaceCategory extends ProcessingCategory<BlastFurnaceRecipe>
     }
 
     @Override
-    protected int getExtraHeight() {
-        return super.getExtraHeight() + FONT_HEIGHT + SPACING;
+    protected int extraHeight() {
+        return super.extraHeight() + FONT_HEIGHT + SPACING;
     }
 
     @Override
     protected int drawExtraText(BlastFurnaceRecipe recipe, int y, PoseStack stack) {
-        var text = I18n.tr("tinactory.jei.processing.temperature",
-            NUMBER_FORMAT.format(recipe.temperature));
+        var text = tr("temperature", NUMBER_FORMAT.format(recipe.temperature));
         return drawTextLine(stack, text, y);
     }
 }

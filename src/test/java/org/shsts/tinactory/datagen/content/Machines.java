@@ -94,6 +94,7 @@ import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
 import static org.shsts.tinactory.content.AllMaterials.PE;
+import static org.shsts.tinactory.content.AllMaterials.PTFE;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
@@ -107,6 +108,8 @@ import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.DISTILLATION_TOWER;
 import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
+import static org.shsts.tinactory.content.AllMultiblocks.INERT_PTFE_CASING;
+import static org.shsts.tinactory.content.AllMultiblocks.LARGE_CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllMultiblocks.PLASCRETE;
 import static org.shsts.tinactory.content.AllMultiblocks.PYROLYSE_OVEN;
 import static org.shsts.tinactory.content.AllMultiblocks.SIFTER;
@@ -219,6 +222,7 @@ public final class Machines {
             .tag(MINEABLE_WITH_WRENCH)
             .build();
         multiblock(PYROLYSE_OVEN, "heatproof", "pyrolyse_oven", AllRecipes.PYROLYSE_OVEN);
+        multiblock(LARGE_CHEMICAL_REACTOR, "inert_ptfe", "large_chemical_reactor", AllRecipes.CHEMICAL_REACTOR);
 
         MULTIBLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
             .blockState(multiblockInterface(IO_TEX))
@@ -426,6 +430,18 @@ public final class Machines {
             .voltage(Voltage.MV)
             .workTicks(ASSEMBLE_TICKS)
             .requireTech(Technologies.CLEANROOM)
+            .build()
+            .recipe(DATA_GEN, LARGE_CHEMICAL_REACTOR)
+            .outputItem(LARGE_CHEMICAL_REACTOR, 1)
+            .inputItem(INERT_PTFE_CASING, 1)
+            .inputItem(circuit(Voltage.HV), 4)
+            .inputItem(ELECTRIC_MOTOR.get(Voltage.HV), 4)
+            .inputItem(STAINLESS_STEEL.tag("rotor"), 4)
+            .inputItem(CABLE.get(Voltage.HV), 4)
+            .inputItem(PTFE.tag("pipe"), 4)
+            .voltage(Voltage.MV)
+            .workTicks(ASSEMBLE_TICKS)
+            .requireTech(Technologies.ADVANCED_CHEMISTRY)
             .build();
     }
 
