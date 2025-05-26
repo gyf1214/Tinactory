@@ -57,6 +57,8 @@ public final class AllMaterials {
     public static MaterialSet POTASSIUM;
     public static MaterialSet CALCIUM;
     public static MaterialSet LITHIUM;
+    public static MaterialSet TITANIUM;
+    public static MaterialSet NEODYMIUM;
 
     // First Degree
     public static MaterialSet WATER;

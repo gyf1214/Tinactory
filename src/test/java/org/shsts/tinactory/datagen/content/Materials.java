@@ -97,6 +97,7 @@ import static org.shsts.tinactory.content.AllMaterials.MAGNETITE;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
 import static org.shsts.tinactory.content.AllMaterials.METHANE;
 import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
+import static org.shsts.tinactory.content.AllMaterials.NEODYMIUM;
 import static org.shsts.tinactory.content.AllMaterials.NICHROME;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
@@ -139,6 +140,7 @@ import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.TITANIUM;
 import static org.shsts.tinactory.content.AllMaterials.TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
@@ -369,7 +371,15 @@ public final class Materials {
             .material(SODIUM, METALLIC).build()
             .material(POTASSIUM, METALLIC).build()
             .material(CALCIUM, METALLIC).build()
-            .material(LITHIUM, DULL).build();
+            .material(LITHIUM, DULL).build()
+            .material(TITANIUM, METALLIC)
+            .machineProcess(Voltage.HV, 1.25d)
+            .blast(Voltage.HV, 2000, 960, NITROGEN, 1f)
+            .build()
+            .material(NEODYMIUM, METALLIC)
+            .machineProcess(Voltage.HV)
+            .blast(Voltage.MV, 1300, 2400)
+            .build();
     }
 
     private static void firstDegrees() {

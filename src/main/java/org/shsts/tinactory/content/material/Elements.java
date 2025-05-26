@@ -26,6 +26,7 @@ import static org.shsts.tinactory.content.AllMaterials.LEAD;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM;
 import static org.shsts.tinactory.content.AllMaterials.MAGNESIUM;
 import static org.shsts.tinactory.content.AllMaterials.MANGANESE;
+import static org.shsts.tinactory.content.AllMaterials.NEODYMIUM;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL;
 import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
@@ -36,6 +37,7 @@ import static org.shsts.tinactory.content.AllMaterials.SODIUM;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.THORIUM;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.TITANIUM;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMaterials.dust;
@@ -166,6 +168,16 @@ public final class Elements {
         POTASSIUM = dust("potassium", 0xFFBEDCFF);
         CALCIUM = dust("calcium", 0xFFFFF5DE);
         LITHIUM = dust("lithium", 0xFFBDC7DB);
+
+        TITANIUM = set("titanium")
+            .color(0xFFDCA0F0)
+            .mechanical().hot().gear().molten().pipe()
+            .buildObject();
+
+        NEODYMIUM = set("neodymium")
+            .color(0xFF646464)
+            .magnetic()
+            .buildObject();
     }
 
     public static void init() {}

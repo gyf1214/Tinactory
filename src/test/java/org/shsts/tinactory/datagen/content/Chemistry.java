@@ -88,11 +88,13 @@ import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TETRA_FLUORO_ETHYLENE;
+import static org.shsts.tinactory.content.AllMaterials.TITANIUM;
 import static org.shsts.tinactory.content.AllMaterials.TITANIUM_TETRACHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.TOLUENE;
 import static org.shsts.tinactory.content.AllMaterials.TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
+import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.MIXER;
 import static org.shsts.tinactory.content.AllRecipes.PYROLYSE_OVEN;
@@ -470,6 +472,16 @@ public class Chemistry {
             .workTicks(320)
             .voltage(Voltage.HV)
             .requireTech(Technologies.ADVANCED_CHEMISTRY)
+            .build();
+
+        BLAST_FURNACE.recipe(DATA_GEN, suffix(TITANIUM.loc("ingot_hot"), "_from_titanium_tetrachloride"))
+            .inputItem(MAGNESIUM.tag("dust"), 2)
+            .inputFluid(TITANIUM_TETRACHLORIDE.fluid(), TITANIUM_TETRACHLORIDE.fluidAmount(1f))
+            .outputItem(TITANIUM.entry("ingot_hot"), 1)
+            .outputItem(MAGNESIUM_CHLORIDE.entry("dust"), 2)
+            .voltage(Voltage.HV)
+            .workTicks(800)
+            .temperature(2300)
             .build();
     }
 

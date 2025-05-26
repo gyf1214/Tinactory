@@ -90,6 +90,8 @@ import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
+import static org.shsts.tinactory.content.AllMaterials.LITHIUM;
+import static org.shsts.tinactory.content.AllMaterials.NEODYMIUM;
 import static org.shsts.tinactory.content.AllMaterials.NICHROME;
 import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.PE;
@@ -107,6 +109,7 @@ import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
+import static org.shsts.tinactory.content.AllMaterials.TITANIUM;
 import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
@@ -400,11 +403,12 @@ public final class Components {
         componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, GLASS);
         componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, ELECTRUM, RUBY);
         componentRecipe(Voltage.HV, STAINLESS_STEEL, ELECTRUM, STAINLESS_STEEL, STEEL, STEEL, CHROME, EMERALD);
+        // TODO: sensor and emitter
+        componentRecipe(Voltage.EV, TITANIUM, KANTHAL, TITANIUM, STAINLESS_STEEL, NEODYMIUM, CHROME, EMERALD);
 
         batteryRecipe(Voltage.LV, CADMIUM);
         batteryRecipe(Voltage.MV, SODIUM_HYDROXIDE);
-        // TODO: Li
-        batteryRecipe(Voltage.HV, CADMIUM);
+        batteryRecipe(Voltage.HV, LITHIUM);
 
         // TODO: advanced_buzzsaw
         buzzsawRecipe(BASIC_BUZZSAW, COBALT_BRASS, Voltage.LV);
