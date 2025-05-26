@@ -54,6 +54,7 @@ public final class AllRecipes {
     public static final IRecipeType<ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
     public static final IRecipeType<ProcessingRecipe.Builder> ELECTROLYZER;
     public static final IRecipeType<ChemicalReactorRecipe.Builder> CHEMICAL_REACTOR;
+    public static final IRecipeType<ProcessingRecipe.Builder> ARC_FURNACE;
     public static final IRecipeType<ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final IRecipeType<ProcessingRecipe.Builder> GAS_TURBINE;
     public static final IRecipeType<ProcessingRecipe.Builder> COMBUSTION_GENERATOR;
@@ -158,6 +159,10 @@ public final class AllRecipes {
             .recipeClass(ChemicalReactorRecipe.class)
             .serializer(ChemicalReactorRecipe.SERIALIZER)
             .defaults($ -> $.amperage(0.375d).transform(AllRecipes::fullDefaults))
+            .register();
+
+        ARC_FURNACE = processing("arc_furnace")
+            .defaults($ -> $.amperage(1d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(2))
             .register();
 
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder)

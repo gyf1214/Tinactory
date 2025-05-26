@@ -119,6 +119,7 @@ public final class AllMaterials {
     public static MaterialSet CHLOROFORM;
     public static MaterialSet TETRA_FLUORO_ETHYLENE;
     public static MaterialSet TITANIUM_TETRACHLORIDE;
+    public static MaterialSet ANNEALED_COPPER;
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;

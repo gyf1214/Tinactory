@@ -36,6 +36,7 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     public static final IconSet GEM_HORIZONTAL = new IconSet("gem_horizontal", SHINY);
     public static final IconSet LIGNITE = new IconSet("lignite", ROUGH);
     public static final IconSet QUARTZ = new IconSet("quartz", ROUGH);
+    public static final IconSet BRIGHT = new IconSet("bright", SHINY);
 
     private IconSet() {
         this("dull", null);

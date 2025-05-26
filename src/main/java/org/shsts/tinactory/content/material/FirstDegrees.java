@@ -7,6 +7,7 @@ import net.minecraft.world.level.material.Fluids;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM_OXIDE;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIA;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.ANNEALED_COPPER;
 import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.BENZENE;
 import static org.shsts.tinactory.content.AllMaterials.BRASS;
@@ -225,6 +226,11 @@ public final class FirstDegrees {
         TETRA_FLUORO_ETHYLENE = gas("tetra_fluoro_ethylene", 0xFF7D7D7D);
 
         TITANIUM_TETRACHLORIDE = fluid("titanium_tetrachloride", 0xFFD40D5C, "liquid");
+
+        ANNEALED_COPPER = set("annealed_copper")
+            .color(0xFFFF8D3B)
+            .wireFine()
+            .buildObject();
     }
 
     public static void init() {}

@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
+import static org.shsts.tinactory.content.AllBlockEntities.ARC_FURNACE;
 import static org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX;
 import static org.shsts.tinactory.content.AllBlockEntities.BENDER;
 import static org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE;
@@ -90,6 +91,7 @@ import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
+import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
@@ -170,6 +172,7 @@ public final class Machines {
         machine(FLUID_SOLIDIFIER);
         machine(ELECTROLYZER);
         machine(CHEMICAL_REACTOR);
+        machine(ARC_FURNACE);
         machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
             .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
             .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
@@ -831,6 +834,13 @@ public final class Machines {
             .material(rotor, "rotor", 2)
             .material(GLASS, "primary", 2)
             .tech(Technologies.CHEMISTRY)
+            .build()
+            .recipe(ARC_FURNACE)
+            .circuit(2)
+            .material(electric, "wire", wireNumber * 4)
+            .material(GRAPHITE, "dust", 4)
+            .material(main, "plate", 4)
+            .tech(Technologies.ARC_FURNACE)
             .build()
             .recipe(STEAM_TURBINE)
             .circuit(2)

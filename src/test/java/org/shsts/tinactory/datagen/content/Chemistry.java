@@ -17,6 +17,7 @@ import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM_OXIDE;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIA;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.ANNEALED_COPPER;
 import static org.shsts.tinactory.content.AllMaterials.ARGON;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.BENZENE;
@@ -34,6 +35,7 @@ import static org.shsts.tinactory.content.AllMaterials.CHLOROFORM;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COKE;
+import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CREOSOTE_OIL;
 import static org.shsts.tinactory.content.AllMaterials.ETHANE;
 import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
@@ -71,7 +73,9 @@ import static org.shsts.tinactory.content.AllMaterials.PROPANE;
 import static org.shsts.tinactory.content.AllMaterials.PROPENE;
 import static org.shsts.tinactory.content.AllMaterials.PTFE;
 import static org.shsts.tinactory.content.AllMaterials.PVC;
+import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
+import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
@@ -94,6 +98,8 @@ import static org.shsts.tinactory.content.AllMaterials.TOLUENE;
 import static org.shsts.tinactory.content.AllMaterials.TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
+import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
+import static org.shsts.tinactory.content.AllRecipes.ARC_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.MIXER;
@@ -483,6 +489,21 @@ public class Chemistry {
             .workTicks(800)
             .temperature(2300)
             .build();
+
+        ARC_FURNACE.recipe(DATA_GEN, WROUGHT_IRON.loc("ingot"))
+            .inputItem(IRON.tag("ingot"), 1)
+            .inputFluid(OXYGEN.fluid(), OXYGEN.fluidAmount(0.05f))
+            .outputItem(WROUGHT_IRON.entry("ingot"), 1)
+            .voltage(Voltage.HV)
+            .workTicks(64)
+            .build()
+            .recipe(DATA_GEN, ANNEALED_COPPER.loc("ingot"))
+            .inputItem(COPPER.tag("ingot"), 1)
+            .inputFluid(OXYGEN.fluid(), OXYGEN.fluidAmount(0.075f))
+            .outputItem(ANNEALED_COPPER.entry("ingot"), 1)
+            .voltage(Voltage.HV)
+            .workTicks(96)
+            .build();
     }
 
     private static void sulfuric(MaterialSet material, long workTicks) {
@@ -653,6 +674,14 @@ public class Chemistry {
             .output(ETHYLENE)
             .output(SULFURIC_ACID, "dilute", 2f)
             .workTicks(240)
+            .voltage(Voltage.MV)
+            .requireTech(Technologies.ORGANIC_CHEMISTRY)
+            .build()
+            .recipe(DATA_GEN, RUBBER.fluidLoc())
+            .input(RAW_RUBBER, 9f)
+            .input(SULFUR)
+            .output(RUBBER, "molten", 9f)
+            .workTicks(160)
             .voltage(Voltage.MV)
             .requireTech(Technologies.ORGANIC_CHEMISTRY)
             .build();

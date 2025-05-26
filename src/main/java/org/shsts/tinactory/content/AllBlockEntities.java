@@ -68,6 +68,7 @@ public final class AllBlockEntities {
     public static final ProcessingSet FLUID_SOLIDIFIER;
     public static final ProcessingSet ELECTROLYZER;
     public static final ProcessingSet CHEMICAL_REACTOR;
+    public static final ProcessingSet ARC_FURNACE;
     public static final ProcessingSet STEAM_TURBINE;
     public static final ProcessingSet GAS_TURBINE;
     public static final ProcessingSet COMBUSTION_GENERATOR;
@@ -347,6 +348,19 @@ public final class AllBlockEntities {
             .port(FLUID_OUTPUT)
             .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 2)
             .progressBar(Texture.PROGRESS_MIXER, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .build()
+            .buildObject();
+
+        ARC_FURNACE = set.processing(AllRecipes.ARC_FURNACE)
+            .voltages(Voltage.HV)
+            .layoutSet()
+            .port(ITEM_INPUT)
+            .slot(0, 1)
+            .port(FLUID_INPUT)
+            .slot(SLOT_SIZE, 1)
+            .port(ITEM_OUTPUT)
+            .slot(SLOT_SIZE * 4, 1)
+            .progressBar(Texture.PROGRESS_SLICE, 8 + SLOT_SIZE * 2, 0)
             .build()
             .buildObject();
 

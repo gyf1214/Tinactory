@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
+import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.AllMultiblocks;
@@ -56,6 +57,7 @@ public final class Technologies {
     public static ResourceLocation CPU;
     public static ResourceLocation CLEANROOM;
     public static ResourceLocation NICHROME;
+    public static ResourceLocation ARC_FURNACE;
     public static ResourceLocation HYDROMETALLURGY;
     public static ResourceLocation ADVANCED_CHEMISTRY;
 
@@ -203,10 +205,16 @@ public final class Technologies {
             .depends(KANTHAL)
             .register();
 
+        factory.base(CHEMISTRY);
+
         HYDROMETALLURGY = factory.tech("hydrometallurgy")
             .maxProgress(30L)
             .displayItem(AllMaterials.ALUMINIUM_OXIDE.entry("dust"))
-            .depends(CHEMISTRY)
+            .register();
+
+        ARC_FURNACE = factory.tech("arc_furnace")
+            .maxProgress(30L)
+            .displayItem(AllBlockEntities.ARC_FURNACE.entry(Voltage.HV))
             .register();
 
         factory.base(ORGANIC_CHEMISTRY);

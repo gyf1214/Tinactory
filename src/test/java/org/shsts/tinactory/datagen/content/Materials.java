@@ -33,6 +33,7 @@ import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM_OXIDE;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
+import static org.shsts.tinactory.content.AllMaterials.ANNEALED_COPPER;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
 import static org.shsts.tinactory.content.AllMaterials.ARSENIC;
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
@@ -180,6 +181,7 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
+import static org.shsts.tinactory.datagen.content.model.IconSet.BRIGHT;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.FINE;
 import static org.shsts.tinactory.datagen.content.model.IconSet.GEM_HORIZONTAL;
@@ -335,7 +337,7 @@ public final class Materials {
             .material(THORIUM, SHINY).build()
             .material(CHROME, SHINY)
             .machineProcess(Voltage.MV, 1.5d)
-            .blast(Voltage.MV, 2200, 1024, NITROGEN, 1f)
+            .blast(Voltage.MV, 2200, 1024, NITROGEN)
             .build()
             .material(ANTIMONY, SHINY)
             .machineProcess(Voltage.LV).smelt()
@@ -374,7 +376,7 @@ public final class Materials {
             .material(LITHIUM, DULL).build()
             .material(TITANIUM, METALLIC)
             .machineProcess(Voltage.HV, 1.25d)
-            .blast(Voltage.HV, 2000, 960, NITROGEN, 1f)
+            .blast(Voltage.HV, 2000, 960, NITROGEN)
             .build()
             .material(NEODYMIUM, METALLIC)
             .machineProcess(Voltage.HV)
@@ -406,6 +408,7 @@ public final class Materials {
             .toolProcess(1.5d)
             .blast(Voltage.ULV, 1000, 800)
             .blastFrom(Voltage.ULV, 1000, 1000, IRON)
+            .blastFrom(Voltage.MV, 1000, 96, WROUGHT_IRON, OXYGEN)
             .build()
             .material(RED_ALLOY, DULL)
             .toolProcess(0.5d).smelt()
@@ -474,10 +477,13 @@ public final class Materials {
             .build()
             .material(NICHROME, METALLIC)
             .machineProcess(Voltage.MV, 1.25d)
-            .blast(Voltage.HV, 2700, 880, NITROGEN, 1f)
+            .blast(Voltage.HV, 2700, 880, NITROGEN)
             .mix(Voltage.MV, NICKEL, 4, CHROME, 1)
             .build()
-            .material(ALUMINIUM_OXIDE, FINE).build();
+            .material(ALUMINIUM_OXIDE, FINE).build()
+            .material(ANNEALED_COPPER, BRIGHT)
+            .machineProcess(Voltage.MV, 0.8d)
+            .build();
     }
 
     private static void higherDegrees() {
@@ -502,7 +508,7 @@ public final class Materials {
             .build()
             .material(VANADIUM_STEEL, METALLIC)
             .machineProcess(Voltage.MV, 1.5d)
-            .blast(Voltage.MV, 2500, 1280, NITROGEN, 1)
+            .blast(Voltage.MV, 2500, 1280, NITROGEN)
             .build()
             .material(PTFE, DULL)
             .machineProcess(Voltage.LV, 0.75d)
