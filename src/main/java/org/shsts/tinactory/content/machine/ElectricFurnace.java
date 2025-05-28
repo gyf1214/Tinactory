@@ -23,6 +23,7 @@ import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -56,7 +57,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     private boolean canOutput(SmeltingRecipe recipe, IContainer container) {
         var result = recipe.assemble(getInputWrapper(container));
         var outputPort = getOutputPort(container);
-        return outputPort.acceptInput(result) && outputPort.insertItem(result, true).isEmpty();
+        return outputPort.insertItem(result, true).isEmpty();
     }
 
     @Override
@@ -74,7 +75,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
                 .getRecipeFor(RecipeType.SMELTING, getInputWrapper(container), world)
                 .filter(recipe -> canOutput(recipe, container))
                 .map(List::of))
-            .orElse(List.of());
+            .orElse(Collections.emptyList());
     }
 
     @Override

@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 
-import java.util.List;
+import java.util.Collections;
 
 import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
@@ -50,7 +50,7 @@ public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
         addTechIngredient(builder, RecipeIngredientRole.OUTPUT, rect.x(), rect.y(), recipe.target);
         var requiredTech = TechManager.client().techByKey(recipe.target)
             .map(tech -> tech.getDepends().stream().map(ITechnology::getLoc).toList())
-            .orElse(List.of());
+            .orElse(Collections.emptyList());
         addRequiredTech(builder, requiredTech);
     }
 }

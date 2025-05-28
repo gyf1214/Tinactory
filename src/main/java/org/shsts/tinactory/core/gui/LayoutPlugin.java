@@ -40,19 +40,16 @@ public abstract class LayoutPlugin<S extends MenuScreen> extends InventoryPlugin
         }
     }
 
-    private static class Simple extends LayoutPlugin<MenuScreen> {
-        protected Simple(IMenu menu) {
-            super(menu, 0);
-            addSlots(menu, layout);
-        }
-
-        @Override
-        public Class<MenuScreen> menuScreenClass() {
-            return MenuScreen.class;
-        }
-    }
-
     public static LayoutPlugin<MenuScreen> simple(IMenu menu) {
-        return new Simple(menu);
+        return new LayoutPlugin<>(menu, 0) {
+            {
+                addSlots(menu, layout);
+            }
+
+            @Override
+            public Class<MenuScreen> menuScreenClass() {
+                return MenuScreen.class;
+            }
+        };
     }
 }

@@ -18,8 +18,6 @@ public interface IFluidCollection extends IPort {
 
     boolean acceptInput(FluidStack stack);
 
-    boolean acceptOutput();
-
     /**
      * Returns the amount of fluid inserted. The passed FluidStack can be safely modified.
      */

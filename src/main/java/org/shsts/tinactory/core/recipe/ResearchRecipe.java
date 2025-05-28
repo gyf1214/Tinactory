@@ -9,8 +9,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
-import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
@@ -46,8 +46,8 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public void insertOutputs(IContainer container, Random random) {
-        container.getOwnerTeam()
+    public void insertOutputs(IMachine machine, Random random) {
+        machine.owner()
             .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress));
     }
 

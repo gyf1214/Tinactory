@@ -271,7 +271,7 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
     }
 
     private void onTechChange(ITeamProfile team) {
-        if (team == getContainer().flatMap(IContainer::getOwnerTeam).orElse(null)) {
+        if (team == getMachine().flatMap(IMachine::owner).orElse(null)) {
             setUpdateRecipe();
         }
     }

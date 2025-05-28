@@ -56,7 +56,7 @@ public final class AllMenus {
     public static final IMenuType BOILER;
     public static final IMenuType ELECTRIC_FURNACE;
     public static final IMenuType RESEARCH_BENCH;
-    public static final IMenuType BATTERY_BOX;
+    public static final IMenuType SIMPLE;
     public static final IMenuType MULTIBLOCK;
 
     static {
@@ -102,7 +102,7 @@ public final class AllMenus {
             .screen(() -> () -> NetworkControllerScreen::new)
             .register();
 
-        LOGISTIC_WORKER = REGISTRATE.menu("network/logistic_worker")
+        LOGISTIC_WORKER = REGISTRATE.menu("logistics/logistic_worker")
             .title("tinactory.gui.logisticWorker.title")
             .screen(() -> () -> LogisticWorkerScreen::new)
             .dummyPlugin(menu -> {
@@ -159,7 +159,7 @@ public final class AllMenus {
             .plugin(MachinePlugin::new)
             .register();
 
-        BATTERY_BOX = REGISTRATE.menu("machine/battery_box")
+        SIMPLE = REGISTRATE.menu("machine/simple")
             .title(ProcessingPlugin::getTitle)
             .screen(() -> () -> MenuScreen::new)
             .plugin(LayoutPlugin::simple)

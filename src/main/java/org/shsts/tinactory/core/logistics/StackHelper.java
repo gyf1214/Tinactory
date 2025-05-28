@@ -28,23 +28,39 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class StackHelper {
+    static final Predicate<ItemStack> TRUE_FILTER = $ -> true;
+    static final Predicate<ItemStack> FALSE_FILTER = $ -> false;
+
+    public static CompoundTag serializeItemStack(ItemStack stack) {
+        var tag = new CompoundTag();
+        stack.save(tag);
+        tag.putInt("CountInt", stack.getCount());
+        return tag;
+    }
+
+    public static ItemStack deserializeItemStack(CompoundTag tag) {
+        var stack = ItemStack.of(tag);
+        if (tag.contains("CountInt", Tag.TAG_INT)) {
+            stack.setCount(tag.getInt("CountInt"));
+        }
+        return stack;
+    }
+
     public static CompoundTag serializeItemHandler(IItemHandler itemHandler) {
         var listTag = new ListTag();
         var size = itemHandler.getSlots();
         for (var i = 0; i < size; i++) {
             var stack = itemHandler.getStackInSlot(i);
             if (!stack.isEmpty()) {
-                CompoundTag itemTag = new CompoundTag();
+                var itemTag = serializeItemStack(stack);
                 itemTag.putInt("Slot", i);
-                stack.save(itemTag);
-                itemTag.putInt("CountInt", stack.getCount());
                 listTag.add(itemTag);
             }
         }
-        CompoundTag nbt = new CompoundTag();
-        nbt.put("Items", listTag);
-        nbt.putInt("Size", size);
-        return nbt;
+        var tag = new CompoundTag();
+        tag.put("Items", listTag);
+        tag.putInt("Size", size);
+        return tag;
     }
 
     public static void deserializeItemHandler(IItemHandlerModifiable itemHandler, CompoundTag tag) {
@@ -52,15 +68,12 @@ public final class StackHelper {
         for (int i = 0; i < size; i++) {
             itemHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
-        ListTag tagList = tag.getList("Items", Tag.TAG_COMPOUND);
-        for (int i = 0; i < tagList.size(); i++) {
-            CompoundTag itemTag = tagList.getCompound(i);
+        var listTag = tag.getList("Items", Tag.TAG_COMPOUND);
+        for (var tag1 : listTag) {
+            var itemTag = (CompoundTag) tag1;
             int slot = itemTag.getInt("Slot");
             if (slot >= 0 && slot < size) {
-                var stack = ItemStack.of(itemTag);
-                if (itemTag.contains("CountInt", Tag.TAG_INT)) {
-                    stack.setCount(itemTag.getInt("CountInt"));
-                }
+                var stack = deserializeItemStack(itemTag);
                 itemHandler.setStackInSlot(slot, stack);
             }
         }
@@ -121,9 +134,6 @@ public final class StackHelper {
     }
 
     public static boolean hasItem(IItemCollection collection, Predicate<ItemStack> ingredient) {
-        if (!collection.acceptOutput()) {
-            return false;
-        }
         for (var itemStack : collection.getAllItems()) {
             if (ingredient.test(itemStack)) {
                 return true;
@@ -137,9 +147,6 @@ public final class StackHelper {
      */
     public static boolean consumeItemCollection(IItemCollection collection, Predicate<ItemStack> ingredient,
         int amount, boolean simulate) {
-        if (!collection.acceptOutput()) {
-            return false;
-        }
         for (var itemStack : collection.getAllItems()) {
             if (amount <= 0) {
                 return true;

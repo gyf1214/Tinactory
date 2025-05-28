@@ -48,16 +48,6 @@ public class ItemHandlerCollection implements IItemCollection {
     }
 
     @Override
-    public boolean isEmpty() {
-        for (var i = minSlot; i < maxSlot; i++) {
-            if (!itemHandler.getStackInSlot(i).isEmpty()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
     public boolean acceptInput(ItemStack stack) {
         for (var i = minSlot; i < maxSlot; i++) {
             if (itemHandler.isItemValid(i, stack)) {

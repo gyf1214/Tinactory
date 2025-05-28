@@ -82,7 +82,7 @@ public final class ProcessingResults {
 
         @Override
         protected boolean doInsertPort(IItemCollection port, Random random, boolean simulate) {
-            return port.acceptInput(stack) && port.insertItem(stack, simulate).isEmpty();
+            return port.insertItem(stack, simulate).isEmpty();
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(

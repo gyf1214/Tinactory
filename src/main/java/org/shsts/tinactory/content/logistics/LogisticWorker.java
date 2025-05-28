@@ -44,10 +44,9 @@ import static org.shsts.tinactory.core.gui.ProcessingPlugin.portLabel;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorker extends CapabilityProvider
-    implements IEventSubscriber {
+public class LogisticWorker extends CapabilityProvider implements IEventSubscriber {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String ID = "network/logistic_worker";
+    private static final String ID = "logistics/logistic_worker";
 
     private final BlockEntity blockEntity;
     private final Voltage voltage;

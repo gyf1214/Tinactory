@@ -54,6 +54,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.LATHE;
 import static org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
+import static org.shsts.tinactory.content.AllBlockEntities.ME_DRIVER;
 import static org.shsts.tinactory.content.AllBlockEntities.MIXER;
 import static org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE;
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
@@ -188,6 +189,7 @@ public final class Machines {
             .overlay(Direction.UP, "overlay/machine/overlay_qtank")
             .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
         machine(LOGISTIC_WORKER, "cover/overlay_conveyor");
+        machine(ME_DRIVER, "overlay/automation/automation_superbuffer");
 
         DATA_GEN.block(NETWORK_CONTROLLER)
             .child(MachineModel::builder)

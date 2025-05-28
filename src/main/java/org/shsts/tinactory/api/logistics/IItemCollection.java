@@ -20,22 +20,23 @@ public interface IItemCollection extends IPort {
         return PortType.ITEM;
     }
 
+    /**
+     * If this returns false, insertItem with the same stack must return the entire stack.
+     */
     boolean acceptInput(ItemStack stack);
 
-    boolean acceptOutput();
-
     /**
-     * Returns the remaining items not inserted. The passed and returned ItemStack can be safely modified.
+     * Returns the remaining items not inserted. The passed and returned ItemStack should be safely modified.
      */
     ItemStack insertItem(ItemStack stack, boolean simulate);
 
     /**
-     * Returns the items taken. The passed and returned ItemStack can be safely modified.
+     * Returns the items taken. The passed and returned ItemStack should be safely modified.
      */
     ItemStack extractItem(ItemStack item, boolean simulate);
 
     /**
-     * Extract any item and returns the items taken. The returned ItemStack can be safely modified.
+     * Extract any item and returns the items taken. The returned ItemStack should be safely modified.
      */
     ItemStack extractItem(int limit, boolean simulate);
 

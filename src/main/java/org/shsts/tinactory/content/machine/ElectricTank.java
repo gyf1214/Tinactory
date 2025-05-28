@@ -27,7 +27,7 @@ import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricTank extends ElectricStorage implements INBTSerializable<CompoundTag> {
-    private static final String ID = "machine/tank";
+    public static final String ID = "machine/tank";
 
     private final int size;
     private final WrapperFluidTank[] innerTanks;

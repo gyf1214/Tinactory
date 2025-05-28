@@ -19,6 +19,8 @@ public final class TinactoryConfig {
     public final ConfigValue<List<? extends Integer>> workerDelay;
     public final ConfigValue<List<? extends Integer>> workerStack;
     public final ConfigValue<List<? extends Integer>> workerFluidStack;
+    public final ConfigValue<Integer> bytesPerItem;
+    public final ConfigValue<Integer> bytesPerItemType;
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
     public final ConfigValue<List<? extends Double>> cableResistanceFactor;
@@ -52,6 +54,11 @@ public final class TinactoryConfig {
             .defineList("worker_stack", List.of(4, 16, 64, 64, 128), validator);
         workerFluidStack = builder.comment("Worker fluid stacks for logistics component")
             .defineList("worker_fluid_stack", List.of(1000, 4000, 16000, 16000, 32000), validator);
+
+        bytesPerItem = builder.comment("Bytes used per item by digital storage")
+            .defineInRange("bytes_per_item", 256, 1, Integer.MAX_VALUE);
+        bytesPerItemType = builder.comment("Bytes used per item type by digital storage")
+            .defineInRange("bytes_per_item_type", 4096, 1, Integer.MAX_VALUE);
         builder.pop();
 
         builder.push("machine");

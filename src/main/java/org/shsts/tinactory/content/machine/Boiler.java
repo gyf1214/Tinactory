@@ -12,7 +12,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -85,16 +84,15 @@ public class Boiler extends CapabilityProvider implements
 
     @Override
     public void onPreWork() {
-        if (maxBurn > 0 || fuelPort.isEmpty()) {
+        if (maxBurn > 0) {
             return;
         }
-        var item = ItemHandlerHelper.copyStackWithSize(fuelPort.getAllItems().iterator().next(), 1);
-        if (!fuelPort.acceptOutput() || fuelPort.extractItem(item, true).isEmpty()) {
+        var item = fuelPort.extractItem(1, false);
+        if (item.isEmpty()) {
             return;
         }
-        var item1 = fuelPort.extractItem(item, false);
-        if (item1.hasContainerItem()) {
-            fuelPort.insertItem(item1.getContainerItem(), false);
+        if (item.hasContainerItem()) {
+            fuelPort.insertItem(item.getContainerItem(), false);
         }
         maxBurn = (long) ForgeHooks.getBurnTime(item, null) * PROGRESS_PER_TICK;
         currentBurn = 0L;

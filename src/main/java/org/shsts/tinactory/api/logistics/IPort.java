@@ -18,7 +18,10 @@ public interface IPort {
         return (IFluidCollection) this;
     }
 
-    boolean isEmpty();
+    /**
+     * If this returns false, extract and
+     */
+    boolean acceptOutput();
 
     IPort EMPTY = new IPort() {
         @Override
@@ -27,8 +30,8 @@ public interface IPort {
         }
 
         @Override
-        public boolean isEmpty() {
-            return true;
+        public boolean acceptOutput() {
+            return false;
         }
     };
 }

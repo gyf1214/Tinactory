@@ -38,6 +38,7 @@
   "tinactory.tooltip.fluidCell": "%s / %s",
   "tinactory.tooltip.battery": "%s / %s EU (%s)",
   "tinactory.tooltip.tool": "%s Crafting Uses",
+  "tinactory.tooltip.meStorageCell": "%sB / %sB",
   "tinactory.gui.networkController.title": "Network Controller",
   "tinactory.gui.networkController.welcome": "New Team Name: ",
   "tinactory.gui.networkController.welcomeButton": "Create Team",

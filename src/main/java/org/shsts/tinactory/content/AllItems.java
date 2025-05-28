@@ -17,6 +17,7 @@ import org.shsts.tinactory.content.electric.CircuitLevel;
 import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.RubberLogBlock;
@@ -107,6 +108,7 @@ public final class AllItems {
     public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
     public static final IEntry<Item> ITEM_FILTER;
     public static final IEntry<Item> FERTILIZER;
+    public static final IEntry<MEStorageCell> ME_STORAGE_CELL;
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
@@ -253,6 +255,10 @@ public final class AllItems {
 
         ITEM_FILTER = simple("component/item_filter");
         FERTILIZER = simple("misc/fertilizer");
+
+        ME_STORAGE_CELL = REGISTRATE.item("logistics/me_storage_cell",
+                properties -> new MEStorageCell(properties, 8192))
+            .register();
     }
 
     public static void init() {}

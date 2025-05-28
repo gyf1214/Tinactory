@@ -28,9 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -42,7 +43,8 @@ public class ElectricTankPlugin extends ElectricStoragePlugin {
 
     public ElectricTankPlugin(IMenu menu) {
         super(menu);
-        this.tank = (ElectricTank) PROCESSOR.get(menu.blockEntity());
+        this.tank = EVENT_MANAGER.get(menu.blockEntity())
+            .getProvider(modLoc(ElectricTank.ID), ElectricTank.class);
         this.container = FLUID_STACK_HANDLER.get(menu.blockEntity());
 
         for (var slot : layout.slots) {

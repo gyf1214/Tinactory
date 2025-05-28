@@ -29,12 +29,13 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllMenus.CHEST_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.client.FluidSlot.HIGHLIGHT_COLOR;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -120,7 +121,8 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
 
     public ElectricChestPlugin(IMenu menu) {
         super(menu);
-        this.chest = (ElectricChest) PROCESSOR.get(menu.blockEntity());
+        this.chest = EVENT_MANAGER.get(menu.blockEntity())
+            .getProvider(modLoc(ElectricChest.ID), ElectricChest.class);
 
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {

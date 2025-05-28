@@ -11,12 +11,12 @@ import net.minecraftforge.items.ItemStackHandler;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
+import static org.shsts.tinactory.core.logistics.StackHelper.FALSE_FILTER;
+import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WrapperItemHandler implements IItemHandlerModifiable {
-    private static final Predicate<ItemStack> TRUE = $ -> true;
-    private static final Predicate<ItemStack> FALSE = $ -> false;
-
     private final IItemHandlerModifiable compose;
     @Nullable
     private Runnable updateListener = null;
@@ -33,7 +33,7 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         this.compose = compose;
         this.filters = new Predicate[size];
         this.allowOutputs = new boolean[size];
-        Arrays.fill(filters, TRUE);
+        Arrays.fill(filters, TRUE_FILTER);
         Arrays.fill(allowOutputs, true);
     }
 
@@ -42,11 +42,11 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
     }
 
     public void disallowInput(int idx) {
-        filters[idx] = FALSE;
+        filters[idx] = FALSE_FILTER;
     }
 
     public void resetFilter(int idx) {
-        filters[idx] = TRUE;
+        filters[idx] = TRUE_FILTER;
     }
 
     public void setAllowOutput(int idx, boolean value) {

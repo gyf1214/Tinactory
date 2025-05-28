@@ -51,10 +51,10 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     private final LazyOptional<IItemHandler> itemHandlerCap;
 
     public BatteryBox(BlockEntity blockEntity, Layout layout) {
-        this.layout = layout;
         this.blockEntity = blockEntity;
+        this.layout = layout;
         this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
-        var size = voltage.rank * voltage.rank;
+        var size = layout.slots.size();
         this.items = new WrapperItemHandler(size);
         for (var i = 0; i < size; i++) {
             items.setFilter(i, this::allowItem);

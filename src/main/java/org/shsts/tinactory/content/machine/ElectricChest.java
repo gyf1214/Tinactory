@@ -33,7 +33,7 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricChest extends ElectricStorage implements INBTSerializable<CompoundTag> {
-    private static final String ID = "machine/chest";
+    public static final String ID = "machine/chest";
 
     public final int capacity;
     private final int size;

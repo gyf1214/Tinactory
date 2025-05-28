@@ -10,6 +10,7 @@ import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.content.machine.ElectricTank;
+import org.shsts.tinactory.content.machine.MEDriver;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveMachine;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -76,6 +77,7 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
     public static final MachineSet LOGISTIC_WORKER;
+    public static final MachineSet ME_DRIVER;
     public static final Map<Voltage, IEntry<MachineBlock>> MULTIBLOCK_INTERFACE;
 
     public static final IEntry<MachineBlock> NETWORK_CONTROLLER;
@@ -406,7 +408,7 @@ public final class AllBlockEntities {
 
         BATTERY_BOX = set.machine()
             .machine(v -> "machine/" + v.id + "/battery_box", MachineBlock::sided)
-            .menu(AllMenus.BATTERY_BOX)
+            .menu(AllMenus.SIMPLE)
             .layoutMachine(BatteryBox::factory)
             .voltages(Voltage.LV, Voltage.HV)
             .layoutSet()
@@ -459,10 +461,22 @@ public final class AllBlockEntities {
             .buildObject();
 
         LOGISTIC_WORKER = set.machine()
-            .machine(v -> "network/" + v.id + "/logistic_worker", MachineBlock::factory)
+            .machine(v -> "logistics/" + v.id + "/logistic_worker", MachineBlock::factory)
             .menu(AllMenus.LOGISTIC_WORKER)
             .machine(LogisticWorker::factory)
             .voltages(Voltage.ULV)
+            .tintVoltage(2)
+            .buildObject();
+
+        ME_DRIVER = set.machine()
+            .machine(v -> "logistics/" + v.id + "me_driver", MachineBlock::factory)
+            .menu(AllMenus.SIMPLE)
+            .layoutMachine(MEDriver::factory)
+            .voltages(Voltage.HV)
+            .layoutSet()
+            .port(ITEM_INPUT)
+            .slots(0, 0, 3, 3)
+            .build()
             .tintVoltage(2)
             .buildObject();
 
