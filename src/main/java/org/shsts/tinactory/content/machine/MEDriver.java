@@ -63,6 +63,7 @@ public class MEDriver extends CapabilityProvider
         this.itemCollectionCap = LazyOptional.of(() -> combinedCollection);
 
         storages.onUpdate(this::onUpdateStorage);
+        combinedCollection.onUpdate(blockEntity::setChanged);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.logistics;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
@@ -15,10 +16,16 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 public class CombinedItemCollection implements IItemCollection {
     private final List<IItemCollection> composes = new ArrayList<>();
+    @Nullable
+    private Runnable updateListener = null;
 
     public void setComposes(Collection<IItemCollection> val) {
         composes.clear();
         composes.addAll(val);
+    }
+
+    public void onUpdate(Runnable listener) {
+        updateListener = listener;
     }
 
     @Override
@@ -31,13 +38,23 @@ public class CombinedItemCollection implements IItemCollection {
         return composes.stream().anyMatch(IPort::acceptOutput);
     }
 
+    private void invokeUpdate() {
+        if (updateListener != null) {
+            updateListener.run();
+        }
+    }
+
     @Override
     public ItemStack insertItem(ItemStack stack, boolean simulate) {
+        var count = stack.getCount();
         for (var compose : composes) {
             stack = compose.insertItem(stack, simulate);
             if (stack.isEmpty()) {
-                return ItemStack.EMPTY;
+                break;
             }
+        }
+        if (!simulate && stack.getCount() < count) {
+            invokeUpdate();
         }
         return stack;
     }
@@ -48,7 +65,7 @@ public class CombinedItemCollection implements IItemCollection {
         var ret = ItemStack.EMPTY;
         for (var compose : composes) {
             if (item1.isEmpty()) {
-                return ret;
+                break;
             }
             var stack = compose.extractItem(item1, simulate);
             if (!stack.isEmpty()) {
@@ -58,13 +75,20 @@ public class CombinedItemCollection implements IItemCollection {
                 item1.shrink(stack.getCount());
             }
         }
+        if (!simulate && !ret.isEmpty()) {
+            invokeUpdate();
+        }
         return ret;
     }
 
     @Override
     public ItemStack extractItem(int limit, boolean simulate) {
-        return composes.isEmpty() ? ItemStack.EMPTY :
+        var ret = composes.isEmpty() ? ItemStack.EMPTY :
             composes.get(0).extractItem(limit, simulate);
+        if (!simulate && !ret.isEmpty()) {
+            invokeUpdate();
+        }
+        return ret;
     }
 
     @Override
