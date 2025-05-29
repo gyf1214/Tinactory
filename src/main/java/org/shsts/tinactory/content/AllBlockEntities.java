@@ -469,7 +469,7 @@ public final class AllBlockEntities {
             .buildObject();
 
         ME_DRIVER = set.machine()
-            .machine(v -> "logistics/" + v.id + "me_driver", MachineBlock::factory)
+            .machine(v -> "logistics/" + v.id + "/me_driver", MachineBlock::factory)
             .menu(AllMenus.SIMPLE)
             .layoutMachine(MEDriver::factory)
             .voltages(Voltage.HV)

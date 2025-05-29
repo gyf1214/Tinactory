@@ -56,11 +56,8 @@ public class LanguageProcessor {
 
     public LanguageProcessor() {
         abbreviate("cpu", "ram", "nand", "nor", "soc", "pic");
+        abbreviate("ptfe", "me");
 
-        pattern("block[.]tinactory[.]material[.]ore[.](.*)", matcher ->
-            fmt("%s Ore", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("item[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
             fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("item[.]tinactory[.]component[.](.*)[.](basic|good|advanced)", matcher ->
@@ -111,6 +108,12 @@ public class LanguageProcessor {
             fmt("%s Wafer", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]chip[.](.*)", matcher ->
             fmt("%s Chip", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]logistics[.](.*_storage_cell)[.](.*)", matcher ->
+            fmt("%s %s", capitalize(matcher, 2), normalize(matcher, 1)));
+        pattern("block[.]tinactory[.]material[.]ore[.](.*)", matcher ->
+            fmt("%s Ore", normalize(matcher, 1)));
+        pattern("block[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
+            fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("block[.]tinactory[.]machine[.](.*)[.](.*)", matcher ->
             fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("block[.]tinactory[.]primitive[.](.*)", matcher ->
@@ -125,6 +128,8 @@ public class LanguageProcessor {
             fmt("%s", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]multiblock[.](.*)", matcher ->
             fmt("%s", normalize(matcher, 1)));
+        pattern("block[.]tinactory[.]logistics[.](.*)[.](.*)", matcher ->
+            fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
         pattern("fluid[.]tinactory[.]material[.]gas[.](.*)", matcher ->
             fmt("%s", normalize(matcher, 1)));
         pattern("fluid[.]tinactory[.]material[.]liquid[.](.*)", matcher ->

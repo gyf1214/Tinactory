@@ -56,6 +56,7 @@ import static org.shsts.tinactory.content.AllItems.GOOD_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.INDUCTOR;
 import static org.shsts.tinactory.content.AllItems.INTEGRATED_PROCESSOR;
 import static org.shsts.tinactory.content.AllItems.ITEM_FILTER;
+import static org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.MAINFRAME;
 import static org.shsts.tinactory.content.AllItems.MICROPROCESSOR;
@@ -148,6 +149,7 @@ import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.content.electric.Circuits.board;
 import static org.shsts.tinactory.content.electric.Circuits.circuitBoard;
+import static org.shsts.tinactory.core.util.LocHelper.ae2;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
@@ -241,6 +243,13 @@ public final class Components {
             .item(FERTILIZER)
             .model(Models::simpleItem)
             .build();
+
+        for (var i = 0; i < ITEM_STORAGE_CELL.size(); i++) {
+            var k = 1 << (2 * i);
+            DATA_GEN.item(ITEM_STORAGE_CELL.get(i))
+                .model(basicItem(ae2("item/item_storage_cell_" + k + "k")))
+                .build();
+        }
     }
 
     private static void chip(String name, String tex) {

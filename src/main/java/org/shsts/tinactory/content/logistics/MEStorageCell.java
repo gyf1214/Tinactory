@@ -25,7 +25,7 @@ public class MEStorageCell extends CapabilityItem {
     private final int bytesLimit;
 
     public MEStorageCell(Properties properties, int bytesLimit) {
-        super(properties);
+        super(properties.stacksTo(1));
         this.bytesLimit = bytesLimit;
     }
 

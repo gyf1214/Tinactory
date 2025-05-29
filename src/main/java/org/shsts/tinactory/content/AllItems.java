@@ -108,7 +108,7 @@ public final class AllItems {
     public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
     public static final IEntry<Item> ITEM_FILTER;
     public static final IEntry<Item> FERTILIZER;
-    public static final IEntry<MEStorageCell> ME_STORAGE_CELL;
+    public static final List<IEntry<MEStorageCell>> ITEM_STORAGE_CELL;
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
@@ -256,9 +256,14 @@ public final class AllItems {
         ITEM_FILTER = simple("component/item_filter");
         FERTILIZER = simple("misc/fertilizer");
 
-        ME_STORAGE_CELL = REGISTRATE.item("logistics/me_storage_cell",
-                properties -> new MEStorageCell(properties, 8192))
-            .register();
+        ITEM_STORAGE_CELL = new ArrayList<>();
+        for (var i = 0; i < 5; i++) {
+            var k = 1 << (2 * i);
+            var item = REGISTRATE.item("logistics/item_storage_cell/" + k + "m",
+                    properties -> new MEStorageCell(properties, 1048576 * k))
+                .register();
+            ITEM_STORAGE_CELL.add(item);
+        }
     }
 
     public static void init() {}
