@@ -57,14 +57,11 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
 
     protected void registerPort(INetwork network, IPort port) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        logistics.unregisterPort(machine, 0);
+        var subnet = network.getSubnet(blockEntity.getBlockPos());
 
-        if (isGlobal()) {
-            logistics.registerGlobalPort(machine, 0, port);
-        } else {
-            var subnet = network.getSubnet(blockEntity.getBlockPos());
-            logistics.registerPort(subnet, machine, 0, port);
-        }
+        logistics.unregisterPort(machine, 0);
+        logistics.registerPort(subnet, machine, 0, port, isGlobal());
+        logistics.registerStoragePort(subnet, machine, 0, port);
     }
 
     protected void onSlotChange() {

@@ -101,7 +101,8 @@ public class MEDriver extends CapabilityProvider
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         var subnet = network.getSubnet(blockEntity.getBlockPos());
         var machine = MACHINE.get(blockEntity);
-        logistics.registerPort(subnet, machine, 0, combinedCollection);
+        logistics.registerPort(subnet, machine, 0, combinedCollection, false);
+        logistics.registerStoragePort(subnet, machine, 0, combinedCollection);
     }
 
     @Override
