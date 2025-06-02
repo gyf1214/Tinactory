@@ -5,11 +5,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.AllTags;
@@ -24,6 +26,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
@@ -225,6 +228,7 @@ public final class Materials {
         woodRecipes("dark_oak");
         woodRecipes("crimson");
         woodRecipes("warped");
+        woodFarmRecipes(RUBBER_SAPLING.loc(), RUBBER_SAPLING, RUBBER_LOG, RUBBER_LEAVES);
 
         // disable wooden and iron tools
         DATA_GEN.nullRecipe(Items.WOODEN_AXE)
@@ -273,7 +277,7 @@ public final class Materials {
             .blockState(cubeTint("wood/rubber/leaves_rubber"))
             .tag(BlockTags.LEAVES).itemTag(ItemTags.LEAVES)
             .dropSelfOnTool(TOOL_SHEARS)
-            .drop(RUBBER_SAPLING, 0.05f)
+            .drop(RUBBER_SAPLING, 0.075f)
             .build()
             .block(RUBBER_SAPLING)
             .blockState(ctx -> ctx.provider()
@@ -1105,41 +1109,52 @@ public final class Materials {
 
         // farm
         if (!nether) {
-            var log = mcLoc(prefix + "_log");
-            var logItem = ITEMS.getEntry(log);
-            var leavesItem = ITEMS.getEntry(mcLoc(prefix + "_leaves"));
             var sapling = mcLoc(prefix + "_sapling");
             var saplingItem = ITEMS.getEntry(sapling);
-
-            AUTOFARM.recipe(DATA_GEN, sapling)
-                .inputItem(saplingItem, 1)
-                .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(1f))
-                .outputItem(logItem, 6)
-                .outputItem(saplingItem, 2)
-                .voltage(Voltage.LV)
-                .workTicks(1600)
-                .build()
-                .recipe(DATA_GEN, suffix(sapling, "_with_bone_meal"))
-                .inputItem(saplingItem, 1)
-                .inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
-                .inputItem(2, () -> Items.BONE_MEAL, 2)
-                .outputItem(logItem, 6)
-                .outputItem(saplingItem, 2)
-                .outputItem(leavesItem, 16)
-                .voltage(Voltage.LV)
-                .workTicks(300)
-                .build()
-                .recipe(DATA_GEN, suffix(sapling, "_with_fertilizer"))
-                .inputItem(saplingItem, 1)
-                .inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
-                .inputItem(2, FERTILIZER, 2)
-                .outputItem(logItem, 12)
-                .outputItem(saplingItem, 4)
-                .outputItem(leavesItem, 32)
-                .voltage(Voltage.MV)
-                .workTicks(300)
-                .build();
+            var logItem = ITEMS.getEntry(mcLoc(prefix + "_log"));
+            var leavesItem = ITEMS.getEntry(mcLoc(prefix + "_leaves"));
+            woodFarmRecipes(sapling, saplingItem, logItem, leavesItem);
         }
+    }
+
+    private static void woodFarmRecipes(ResourceLocation loc,
+        Supplier<? extends ItemLike> saplingItem,
+        Supplier<? extends ItemLike> logItem,
+        Supplier<? extends ItemLike> leavesItem) {
+
+        var isRubber = loc.equals(RUBBER_SAPLING.loc());
+
+        AUTOFARM.recipe(DATA_GEN, loc)
+            .inputItem(saplingItem, 1)
+            .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(1f))
+            .outputItem(logItem, 6)
+            .transform($ -> isRubber ? $.outputItem(STICKY_RESIN, 6) : $)
+            .outputItem(saplingItem, 2)
+            .voltage(Voltage.LV)
+            .workTicks(1600)
+            .build()
+            .recipe(DATA_GEN, suffix(loc, "_with_bone_meal"))
+            .inputItem(saplingItem, 1)
+            .inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
+            .inputItem(2, () -> Items.BONE_MEAL, 2)
+            .outputItem(logItem, 6)
+            .transform($ -> isRubber ? $.outputItem(STICKY_RESIN, 6) : $)
+            .outputItem(saplingItem, 2)
+            .outputItem(leavesItem, 16)
+            .voltage(Voltage.LV)
+            .workTicks(300)
+            .build()
+            .recipe(DATA_GEN, suffix(loc, "_with_fertilizer"))
+            .inputItem(saplingItem, 1)
+            .inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
+            .inputItem(2, FERTILIZER, 2)
+            .outputItem(logItem, 12)
+            .transform($ -> isRubber ? $.outputItem(STICKY_RESIN, 12) : $)
+            .outputItem(saplingItem, 4)
+            .outputItem(leavesItem, 32)
+            .voltage(Voltage.MV)
+            .workTicks(300)
+            .build();
     }
 
     private static void generatorRecipes(IRecipeType<ProcessingRecipe.Builder> type,

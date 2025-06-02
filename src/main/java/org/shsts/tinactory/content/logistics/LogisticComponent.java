@@ -41,14 +41,6 @@ public class LogisticComponent extends NetworkComponent {
             storagePorts.add(key);
         }
 
-        public Collection<PortKey> subnetPorts() {
-            return subnetPorts;
-        }
-
-        public Collection<PortKey> storagePorts() {
-            return storagePorts;
-        }
-
         public void unregisterPort(PortKey key) {
             subnetPorts.remove(key);
             storagePorts.remove(key);
@@ -58,6 +50,7 @@ public class LogisticComponent extends NetworkComponent {
     private final Map<PortKey, PortInfo> ports = new HashMap<>();
     private final Map<BlockPos, Subnet> subnets = new HashMap<>();
     private final Set<PortKey> globalPorts = new HashSet<>();
+    private final Map<BlockPos, Runnable> onUpdatePorts = new HashMap<>();
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
@@ -79,6 +72,9 @@ public class LogisticComponent extends NetworkComponent {
         } else {
             getSubnet(subnet).registerSubnetPort(key);
         }
+        if (onUpdatePorts.containsKey(subnet)) {
+            onUpdatePorts.get(subnet).run();
+        }
     }
 
     public void registerStoragePort(BlockPos subnet, IMachine machine, int index, IPort port) {
@@ -87,6 +83,9 @@ public class LogisticComponent extends NetworkComponent {
             ports.put(key, new PortInfo(machine, index, port, subnet, false));
         }
         getSubnet(subnet).registerStoragePort(key);
+        if (onUpdatePorts.containsKey(subnet)) {
+            onUpdatePorts.get(subnet).run();
+        }
     }
 
     public void unregisterPort(IMachine machine, int index) {
@@ -96,18 +95,21 @@ public class LogisticComponent extends NetworkComponent {
             ports.remove(key);
             getSubnet(info.subnet).unregisterPort(key);
             globalPorts.remove(key);
+            if (onUpdatePorts.containsKey(info.subnet)) {
+                onUpdatePorts.get(info.subnet).run();
+            }
         }
     }
 
     public Collection<PortInfo> getVisiblePorts(BlockPos subnet) {
         var ret = new ArrayList<PortInfo>();
         globalPorts.forEach(key -> ret.add(ports.get(key)));
-        getSubnet(subnet).subnetPorts().forEach(key -> ret.add(ports.get(key)));
+        getSubnet(subnet).subnetPorts.forEach(key -> ret.add(ports.get(key)));
         return ret;
     }
 
     public Collection<IPort> getStoragePorts(BlockPos subnet) {
-        return getSubnet(subnet).storagePorts().stream()
+        return getSubnet(subnet).storagePorts.stream()
             .map(key -> ports.get(key).port())
             .toList();
     }
@@ -116,11 +118,16 @@ public class LogisticComponent extends NetworkComponent {
         return Optional.ofNullable(ports.get(key));
     }
 
+    public void onUpdatePorts(BlockPos subnet, Runnable callback) {
+        onUpdatePorts.put(subnet, callback);
+    }
+
     @Override
     public void onDisconnect() {
         ports.clear();
         globalPorts.clear();
         subnets.clear();
+        onUpdatePorts.clear();
     }
 
     private void onTick(Level world, INetwork network) {}
