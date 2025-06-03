@@ -179,7 +179,7 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         blockEntity.setChanged();
     }
 
-    public void setUpdateRecipe() {
+    private void setUpdateRecipe() {
         if (currentRecipe == null) {
             needUpdate = true;
         }
@@ -287,7 +287,7 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         return getMachine().flatMap(IMachine::container);
     }
 
-    public void onServerLoad(Level world) {
+    private void onServerLoad(Level world) {
         currentRecipe = Optional.ofNullable(currentRecipeLoc)
             .flatMap($ -> fromLoc(world, $))
             .orElse(null);
@@ -301,13 +301,13 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         TechManager.server().onProgressChange(onTechChange);
     }
 
-    public void onRemoved(Level world) {
+    private void onRemoved(Level world) {
         if (!world.isClientSide) {
             TechManager.server().removeProgressChangeListener(onTechChange);
         }
     }
 
-    public void onMachineConfig() {
+    private void onMachineConfig() {
         updateTargetRecipe();
         setUpdateRecipe();
     }
@@ -335,6 +335,9 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         var tag = new CompoundTag();
         if (currentRecipe != null) {
             tag.putString("currentRecipe", toLoc(currentRecipe).toString());
+            tag.putLong("workProgress", workProgress);
+        } else if (currentRecipeLoc != null) {
+            tag.putString("currentRecipe", currentRecipeLoc.toString());
             tag.putLong("workProgress", workProgress);
         }
         return tag;
