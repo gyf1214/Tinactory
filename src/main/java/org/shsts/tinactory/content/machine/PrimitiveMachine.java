@@ -78,8 +78,8 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
         }
 
         @Override
-        public boolean getBoolean(String key) {
-            return false;
+        public Optional<Boolean> getBoolean(String key) {
+            return Optional.empty();
         }
 
         @Override

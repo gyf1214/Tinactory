@@ -15,7 +15,11 @@ public interface IMachineConfig extends INBTSerializable<CompoundTag> {
 
     boolean contains(String key, int tagType);
 
-    boolean getBoolean(String key);
+    Optional<Boolean> getBoolean(String key);
+
+    default boolean getBoolean(String key, boolean defaultValue) {
+        return getBoolean(key).orElse(defaultValue);
+    }
 
     Optional<String> getString(String key);
 

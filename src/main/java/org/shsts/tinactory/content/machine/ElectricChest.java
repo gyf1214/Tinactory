@@ -38,7 +38,6 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     public final int capacity;
     private final int size;
     private final WrapperItemHandler internalItems;
-    private final WrapperItemHandler externalItems;
     private final IItemCollection externalPort;
     private final ItemStack[] filters;
     private final LazyOptional<?> itemHandlerCap;
@@ -91,6 +90,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         super(blockEntity, layout);
         this.size = layout.slots.size() / 2;
         this.capacity = CONFIG.chestSize.get();
+        this.filters = new ItemStack[size];
 
         var inner = new ItemSlotHandler(size, capacity);
         this.internalItems = new WrapperItemHandler(inner);
@@ -99,16 +99,10 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
             var slot = i;
             internalItems.setFilter(i, stack -> allowStackInSlot(slot, stack));
         }
-        var externalHandler = new ExternalItemHandler();
 
-        this.externalItems = new WrapperItemHandler(internalItems);
-        this.externalPort = new ItemHandlerCollection(this.externalItems) {
-            @Override
-            public boolean acceptOutput() {
-                return allowOutput();
-            }
-        };
-        this.filters = new ItemStack[size];
+        var externalHandler = new ExternalItemHandler();
+        var externalItems = new WrapperItemHandler(internalItems);
+        this.externalPort = new ItemHandlerCollection(externalItems);
         this.itemHandlerCap = LazyOptional.of(() -> externalHandler);
     }
 
@@ -156,12 +150,6 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     @Override
     protected void onMachineConfig() {
-        var allowInput = allowInput();
-        var allowOutput = allowOutput();
-        for (var i = 0; i < size; i++) {
-            externalItems.setFilter(i, $ -> allowInput);
-            externalItems.setAllowOutput(i, allowOutput);
-        }
         machine.network().ifPresent(network -> registerPort(network, externalPort));
     }
 

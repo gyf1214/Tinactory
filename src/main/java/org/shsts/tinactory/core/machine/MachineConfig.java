@@ -26,8 +26,8 @@ public class MachineConfig implements IMachineConfig {
     }
 
     @Override
-    public boolean getBoolean(String key) {
-        return tag.getBoolean(key);
+    public Optional<Boolean> getBoolean(String key) {
+        return tag.contains(key, Tag.TAG_BYTE) ? Optional.of(tag.getBoolean(key)) : Optional.empty();
     }
 
     @Override

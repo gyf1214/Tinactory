@@ -40,28 +40,21 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     }
 
     public boolean isUnlocked() {
-        return machineConfig.getBoolean("unlockChest");
-    }
-
-    public boolean allowInput() {
-        return machineConfig.getBoolean("allowInput");
-    }
-
-    public boolean allowOutput() {
-        return machineConfig.getBoolean("allowOutput");
+        return machineConfig.getBoolean("unlockChest", false);
     }
 
     public boolean isGlobal() {
-        return machineConfig.getBoolean("global");
+        return machineConfig.getBoolean("global", false);
+    }
+
+    public boolean isStorage() {
+        return machineConfig.getBoolean("storage", true);
     }
 
     protected void registerPort(INetwork network, IPort port) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        var subnet = network.getSubnet(blockEntity.getBlockPos());
-
         logistics.unregisterPort(machine, 0);
-        logistics.registerPort(subnet, machine, 0, port, isGlobal());
-        logistics.registerStoragePort(subnet, machine, 0, port);
+        logistics.registerPort(machine, 0, port, isGlobal(), isStorage());
     }
 
     protected void onSlotChange() {

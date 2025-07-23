@@ -231,13 +231,12 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         this.network = (Network) network;
 
         container().ifPresent(container -> {
-            var subnet = network.getSubnet(blockEntity.getBlockPos());
             var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
             for (var i = 0; i < container.portSize(); i++) {
                 if (!container.hasPort(i)) {
                     continue;
                 }
-                logistics.registerPort(subnet, this, i, container.getPort(i, false), false);
+                logistics.registerPort(this, i, container.getPort(i, false), false, false);
             }
         });
 

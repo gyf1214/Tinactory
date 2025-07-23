@@ -31,7 +31,6 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     private final int size;
     private final WrapperFluidTank[] innerTanks;
-    private final WrapperFluidTank[] externalTanks;
     private final CombinedFluidTank innerPort;
     private final CombinedFluidTank externalPort;
     private final FluidStack[] filters;
@@ -42,7 +41,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         this.size = layout.slots.size();
         var capacity = CONFIG.tankSize.get();
         this.innerTanks = new WrapperFluidTank[size];
-        this.externalTanks = new WrapperFluidTank[size];
+        var externalTanks = new WrapperFluidTank[size];
         for (var i = 0; i < size; i++) {
             var slot = i;
             innerTanks[i] = new WrapperFluidTank(capacity);
@@ -83,12 +82,6 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     @Override
     protected void onMachineConfig() {
-        var allowInput = allowInput();
-        var allowOutput = allowOutput();
-        for (var i = 0; i < size; i++) {
-            externalTanks[i].allowInput = allowInput;
-            externalTanks[i].allowOutput = allowOutput;
-        }
         machine.network().ifPresent(network -> registerPort(network, externalPort));
     }
 

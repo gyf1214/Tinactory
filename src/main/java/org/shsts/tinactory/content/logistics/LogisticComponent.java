@@ -11,7 +11,6 @@ import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.NetworkComponent;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +26,7 @@ import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 public class LogisticComponent extends NetworkComponent {
     public record PortKey(UUID machineId, int portIndex) {}
 
-    public record PortInfo(IMachine machine, int portIndex, IPort port, BlockPos subnet, boolean isGlobal) {}
+    public record PortInfo(IMachine machine, int portIndex, IPort port) {}
 
     private static class Subnet {
         private final Set<PortKey> subnetPorts = new HashSet<>();
@@ -60,52 +59,57 @@ public class LogisticComponent extends NetworkComponent {
         return subnets.computeIfAbsent(subnet, $ -> new Subnet());
     }
 
-    /**
-     * Call this function first before calling {@link #registerStoragePort} if you want both.
-     */
-    public void registerPort(BlockPos subnet, IMachine machine, int index, IPort port, boolean isGlobal) {
-        var key = new PortKey(machine.uuid(), index);
-        assert !ports.containsKey(key);
-        ports.put(key, new PortInfo(machine, index, port, subnet, isGlobal));
-        if (isGlobal) {
-            globalPorts.add(key);
-        } else {
-            getSubnet(subnet).registerSubnetPort(key);
-        }
+    private BlockPos getMachineSubnet(IMachine machine) {
+        return network.getSubnet(machine.blockEntity().getBlockPos());
+    }
+
+    private void invokeUpdate(BlockPos subnet) {
+        // TODO: allow multiple callbacks
         if (onUpdatePorts.containsKey(subnet)) {
             onUpdatePorts.get(subnet).run();
         }
     }
 
-    public void registerStoragePort(BlockPos subnet, IMachine machine, int index, IPort port) {
+    private PortKey registerPort(IMachine machine, int index, IPort port) {
         var key = new PortKey(machine.uuid(), index);
-        if (!ports.containsKey(key)) {
-            ports.put(key, new PortInfo(machine, index, port, subnet, false));
+        assert !ports.containsKey(key);
+        ports.put(key, new PortInfo(machine, index, port));
+        return key;
+    }
+
+    public void registerPort(IMachine machine, int index, IPort port,
+        boolean isGlobal, boolean isStorage) {
+        var subnet = getMachineSubnet(machine);
+        var key = registerPort(machine, index, port);
+        var logisticSubnet = getSubnet(subnet);
+        logisticSubnet.registerSubnetPort(key);
+        if (isGlobal) {
+            globalPorts.add(key);
         }
-        getSubnet(subnet).registerStoragePort(key);
-        if (onUpdatePorts.containsKey(subnet)) {
-            onUpdatePorts.get(subnet).run();
+        if (isStorage) {
+            logisticSubnet.registerStoragePort(key);
         }
+        invokeUpdate(subnet);
     }
 
     public void unregisterPort(IMachine machine, int index) {
         var key = new PortKey(machine.uuid(), index);
         if (ports.containsKey(key)) {
             var info = ports.get(key);
+            var subnet = getMachineSubnet(info.machine);
             ports.remove(key);
-            getSubnet(info.subnet).unregisterPort(key);
             globalPorts.remove(key);
-            if (onUpdatePorts.containsKey(info.subnet)) {
-                onUpdatePorts.get(info.subnet).run();
-            }
+            getSubnet(subnet).unregisterPort(key);
+            invokeUpdate(subnet);
         }
     }
 
     public Collection<PortInfo> getVisiblePorts(BlockPos subnet) {
-        var ret = new ArrayList<PortInfo>();
-        globalPorts.forEach(key -> ret.add(ports.get(key)));
-        getSubnet(subnet).subnetPorts.forEach(key -> ret.add(ports.get(key)));
-        return ret;
+        var keys = new HashSet<PortKey>();
+        keys.addAll(globalPorts);
+        keys.addAll(getSubnet(subnet).subnetPorts);
+
+        return keys.stream().map(ports::get).toList();
     }
 
     public Collection<IPort> getStoragePorts(BlockPos subnet) {
@@ -114,11 +118,16 @@ public class LogisticComponent extends NetworkComponent {
             .toList();
     }
 
-    public Optional<PortInfo> getPort(PortKey key) {
-        return Optional.ofNullable(ports.get(key));
+    public Optional<PortInfo> getPort(PortKey key, BlockPos subnet) {
+        if (globalPorts.contains(key) || getSubnet(subnet).subnetPorts.contains(key)) {
+            return Optional.ofNullable(ports.get(key));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public void onUpdatePorts(BlockPos subnet, Runnable callback) {
+        // TODO: allow multiple callbacks
         onUpdatePorts.put(subnet, callback);
     }
 
