@@ -11,7 +11,6 @@ import org.shsts.tinactory.content.machine.ElectricTank;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
@@ -31,6 +30,7 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -127,7 +127,7 @@ public class ElectricTankPlugin extends ElectricStoragePlugin {
         for (var slot : layout.slots) {
             var rect = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
             var rect1 = rect.offset(1, 1).enlarge(-2, -2);
-            layoutPanel.addWidget(rect, new StaticWidget(menu, Texture.SLOT_BACKGROUND));
+            layoutPanel.addWidget(rect, new StaticWidget(menu, SLOT_BACKGROUND));
             layoutPanel.addWidget(rect1, new TankSlot(menu, slot));
         }
         screen.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);

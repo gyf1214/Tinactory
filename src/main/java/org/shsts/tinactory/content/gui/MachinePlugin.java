@@ -14,7 +14,6 @@ import org.shsts.tinactory.core.common.ValueHolder;
 import org.shsts.tinactory.core.gui.ProcessingPlugin;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.machine.MachineProcessor;
@@ -34,7 +33,9 @@ import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_AN
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.PANEL_OFFSET;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Texture.GREGTECH_LOGO;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
+import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -70,7 +71,7 @@ public class MachinePlugin extends ProcessingPlugin {
         var buttonY = layout.rect.endY() + SPACING;
 
         var portPanel = new PortPanel(screen, layout);
-        var button = new SimpleButton(menu, Texture.SWITCH_BUTTON,
+        var button = new SimpleButton(menu, SWITCH_BUTTON,
             I18n.tr("tinactory.tooltip.openPortPanel"), 0, 0, 0, 0) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
@@ -81,7 +82,7 @@ public class MachinePlugin extends ProcessingPlugin {
                 }
             }
         };
-        var buttonOverlay = new StaticWidget(menu, Texture.GREGTECH_LOGO);
+        var buttonOverlay = new StaticWidget(menu, GREGTECH_LOGO);
         screen.addPanel(PANEL_ANCHOR, PANEL_OFFSET, portPanel);
         portPanel.setActive(false);
         var buttonAnchor = RectD.corners(1d, 0d, 1d, 0d);

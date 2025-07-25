@@ -14,7 +14,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinycorelib.api.gui.IMenu;
 import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
 
@@ -28,6 +27,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.BACKGROUND;
+import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -52,7 +52,7 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
             if (slot.isActive()) {
                 int x = slot.x - 1 - MARGIN_X;
                 int y = slot.y - 1 - MARGIN_TOP;
-                var slotBg = new StaticWidget(menu, Texture.SLOT_BACKGROUND);
+                var slotBg = new StaticWidget(menu, SLOT_BACKGROUND);
                 rootPanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
             }
         }

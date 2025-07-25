@@ -42,6 +42,23 @@ import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
 import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_ARROW;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_BATH;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_BENDING;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_CIRCUIT;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_CIRCUIT_ASSEMBLER;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_EXTRACT;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_EXTRUDER;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_GAS;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_LATHE;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_LATH_BASE;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_MACERATE;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_MAGNETIC;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_MIXER;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_MULTIPLE;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_SIFT;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_SLICE;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_WIREMILL;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -102,7 +119,7 @@ public final class AllBlockEntities {
             .port(ITEM_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
             .placeHolder(new Rect(3 * SLOT_SIZE, SLOT_SIZE / 2 - 2, 24, 24))
-            .progressBar(Texture.PROGRESS_MULTIPLE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_MULTIPLE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -117,7 +134,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
-            .progressBar(Texture.PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE)
+            .progressBar(PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE)
             .build()
             .buildObject();
 
@@ -129,7 +146,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_ARROW, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -142,7 +159,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_CIRCUIT_ASSEMBLER, 8 + SLOT_SIZE * 3, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_CIRCUIT_ASSEMBLER, 8 + SLOT_SIZE * 3, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -154,7 +171,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE / 2)
             .port(FLUID_OUTPUT)
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, Voltage.ULV)
-            .progressBar(Texture.PROGRESS_MACERATE, 8, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_MACERATE, 8, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -169,7 +186,7 @@ public final class AllBlockEntities {
             .slots(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, 1, 2, Voltage.PRIMITIVE, Voltage.ULV)
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, List.of(Voltage.ULV))
             .slots(SLOT_SIZE * 3, 1, 2, 3, Voltage.LV)
-            .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -183,7 +200,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2, Voltage.MV, Voltage.HV)
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, List.of(Voltage.HV))
             .slots(SLOT_SIZE * 3, 1, 2, 2, Voltage.EV)
-            .progressBar(Texture.PROGRESS_MACERATE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_MACERATE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -201,7 +218,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, Voltage.ULV)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE / 2, Voltage.ULV)
-            .progressBar(Texture.PROGRESS_BATH, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_BATH, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -216,7 +233,7 @@ public final class AllBlockEntities {
             .slots(SLOT_SIZE * 4, 1, 1, 3)
             .port(FLUID_OUTPUT)
             .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 3)
-            .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -228,7 +245,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -239,7 +256,7 @@ public final class AllBlockEntities {
             .machine(RecipeProcessor::electricFurnace)
             .tintVoltage(2)
             .voltages(Voltage.ULV)
-            .transform(simpleLayout(Texture.PROGRESS_ARROW))
+            .transform(simpleLayout(PROGRESS_ARROW))
             .buildObject();
 
         ALLOY_SMELTER = set.processing(AllRecipes.ALLOY_SMELTER)
@@ -251,7 +268,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2)
             .port(FLUID_OUTPUT)
             .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE * 3, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_ARROW, 8 + SLOT_SIZE * 3, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -266,18 +283,18 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
             .port(FLUID_OUTPUT)
             .slot(SLOT_SIZE * 6, 1 + SLOT_SIZE)
-            .progressBar(Texture.PROGRESS_MIXER, 8 + SLOT_SIZE * 3, SLOT_SIZE)
+            .progressBar(PROGRESS_MIXER, 8 + SLOT_SIZE * 3, SLOT_SIZE)
             .build()
             .buildObject();
 
-        POLARIZER = set.simpleMachine(AllRecipes.POLARIZER, Texture.PROGRESS_MAGNETIC);
-        WIREMILL = set.simpleMachine(AllRecipes.WIREMILL, Texture.PROGRESS_WIREMILL);
-        BENDER = set.simpleMachine(AllRecipes.BENDER, Texture.PROGRESS_BENDING);
+        POLARIZER = set.simpleMachine(AllRecipes.POLARIZER, PROGRESS_MAGNETIC);
+        WIREMILL = set.simpleMachine(AllRecipes.WIREMILL, PROGRESS_WIREMILL);
+        BENDER = set.simpleMachine(AllRecipes.BENDER, PROGRESS_BENDING);
 
         LATHE = set.processing(AllRecipes.LATHE)
-            .transform(simpleLayout(Texture.PROGRESS_LATHE))
+            .transform(simpleLayout(PROGRESS_LATHE))
             .layoutSet()
-            .image(28 + SLOT_SIZE, 1 + SLOT_SIZE / 2, Texture.PROGRESS_LATH_BASE)
+            .image(28 + SLOT_SIZE, 1 + SLOT_SIZE / 2, PROGRESS_LATH_BASE)
             .build()
             .buildObject();
 
@@ -289,14 +306,14 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_SLICE, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_SLICE, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
         EXTRUDER = set.processing(AllRecipes.EXTRUDER)
             .voltages(Voltage.MV)
             .processor(RecipeProcessor::noAutoRecipe)
-            .transform(simpleLayout(Texture.PROGRESS_EXTRUDER))
+            .transform(simpleLayout(PROGRESS_EXTRUDER))
             .buildObject();
 
         EXTRACTOR = set.processing(AllRecipes.EXTRACTOR)
@@ -307,7 +324,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
             .port(FLUID_OUTPUT)
             .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_EXTRACT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -318,7 +335,7 @@ public final class AllBlockEntities {
             .slot(0, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -333,7 +350,7 @@ public final class AllBlockEntities {
             .slots(SLOT_SIZE * 4, 1, 1, 3)
             .port(FLUID_OUTPUT)
             .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 3)
-            .progressBar(Texture.PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_EXTRACT, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -349,7 +366,7 @@ public final class AllBlockEntities {
             .slots(SLOT_SIZE * 4, 1, 1, 2)
             .port(FLUID_OUTPUT)
             .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 2)
-            .progressBar(Texture.PROGRESS_MIXER, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_MIXER, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -362,7 +379,7 @@ public final class AllBlockEntities {
             .slot(SLOT_SIZE, 1)
             .port(ITEM_OUTPUT)
             .slot(SLOT_SIZE * 4, 1)
-            .progressBar(Texture.PROGRESS_SLICE, 8 + SLOT_SIZE * 2, 0)
+            .progressBar(PROGRESS_SLICE, 8 + SLOT_SIZE * 2, 0)
             .build()
             .buildObject();
 
@@ -374,7 +391,7 @@ public final class AllBlockEntities {
             .slot(0, 1 + SLOT_SIZE / 2)
             .port(FLUID_OUTPUT)
             .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -384,7 +401,7 @@ public final class AllBlockEntities {
             .layoutSet()
             .port(FLUID_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 
@@ -394,7 +411,7 @@ public final class AllBlockEntities {
             .layoutSet()
             .port(FLUID_INPUT)
             .slot(0, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .build()
             .buildObject();
 

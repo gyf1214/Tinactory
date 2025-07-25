@@ -44,7 +44,10 @@ import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
+import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
+import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 
 @OnlyIn(Dist.CLIENT)
@@ -78,8 +81,6 @@ public class LogisticWorkerScreen extends MenuScreen {
         private static final Rect FROM_RECT = new Rect(1, 1, BUTTON_SIZE, BUTTON_SIZE);
         private static final Rect TO_RECT = FROM_RECT.offset(BUTTON_SIZE * 2 + SPACING * 2, 0);
         private static final Rect VALID_RECT = FROM_RECT.offset(BUTTON_SIZE + SPACING, 0);
-        private static final Texture VALID_TEX = new Texture(
-            gregtech("gui/widget/button_allow_import_export"), 20, 40);
         private static final Texture BACKGROUND_TEX = new Texture(
             mcLoc("gui/container/enchanting_table"), 256, 256);
         private static final Rect BG_TEX_RECT = new Rect(0, 185, 108, 19);
@@ -112,13 +113,14 @@ public class LogisticWorkerScreen extends MenuScreen {
             var isValid = config.isValid();
             var fromRect = rect.offset(1, 1).resize(BUTTON_SIZE, BUTTON_SIZE);
             var validRect = fromRect.offset(BUTTON_SIZE + SPACING, 1)
-                .resize(VALID_TEX.width(), VALID_TEX.height() / 2);
+                .resize(ALLOW_ARROW_BUTTON.width(), ALLOW_ARROW_BUTTON.height() / 2);
             var toRect = fromRect.offset(BUTTON_SIZE * 2 + SPACING * 2, 0);
 
             StretchImage.render(poseStack, BACKGROUND_TEX, z, rect, BG_TEX_RECT, 2);
-            RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, z, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
-            RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, z, toRect, isTo ? BUTTON_SIZE : 0, 0);
-            RenderUtil.blit(poseStack, VALID_TEX, z, validRect, 0, isValid ? VALID_TEX.height() / 2 : 0);
+            RenderUtil.blit(poseStack, RECIPE_BUTTON, z, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
+            RenderUtil.blit(poseStack, RECIPE_BUTTON, z, toRect, isTo ? BUTTON_SIZE : 0, 0);
+            RenderUtil.blit(poseStack,
+                ALLOW_ARROW_BUTTON, z, validRect, 0, isValid ? ALLOW_ARROW_BUTTON.height() / 2 : 0);
             RenderUtil.renderItem(from, fromRect.x() + 2, fromRect.y() + 2);
             RenderUtil.renderItem(to, toRect.x() + 2, toRect.y() + 2);
         }
@@ -172,7 +174,7 @@ public class LogisticWorkerScreen extends MenuScreen {
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
             float partialTick, Rect rect, int index) {
             var machine = machineList.get(index);
-            RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, getBlitOffset(), rect,
+            RenderUtil.blit(poseStack, RECIPE_BUTTON, getBlitOffset(), rect,
                 machine.id.equals(selectedMachine) ? 21 : 0, 0);
             RenderUtil.renderItem(machine.icon, rect.x() + 2, rect.y() + 2);
         }
@@ -224,11 +226,10 @@ public class LogisticWorkerScreen extends MenuScreen {
                 return;
             }
             var port = ports.get(index);
-            var tex = Texture.SWITCH_BUTTON;
-            var texRect = new Rect(0, isSelected(port) ? tex.height() / 2 : 0,
-                tex.width(), tex.height() / 2);
+            var texRect = new Rect(0, isSelected(port) ? SWITCH_BUTTON.height() / 2 : 0,
+                SWITCH_BUTTON.width(), SWITCH_BUTTON.height() / 2);
             isSelected(port);
-            StretchImage.render(poseStack, tex, getBlitOffset(), rect, texRect, 3);
+            StretchImage.render(poseStack, SWITCH_BUTTON, getBlitOffset(), rect, texRect, 3);
 
             RenderUtil.renderText(poseStack, port.portName(),
                 rect.x() + X_OFFSET, rect.y() + Y_OFFSET, PortPanel.TEXT_COLOR);
@@ -287,7 +288,7 @@ public class LogisticWorkerScreen extends MenuScreen {
         addWidget(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
             new Label(menu, tr("portLabel")));
 
-        var bg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
+        var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
         addWidget(anchor2, offset2.offset(-2, -2).enlarge(4, 4), bg);
 
         addPanel(RectD.corners(0d, 0d, 0d, 1d), offset1, configPanel);

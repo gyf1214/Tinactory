@@ -9,7 +9,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.gui.IMenu;
@@ -17,6 +16,8 @@ import org.shsts.tinycorelib.api.gui.IMenu;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -74,7 +75,7 @@ public abstract class ButtonPanel extends Panel {
         private final int pageChange;
 
         public PageButton(IMenu menu, int texX, int pageChange) {
-            super(menu, Texture.RECIPE_BOOK_BG, null, texX, TEX_Y,
+            super(menu, RECIPE_BOOK_BG, null, texX, TEX_Y,
                 texX, TEX_Y + PAGE_OFFSET.height());
             this.pageChange = pageChange;
         }

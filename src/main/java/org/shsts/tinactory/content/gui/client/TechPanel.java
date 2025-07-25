@@ -41,6 +41,8 @@ import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
+import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -219,7 +221,7 @@ public class TechPanel extends Panel {
         var top = BUTTON_SIZE + MARGIN_VERTICAL * 2;
         var offset1 = Rect.corners(-1, top + FONT_HEIGHT + SPACING, LEFT_WIDTH - 1, 0);
         var offset2 = offset1.offset(PANEL_BORDER, PANEL_BORDER).enlarge(-PANEL_BORDER * 2, -PANEL_BORDER * 2);
-        var bg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
+        var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
         addWidget(new Rect(0, top, LEFT_WIDTH, FONT_HEIGHT), label2);
         addWidget(anchor1, offset1, bg);
         addPanel(anchor1, offset2, availableTechPanel);
@@ -262,13 +264,12 @@ public class TechPanel extends Panel {
             color = INVALID_COLOR;
         }
 
-        var tex = Texture.SWITCH_BUTTON;
-        var th = Texture.SWITCH_BUTTON.height() / 2;
-        var texRect = new Rect(0, 0, tex.width(), th);
+        var th = SWITCH_BUTTON.height() / 2;
+        var texRect = new Rect(0, 0, SWITCH_BUTTON.width(), th);
         if (pressed) {
             texRect = texRect.offset(0, th);
         }
-        StretchImage.render(poseStack, Texture.SWITCH_BUTTON, z, color, rect, texRect, 1);
+        StretchImage.render(poseStack, SWITCH_BUTTON, z, color, rect, texRect, 1);
 
         var x = rect.x() + (rect.width() - 16) / 2;
         var y = rect.y() + (rect.height() - 16) / 2;

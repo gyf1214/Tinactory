@@ -11,7 +11,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
@@ -23,6 +22,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -44,7 +44,7 @@ public class ProcessingScreen extends MenuScreen {
                 var syncSlot = "fluidSlot_" + slot.index();
                 var rect = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
                 var rect1 = rect.offset(1, 1).enlarge(-2, -2);
-                layoutPanel.addWidget(rect, new StaticWidget(menu, Texture.SLOT_BACKGROUND));
+                layoutPanel.addWidget(rect, new StaticWidget(menu, SLOT_BACKGROUND));
                 layoutPanel.addWidget(rect1, new FluidSlot(menu, slot.index(), syncSlot));
             }
         }

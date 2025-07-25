@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Texture.VOID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -95,7 +96,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     }
 
     public LayoutSetBuilder<P> placeHolder(Rect rect) {
-        return image(rect, Texture.VOID);
+        return image(rect, VOID);
     }
 
     public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {

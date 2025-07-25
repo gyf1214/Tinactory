@@ -13,7 +13,6 @@ import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
@@ -33,6 +32,9 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Texture.DISABLE_BUTTON;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -82,12 +84,12 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             var recipe = getRecipe(loc);
             var z = getBlitOffset();
             if (Objects.equals(getCurrentRecipeLoc(), loc)) {
-                RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, z, rect, 21, 0);
+                RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect, 21, 0);
             } else {
-                RenderUtil.blit(poseStack, Texture.RECIPE_BUTTON, z, rect);
+                RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect);
             }
             if (recipe == null) {
-                RenderUtil.blit(poseStack, Texture.DISABLE_BUTTON, z, rect.offset(2, 2).enlarge(-5, -5));
+                RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect.offset(2, 2).enlarge(-5, -5));
             } else {
                 AbstractRecipeBook.this.renderButton(poseStack, mouseX, mouseY, partialTick, recipe, rect, z);
             }
@@ -137,7 +139,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
         this.ghostRecipe = new GhostRecipe(menu);
 
         buttonPanel = new RecipeButtonPanel();
-        var panelBg = new StretchImage(menu, Texture.RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);
+        var panelBg = new StretchImage(menu, RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);
         bookPanel.addWidget(RectD.FULL, Rect.ZERO, panelBg);
         bookPanel.addPanel(BUTTON_PANEL_OFFSET, buttonPanel);
         bookPanel.setActive(false);

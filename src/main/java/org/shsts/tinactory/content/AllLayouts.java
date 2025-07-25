@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinycorelib.api.core.Transformer;
 
 import java.util.ArrayList;
@@ -16,6 +15,13 @@ import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Texture.CRAFTING_ARROW;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_ARROW;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_CLEANROOM;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_EXTRACT;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_MIXER;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_RECYCLER;
+import static org.shsts.tinactory.core.gui.Texture.PROGRESS_SIFT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -34,7 +40,7 @@ public final class AllLayouts {
     static {
         WORKBENCH = Layout.builder()
             .dummySlot(9 + 6 * SLOT_SIZE, SLOT_SIZE)
-            .image(16 + 4 * SLOT_SIZE, 20, Texture.CRAFTING_ARROW)
+            .image(16 + 4 * SLOT_SIZE, 20, CRAFTING_ARROW)
             .port(ITEM_INPUT)
             .slots(0, 3 * SLOT_SIZE + SPACING, 1, 9)
             .slots(9 + SLOT_SIZE, 0, 3, 3)
@@ -58,7 +64,7 @@ public final class AllLayouts {
             .slots(5 * SLOT_SIZE, 1, 1, 3)
             .port(FLUID_OUTPUT)
             .slot(5 * SLOT_SIZE, 1 + SLOT_SIZE)
-            .progressBar(Texture.PROGRESS_ARROW, 8 + 3 * SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_ARROW, 8 + 3 * SLOT_SIZE, SLOT_SIZE / 2)
             .buildLayout();
 
         SIFTER = Layout.builder()
@@ -66,7 +72,7 @@ public final class AllLayouts {
             .slot(0, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slots(3 * SLOT_SIZE, 1, 2, 3)
-            .progressBar(Texture.PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
             .buildLayout();
 
         VACUUM_FREEZER = Layout.builder()
@@ -78,7 +84,7 @@ public final class AllLayouts {
             .slot(4 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
             .port(FLUID_OUTPUT)
             .slot(5 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_ARROW, 8 + 2 * SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_ARROW, 8 + 2 * SLOT_SIZE, SLOT_SIZE / 2)
             .buildLayout();
 
         DISTILLATION_TOWER = new ArrayList<>();
@@ -87,7 +93,7 @@ public final class AllLayouts {
         }
 
         CLEANROOM = Layout.builder()
-            .progressBar(Texture.PROGRESS_CLEANROOM, 0, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_CLEANROOM, 0, SLOT_SIZE / 2)
             .buildLayout();
 
         AUTOFARM = Layout.builder()
@@ -99,7 +105,7 @@ public final class AllLayouts {
             .slot(2 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
             .port(ITEM_OUTPUT)
             .slots(5 * SLOT_SIZE, 1, 2, 2)
-            .progressBar(Texture.PROGRESS_RECYCLER, 8 + 3 * SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_RECYCLER, 8 + 3 * SLOT_SIZE, SLOT_SIZE / 2)
             .buildLayout();
 
         PYROLYSE_OVEN = Layout.builder()
@@ -111,7 +117,7 @@ public final class AllLayouts {
             .slot(4 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
             .port(FLUID_OUTPUT)
             .slot(5 * SLOT_SIZE, 1 + SLOT_SIZE / 2)
-            .progressBar(Texture.PROGRESS_EXTRACT, 8 + 2 * SLOT_SIZE, SLOT_SIZE / 2)
+            .progressBar(PROGRESS_EXTRACT, 8 + 2 * SLOT_SIZE, SLOT_SIZE / 2)
             .buildLayout();
 
         LARGE_CHEMICAL_REACTOR = Layout.builder()
@@ -123,7 +129,7 @@ public final class AllLayouts {
             .slots(SLOT_SIZE * 5, 1, 1, 3)
             .port(FLUID_OUTPUT)
             .slots(SLOT_SIZE * 5, 1 + SLOT_SIZE, 2, 2)
-            .progressBar(Texture.PROGRESS_MIXER, 8 + SLOT_SIZE * 3, SLOT_SIZE)
+            .progressBar(PROGRESS_MIXER, 8 + SLOT_SIZE * 3, SLOT_SIZE)
             .buildLayout();
     }
 
@@ -136,7 +142,7 @@ public final class AllLayouts {
             .transform(distillationSlots(slots, 0))
             .port(ITEM_OUTPUT)
             .transform(distillationSlots(slots, SLOT_SIZE + yOffset + 8))
-            .progressBar(Texture.PROGRESS_ARROW, 8 + SLOT_SIZE, yOffset + SLOT_SIZE / 2 + 4)
+            .progressBar(PROGRESS_ARROW, 8 + SLOT_SIZE, yOffset + SLOT_SIZE / 2 + 4)
             .buildLayout();
     }
 
