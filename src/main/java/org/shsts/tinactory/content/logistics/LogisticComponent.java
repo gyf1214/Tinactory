@@ -26,18 +26,17 @@ import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 public class LogisticComponent extends NetworkComponent {
     public record PortKey(UUID machineId, int portIndex) {}
 
-    public record PortInfo(IMachine machine, int portIndex, IPort port) {}
+    public record PortInfo(IMachine machine, int portIndex, IPort port, Collection<BlockPos> subnets) {}
 
     private static class Subnet {
         private final Set<PortKey> subnetPorts = new HashSet<>();
         private final Set<PortKey> storagePorts = new HashSet<>();
 
-        public void registerSubnetPort(PortKey key) {
+        public void registerSubnetPort(PortKey key, boolean isStorage) {
             subnetPorts.add(key);
-        }
-
-        public void registerStoragePort(PortKey key) {
-            storagePorts.add(key);
+            if (isStorage) {
+                storagePorts.add(key);
+            }
         }
 
         public void unregisterPort(PortKey key) {
@@ -70,37 +69,48 @@ public class LogisticComponent extends NetworkComponent {
         }
     }
 
-    private PortKey registerPort(IMachine machine, int index, IPort port) {
+    private PortKey registerPort(IMachine machine, int index, IPort port, Collection<BlockPos> subnets) {
         var key = new PortKey(machine.uuid(), index);
         assert !ports.containsKey(key);
-        ports.put(key, new PortInfo(machine, index, port));
+        ports.put(key, new PortInfo(machine, index, port, subnets));
         return key;
+    }
+
+    public void registerPortInSubnets(IMachine machine, int index, IPort port,
+        boolean isGlobal, Object... subnetOpts) {
+        var subnets = new HashSet<BlockPos>();
+        for (var i = 0; i < subnetOpts.length; i += 2) {
+            var subnet = (BlockPos) subnetOpts[i];
+            subnets.add(subnet);
+        }
+        var key = registerPort(machine, index, port, subnets);
+        if (isGlobal) {
+            globalPorts.add(key);
+        }
+        for (var i = 0; i < subnetOpts.length; i += 2) {
+            var subnet = (BlockPos) subnetOpts[i];
+            var isStorage = (boolean) subnetOpts[i + 1];
+            getSubnet(subnet).registerSubnetPort(key, isStorage);
+            invokeUpdate(subnet);
+        }
     }
 
     public void registerPort(IMachine machine, int index, IPort port,
         boolean isGlobal, boolean isStorage) {
-        var subnet = getMachineSubnet(machine);
-        var key = registerPort(machine, index, port);
-        var logisticSubnet = getSubnet(subnet);
-        logisticSubnet.registerSubnetPort(key);
-        if (isGlobal) {
-            globalPorts.add(key);
-        }
-        if (isStorage) {
-            logisticSubnet.registerStoragePort(key);
-        }
-        invokeUpdate(subnet);
+        registerPortInSubnets(machine, index, port, isGlobal,
+            getMachineSubnet(machine), isStorage);
     }
 
     public void unregisterPort(IMachine machine, int index) {
         var key = new PortKey(machine.uuid(), index);
         if (ports.containsKey(key)) {
             var info = ports.get(key);
-            var subnet = getMachineSubnet(info.machine);
-            ports.remove(key);
             globalPorts.remove(key);
-            getSubnet(subnet).unregisterPort(key);
-            invokeUpdate(subnet);
+            ports.remove(key);
+            for (var subnet : info.subnets) {
+                getSubnet(subnet).unregisterPort(key);
+                invokeUpdate(subnet);
+            }
         }
     }
 
