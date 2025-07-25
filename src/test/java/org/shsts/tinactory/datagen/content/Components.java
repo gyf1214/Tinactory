@@ -49,6 +49,7 @@ import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
 import static org.shsts.tinactory.content.AllItems.EMITTER;
 import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
+import static org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL;
 import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
@@ -248,6 +249,11 @@ public final class Components {
             var k = 1 << (2 * i);
             DATA_GEN.item(ITEM_STORAGE_CELL.get(i))
                 .model(basicItem(ae2("item/item_storage_cell_" + k + "k")))
+                .tag(AllTags.ITEM_STORAGE_CELL)
+                .build();
+            DATA_GEN.item(FLUID_STORAGE_CELL.get(i))
+                .model(basicItem(ae2("item/fluid_storage_cell_" + k + "k")))
+                .tag(AllTags.FLUID_STORAGE_CELL)
                 .build();
         }
     }

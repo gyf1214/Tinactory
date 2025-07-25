@@ -12,7 +12,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IItemCollection;
-import org.shsts.tinactory.core.common.CapabilityProvider;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -28,7 +27,7 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalItemStorage extends CapabilityProvider
+public class DigitalItemStorage extends DigitalStorage
     implements IItemCollection, INBTSerializable<CompoundTag> {
     private record ItemStackWrapper(ItemStack stack) {
         @Override
@@ -47,21 +46,10 @@ public class DigitalItemStorage extends CapabilityProvider
     }
 
     private final Map<ItemStackWrapper, ItemStack> items = new HashMap<>();
-    private final int bytesLimit;
-    private int bytesRemaining;
     private Predicate<ItemStack> filter = TRUE_FILTER;
 
     public DigitalItemStorage(int bytesLimit) {
-        this.bytesLimit = bytesLimit;
-        this.bytesRemaining = bytesLimit;
-    }
-
-    public int bytesLimit() {
-        return bytesLimit;
-    }
-
-    public int bytesUsed() {
-        return bytesLimit - bytesRemaining;
+        super(bytesLimit);
     }
 
     @Override
@@ -175,10 +163,7 @@ public class DigitalItemStorage extends CapabilityProvider
 
     @Override
     public Collection<ItemStack> getAllItems() {
-        if (!acceptOutput()) {
-            return Collections.emptyList();
-        }
-        return items.values();
+        return acceptOutput() ? items.values() : Collections.emptyList();
     }
 
     @Override

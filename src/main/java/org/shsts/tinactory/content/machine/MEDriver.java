@@ -12,10 +12,13 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.logistics.CombinedFluidCollection;
 import org.shsts.tinactory.core.logistics.CombinedItemCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
@@ -27,8 +30,8 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -46,9 +49,11 @@ public class MEDriver extends CapabilityProvider
     private final BlockEntity blockEntity;
     private final Layout layout;
     private final WrapperItemHandler storages;
-    private final CombinedItemCollection combinedCollection;
+    private final CombinedItemCollection combinedItems;
+    private final CombinedFluidCollection combinedFluids;
     private final LazyOptional<IItemHandler> itemHandlerCap;
     private final LazyOptional<IItemCollection> itemCollectionCap;
+    private final LazyOptional<IFluidCollection> fluidCollectionCap;
 
     public MEDriver(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
@@ -58,12 +63,16 @@ public class MEDriver extends CapabilityProvider
         for (var i = 0; i < size; i++) {
             storages.setFilter(i, this::allowItem);
         }
-        this.combinedCollection = new CombinedItemCollection();
         this.itemHandlerCap = LazyOptional.of(() -> storages);
-        this.itemCollectionCap = LazyOptional.of(() -> combinedCollection);
-
         storages.onUpdate(this::onUpdateStorage);
-        combinedCollection.onUpdate(blockEntity::setChanged);
+
+        this.combinedItems = new CombinedItemCollection();
+        this.itemCollectionCap = LazyOptional.of(() -> combinedItems);
+        combinedItems.onUpdate(blockEntity::setChanged);
+
+        this.combinedFluids = new CombinedFluidCollection();
+        this.fluidCollectionCap = LazyOptional.of(() -> combinedFluids);
+        combinedFluids.onUpdate(blockEntity::setChanged);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
@@ -71,7 +80,7 @@ public class MEDriver extends CapabilityProvider
     }
 
     private boolean allowItem(ItemStack stack) {
-        return stack.getCapability(ITEM_COLLECTION.get()).isPresent();
+        return stack.is(AllTags.STORAGE_CELL);
     }
 
     private void onUpdateStorage() {
@@ -81,26 +90,26 @@ public class MEDriver extends CapabilityProvider
         }
         LOGGER.debug("{} on update storage", blockEntity);
         var slots = storages.getSlots();
-        var caps = new ArrayList<IItemCollection>();
+        var items = new ArrayList<IItemCollection>();
+        var fluids = new ArrayList<IFluidCollection>();
         for (var i = 0; i < slots; i++) {
             var stack = storages.getStackInSlot(i);
             if (stack.isEmpty()) {
                 continue;
             }
-            var cap = stack.getCapability(ITEM_COLLECTION.get());
-            if (!cap.isPresent()) {
-                continue;
-            }
-            caps.add(cap.orElseThrow(NoSuchElementException::new));
+            stack.getCapability(ITEM_COLLECTION.get()).ifPresent(items::add);
+            stack.getCapability(FLUID_COLLECTION.get()).ifPresent(fluids::add);
         }
-        combinedCollection.setComposes(caps);
+        combinedItems.setComposes(items);
+        combinedFluids.setComposes(fluids);
         blockEntity.setChanged();
     }
 
     private void onConnect(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         var machine = MACHINE.get(blockEntity);
-        logistics.registerPort(machine, 0, combinedCollection, false, true);
+        logistics.registerPort(machine, 0, combinedItems, false, true);
+        logistics.registerPort(machine, 1, combinedFluids, false, true);
     }
 
     @Override
@@ -116,6 +125,8 @@ public class MEDriver extends CapabilityProvider
             return itemHandlerCap.cast();
         } else if (cap == ITEM_COLLECTION.get()) {
             return itemCollectionCap.cast();
+        } else if (cap == FLUID_COLLECTION.get()) {
+            return fluidCollectionCap.cast();
         }
         return LazyOptional.empty();
     }

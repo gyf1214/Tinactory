@@ -168,6 +168,9 @@ import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllRegistries.ITEMS;
+import static org.shsts.tinactory.content.AllTags.FLUID_STORAGE_CELL;
+import static org.shsts.tinactory.content.AllTags.ITEM_STORAGE_CELL;
+import static org.shsts.tinactory.content.AllTags.STORAGE_CELL;
 import static org.shsts.tinactory.content.AllTags.TOOL;
 import static org.shsts.tinactory.content.AllTags.TOOL_FILE;
 import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
@@ -1013,7 +1016,9 @@ public final class Materials {
             .tag(() -> Items.SHEARS, TOOL_SHEARS)
             .tag(() -> Items.STICK, TOOL_HANDLE)
             .tag(WROUGHT_IRON.tag("stick"), TOOL_HANDLE)
-            .tag(IRON.tag("screw"), TOOL_SCREW);
+            .tag(IRON.tag("screw"), TOOL_SCREW)
+            .tag(ITEM_STORAGE_CELL, STORAGE_CELL)
+            .tag(FLUID_STORAGE_CELL, STORAGE_CELL);
     }
 
     private static void woodRecipes(String prefix) {

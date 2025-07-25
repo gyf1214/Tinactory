@@ -1,11 +1,12 @@
 package org.shsts.tinactory.core.logistics;
 
-import javax.annotation.Nullable;
+import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,18 +15,14 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedItemCollection implements IItemCollection {
+public class CombinedItemCollection extends CombinedCollection implements IItemCollection {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private final List<IItemCollection> composes = new ArrayList<>();
-    @Nullable
-    private Runnable updateListener = null;
 
     public void setComposes(Collection<IItemCollection> val) {
         composes.clear();
         composes.addAll(val);
-    }
-
-    public void onUpdate(Runnable listener) {
-        updateListener = listener;
     }
 
     @Override
@@ -38,25 +35,19 @@ public class CombinedItemCollection implements IItemCollection {
         return composes.stream().anyMatch(IPort::acceptOutput);
     }
 
-    private void invokeUpdate() {
-        if (updateListener != null) {
-            updateListener.run();
-        }
-    }
-
     @Override
     public ItemStack insertItem(ItemStack stack, boolean simulate) {
-        var count = stack.getCount();
+        var stack1 = stack.copy();
         for (var compose : composes) {
-            stack = compose.insertItem(stack, simulate);
-            if (stack.isEmpty()) {
+            if (stack1.isEmpty()) {
                 break;
             }
+            stack1 = compose.insertItem(stack1, simulate);
         }
-        if (!simulate && stack.getCount() < count) {
+        if (!simulate && stack1.getCount() < stack.getCount()) {
             invokeUpdate();
         }
-        return stack;
+        return stack1;
     }
 
     @Override
@@ -71,6 +62,13 @@ public class CombinedItemCollection implements IItemCollection {
             if (!stack.isEmpty()) {
                 if (ret.isEmpty()) {
                     ret = stack;
+                } else if (StackHelper.canItemsStack(ret, stack)) {
+                    ret.grow(stack.getCount());
+                } else {
+                    // don't know what to do actually, can only destroy the extracted item
+                    LOGGER.warn("{}: Extracted item {} cannot stack with required item {}",
+                        this, stack, ret);
+                    continue;
                 }
                 item1.shrink(stack.getCount());
             }

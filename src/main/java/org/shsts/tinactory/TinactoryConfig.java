@@ -21,6 +21,8 @@ public final class TinactoryConfig {
     public final ConfigValue<List<? extends Integer>> workerFluidStack;
     public final ConfigValue<Integer> bytesPerItem;
     public final ConfigValue<Integer> bytesPerItemType;
+    public final ConfigValue<Integer> bytesPerFluid;
+    public final ConfigValue<Integer> bytesPerFluidType;
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
     public final ConfigValue<List<? extends Double>> cableResistanceFactor;
@@ -59,6 +61,10 @@ public final class TinactoryConfig {
             .defineInRange("bytes_per_item", 256, 1, Integer.MAX_VALUE);
         bytesPerItemType = builder.comment("Bytes used per item type by digital storage")
             .defineInRange("bytes_per_item_type", 4096, 1, Integer.MAX_VALUE);
+        bytesPerFluid = builder.comment("Bytes used per fluid by digital storage")
+            .defineInRange("bytes_per_fluid", 1, 1, Integer.MAX_VALUE);
+        bytesPerFluidType = builder.comment("Bytes used per fluid type by digital storage")
+            .defineInRange("bytes_per_fluid_type", 4096, 1, Integer.MAX_VALUE);
         builder.pop();
 
         builder.push("machine");

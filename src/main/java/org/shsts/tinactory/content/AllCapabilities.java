@@ -6,6 +6,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -26,6 +27,7 @@ public final class AllCapabilities {
     public static final ICapability<IFluidStackHandler> FLUID_STACK_HANDLER;
     public static final ICapability<IItemHandlerModifiable> MENU_ITEM_HANDLER;
     public static final ICapability<IItemCollection> ITEM_COLLECTION;
+    public static final ICapability<IFluidCollection> FLUID_COLLECTION;
 
     public static final ICapability<ILayoutProvider> LAYOUT_PROVIDER;
     public static final ICapability<IMachine> MACHINE;
@@ -40,6 +42,7 @@ public final class AllCapabilities {
         FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
         MENU_ITEM_HANDLER = REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
         ITEM_COLLECTION = REGISTRATE.capability(IItemCollection.class, new CapabilityToken<>() {});
+        FLUID_COLLECTION = REGISTRATE.capability(IFluidCollection.class, new CapabilityToken<>() {});
 
         LAYOUT_PROVIDER = REGISTRATE.capability(ILayoutProvider.class, new CapabilityToken<>() {});
         MACHINE = REGISTRATE.capability(IMachine.class, new CapabilityToken<>() {});

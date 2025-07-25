@@ -109,6 +109,7 @@ public final class AllItems {
     public static final IEntry<Item> ITEM_FILTER;
     public static final IEntry<Item> FERTILIZER;
     public static final List<IEntry<MEStorageCell>> ITEM_STORAGE_CELL;
+    public static final List<IEntry<MEStorageCell>> FLUID_STORAGE_CELL;
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
@@ -257,12 +258,16 @@ public final class AllItems {
         FERTILIZER = simple("misc/fertilizer");
 
         ITEM_STORAGE_CELL = new ArrayList<>();
+        FLUID_STORAGE_CELL = new ArrayList<>();
         for (var i = 0; i < 5; i++) {
             var k = 1 << (2 * i);
-            var item = REGISTRATE.item("logistics/item_storage_cell/" + k + "m",
-                    properties -> new MEStorageCell(properties, 1048576 * k))
-                .register();
-            ITEM_STORAGE_CELL.add(item);
+            var bytes = 1048576 * k;
+            ITEM_STORAGE_CELL.add(REGISTRATE.item(
+                "logistics/item_storage_cell/" + k + "m",
+                MEStorageCell.itemCell(bytes)).register());
+            FLUID_STORAGE_CELL.add(REGISTRATE.item(
+                "logistics/fluid_storage_cell/" + k + "m",
+                MEStorageCell.fluidCell(bytes)).register());
         }
     }
 

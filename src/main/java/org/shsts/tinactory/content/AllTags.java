@@ -40,6 +40,10 @@ public final class AllTags {
     public static final TagKey<Block> CLEANROOM_CONNECTOR = modBlock("multiblock/cleanroom_connector");
     public static final TagKey<Block> CLEANROOM_DOOR = modBlock("multiblock/cleanroom_door");
 
+    public static final TagKey<Item> STORAGE_CELL = modItem("storage_cell");
+    public static final TagKey<Item> ITEM_STORAGE_CELL = extend(STORAGE_CELL, "item");
+    public static final TagKey<Item> FLUID_STORAGE_CELL = extend(STORAGE_CELL, "fluid");
+
     public static TagKey<Item> machineTag(IRecipeType<?> recipeType) {
         return extend(MACHINE, recipeType.id());
     }
