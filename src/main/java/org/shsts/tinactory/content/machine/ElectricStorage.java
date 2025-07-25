@@ -31,8 +31,8 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     protected final BlockEntity blockEntity;
     public final Layout layout;
 
-    protected IMachineConfig machineConfig;
     protected IMachine machine;
+    protected IMachineConfig machineConfig;
 
     public ElectricStorage(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
@@ -43,18 +43,12 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
         return machineConfig.getBoolean("unlockChest", false);
     }
 
-    public boolean isGlobal() {
-        return machineConfig.getBoolean("global", false);
-    }
-
-    public boolean isStorage() {
-        return machineConfig.getBoolean("storage", true);
-    }
-
     protected void registerPort(INetwork network, IPort port) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.unregisterPort(machine, 0);
-        logistics.registerPort(machine, 0, port, isGlobal(), isStorage());
+        logistics.registerPort(machine, 0, port,
+            machineConfig.getBoolean("global", false),
+            machineConfig.getBoolean("storage", true));
     }
 
     protected void onSlotChange() {
@@ -64,10 +58,6 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     private void onLoad() {
         machine = MACHINE.get(blockEntity);
         machineConfig = machine.config();
-    }
-
-    protected void onConnect(INetwork network) {
-        onMachineConfig();
     }
 
     protected abstract void onMachineConfig();
@@ -81,7 +71,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CONNECT.get(), this::onConnect);
+        eventManager.subscribe(CONNECT.get(), $ -> onMachineConfig());
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }
 

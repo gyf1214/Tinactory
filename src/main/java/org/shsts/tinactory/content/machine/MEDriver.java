@@ -14,6 +14,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.core.common.CapabilityProvider;
@@ -36,7 +38,11 @@ import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
@@ -54,6 +60,9 @@ public class MEDriver extends CapabilityProvider
     private final LazyOptional<IItemHandler> itemHandlerCap;
     private final LazyOptional<IItemCollection> itemCollectionCap;
     private final LazyOptional<IFluidCollection> fluidCollectionCap;
+
+    private IMachine machine;
+    private IMachineConfig machineConfig;
 
     public MEDriver(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
@@ -83,6 +92,15 @@ public class MEDriver extends CapabilityProvider
         return stack.is(AllTags.STORAGE_CELL);
     }
 
+    private void registerPort(INetwork network) {
+        var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+        var isStorage = machineConfig.getBoolean("storage", true);
+        logistics.unregisterPort(machine, 0);
+        logistics.unregisterPort(machine, 1);
+        logistics.registerPort(machine, 0, combinedItems, false, isStorage);
+        logistics.registerPort(machine, 1, combinedFluids, false, isStorage);
+    }
+
     private void onUpdateStorage() {
         var world = blockEntity.getLevel();
         if (world != null && world.isClientSide) {
@@ -105,11 +123,13 @@ public class MEDriver extends CapabilityProvider
         blockEntity.setChanged();
     }
 
-    private void onConnect(INetwork network) {
-        var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        var machine = MACHINE.get(blockEntity);
-        logistics.registerPort(machine, 0, combinedItems, false, true);
-        logistics.registerPort(machine, 1, combinedFluids, false, true);
+    private void onMachineConfig() {
+        machine.network().ifPresent(this::registerPort);
+    }
+
+    private void onLoad() {
+        machine = MACHINE.get(blockEntity);
+        machineConfig = machine.config();
     }
 
     @Override
@@ -133,7 +153,12 @@ public class MEDriver extends CapabilityProvider
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(CONNECT.get(), this::onConnect);
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CONNECT.get(), this::registerPort);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
+            StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), storages));
     }
 
     @Override
