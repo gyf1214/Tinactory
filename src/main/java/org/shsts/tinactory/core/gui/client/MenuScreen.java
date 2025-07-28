@@ -36,8 +36,8 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements
     protected final Panel rootPanel;
     protected final List<Widget> hoverables = new ArrayList<>();
 
-    public int contentWidth;
-    public int contentHeight;
+    protected int contentWidth;
+    protected int contentHeight;
 
     private class SlotBackground extends StaticWidget {
         private final Slot slot;

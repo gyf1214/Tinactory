@@ -7,7 +7,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.LayoutScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 
@@ -16,7 +16,7 @@ import static org.shsts.tinactory.content.AllLayouts.WORKBENCH;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WorkbenchScreen extends MenuScreen<WorkbenchMenu> {
+public class WorkbenchScreen extends LayoutScreen<WorkbenchMenu> {
     public WorkbenchScreen(WorkbenchMenu menu, Component title) {
         super(menu, title);
         var panel = new Panel(this);

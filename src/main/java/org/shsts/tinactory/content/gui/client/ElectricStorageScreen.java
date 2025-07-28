@@ -11,7 +11,7 @@ import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.LayoutScreen;
 
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -23,7 +23,7 @@ import static org.shsts.tinactory.core.gui.Texture.LOCK_BUTTON;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricStorageScreen<M extends ElectricStorageMenu> extends MenuScreen<M> {
+public class ElectricStorageScreen<M extends ElectricStorageMenu> extends LayoutScreen<M> {
     private final IMachineConfig machineConfig;
 
     private class ConfigButton extends SwitchButton {

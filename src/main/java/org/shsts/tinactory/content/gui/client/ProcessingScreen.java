@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.LayoutScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
@@ -21,7 +21,7 @@ import static org.shsts.tinactory.core.gui.ProcessingMenu.FLUID_SLOT;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingScreen extends MenuScreen<ProcessingMenu> {
+public class ProcessingScreen extends LayoutScreen<ProcessingMenu> {
     protected final Layout layout;
     protected final Panel layoutPanel;
 
