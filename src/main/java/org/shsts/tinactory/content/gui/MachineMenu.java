@@ -1,0 +1,56 @@
+package org.shsts.tinactory.content.gui;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.machine.Boiler;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
+import org.shsts.tinactory.core.gui.sync.SyncPackets;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+
+import java.util.Optional;
+
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.machine.Machine.getProcessor;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class MachineMenu extends ProcessingMenu {
+    protected MachineMenu(Properties properties) {
+        super(properties, SLOT_SIZE + SPACING);
+        onEventPacket(SET_MACHINE_CONFIG, p -> MACHINE.get(blockEntity).setConfig(p));
+    }
+
+    public static ProcessingMenu machine(Properties properties) {
+        return new MachineMenu(properties);
+    }
+
+    public static ProcessingMenu multiblock(Properties properties) {
+        return new MachineMenu(properties) {
+            @Override
+            public Optional<IRecipeType<?>> recipeType() {
+                var multiblockInterface = (MultiblockInterface) MACHINE.get(blockEntity);
+                return multiblockInterface.getRecipeType();
+            }
+        };
+    }
+
+    public static ProcessingMenu boiler(Properties properties) {
+        return new MachineMenu(properties) {
+            {
+                addSyncSlot("burn", be -> new SyncPackets.Double(
+                    getProcessor(be)
+                        .map(IProcessor::getProgress)
+                        .orElse(0d)));
+                addSyncSlot("heat", be -> new SyncPackets.Double(
+                    getProcessor(be)
+                        .map($ -> ((Boiler) $).heat() / 500d)
+                        .orElse(0d)));
+            }
+        };
+    }
+}

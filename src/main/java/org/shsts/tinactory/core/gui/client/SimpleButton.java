@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -18,7 +18,7 @@ public abstract class SimpleButton extends Button {
     protected final int normalX, normalY;
     protected final int hoverX, hoverY;
 
-    public SimpleButton(IMenu menu, Texture texture,
+    public SimpleButton(MenuBase menu, Texture texture,
         @Nullable Component tooltip, int normalX, int normalY,
         int hoverX, int hoverY) {
         super(menu, tooltip);
@@ -29,7 +29,7 @@ public abstract class SimpleButton extends Button {
         this.hoverY = hoverY;
     }
 
-    public SimpleButton(IMenu menu, Texture texture,
+    public SimpleButton(MenuBase menu, Texture texture,
         @Nullable Component tooltip, int hoverX, int hoverY) {
         this(menu, texture, tooltip, 0, 0, hoverX, hoverY);
     }

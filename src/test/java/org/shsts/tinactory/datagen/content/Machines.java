@@ -619,13 +619,7 @@ public final class Machines {
         ulvMachine(set.entry(Voltage.ULV), primitive);
     }
 
-    private static class RecipeFactory {
-        private final Voltage voltage;
-
-        public RecipeFactory(Voltage voltage) {
-            this.voltage = voltage;
-        }
-
+    private record RecipeFactory(Voltage voltage) {
         private AssemblyRecipeBuilder<RecipeFactory> recipe(
             IEntry<? extends ItemLike> item, Voltage v1) {
             var builder = ASSEMBLER.recipe(DATA_GEN, item)

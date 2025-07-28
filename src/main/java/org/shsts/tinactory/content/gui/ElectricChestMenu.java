@@ -1,31 +1,17 @@
 package org.shsts.tinactory.content.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
-import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,13 +19,11 @@ import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllMenus.CHEST_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
-import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.client.FluidSlot.HIGHLIGHT_COLOR;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricChestPlugin extends ElectricStoragePlugin {
+public class ElectricChestMenu extends ElectricStorageMenu {
     private final ElectricChest chest;
 
     private class InputSlot extends Slot {
@@ -119,15 +103,15 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
         }
     }
 
-    public ElectricChestPlugin(IMenu menu) {
-        super(menu);
-        this.chest = EVENT_MANAGER.get(menu.blockEntity())
+    public ElectricChestMenu(Properties properties) {
+        super(properties);
+        this.chest = EVENT_MANAGER.get(blockEntity)
             .getProvider(modLoc(ElectricChest.ID), ElectricChest.class);
 
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {
-            var syncSlot = menu.addSyncSlot(itemSyncPacket(i));
-            menu.onSyncPacket(syncSlot, onItemSync(i));
+            var syncSlot = addSyncSlot(itemSyncPacket(i));
+            onSyncPacket(syncSlot, onItemSync(i));
         }
         for (var i = 0; i < size * 2; i++) {
             var slotInfo = layout.slots.get(i);
@@ -135,9 +119,13 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
             var y = slotInfo.y() + MARGIN_TOP + 1;
 
             var slot = i < size ? new InputSlot(i, x, y) : new OutputSlot(i - size, x, y);
-            menu.addMenuSlot(slot);
+            addSlot(slot);
         }
-        menu.onEventPacket(CHEST_SLOT_CLICK, this::onClickSlot);
+        onEventPacket(CHEST_SLOT_CLICK, this::onClickSlot);
+    }
+
+    public ElectricChest chest() {
+        return chest;
     }
 
     private Function<BlockEntity, ChestItemSyncPacket> itemSyncPacket(int slot) {
@@ -154,7 +142,7 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
     }
 
     private void onClickSlot(SlotEventPacket p) {
-        var carried = menu.getMenu().getCarried();
+        var carried = getCarried();
         var slot = p.getIndex();
         if (!chest.getStackInSlot(slot).isEmpty()) {
             return;
@@ -164,81 +152,5 @@ public class ElectricChestPlugin extends ElectricStoragePlugin {
         } else {
             chest.setFilter(slot, carried);
         }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private class ItemSlot extends MenuWidget {
-        private final int slot;
-
-        public ItemSlot(int slot) {
-            super(ElectricChestPlugin.this.menu);
-            this.slot = slot;
-        }
-
-        private ItemStack getStack() {
-            return chest.getStackInSlot(slot);
-        }
-
-        private Optional<ItemStack> getFilter() {
-            return chest.getFilter(slot);
-        }
-
-        @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            var stack = getStack();
-            if (stack.isEmpty()) {
-                getFilter().ifPresent(stack1 ->
-                    RenderUtil.renderGhostItem(poseStack, stack1, rect.x(), rect.y()));
-            } else {
-                var s = String.valueOf(stack.getCount());
-                RenderUtil.renderItemWithDecoration(stack, rect.x(), rect.y(), s);
-            }
-
-            if (isHovering(mouseX, mouseY)) {
-                RenderSystem.colorMask(true, true, true, false);
-                RenderUtil.fill(poseStack, rect, HIGHLIGHT_COLOR);
-                RenderSystem.colorMask(true, true, true, true);
-            }
-        }
-
-        @Override
-        protected boolean canHover() {
-            return true;
-        }
-
-        @Override
-        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            return Optional.of(getStack())
-                .filter(stack -> !stack.isEmpty())
-                .or(this::getFilter)
-                .map(ClientUtil::itemTooltip);
-        }
-
-        @Override
-        protected boolean canClick(int button) {
-            return true;
-        }
-
-        @Override
-        public void onMouseClicked(double mouseX, double mouseY, int button) {
-            menu.triggerEvent(CHEST_SLOT_CLICK, () -> new SlotEventPacket(slot, button));
-        }
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void applyMenuScreen(MenuScreen screen) {
-        super.applyMenuScreen(screen);
-
-        var layoutPanel = new Panel(screen);
-        var size = layout.slots.size() / 2;
-        for (var i = 0; i < size; i++) {
-            var slot = layout.slots.get(i);
-            var slot1 = layout.slots.get(i + size);
-            var x = slot.x() + 1;
-            var y = (slot.y() + slot1.y()) / 2 + 1;
-            layoutPanel.addWidget(new Rect(x, y, SLOT_SIZE - 2, SLOT_SIZE - 2), new ItemSlot(i));
-        }
-        screen.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
     }
 }

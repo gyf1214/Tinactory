@@ -9,7 +9,7 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.core.util.MathUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -25,14 +25,14 @@ public class ProgressBar extends MenuWidget {
 
     public Direction direction = Direction.HORIZONTAL;
 
-    public ProgressBar(IMenu menu, Texture texture, Texture texture2, String syncName) {
+    public ProgressBar(MenuBase menu, Texture texture, Texture texture2, String syncName) {
         super(menu);
         this.texture = texture;
         this.texture2 = texture2;
         this.syncName = syncName;
     }
 
-    public ProgressBar(IMenu menu, Texture texture, String syncName) {
+    public ProgressBar(MenuBase menu, Texture texture, String syncName) {
         this(menu, texture, texture, syncName);
     }
 

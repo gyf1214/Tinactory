@@ -7,18 +7,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
 import org.apache.commons.lang3.StringUtils;
-import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.network.NetworkController;
-import org.shsts.tinycorelib.api.gui.IMenu;
-import org.shsts.tinycorelib.api.gui.IMenuPlugin;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.function.Consumer;
 
@@ -33,7 +29,7 @@ import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class NetworkControllerPlugin implements IMenuPlugin<NetworkControllerScreen> {
+public class NetworkControllerMenu extends MenuBase {
     public static final int BUTTON_SIZE = 24;
     public static final int PANEL_BORDER = 2;
     public static final int LEFT_WIDTH = PANEL_BORDER * 2 + BUTTON_SIZE * 5;
@@ -53,7 +49,6 @@ public class NetworkControllerPlugin implements IMenuPlugin<NetworkControllerScr
     public static final int RENAME_SLOT_Y = RENAME_BASE_Y + FONT_HEIGHT +
         EDIT_BOX_LINE_HEIGHT + MARGIN_VERTICAL * 2;
 
-    private final IMenu menu;
     private String name = "";
     private boolean renameActive = false;
     private final WrapperItemHandler renameItem = new WrapperItemHandler(1);
@@ -63,7 +58,7 @@ public class NetworkControllerPlugin implements IMenuPlugin<NetworkControllerScr
 
     private class RenameInventorySlot extends Slot {
         public RenameInventorySlot(int slot, int x, int y) {
-            super(menu.inventory(), slot, x, y);
+            super(inventory, slot, x, y);
         }
 
         @Override
@@ -127,34 +122,37 @@ public class NetworkControllerPlugin implements IMenuPlugin<NetworkControllerScr
         }
     }
 
-    public NetworkControllerPlugin(IMenu menu) {
-        this.menu = menu;
+    public NetworkControllerMenu(Properties properties) {
+        super(properties);
 
         renameItem.setFilter(0, stack -> stack.is(Items.NAME_TAG));
         renameItem.onUpdate(this::refreshRenameItem);
 
-        menu.setValidPredicate(() -> NetworkController
-            .get(menu.blockEntity())
-            .canPlayerInteract(menu.player()));
-        menu.addSyncSlot("info", NetworkControllerSyncPacket::new);
-        menu.onEventPacket(RENAME, p -> refreshName(p.getName(), false));
-        menu.addMenuSlot(new RenameInputSlot(MARGIN_X + RENAME_BASE_MARGIN + 1,
+        addSyncSlot("info", NetworkControllerSyncPacket::new);
+        onEventPacket(RENAME, p -> refreshName(p.getName(), false));
+        addSlot(new RenameInputSlot(MARGIN_X + RENAME_BASE_MARGIN + 1,
             MARGIN_TOP + RENAME_SLOT_Y + 1));
-        menu.addMenuSlot(new RenameResultSlot(MARGIN_X + RENAME_BASE_MARGIN + SLOT_SIZE * 4 + 1,
+        addSlot(new RenameResultSlot(MARGIN_X + RENAME_BASE_MARGIN + SLOT_SIZE * 4 + 1,
             MARGIN_TOP + RENAME_SLOT_Y + 1));
 
         for (var j = 0; j < 9; j++) {
             var x = MARGIN_X + RENAME_INVENTORY_MARGIN + j * SLOT_SIZE;
             var y = MARGIN_TOP + RENAME_INVENTORY_BAR_Y;
-            menu.addMenuSlot(new RenameInventorySlot(j, x + 1, y + 1));
+            addSlot(new RenameInventorySlot(j, x + 1, y + 1));
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 9; j++) {
                 var x = MARGIN_X + RENAME_INVENTORY_MARGIN + j * SLOT_SIZE;
                 var y = MARGIN_TOP + RENAME_INVENTORY_Y + i * SLOT_SIZE;
-                menu.addMenuSlot(new RenameInventorySlot(9 + i * 9 + j, x + 1, y + 1));
+                addSlot(new RenameInventorySlot(9 + i * 9 + j, x + 1, y + 1));
             }
         }
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return super.stillValid(player) &&
+            NetworkController.get(blockEntity).canPlayerInteract(player);
     }
 
     public void setRenameActive(boolean val) {
@@ -193,19 +191,12 @@ public class NetworkControllerPlugin implements IMenuPlugin<NetworkControllerScr
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public Class<NetworkControllerScreen> menuScreenClass() {
-        return NetworkControllerScreen.class;
+    public void removed(Player player) {
+        super.removed(player);
+        StackHelper.returnItemHandlerToPlayer(player, renameItem);
     }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void applyMenuScreen(NetworkControllerScreen screen) {
-        onRefreshName = screen::refreshName;
-    }
-
-    @Override
-    public void onMenuRemoved() {
-        StackHelper.returnItemHandlerToPlayer(menu.player(), renameItem);
+    public void onRefreshName(Consumer<String> cb) {
+        onRefreshName = cb;
     }
 }

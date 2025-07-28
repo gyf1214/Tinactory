@@ -13,7 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import static org.shsts.tinactory.core.gui.Texture.VANILLA_WIDGETS;
 
@@ -24,7 +24,7 @@ public final class Widgets {
     public static final int EDIT_BOX_LINE_HEIGHT = 14;
     public static final int BUTTON_HEIGHT = 20;
 
-    public static Button simpleButton(IMenu menu, Component label,
+    public static Button simpleButton(MenuBase menu, Component label,
         @Nullable Component tooltip, Runnable onPress) {
         return new Button(menu, tooltip) {
             private final Texture texture = VANILLA_WIDGETS;

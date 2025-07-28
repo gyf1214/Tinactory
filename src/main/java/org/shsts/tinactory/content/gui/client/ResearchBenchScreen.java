@@ -6,15 +6,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,12 +22,12 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ResearchBenchScreen extends ProcessingScreen {
+public class ResearchBenchScreen extends MachineScreen {
     private static class TechButton extends MenuWidget {
         @Nullable
         private ITechnology tech = null;
 
-        public TechButton(IMenu menu) {
+        public TechButton(MenuBase menu) {
             super(menu);
         }
 
@@ -55,8 +55,8 @@ public class ResearchBenchScreen extends ProcessingScreen {
         }
     }
 
-    public ResearchBenchScreen(IMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
+    public ResearchBenchScreen(ProcessingMenu menu, Component title) {
+        super(menu, title);
         var rect = layout.images.get(0).rect().offset(layout.getXOffset(), 0);
         addWidget(rect, new TechButton(menu));
     }

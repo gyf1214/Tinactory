@@ -14,7 +14,7 @@ import org.shsts.tinactory.core.tech.TechManager;
 
 import java.util.Collections;
 
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.BUTTON_SIZE;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;

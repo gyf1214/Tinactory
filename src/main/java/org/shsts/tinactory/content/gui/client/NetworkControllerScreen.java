@@ -7,14 +7,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.NetworkControllerPlugin;
+import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.core.gui.Rect;
@@ -28,7 +27,6 @@ import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
 import org.slf4j.Logger;
 
 import java.util.function.Consumer;
@@ -36,11 +34,11 @@ import java.util.function.Consumer;
 import static org.shsts.tinactory.content.AllItems.CABLE;
 import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllMenus.RENAME;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.HEIGHT;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.RENAME_BASE_MARGIN;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.RENAME_BASE_WIDTH;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.RENAME_BASE_Y;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.WIDTH;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.HEIGHT;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_MARGIN;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_WIDTH;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_Y;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.WIDTH;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
@@ -54,7 +52,7 @@ import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkControllerScreen extends MenuScreen {
+public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int WELCOME_BUTTON_WIDTH = 72;
 
@@ -63,9 +61,7 @@ public class NetworkControllerScreen extends MenuScreen {
     private final Tab tabs;
     private final Label stateLabel;
     private final TechPanel techPanel;
-    private final EditBox renameEdit;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
-    private final NetworkControllerPlugin plugin;
 
     public static Component tr(String key, Object... args) {
         return I18n.tr("tinactory.gui.networkController." + key, args);
@@ -79,16 +75,12 @@ public class NetworkControllerScreen extends MenuScreen {
         @Override
         public void setActive(boolean value) {
             super.setActive(value);
-            plugin.setRenameActive(value);
+            menu().setRenameActive(value);
         }
     }
 
-    public NetworkControllerScreen(IMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-
-        this.plugin = (NetworkControllerPlugin) menu.getPlugins().stream()
-            .filter($ -> $ instanceof NetworkControllerPlugin)
-            .findAny().orElseThrow();
+    public NetworkControllerScreen(NetworkControllerMenu menu, Component title) {
+        super(menu, title);
 
         this.welcomePanel = new Panel(this);
         var welcomeLabel = new Label(menu, tr("welcome"));
@@ -108,7 +100,7 @@ public class NetworkControllerScreen extends MenuScreen {
 
         var renamePanel = new RenamePanel();
         var rect = new Rect(RENAME_BASE_MARGIN, RENAME_BASE_Y, RENAME_BASE_WIDTH, 0);
-        this.renameEdit = Widgets.editBox();
+        var renameEdit = Widgets.editBox();
         renameEdit.setResponder(name -> menu.triggerEvent(RENAME, () -> new RenameEventPacket(name)));
         renamePanel.addWidget(rect.enlarge(0, FONT_HEIGHT), new Label(menu, tr("rename")));
         renamePanel.addWidget(rect.offset(0, FONT_HEIGHT + MARGIN_VERTICAL)
@@ -116,6 +108,7 @@ public class NetworkControllerScreen extends MenuScreen {
         renamePanel.addWidget(rect.offset(34, FONT_HEIGHT + EDIT_BOX_LINE_HEIGHT + MARGIN_VERTICAL * 2 + 1)
                 .enlarge(-RENAME_BASE_WIDTH + CRAFTING_ARROW.width(), CRAFTING_ARROW.height()),
             new StaticWidget(menu, CRAFTING_ARROW));
+        menu.onRefreshName(renameEdit::setValue);
 
         this.tabs = new Tab(this, statePanel, CABLE.get(Voltage.LV),
             techPanel, RESEARCH_EQUIPMENT.get(Voltage.LV),
@@ -134,10 +127,6 @@ public class NetworkControllerScreen extends MenuScreen {
 
         this.contentWidth = WIDTH;
         this.contentHeight = HEIGHT;
-    }
-
-    public void refreshName(String name) {
-        renameEdit.setValue(name);
     }
 
     @Override
@@ -194,7 +183,7 @@ public class NetworkControllerScreen extends MenuScreen {
     }
 
     private void onWelcomePressed() {
-        if (iMenu.player() instanceof LocalPlayer player) {
+        if (menu.player() instanceof LocalPlayer player) {
             var name = welcomeEdit.getValue();
             var command = "/" + Tinactory.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
             player.chat(command);

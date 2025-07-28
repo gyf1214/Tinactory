@@ -10,17 +10,17 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class MenuScreenHandler<M extends MenuScreen> implements IGuiContainerHandler<M> {
+public abstract class MenuScreenHandler<M extends MenuScreen<?>> implements IGuiContainerHandler<M> {
     protected abstract @Nullable Object getIngredientHovered(Widget hovered, double mouseX, double mouseY);
 
     @Override
     public @Nullable Object getIngredientUnderMouse(M screen, double mouseX, double mouseY) {
-        var hovered = screen.getHovered((int) mouseX, (int) mouseY);
-        return hovered.map(widget -> getIngredientHovered(widget, mouseX, mouseY))
+        return screen.getHovered((int) mouseX, (int) mouseY)
+            .map(widget -> getIngredientHovered(widget, mouseX, mouseY))
             .orElse(null);
     }
 
-    public static MenuScreenHandler<MenuScreen> fluid() {
+    public static MenuScreenHandler<MenuScreen<?>> fluid() {
         return new MenuScreenHandler<>() {
             @Override
             protected @Nullable Object getIngredientHovered(Widget hovered,

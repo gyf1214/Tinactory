@@ -1,46 +1,39 @@
 package org.shsts.tinactory.content.gui.client;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
-import org.shsts.tinycorelib.api.gui.IMenu;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.Optional;
-
-import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.core.gui.ProcessingMenu.FLUID_SLOT;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingScreen extends MenuScreen {
-    public final Layout layout;
+public class ProcessingScreen extends MenuScreen<ProcessingMenu> {
+    protected final Layout layout;
     protected final Panel layoutPanel;
-    @Nullable
-    private IRecipeType<?> recipeType = null;
 
-    public ProcessingScreen(IMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
+    public ProcessingScreen(ProcessingMenu menu, Component title) {
+        super(menu, title);
 
-        this.layout = LAYOUT_PROVIDER.get(menu.blockEntity()).getLayout();
+        this.layout = menu.layout();
         this.layoutPanel = new Panel(this);
 
         for (var slot : layout.slots) {
             if (slot.type().portType == PortType.FLUID) {
-                var syncSlot = "fluidSlot_" + slot.index();
+                var syncSlot = FLUID_SLOT + slot.index();
                 var rect = new Rect(slot.x() + 1, slot.y() + 1, Menu.SLOT_SIZE - 2, Menu.SLOT_SIZE - 2);
                 layoutPanel.addWidget(rect, new FluidSlot(menu, slot.index(), syncSlot));
             }
@@ -57,13 +50,5 @@ public class ProcessingScreen extends MenuScreen {
         }
 
         addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
-    }
-
-    public Optional<IRecipeType<?>> getRecipeType() {
-        return Optional.ofNullable(recipeType);
-    }
-
-    public void setRecipeType(IRecipeType<?> recipeType) {
-        this.recipeType = recipeType;
     }
 }

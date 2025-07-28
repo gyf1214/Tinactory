@@ -132,7 +132,6 @@ public abstract class AbstractRecipeBook<T> extends Panel {
 
     public AbstractRecipeBook(ProcessingScreen screen, int xOffset) {
         super(screen);
-        var menu = screen.menu();
         this.blockEntity = menu.blockEntity();
         this.machineConfig = MACHINE.get(blockEntity).config();
         this.bookPanel = new Panel(screen);

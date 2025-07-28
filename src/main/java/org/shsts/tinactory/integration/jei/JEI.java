@@ -167,9 +167,9 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addGuiContainerHandler(MenuScreen.class, MenuScreenHandler.fluid());
-        registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler(this));
+        registration.addGenericGuiContainerHandler(MenuScreen.class, MenuScreenHandler.fluid());
         registration.addGuiContainerHandler(NetworkControllerScreen.class, new NetworkControllerHandler());
+        registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler(this));
         registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchBenchHandler());
         WorkbenchHandler.addWorkbenchClickArea(registration, toolCategory);
     }

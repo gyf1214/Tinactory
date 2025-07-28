@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,11 +23,11 @@ import java.util.Optional;
 public abstract class MenuWidget extends GuiComponent implements
     Widget, GuiEventListener, NarratableEntry {
 
-    protected final IMenu menu;
+    protected final MenuBase menu;
     protected Rect rect;
     protected boolean active = true;
 
-    public MenuWidget(IMenu menu) {
+    public MenuWidget(MenuBase menu) {
         this.menu = menu;
         this.setBlitOffset(0);
     }

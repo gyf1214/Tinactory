@@ -40,7 +40,7 @@ import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
-import static org.shsts.tinactory.core.gui.ProcessingPlugin.portLabel;
+import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

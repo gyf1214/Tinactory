@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -14,7 +14,7 @@ import org.shsts.tinycorelib.api.gui.IMenu;
 public class StaticWidget extends MenuWidget {
     private final Texture texture;
 
-    public StaticWidget(IMenu menu, Texture texture) {
+    public StaticWidget(MenuBase menu, Texture texture) {
         super(menu);
         this.texture = texture;
     }

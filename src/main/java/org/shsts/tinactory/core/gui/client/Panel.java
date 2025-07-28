@@ -8,7 +8,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
             }
         }
 
-        public void addToScreen(MenuScreen screen) {
+        public void addToScreen(MenuScreen<?> screen) {
             if (child instanceof MenuWidget widget) {
                 screen.addWidgetToScreen(widget);
             } else if (child instanceof AbstractWidget widget) {
@@ -64,12 +64,12 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
         }
     }
 
-    protected final IMenu menu;
-    protected final MenuScreen screen;
+    protected final MenuBase menu;
+    protected final MenuScreen<?> screen;
     protected final List<Child> children = new ArrayList<>();
     protected boolean active = true;
 
-    public Panel(MenuScreen screen) {
+    public Panel(MenuScreen<?> screen) {
         this.screen = screen;
         this.menu = screen.menu();
     }

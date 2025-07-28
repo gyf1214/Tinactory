@@ -25,7 +25,7 @@ public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe
     private final Layout.SlotInfo inputSlot;
     private final Layout.SlotInfo outputSlot;
 
-    public ElectricFurnaceRecipeBook(ProcessingScreen screen, Layout layout) {
+    private ElectricFurnaceRecipeBook(ProcessingScreen screen, Layout layout) {
         super(screen, layout.getXOffset());
         this.inputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == 0)
@@ -33,6 +33,10 @@ public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe
         this.outputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == 1)
             .findFirst().orElseThrow();
+    }
+
+    public ElectricFurnaceRecipeBook(ProcessingScreen screen) {
+        this(screen, screen.menu().layout());
     }
 
     @Override

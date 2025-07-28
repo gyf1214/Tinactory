@@ -5,44 +5,56 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
-import org.shsts.tinactory.core.machine.Machine;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinactory.core.machine.MachineProcessor;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+
+import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 import static org.shsts.tinactory.core.util.I18n.tr;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingPlugin extends LayoutPlugin<ProcessingScreen> {
-    protected ProcessingPlugin(IMenu menu, int extraHeight) {
-        super(menu, extraHeight);
-        addSlots(menu, layout);
+public class ProcessingMenu extends LayoutMenu {
+    public static final String FLUID_SLOT = "fluidSlot_";
 
-        var fluids = FLUID_STACK_HANDLER.get(menu.blockEntity());
+    protected ProcessingMenu(Properties properties, int extraHeight) {
+        super(properties, extraHeight);
+        addLayoutSlots(layout);
+
+        var fluids = FLUID_STACK_HANDLER.get(blockEntity);
         for (var slot : layout.slots) {
             if (slot.type().portType == PortType.FLUID) {
-                menu.addSyncSlot("fluidSlot_" + slot.index(),
+                addSyncSlot(FLUID_SLOT + slot.index(),
                     $ -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
             }
         }
 
         if (layout.progressBar != null) {
-            menu.addSyncSlot("progress", be -> new SyncPackets.Double(Machine.getProcessor(be)
+            addSyncSlot("progress", be -> new SyncPackets.Double(getProcessor(be)
                 .map(IProcessor::getProgress)
                 .orElse(0d)));
         }
 
-        menu.onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
+        onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
+    }
+
+    public Optional<IRecipeType<?>> recipeType() {
+        var processor = PROCESSOR.tryGet(blockEntity).orElse(null);
+        if (processor instanceof MachineProcessor<?> machine) {
+            return Optional.of(machine.recipeType);
+        }
+        return Optional.empty();
     }
 
     public static Component getTitle(BlockEntity be) {
@@ -56,9 +68,13 @@ public class ProcessingPlugin extends LayoutPlugin<ProcessingScreen> {
         return tr(key, index);
     }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public Class<ProcessingScreen> menuScreenClass() {
-        return ProcessingScreen.class;
+    public static class Primitive extends ProcessingMenu {
+        public Primitive(Properties properties) {
+            super(properties, SLOT_SIZE / 2);
+        }
+    }
+
+    public static ProcessingMenu primitive(Properties properties) {
+        return new Primitive(properties);
     }
 }

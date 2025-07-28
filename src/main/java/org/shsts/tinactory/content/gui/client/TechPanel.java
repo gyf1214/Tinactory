@@ -19,7 +19,6 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
@@ -32,10 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.BUTTON_SIZE;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.LEFT_OFFSET;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.LEFT_WIDTH;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.PANEL_BORDER;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_OFFSET;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_WIDTH;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.PANEL_BORDER;
 import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
@@ -205,7 +204,7 @@ public class TechPanel extends Panel {
         }
     }
 
-    public TechPanel(MenuScreen screen) {
+    public TechPanel(NetworkControllerScreen screen) {
         super(screen);
         this.techManager = TechManager.client();
 

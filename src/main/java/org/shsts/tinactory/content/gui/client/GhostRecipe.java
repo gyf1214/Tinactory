@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.List;
 public class GhostRecipe extends MenuWidget {
     private final List<Layout.SlotWith<? extends IProcessingObject>> ingredients = new ArrayList<>();
 
-    public GhostRecipe(IMenu menu) {
+    public GhostRecipe(MenuBase menu) {
         super(menu);
     }
 

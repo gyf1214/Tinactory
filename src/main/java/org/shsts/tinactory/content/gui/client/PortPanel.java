@@ -8,14 +8,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.ProcessingPlugin;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 
@@ -26,6 +25,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 
 @OnlyIn(Dist.CLIENT)
@@ -42,7 +42,7 @@ public class PortPanel extends Panel {
     private class ConfigLabel extends Label {
         private final List<Layout.SlotInfo> slots;
 
-        public ConfigLabel(IMenu menu, Component line, List<Layout.SlotInfo> slots) {
+        public ConfigLabel(MenuBase menu, Component line, List<Layout.SlotInfo> slots) {
             super(menu, line);
             this.slots = slots;
             this.verticalAlign = Label.Alignment.MIDDLE;
@@ -81,7 +81,7 @@ public class PortPanel extends Panel {
                 continue;
             }
 
-            var label = new ConfigLabel(menu, ProcessingPlugin.portLabel(type.portType, port), slots);
+            var label = new ConfigLabel(menu, portLabel(type.portType, port), slots);
             label.verticalAlign = Label.Alignment.MIDDLE;
             label.color = 0xFFFFAA00;
 

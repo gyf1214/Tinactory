@@ -9,13 +9,12 @@ import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
+public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements IWidgetConsumer {
     protected final Panel rootPanel;
     protected final List<Widget> hoverables = new ArrayList<>();
 
@@ -44,7 +43,7 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
         private final Slot slot;
 
         public SlotBackground(Slot slot) {
-            super(iMenu, SLOT_BACKGROUND);
+            super(MenuScreen.this.menu, SLOT_BACKGROUND);
             this.slot = slot;
         }
 
@@ -56,15 +55,15 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
         }
     }
 
-    public MenuScreen(IMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
+    public MenuScreen(M menu, Component title) {
+        super(menu, title);
         this.titleLabelX = MARGIN_X;
         this.titleLabelY = MARGIN_VERTICAL;
         this.contentWidth = CONTENT_WIDTH;
         this.contentHeight = 0;
 
         this.rootPanel = new Panel(this);
-        for (var slot : menu.getMenu().slots) {
+        for (var slot : menu.slots) {
             int x = slot.x - 1 - MARGIN_X;
             int y = slot.y - 1 - MARGIN_TOP;
             var slotBg = new SlotBackground(slot);
@@ -72,8 +71,8 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
         }
     }
 
-    public IMenu menu() {
-        return iMenu;
+    public M menu() {
+        return menu;
     }
 
     @Override

@@ -32,8 +32,9 @@ public class ProcessingHandler extends MenuScreenHandler<ProcessingScreen> {
     @Override
     public Collection<IGuiClickableArea> getGuiClickableAreas(ProcessingScreen screen,
         double mouseX, double mouseY) {
-        var layout = screen.layout;
-        var category = screen.getRecipeType()
+        var menu = screen.menu();
+        var layout = menu.layout();
+        var category = menu.recipeType()
             .flatMap(jei::processingCategory)
             .orElse(null);
         if (layout.progressBar == null || category == null) {

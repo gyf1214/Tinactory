@@ -11,7 +11,6 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.MathUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +39,8 @@ public abstract class ButtonPanel extends Panel {
     public class ItemButton extends Button {
         private int index = 0;
 
-        public ItemButton(IMenu menu) {
-            super(menu);
+        public ItemButton() {
+            super(ButtonPanel.this.menu);
         }
 
         @Override
@@ -74,8 +73,8 @@ public abstract class ButtonPanel extends Panel {
 
         private final int pageChange;
 
-        public PageButton(IMenu menu, int texX, int pageChange) {
-            super(menu, RECIPE_BOOK_BG, null, texX, TEX_Y,
+        public PageButton(int texX, int pageChange) {
+            super(ButtonPanel.this.menu, RECIPE_BOOK_BG, null, texX, TEX_Y,
                 texX, TEX_Y + PAGE_OFFSET.height());
             this.pageChange = pageChange;
         }
@@ -92,13 +91,13 @@ public abstract class ButtonPanel extends Panel {
         }
     }
 
-    public ButtonPanel(MenuScreen screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
+    public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
         super(screen);
         this.buttonWidth = buttonWidth;
         this.buttonHeight = buttonHeight;
         this.verticalSpacing = verticalSpacing;
-        this.leftPageButton = new PageButton(menu, 15, -1);
-        this.rightPageButton = new PageButton(menu, 1, 1);
+        this.leftPageButton = new PageButton(15, -1);
+        this.rightPageButton = new PageButton(1, 1);
 
         addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_OFFSET.width(), 0), leftPageButton);
         addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(PAGE_MARGIN, 0), rightPageButton);
@@ -122,7 +121,7 @@ public abstract class ButtonPanel extends Panel {
                 var y = row * (buttonHeight + verticalSpacing);
 
                 var offset = new Rect(x, y, buttonWidth, buttonHeight);
-                var button = new ItemButton(menu);
+                var button = new ItemButton();
                 buttons.add(button);
                 button.setActive(active);
                 addWidget(offset, button);

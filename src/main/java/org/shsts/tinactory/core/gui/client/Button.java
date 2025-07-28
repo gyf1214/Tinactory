@@ -8,7 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +19,12 @@ import java.util.Optional;
 public abstract class Button extends MenuWidget {
     private final @Nullable Component tooltip;
 
-    public Button(IMenu menu, @Nullable Component tooltip) {
+    public Button(MenuBase menu, @Nullable Component tooltip) {
         super(menu);
         this.tooltip = tooltip;
     }
 
-    public Button(IMenu menu) {
+    public Button(MenuBase menu) {
         this(menu, null);
     }
 

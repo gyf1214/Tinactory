@@ -2,20 +2,17 @@ package org.shsts.tinactory.core.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinycorelib.api.gui.IMenu;
-import org.shsts.tinycorelib.api.gui.IMenuPlugin;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
@@ -24,45 +21,52 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlugin<S> {
-    protected final IMenu menu;
+public abstract class InventoryMenu extends MenuBase {
     private final int beginInvSlot;
     private final int endInvSlot;
     private final int endY;
 
-    protected InventoryPlugin(IMenu menu, int y) {
-        this.menu = menu;
-        this.beginInvSlot = menu.getSlotSize();
-        var inventory = menu.inventory();
+    public InventoryMenu(Properties properties, int y) {
+        super(properties);
+
+        this.beginInvSlot = slots.size();
         var barY = y + 3 * SLOT_SIZE + SPACING;
         var barY1 = barY + MARGIN_TOP;
         for (var j = 0; j < 9; j++) {
             var x = MARGIN_X + j * SLOT_SIZE;
-            menu.addMenuSlot(new Slot(inventory, j, x + 1, barY1 + 1));
+            addSlot(new Slot(inventory, j, x + 1, barY1 + 1));
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 9; j++) {
                 var x = MARGIN_X + j * SLOT_SIZE;
                 var y1 = y + i * SLOT_SIZE + MARGIN_TOP;
-                menu.addMenuSlot(new Slot(inventory, 9 + i * 9 + j, x + 1, y1 + 1));
+                addSlot(new Slot(inventory, 9 + i * 9 + j, x + 1, y1 + 1));
             }
         }
-        this.endInvSlot = menu.getSlotSize();
+        this.endInvSlot = slots.size();
         this.endY = barY + SLOT_SIZE;
-
-        menu.setOnQuickMoveStack(this::onQuickMoveStack);
     }
 
-    protected boolean onQuickMoveStack(Slot slot) {
-        if (menu.world().isClientSide) {
+    public int endY() {
+        return endY;
+    }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int index) {
+        var slot = getSlot(index);
+        return quickMoveStack(slot) ? slot.getItem() : ItemStack.EMPTY;
+    }
+
+    protected boolean quickMoveStack(Slot slot) {
+        if (world.isClientSide) {
             return false;
         }
         if (!slot.hasItem()) {
             return false;
         }
-        var inv = new PlayerMainInvWrapper(menu.inventory());
+        var inv = new PlayerMainInvWrapper(inventory);
         if (slot.index < beginInvSlot || slot.index >= endInvSlot) {
-            if (!slot.mayPickup(menu.player())) {
+            if (!slot.mayPickup(player)) {
                 return false;
             }
             var oldStack = slot.getItem().copy();
@@ -72,7 +76,7 @@ public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlug
             if (stack.isEmpty()) {
                 return false;
             }
-            var stack1 = slot.safeTake(stack.getCount(), Integer.MAX_VALUE, menu.player());
+            var stack1 = slot.safeTake(stack.getCount(), Integer.MAX_VALUE, player);
             ItemHandlerHelper.insertItemStacked(inv, stack1, false);
 
             return ItemStack.isSame(oldStack, slot.getItem());
@@ -81,9 +85,9 @@ public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlug
             var oldStack = inv.getStackInSlot(invIndex).copy();
             var stack = oldStack.copy();
             var amount = stack.getCount();
-            for (var i = beginInvSlot == 0 ? endInvSlot : 0; i < menu.getSlotSize();
+            for (var i = beginInvSlot == 0 ? endInvSlot : 0; i < slots.size();
                 i = i + 1 == beginInvSlot ? endInvSlot : i + 1) {
-                var targetSlot = menu.getMenuSlot(i);
+                var targetSlot = getSlot(i);
                 if (!targetSlot.mayPlace(stack)) {
                     continue;
                 }
@@ -144,7 +148,7 @@ public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlug
 
     protected void clickFluidSlot(IFluidStackHandler container, int tankIndex, int button) {
         var tank = container.getTank(tankIndex);
-        var item = menu.getMenu().getCarried();
+        var item = getCarried();
         var outputItem = ItemStack.EMPTY;
         var mayDrain = true;
         var mayFill = true;
@@ -162,7 +166,7 @@ public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlug
             var retItem = clickResult.stack;
             var combinedItem = StackHelper.combineStack(outputItem, retItem);
             if (combinedItem.isEmpty()) {
-                ItemHandlerHelper.giveItemToPlayer(menu.player(), retItem);
+                ItemHandlerHelper.giveItemToPlayer(player, retItem);
             } else {
                 outputItem = combinedItem.get();
             }
@@ -171,21 +175,9 @@ public abstract class InventoryPlugin<S extends MenuScreen> implements IMenuPlug
             }
         }
         if (item.isEmpty()) {
-            menu.getMenu().setCarried(outputItem);
+            setCarried(outputItem);
         } else {
-            ItemHandlerHelper.giveItemToPlayer(menu.player(), outputItem);
-        }
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public abstract Class<S> menuScreenClass();
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void applyMenuScreen(S screen) {
-        if (screen.contentHeight < endY) {
-            screen.contentHeight = endY;
+            ItemHandlerHelper.giveItemToPlayer(player, outputItem);
         }
     }
 }

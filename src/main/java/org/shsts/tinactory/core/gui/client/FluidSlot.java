@@ -12,7 +12,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,14 +31,14 @@ public class FluidSlot extends MenuWidget {
     @Nullable
     private final String syncName;
 
-    public FluidSlot(IMenu menu, int tank, int syncSlot) {
+    public FluidSlot(MenuBase menu, int tank, int syncSlot) {
         super(menu);
         this.tank = tank;
         this.syncSlot = syncSlot;
         this.syncName = null;
     }
 
-    public FluidSlot(IMenu menu, int tank, String syncName) {
+    public FluidSlot(MenuBase menu, int tank, String syncName) {
         super(menu);
         this.tank = tank;
         this.syncSlot = 0;
@@ -71,7 +71,7 @@ public class FluidSlot extends MenuWidget {
 
     @Override
     protected boolean canClick(int button) {
-        return (button == 0 || button == 1) && !menu.getMenu().getCarried().isEmpty();
+        return (button == 0 || button == 1) && !menu.getCarried().isEmpty();
     }
 
     @Override

@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
-import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import static org.shsts.tinactory.Tinactory.CORE;
@@ -18,8 +17,8 @@ import static org.shsts.tinactory.content.AllRecipes.MARKER;
 public class MarkerRecipeBook extends MachineRecipeBook {
     private final boolean includeNormal;
 
-    public MarkerRecipeBook(ProcessingScreen screen, Layout layout, boolean includeNormal) {
-        super(screen, layout);
+    public MarkerRecipeBook(ProcessingScreen screen, boolean includeNormal) {
+        super(screen);
         this.includeNormal = includeNormal;
     }
 

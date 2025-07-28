@@ -6,12 +6,11 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
-import org.shsts.tinactory.content.gui.NetworkControllerPlugin;
+import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
@@ -26,7 +25,7 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,7 +37,7 @@ import java.util.UUID;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.gui.NetworkControllerPlugin.PANEL_BORDER;
+import static org.shsts.tinactory.content.gui.NetworkControllerMenu.PANEL_BORDER;
 import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_PANEL_BG;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
@@ -53,7 +52,7 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorkerScreen extends MenuScreen {
+public class LogisticWorkerScreen extends MenuScreen<MenuBase> {
     private record MachineInfo(UUID id, Component name, ItemStack icon) {}
 
     private final int workerSlots;
@@ -71,8 +70,8 @@ public class LogisticWorkerScreen extends MenuScreen {
     private UUID selectedMachine = null;
 
     private static final int BUTTON_SIZE = AbstractRecipeBook.BUTTON_SIZE;
-    private static final int IMAGE_WIDTH = NetworkControllerPlugin.WIDTH;
-    private static final int IMAGE_HEIGHT = NetworkControllerPlugin.HEIGHT;
+    private static final int IMAGE_WIDTH = NetworkControllerMenu.WIDTH;
+    private static final int IMAGE_HEIGHT = NetworkControllerMenu.HEIGHT;
     private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
     private static final int HORIZONTAL_SPACING = MARGIN_X * 2;
 
@@ -266,8 +265,8 @@ public class LogisticWorkerScreen extends MenuScreen {
         return I18n.tr("tinactory.gui.logisticWorker." + key);
     }
 
-    public LogisticWorkerScreen(IMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
+    public LogisticWorkerScreen(MenuBase menu, Component title) {
+        super(menu, title);
         var blockEntity = menu.blockEntity();
         this.machineConfig = MACHINE.get(blockEntity).config();
         this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;

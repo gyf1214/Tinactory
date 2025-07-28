@@ -9,7 +9,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.Button;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinycorelib.api.gui.IMenu;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +26,7 @@ public abstract class SwitchButton extends Button {
     protected final String enableLang;
     protected final String disableLang;
 
-    public SwitchButton(IMenu menu, Texture texture, int enableTexY, int disableTexY,
+    public SwitchButton(MenuBase menu, Texture texture, int enableTexY, int disableTexY,
         String enableLang, String disableLang) {
         super(menu);
         this.texture = texture;

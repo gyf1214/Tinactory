@@ -33,15 +33,17 @@ public class MachineRecipeBook extends AbstractRecipeBook<ProcessingRecipe> {
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
     private final Layout layout;
 
-    private MachineRecipeBook(ProcessingScreen screen, Layout layout, @Nullable IRecipeType<?> recipeType) {
+    private MachineRecipeBook(ProcessingScreen screen, Layout layout,
+        @Nullable IRecipeType<?> recipeType) {
         super(screen, layout.getXOffset());
         this.recipeType = recipeType;
         this.layout = layout;
         TechManager.client().onProgressChange(onTechChange);
     }
 
-    public MachineRecipeBook(ProcessingScreen screen, Layout layout) {
-        this(screen, layout, screen.getRecipeType().orElse(null));
+    public MachineRecipeBook(ProcessingScreen screen) {
+        this(screen, screen.menu().layout(),
+            screen.menu().recipeType().orElse(null));
     }
 
     public void remove() {

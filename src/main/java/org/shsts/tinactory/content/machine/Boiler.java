@@ -62,7 +62,7 @@ public class Boiler extends CapabilityProvider implements
         return $ -> $.capability(ID, be -> new Boiler(be, burnSpeed));
     }
 
-    public double getHeat() {
+    public double heat() {
         return heat;
     }
 
