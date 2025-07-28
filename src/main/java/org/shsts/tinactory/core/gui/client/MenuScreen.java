@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
@@ -39,6 +40,22 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
     public int contentWidth;
     public int contentHeight;
 
+    private class SlotBackground extends StaticWidget {
+        private final Slot slot;
+
+        public SlotBackground(Slot slot) {
+            super(iMenu, SLOT_BACKGROUND);
+            this.slot = slot;
+        }
+
+        @Override
+        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+            if (slot.isActive()) {
+                super.doRender(poseStack, mouseX, mouseY, partialTick);
+            }
+        }
+    }
+
     public MenuScreen(IMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.titleLabelX = MARGIN_X;
@@ -48,13 +65,10 @@ public class MenuScreen extends MenuScreenBase implements IWidgetConsumer {
 
         this.rootPanel = new Panel(this);
         for (var slot : menu.getMenu().slots) {
-            // TODO: need a more consistent way to determine whether the slot needs background
-            if (slot.isActive()) {
-                int x = slot.x - 1 - MARGIN_X;
-                int y = slot.y - 1 - MARGIN_TOP;
-                var slotBg = new StaticWidget(menu, SLOT_BACKGROUND);
-                rootPanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
-            }
+            int x = slot.x - 1 - MARGIN_X;
+            int y = slot.y - 1 - MARGIN_TOP;
+            var slotBg = new SlotBackground(slot);
+            rootPanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
         }
     }
 

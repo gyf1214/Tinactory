@@ -9,13 +9,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.machine.ElectricTank;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -30,7 +28,7 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
-import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -107,14 +105,13 @@ public class ElectricTankPlugin extends ElectricStoragePlugin {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {
             var fluid = getFluidStack();
             var filter = getFilterFluid();
             if (fluid.isEmpty() && !filter.isEmpty()) {
                 RenderUtil.renderGhostFluid(poseStack, filter, rect, getBlitOffset());
             }
-
-            super.doRender(poseStack, mouseX, mouseY, partialTick);
+            super.renderSlot(poseStack, mouseX, mouseY);
         }
     }
 
@@ -125,10 +122,8 @@ public class ElectricTankPlugin extends ElectricStoragePlugin {
 
         var layoutPanel = new Panel(screen);
         for (var slot : layout.slots) {
-            var rect = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
-            var rect1 = rect.offset(1, 1).enlarge(-2, -2);
-            layoutPanel.addWidget(rect, new StaticWidget(menu, SLOT_BACKGROUND));
-            layoutPanel.addWidget(rect1, new TankSlot(menu, slot));
+            var rect = new Rect(slot.x() + 1, slot.y() + 1, SLOT_SIZE - 2, SLOT_SIZE - 2);
+            layoutPanel.addWidget(rect, new TankSlot(menu, slot));
         }
         screen.addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
     }

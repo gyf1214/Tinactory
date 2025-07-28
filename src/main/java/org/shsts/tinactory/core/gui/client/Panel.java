@@ -4,9 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Widget;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
@@ -80,11 +77,6 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
     @Override
     public void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget) {
         children.add(new Child(anchor, offset, widget));
-    }
-
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addVanillaWidget(
-        Rect offset, T widget) {
-        addGuiComponent(RectD.ZERO, offset, widget);
     }
 
     public void init(Rect rect) {
