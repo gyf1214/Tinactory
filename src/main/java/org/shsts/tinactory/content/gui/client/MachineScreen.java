@@ -92,27 +92,33 @@ public class MachineScreen extends ProcessingScreen {
         }
     }
 
-    public static MachineScreen boiler(ProcessingMenu menu, Component title) {
-        return new MachineScreen(menu, title, null) {
-            {
-                var burnBar = new ProgressBar(menu, PROGRESS_BURN, "burn");
-                burnBar.direction = ProgressBar.Direction.VERTICAL;
-                layoutPanel.addWidget(new Rect(1, 1 + SLOT_SIZE, 16, 16), burnBar);
+    public static class Boiler extends MachineScreen {
+        public Boiler(ProcessingMenu menu, Component title) {
+            super(menu, title, null);
+            var burnBar = new ProgressBar(menu, PROGRESS_BURN, "burn");
+            burnBar.direction = ProgressBar.Direction.VERTICAL;
+            layoutPanel.addWidget(new Rect(1, 1 + SLOT_SIZE, 16, 16), burnBar);
 
-                var heatBar = new ProgressBar(menu, HEAT_EMPTY, HEAT_FULL, "heat");
-                heatBar.direction = ProgressBar.Direction.VERTICAL;
-                var rect = new Rect(SLOT_SIZE * 2, 1, HEAT_EMPTY.width(), HEAT_EMPTY.height());
-                layoutPanel.addWidget(rect, heatBar);
-            }
-        };
+            var heatBar = new ProgressBar(menu, HEAT_EMPTY, HEAT_FULL, "heat");
+            heatBar.direction = ProgressBar.Direction.VERTICAL;
+            var rect = new Rect(SLOT_SIZE * 2, 1, HEAT_EMPTY.width(), HEAT_EMPTY.height());
+            layoutPanel.addWidget(rect, heatBar);
+        }
     }
 
-    public static MachineScreen electricFurnace(ProcessingMenu menu, Component title) {
-        return new MachineScreen(menu, title, ElectricFurnaceRecipeBook::new);
+    public static class ElectricFurnace extends MachineScreen {
+        public ElectricFurnace(ProcessingMenu menu, Component title) {
+            super(menu, title, ElectricFurnaceRecipeBook::new);
+        }
+    }
+
+    public static class Marker extends MachineScreen {
+        public Marker(ProcessingMenu menu, Component title, boolean includeNormal) {
+            super(menu, title, screen -> new MarkerRecipeBook(screen, includeNormal));
+        }
     }
 
     public static IMenuScreenFactory<ProcessingMenu, MachineScreen> marker(boolean includeNormal) {
-        return (menu, title) -> new MachineScreen(menu, title,
-            screen -> new MarkerRecipeBook(screen, includeNormal));
+        return (menu, title) -> new Marker(menu, title, includeNormal);
     }
 }

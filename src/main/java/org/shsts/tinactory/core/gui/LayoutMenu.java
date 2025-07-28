@@ -210,11 +210,14 @@ public class LayoutMenu extends MenuBase {
         }
     }
 
+    public static class Simple extends LayoutMenu {
+        private Simple(Properties properties) {
+            super(properties, 0);
+            addLayoutSlots(layout);
+        }
+    }
+
     public static LayoutMenu simple(Properties properties) {
-        return new LayoutMenu(properties, 0) {
-            {
-                addLayoutSlots(layout);
-            }
-        };
+        return new Simple(properties);
     }
 }

@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
@@ -25,7 +26,6 @@ import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -52,7 +52,7 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorkerScreen extends MenuScreen<MenuBase> {
+public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private record MachineInfo(UUID id, Component name, ItemStack icon) {}
 
     private final int workerSlots;
@@ -265,7 +265,7 @@ public class LogisticWorkerScreen extends MenuScreen<MenuBase> {
         return I18n.tr("tinactory.gui.logisticWorker." + key);
     }
 
-    public LogisticWorkerScreen(MenuBase menu, Component title) {
+    public LogisticWorkerScreen(LogisticWorkerMenu menu, Component title) {
         super(menu, title);
         var blockEntity = menu.blockEntity();
         this.machineConfig = MACHINE.get(blockEntity).config();

@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
@@ -13,6 +12,7 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.content.machine.Boiler.getHeat;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.machine.Machine.getProcessor;
@@ -20,9 +20,35 @@ import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineMenu extends ProcessingMenu {
-    protected MachineMenu(Properties properties) {
+    public MachineMenu(Properties properties) {
         super(properties, SLOT_SIZE + SPACING);
         onEventPacket(SET_MACHINE_CONFIG, p -> MACHINE.get(blockEntity).setConfig(p));
+    }
+
+    public static class Multiblock extends MachineMenu {
+        public Multiblock(Properties properties) {
+            super(properties);
+        }
+
+        @Override
+        public Optional<IRecipeType<?>> recipeType() {
+            var multiblockInterface = (MultiblockInterface) MACHINE.get(blockEntity);
+            return multiblockInterface.getRecipeType();
+        }
+    }
+
+    public static class Boiler extends MachineMenu {
+        public Boiler(Properties properties) {
+            super(properties);
+            addSyncSlot("burn", be -> new SyncPackets.Double(
+                getProcessor(be)
+                    .map(IProcessor::getProgress)
+                    .orElse(0d)));
+            addSyncSlot("heat", be -> new SyncPackets.Double(
+                getProcessor(be)
+                    .map($ -> getHeat($) / 500d)
+                    .orElse(0d)));
+        }
     }
 
     public static ProcessingMenu machine(Properties properties) {
@@ -30,27 +56,10 @@ public class MachineMenu extends ProcessingMenu {
     }
 
     public static ProcessingMenu multiblock(Properties properties) {
-        return new MachineMenu(properties) {
-            @Override
-            public Optional<IRecipeType<?>> recipeType() {
-                var multiblockInterface = (MultiblockInterface) MACHINE.get(blockEntity);
-                return multiblockInterface.getRecipeType();
-            }
-        };
+        return new Multiblock(properties);
     }
 
     public static ProcessingMenu boiler(Properties properties) {
-        return new MachineMenu(properties) {
-            {
-                addSyncSlot("burn", be -> new SyncPackets.Double(
-                    getProcessor(be)
-                        .map(IProcessor::getProgress)
-                        .orElse(0d)));
-                addSyncSlot("heat", be -> new SyncPackets.Double(
-                    getProcessor(be)
-                        .map($ -> ((Boiler) $).heat() / 500d)
-                        .orElse(0d)));
-            }
-        };
+        return new Boiler(properties);
     }
 }

@@ -15,4 +15,10 @@ public class LayoutScreen<M extends LayoutMenu> extends MenuScreen<M> {
         super(menu, title);
         this.contentHeight = menu.endY();
     }
+
+    public static class Simple extends LayoutScreen<LayoutMenu> {
+        public Simple(LayoutMenu menu, Component title) {
+            super(menu, title);
+        }
+    }
 }

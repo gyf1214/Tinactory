@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
+import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
@@ -22,18 +23,16 @@ import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.LayoutScreen;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinycorelib.api.gui.IMenuEvent;
-import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import static org.shsts.tinactory.Tinactory.CHANNEL;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -79,7 +78,7 @@ public final class AllMenus {
 
         SIMPLE = REGISTRATE.menu("machine/simple", LayoutMenu::simple)
             .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> MenuScreen::new)
+            .screen(() -> () -> LayoutScreen.Simple::new)
             .register();
 
         WORKBENCH = REGISTRATE.menu("primitive/workbench", WorkbenchMenu::new)
@@ -102,13 +101,7 @@ public final class AllMenus {
             .screen(() -> () -> NetworkControllerScreen::new)
             .register();
 
-        LOGISTIC_WORKER = REGISTRATE.menu("logistics/logistic_worker",
-                properties -> (MenuBase) new MenuBase(properties) {
-                    {
-                        addSyncSlot("info", LogisticWorkerSyncPacket::new);
-                        onEventPacket(SET_MACHINE_CONFIG, p -> MACHINE.get(blockEntity).setConfig(p));
-                    }
-                })
+        LOGISTIC_WORKER = REGISTRATE.menu("logistics/logistic_worker", LogisticWorkerMenu::new)
             .title("tinactory.gui.logisticWorker.title")
             .screen(() -> () -> LogisticWorkerScreen::new)
             .register();
@@ -135,12 +128,12 @@ public final class AllMenus {
 
         BOILER = REGISTRATE.menu("machine/boiler", MachineMenu::boiler)
             .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> MachineScreen::boiler)
+            .screen(() -> () -> MachineScreen.Boiler::new)
             .register();
 
         ELECTRIC_FURNACE = REGISTRATE.menu("machine/electric_furnace", MachineMenu::machine)
             .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> MachineScreen::electricFurnace)
+            .screen(() -> () -> MachineScreen.ElectricFurnace::new)
             .register();
 
         RESEARCH_BENCH = REGISTRATE.menu("machine/research_bench", MachineMenu::machine)
