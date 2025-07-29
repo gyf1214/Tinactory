@@ -425,7 +425,7 @@ public final class AllBlockEntities {
 
         BATTERY_BOX = set.machine()
             .machine(v -> "machine/" + v.id + "/battery_box", MachineBlock::sided)
-            .menu(AllMenus.SIMPLE)
+            .menu(AllMenus.SIMPLE_MACHINE)
             .layoutMachine(BatteryBox::factory)
             .voltages(Voltage.LV, Voltage.HV)
             .layoutSet()
@@ -487,7 +487,7 @@ public final class AllBlockEntities {
 
         ME_DRIVER = set.machine()
             .machine(v -> "logistics/" + v.id + "/me_driver", MachineBlock::factory)
-            .menu(AllMenus.SIMPLE)
+            .menu(AllMenus.SIMPLE_MACHINE)
             .layoutMachine(MEDriver::factory)
             .voltages(Voltage.HV)
             .layoutSet()

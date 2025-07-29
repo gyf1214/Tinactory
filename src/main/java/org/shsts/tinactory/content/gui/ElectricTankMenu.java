@@ -30,9 +30,9 @@ public class ElectricTankMenu extends ElectricStorageMenu {
         this.fluidHandler = FLUID_STACK_HANDLER.get(blockEntity);
 
         for (var slot : layout.slots) {
-            addSyncSlot(FLUID_SLOT + slot.index(), $ ->
+            addSyncSlot(FLUID_SLOT + slot.index(), () ->
                 new FluidSyncPacket(fluidHandler.getFluidInTank(slot.index())));
-            addSyncSlot(FILTER_SLOT + slot.index(), $ ->
+            addSyncSlot(FILTER_SLOT + slot.index(), () ->
                 new FluidSyncPacket(tank.getFilter(slot.index())));
         }
 

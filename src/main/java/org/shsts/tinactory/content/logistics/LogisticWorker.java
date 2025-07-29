@@ -18,7 +18,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
@@ -27,8 +26,6 @@ import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
@@ -40,7 +37,6 @@ import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
-import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -97,24 +93,6 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         public double getPowerCons() {
             return voltage.value * 0.125d;
         }
-    }
-
-    public List<LogisticWorkerSyncPacket.PortInfo> getVisiblePorts() {
-        var ret = new ArrayList<LogisticWorkerSyncPacket.PortInfo>();
-        var machine = MACHINE.get(blockEntity);
-        machine.network().ifPresent(network -> {
-            var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-            var subnet = network.getSubnet(blockEntity.getBlockPos());
-            for (var info : logistics.getVisiblePorts(subnet)) {
-                var machine1 = info.machine();
-                var index = info.portIndex();
-                var portName = portLabel(info.port().type(), index);
-
-                ret.add(new LogisticWorkerSyncPacket.PortInfo(machine1.uuid(),
-                    index, machine1.title(), machine1.icon(), portName));
-            }
-        });
-        return ret;
     }
 
     private Optional<LogisticWorkerConfig> getConfig(int index) {

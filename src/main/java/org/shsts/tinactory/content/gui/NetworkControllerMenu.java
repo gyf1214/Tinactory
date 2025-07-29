@@ -128,7 +128,7 @@ public class NetworkControllerMenu extends MenuBase {
         renameItem.setFilter(0, stack -> stack.is(Items.NAME_TAG));
         renameItem.onUpdate(this::refreshRenameItem);
 
-        addSyncSlot("info", NetworkControllerSyncPacket::new);
+        addSyncSlot("info", () -> new NetworkControllerSyncPacket(blockEntity));
         onEventPacket(RENAME, p -> refreshName(p.getName(), false));
         addSlot(new RenameInputSlot(MARGIN_X + RENAME_BASE_MARGIN + 1,
             MARGIN_TOP + RENAME_SLOT_Y + 1));

@@ -21,7 +21,6 @@ import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.LayoutScreen;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
@@ -42,9 +41,9 @@ public final class AllMenus {
     public static final IMenuEvent<ISetMachineConfigPacket> SET_MACHINE_CONFIG;
     public static final IMenuEvent<RenameEventPacket> RENAME;
 
-    public static final IMenuType SIMPLE;
     public static final IMenuType WORKBENCH;
     public static final IMenuType NETWORK_CONTROLLER;
+    public static final IMenuType SIMPLE_MACHINE;
     public static final IMenuType ELECTRIC_CHEST;
     public static final IMenuType ELECTRIC_TANK;
     public static final IMenuType LOGISTIC_WORKER;
@@ -76,7 +75,7 @@ public final class AllMenus {
         RENAME = CHANNEL.registerMenuEventPacket(RenameEventPacket.class,
             RenameEventPacket::new);
 
-        SIMPLE = REGISTRATE.menu("machine/simple", LayoutMenu::simple)
+        SIMPLE_MACHINE = REGISTRATE.menu("machine/simple", MachineMenu::simple)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> LayoutScreen.Simple::new)
             .register();

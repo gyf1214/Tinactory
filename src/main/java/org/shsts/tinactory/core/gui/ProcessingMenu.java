@@ -36,12 +36,12 @@ public class ProcessingMenu extends LayoutMenu {
         for (var slot : layout.slots) {
             if (slot.type().portType == PortType.FLUID) {
                 addSyncSlot(FLUID_SLOT + slot.index(),
-                    $ -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
+                    () -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
             }
         }
 
         if (layout.progressBar != null) {
-            addSyncSlot("progress", be -> new SyncPackets.Double(getProcessor(be)
+            addSyncSlot("progress", () -> new SyncPackets.Double(getProcessor(blockEntity)
                 .map(IProcessor::getProgress)
                 .orElse(0d)));
         }

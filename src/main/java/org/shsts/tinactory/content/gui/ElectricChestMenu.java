@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
@@ -13,7 +12,7 @@ import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.content.AllMenus.CHEST_SLOT_CLICK;
@@ -128,8 +127,8 @@ public class ElectricChestMenu extends ElectricStorageMenu {
         return chest;
     }
 
-    private Function<BlockEntity, ChestItemSyncPacket> itemSyncPacket(int slot) {
-        return $ -> new ChestItemSyncPacket(chest.getStackInSlot(slot),
+    private Supplier<ChestItemSyncPacket> itemSyncPacket(int slot) {
+        return () -> new ChestItemSyncPacket(chest.getStackInSlot(slot),
             chest.getFilter(slot).orElse(null));
     }
 

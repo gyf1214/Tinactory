@@ -5,9 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
-import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -49,10 +47,8 @@ public class LogisticWorkerSyncPacket implements IPacket {
         this.visiblePorts = new ArrayList<>();
     }
 
-    public LogisticWorkerSyncPacket(BlockEntity be) {
-        this.visiblePorts = LogisticWorker.tryGet(be)
-            .map(LogisticWorker::getVisiblePorts)
-            .orElseGet(List::of);
+    public LogisticWorkerSyncPacket(List<PortInfo> visiblePorts) {
+        this.visiblePorts = visiblePorts;
     }
 
     public Collection<PortInfo> getPorts() {

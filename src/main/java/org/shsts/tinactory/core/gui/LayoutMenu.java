@@ -209,15 +209,4 @@ public class LayoutMenu extends MenuBase {
             ItemHandlerHelper.giveItemToPlayer(player, outputItem);
         }
     }
-
-    public static class Simple extends LayoutMenu {
-        private Simple(Properties properties) {
-            super(properties, 0);
-            addLayoutSlots(layout);
-        }
-    }
-
-    public static LayoutMenu simple(Properties properties) {
-        return new Simple(properties);
-    }
 }
