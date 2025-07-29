@@ -73,7 +73,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     protected Network network;
 
     private UUID uuid = UUID.randomUUID();
-    public final MachineConfig config = new MachineConfig();
+    protected final MachineConfig config = new MachineConfig();
 
     protected Machine(BlockEntity be) {
         this.blockEntity = be;
