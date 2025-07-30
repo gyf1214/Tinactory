@@ -31,40 +31,24 @@ public class LogisticComponent extends NetworkComponent {
     private static class Subnet {
         private final Set<PortKey> subnetPorts = new HashSet<>();
         private final Set<PortKey> storagePorts = new HashSet<>();
-        private final Set<Runnable> callbacks = new HashSet<>();
-
-        private void invokeUpdate() {
-            for (var cb : callbacks) {
-                cb.run();
-            }
-        }
 
         public void registerSubnetPort(PortKey key, boolean isStorage) {
             subnetPorts.add(key);
             if (isStorage) {
                 storagePorts.add(key);
             }
-            invokeUpdate();
         }
 
         public void unregisterPort(PortKey key) {
             subnetPorts.remove(key);
             storagePorts.remove(key);
-            invokeUpdate();
-        }
-
-        public void addCallback(Runnable cb) {
-            callbacks.add(cb);
-        }
-
-        public void removeCallback(Runnable cb) {
-            callbacks.remove(cb);
         }
     }
 
     private final Map<PortKey, PortInfo> ports = new HashMap<>();
     private final Map<BlockPos, Subnet> subnets = new HashMap<>();
     private final Set<PortKey> globalPorts = new HashSet<>();
+    private final Set<Runnable> callbacks = new HashSet<>();
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
@@ -78,7 +62,7 @@ public class LogisticComponent extends NetworkComponent {
         return network.getSubnet(machine.blockEntity().getBlockPos());
     }
 
-    private PortKey registerPort(IMachine machine, int index, IPort port, Collection<BlockPos> subnets) {
+    private PortKey createPort(IMachine machine, int index, IPort port, Collection<BlockPos> subnets) {
         var key = new PortKey(machine.uuid(), index);
         assert !ports.containsKey(key);
         ports.put(key, new PortInfo(machine, index, port, subnets));
@@ -92,7 +76,7 @@ public class LogisticComponent extends NetworkComponent {
             var subnet = (BlockPos) subnetOpts[i];
             subnets.add(subnet);
         }
-        var key = registerPort(machine, index, port, subnets);
+        var key = createPort(machine, index, port, subnets);
         if (isGlobal) {
             globalPorts.add(key);
         }
@@ -101,6 +85,7 @@ public class LogisticComponent extends NetworkComponent {
             var isStorage = (boolean) subnetOpts[i + 1];
             getSubnet(subnet).registerSubnetPort(key, isStorage);
         }
+        invokeUpdate();
     }
 
     public void registerPort(IMachine machine, int index, IPort port,
@@ -118,6 +103,7 @@ public class LogisticComponent extends NetworkComponent {
             for (var subnet : info.subnets) {
                 getSubnet(subnet).unregisterPort(key);
             }
+            invokeUpdate();
         }
     }
 
@@ -143,12 +129,18 @@ public class LogisticComponent extends NetworkComponent {
         }
     }
 
-    public void onUpdatePorts(BlockPos subnet, Runnable cb) {
-        getSubnet(subnet).addCallback(cb);
+    private void invokeUpdate() {
+        for (var cb : callbacks) {
+            cb.run();
+        }
     }
 
-    public void unregisterCallback(BlockPos subnet, Runnable cb) {
-        getSubnet(subnet).removeCallback(cb);
+    public void onUpdatePorts(Runnable cb) {
+        callbacks.add(cb);
+    }
+
+    public void unregisterCallback(Runnable cb) {
+        callbacks.remove(cb);
     }
 
     @Override
@@ -156,6 +148,7 @@ public class LogisticComponent extends NetworkComponent {
         ports.clear();
         globalPorts.clear();
         subnets.clear();
+        callbacks.clear();
     }
 
     private void onTick(Level world, INetwork network) {}

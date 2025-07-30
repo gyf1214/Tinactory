@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
@@ -33,6 +34,7 @@ public class LogisticWorkerMenu extends MenuBase {
         }
     }
 
+    private final IMachine machine;
     private final LogisticComponent logistic;
     private final BlockPos subnet;
     private final Runnable onUpdatePorts = () -> needUpdate = true;
@@ -42,11 +44,12 @@ public class LogisticWorkerMenu extends MenuBase {
     public LogisticWorkerMenu(Properties properties) {
         super(properties);
 
+        this.machine = MACHINE.get(blockEntity);
         if (!world.isClientSide) {
-            var network = MACHINE.get(blockEntity).network().orElseThrow();
+            var network = machine.network().orElseThrow();
             this.logistic = network.getComponent(LOGISTIC_COMPONENT.get());
             this.subnet = network.getSubnet(blockEntity.getBlockPos());
-            logistic.onUpdatePorts(subnet, onUpdatePorts);
+            logistic.onUpdatePorts(onUpdatePorts);
         } else {
             this.logistic = null;
             this.subnet = null;
@@ -57,10 +60,15 @@ public class LogisticWorkerMenu extends MenuBase {
     }
 
     @Override
+    public boolean stillValid(Player player) {
+        return super.stillValid(player) && machine.canPlayerInteract(player);
+    }
+
+    @Override
     public void removed(Player player) {
         super.removed(player);
         if (!world.isClientSide) {
-            logistic.unregisterCallback(subnet, onUpdatePorts);
+            logistic.unregisterCallback(onUpdatePorts);
         }
     }
 
