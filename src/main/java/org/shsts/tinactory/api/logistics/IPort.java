@@ -13,9 +13,19 @@ public interface IPort {
         return (IItemCollection) this;
     }
 
+    default IItemFilter asItemFilter() {
+        assert type() == PortType.ITEM;
+        return (IItemFilter) this;
+    }
+
     default IFluidCollection asFluid() {
         assert type() == PortType.FLUID;
         return (IFluidCollection) this;
+    }
+
+    default IFluidFilter asFluidFilter() {
+        assert type() == PortType.FLUID;
+        return (IFluidFilter) this;
     }
 
     /**

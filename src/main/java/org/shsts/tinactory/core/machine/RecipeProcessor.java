@@ -211,7 +211,7 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
                 }
                 var port = container.getPort(i, true);
                 switch (port.type()) {
-                    case ITEM -> port.asItem().resetItemFilter();
+                    case ITEM -> port.asItemFilter().resetFilters();
                     case FLUID -> port.asFluid().resetFluidFilter();
                 }
             }

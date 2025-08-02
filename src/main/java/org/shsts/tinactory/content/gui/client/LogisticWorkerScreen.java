@@ -306,7 +306,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         machineList.clear();
         ports.clear();
 
-        for (var port : p.getPorts()) {
+        for (var port : p.ports()) {
             if (!machinePorts.containsKey(port.machineId())) {
                 var info = new MachineInfo(port.machineId(), port.machineName(), port.icon());
                 machineList.add(info);

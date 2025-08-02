@@ -12,6 +12,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IItemFilter;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -28,7 +29,7 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DigitalItemStorage extends DigitalStorage
-    implements IItemCollection, INBTSerializable<CompoundTag> {
+    implements IItemCollection, IItemFilter, INBTSerializable<CompoundTag> {
     private record ItemStackWrapper(ItemStack stack) {
         @Override
         public boolean equals(Object other) {
@@ -167,12 +168,12 @@ public class DigitalItemStorage extends DigitalStorage
     }
 
     @Override
-    public void setItemFilter(List<? extends Predicate<ItemStack>> filters) {
+    public void setFilters(List<? extends Predicate<ItemStack>> filters) {
         filter = stack -> filters.stream().anyMatch($ -> $.test(stack));
     }
 
     @Override
-    public void resetItemFilter() {
+    public void resetFilters() {
         filter = TRUE_FILTER;
     }
 

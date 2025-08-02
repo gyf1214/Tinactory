@@ -129,7 +129,7 @@ public class MachineProcessor<R extends ProcessingRecipe>
             for (var idx : itemFilters.keys().elementSet()) {
                 var port = container.getPort(idx, true);
                 if (port.type() == PortType.ITEM) {
-                    port.asItem().setItemFilter(itemFilters.get(idx));
+                    port.asItemFilter().setFilters(itemFilters.get(idx));
                 }
             }
 

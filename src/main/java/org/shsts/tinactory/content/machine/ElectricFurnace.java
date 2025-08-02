@@ -102,7 +102,7 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
         targetRecipe = (SmeltingRecipe) world.getRecipeManager().byKey(loc).orElseThrow();
         getContainer().ifPresent(container -> {
             if (container.hasPort(0) && container.getPort(0, true) instanceof IItemCollection itemPort) {
-                itemPort.setItemFilter(targetRecipe.getIngredients());
+                itemPort.asItemFilter().setFilters(targetRecipe.getIngredients());
             }
         });
     }

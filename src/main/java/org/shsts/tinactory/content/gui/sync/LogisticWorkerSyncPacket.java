@@ -11,9 +11,7 @@ import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -51,7 +49,7 @@ public class LogisticWorkerSyncPacket implements IPacket {
         this.visiblePorts = visiblePorts;
     }
 
-    public Collection<PortInfo> getPorts() {
+    public Collection<PortInfo> ports() {
         return visiblePorts;
     }
 
@@ -63,23 +61,5 @@ public class LogisticWorkerSyncPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         visiblePorts.addAll(buf.readList(PortInfo::deserialize));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof LogisticWorkerSyncPacket that)) {
-            return false;
-        }
-        var thisPorts = new HashSet<>(visiblePorts);
-        return visiblePorts.size() == that.visiblePorts.size() &&
-            thisPorts.containsAll(that.visiblePorts);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(visiblePorts);
     }
 }

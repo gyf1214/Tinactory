@@ -9,6 +9,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.RangedWrapper;
 import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IItemFilter;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import java.util.function.Predicate;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemHandlerCollection implements IItemCollection {
+public class ItemHandlerCollection implements IItemCollection, IItemFilter {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final IItemHandler itemHandler;
@@ -146,7 +147,7 @@ public class ItemHandlerCollection implements IItemCollection {
     }
 
     @Override
-    public void setItemFilter(List<? extends Predicate<ItemStack>> filters) {
+    public void setFilters(List<? extends Predicate<ItemStack>> filters) {
         if (!(itemHandler instanceof WrapperItemHandler wrapper)) {
             return;
         }
@@ -160,7 +161,7 @@ public class ItemHandlerCollection implements IItemCollection {
     }
 
     @Override
-    public void resetItemFilter() {
+    public void resetFilters() {
         if (!(itemHandler instanceof WrapperItemHandler wrapper)) {
             return;
         }

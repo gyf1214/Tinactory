@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -97,15 +96,5 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
     @Override
     public Collection<ItemStack> getAllItems() {
         return composes.stream().flatMap($ -> $.getAllItems().stream()).toList();
-    }
-
-    @Override
-    public void setItemFilter(List<? extends Predicate<ItemStack>> filters) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void resetItemFilter() {
-        throw new UnsupportedOperationException();
     }
 }
