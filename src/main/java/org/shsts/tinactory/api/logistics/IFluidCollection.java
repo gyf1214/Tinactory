@@ -5,8 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -39,8 +37,4 @@ public interface IFluidCollection extends IPort {
      * DO NOT change the returned ItemStack.
      */
     Collection<FluidStack> getAllFluids();
-
-    void setFluidFilter(List<? extends Predicate<FluidStack>> filters);
-
-    void resetFluidFilter();
 }

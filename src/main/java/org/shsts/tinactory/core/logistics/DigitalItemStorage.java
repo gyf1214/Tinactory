@@ -58,10 +58,7 @@ public class DigitalItemStorage extends DigitalStorage
         if (stack.isEmpty()) {
             return true;
         }
-        if (!filter.test(stack)) {
-            return false;
-        }
-        if (bytesRemaining < CONFIG.bytesPerItem.get()) {
+        if (!filter.test(stack) || bytesRemaining < CONFIG.bytesPerItem.get()) {
             return false;
         }
         if (!items.containsKey(new ItemStackWrapper(stack))) {

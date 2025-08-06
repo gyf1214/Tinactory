@@ -28,8 +28,9 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class StackHelper {
-    static final Predicate<ItemStack> TRUE_FILTER = $ -> true;
-    static final Predicate<ItemStack> FALSE_FILTER = $ -> false;
+    public static final Predicate<ItemStack> TRUE_FILTER = $ -> true;
+    public static final Predicate<ItemStack> FALSE_FILTER = $ -> false;
+    public static final Predicate<FluidStack> TRUE_FLUID_FILTER = $ -> true;
 
     public static CompoundTag serializeItemStack(ItemStack stack) {
         var tag = new CompoundTag();

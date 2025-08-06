@@ -73,7 +73,7 @@ public class Boiler extends CapabilityProvider implements
         outputPort = container.getPort(2, true).asFluid();
 
         fuelPort.asItemFilter().setFilters(List.of(item -> ForgeHooks.getBurnTime(item, null) > 0));
-        waterPort.setFluidFilter(List.of(fluid -> fluid.getFluid() == WATER.fluid().get()));
+        waterPort.asFluidFilter().setFilters(List.of(fluid -> fluid.getFluid() == WATER.fluid().get()));
     }
 
     @Override

@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -98,15 +97,5 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
     @Override
     public Collection<FluidStack> getAllFluids() {
         return composes.stream().flatMap($ -> $.getAllFluids().stream()).toList();
-    }
-
-    @Override
-    public void setFluidFilter(List<? extends Predicate<FluidStack>> filters) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void resetFluidFilter() {
-        throw new UnsupportedOperationException();
     }
 }

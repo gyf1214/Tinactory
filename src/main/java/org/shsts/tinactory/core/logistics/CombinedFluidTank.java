@@ -10,6 +10,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.shsts.tinactory.api.logistics.IFluidFilter;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -20,7 +21,7 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<CompoundTag> {
+public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final WrapperFluidTank[] tanks;
@@ -189,7 +190,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
     }
 
     @Override
-    public void setFluidFilter(List<? extends Predicate<FluidStack>> filters) {
+    public void setFilters(List<? extends Predicate<FluidStack>> filters) {
         for (var i = 0; i < tanks.length; i++) {
             if (i < filters.size()) {
                 tanks[i].filter = filters.get(i);
@@ -200,7 +201,7 @@ public class CombinedFluidTank implements IFluidStackHandler, INBTSerializable<C
     }
 
     @Override
-    public void resetFluidFilter() {
+    public void resetFilters() {
         for (var tank : tanks) {
             tank.resetFilter();
         }

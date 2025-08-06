@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
+import org.shsts.tinactory.api.logistics.IFluidFilter;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,11 +24,12 @@ import java.util.function.Predicate;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
+import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DigitalFluidStorage extends DigitalStorage
-    implements IFluidCollection, INBTSerializable<CompoundTag> {
+    implements IFluidCollection, IFluidFilter, INBTSerializable<CompoundTag> {
     private record FluidStackWrapper(FluidStack stack) {
         @Override
         public boolean equals(Object other) {
@@ -42,7 +44,7 @@ public class DigitalFluidStorage extends DigitalStorage
     }
 
     private final Map<FluidStackWrapper, FluidStack> fluids = new HashMap<>();
-    // TODO: filter
+    private Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
 
     public DigitalFluidStorage(int bytesLimit) {
         super(bytesLimit);
@@ -53,7 +55,7 @@ public class DigitalFluidStorage extends DigitalStorage
         if (stack.isEmpty()) {
             return true;
         }
-        if (bytesRemaining < CONFIG.bytesPerFluid.get()) {
+        if (!filter.test(stack) || bytesRemaining < CONFIG.bytesPerFluid.get()) {
             return false;
         }
         if (!fluids.containsKey(new FluidStackWrapper(stack))) {
@@ -158,13 +160,13 @@ public class DigitalFluidStorage extends DigitalStorage
     }
 
     @Override
-    public void setFluidFilter(List<? extends Predicate<FluidStack>> filters) {
-        throw new UnsupportedOperationException();
+    public void setFilters(List<? extends Predicate<FluidStack>> filters) {
+        filter = stack -> filters.stream().anyMatch($ -> $.test(stack));
     }
 
     @Override
-    public void resetFluidFilter() {
-        throw new UnsupportedOperationException();
+    public void resetFilters() {
+        filter = TRUE_FLUID_FILTER;
     }
 
     @Override

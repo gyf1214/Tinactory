@@ -136,7 +136,7 @@ public class MachineProcessor<R extends ProcessingRecipe>
             for (var idx : fluidFilters.keys().elementSet()) {
                 var port = container.getPort(idx, true);
                 if (port.type() == PortType.FLUID) {
-                    port.asFluid().setFluidFilter(fluidFilters.get(idx));
+                    port.asFluidFilter().setFilters(fluidFilters.get(idx));
                 }
             }
         });
