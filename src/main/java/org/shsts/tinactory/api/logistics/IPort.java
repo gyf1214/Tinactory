@@ -29,7 +29,7 @@ public interface IPort {
     }
 
     /**
-     * If this returns false, extract and
+     * If this returns false, extract and getItem should return empty.
      */
     boolean acceptOutput();
 
