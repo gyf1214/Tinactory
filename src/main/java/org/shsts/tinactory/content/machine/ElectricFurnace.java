@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

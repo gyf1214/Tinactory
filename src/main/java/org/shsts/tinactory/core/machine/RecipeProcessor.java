@@ -21,13 +21,11 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.GeneratorProcessor;
-import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
 import org.shsts.tinactory.content.multiblock.CoilProcessor;
 import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
-import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -352,10 +350,5 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         } else {
             currentRecipeLoc = null;
         }
-    }
-
-    public static Voltage getBlockVoltage(BlockEntity be) {
-        return be.getBlockState().getBlock() instanceof MachineBlock machineBlock ?
-            machineBlock.voltage : Voltage.PRIMITIVE;
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -62,6 +63,11 @@ public class MachineBlock extends SmartEntityBlock
     public static Factory<MachineBlock> multiblockInterface(Voltage voltage) {
         return (properties, entityType, menu) ->
             new MultiblockInterfaceBlock(properties, entityType, menu, voltage);
+    }
+
+    public static Voltage getBlockVoltage(BlockEntity be) {
+        return be.getBlockState().getBlock() instanceof MachineBlock machineBlock ?
+            machineBlock.voltage : Voltage.PRIMITIVE;
     }
 
     @Override

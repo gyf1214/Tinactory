@@ -12,6 +12,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -25,6 +26,7 @@ import org.shsts.tinactory.core.logistics.CombinedItemCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
+import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -33,6 +35,8 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
@@ -44,6 +48,7 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -58,8 +63,7 @@ public class MEDriver extends CapabilityProvider
     private final CombinedItemCollection combinedItems;
     private final CombinedFluidCollection combinedFluids;
     private final LazyOptional<IItemHandler> itemHandlerCap;
-    private final LazyOptional<IItemCollection> itemCollectionCap;
-    private final LazyOptional<IFluidCollection> fluidCollectionCap;
+    private final LazyOptional<IElectricMachine> electricCap;
 
     private IMachine machine;
     private IMachineConfig machineConfig;
@@ -76,12 +80,14 @@ public class MEDriver extends CapabilityProvider
         storages.onUpdate(this::onUpdateStorage);
 
         this.combinedItems = new CombinedItemCollection();
-        this.itemCollectionCap = LazyOptional.of(() -> combinedItems);
         combinedItems.onUpdate(blockEntity::setChanged);
 
         this.combinedFluids = new CombinedFluidCollection();
-        this.fluidCollectionCap = LazyOptional.of(() -> combinedFluids);
         combinedFluids.onUpdate(blockEntity::setChanged);
+
+        var electric = new SimpleElectricConsumer(getBlockVoltage(blockEntity),
+            CONFIG.meDriverAmperage.get());
+        this.electricCap = LazyOptional.of(() -> electric);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
@@ -143,10 +149,8 @@ public class MEDriver extends CapabilityProvider
             return myself();
         } else if (cap == MENU_ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
-        } else if (cap == ITEM_COLLECTION.get()) {
-            return itemCollectionCap.cast();
-        } else if (cap == FLUID_COLLECTION.get()) {
-            return fluidCollectionCap.cast();
+        } else if (cap == ELECTRIC_MACHINE.get()) {
+            return electricCap.cast();
         }
         return LazyOptional.empty();
     }

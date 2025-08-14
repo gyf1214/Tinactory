@@ -55,6 +55,7 @@ import static org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
 import static org.shsts.tinactory.content.AllBlockEntities.ME_DRIVER;
+import static org.shsts.tinactory.content.AllBlockEntities.ME_STORAGE_INTERFACE;
 import static org.shsts.tinactory.content.AllBlockEntities.MIXER;
 import static org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE;
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
@@ -174,22 +175,23 @@ public final class Machines {
         machine(ELECTROLYZER);
         machine(CHEMICAL_REACTOR);
         machine(ARC_FURNACE);
-        machine(STEAM_TURBINE, $ -> $.ioTex(IO_TEX)
+        machine(STEAM_TURBINE, $ -> $
             .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
             .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
-        machine(GAS_TURBINE, $ -> $.ioTex(IO_TEX)
+        machine(GAS_TURBINE, $ -> $
             .overlay(Direction.EAST, "generators/steam_turbine/overlay_side")
             .overlay(Direction.WEST, "generators/steam_turbine/overlay_side"));
         machine(COMBUSTION_GENERATOR, "generators/combustion");
         machine(BATTERY_BOX, IO_OUT_TEX);
-        machine(ELECTRIC_CHEST, $ -> $.ioTex(IO_TEX)
+        machine(ELECTRIC_CHEST, $ -> $
             .overlay(Direction.UP, "overlay/machine/overlay_qchest")
             .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
-        machine(ELECTRIC_TANK, $ -> $.ioTex(IO_TEX)
+        machine(ELECTRIC_TANK, $ -> $
             .overlay(Direction.UP, "overlay/machine/overlay_qtank")
             .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
         machine(LOGISTIC_WORKER, "cover/overlay_conveyor");
         machine(ME_DRIVER, "overlay/automation/automation_superbuffer");
+        machine(ME_STORAGE_INTERFACE, "cover/overlay_storage");
 
         DATA_GEN.block(NETWORK_CONTROLLER)
             .child(MachineModel::builder)
@@ -565,12 +567,8 @@ public final class Machines {
         }
     }
 
-    private static void machine(MachineSet set, String overlay, String ioTex) {
-        machine(set, $ -> $.overlay(overlay).ioTex(ioTex));
-    }
-
     private static void machine(MachineSet set, String overlay) {
-        machine(set, overlay, IO_TEX);
+        machine(set, $ -> $.overlay(overlay));
     }
 
     private static void machine(ProcessingSet set) {

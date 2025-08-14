@@ -17,10 +17,9 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
-import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -37,6 +36,7 @@ import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -45,7 +45,6 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private static final String ID = "logistics/logistic_worker";
 
     private final BlockEntity blockEntity;
-    private final Voltage voltage;
     public final int workerSlots;
     private final int workerInterval;
     private final int workerStack;
@@ -57,42 +56,20 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     public LogisticWorker(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
-        this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
+        var voltage = getBlockVoltage(blockEntity);
         var idx = voltage.rank - 1;
-        this.workerSlots = listConfig(CONFIG.workerSize, idx);
-        this.workerInterval = listConfig(CONFIG.workerDelay, idx);
-        this.workerStack = listConfig(CONFIG.workerStack, idx);
-        this.workerFluidStack = listConfig(CONFIG.workerFluidStack, idx);
+        this.workerSlots = listConfig(CONFIG.logisticWorkerSize, idx);
+        this.workerInterval = listConfig(CONFIG.logisticWorkerDelay, idx);
+        this.workerStack = listConfig(CONFIG.logisticWorkerStack, idx);
+        this.workerFluidStack = listConfig(CONFIG.logisticWorkerFluidStack, idx);
 
-        var electric = new Electric();
+        var electric = new SimpleElectricConsumer(voltage, CONFIG.logisticWorkerAmperage.get());
         this.electricCap = LazyOptional.of(() -> electric);
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
         return builder.capability(ID, LogisticWorker::new);
-    }
-
-    private class Electric implements IElectricMachine {
-        @Override
-        public long getVoltage() {
-            return voltage.value;
-        }
-
-        @Override
-        public ElectricMachineType getMachineType() {
-            return ElectricMachineType.CONSUMER;
-        }
-
-        @Override
-        public double getPowerGen() {
-            return 0;
-        }
-
-        @Override
-        public double getPowerCons() {
-            return voltage.value * 0.125d;
-        }
     }
 
     private Optional<LogisticWorkerConfig> getConfig(int index) {

@@ -102,6 +102,9 @@ public class Network extends NetworkBase implements INetwork {
         for (var machine : subnetMachines.values()) {
             machine.onConnectToNetwork(this);
         }
+        for (var component : components.values()) {
+            component.onPostConnect();
+        }
         for (var machine : subnetMachines.values()) {
             machine.buildSchedulings(machineSchedulings::put);
         }

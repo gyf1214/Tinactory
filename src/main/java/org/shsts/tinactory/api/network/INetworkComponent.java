@@ -19,6 +19,8 @@ public interface INetworkComponent {
      */
     void onConnect();
 
+    void onPostConnect();
+
     /**
      * Called when network disconnects.
      */

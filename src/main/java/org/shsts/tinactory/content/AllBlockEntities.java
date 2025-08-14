@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.content.machine.ElectricTank;
 import org.shsts.tinactory.content.machine.MEDriver;
+import org.shsts.tinactory.content.machine.MEStorageInterface;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.PrimitiveMachine;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -95,6 +96,7 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_TANK;
     public static final MachineSet LOGISTIC_WORKER;
     public static final MachineSet ME_DRIVER;
+    public static final MachineSet ME_STORAGE_INTERFACE;
     public static final Map<Voltage, IEntry<MachineBlock>> MULTIBLOCK_INTERFACE;
 
     public static final IEntry<MachineBlock> NETWORK_CONTROLLER;
@@ -494,6 +496,13 @@ public final class AllBlockEntities {
             .port(ITEM_INPUT)
             .slots(0, 0, 3, 3)
             .build()
+            .tintVoltage(2)
+            .buildObject();
+
+        ME_STORAGE_INTERFACE = set.machine()
+            .machine(v -> "logistics/" + v.id + "/me_storage_interface", MachineBlock::factory)
+            .voltages(Voltage.HV)
+            .machine(MEStorageInterface::factory)
             .tintVoltage(2)
             .buildObject();
 

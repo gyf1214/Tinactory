@@ -29,5 +29,8 @@ public abstract class NetworkComponent implements INetworkComponent {
     public void onConnect() {}
 
     @Override
+    public void onPostConnect() {}
+
+    @Override
     public void onDisconnect() {}
 }

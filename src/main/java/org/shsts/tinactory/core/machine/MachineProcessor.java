@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

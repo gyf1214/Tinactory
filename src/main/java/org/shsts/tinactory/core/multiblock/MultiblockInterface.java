@@ -23,7 +23,6 @@ import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.machine.MachineProcessor;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -38,6 +37,7 @@ import static org.shsts.tinactory.content.AllEvents.CLIENT_TICK;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -60,7 +60,7 @@ public class MultiblockInterface extends Machine {
 
     public MultiblockInterface(BlockEntity be) {
         super(be);
-        this.voltage = RecipeProcessor.getBlockVoltage(be);
+        this.voltage = getBlockVoltage(be);
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(

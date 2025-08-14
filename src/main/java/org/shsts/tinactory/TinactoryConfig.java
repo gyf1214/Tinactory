@@ -15,14 +15,18 @@ public final class TinactoryConfig {
     public final ConfigValue<Integer> baseFluidCellSize;
     public final ConfigValue<Integer> chestSize;
     public final ConfigValue<Integer> tankSize;
-    public final ConfigValue<List<? extends Integer>> workerSize;
-    public final ConfigValue<List<? extends Integer>> workerDelay;
-    public final ConfigValue<List<? extends Integer>> workerStack;
-    public final ConfigValue<List<? extends Integer>> workerFluidStack;
+    public final ConfigValue<List<? extends Integer>> logisticWorkerSize;
+    public final ConfigValue<List<? extends Integer>> logisticWorkerDelay;
+    public final ConfigValue<List<? extends Integer>> logisticWorkerStack;
+    public final ConfigValue<List<? extends Integer>> logisticWorkerFluidStack;
     public final ConfigValue<Integer> bytesPerItem;
     public final ConfigValue<Integer> bytesPerItemType;
     public final ConfigValue<Integer> bytesPerFluid;
     public final ConfigValue<Integer> bytesPerFluidType;
+    public final ConfigValue<Double> logisticWorkerAmperage;
+    public final ConfigValue<Double> electricStorageAmperage;
+    public final ConfigValue<Double> meDriverAmperage;
+    public final ConfigValue<Double> meStorageInterfaceAmperage;
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
     public final ConfigValue<List<? extends Double>> cableResistanceFactor;
@@ -48,14 +52,14 @@ public final class TinactoryConfig {
             .defineInRange("tank_size", 256000, 1, Integer.MAX_VALUE);
 
         Predicate<Object> validator = i -> ((Number) i).doubleValue() > 0d;
-        workerSize = builder.comment("Worker sizes for logistics component")
-            .defineList("worker_size", List.of(8, 8, 16, 16, 32), validator);
-        workerDelay = builder.comment("Worker delays for logistics component")
-            .defineList("worker_delay", List.of(40, 40, 20, 20, 10), validator);
-        workerStack = builder.comment("Worker item stacks for logistics component")
-            .defineList("worker_stack", List.of(4, 16, 64, 64, 128), validator);
-        workerFluidStack = builder.comment("Worker fluid stacks for logistics component")
-            .defineList("worker_fluid_stack", List.of(1000, 4000, 16000, 16000, 32000), validator);
+        logisticWorkerSize = builder.comment("Logistic Worker sizes")
+            .defineList("logistic_worker_size", List.of(8, 8, 16, 16, 32), validator);
+        logisticWorkerDelay = builder.comment("Logistic Worker delays")
+            .defineList("logistic_worker_delay", List.of(40, 40, 20, 20, 10), validator);
+        logisticWorkerStack = builder.comment("Logistic Worker item stacks per cycle")
+            .defineList("logistic_worker_stack", List.of(4, 16, 64, 64, 128), validator);
+        logisticWorkerFluidStack = builder.comment("Logistic Worker fluid stacks per cycle")
+            .defineList("logistic_worker_fluid_stack", List.of(1000, 4000, 16000, 16000, 32000), validator);
 
         bytesPerItem = builder.comment("Bytes used per item by digital storage")
             .defineInRange("bytes_per_item", 256, 1, Integer.MAX_VALUE);
@@ -65,11 +69,20 @@ public final class TinactoryConfig {
             .defineInRange("bytes_per_fluid", 1, 1, Integer.MAX_VALUE);
         bytesPerFluidType = builder.comment("Bytes used per fluid type by digital storage")
             .defineInRange("bytes_per_fluid_type", 4096, 1, Integer.MAX_VALUE);
+
+        logisticWorkerAmperage = builder.comment("Amperage usage on Logistic Worker")
+            .defineInRange("logistic_worker_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
+        electricStorageAmperage = builder.comment("Amperage usage on Electric Storage")
+            .defineInRange("electric_storage_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
+        meDriverAmperage = builder.comment("Amperage usage on ME Driver")
+            .defineInRange("me_driver_amperage", 0.25d, 0d, Double.POSITIVE_INFINITY);
+        meStorageInterfaceAmperage = builder.comment("Amperage usage on ME Storage Interface")
+            .defineInRange("me_storage_interface_amperage", 0.5d, 0d, Double.POSITIVE_INFINITY);
         builder.pop();
 
         builder.push("machine");
         primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
-            .defineInRange("primitive_work_speed", 0.25, 0d, 1d);
+            .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
         machineResistanceFactor = builder.comment("Machine resistance factor")
             .defineList("machine_resistance_factor", List.of(0.05d, 0.1d, 0.1d, 0.2d, 0.2d, 0.4d), validator);
         cableResistanceFactor = builder.comment("Cable resistance factor")

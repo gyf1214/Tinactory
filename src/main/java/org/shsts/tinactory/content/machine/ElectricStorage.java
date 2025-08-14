@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
@@ -14,9 +15,12 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
+import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
@@ -24,12 +28,14 @@ import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class ElectricStorage extends CapabilityProvider implements ILayoutProvider, IEventSubscriber {
     protected final BlockEntity blockEntity;
-    public final Layout layout;
+    private final Layout layout;
+    private final LazyOptional<IElectricMachine> electricCap;
 
     protected IMachine machine;
     protected IMachineConfig machineConfig;
@@ -37,6 +43,10 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     public ElectricStorage(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
         this.layout = layout;
+
+        var electric = new SimpleElectricConsumer(getBlockVoltage(blockEntity),
+            CONFIG.electricStorageAmperage.get());
+        this.electricCap = LazyOptional.of(() -> electric);
     }
 
     public boolean isUnlocked() {
@@ -79,6 +89,8 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == LAYOUT_PROVIDER.get()) {
             return myself();
+        } else if (cap == ELECTRIC_MACHINE.get()) {
+            return electricCap.cast();
         }
         return LazyOptional.empty();
     }

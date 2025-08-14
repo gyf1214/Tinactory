@@ -21,7 +21,6 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
@@ -36,6 +35,7 @@ import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -53,7 +53,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     public BatteryBox(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
         this.layout = layout;
-        this.voltage = RecipeProcessor.getBlockVoltage(blockEntity);
+        this.voltage = getBlockVoltage(blockEntity);
         var size = layout.slots.size();
         this.items = new WrapperItemHandler(size);
         for (var i = 0; i < size; i++) {

@@ -49,6 +49,7 @@ public class LogisticComponent extends NetworkComponent {
     private final Map<BlockPos, Subnet> subnets = new HashMap<>();
     private final Set<PortKey> globalPorts = new HashSet<>();
     private final Set<Runnable> callbacks = new HashSet<>();
+    private boolean isConnecting = false;
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
@@ -130,6 +131,9 @@ public class LogisticComponent extends NetworkComponent {
     }
 
     private void invokeUpdate() {
+        if (isConnecting) {
+            return;
+        }
         for (var cb : callbacks) {
             cb.run();
         }
@@ -141,6 +145,17 @@ public class LogisticComponent extends NetworkComponent {
 
     public void unregisterCallback(Runnable cb) {
         callbacks.remove(cb);
+    }
+
+    @Override
+    public void onConnect() {
+        isConnecting = true;
+    }
+
+    @Override
+    public void onPostConnect() {
+        isConnecting = false;
+        invokeUpdate();
     }
 
     @Override
