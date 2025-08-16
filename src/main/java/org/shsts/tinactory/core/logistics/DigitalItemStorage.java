@@ -9,7 +9,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IItemFilter;
@@ -27,13 +26,12 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalItemStorage extends DigitalStorage
-    implements IItemCollection, IItemFilter, INBTSerializable<CompoundTag> {
+public class DigitalItemStorage extends DigitalStorage implements IItemCollection, IItemFilter {
     private final Map<ItemStackWrapper, ItemStack> items = new HashMap<>();
     private Predicate<ItemStack> filter = TRUE_FILTER;
 
-    public DigitalItemStorage(int bytesLimit) {
-        super(bytesLimit);
+    public DigitalItemStorage(ItemStack stack, int bytesLimit) {
+        super(stack, bytesLimit);
     }
 
     @Override
@@ -172,7 +170,7 @@ public class DigitalItemStorage extends DigitalStorage
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    protected CompoundTag serializeNBT() {
         var tag = new CompoundTag();
         var listTag = new ListTag();
         for (var stack : items.values()) {
@@ -184,10 +182,7 @@ public class DigitalItemStorage extends DigitalStorage
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        items.clear();
-        bytesRemaining = bytesLimit;
-
+    protected void deserializeNBT(CompoundTag tag) {
         var listTag = tag.getList("Items", Tag.TAG_COMPOUND);
         var bytesPerItem = CONFIG.bytesPerItem.get();
         var bytesPerType = CONFIG.bytesPerItemType.get();

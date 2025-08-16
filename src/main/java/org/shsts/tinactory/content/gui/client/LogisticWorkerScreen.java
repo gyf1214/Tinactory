@@ -131,11 +131,11 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             if (FROM_RECT.in(mouseX, mouseY)) {
                 selectedConfig = index;
                 selectedFrom = true;
-                config.from().ifPresent(p -> selectedMachine = p.machineId());
+                config.from().ifPresent(p -> selectMachine(p.machineId()));
             } else if (TO_RECT.in(mouseX, mouseY)) {
                 selectedConfig = index;
                 selectedFrom = false;
-                config.to().ifPresent(p -> selectedMachine = p.machineId());
+                config.to().ifPresent(p -> selectMachine(p.machineId()));
             } else if (VALID_RECT.in(mouseX, mouseY)) {
                 config.setValid(!config.isValid());
                 var packet = SetMachineConfigPacket.builder()
@@ -180,8 +180,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected void onSelect(int index, double mouseX, double mouseY, int button) {
-            selectedMachine = machineList.get(index).id;
-            portSelectPanel.refresh();
+            selectMachine(machineList.get(index).id);
         }
 
         @Override
@@ -326,6 +325,11 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         machineSelectPanel.refresh();
+        portSelectPanel.refresh();
+    }
+
+    private void selectMachine(UUID id) {
+        selectedMachine = machines.containsKey(id) ? id : null;
         portSelectPanel.refresh();
     }
 

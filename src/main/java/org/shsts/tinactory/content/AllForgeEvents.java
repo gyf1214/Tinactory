@@ -16,6 +16,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.CapabilityItem;
+import org.shsts.tinactory.core.common.ItemCapabilityProvider;
 import org.shsts.tinactory.core.multiblock.MultiblockManager;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -32,6 +33,11 @@ public final class AllForgeEvents {
     public static void onAttachItemStack(AttachCapabilitiesEvent<ItemStack> event) {
         if (event.getObject().getItem() instanceof CapabilityItem capabilityItem) {
             capabilityItem.attachCapabilities(event);
+        }
+        for (var cap : event.getCapabilities().values()) {
+            if (cap instanceof ItemCapabilityProvider itemCap) {
+                itemCap.init();
+            }
         }
     }
 

@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -23,13 +22,10 @@ import java.util.function.Function;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEStorageCell extends CapabilityItem {
-    private static final ResourceLocation ID = modLoc("logistics/me_storage_cell");
-
     private final boolean isFluid;
     private final int bytesLimit;
 
@@ -70,10 +66,11 @@ public class MEStorageCell extends CapabilityItem {
 
     @Override
     public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
+        var stack = event.getObject();
         if (isFluid) {
-            event.addCapability(ID, new DigitalFluidStorage(bytesLimit));
+            event.addCapability(DigitalStorage.ID, new DigitalFluidStorage(stack, bytesLimit));
         } else {
-            event.addCapability(ID, new DigitalItemStorage(bytesLimit));
+            event.addCapability(DigitalStorage.ID, new DigitalItemStorage(stack, bytesLimit));
         }
     }
 }

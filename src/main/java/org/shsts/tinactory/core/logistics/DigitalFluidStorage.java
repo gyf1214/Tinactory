@@ -7,8 +7,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
@@ -27,13 +27,12 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalFluidStorage extends DigitalStorage
-    implements IFluidCollection, IFluidFilter, INBTSerializable<CompoundTag> {
+public class DigitalFluidStorage extends DigitalStorage implements IFluidCollection, IFluidFilter {
     private final Map<FluidStackWrapper, FluidStack> fluids = new HashMap<>();
     private Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
 
-    public DigitalFluidStorage(int bytesLimit) {
-        super(bytesLimit);
+    public DigitalFluidStorage(ItemStack stack, int bytesLimit) {
+        super(stack, bytesLimit);
     }
 
     @Override
@@ -184,9 +183,6 @@ public class DigitalFluidStorage extends DigitalStorage
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        fluids.clear();
-        bytesRemaining = bytesLimit;
-
         var listTag = tag.getList("Fluids", Tag.TAG_COMPOUND);
         var bytesPerFluid = CONFIG.bytesPerFluid.get();
         var bytesPerType = CONFIG.bytesPerFluidType.get();
