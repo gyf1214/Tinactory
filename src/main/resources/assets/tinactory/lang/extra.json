@@ -31,6 +31,8 @@
   "tinactory.tooltip.chestNotStorage": "Not used as a storage port",
   "tinactory.tooltip.chestLocal": "Accessible from local subnet",
   "tinactory.tooltip.chestGlobal": "Accessible from global network",
+  "tinactory.tooltip.connectParent": "Connected to parent subnet",
+  "tinactory.tooltip.disconnectParent": "Not connected to parent subnet",
   "tinactory.tooltip.fluidCell": "%s / %s",
   "tinactory.tooltip.battery": "%s / %s EU (%s)",
   "tinactory.tooltip.tool": "%s Crafting Uses",

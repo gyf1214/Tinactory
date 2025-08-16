@@ -42,6 +42,7 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 @MethodsReturnNonnullByDefault
 public class MEStorageInterface extends CapabilityProvider implements IEventSubscriber {
     public static final String ID = "machine/me_storage_interface";
+    public static final String CONNECT_PARENT_KEY = "connectParent";
 
     private final BlockEntity blockEntity;
     private final CombinedItemCollection combinedItem;
@@ -88,18 +89,18 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
     private void registerPorts(LogisticComponent logistics, INetwork network, BlockPos subnet) {
         logistics.unregisterPort(machine, 0);
         logistics.unregisterPort(machine, 1);
+        var connectParent = machineConfig.getBoolean(CONNECT_PARENT_KEY, false);
         var parent = network.getSubnet(subnet);
-        if (parent.equals(subnet)) {
+        if (parent.equals(subnet) || !connectParent) {
             logistics.registerPortInSubnets(machine, 0, combinedItem, false,
                 subnet, false);
             logistics.registerPortInSubnets(machine, 1, combinedFluid, false,
                 subnet, false);
         } else {
-            var isStorage = machineConfig.getBoolean("isStorage", true);
             logistics.registerPortInSubnets(machine, 0, combinedItem, false,
-                subnet, false, parent, isStorage);
+                subnet, false, parent, true);
             logistics.registerPortInSubnets(machine, 1, combinedFluid, false,
-                subnet, false, parent, isStorage);
+                subnet, false, parent, true);
         }
     }
 

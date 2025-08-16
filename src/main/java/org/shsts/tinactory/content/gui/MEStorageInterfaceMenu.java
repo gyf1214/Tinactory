@@ -10,6 +10,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.machine.MEStorageInterface;
@@ -18,7 +20,9 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
 import org.slf4j.Logger;
 
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.ME_STORAGE_INTERFACE_SLOT;
+import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
@@ -28,9 +32,11 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 public class MEStorageInterfaceMenu extends InventoryMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final String SYNC_SLOT = "sync";
+    public static final String SLOT_SYNC = "slots";
     public static final int PANEL_HEIGHT = 6 * SLOT_SIZE + 21;
 
+    private final IMachine machine;
+    private final IMachineConfig machineConfig;
     private final MEStorageInterface storageInterface;
     private boolean needUpdate = true;
     private final Runnable updateListener = () -> needUpdate = true;
@@ -51,14 +57,22 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
 
     public MEStorageInterfaceMenu(Properties properties) {
         super(properties, PANEL_HEIGHT + SPACING);
+        this.machine = MACHINE.get(blockEntity);
+        this.machineConfig = machine.config();
         this.storageInterface = getProvider(blockEntity, MEStorageInterface.ID, MEStorageInterface.class);
 
-        addSyncSlot(SYNC_SLOT, new SyncScheduler());
+        addSyncSlot(SLOT_SYNC, new SyncScheduler());
         if (!world.isClientSide) {
             storageInterface.onUpdate(updateListener);
         }
 
         onEventPacket(ME_STORAGE_INTERFACE_SLOT, this::onSlotClick);
+        onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return super.stillValid(player) && machine.canPlayerInteract(player);
     }
 
     @Override
@@ -67,6 +81,10 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         if (!world.isClientSide) {
             storageInterface.unregisterListener(updateListener);
         }
+    }
+
+    public IMachineConfig machineConfig() {
+        return machineConfig;
     }
 
     private FluidClickResult doClickFluidSlot(ItemStack carried, IFluidCollection port,

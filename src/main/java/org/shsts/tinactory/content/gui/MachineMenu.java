@@ -33,7 +33,7 @@ public class MachineMenu extends ProcessingMenu {
         return super.stillValid(player) && canPlayerInteract(blockEntity, player);
     }
 
-    private static boolean canPlayerInteract(BlockEntity blockEntity, Player player) {
+    public static boolean canPlayerInteract(BlockEntity blockEntity, Player player) {
         return MACHINE.tryGet(blockEntity)
             .filter($ -> $.canPlayerInteract(player))
             .isPresent();
