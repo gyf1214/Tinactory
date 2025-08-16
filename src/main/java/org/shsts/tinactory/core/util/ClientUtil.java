@@ -63,13 +63,27 @@ public final class ClientUtil {
         return stack.getTooltipLines(getPlayer(), tooltipFlag);
     }
 
+    public static String getItemCountString(int count) {
+        if (count < 1000) {
+            return NUMBER_FORMAT.format(count);
+        } else if (count < 1000000) {
+            return NUMBER_FORMAT.format(count / 1000) + "k";
+        } else if (count < 1000000000) {
+            return NUMBER_FORMAT.format(count / 1000000) + "M";
+        } else {
+            return NUMBER_FORMAT.format(count / 1000000000) + "G";
+        }
+    }
+
     public static String getFluidAmountString(int amount) {
         if (amount < 1000) {
             return NUMBER_FORMAT.format(amount);
         } else if (amount < 1000000) {
             return NUMBER_FORMAT.format(amount / 1000) + "B";
-        } else {
+        } else if (amount < 1000000000) {
             return NUMBER_FORMAT.format(amount / 1000000) + "k";
+        } else {
+            return NUMBER_FORMAT.format(amount / 1000000000) + "M";
         }
     }
 

@@ -11,6 +11,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.api.logistics.IFluidFilter;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -21,19 +22,20 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter, INBTSerializable<CompoundTag> {
+public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter,
+    IPortNotifier, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final WrapperFluidTank[] tanks;
     private final boolean acceptOutput;
 
-    public CombinedFluidTank(WrapperFluidTank... tanks) {
-        this(true, tanks);
-    }
-
     public CombinedFluidTank(boolean acceptOutput, WrapperFluidTank... tanks) {
         this.tanks = tanks;
         this.acceptOutput = acceptOutput;
+    }
+
+    public CombinedFluidTank(WrapperFluidTank... tanks) {
+        this(true, tanks);
     }
 
     @Override
@@ -204,6 +206,20 @@ public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter, INBT
     public void resetFilters() {
         for (var tank : tanks) {
             tank.resetFilter();
+        }
+    }
+
+    @Override
+    public void onUpdate(Runnable listener) {
+        for (var tank : tanks) {
+            tank.onUpdate(listener);
+        }
+    }
+
+    @Override
+    public void unregisterListener(Runnable listener) {
+        for (var tank : tanks) {
+            tank.unregisterListener(listener);
         }
     }
 }

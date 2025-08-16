@@ -5,9 +5,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
@@ -25,6 +27,7 @@ import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
@@ -38,7 +41,7 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEStorageInterface extends CapabilityProvider implements IEventSubscriber {
-    private static final String ID = "machine/me_storage_interface";
+    public static final String ID = "machine/me_storage_interface";
 
     private final BlockEntity blockEntity;
     private final CombinedItemCollection combinedItem;
@@ -116,6 +119,32 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
         var subnet = network.getSubnet(blockEntity.getBlockPos());
         logistics.onUpdatePorts(() -> onUpdateLogistics(logistics, subnet));
         registerPorts(logistics, network, subnet);
+    }
+
+    public void onUpdate(Runnable listener) {
+        combinedItem.onUpdate(listener);
+        combinedFluid.onUpdate(listener);
+    }
+
+    public void unregisterListener(Runnable listener) {
+        combinedItem.unregisterListener(listener);
+        combinedFluid.unregisterListener(listener);
+    }
+
+    public IItemCollection itemPort() {
+        return combinedItem;
+    }
+
+    public IFluidCollection fluidPort() {
+        return combinedFluid;
+    }
+
+    public Collection<ItemStack> getAllItems() {
+        return combinedItem.getAllItems();
+    }
+
+    public Collection<FluidStack> getAllFluids() {
+        return combinedFluid.getAllFluids();
     }
 
     @Override

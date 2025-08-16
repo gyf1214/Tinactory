@@ -22,7 +22,7 @@ public class ItemIngredientRenderer implements IIngredientRenderer<ItemStack> {
     @Override
     public void render(PoseStack poseStack, ItemStack ingredient) {
         var poseStack1 = RenderUtil.applyToModelViewStack(poseStack);
-        RenderUtil.renderFakeItemWithDecoration(ingredient, 0, 0, null);
+        RenderUtil.renderFakeItemWithDecoration(ingredient, 0, 0);
         RenderUtil.popModelViewStack(poseStack1);
     }
 

@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -22,7 +21,6 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllMenus.CHEST_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.client.FluidSlot.HIGHLIGHT_COLOR;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -53,14 +51,11 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
                 getFilter().ifPresent(stack1 ->
                     RenderUtil.renderGhostItem(poseStack, stack1, rect.x(), rect.y()));
             } else {
-                var s = String.valueOf(stack.getCount());
-                RenderUtil.renderItemWithDecoration(stack, rect.x(), rect.y(), s);
+                RenderUtil.renderItemWithDecoration(stack, rect.x(), rect.y());
             }
 
             if (isHovering(mouseX, mouseY)) {
-                RenderSystem.colorMask(true, true, true, false);
-                RenderUtil.fill(poseStack, rect, HIGHLIGHT_COLOR);
-                RenderSystem.colorMask(true, true, true, true);
+                RenderUtil.renderSlotHover(poseStack, rect);
             }
         }
 

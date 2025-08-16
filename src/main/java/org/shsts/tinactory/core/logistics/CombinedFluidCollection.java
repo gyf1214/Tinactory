@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -20,8 +21,19 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
     private final List<IFluidCollection> composes = new ArrayList<>();
 
     public void setComposes(Collection<IFluidCollection> val) {
+        for (var compose : composes) {
+            if (compose instanceof IPortNotifier notifier) {
+                notifier.unregisterListener(combinedListener);
+            }
+        }
         composes.clear();
         composes.addAll(val);
+        for (var compose : composes) {
+            if (compose instanceof IPortNotifier notifier) {
+                notifier.onUpdate(combinedListener);
+            }
+        }
+        invokeUpdate();
     }
 
     @Override
@@ -43,9 +55,6 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
             }
             var filled = compose.fill(stack, simulate);
             stack.shrink(filled);
-        }
-        if (!simulate && stack.getAmount() < fluid.getAmount()) {
-            invokeUpdate();
         }
         return fluid.getAmount() - stack.getAmount();
     }
@@ -73,20 +82,13 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
                 stack.shrink(stack1.getAmount());
             }
         }
-        if (!simulate && !ret.isEmpty()) {
-            invokeUpdate();
-        }
         return ret;
     }
 
     @Override
     public FluidStack drain(int limit, boolean simulate) {
-        var ret = composes.isEmpty() ? FluidStack.EMPTY :
+        return composes.isEmpty() ? FluidStack.EMPTY :
             composes.get(0).drain(limit, simulate);
-        if (!simulate && !ret.isEmpty()) {
-            invokeUpdate();
-        }
-        return ret;
     }
 
     @Override

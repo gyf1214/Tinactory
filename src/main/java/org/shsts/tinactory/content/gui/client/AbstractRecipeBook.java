@@ -79,7 +79,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
 
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-            float partialTick, Rect rect, int index) {
+            float partialTick, Rect rect, int index, boolean isHovering) {
             var loc = getLoc(index);
             var recipe = getRecipe(loc);
             var z = getBlitOffset();
@@ -96,7 +96,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
         }
 
         @Override
-        protected void onSelect(int index, double mouseX, double mouseY) {
+        protected void onSelect(int index, double mouseX, double mouseY, int button) {
             var loc = getLoc(index);
             var recipe = getRecipe(loc);
             ghostRecipe.clear();

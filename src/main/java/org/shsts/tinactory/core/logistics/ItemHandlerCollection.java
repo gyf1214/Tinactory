@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.logistics;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
@@ -10,6 +11,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.RangedWrapper;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IItemFilter;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -23,10 +25,12 @@ import java.util.function.Predicate;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemHandlerCollection implements IItemCollection, IItemFilter {
+public class ItemHandlerCollection implements IItemCollection, IItemFilter, IPortNotifier {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final IItemHandler itemHandler;
+    @Nullable
+    private final IPortNotifier notifier;
     private final int minSlot;
     private final int maxSlot;
     private final RangedWrapper rangedWrapper;
@@ -38,6 +42,12 @@ public class ItemHandlerCollection implements IItemCollection, IItemFilter {
         this.maxSlot = maxSlot;
         this.rangedWrapper = new RangedWrapper(itemHandler, minSlot, maxSlot);
         this.acceptOutput = acceptOutput;
+
+        if (itemHandler instanceof IPortNotifier notifier1) {
+            this.notifier = notifier1;
+        } else {
+            this.notifier = null;
+        }
     }
 
     public ItemHandlerCollection(IItemHandlerModifiable itemHandler, int minSlot, int maxSlot) {
@@ -167,6 +177,24 @@ public class ItemHandlerCollection implements IItemCollection, IItemFilter {
         }
         for (var i = minSlot; i < maxSlot; i++) {
             wrapper.resetFilter(i);
+        }
+    }
+
+    @Override
+    public void onUpdate(Runnable listener) {
+        if (notifier != null) {
+            notifier.onUpdate(listener);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public void unregisterListener(Runnable listener) {
+        if (notifier != null) {
+            notifier.unregisterListener(listener);
+        } else {
+            throw new UnsupportedOperationException();
         }
     }
 }

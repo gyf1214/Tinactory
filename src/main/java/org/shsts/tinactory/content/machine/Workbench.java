@@ -277,10 +277,10 @@ public class Workbench extends CapabilityProvider implements
     }
 
     public static Optional<Workbench> tryGet(BlockEntity be) {
-        return tryGet(be, ID, Workbench.class);
+        return tryGetProvider(be, ID, Workbench.class);
     }
 
     public static Workbench get(BlockEntity be) {
-        return get(be, ID, Workbench.class);
+        return getProvider(be, ID, Workbench.class);
     }
 }

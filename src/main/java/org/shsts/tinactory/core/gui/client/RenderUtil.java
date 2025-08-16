@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
@@ -40,6 +39,7 @@ import java.util.function.Consumer;
 public final class RenderUtil {
     private static final int CYCLE_TIME = 1000;
     public static final int TEXT_COLOR = 0xFF404040;
+    public static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
     public static final int WHITE = 0xFFFFFFFF;
 
     public static void blit(PoseStack poseStack, Texture tex, int zIndex, Rect dstRect) {
@@ -138,6 +138,12 @@ public final class RenderUtil {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
+    public static void renderSlotHover(PoseStack poseStack, Rect rect) {
+        RenderSystem.colorMask(true, true, true, false);
+        RenderUtil.fill(poseStack, rect, HIGHLIGHT_COLOR);
+        RenderSystem.colorMask(true, true, true, true);
+    }
+
     public static void renderFluid(PoseStack poseStack, FluidStack stack, Rect rect, int color, int zIndex) {
         var fluid = stack.getFluid();
         if (!stack.isEmpty() && fluid != null) {
@@ -190,18 +196,19 @@ public final class RenderUtil {
         RenderSystem.disableBlend();
     }
 
-    public static void renderItemWithDecoration(ItemStack stack, int x, int y, @Nullable String text) {
+    public static void renderItemWithDecoration(ItemStack stack, int x, int y) {
         var renderer = ClientUtil.getItemRenderer();
+        var text = ClientUtil.getItemCountString(stack.getCount());
         renderer.renderAndDecorateItem(stack, x, y);
         renderer.renderGuiItemDecorations(ClientUtil.getFont(), stack, x, y, text);
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
     }
 
-    public static void renderFakeItemWithDecoration(ItemStack stack, int x, int y, @Nullable String text) {
+    public static void renderFakeItemWithDecoration(ItemStack stack, int x, int y) {
         var renderer = ClientUtil.getItemRenderer();
         renderer.renderAndDecorateFakeItem(stack, x, y);
-        renderer.renderGuiItemDecorations(ClientUtil.getFont(), stack, x, y, text);
+        renderer.renderGuiItemDecorations(ClientUtil.getFont(), stack, x, y, null);
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
     }

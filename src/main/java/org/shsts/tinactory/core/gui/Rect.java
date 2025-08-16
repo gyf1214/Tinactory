@@ -41,7 +41,7 @@ public record Rect(int x, int y, int width, int height) {
     }
 
     public boolean in(double pX, double pY) {
-        return pX >= (double) (x - 1) && pX < (double) (x + width + 1) &&
-            pY >= (double) (y - 1) && pY < (double) (y + height + 1);
+        return pX >= (double) (x) && pX < (double) (x + width) &&
+            pY >= (double) (y) && pY < (double) (y + height);
     }
 }

@@ -1,7 +1,6 @@
 package org.shsts.tinactory.core.logistics;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
@@ -11,20 +10,25 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
+
+import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<CompoundTag> {
+public class WrapperFluidTank implements IFluidTankModifiable, IPortNotifier,
+    INBTSerializable<CompoundTag> {
     public static final WrapperFluidTank EMPTY = new WrapperFluidTank(0);
 
     private final IFluidTank tank;
-    @Nullable
-    private Runnable updateListener = null;
+    private final Set<Runnable> updateListeners = new HashSet<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
-    public Predicate<FluidStack> filter = $ -> true;
+    public Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
 
     public WrapperFluidTank(int capacity) {
         this(new FluidTank(capacity));
@@ -36,22 +40,24 @@ public class WrapperFluidTank implements IFluidTankModifiable, INBTSerializable<
         this.tank = tank;
     }
 
-    public void onUpdate(Runnable cb) {
-        updateListener = cb;
+    @Override
+    public void onUpdate(Runnable listener) {
+        updateListeners.add(listener);
     }
 
-    public void resetOnUpdate() {
-        updateListener = null;
+    @Override
+    public void unregisterListener(Runnable listener) {
+        updateListeners.remove(listener);
+    }
+
+    private void invokeUpdate() {
+        for (var cb : updateListeners) {
+            cb.run();
+        }
     }
 
     public void resetFilter() {
-        filter = $ -> true;
-    }
-
-    protected void invokeUpdate() {
-        if (updateListener != null) {
-            updateListener.run();
-        }
+        filter = TRUE_FLUID_FILTER;
     }
 
     @Nonnull

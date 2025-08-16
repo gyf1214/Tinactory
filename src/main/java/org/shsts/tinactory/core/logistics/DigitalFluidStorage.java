@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
@@ -30,19 +29,6 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 @MethodsReturnNonnullByDefault
 public class DigitalFluidStorage extends DigitalStorage
     implements IFluidCollection, IFluidFilter, INBTSerializable<CompoundTag> {
-    private record FluidStackWrapper(FluidStack stack) {
-        @Override
-        public boolean equals(Object other) {
-            return this == other || (other instanceof FluidStackWrapper wrapper &&
-                stack.isFluidEqual(wrapper.stack));
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(stack.getFluid(), stack.getTag());
-        }
-    }
-
     private final Map<FluidStackWrapper, FluidStack> fluids = new HashMap<>();
     private Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
 
@@ -84,6 +70,7 @@ public class DigitalFluidStorage extends DigitalStorage
                 var insertedStack = StackHelper.copyWithAmount(fluid, inserted);
                 fluids.put(new FluidStackWrapper(insertedStack), insertedStack);
                 bytesRemaining = newBytesRemaining - inserted * bytesPerFluid;
+                invokeUpdate();
             }
             return inserted;
         } else {
@@ -92,6 +79,7 @@ public class DigitalFluidStorage extends DigitalStorage
             if (!simulate) {
                 fluids.get(key).grow(inserted);
                 bytesRemaining -= inserted * bytesPerFluid;
+                invokeUpdate();
             }
             return inserted;
         }
@@ -112,12 +100,14 @@ public class DigitalFluidStorage extends DigitalStorage
             if (!simulate) {
                 fluids.remove(key);
                 bytesRemaining += CONFIG.bytesPerFluidType.get() + bytesPerFluid * stack.getAmount();
+                invokeUpdate();
             }
             return stack.copy();
         } else {
             if (!simulate) {
                 stack.shrink(fluid.getAmount());
                 bytesRemaining += bytesPerFluid * fluid.getAmount();
+                invokeUpdate();
             }
             return fluid.copy();
         }
@@ -134,12 +124,14 @@ public class DigitalFluidStorage extends DigitalStorage
             if (!simulate) {
                 fluids.remove(new FluidStackWrapper(stack));
                 bytesRemaining += CONFIG.bytesPerFluidType.get() + bytesPerFluid * stack.getAmount();
+                invokeUpdate();
             }
             return stack.copy();
         } else {
             if (!simulate) {
                 stack.shrink(limit);
                 bytesRemaining += bytesPerFluid * limit;
+                invokeUpdate();
             }
             return StackHelper.copyWithAmount(stack, limit);
         }

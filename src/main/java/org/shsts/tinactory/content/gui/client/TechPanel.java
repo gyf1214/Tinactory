@@ -116,12 +116,12 @@ public class TechPanel extends Panel {
 
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-            float partialTick, Rect rect, int index) {
+            float partialTick, Rect rect, int index, boolean isHovering) {
             renderTechButton(poseStack, getBlitOffset(), rect, getTech(index), true);
         }
 
         @Override
-        protected void onSelect(int index, double mouseX, double mouseY) {
+        protected void onSelect(int index, double mouseX, double mouseY, int button) {
             TechPanel.this.onSelect(getTech(index));
         }
 

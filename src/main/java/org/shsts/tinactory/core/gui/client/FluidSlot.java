@@ -1,6 +1,5 @@
 package org.shsts.tinactory.core.gui.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -24,8 +23,6 @@ import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FluidSlot extends MenuWidget {
-    public static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
-
     private final int tank;
     private final int syncSlot;
     @Nullable
@@ -86,9 +83,7 @@ public class FluidSlot extends MenuWidget {
     protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {
         RenderUtil.renderFluidWithDecoration(poseStack, getFluidStack(), rect, getBlitOffset());
         if (isHovering(mouseX, mouseY)) {
-            RenderSystem.colorMask(true, true, true, false);
-            RenderUtil.fill(poseStack, rect, HIGHLIGHT_COLOR);
-            RenderSystem.colorMask(true, true, true, true);
+            RenderUtil.renderSlotHover(poseStack, rect);
         }
     }
 

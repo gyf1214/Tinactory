@@ -132,10 +132,10 @@ public class NetworkController extends CapabilityProvider
     }
 
     public static Optional<NetworkController> tryGet(BlockEntity be) {
-        return tryGet(be, ID, NetworkController.class);
+        return tryGetProvider(be, ID, NetworkController.class);
     }
 
     public static NetworkController get(BlockEntity be) {
-        return get(be, ID, NetworkController.class);
+        return getProvider(be, ID, NetworkController.class);
     }
 }

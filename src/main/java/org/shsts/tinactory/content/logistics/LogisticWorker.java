@@ -215,10 +215,10 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     public static Optional<LogisticWorker> tryGet(BlockEntity be) {
-        return tryGet(be, ID, LogisticWorker.class);
+        return tryGetProvider(be, ID, LogisticWorker.class);
     }
 
     public static LogisticWorker get(BlockEntity be) {
-        return get(be, ID, LogisticWorker.class);
+        return getProvider(be, ID, LogisticWorker.class);
     }
 }

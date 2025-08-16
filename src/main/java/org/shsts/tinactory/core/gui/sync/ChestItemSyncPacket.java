@@ -27,7 +27,7 @@ public class ChestItemSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        StackHelper.serializeStackToBuf(stack, buf);
+        StackHelper.serializeStackToBuf(buf, stack);
         buf.writeBoolean(filter != null);
         if (filter != null) {
             buf.writeItem(filter);

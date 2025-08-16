@@ -501,6 +501,7 @@ public final class AllBlockEntities {
 
         ME_STORAGE_INTERFACE = set.machine()
             .machine(v -> "logistics/" + v.id + "/me_storage_interface", MachineBlock::factory)
+            .menu(AllMenus.ME_STORAGE_INTERFACE)
             .voltages(Voltage.HV)
             .machine(MEStorageInterface::factory)
             .tintVoltage(2)

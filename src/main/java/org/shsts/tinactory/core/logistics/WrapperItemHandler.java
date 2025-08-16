@@ -1,14 +1,16 @@
 package org.shsts.tinactory.core.logistics;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.core.logistics.StackHelper.FALSE_FILTER;
@@ -16,10 +18,9 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WrapperItemHandler implements IItemHandlerModifiable {
+public class WrapperItemHandler implements IItemHandlerModifiable, IPortNotifier {
     private final IItemHandlerModifiable compose;
-    @Nullable
-    private Runnable updateListener = null;
+    private final Set<Runnable> updateListeners = new HashSet<>();
     private final Predicate<ItemStack>[] filters;
     private final boolean[] allowOutputs;
 
@@ -53,17 +54,19 @@ public class WrapperItemHandler implements IItemHandlerModifiable {
         allowOutputs[idx] = value;
     }
 
-    public void onUpdate(Runnable cons) {
-        updateListener = cons;
+    @Override
+    public void onUpdate(Runnable listener) {
+        updateListeners.add(listener);
     }
 
-    public void resetOnUpdate() {
-        updateListener = null;
+    @Override
+    public void unregisterListener(Runnable listener) {
+        updateListeners.remove(listener);
     }
 
     private void invokeUpdate() {
-        if (updateListener != null) {
-            updateListener.run();
+        for (var cb : updateListeners) {
+            cb.run();
         }
     }
 

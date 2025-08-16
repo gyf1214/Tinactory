@@ -101,8 +101,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         }
 
         var externalHandler = new ExternalItemHandler();
-        var externalItems = new WrapperItemHandler(internalItems);
-        this.externalPort = new ItemHandlerCollection(externalItems);
+        this.externalPort = new ItemHandlerCollection(internalItems);
         this.itemHandlerCap = LazyOptional.of(() -> externalHandler);
     }
 

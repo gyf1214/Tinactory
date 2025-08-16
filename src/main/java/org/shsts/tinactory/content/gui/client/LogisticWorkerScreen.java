@@ -100,7 +100,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-            float partialTick, Rect rect, int index) {
+            float partialTick, Rect rect, int index, boolean isHovering) {
             var config = getConfig(index);
             var z = getBlitOffset();
 
@@ -125,7 +125,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         @Override
-        protected void onSelect(int index, double mouseX, double mouseY) {
+        protected void onSelect(int index, double mouseX, double mouseY, int button) {
             var config = getConfig(index);
 
             if (FROM_RECT.in(mouseX, mouseY)) {
@@ -171,7 +171,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-            float partialTick, Rect rect, int index) {
+            float partialTick, Rect rect, int index, boolean isHovering) {
             var machine = machineList.get(index);
             RenderUtil.blit(poseStack, RECIPE_BUTTON, getBlitOffset(), rect,
                 machine.id.equals(selectedMachine) ? 21 : 0, 0);
@@ -179,7 +179,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         @Override
-        protected void onSelect(int index, double mouseX, double mouseY) {
+        protected void onSelect(int index, double mouseX, double mouseY, int button) {
             selectedMachine = machineList.get(index).id;
             portSelectPanel.refresh();
         }
@@ -216,7 +216,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-            float partialTick, Rect rect, int index) {
+            float partialTick, Rect rect, int index, boolean isHovering) {
             if (selectedMachine == null) {
                 return;
             }
@@ -235,7 +235,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         @Override
-        protected void onSelect(int index, double mouseX, double mouseY) {
+        protected void onSelect(int index, double mouseX, double mouseY, int button) {
             if (selectedConfig == -1 || selectedMachine == null) {
                 return;
             }

@@ -50,13 +50,18 @@ public abstract class ButtonPanel extends Panel {
 
         @Override
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            renderButton(poseStack, mouseX, mouseY, partialTick, rect, index);
+            renderButton(poseStack, mouseX, mouseY, partialTick, rect, index, isHovering(mouseX, mouseY));
+        }
+
+        @Override
+        protected boolean canClick(int button) {
+            return canClickButton(index, button);
         }
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
-            super.onMouseClicked(mouseX, mouseY, button);
-            onSelect(index, mouseX - rect.x(), mouseY - rect.y());
+            playButtonSound();
+            onSelect(index, mouseX - rect.x(), mouseY - rect.y(), button);
         }
 
         public int getIndex() {
@@ -140,9 +145,17 @@ public abstract class ButtonPanel extends Panel {
     protected abstract int getItemCount();
 
     protected abstract void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-        float partialTick, Rect rect, int index);
+        float partialTick, Rect rect, int index, boolean isHovering);
 
-    protected abstract void onSelect(int index, double mouseX, double mouseY);
+    protected boolean canClickButton(int index, int button) {
+        return button == 0;
+    }
+
+    protected void playButtonSound() {
+        ClientUtil.playSound(SoundEvents.UI_BUTTON_CLICK);
+    }
+
+    protected abstract void onSelect(int index, double mouseX, double mouseY, int button);
 
     protected abstract Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY);
 

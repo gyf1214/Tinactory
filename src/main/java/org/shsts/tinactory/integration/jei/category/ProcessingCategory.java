@@ -13,11 +13,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
@@ -115,7 +115,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
                 builder.itemNotConsumedInput(slot, List.of(item.ingredient.getItems()));
             } else {
                 var items = Arrays.stream(item.ingredient.getItems())
-                    .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, item.amount))
+                    .map(stack -> StackHelper.copyWithCount(stack, item.amount))
                     .toList();
                 builder.itemInput(slot, items);
             }

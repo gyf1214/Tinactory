@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -20,8 +21,19 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
     private final List<IItemCollection> composes = new ArrayList<>();
 
     public void setComposes(Collection<IItemCollection> val) {
+        for (var compose : composes) {
+            if (compose instanceof IPortNotifier notifier) {
+                notifier.unregisterListener(combinedListener);
+            }
+        }
         composes.clear();
         composes.addAll(val);
+        for (var compose : composes) {
+            if (compose instanceof IPortNotifier notifier) {
+                notifier.onUpdate(combinedListener);
+            }
+        }
+        invokeUpdate();
     }
 
     @Override
@@ -42,9 +54,6 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
                 break;
             }
             stack1 = compose.insertItem(stack1, simulate);
-        }
-        if (!simulate && stack1.getCount() < stack.getCount()) {
-            invokeUpdate();
         }
         return stack1;
     }
@@ -72,20 +81,13 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
                 item1.shrink(stack.getCount());
             }
         }
-        if (!simulate && !ret.isEmpty()) {
-            invokeUpdate();
-        }
         return ret;
     }
 
     @Override
     public ItemStack extractItem(int limit, boolean simulate) {
-        var ret = composes.isEmpty() ? ItemStack.EMPTY :
+        return composes.isEmpty() ? ItemStack.EMPTY :
             composes.get(0).extractItem(limit, simulate);
-        if (!simulate && !ret.isEmpty()) {
-            invokeUpdate();
-        }
-        return ret;
     }
 
     @Override

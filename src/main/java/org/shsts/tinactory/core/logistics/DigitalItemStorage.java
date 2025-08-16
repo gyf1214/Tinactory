@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
@@ -30,22 +29,6 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 @MethodsReturnNonnullByDefault
 public class DigitalItemStorage extends DigitalStorage
     implements IItemCollection, IItemFilter, INBTSerializable<CompoundTag> {
-    private record ItemStackWrapper(ItemStack stack) {
-        @Override
-        public boolean equals(Object other) {
-            return this == other || (other instanceof ItemStackWrapper wrapper &&
-                StackHelper.canItemsStack(stack, wrapper.stack));
-        }
-
-        /**
-         * Serializing caps is too expensive so we only rely on item and tag.
-         */
-        @Override
-        public int hashCode() {
-            return Objects.hash(stack.getItem(), stack.getTag());
-        }
-    }
-
     private final Map<ItemStackWrapper, ItemStack> items = new HashMap<>();
     private Predicate<ItemStack> filter = TRUE_FILTER;
 
@@ -88,6 +71,7 @@ public class DigitalItemStorage extends DigitalStorage
                 var insertedStack = StackHelper.copyWithCount(stack, inserted);
                 items.put(new ItemStackWrapper(insertedStack), insertedStack);
                 bytesRemaining = newBytesRemaining - inserted * bytesPerItem;
+                invokeUpdate();
             }
             return remaining;
         } else {
@@ -97,6 +81,7 @@ public class DigitalItemStorage extends DigitalStorage
             if (!simulate) {
                 items.get(key).grow(inserted);
                 bytesRemaining -= inserted * bytesPerItem;
+                invokeUpdate();
             }
             return remaining;
         }
@@ -117,12 +102,14 @@ public class DigitalItemStorage extends DigitalStorage
             if (!simulate) {
                 items.remove(key);
                 bytesRemaining += CONFIG.bytesPerItemType.get() + bytesPerItem * stack.getCount();
+                invokeUpdate();
             }
             return stack.copy();
         } else {
             if (!simulate) {
                 stack.shrink(item.getCount());
                 bytesRemaining += bytesPerItem * item.getCount();
+                invokeUpdate();
             }
             return item.copy();
         }
@@ -139,12 +126,14 @@ public class DigitalItemStorage extends DigitalStorage
             if (!simulate) {
                 items.remove(new ItemStackWrapper(stack));
                 bytesRemaining += CONFIG.bytesPerItemType.get() + bytesPerItem * stack.getCount();
+                invokeUpdate();
             }
             return stack.copy();
         } else {
             if (!simulate) {
                 stack.shrink(limit);
                 bytesRemaining += bytesPerItem * limit;
+                invokeUpdate();
             }
             return StackHelper.copyWithCount(stack, limit);
         }

@@ -80,7 +80,7 @@ public final class StackHelper {
         }
     }
 
-    public static void serializeStackToBuf(ItemStack stack, FriendlyByteBuf buf) {
+    public static void serializeStackToBuf(FriendlyByteBuf buf, ItemStack stack) {
         if (stack.isEmpty()) {
             buf.writeBoolean(false);
         } else {

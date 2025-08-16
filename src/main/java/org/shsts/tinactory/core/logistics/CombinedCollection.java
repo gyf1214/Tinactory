@@ -1,22 +1,31 @@
 package org.shsts.tinactory.core.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedCollection {
-    @Nullable
-    private Runnable updateListener = null;
+public class CombinedCollection implements IPortNotifier {
+    private final Set<Runnable> updateListeners = new HashSet<>();
+    protected final Runnable combinedListener = this::invokeUpdate;
 
+    @Override
     public void onUpdate(Runnable listener) {
-        updateListener = listener;
+        updateListeners.add(listener);
+    }
+
+    @Override
+    public void unregisterListener(Runnable listener) {
+        updateListeners.remove(listener);
     }
 
     protected void invokeUpdate() {
-        if (updateListener != null) {
-            updateListener.run();
+        for (var cb : updateListeners) {
+            cb.run();
         }
     }
 }

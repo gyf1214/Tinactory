@@ -39,13 +39,13 @@ public abstract class CapabilityProvider implements ICapabilityProvider {
             .orElse(event.get().defaultResult());
     }
 
-    protected static <T extends ICapabilityProvider> Optional<T> tryGet(
+    public static <T extends ICapabilityProvider> Optional<T> tryGetProvider(
         BlockEntity be, String id, Class<T> clazz) {
         return EVENT_MANAGER.tryGet(be)
             .flatMap($ -> $.tryGetProvider(modLoc(id), clazz));
     }
 
-    protected static <T extends ICapabilityProvider> T get(
+    public static <T extends ICapabilityProvider> T getProvider(
         BlockEntity be, String id, Class<T> clazz) {
         return EVENT_MANAGER.get(be).getProvider(modLoc(id), clazz);
     }

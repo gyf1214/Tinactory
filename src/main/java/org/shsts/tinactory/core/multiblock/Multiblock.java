@@ -333,10 +333,10 @@ public class Multiblock extends MultiblockBase {
     }
 
     public static Optional<Multiblock> tryGet(BlockEntity be) {
-        return tryGet(be, ID, Multiblock.class);
+        return tryGetProvider(be, ID, Multiblock.class);
     }
 
     public static Multiblock get(BlockEntity be) {
-        return get(be, ID, Multiblock.class);
+        return getProvider(be, ID, Multiblock.class);
     }
 }
