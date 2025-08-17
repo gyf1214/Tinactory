@@ -160,13 +160,7 @@ public class Chemistry {
             .recipe(COKE, 1, 32, CARBON, 2)
             .recipe(GRAPHITE, 1, 64, CARBON, 4)
             .recipe(SILICON_DIOXIDE, 1, 480, SILICON, 1, OXYGEN, 1f)
-            .recipe(ALUMINIUM_OXIDE, 1, 96, ALUMINIUM, 1, OXYGEN, 0.75f)
-            .voltage(Voltage.HV)
-            .recipe(SODIUM_CHLORIDE, 1, 400, SODIUM, 1, CHLORINE, 0.5f)
-            .recipe(POTASSIUM_CHLORIDE, 1, 480, POTASSIUM, 1, CHLORINE, 0.5f)
-            .recipe(MAGNESIUM_CHLORIDE, 1, 320, MAGNESIUM, 1, CHLORINE, 1f)
-            .recipe(CALCIUM_CHLORIDE, 1, 320, CALCIUM, 1, CHLORINE, 1f)
-            .recipe(LITHIUM_CHLORIDE, 1, 400, LITHIUM, 1, CHLORINE, 0.5f);
+            .recipe(ALUMINIUM_OXIDE, 1, 96, ALUMINIUM, 1, OXYGEN, 0.75f);
 
         CHEMICAL_REACTOR.recipe(DATA_GEN, HYDROGEN_CHLORIDE.fluidLoc())
             .input(HYDROGEN, 0.5f)
@@ -479,6 +473,14 @@ public class Chemistry {
             .voltage(Voltage.HV)
             .requireTech(Technologies.ADVANCED_CHEMISTRY)
             .build();
+
+        ELECTROLYZER
+            .voltage(Voltage.HV)
+            .recipe(SODIUM_CHLORIDE, 1, 400, SODIUM, 1, CHLORINE, 0.5f)
+            .recipe(POTASSIUM_CHLORIDE, 1, 480, POTASSIUM, 1, CHLORINE, 0.5f)
+            .recipe(MAGNESIUM_CHLORIDE, 1, 320, MAGNESIUM, 1, CHLORINE, 1f)
+            .recipe(CALCIUM_CHLORIDE, 1, 320, CALCIUM, 1, CHLORINE, 1f)
+            .recipe(LITHIUM_CHLORIDE, 1, 400, LITHIUM, 1, CHLORINE, 0.5f);
 
         BLAST_FURNACE.recipe(DATA_GEN, suffix(TITANIUM.loc("ingot_hot"), "_from_titanium_tetrachloride"))
             .inputItem(MAGNESIUM.tag("dust"), 2)
