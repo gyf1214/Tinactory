@@ -123,6 +123,10 @@ public class MaterialSet {
         return items.keySet();
     }
 
+    public Set<String> fluidSubs() {
+        return fluids.keySet();
+    }
+
     private BlockEntry safeBlock(String sub) {
         assert blocks.containsKey(sub) : "%s does not have block %s".formatted(this, sub);
         return blocks.get(sub);
