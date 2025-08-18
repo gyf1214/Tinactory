@@ -21,6 +21,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.material.MaterialSet;
+import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;

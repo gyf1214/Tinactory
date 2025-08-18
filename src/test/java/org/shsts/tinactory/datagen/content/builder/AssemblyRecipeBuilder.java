@@ -1,4 +1,4 @@
-package org.shsts.tinactory.datagen.content;
+package org.shsts.tinactory.datagen.content.builder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

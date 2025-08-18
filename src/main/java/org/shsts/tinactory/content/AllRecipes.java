@@ -12,18 +12,21 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
-import org.shsts.tinactory.content.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.builder.IRecipeTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
@@ -35,7 +38,6 @@ public final class AllRecipes {
     public static final IRecipeType<AssemblyRecipe.Builder> ASSEMBLER;
     public static final IRecipeType<CleanRecipe.Builder> LASER_ENGRAVER;
     public static final IRecipeType<ProcessingRecipe.Builder> CIRCUIT_ASSEMBLER;
-    public static final IRecipeType<ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final IRecipeType<OreAnalyzerRecipe.Builder> ORE_ANALYZER;
     public static final IRecipeType<ProcessingRecipe.Builder> MACERATOR;
     public static final IRecipeType<ProcessingRecipe.Builder> ORE_WASHER;
@@ -66,6 +68,8 @@ public final class AllRecipes {
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
 
+    private static final Map<String, IRecipeType<?>> RECIPE_TYPES = new HashMap<>();
+
     static {
         TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)
             .recipeClass(ToolRecipe.class)
@@ -92,10 +96,6 @@ public final class AllRecipes {
 
         CIRCUIT_ASSEMBLER = processing("circuit_assembler")
             .defaults($ -> $.amperage(0.25d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(2))
-            .register();
-
-        STONE_GENERATOR = processing("stone_generator")
-            .defaults($ -> $.amperage(0.125d).workTicks(20L).defaultOutputItem(0).defaultOutputFluid(1))
             .register();
 
         ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.Builder::new)
@@ -183,9 +183,7 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(4d).transform(AllRecipes::fullDefaults))
             .register();
 
-        VACUUM_FREEZER = processing("vacuum_freezer")
-            .defaults($ -> $.amperage(1.5d).transform(AllRecipes::fullDefaults))
-            .register();
+        VACUUM_FREEZER = processing("vacuum_freezer").register();
 
         DISTILLATION = processing("distillation", DistillationRecipe::builder)
             .defaults($ -> $.amperage(2.5d).defaultInputFluid(0).defaultOutputFluid(1).defaultOutputItem(2))

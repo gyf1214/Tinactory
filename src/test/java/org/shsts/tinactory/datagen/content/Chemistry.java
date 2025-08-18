@@ -104,9 +104,9 @@ import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.MIXER;
 import static org.shsts.tinactory.content.AllRecipes.PYROLYSE_OVEN;
-import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
-import static org.shsts.tinactory.content.AllRecipes.VACUUM_FREEZER;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
+import static org.shsts.tinactory.datagen.content.builder.RecipeFactories.STONE_GENERATOR;
+import static org.shsts.tinactory.datagen.content.builder.RecipeFactories.VACUUM_FREEZER;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -119,24 +119,22 @@ public class Chemistry {
     }
 
     private static void inorganic() {
-        STONE_GENERATOR.recipe(DATA_GEN, AIR.fluidLoc())
-            .outputFluid(AIR.fluid(), AIR.fluidAmount(1f))
+        STONE_GENERATOR
+            .outputMaterial("air", "gas", 1)
             .voltage(Voltage.MV)
             .build()
-            .recipe(DATA_GEN, SEA_WATER.fluidLoc())
-            .outputFluid(SEA_WATER.fluid(), SEA_WATER.fluidAmount(1f))
+            .outputMaterial("sea_water", "liquid", 1)
             .voltage(Voltage.MV)
             .build();
 
-        VACUUM_FREEZER.recipe(DATA_GEN, AIR.fluidLoc("liquid"))
-            .inputFluid(AIR.fluid(), AIR.fluidAmount(1f))
-            .outputFluid(AIR.fluid("liquid"), AIR.fluidAmount("liquid", 1f))
+        VACUUM_FREEZER
+            .outputMaterial("air", "liquid", 1)
+            .inputMaterial("air", "gas", 1)
             .workTicks(200)
             .voltage(Voltage.MV)
             .build()
-            .recipe(DATA_GEN, WATER.fluidLoc())
-            .inputFluid(WATER.fluid("gas"), WATER.fluidAmount("gas", 1f))
-            .outputFluid(WATER.fluid(), WATER.fluidAmount(1f))
+            .outputMaterial("water", "liquid", 1)
+            .inputMaterial("water", "gas", 1)
             .workTicks(32)
             .voltage(Voltage.MV)
             .build();

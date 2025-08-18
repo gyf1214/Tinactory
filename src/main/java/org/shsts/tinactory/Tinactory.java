@@ -22,6 +22,7 @@ import org.shsts.tinactory.content.AllForgeEvents;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.AllMenus;
+import org.shsts.tinactory.content.AllMeta;
 import org.shsts.tinactory.content.AllMultiblocks;
 import org.shsts.tinactory.content.AllNetworks;
 import org.shsts.tinactory.content.AllRecipes;
@@ -56,8 +57,8 @@ public class Tinactory {
     }
 
     private void onConstructEvent(FMLConstructModEvent event) {
-        event.enqueueWork(this::onConstruct);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> event.enqueueWork(this::onConstructClient));
+        onConstruct();
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> this::onConstructClient);
     }
 
     public void onConstruct() {
@@ -67,6 +68,7 @@ public class Tinactory {
             REGISTRATE = CORE.registrate(ID).setDefaultChannel(CHANNEL);
 
             AllRegistries.init();
+            AllMeta.init();
 
             AllRecipes.init();
             AllCapabilities.init();

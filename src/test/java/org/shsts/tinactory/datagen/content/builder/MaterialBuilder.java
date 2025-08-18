@@ -59,7 +59,6 @@ import static org.shsts.tinactory.content.AllRecipes.POLARIZER;
 import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.THERMAL_CENTRIFUGE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
-import static org.shsts.tinactory.content.AllRecipes.VACUUM_FREEZER;
 import static org.shsts.tinactory.content.AllRecipes.WIREMILL;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.TOOL_FILE;
@@ -77,6 +76,7 @@ import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.oreBlock;
+import static org.shsts.tinactory.datagen.content.builder.RecipeFactories.VACUUM_FREEZER;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -99,6 +99,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
     private final IDataGen dataGen;
     private final MaterialSet material;
+    private final String name;
     @Nullable
     private IconSet icon = null;
     private boolean hasProcess = false;
@@ -108,6 +109,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         super(parent);
         this.dataGen = dataGen;
         this.material = material;
+        this.name = material.name;
     }
 
     public static <P> MaterialBuilder<P> factory(IDataGen dataGen,
@@ -415,7 +417,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
     public MaterialBuilder<P> smelt(MaterialSet to, String sub) {
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(material.tag("dust")), to.item(sub), 0, 200)
-            .unlockedBy("has_material", has(material.tag("dust"))), "_from_" + material.name);
+            .unlockedBy("has_material", has(material.tag("dust"))), "_from_" + name);
         return this;
     }
 
@@ -456,9 +458,8 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         builder.build();
 
         if (sub.equals("ingot_hot")) {
-            VACUUM_FREEZER.recipe(DATA_GEN, material.loc("ingot"))
-                .inputItem(material.tag("ingot_hot"), 1)
-                .outputItem(material.entry("ingot"), 1)
+            VACUUM_FREEZER.outputMaterial(name, "ingot", 1)
+                .inputMaterial(name, "ingot_hot", 1)
                 .voltage(v)
                 .workTicks(200)
                 .build();

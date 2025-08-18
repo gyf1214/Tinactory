@@ -274,5 +274,9 @@ public final class AllMaterials {
         };
     }
 
+    public static MaterialSet getMaterial(String name) {
+        return SET.get(name);
+    }
+
     public static void init() {}
 }

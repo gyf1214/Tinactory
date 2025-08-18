@@ -22,6 +22,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;

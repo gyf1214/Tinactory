@@ -175,7 +175,6 @@ import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
-import static org.shsts.tinactory.content.AllRecipes.STONE_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllRegistries.ITEMS;
@@ -198,6 +197,7 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
+import static org.shsts.tinactory.datagen.content.builder.RecipeFactories.STONE_GENERATOR;
 import static org.shsts.tinactory.datagen.content.model.IconSet.BRIGHT;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.FINE;
@@ -537,14 +537,14 @@ public final class Materials {
     private static void ores() {
         // stone generator
         for (var variant : OreVariant.values()) {
-            STONE_GENERATOR.recipe(DATA_GEN, variant.baseItem)
-                .outputItem(() -> variant.baseItem, 1)
+            STONE_GENERATOR
+                .outputItem(variant.baseItem, 1)
                 .voltage(variant == OreVariant.STONE ? Voltage.PRIMITIVE : variant.voltage)
                 .build();
         }
         // generate water
-        STONE_GENERATOR.recipe(DATA_GEN, WATER.fluidLoc())
-            .outputFluid(WATER.fluid(), WATER.fluidAmount(1f))
+        STONE_GENERATOR
+            .outputMaterial("water", "liquid", 1)
             .voltage(Voltage.ULV)
             .build();
 

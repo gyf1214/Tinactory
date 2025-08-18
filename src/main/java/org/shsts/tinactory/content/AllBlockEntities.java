@@ -3,6 +3,7 @@ package org.shsts.tinactory.content;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
@@ -165,7 +167,7 @@ public final class AllBlockEntities {
             .build()
             .buildObject();
 
-        STONE_GENERATOR = set.processing(AllRecipes.STONE_GENERATOR)
+        STONE_GENERATOR = set.processing("stone_generator")
             .processor(RecipeProcessor::noAutoRecipe)
             .voltages(Voltage.ULV)
             .layoutSet()
@@ -548,6 +550,13 @@ public final class AllBlockEntities {
         public <R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>> ProcessingSet.Builder<R,
             B, SetFactory> processing(IRecipeType<B> recipeType) {
             return ProcessingSet.builder(this, recipeType)
+                .tintVoltage(2)
+                .onCreateObject(PROCESSING_SETS::add);
+        }
+
+        public <R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>> ProcessingSet.Builder<R,
+            B, SetFactory> processing(String id) {
+            return ProcessingSet.builder(this, REGISTRATE.<IMachine, R, B>getRecipeType(id))
                 .tintVoltage(2)
                 .onCreateObject(PROCESSING_SETS::add);
         }
