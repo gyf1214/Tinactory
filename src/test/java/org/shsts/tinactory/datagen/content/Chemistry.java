@@ -105,8 +105,6 @@ import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.MIXER;
 import static org.shsts.tinactory.content.AllRecipes.PYROLYSE_OVEN;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.content.builder.RecipeFactories.STONE_GENERATOR;
-import static org.shsts.tinactory.datagen.content.builder.RecipeFactories.VACUUM_FREEZER;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -119,26 +117,6 @@ public class Chemistry {
     }
 
     private static void inorganic() {
-        STONE_GENERATOR
-            .outputMaterial("air", "gas", 1)
-            .voltage(Voltage.MV)
-            .build()
-            .outputMaterial("sea_water", "liquid", 1)
-            .voltage(Voltage.MV)
-            .build();
-
-        VACUUM_FREEZER
-            .outputMaterial("air", "liquid", 1)
-            .inputMaterial("air", "gas", 1)
-            .workTicks(200)
-            .voltage(Voltage.MV)
-            .build()
-            .outputMaterial("water", "liquid", 1)
-            .inputMaterial("water", "gas", 1)
-            .workTicks(32)
-            .voltage(Voltage.MV)
-            .build();
-
         DISTILLATION.voltage(Voltage.MV)
             .recipe(AIR, "liquid", 1f, 96, NITROGEN, 0.78f, OXYGEN, 0.21f, ARGON, 0.01f)
             .recipe(SEA_WATER, 10f, 2000,

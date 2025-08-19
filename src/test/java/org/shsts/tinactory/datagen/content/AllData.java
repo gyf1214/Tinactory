@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.datagen.content.builder.RecipesKt;
 import org.shsts.tinactory.datagen.provider.LanguageDataProvider;
 
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
@@ -16,6 +17,7 @@ public final class AllData {
         Models.init();
         Technologies.init();
         Materials.init();
+        RecipesKt.INSTANCE.init();
         Chemistry.init();
         Components.init();
         Machines.init();

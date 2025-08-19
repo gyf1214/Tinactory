@@ -76,7 +76,7 @@ import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.oreBlock;
-import static org.shsts.tinactory.datagen.content.builder.RecipeFactories.VACUUM_FREEZER;
+import static org.shsts.tinactory.datagen.content.builder.RecipeFactories1.VACUUM_FREEZER;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault

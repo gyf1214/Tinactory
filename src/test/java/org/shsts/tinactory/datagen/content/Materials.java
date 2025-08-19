@@ -22,7 +22,6 @@ import org.shsts.tinactory.content.AllMaterials;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.content.material.OreVariant;
 import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -197,7 +196,6 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
-import static org.shsts.tinactory.datagen.content.builder.RecipeFactories.STONE_GENERATOR;
 import static org.shsts.tinactory.datagen.content.model.IconSet.BRIGHT;
 import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
 import static org.shsts.tinactory.datagen.content.model.IconSet.FINE;
@@ -535,19 +533,6 @@ public final class Materials {
     }
 
     private static void ores() {
-        // stone generator
-        for (var variant : OreVariant.values()) {
-            STONE_GENERATOR
-                .outputItem(variant.baseItem, 1)
-                .voltage(variant == OreVariant.STONE ? Voltage.PRIMITIVE : variant.voltage)
-                .build();
-        }
-        // generate water
-        STONE_GENERATOR
-            .outputMaterial("water", "liquid", 1)
-            .voltage(Voltage.ULV)
-            .build();
-
         FACTORY.material(CHALCOPYRITE, DULL)
             .primitiveOreProcess(SULFUR, COBALTITE, ZINC)
             .smelt(COPPER)

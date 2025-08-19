@@ -15,13 +15,13 @@ import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class RecipeFactory<B extends ProcessingRecipe.BuilderBase<?, B>,
-    RB extends ProcessingRecipeBuilder<B, S, RB>, S extends RecipeFactory<B, RB, S>>
+public abstract class RecipeFactory1<B extends ProcessingRecipe.BuilderBase<?, B>,
+    RB extends ProcessingRecipeBuilder1<B, S, RB>, S extends RecipeFactory1<B, RB, S>>
     implements ISelf<S> {
     private final IRecipeType<B> recipeType;
     private Transformer<RB> defaults = $ -> $;
 
-    public RecipeFactory(IRecipeType<B> recipeType) {
+    public RecipeFactory1(IRecipeType<B> recipeType) {
         this.recipeType = recipeType;
     }
 

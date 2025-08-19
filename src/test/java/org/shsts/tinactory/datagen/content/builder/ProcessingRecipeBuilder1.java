@@ -22,8 +22,8 @@ import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingRecipeBuilder<B extends ProcessingRecipe.BuilderBase<?, B>, P,
-    S extends ProcessingRecipeBuilder<B, P, S>>
+public class ProcessingRecipeBuilder1<B extends ProcessingRecipe.BuilderBase<?, B>, P,
+    S extends ProcessingRecipeBuilder1<B, P, S>>
     extends SimpleBuilder<Unit, P, S> {
     private final B builder;
     private long voltage = -1;
@@ -33,7 +33,7 @@ public class ProcessingRecipeBuilder<B extends ProcessingRecipe.BuilderBase<?, B
     private int defaultOutputItem = -1;
     private int defaultOutputFluid = -1;
 
-    public ProcessingRecipeBuilder(P parent, B builder) {
+    public ProcessingRecipeBuilder1(P parent, B builder) {
         super(parent);
         this.builder = builder;
     }

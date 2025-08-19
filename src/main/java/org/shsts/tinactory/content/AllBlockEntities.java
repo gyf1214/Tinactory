@@ -3,7 +3,6 @@ package org.shsts.tinactory.content;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
-import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
@@ -556,7 +555,7 @@ public final class AllBlockEntities {
 
         public <R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>> ProcessingSet.Builder<R,
             B, SetFactory> processing(String id) {
-            return ProcessingSet.builder(this, REGISTRATE.<IMachine, R, B>getRecipeType(id))
+            return ProcessingSet.builder(this, REGISTRATE.<B>getRecipeType(id))
                 .tintVoltage(2)
                 .onCreateObject(PROCESSING_SETS::add);
         }
