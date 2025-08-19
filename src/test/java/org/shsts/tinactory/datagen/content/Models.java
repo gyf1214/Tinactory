@@ -76,6 +76,11 @@ public final class Models {
             .build();
     }
 
+    public static <U extends Item> void basicItem(IEntryDataContext<Item, U, ItemModelProvider> ctx,
+        ResourceLocation... layers) {
+        Models.<U>basicItem(layers).accept(ctx);
+    }
+
     public static <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> basicItem(
         ResourceLocation... layers) {
         return ctx -> {
@@ -135,6 +140,11 @@ public final class Models {
             var overlay = new ConfiguredModel(models.getExistingFile(modLoc("block/material/ore_overlay")));
             ctx.provider().simpleBlock(ctx.object(), baseModel, overlay);
         };
+    }
+
+    public static <U extends Block> void oreBlock(IEntryDataContext<Block,
+        U, BlockStateProvider> ctx, OreVariant variant) {
+        Models.<U>oreBlock(variant).accept(ctx);
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<Block,

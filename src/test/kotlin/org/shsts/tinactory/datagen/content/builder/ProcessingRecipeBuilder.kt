@@ -6,14 +6,15 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
-import org.shsts.tinactory.content.AllMaterials
+import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.content.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingIngredients
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ProcessingResults
 
 class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builder: B) {
-    var voltage: Long? = null
+    private var voltage: Long? = null
     var amperage: Double? = null
     var defaultInputItem: Int? = null
     var defaultInputFluid: Int? = null
@@ -31,6 +32,11 @@ class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builde
         defaults(0, 1, 2, 3)
     }
 
+    fun simpleDefaults() {
+        defaultInputItem = 0
+        defaultOutputItem = 1
+    }
+
     fun inputTag(tag: TagKey<Item>, amount: Int = 1, port: Int = defaultInputItem!!) {
         builder.input(port) { ProcessingIngredients.TagIngredient(tag, amount) }
     }
@@ -41,14 +47,17 @@ class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builde
         }
     }
 
-    fun inputMaterial(name: String, sub: String, amount: Number = 1, port: Int? = null) {
-        val mat = AllMaterials.getMaterial(name)
+    fun inputMaterial(mat: MaterialSet, sub: String, amount: Number = 1, port: Int? = null) {
         if (mat.hasFluid(sub)) {
             inputFluid(mat.fluid(sub)::get, mat.fluidAmount(amount.toFloat()),
                 port ?: defaultInputFluid!!)
         } else {
             inputTag(mat.tag(sub), amount.toInt(), port ?: defaultInputItem!!)
         }
+    }
+
+    fun inputMaterial(name: String, sub: String, amount: Number = 1, port: Int? = null) {
+        inputMaterial(getMaterial(name), sub, amount, port)
     }
 
     fun outputItem(item: () -> ItemLike, amount: Int = 1,
@@ -65,15 +74,19 @@ class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builde
         }
     }
 
-    fun outputMaterial(name: String, sub: String, amount: Number = 1, port: Int? = null,
+    fun outputMaterial(mat: MaterialSet, sub: String, amount: Number = 1, port: Int? = null,
         rate: Double = 1.0) {
-        val mat = AllMaterials.getMaterial(name)
         if (mat.hasFluid(sub)) {
             outputFluid(mat.fluid(sub)::get, mat.fluidAmount(amount.toFloat()),
                 port ?: defaultOutputFluid!!, rate)
         } else {
             outputItem(mat.entry(sub)::get, amount.toInt(), port ?: defaultOutputItem!!, rate)
         }
+    }
+
+    fun outputMaterial(name: String, sub: String, amount: Number = 1, port: Int? = null,
+        rate: Double = 1.0) {
+        outputMaterial(getMaterial(name), sub, amount, port, rate)
     }
 
     fun extra(block: B.() -> Unit) {

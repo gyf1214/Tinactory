@@ -26,7 +26,7 @@ import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.LocHelper;
-import org.shsts.tinactory.datagen.content.builder.MaterialBuilder;
+import org.shsts.tinactory.datagen.content.builder.MaterialBuilder1;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -224,8 +224,8 @@ public final class Materials {
     }
 
     private static class MaterialFactory {
-        public MaterialBuilder<MaterialFactory> material(MaterialSet material, IconSet icon) {
-            return MaterialBuilder.factory(DATA_GEN, this, material).icon(icon);
+        public MaterialBuilder1<MaterialFactory> material(MaterialSet material, IconSet icon) {
+            return MaterialBuilder1.factory(DATA_GEN, this, material).icon(icon);
         }
     }
 

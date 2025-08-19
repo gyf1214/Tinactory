@@ -81,7 +81,7 @@ import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
+public class MaterialBuilder1<P> extends Builder<Unit, P, MaterialBuilder1<P>> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static ResourceLocation toolTex(String sub) {
@@ -105,25 +105,25 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
     private boolean hasProcess = false;
     private boolean hasOreProcess = false;
 
-    private MaterialBuilder(IDataGen dataGen, P parent, MaterialSet material) {
+    private MaterialBuilder1(IDataGen dataGen, P parent, MaterialSet material) {
         super(parent);
         this.dataGen = dataGen;
         this.material = material;
         this.name = material.name;
     }
 
-    public static <P> MaterialBuilder<P> factory(IDataGen dataGen,
+    public static <P> MaterialBuilder1<P> factory(IDataGen dataGen,
         P parent, MaterialSet material) {
-        var builder = new MaterialBuilder<>(dataGen, parent, material);
+        var builder = new MaterialBuilder1<>(dataGen, parent, material);
         return builder.onBuild(builder::onRegister);
     }
 
-    public MaterialBuilder<P> icon(IconSet value) {
+    public MaterialBuilder1<P> icon(IconSet value) {
         icon = value;
         return this;
     }
 
-    public MaterialBuilder<P> toolProcess(double factor) {
+    public MaterialBuilder1<P> toolProcess(double factor) {
         // grind dust
         process("dust", 1, "primary", TOOL_MORTAR);
         process("dust_tiny", 1, "nugget", TOOL_MORTAR);
@@ -152,7 +152,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return machineProcess(Voltage.LV, factor);
     }
 
-    public MaterialBuilder<P> toolProcess() {
+    public MaterialBuilder1<P> toolProcess() {
         return toolProcess(1d);
     }
 
@@ -350,7 +350,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             extrude("pipe", 1, 3);
         }
 
-        public MaterialBuilder<P> build() {
+        public MaterialBuilder1<P> build() {
             process(POLARIZER, "magnetic", 1, "stick", 40L);
             process(WIREMILL, "wire", 2, "ingot", 48L);
             process(WIREMILL, "wire_fine", 4, "wire", 64L);
@@ -392,7 +392,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             extrude();
 
             hasProcess = true;
-            return MaterialBuilder.this;
+            return MaterialBuilder1.this;
         }
     }
 
@@ -400,32 +400,32 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return new MachineProcessBuilder(v, factor);
     }
 
-    public MaterialBuilder<P> machineProcess(Voltage v, double factor) {
+    public MaterialBuilder1<P> machineProcess(Voltage v, double factor) {
         return processBuilder(v, factor).build();
     }
 
-    public MaterialBuilder<P> machineProcess(Voltage v) {
+    public MaterialBuilder1<P> machineProcess(Voltage v) {
         return machineProcess(v, 1d);
     }
 
-    public MaterialBuilder<P> smelt() {
+    public MaterialBuilder1<P> smelt() {
         smelt("ingot", "dust");
         smelt("nugget", "dust_tiny");
         return this;
     }
 
-    public MaterialBuilder<P> smelt(MaterialSet to, String sub) {
+    public MaterialBuilder1<P> smelt(MaterialSet to, String sub) {
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(material.tag("dust")), to.item(sub), 0, 200)
             .unlockedBy("has_material", has(material.tag("dust"))), "_from_" + name);
         return this;
     }
 
-    public MaterialBuilder<P> smelt(MaterialSet to) {
+    public MaterialBuilder1<P> smelt(MaterialSet to) {
         return smelt(to, "ingot");
     }
 
-    public MaterialBuilder<P> blastFrom(Voltage v, int temperature, long ticks,
+    public MaterialBuilder1<P> blastFrom(Voltage v, int temperature, long ticks,
         MaterialSet source, Object... extra) {
         var suffix = source == material ? "" : "_from_" + source.name;
         var sub = material.hasItem("ingot_hot") ? "ingot_hot" : "ingot";
@@ -468,11 +468,11 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return this;
     }
 
-    public MaterialBuilder<P> blast(Voltage v, int temperature, long ticks, Object... extra) {
+    public MaterialBuilder1<P> blast(Voltage v, int temperature, long ticks, Object... extra) {
         return blastFrom(v, temperature, ticks, material, extra);
     }
 
-    private MaterialBuilder<P> compose(Voltage v, IRecipeType<ProcessingRecipe.Builder> recipeType,
+    private MaterialBuilder1<P> compose(Voltage v, IRecipeType<ProcessingRecipe.Builder> recipeType,
         boolean decompose, long workTicks, String output, Object... components) {
         var loc = material.hasItem(output) ? material.loc(output) : material.fluidLoc(output);
 
@@ -535,33 +535,33 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return this;
     }
 
-    public MaterialBuilder<P> centrifuge(Voltage voltage, Object... components) {
+    public MaterialBuilder1<P> centrifuge(Voltage voltage, Object... components) {
         return compose(voltage, CENTRIFUGE, true, 60L, "dust", components);
     }
 
-    public MaterialBuilder<P> mix(Voltage voltage, Object... components) {
+    public MaterialBuilder1<P> mix(Voltage voltage, Object... components) {
         return compose(voltage, MIXER, false, 20L, "dust", components)
             .centrifuge(voltage, components);
     }
 
-    public MaterialBuilder<P> fluidMix(Voltage voltage, String sub, Object... components) {
+    public MaterialBuilder1<P> fluidMix(Voltage voltage, String sub, Object... components) {
         return compose(voltage, MIXER, false, 20L, sub, components);
     }
 
-    public MaterialBuilder<P> fluidMix(Voltage voltage, Object... components) {
+    public MaterialBuilder1<P> fluidMix(Voltage voltage, Object... components) {
         return fluidMix(voltage, "fluid", components);
     }
 
-    public MaterialBuilder<P> alloyOnly(Voltage voltage, Object... components) {
+    public MaterialBuilder1<P> alloyOnly(Voltage voltage, Object... components) {
         return compose(voltage, ALLOY_SMELTER, false, 40L, "ingot", components);
     }
 
-    public MaterialBuilder<P> alloy(Voltage voltage, Object... components) {
+    public MaterialBuilder1<P> alloy(Voltage voltage, Object... components) {
         return alloyOnly(voltage, components)
             .mix(voltage.rank < Voltage.LV.rank ? Voltage.LV : voltage, components);
     }
 
-    public MaterialBuilder<P> fluidAlloy(Voltage voltage, Object... components) {
+    public MaterialBuilder1<P> fluidAlloy(Voltage voltage, Object... components) {
         return compose(voltage, ALLOY_SMELTER, false, 40L, "fluid", components);
     }
 
@@ -569,21 +569,21 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         return new OreRecipeBuilder(byproduct);
     }
 
-    public MaterialBuilder<P> oreProcess(int amount, MaterialSet... byproduct) {
+    public MaterialBuilder1<P> oreProcess(int amount, MaterialSet... byproduct) {
         return oreBuilder(byproduct)
             .amount(amount)
             .build();
     }
 
-    public MaterialBuilder<P> oreProcess(MaterialSet... byproduct) {
+    public MaterialBuilder1<P> oreProcess(MaterialSet... byproduct) {
         return oreBuilder(byproduct).build();
     }
 
-    public MaterialBuilder<P> primitiveOreProcess(MaterialSet... byproduct) {
+    public MaterialBuilder1<P> primitiveOreProcess(MaterialSet... byproduct) {
         return oreBuilder(byproduct).primitive().build();
     }
 
-    public MaterialBuilder<P> oilOre(int workTicks) {
+    public MaterialBuilder1<P> oilOre(int workTicks) {
         CENTRIFUGE.recipe(DATA_GEN, material.loc("raw"))
             .inputItem(material.tag("raw"), 1)
             .outputItem(() -> Blocks.SAND, 1)
@@ -597,7 +597,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
     private <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> toolModel(String sub) {
         var category = sub.substring("tool/".length());
         var handle = Optional.ofNullable(TOOL_HANDLE_TEX.get(category))
-            .map(MaterialBuilder::toolTex)
+            .map(MaterialBuilder1::toolTex)
             .orElse(VOID_TEX);
         var head = gregtech("items/tools/" + category);
         return basicItem(handle, head);
@@ -825,7 +825,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             builder.voltage(voltage).build();
         }
 
-        public MaterialBuilder<P> build() {
+        public MaterialBuilder1<P> build() {
             if (primitive || variant.voltage.rank <= Voltage.ULV.rank) {
                 if (material.hasItem("gem")) {
                     hammerPrimary = true;
@@ -883,7 +883,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             }
 
             hasOreProcess = true;
-            return MaterialBuilder.this;
+            return MaterialBuilder1.this;
         }
     }
 

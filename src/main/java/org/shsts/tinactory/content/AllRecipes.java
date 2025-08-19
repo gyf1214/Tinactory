@@ -25,9 +25,6 @@ import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.builder.IRecipeTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
@@ -67,8 +64,6 @@ public final class AllRecipes {
     public static final IRecipeType<ProcessingRecipe.Builder> PYROLYSE_OVEN;
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
-
-    private static final Map<String, IRecipeType<?>> RECIPE_TYPES = new HashMap<>();
 
     static {
         TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)
