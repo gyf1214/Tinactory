@@ -41,37 +41,35 @@ object Woods {
         val stickResin = AllItems.STICKY_RESIN.get()
         autofarm {
             defaults {
+                output(log, 6)
+                if (isRubber) {
+                    output(stickResin, 6)
+                }
+                output(sapling, 2)
                 voltage(Voltage.LV)
             }
             input(sapling) {
-                input("biomass", "fluid", 1)
-                output(log, 6)
-                if (isRubber) {
-                    output(stickResin, 6)
-                }
-                output(sapling, 2)
+                input("biomass", "fluid")
                 workTicks(1600)
             }
             input(sapling, suffix = "_with_bone_meal") {
-                input("water", "fluid", 1)
+                input("water", "fluid")
                 input(Items.BONE_MEAL, 2, port = 2)
-                output(log, 6)
-                if (isRubber) {
-                    output(stickResin, 6)
-                }
-                output(sapling, 2)
                 output(leaves, 16)
                 workTicks(300)
             }
+        }
+        autofarm {
             input(sapling, suffix = "_with_fertilizer") {
-                input("water", "fluid", 1f)
-                input(FERTILIZER.get(), 2)
+                input("water", "fluid")
+                input(FERTILIZER.get(), 2, port = 2)
                 output(log, 12)
                 if (isRubber) {
                     output(stickResin, 12)
                 }
                 output(sapling, 4)
                 output(leaves, 32)
+                voltage(Voltage.MV)
                 workTicks(300)
             }
         }
@@ -159,7 +157,7 @@ object Woods {
         // to biomass
         extractor {
             defaults {
-                voltage(Voltage.LV)
+                voltage(Voltage.MV)
             }
             input(ItemTags.LEAVES, 16) {
                 output("biomass", "fluid", 0.3)
