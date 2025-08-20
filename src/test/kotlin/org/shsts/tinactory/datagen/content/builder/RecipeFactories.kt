@@ -228,6 +228,7 @@ object RecipeFactories {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
+            amperage = 0.25
         }.block()
     }
 }

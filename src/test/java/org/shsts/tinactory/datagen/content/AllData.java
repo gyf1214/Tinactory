@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.datagen.content.material.Materials;
 import org.shsts.tinactory.datagen.provider.LanguageDataProvider;
 
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;

@@ -232,10 +232,11 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         private fun valid(result: String, vararg inputs: String) = material.hasItem(result) &&
             inputs.all { material.hasItem(it) && material.loc(it) != material.loc(result) }
 
-        private fun ProcessingRecipeFactory.process(result: String, amount: Int,
-            input: String, workTicks: Long, suffix: String = "", inputAmount: Int = 1,
+        private fun <B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<B>>
+            RecipeFactory<B, RB>.process(result: String, input: String,
+            workTicks: Long, amount: Int = 1, inputAmount: Int = 1, suffix: String = "",
             voltage: Voltage = this@ProcessBuilder.voltage,
-            block: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit = {}) {
+            block: RB.() -> Unit = {}) {
             if (!valid(result, input)) {
                 return
             }
@@ -248,22 +249,14 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
         }
 
-        private fun macerate(input: String, result: String, amount: Int) {
+        private fun macerate(input: String, amount: Int = 1, output: String = "dust") {
             macerator {
-                process(result, amount, input, 128, "_from_$input")
+                process(output, input, 128, amount, suffix = "_from_$input")
             }
         }
 
-        private fun macerate(input: String, amount: Int) {
-            macerate(input, "dust", amount)
-        }
-
-        private fun macerate(input: String) {
-            macerate(input, "dust", 1)
-        }
-
         private fun macerateTiny(input: String, amount: Int) {
-            macerate(input, "dust_tiny", amount)
+            macerate(input, amount, "dust_tiny")
         }
 
         private fun macerates() {
@@ -340,7 +333,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
 
             extruder {
-                process(result, outAmount, input, 96 * inAmount.toLong(),
+                process(result, input, 96 * inAmount.toLong(), outAmount,
                     inputAmount = inAmount, voltage = v)
             }
         }
@@ -359,59 +352,48 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
         fun build() {
             polarizer {
-                process("magnetic", 1, "stick", 40)
+                process("magnetic", "stick", 40)
             }
             wiremill {
-                process("wire", 2, "ingot", 48)
-                process("wire_fine", 4, "wire", 64)
-                process("ring", 1, "stick", 64)
+                process("wire", "ingot", 48, 2)
+                process("wire_fine", "wire", 64, 4)
+                process("ring", "stick", 64)
             }
             bender {
-                process("plate", 1, "ingot", 72)
-                process("foil", 4, "plate", 40)
-                process("foil", 4, "sheet", 40)
+                process("plate", "ingot", 72)
+                process("foil", "plate", 40, 4)
+                process("foil", "sheet", 40, 4)
             }
             lathe {
-                process("stick", 1, "ingot", 64)
-                process("screw", 1, "bolt", 16)
-                process("lens", 1, "gem_exquisite", 600)
+                process("stick", "ingot", 64)
+                process("screw", "bolt", 16)
+                process("lens", "gem_exquisite", 600)
             }
             cutter {
-                process("bolt", 4, "stick", 64) {
+                process("bolt", "stick", 64, 4) {
                     input("water", "liquid", 0.05)
                 }
-                process("gem", 8, "gem_flawless", 480) {
+                process("gem", "gem_flawless", 480, 8) {
                     input("water", "liquid", 0.8)
                 }
             }
             assembler {
                 defaults {
-                    voltage(voltage)
                     input("soldering_alloy", "molten", 0.5)
                     tech(Technologies.SOLDERING)
                 }
-                output(material, "gear") {
-                    input(material, "plate")
+                process("gear", "plate", 128) {
                     input(material, "stick", 2)
-                    workTicks(ticks(128))
                 }
-                output(material, "rotor") {
+                process("rotor", "ring", 160) {
                     input(material, "plate", 4)
-                    input(material, "ring")
-                    workTicks(ticks(160))
                 }
-                output(material, "pipe") {
-                    input(material, "plate", 3)
-                    workTicks(ticks(120))
-                }
+                process("pipe", "ring", 120, inputAmount = 3)
             }
             assembler {
-                output(material, "gem_exquisite") {
-                    input(material, "gem_flawless")
+                process("gem_exquisite", "gem_flawless", 400) {
                     input(material, "gem", 4)
                     input(material, "dust", 4)
-                    voltage(voltage)
-                    workTicks(ticks(400))
                     tech(Technologies.MATERIAL_CUTTING)
                 }
             }

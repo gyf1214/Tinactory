@@ -4,9 +4,12 @@ import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.material.OreVariant
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.stoneGenerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
+import org.shsts.tinactory.datagen.content.material.Woods
 
 object RecipesKt {
     fun init() {
+        Woods.init()
+
         vacuumFreezer {
             defaults {
                 voltage(Voltage.MV)
