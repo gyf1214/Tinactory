@@ -1,14 +1,10 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import com.mojang.logging.LogUtils
-import net.minecraft.data.recipes.ShapedRecipeBuilder
-import net.minecraft.data.recipes.ShapelessRecipeBuilder
-import net.minecraft.data.recipes.SimpleCookingRecipeBuilder
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.client.model.generators.ItemModelProvider
 import org.shsts.tinactory.content.AllMaterials
@@ -50,6 +46,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.thermalCentrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory.Companion.matLoc
 import org.shsts.tinactory.datagen.content.model.IconSet
@@ -176,16 +173,16 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         private fun buildVanilla() {
-            DATA_GEN.vanillaRecipe {
-                val builder = ShapedRecipeBuilder.shaped(material.item(result), amount)
-                for (pattern in patterns) {
-                    builder.pattern(pattern)
+            vanilla {
+                shaped(material.item(result), amount) {
+                    for (pattern in patterns) {
+                        pattern(pattern)
+                    }
+                    for ((i, input) in inputs.withIndex()) {
+                        define('A' + i, input)
+                    }
+                    unlockedBy("has_material", has(inputs[0]))
                 }
-                for ((i, input) in inputs.withIndex()) {
-                    builder.define('A' + i, input)
-                }
-                builder.unlockedBy("has_material", has(inputs[0]))
-                builder
             }
         }
 
@@ -443,23 +440,17 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         machineProcess(Voltage.LV, factor)
     }
 
-    fun smelt(from: String, toMat: MaterialSet, to: String) {
+    private fun smelt(from: String, toMat: MaterialSet, to: String) {
         if (material.hasItem(from) && toMat.hasItem(to)) {
             val suffix = if (toMat == material) "" else "_from_${material.name}"
-            DATA_GEN.vanillaRecipe({
-                SimpleCookingRecipeBuilder
-                    .smelting(Ingredient.of(material.tag(from)), toMat.item(to), 0f, 200)
-                    .unlockedBy("has_material", has(material.tag(from)))
-            }, suffix)
+            vanilla {
+                smelting(material.tag(from), toMat.item(to), 200, suffix)
+            }
         }
     }
 
-    fun smelt(toMat: String, to: String) {
+    fun smelt(toMat: String, to: String = "ingot") {
         smelt("dust", getMaterial(toMat), to)
-    }
-
-    fun smelt(toMat: String) {
-        smelt(toMat, "ingot")
     }
 
     fun smelt() {
@@ -644,7 +635,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                         output(byProduct(0), "dust", port = 4, rate = 0.3)
                         workTicks(200)
                     } else {
-                        input("water", "liquid", amount = 0.1)
+                        input("water", "liquid", 0.1)
                         workTicks(32)
                     }
                     if (primitive && from == "dust_impure") {
@@ -739,17 +730,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     private fun dustWithTiny() {
         if (material.hasItem("dust") && material.hasItem("dust_tiny")) {
-            DATA_GEN.vanillaRecipe {
-                ShapelessRecipeBuilder
-                    .shapeless(material.item("dust_tiny"), 9)
-                    .requires(material.tag("dust"))
-                    .unlockedBy("has_dust", has(material.tag("dust")))
-            }
-            DATA_GEN.vanillaRecipe {
-                ShapelessRecipeBuilder
-                    .shapeless(material.item("dust"))
-                    .requires(Ingredient.of(material.tag("dust_tiny")), 9)
-                    .unlockedBy("has_dust_small", has(material.tag("dust_tiny")))
+            vanilla {
+                shapeless(material.tag("dust"), material.item("dust_tiny"), toAmount = 9)
+                shapeless(material.tag("dust_tiny"), material.item("dust"), fromAmount = 9)
             }
         }
     }

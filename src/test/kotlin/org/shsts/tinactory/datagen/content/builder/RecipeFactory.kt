@@ -1,6 +1,8 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.Item
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.material.MaterialSet
@@ -39,6 +41,22 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         userDefaults = value
     }
 
+    fun input(tag: TagKey<Item>, amount: Int = 1,
+        suffix: String = "", block: RB.() -> Unit = {}) {
+        recipe(suffix(tag.location, suffix)) {
+            input(tag, amount)
+            block()
+        }
+    }
+
+    fun input(item: ItemLike, amount: Int = 1,
+        suffix: String = "", block: RB.() -> Unit = {}) {
+        recipe(suffix(item.asItem().registryName!!, suffix)) {
+            input(item, amount)
+            block()
+        }
+    }
+
     fun input(mat: MaterialSet, sub: String, amount: Number = 1,
         suffix: String = "", block: RB.() -> Unit = {}) {
         recipe(matLoc(mat, sub, suffix)) {
@@ -52,7 +70,7 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         input(getMaterial(name), sub, amount, suffix, block)
     }
 
-    fun output(item: ItemLike, suffix: String = "", amount: Int = 1,
+    fun output(item: ItemLike, amount: Int = 1, suffix: String = "",
         rate: Double = 1.0, block: RB.() -> Unit = {}) {
         recipe(suffix(item.asItem().registryName!!, suffix)) {
             output(item, amount, rate = rate)

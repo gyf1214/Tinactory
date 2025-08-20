@@ -8,6 +8,7 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
@@ -202,7 +203,7 @@ public final class AllRecipes {
         return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
     }
 
-    public static InventoryChangeTrigger.TriggerInstance has(Item item) {
+    public static InventoryChangeTrigger.TriggerInstance has(ItemLike item) {
         return inventoryTrigger(ItemPredicate.Builder.item().of(item).build());
     }
 

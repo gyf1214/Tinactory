@@ -5,21 +5,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.AllMaterials;
-import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.RubberLogBlock;
@@ -36,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllItems.RUBBER_LEAVES;
@@ -56,7 +50,6 @@ import static org.shsts.tinactory.content.AllMaterials.METHANE;
 import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
-import static org.shsts.tinactory.content.AllMaterials.REDSTONE;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
@@ -73,13 +66,11 @@ import static org.shsts.tinactory.content.AllRecipes.COMBUSTION_GENERATOR;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.EXTRACTOR;
 import static org.shsts.tinactory.content.AllRecipes.GAS_TURBINE;
-import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.MACERATOR;
 import static org.shsts.tinactory.content.AllRecipes.SIFTER;
 import static org.shsts.tinactory.content.AllRecipes.STEAM_TURBINE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
-import static org.shsts.tinactory.content.AllRegistries.ITEMS;
 import static org.shsts.tinactory.content.AllTags.FLUID_STORAGE_CELL;
 import static org.shsts.tinactory.content.AllTags.ITEM_STORAGE_CELL;
 import static org.shsts.tinactory.content.AllTags.STORAGE_CELL;
@@ -95,7 +86,6 @@ import static org.shsts.tinactory.content.AllTags.TOOL_SHEARS;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
-import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
@@ -124,49 +114,6 @@ public final class Materials1 {
     private static final MaterialFactory FACTORY = new MaterialFactory();
 
     private static void wood() {
-        // all wood recipes
-        woodRecipes("oak");
-        woodRecipes("spruce");
-        woodRecipes("birch");
-        woodRecipes("jungle");
-        woodRecipes("acacia");
-        woodRecipes("dark_oak");
-        woodRecipes("crimson");
-        woodRecipes("warped");
-        woodFarmRecipes(RUBBER_SAPLING.loc(), RUBBER_SAPLING, RUBBER_LOG, RUBBER_LEAVES);
-
-        // disable wooden and iron tools
-        DATA_GEN.nullRecipe(Items.WOODEN_AXE)
-            .nullRecipe(Items.WOODEN_HOE)
-            .nullRecipe(Items.WOODEN_PICKAXE)
-            .nullRecipe(Items.WOODEN_SHOVEL)
-            .nullRecipe(Items.WOODEN_SWORD)
-            .nullRecipe(Items.IRON_AXE)
-            .nullRecipe(Items.IRON_HOE)
-            .nullRecipe(Items.IRON_PICKAXE)
-            .nullRecipe(Items.IRON_SHOVEL)
-            .nullRecipe(Items.IRON_SWORD)
-            .nullRecipe(Items.COMPOSTER);
-
-        // stick
-        TOOL_CRAFTING.recipe(DATA_GEN, Items.STICK)
-            .result(Items.STICK, 4)
-            .pattern("#").pattern("#")
-            .define('#', ItemTags.PLANKS)
-            .toolTag(TOOL_SAW)
-            .build();
-        DATA_GEN.replaceVanillaRecipe(() -> ShapedRecipeBuilder
-            .shaped(Items.STICK, 2)
-            .define('#', ItemTags.PLANKS)
-            .pattern("#").pattern("#")
-            .unlockedBy("has_planks", has(ItemTags.PLANKS)));
-        LATHE.recipe(DATA_GEN, Items.STICK)
-            .inputItem(ItemTags.PLANKS, 1)
-            .outputItem(() -> Items.STICK, 1)
-            .voltage(Voltage.LV)
-            .workTicks(32)
-            .build();
-
         // rubber
         DATA_GEN.block(RUBBER_LOG)
             .blockState(ctx -> ctx.provider()
@@ -190,20 +137,6 @@ public final class Materials1 {
                     .cross(ctx.id(), gregtech("blocks/wood/rubber/sapling_rubber"))))
             .itemModel(basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
             .tag(BlockTags.SAPLINGS).itemTag(ItemTags.SAPLINGS)
-            .build();
-
-        // biomass
-        EXTRACTOR.recipe(DATA_GEN, ItemTags.LEAVES.location())
-            .inputItem(ItemTags.LEAVES, 16)
-            .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.3f))
-            .workTicks(128)
-            .voltage(Voltage.LV)
-            .build()
-            .recipe(DATA_GEN, ItemTags.SAPLINGS.location())
-            .inputItem(ItemTags.SAPLINGS, 16)
-            .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.1f))
-            .workTicks(64)
-            .voltage(Voltage.LV)
             .build();
 
         // nameplate
@@ -542,147 +475,6 @@ public final class Materials1 {
             .tag(IRON.tag("screw"), TOOL_SCREW)
             .tag(ITEM_STORAGE_CELL, STORAGE_CELL)
             .tag(FLUID_STORAGE_CELL, STORAGE_CELL);
-    }
-
-    private static void woodRecipes(String prefix) {
-        var nether = prefix.equals("crimson") || prefix.equals("warped");
-
-        var planks = ITEMS.getEntry(mcLoc(prefix + "_planks"));
-        var logs = mcLoc(prefix + (nether ? "_stems" : "_logs"));
-        var logsTag = AllTags.item(logs);
-        var wood = prefix + (nether ? "_hyphae" : "_wood");
-        var woodStripped = "stripped_" + wood;
-
-        // saw plank
-        TOOL_CRAFTING.recipe(DATA_GEN, planks)
-            .result(planks, 4)
-            .pattern("X")
-            .define('X', logsTag)
-            .toolTag(TOOL_SAW)
-            .build();
-
-        // disable wood and woodStripped recipes
-        DATA_GEN.nullRecipe(wood)
-            .nullRecipe(woodStripped)
-            // reduce vanilla recipe to 2 planks
-            .replaceVanillaRecipe(() -> ShapelessRecipeBuilder
-                .shapeless(planks.get(), 2)
-                .requires(logsTag)
-                .group("planks")
-                .unlockedBy("has_logs", has(logsTag)));
-
-        // wood components
-        var sign = ITEMS.getEntry(mcLoc(prefix + "_sign"));
-        var pressurePlate = ITEMS.getEntry(mcLoc(prefix + "_pressure_plate"));
-        var button = ITEMS.getEntry(mcLoc(prefix + "_button"));
-        var slab = ITEMS.getEntry(mcLoc(prefix + "_slab"));
-
-        DATA_GEN.nullRecipe(sign.loc())
-            .nullRecipe(pressurePlate.loc())
-            .nullRecipe(button.loc())
-            .nullRecipe(slab.loc());
-
-        TOOL_CRAFTING.recipe(DATA_GEN, slab)
-            .result(slab, 1)
-            .pattern("#")
-            .define('#', planks)
-            .toolTag(TOOL_SAW)
-            .build()
-            .recipe(DATA_GEN, button)
-            .result(button, 4)
-            .pattern("#")
-            .define('#', pressurePlate)
-            .toolTag(TOOL_SAW)
-            .build();
-
-        CUTTER.recipe(DATA_GEN, planks)
-            .outputItem(planks, 6)
-            .inputItem(logsTag, 1)
-            .inputFluid(WATER.fluid(), WATER.fluidAmount(0.6f))
-            .voltage(Voltage.LV)
-            .workTicks(240)
-            .build()
-            .recipe(DATA_GEN, slab)
-            .outputItem(slab, 2)
-            .inputItem(planks, 1)
-            .inputFluid(WATER.fluid(), WATER.fluidAmount(0.1f))
-            .voltage(Voltage.LV)
-            .workTicks(80)
-            .build()
-            .recipe(DATA_GEN, button)
-            .outputItem(button, 8)
-            .inputItem(pressurePlate, 1)
-            .inputFluid(WATER.fluid(), WATER.fluidAmount(0.05f))
-            .voltage(Voltage.LV)
-            .workTicks(64)
-            .build();
-
-        ASSEMBLER.recipe(DATA_GEN, sign)
-            .outputItem(sign, 1)
-            .inputItem(planks, 1)
-            .inputItem(TOOL_HANDLE, 1)
-            .voltage(Voltage.ULV)
-            .workTicks(64)
-            .requireTech(Technologies.SOLDERING)
-            .build()
-            .recipe(DATA_GEN, pressurePlate)
-            .outputItem(pressurePlate, 1)
-            .inputItem(slab, 1)
-            .inputItem(IRON.tag("ring"), 1)
-            .inputItem(REDSTONE.tag("dust"), 1)
-            .voltage(Voltage.ULV)
-            .workTicks(128)
-            .requireTech(Technologies.SOLDERING)
-            .build();
-
-        // farm
-        if (!nether) {
-            var sapling = mcLoc(prefix + "_sapling");
-            var saplingItem = ITEMS.getEntry(sapling);
-            var logItem = ITEMS.getEntry(mcLoc(prefix + "_log"));
-            var leavesItem = ITEMS.getEntry(mcLoc(prefix + "_leaves"));
-            woodFarmRecipes(sapling, saplingItem, logItem, leavesItem);
-        }
-    }
-
-    private static void woodFarmRecipes(ResourceLocation loc,
-        Supplier<? extends ItemLike> saplingItem,
-        Supplier<? extends ItemLike> logItem,
-        Supplier<? extends ItemLike> leavesItem) {
-
-        var isRubber = loc.equals(RUBBER_SAPLING.loc());
-
-        AUTOFARM.recipe(DATA_GEN, loc)
-            .inputItem(saplingItem, 1)
-            .inputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(1f))
-            .outputItem(logItem, 6)
-            .transform($ -> isRubber ? $.outputItem(STICKY_RESIN, 6) : $)
-            .outputItem(saplingItem, 2)
-            .voltage(Voltage.LV)
-            .workTicks(1600)
-            .build()
-            .recipe(DATA_GEN, suffix(loc, "_with_bone_meal"))
-            .inputItem(saplingItem, 1)
-            .inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
-            .inputItem(2, () -> Items.BONE_MEAL, 2)
-            .outputItem(logItem, 6)
-            .transform($ -> isRubber ? $.outputItem(STICKY_RESIN, 6) : $)
-            .outputItem(saplingItem, 2)
-            .outputItem(leavesItem, 16)
-            .voltage(Voltage.LV)
-            .workTicks(300)
-            .build()
-            .recipe(DATA_GEN, suffix(loc, "_with_fertilizer"))
-            .inputItem(saplingItem, 1)
-            .inputFluid(WATER.fluid(), WATER.fluidAmount(1f))
-            .inputItem(2, FERTILIZER, 2)
-            .outputItem(logItem, 12)
-            .transform($ -> isRubber ? $.outputItem(STICKY_RESIN, 12) : $)
-            .outputItem(saplingItem, 4)
-            .outputItem(leavesItem, 32)
-            .voltage(Voltage.MV)
-            .workTicks(300)
-            .build();
     }
 
     private static void generatorRecipes(IRecipeType<ProcessingRecipe.Builder> type,

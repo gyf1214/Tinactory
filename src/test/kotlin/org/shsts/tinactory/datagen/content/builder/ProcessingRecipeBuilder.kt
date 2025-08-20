@@ -41,15 +41,17 @@ class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builde
         builder.input(port) { ProcessingIngredients.TagIngredient(tag, amount) }
     }
 
-    fun input(fluid: () -> Fluid, amount: Int, port: Int = defaultInputFluid!!) {
-        builder.input(port) {
-            ProcessingIngredients.FluidIngredient(FluidStack(fluid(), amount))
-        }
+    fun input(item: ItemLike, amount: Int = 1, port: Int = defaultInputItem!!) {
+        builder.input(port) { ProcessingIngredients.ItemIngredient(ItemStack(item, amount)) }
+    }
+
+    fun input(fluid: Fluid, amount: Int, port: Int = defaultInputFluid!!) {
+        builder.input(port) { ProcessingIngredients.FluidIngredient(FluidStack(fluid, amount)) }
     }
 
     fun input(mat: MaterialSet, sub: String, amount: Number = 1, port: Int? = null) {
         if (mat.hasFluid(sub)) {
-            input(mat.fluid(sub)::get, mat.fluidAmount(amount.toFloat()),
+            input(mat.fluid(sub).get(), mat.fluidAmount(amount.toFloat()),
                 port ?: defaultInputFluid!!)
         } else {
             input(mat.tag(sub), amount.toInt(), port ?: defaultInputItem!!)
@@ -60,32 +62,27 @@ class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builde
         input(getMaterial(name), sub, amount, port)
     }
 
-    fun outputItem(item: () -> ItemLike, amount: Int = 1,
-        port: Int = defaultOutputItem!!, rate: Double = 1.0) {
-        builder.output(port) {
-            ProcessingResults.ItemResult(rate, ItemStack(item(), amount))
-        }
-    }
-
-    fun outputFluid(fluid: () -> Fluid, amount: Int,
-        port: Int = defaultOutputFluid!!, rate: Double = 1.0) {
-        builder.output(port) {
-            ProcessingResults.FluidResult(rate, FluidStack(fluid(), amount))
-        }
-    }
-
     fun output(item: ItemLike, amount: Int = 1,
         port: Int = defaultOutputItem!!, rate: Double = 1.0) {
-        outputItem({ item }, amount, port, rate)
+        builder.output(port) {
+            ProcessingResults.ItemResult(rate, ItemStack(item, amount))
+        }
+    }
+
+    fun output(fluid: Fluid, amount: Int,
+        port: Int = defaultOutputFluid!!, rate: Double = 1.0) {
+        builder.output(port) {
+            ProcessingResults.FluidResult(rate, FluidStack(fluid, amount))
+        }
     }
 
     fun output(mat: MaterialSet, sub: String, amount: Number = 1, port: Int? = null,
         rate: Double = 1.0) {
         if (mat.hasFluid(sub)) {
-            outputFluid(mat.fluid(sub)::get, mat.fluidAmount(amount.toFloat()),
+            output(mat.fluid(sub).get(), mat.fluidAmount(amount.toFloat()),
                 port ?: defaultOutputFluid!!, rate)
         } else {
-            outputItem(mat.entry(sub)::get, amount.toInt(), port ?: defaultOutputItem!!, rate)
+            output(mat.item(sub), amount.toInt(), port ?: defaultOutputItem!!, rate)
         }
     }
 

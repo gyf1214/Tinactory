@@ -1,6 +1,9 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.Tinactory.REGISTRATE
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING
@@ -23,6 +26,10 @@ object RecipeFactories {
         return RecipeFactory(recipeType, ::ProcessingRecipeBuilder, defaults)
     }
 
+    fun vanilla(replace: Boolean = false, block: VanillaRecipeFactory.() -> Unit) {
+        VanillaRecipeFactory(replace).apply(block)
+    }
+
     private fun simpleProcessing(name: String,
         defaults: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit) =
         processing(name, defaults)
@@ -34,12 +41,44 @@ object RecipeFactories {
         }
     }
 
+    fun toolCrafting(result: ItemLike, amount: Int = 1, block: ToolRecipe.Builder.() -> Unit) {
+        toolCrafting(result.asItem().registryName!!) {
+            result({ result }, amount)
+            block()
+        }
+    }
+
     fun toolCrafting(name: String, sub: String, amount: Int = 1, block: ToolRecipe.Builder.() -> Unit) {
         val mat = getMaterial(name)
         toolCrafting(mat.loc(sub)) {
             result(mat.entry(sub), amount)
             block()
         }
+    }
+
+    fun toolShapeless(from: ItemLike, to: ItemLike, tool: TagKey<Item>, amount: Int = 1) {
+        toolCrafting(to, amount) {
+            pattern("#")
+            define('#') { from }
+            toolTag(tool)
+        }
+    }
+
+    fun toolShapeless(from: TagKey<Item>, to: ItemLike, tool: TagKey<Item>, amount: Int = 1) {
+        toolCrafting(to, amount) {
+            pattern("#")
+            define('#', from)
+            toolTag(tool)
+        }
+    }
+
+    fun stoneGenerator(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("stone_generator") {
+            defaultOutputItem = 0
+            defaultOutputFluid = 1
+            amperage = 0.125
+            workTicks(20)
+        }.block()
     }
 
     fun macerator(block: ProcessingRecipeFactory.() -> Unit) {
@@ -172,12 +211,11 @@ object RecipeFactories {
         }.block()
     }
 
-    fun stoneGenerator(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("stone_generator") {
-            defaultOutputItem = 0
-            defaultOutputFluid = 1
-            amperage = 0.125
-            workTicks(20)
+    fun autofarm(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("autofarm") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
         }.block()
     }
 }
