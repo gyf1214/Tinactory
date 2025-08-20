@@ -5,16 +5,18 @@ import org.shsts.tinactory.Tinactory.REGISTRATE
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING
 import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ToolRecipe
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
-typealias ProcessingRecipeFactory = RecipeFactory<ProcessingRecipe.Builder,
-    ProcessingRecipeBuilder<ProcessingRecipe.Builder>>
+typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
+typealias ProcessingRecipeFactory = ProcessingRecipeFactoryBase<ProcessingRecipe.Builder>
+typealias BlastFurnaceRecipeFactory = ProcessingRecipeFactoryBase<BlastFurnaceRecipe.Builder>
 
 object RecipeFactories {
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> processing(name: String,
-        defaults: ProcessingRecipeBuilder<B>.() -> Unit = {}):
+        defaults: ProcessingRecipeBuilder<B>.() -> Unit):
         RecipeFactory<B, ProcessingRecipeBuilder<B>> {
 
         val recipeType = REGISTRATE.getRecipeType<B>(name)
@@ -22,7 +24,7 @@ object RecipeFactories {
     }
 
     private fun simpleProcessing(name: String,
-        defaults: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit = {}) =
+        defaults: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit) =
         processing(name, defaults)
 
     fun toolCrafting(loc: ResourceLocation, block: ToolRecipe.Builder.() -> Unit) {
@@ -152,6 +154,13 @@ object RecipeFactories {
             defaultInputFluid = 0
             defaultOutputItem = 1
             amperage = 0.25
+        }.block()
+    }
+
+    fun blastFurnace(block: BlastFurnaceRecipeFactory.() -> Unit) {
+        processing<BlastFurnaceRecipe.Builder>("blast_furnace") {
+            fullDefaults()
+            amperage = 4.0
         }.block()
     }
 
