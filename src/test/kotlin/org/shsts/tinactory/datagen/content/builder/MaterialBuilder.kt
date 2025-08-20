@@ -1,7 +1,9 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import com.mojang.logging.LogUtils
 import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.data.recipes.ShapelessRecipeBuilder
+import net.minecraft.data.recipes.SimpleCookingRecipeBuilder
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
@@ -29,26 +31,33 @@ import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.VOID_TEX
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.oreBlock
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.alloySmelter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bender
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extruder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fluidSolidifier
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.polarizer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.thermalCentrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.washer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
+import org.shsts.tinactory.datagen.content.builder.RecipeFactory.Companion.matLoc
 import org.shsts.tinactory.datagen.content.model.IconSet
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 import org.shsts.tinycorelib.api.registrate.entry.IEntry
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext
-import java.util.Optional
-import java.util.function.Supplier
 import kotlin.math.round
 
 class MaterialBuilder(private val material: MaterialSet, private val icon: IconSet) {
     companion object {
+        private val LOGGER = LogUtils.getLogger()
+
         private val TOOL_HANDLE_TEX = mapOf(
             "hammer" to "handle_hammer",
             "mortar" to "mortar_base",
@@ -67,17 +76,16 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     private val name = material.name
     private var hasProcess = false
+    private var hasOreProcess = false
 
     private fun <U : Item> toolModel(ctx: IEntryDataContext<Item, U, ItemModelProvider>, sub: String) {
         val category = sub.substring("tool/".length)
-        val handle = Optional.ofNullable(TOOL_HANDLE_TEX[category])
-            .map { gregtech("items/tools/$it") }
-            .orElse(VOID_TEX)
+        val handle = TOOL_HANDLE_TEX[category]?.let { gregtech("items/tools/$it") } ?: VOID_TEX
         val head = gregtech("items/tools/$category")
         basicItem(ctx, handle, head)
     }
 
-    private fun newItem(sub: String, tag: TagKey<Item>, entry: Supplier<out Item>) {
+    private fun newItem(sub: String, tag: TagKey<Item>, entry: IEntry<out Item>) {
         val builder = DATA_GEN.item(material.loc(sub), entry).tag(tag)
         if (sub.startsWith("tool/")) {
             builder.model { toolModel(it, sub) }
@@ -144,16 +152,17 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         @Suppress("UNCHECKED_CAST")
         fun input(vararg vals: Any) {
             for (input in vals) {
-                if (input is TagKey<*>) {
-                    inputs.add(input as TagKey<Item>)
-                } else if (input is String) {
-                    if (material.hasItem(input)) {
-                        inputs.add(material.tag(input))
-                    } else {
-                        valid = false
+                when (input) {
+                    is TagKey<*> -> inputs.add(input as TagKey<Item>)
+                    is String -> {
+                        if (material.hasItem(input)) {
+                            inputs.add(material.tag(input))
+                        } else {
+                            valid = false
+                        }
                     }
-                } else {
-                    throw IllegalArgumentException()
+
+                    else -> throw IllegalArgumentException()
                 }
             }
         }
@@ -315,7 +324,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             molten("pipe", 3f)
         }
 
-        private fun extrude(result: String, outCount: Int, inCount: Int) {
+        private fun extrude(result: String, outAmount: Int, inAmount: Int) {
             val input: String
             val v: Voltage
             if (material.hasItem("sheet")) {
@@ -327,8 +336,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
 
             extruder {
-                process(result, outCount, input, 96 * inCount.toLong(),
-                    inputAmount = inCount, voltage = v)
+                process(result, outAmount, input, 96 * inAmount.toLong(),
+                    inputAmount = inAmount, voltage = v)
             }
         }
 
@@ -429,6 +438,230 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         machineProcess(Voltage.LV, factor)
     }
 
+    fun smelt(from: String, toMat: MaterialSet, to: String) {
+        if (material.hasItem(from) && toMat.hasItem(to)) {
+            DATA_GEN.vanillaRecipe({
+                SimpleCookingRecipeBuilder
+                    .smelting(Ingredient.of(material.tag(from)), toMat.item(to), 0f, 200)
+                    .unlockedBy("has_material", has(material.tag(from)))
+            }, "_from_$from")
+        }
+    }
+
+    fun smelt(toMat: String, to: String) {
+        smelt("dust", getMaterial(toMat), to)
+    }
+
+    fun smelt(toMat: String) {
+        smelt(toMat, "ingot")
+    }
+
+    fun smelt() {
+        smelt("dust", material, "ingot")
+        smelt("dust_tiny", material, "nugget")
+    }
+
+    inner class ComposeBuilder(private val factory: ProcessingRecipeFactory,
+        private val sub: String, private val voltage: Voltage, private val workTicks: Long,
+        private val decompose: Boolean) {
+        private var _builder: ProcessingRecipeBuilder<ProcessingRecipe.Builder>? = null
+        private val builder get() = _builder!!
+        private var inAmount = 0
+        private var outAmount: Int? = null
+
+        fun amount(value: Int) {
+            outAmount = value
+        }
+
+        fun component(mat: MaterialSet, sub: String? = null, amount: Int = 1) {
+            val sub1 = sub ?: if (mat.hasItem("dust")) "dust" else "fluid"
+            if (decompose) {
+                builder.outputMaterial(mat, sub1, amount)
+            } else {
+                builder.inputMaterial(mat, sub1, amount)
+            }
+            inAmount += amount
+        }
+
+        fun build(block: ComposeBuilder.() -> Unit) {
+            factory.recipe(matLoc(material, sub)) {
+                _builder = this
+                block()
+                val amount = outAmount ?: inAmount
+                if (decompose) {
+                    inputMaterial(material, sub, amount)
+                } else {
+                    outputMaterial(material, sub, amount)
+                }
+                workTicks(workTicks * inAmount)
+                voltage(voltage)
+            }
+        }
+    }
+
+    private fun ProcessingRecipeFactory.compose(sub: String, voltage: Voltage,
+        workTicks: Long, decompose: Boolean, block: ComposeBuilder.() -> Unit) {
+        ComposeBuilder(this, sub, voltage, workTicks, decompose).build(block)
+    }
+
+    fun centrifuge(voltage: Voltage, block: ComposeBuilder.() -> Unit) {
+        centrifuge {
+            compose("dust", voltage, 60, true, block)
+        }
+    }
+
+    fun mix(voltage: Voltage, block: ComposeBuilder.() -> Unit) {
+        mixer {
+            compose("dust", voltage, 20, false, block)
+        }
+        centrifuge(voltage, block)
+    }
+
+    fun fluidMix(voltage: Voltage, sub: String = "fluid", block: ComposeBuilder.() -> Unit) {
+        mixer {
+            compose(sub, voltage, 20, false, block)
+        }
+    }
+
+    fun alloyOnly(voltage: Voltage, sub: String = "ingot", block: ComposeBuilder.() -> Unit) {
+        alloySmelter {
+            compose(sub, voltage, 40, false, block)
+        }
+    }
+
+    fun alloy(voltage: Voltage, block: ComposeBuilder.() -> Unit) {
+        alloyOnly(voltage, block = block)
+        val v1 = if (voltage.rank < Voltage.LV.rank) Voltage.LV else voltage
+        mix(v1, block)
+    }
+
+    fun fluidAlloy(voltage: Voltage, block: ComposeBuilder.() -> Unit) {
+        alloyOnly(voltage, "fluid", block)
+    }
+
+    inner class OreProcessBuilder {
+        var amount = 1
+        var primitive = false
+        var siftAndHammer = false
+        private val variant = material.oreVariant()
+        private val byProducts = mutableListOf<MaterialSet>()
+
+        fun byProducts(vararg value: Any) {
+            for (mat in value) {
+                when (mat) {
+                    is MaterialSet -> byProducts.add(mat)
+                    is String -> byProducts.add(getMaterial(mat))
+                    else -> throw IllegalArgumentException()
+                }
+            }
+        }
+
+        private fun byProduct(i: Int): MaterialSet {
+            return if (byProducts.isEmpty()) {
+                material
+            } else if (i < byProducts.size) {
+                byProducts[i]
+            } else {
+                byProducts[0]
+            }
+        }
+
+        private fun crush(from: String, to: String) {
+            val amount = if (from == "raw") 2 * amount else 1
+            macerator {
+                outputMaterial(material, to, amount) {
+                    inputMaterial(material, from)
+                    voltage(Voltage.LV)
+                    workTicks((variant.destroyTime * 40).toLong())
+                }
+            }
+        }
+
+        private fun wash(from: String, to: String) {
+            washer {
+                outputMaterial(material, to, suffix = "_from_$from") {
+                    inputMaterial(material, from)
+                    if (from == "crushed") {
+                        inputMaterial("water", "liquid")
+                        outputMaterial("stone", "dust", port = 3)
+                        outputMaterial(byProduct(0), "dust", port = 4, rate = 0.3)
+                        workTicks(200)
+                    } else {
+                        inputMaterial("water", "liquid", amount = 0.1)
+                        workTicks(32)
+                    }
+                    if (primitive && from == "dust_impure") {
+                        voltage(Voltage.PRIMITIVE)
+                    } else {
+                        voltage(Voltage.ULV)
+                    }
+                }
+            }
+        }
+
+        fun build() {
+            if (primitive || variant.voltage.rank <= Voltage.ULV.rank) {
+                if (material.hasItem("gem")) {
+                    siftAndHammer = true
+                } else if (!siftAndHammer) {
+                    crafting("crushed", "raw", TOOL_HAMMER, amount)
+                }
+                crafting("dust_pure", "crushed_purified", TOOL_HAMMER)
+                crafting("dust_impure", "crushed", TOOL_HAMMER)
+            }
+
+            if (siftAndHammer) {
+                crafting("primary", "raw", TOOL_HAMMER, amount)
+            }
+
+            crush("raw", "crushed")
+            crush("crushed", "dust_impure")
+            crush("crushed_purified", "dust_pure")
+            crush("crushed_centrifuged", "dust")
+            wash("crushed", "crushed_purified")
+            wash("dust_impure", "dust")
+            wash("dust_pure", "dust")
+
+            centrifuge {
+                inputMaterial(material, "dust_pure") {
+                    outputMaterial(material, "dust")
+                    outputMaterial(byProduct(1), "dust", rate = 0.3)
+                    voltage(Voltage.LV)
+                    workTicks(80)
+                }
+            }
+
+            thermalCentrifuge {
+                outputMaterial(material, "crushed_centrifuged") {
+                    inputMaterial(material, "crushed_purified")
+                    outputMaterial(byProduct(2), "dust", port = 2, rate = 0.4)
+                }
+            }
+
+            sifter {
+                if (material.hasItem("gem")) {
+                    inputMaterial(material, "crushed_purified") {
+                        outputMaterial(material, "gem_flawless", rate = 0.1)
+                        outputMaterial(material, "gem", rate = 0.35)
+                        outputMaterial(material, "dust_pure", rate = 0.65)
+                        voltage(Voltage.LV)
+                        workTicks(600)
+                    }
+                } else if (siftAndHammer) {
+                    inputMaterial(material, "crushed_purified") {
+                        outputMaterial(material, "primary", rate = 0.8)
+                        outputMaterial(material, "primary", rate = 0.35)
+                        outputMaterial(material, "dust_pure", rate = 0.65)
+                        voltage(Voltage.LV)
+                        workTicks(400)
+                    }
+                }
+            }
+
+            hasOreProcess = true
+        }
+    }
+
     private fun dustWithTiny() {
         if (material.hasItem("dust") && material.hasItem("dust_tiny")) {
             DATA_GEN.vanillaRecipe {
@@ -490,5 +723,12 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
         dustWithTiny()
         toolRecipes()
+
+        if (material.hasItem("primary") && !hasProcess) {
+            LOGGER.warn("{} does not have process", material)
+        }
+        if (material.hasBlock("ore") && !hasOreProcess) {
+            LOGGER.warn("{} does not have ore process", material)
+        }
     }
 }

@@ -15,6 +15,13 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
 
     private var userDefaults: RB.() -> Unit = {}
 
+    companion object {
+        fun matLoc(mat: MaterialSet, sub: String, suffix: String = ""): ResourceLocation {
+            val loc = if (mat.hasFluid(sub)) mat.fluidLoc(sub) else mat.loc(sub)
+            return suffix(loc, suffix)
+        }
+    }
+
     private fun apply(inner: B, block: RB.() -> Unit) {
         val ret = factory(inner)
         ret.defaults()
@@ -27,13 +34,16 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         apply(recipeType.recipe(DATA_GEN, loc), block)
     }
 
-    private fun matLoc(mat: MaterialSet, sub: String, suffix: String): ResourceLocation {
-        val loc = if (mat.hasFluid(sub)) mat.fluidLoc(sub) else mat.loc(sub)
-        return suffix(loc, suffix)
-    }
-
     fun defaults(value: RB.() -> Unit) {
         userDefaults = value
+    }
+
+    fun inputMaterial(mat: MaterialSet, sub: String, amount: Number = 1,
+        suffix: String = "", block: RB.() -> Unit = {}) {
+        recipe(matLoc(mat, sub, suffix)) {
+            inputMaterial(mat, sub, amount)
+            block()
+        }
     }
 
     fun outputItem(item: ItemLike, suffix: String = "", amount: Int = 1,

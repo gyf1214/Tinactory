@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import org.shsts.tinactory.Tinactory.REGISTRATE
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING
+import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ToolRecipe
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
@@ -42,6 +43,54 @@ object RecipeFactories {
         simpleProcessing("macerator") {
             simpleDefaults()
             amperage = 0.25
+        }.block()
+    }
+
+    fun washer(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("washer") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
+            amperage = 0.125
+        }.block()
+    }
+
+    fun centrifuge(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("centrifuge") {
+            fullDefaults()
+            amperage = 0.5
+        }.block()
+    }
+
+    fun thermalCentrifuge(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("thermal_centrifuge") {
+            simpleDefaults()
+            amperage = 1.0
+            voltage(Voltage.LV)
+            workTicks(400)
+        }.block()
+    }
+
+    fun sifter(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("sifter") {
+            simpleDefaults()
+            amperage = 0.25
+        }.block()
+    }
+
+    fun alloySmelter(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("alloy_smelter") {
+            defaultInputItem = 0
+            defaultOutputItem = 1
+            defaultOutputFluid = 2
+            amperage = 0.5
+        }.block()
+    }
+
+    fun mixer(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("mixer") {
+            fullDefaults()
+            amperage = 0.5
         }.block()
     }
 
