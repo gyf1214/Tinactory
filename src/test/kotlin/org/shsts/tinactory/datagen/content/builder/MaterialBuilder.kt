@@ -241,8 +241,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 return
             }
 
-            outputMaterial(material, result, amount, suffix) {
-                inputMaterial(material, input, inputAmount)
+            output(material, result, amount, suffix) {
+                input(material, input, inputAmount)
                 voltage(voltage)
                 workTicks(ticks(workTicks))
                 block()
@@ -294,8 +294,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             val v = if (material.hasItem("sheet")) voltage else Voltage.fromRank(voltage.rank + 1)
 
             extractor {
-                inputMaterial(material, input) {
-                    outputMaterial(material, output, amount)
+                input(material, input) {
+                    output(material, output, amount)
                     voltage(v)
                     workTicks(ticks(160))
                 }
@@ -303,8 +303,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
             if (solidify) {
                 fluidSolidifier {
-                    outputMaterial(material, input) {
-                        inputMaterial(material, output, amount)
+                    output(material, input) {
+                        input(material, output, amount)
                         voltage(v)
                         workTicks(ticks(80))
                     }
@@ -379,10 +379,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
             cutter {
                 process("bolt", 4, "stick", 64) {
-                    inputMaterial("water", "liquid", 0.05)
+                    input("water", "liquid", 0.05)
                 }
                 process("gem", 8, "gem_flawless", 480) {
-                    inputMaterial("water", "liquid", 0.8)
+                    input("water", "liquid", 0.8)
                 }
             }
 
@@ -445,7 +445,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     fun smelt(from: String, toMat: MaterialSet, to: String) {
         if (material.hasItem(from) && toMat.hasItem(to)) {
-            val suffix = if (toMat == material) "" else "_from_$from"
+            val suffix = if (toMat == material) "" else "_from_${material.name}"
             DATA_GEN.vanillaRecipe({
                 SimpleCookingRecipeBuilder
                     .smelting(Ingredient.of(material.tag(from)), toMat.item(to), 0f, 200)
@@ -484,9 +484,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         fun component(mat: MaterialSet, amount: Number = 1, sub: String? = null) {
             val sub1 = sub ?: if (mat.hasItem("dust")) "dust" else "fluid"
             if (decompose) {
-                builder.outputMaterial(mat, sub1, amount)
+                builder.output(mat, sub1, amount)
             } else {
-                builder.inputMaterial(mat, sub1, amount)
+                builder.input(mat, sub1, amount)
             }
             inAmount += amount.toFloat()
         }
@@ -505,9 +505,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 block()
                 val amount = outAmount ?: inAmount
                 if (decompose) {
-                    inputMaterial(material, sub, amount)
+                    input(material, sub, amount)
                 } else {
-                    outputMaterial(material, sub, amount)
+                    output(material, sub, amount)
                 }
                 workTicks((workTicks * inAmount).toLong())
                 voltage(voltage)
@@ -568,8 +568,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         if (material.hasItem("ingot_hot")) {
             sub = "ingot_hot"
             vacuumFreezer {
-                outputMaterial(material, "ingot") {
-                    inputMaterial(material, "ingot_hot")
+                output(material, "ingot") {
+                    input(material, "ingot_hot")
                     voltage(voltage)
                     workTicks(200)
                 }
@@ -625,8 +625,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         private fun crush(from: String, to: String) {
             val amount = if (from == "raw") 2 * amount else 1
             macerator {
-                outputMaterial(material, to, amount) {
-                    inputMaterial(material, from)
+                output(material, to, amount) {
+                    input(material, from)
                     voltage(Voltage.LV)
                     workTicks((variant.destroyTime * 40).toLong())
                 }
@@ -636,15 +636,15 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         private fun wash(from: String, to: String) {
             val suffix = if (from == "dust_impure") "_from_impure" else ""
             oreWasher {
-                outputMaterial(material, to, suffix = suffix) {
-                    inputMaterial(material, from)
+                output(material, to, suffix = suffix) {
+                    input(material, from)
                     if (from == "crushed") {
-                        inputMaterial("water", "liquid")
-                        outputMaterial("stone", "dust", port = 3)
-                        outputMaterial(byProduct(0), "dust", port = 4, rate = 0.3)
+                        input("water", "liquid")
+                        output("stone", "dust", port = 3)
+                        output(byProduct(0), "dust", port = 4, rate = 0.3)
                         workTicks(200)
                     } else {
-                        inputMaterial("water", "liquid", amount = 0.1)
+                        input("water", "liquid", amount = 0.1)
                         workTicks(32)
                     }
                     if (primitive && from == "dust_impure") {
@@ -680,35 +680,35 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             wash("dust_pure", "dust")
 
             centrifuge {
-                inputMaterial(material, "dust_pure") {
-                    outputMaterial(material, "dust")
-                    outputMaterial(byProduct(1), "dust", rate = 0.3)
+                input(material, "dust_pure") {
+                    output(material, "dust")
+                    output(byProduct(1), "dust", rate = 0.3)
                     voltage(Voltage.LV)
                     workTicks(80)
                 }
             }
 
             thermalCentrifuge {
-                outputMaterial(material, "crushed_centrifuged") {
-                    inputMaterial(material, "crushed_purified")
-                    outputMaterial(byProduct(2), "dust", port = 2, rate = 0.4)
+                output(material, "crushed_centrifuged") {
+                    input(material, "crushed_purified")
+                    output(byProduct(2), "dust", port = 2, rate = 0.4)
                 }
             }
 
             sifter {
                 if (material.hasItem("gem")) {
-                    inputMaterial(material, "crushed_purified") {
-                        outputMaterial(material, "gem_flawless", rate = 0.1)
-                        outputMaterial(material, "gem", rate = 0.35)
-                        outputMaterial(material, "dust_pure", rate = 0.65)
+                    input(material, "crushed_purified") {
+                        output(material, "gem_flawless", rate = 0.1)
+                        output(material, "gem", rate = 0.35)
+                        output(material, "dust_pure", rate = 0.65)
                         voltage(Voltage.LV)
                         workTicks(600)
                     }
                 } else if (siftAndHammer) {
-                    inputMaterial(material, "crushed_purified") {
-                        outputMaterial(material, "primary", rate = 0.8)
-                        outputMaterial(material, "primary", rate = 0.35)
-                        outputMaterial(material, "dust_pure", rate = 0.65)
+                    input(material, "crushed_purified") {
+                        output(material, "primary", rate = 0.8)
+                        output(material, "primary", rate = 0.35)
+                        output(material, "dust_pure", rate = 0.65)
                         voltage(Voltage.LV)
                         workTicks(400)
                     }
@@ -728,9 +728,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     fun oilOre(workTicks: Long) {
         centrifuge {
-            inputMaterial(material, "raw") {
-                outputItem(Blocks.SAND)
-                outputMaterial(material, "fluid")
+            input(material, "raw") {
+                output(Blocks.SAND)
+                output(material, "fluid")
                 workTicks(workTicks)
                 voltage(Voltage.MV)
             }

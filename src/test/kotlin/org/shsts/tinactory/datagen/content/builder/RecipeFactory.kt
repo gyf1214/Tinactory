@@ -39,37 +39,37 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         userDefaults = value
     }
 
-    fun inputMaterial(mat: MaterialSet, sub: String, amount: Number = 1,
+    fun input(mat: MaterialSet, sub: String, amount: Number = 1,
         suffix: String = "", block: RB.() -> Unit = {}) {
         recipe(matLoc(mat, sub, suffix)) {
-            inputMaterial(mat, sub, amount)
+            input(mat, sub, amount)
             block()
         }
     }
 
-    fun inputMaterial(name: String, sub: String, amount: Number = 1,
+    fun input(name: String, sub: String, amount: Number = 1,
         suffix: String = "", block: RB.() -> Unit = {}) {
-        inputMaterial(getMaterial(name), sub, amount, suffix, block)
+        input(getMaterial(name), sub, amount, suffix, block)
     }
 
-    fun outputItem(item: ItemLike, suffix: String = "", amount: Int = 1,
+    fun output(item: ItemLike, suffix: String = "", amount: Int = 1,
         rate: Double = 1.0, block: RB.() -> Unit = {}) {
         recipe(suffix(item.asItem().registryName!!, suffix)) {
-            outputItem({ item }, amount, rate = rate)
+            output(item, amount, rate = rate)
             block()
         }
     }
 
-    fun outputMaterial(mat: MaterialSet, sub: String, amount: Number = 1,
+    fun output(mat: MaterialSet, sub: String, amount: Number = 1,
         suffix: String = "", rate: Double = 1.0, block: RB.() -> Unit = {}) {
         recipe(matLoc(mat, sub, suffix)) {
-            outputMaterial(mat, sub, amount, rate = rate)
+            output(mat, sub, amount, rate = rate)
             block()
         }
     }
 
-    fun outputMaterial(name: String, sub: String, amount: Number = 1,
+    fun output(name: String, sub: String, amount: Number = 1,
         suffix: String = "", rate: Double = 1.0, block: RB.() -> Unit = {}) {
-        outputMaterial(getMaterial(name), sub, amount, suffix, rate, block)
+        output(getMaterial(name), sub, amount, suffix, rate, block)
     }
 }

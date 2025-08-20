@@ -11,19 +11,19 @@ object RecipesKt {
             defaults {
                 voltage(Voltage.MV)
             }
-            outputMaterial("air", "liquid") {
-                inputMaterial("air", "gas")
+            output("air", "liquid") {
+                input("air", "gas")
                 workTicks(200)
             }
-            outputMaterial("water", "liquid") {
-                inputMaterial("water", "gas")
+            output("water", "liquid") {
+                input("water", "gas")
                 workTicks(32)
             }
         }
 
         stoneGenerator {
             for (variant in OreVariant.entries) {
-                outputItem(variant.baseItem) {
+                output(variant.baseItem) {
                     if (variant == OreVariant.STONE) {
                         voltage(Voltage.PRIMITIVE)
                     } else {
@@ -31,14 +31,14 @@ object RecipesKt {
                     }
                 }
             }
-            outputMaterial("water", "liquid") {
+            output("water", "liquid") {
                 voltage(Voltage.ULV)
             }
             defaults {
                 voltage(Voltage.MV)
             }
-            outputMaterial("air", "gas")
-            outputMaterial("sea_water", "liquid")
+            output("air", "gas")
+            output("sea_water", "liquid")
         }
     }
 }
