@@ -23,11 +23,12 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
     }
 
     private fun apply(inner: B, block: RB.() -> Unit) {
-        val ret = factory(inner)
-        ret.defaults()
-        ret.userDefaults()
-        ret.block()
-        ret.build()
+        factory(inner).apply {
+            defaults()
+            userDefaults()
+            block()
+            build()
+        }
     }
 
     fun recipe(loc: ResourceLocation, block: RB.() -> Unit) {
@@ -44,6 +45,11 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
             inputMaterial(mat, sub, amount)
             block()
         }
+    }
+
+    fun inputMaterial(name: String, sub: String, amount: Number = 1,
+        suffix: String = "", block: RB.() -> Unit = {}) {
+        inputMaterial(getMaterial(name), sub, amount, suffix, block)
     }
 
     fun outputItem(item: ItemLike, suffix: String = "", amount: Int = 1,

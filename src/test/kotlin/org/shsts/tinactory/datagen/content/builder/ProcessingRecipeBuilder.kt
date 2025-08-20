@@ -67,6 +67,11 @@ class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builde
         }
     }
 
+    fun outputItem(item: ItemLike, amount: Int = 1,
+        port: Int = defaultOutputItem!!, rate: Double = 1.0) {
+        outputItem({ item }, amount, port, rate)
+    }
+
     fun outputFluid(fluid: () -> Fluid, amount: Int,
         port: Int = defaultOutputFluid!!, rate: Double = 1.0) {
         builder.output(port) {

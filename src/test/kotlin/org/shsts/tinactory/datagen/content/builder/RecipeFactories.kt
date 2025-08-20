@@ -28,9 +28,10 @@ object RecipeFactories {
         processing(name, defaults)
 
     fun toolCrafting(loc: ResourceLocation, block: ToolRecipe.Builder.() -> Unit) {
-        val builder = TOOL_CRAFTING.recipe(DATA_GEN, loc)
-        builder.block()
-        builder.build()
+        TOOL_CRAFTING.recipe(DATA_GEN, loc).apply {
+            block()
+            build()
+        }
     }
 
     fun toolCrafting(name: String, sub: String, amount: Int = 1, block: ToolRecipe.Builder.() -> Unit) {
@@ -48,8 +49,8 @@ object RecipeFactories {
         }.block()
     }
 
-    fun washer(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("washer") {
+    fun oreWasher(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("ore_washer") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2

@@ -9,6 +9,7 @@ import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.client.model.generators.ItemModelProvider
 import org.shsts.tinactory.content.AllMaterials
 import org.shsts.tinactory.content.AllMaterials.getMaterial
@@ -43,12 +44,12 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fluidSolidifi
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.oreWasher
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.polarizer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.thermalCentrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.washer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory.Companion.matLoc
 import org.shsts.tinactory.datagen.content.model.IconSet
@@ -69,11 +70,11 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             "screwdriver" to "handle_screwdriver",
             "wire_cutter" to "wire_cutter_base")
 
-        fun material(name: String, icon: IconSet, block: MaterialBuilder.() -> Unit) {
-            val mat = getMaterial(name)
-            val builder = MaterialBuilder(mat, icon)
-            builder.block()
-            builder.build()
+        fun material(name: String, icon: IconSet, block: MaterialBuilder.() -> Unit = {}) {
+            MaterialBuilder(getMaterial(name), icon).apply {
+                block()
+                build()
+            }
         }
     }
 
@@ -213,9 +214,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     private fun crafting(result: String, amount: Int = 1, block: CraftingBuilder.() -> Unit) {
-        val builder = CraftingBuilder(result, amount)
-        builder.block()
-        builder.build()
+        CraftingBuilder(result, amount).apply {
+            block()
+            build()
+        }
     }
 
     private fun crafting(result: String, input: String, tool: TagKey<Item>, amount: Int = 1) {
@@ -284,16 +286,16 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             macerate("gem_exquisite", 16)
         }
 
-        private fun molten(input: String, amount: Float, solidify: Boolean = true, result: String = "molten") {
-            if (!material.hasItem(input) || !material.hasFluid(result)) {
+        private fun molten(input: String, amount: Float, solidify: Boolean = true, output: String = "molten") {
+            if (!material.hasItem(input) || !material.hasFluid(output)) {
                 return
             }
 
             val v = if (material.hasItem("sheet")) voltage else Voltage.fromRank(voltage.rank + 1)
 
             extractor {
-                outputMaterial(material, result, amount) {
-                    inputMaterial(material, input)
+                inputMaterial(material, input) {
+                    outputMaterial(material, output, amount)
                     voltage(v)
                     workTicks(ticks(160))
                 }
@@ -302,7 +304,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             if (solidify) {
                 fluidSolidifier {
                     outputMaterial(material, input) {
-                        inputMaterial(material, result, amount)
+                        inputMaterial(material, output, amount)
                         voltage(v)
                         workTicks(ticks(80))
                     }
@@ -479,7 +481,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             outAmount = value.toFloat()
         }
 
-        fun component(mat: MaterialSet, sub: String? = null, amount: Number = 1) {
+        fun component(mat: MaterialSet, amount: Number = 1, sub: String? = null) {
             val sub1 = sub ?: if (mat.hasItem("dust")) "dust" else "fluid"
             if (decompose) {
                 builder.outputMaterial(mat, sub1, amount)
@@ -489,12 +491,16 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             inAmount += amount.toFloat()
         }
 
+        fun component(name: String, amount: Number = 1, sub: String? = null) {
+            component(getMaterial(name), amount, sub)
+        }
+
         fun extra(block: B.() -> Unit) {
             builder.extra(block)
         }
 
         fun build(block: ComposeBuilder<B>.() -> Unit) {
-            factory.recipe(matLoc(material, sub)) {
+            factory.recipe(matLoc(material, sub, suffix)) {
                 _builder = this
                 block()
                 val amount = outAmount ?: inAmount
@@ -557,7 +563,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     fun blast(voltage: Voltage, temperature: Int, workTicks: Long, from: MaterialSet = material,
-        block: ComposeBuilder<BlastFurnaceRecipe.Builder>.() -> Unit) {
+        block: ComposeBuilder<BlastFurnaceRecipe.Builder>.() -> Unit = {}) {
         val sub: String
         if (material.hasItem("ingot_hot")) {
             sub = "ingot_hot"
@@ -575,13 +581,18 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         blastFurnace {
             compose(sub, voltage, workTicks, false, suffix) {
                 amount(1)
-                component(from, "dust")
+                component(from, sub = "dust")
                 extra {
                     temperature(temperature)
                 }
                 block()
             }
         }
+    }
+
+    fun blast(voltage: Voltage, temperature: Int, workTicks: Long, from: String,
+        block: ComposeBuilder<BlastFurnaceRecipe.Builder>.() -> Unit = {}) {
+        blast(voltage, temperature, workTicks, getMaterial(from), block)
     }
 
     inner class OreProcessBuilder {
@@ -624,7 +635,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
         private fun wash(from: String, to: String) {
             val suffix = if (from == "dust_impure") "_from_impure" else ""
-            washer {
+            oreWasher {
                 outputMaterial(material, to, suffix = suffix) {
                     inputMaterial(material, from)
                     if (from == "crushed") {
@@ -705,6 +716,24 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
 
             hasOreProcess = true
+        }
+    }
+
+    fun oreProcess(block: OreProcessBuilder.() -> Unit = {}) {
+        OreProcessBuilder().apply {
+            block()
+            build()
+        }
+    }
+
+    fun oilOre(workTicks: Long) {
+        centrifuge {
+            inputMaterial(material, "raw") {
+                outputItem(Blocks.SAND)
+                outputMaterial(material, "fluid")
+                workTicks(workTicks)
+                voltage(Voltage.MV)
+            }
         }
     }
 
