@@ -1,4 +1,4 @@
-package org.shsts.tinactory.datagen.content.builder
+package org.shsts.tinactory.datagen.content
 
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.material.OreVariant
@@ -34,6 +34,8 @@ object RecipesKt {
             output("water", "liquid") {
                 voltage(Voltage.ULV)
             }
+        }
+        stoneGenerator {
             defaults {
                 voltage(Voltage.MV)
             }

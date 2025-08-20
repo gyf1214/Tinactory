@@ -21,7 +21,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder;
+import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder1;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -619,19 +619,19 @@ public final class Machines {
     }
 
     private record RecipeFactory(Voltage voltage) {
-        private AssemblyRecipeBuilder<RecipeFactory> recipe(
+        private AssemblyRecipeBuilder1<RecipeFactory> recipe(
             IEntry<? extends ItemLike> item, Voltage v1) {
             var builder = ASSEMBLER.recipe(DATA_GEN, item)
                 .outputItem(item, 1)
                 .voltage(v1)
                 .workTicks(ASSEMBLE_TICKS)
                 .inputItem(MACHINE_HULL.get(voltage), 1);
-            return new AssemblyRecipeBuilder<>(this, voltage, builder) {
+            return new AssemblyRecipeBuilder1<>(this, voltage, builder) {
                 private int components = 0;
                 private boolean hasCable = false;
 
                 @Override
-                public AssemblyRecipeBuilder<RecipeFactory> component(
+                public AssemblyRecipeBuilder1<RecipeFactory> component(
                     Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
                     if (component != CABLE) {
                         components += count;
@@ -651,26 +651,26 @@ public final class Machines {
             };
         }
 
-        public AssemblyRecipeBuilder<RecipeFactory> recipe(MachineSet set, Voltage v1) {
+        public AssemblyRecipeBuilder1<RecipeFactory> recipe(MachineSet set, Voltage v1) {
             if (!set.hasVoltage(voltage)) {
-                return new AssemblyRecipeBuilder<>(this);
+                return new AssemblyRecipeBuilder1<>(this);
             }
             return recipe(set.entry(voltage), v1);
         }
 
-        public AssemblyRecipeBuilder<RecipeFactory> recipe(
+        public AssemblyRecipeBuilder1<RecipeFactory> recipe(
             Map<Voltage, ? extends IEntry<? extends ItemLike>> set, Voltage v1) {
             if (!set.containsKey(voltage)) {
-                return new AssemblyRecipeBuilder<>(this);
+                return new AssemblyRecipeBuilder1<>(this);
             }
             return recipe(set.get(voltage), v1);
         }
 
-        public AssemblyRecipeBuilder<RecipeFactory> recipe(MachineSet set) {
+        public AssemblyRecipeBuilder1<RecipeFactory> recipe(MachineSet set) {
             return recipe(set, Voltage.fromRank(voltage.rank - 1));
         }
 
-        public AssemblyRecipeBuilder<RecipeFactory> recipe(
+        public AssemblyRecipeBuilder1<RecipeFactory> recipe(
             Map<Voltage, ? extends IEntry<? extends ItemLike>> set) {
             return recipe(set, Voltage.fromRank(voltage.rank - 1));
         }
@@ -909,7 +909,7 @@ public final class Machines {
             .build();
     }
 
-    private static <P> AssemblyRecipeBuilder<P> pic(AssemblyRecipeBuilder<P> builder) {
+    private static <P> AssemblyRecipeBuilder1<P> pic(AssemblyRecipeBuilder1<P> builder) {
         var v = builder.voltage();
         if (v.rank < Voltage.HV.rank) {
             return builder;

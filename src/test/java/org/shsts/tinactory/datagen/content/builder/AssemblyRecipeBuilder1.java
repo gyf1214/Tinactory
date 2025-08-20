@@ -18,18 +18,18 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRecipeBuilder<P>> {
+public class AssemblyRecipeBuilder1<P> extends SimpleBuilder<Unit, P, AssemblyRecipeBuilder1<P>> {
     private final Voltage voltage;
     @Nullable
     private final AssemblyRecipe.Builder builder;
 
-    public AssemblyRecipeBuilder(P parent) {
+    public AssemblyRecipeBuilder1(P parent) {
         super(parent);
         this.voltage = Voltage.PRIMITIVE;
         this.builder = null;
     }
 
-    public AssemblyRecipeBuilder(P parent, Voltage voltage, AssemblyRecipe.Builder builder) {
+    public AssemblyRecipeBuilder1(P parent, Voltage voltage, AssemblyRecipe.Builder builder) {
         super(parent);
         this.voltage = voltage;
         this.builder = builder;
@@ -39,18 +39,18 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
         return voltage;
     }
 
-    public AssemblyRecipeBuilder<P> circuit(Voltage v, int count) {
+    public AssemblyRecipeBuilder1<P> circuit(Voltage v, int count) {
         if (builder != null) {
             builder.inputItem(AllTags.circuit(v), count);
         }
         return this;
     }
 
-    public AssemblyRecipeBuilder<P> circuit(int count) {
+    public AssemblyRecipeBuilder1<P> circuit(int count) {
         return circuit(voltage, count);
     }
 
-    public AssemblyRecipeBuilder<P> component(
+    public AssemblyRecipeBuilder1<P> component(
         Map<Voltage, ? extends Supplier<? extends ItemLike>> component, int count) {
         if (builder != null) {
             builder.inputItem(component.get(voltage), count);
@@ -58,35 +58,35 @@ public class AssemblyRecipeBuilder<P> extends SimpleBuilder<Unit, P, AssemblyRec
         return this;
     }
 
-    public AssemblyRecipeBuilder<P> material(MaterialSet material, String sub, int count) {
+    public AssemblyRecipeBuilder1<P> material(MaterialSet material, String sub, int count) {
         if (builder != null) {
             builder.inputItem(material.tag(sub), count);
         }
         return this;
     }
 
-    public AssemblyRecipeBuilder<P> materialFluid(MaterialSet material, float count) {
+    public AssemblyRecipeBuilder1<P> materialFluid(MaterialSet material, float count) {
         if (builder != null) {
             builder.inputFluid(material.fluid(), material.fluidAmount(count));
         }
         return this;
     }
 
-    public AssemblyRecipeBuilder<P> tech(ResourceLocation... loc) {
+    public AssemblyRecipeBuilder1<P> tech(ResourceLocation... loc) {
         if (builder != null) {
             builder.requireTech(loc);
         }
         return this;
     }
 
-    public AssemblyRecipeBuilder<P> item(Supplier<? extends ItemLike> item, int count) {
+    public AssemblyRecipeBuilder1<P> item(Supplier<? extends ItemLike> item, int count) {
         if (builder != null) {
             builder.inputItem(item, count);
         }
         return this;
     }
 
-    public AssemblyRecipeBuilder<P> transformBuilder(Transformer<AssemblyRecipe.Builder> trans) {
+    public AssemblyRecipeBuilder1<P> transformBuilder(Transformer<AssemblyRecipe.Builder> trans) {
         if (builder != null) {
             builder.transform(trans);
         }

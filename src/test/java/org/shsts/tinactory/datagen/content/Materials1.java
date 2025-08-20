@@ -21,8 +21,6 @@ import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.LocHelper;
-import org.shsts.tinactory.datagen.content.builder.MaterialBuilder1;
-import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.io.IOException;
@@ -43,19 +41,16 @@ import static org.shsts.tinactory.content.AllMaterials.DIESEL;
 import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
-import static org.shsts.tinactory.content.AllMaterials.GLOWSTONE;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LPG;
 import static org.shsts.tinactory.content.AllMaterials.METHANE;
 import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
-import static org.shsts.tinactory.content.AllMaterials.RARE_EARTH;
 import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
 import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
-import static org.shsts.tinactory.content.AllMaterials.TEST;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllRecipes.ALLOY_SMELTER;
@@ -89,9 +84,6 @@ import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.basicItem;
 import static org.shsts.tinactory.datagen.content.Models.cubeTint;
-import static org.shsts.tinactory.datagen.content.model.IconSet.DULL;
-import static org.shsts.tinactory.datagen.content.model.IconSet.ROUGH;
-import static org.shsts.tinactory.datagen.content.model.IconSet.SHINY;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -104,14 +96,6 @@ public final class Materials1 {
         tags();
         exportMaterial();
     }
-
-    private static class MaterialFactory {
-        public MaterialBuilder1<MaterialFactory> material(MaterialSet material, IconSet icon) {
-            return MaterialBuilder1.factory(DATA_GEN, this, material).icon(icon);
-        }
-    }
-
-    private static final MaterialFactory FACTORY = new MaterialFactory();
 
     private static void wood() {
         // rubber
@@ -274,17 +258,6 @@ public final class Materials1 {
     }
 
     private static void misc() {
-        FACTORY.material(TEST, DULL).build()
-            .material(STONE, ROUGH).toolProcess().build()
-            .material(FLINT, DULL).toolProcess().build()
-            .material(RAW_RUBBER, DULL).build()
-            .material(RUBBER, SHINY)
-            .toolProcess()
-            .build()
-            .material(GLOWSTONE, SHINY).build()
-            .material(RARE_EARTH, ROUGH).build()
-            .material(GLASS, SHINY).build();
-
         // disable vanilla nugget
         disableVanillaOres("iron");
         disableVanillaOres("gold");

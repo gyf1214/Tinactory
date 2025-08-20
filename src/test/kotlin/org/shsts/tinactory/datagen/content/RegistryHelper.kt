@@ -6,7 +6,7 @@ import org.shsts.tinactory.content.AllRegistries.ITEMS
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 
 object RegistryHelper {
-    fun getItem(loc: ResourceLocation) = ITEMS.getEntry<Item>(loc).get()
+    fun getItem(loc: ResourceLocation) = ITEMS.getEntry<Item>(loc).get()!!
 
     fun vanillaItem(id: String) = getItem(mcLoc(id))
 }

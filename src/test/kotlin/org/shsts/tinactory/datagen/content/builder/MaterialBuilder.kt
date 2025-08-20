@@ -29,7 +29,9 @@ import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.VOID_TEX
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.oreBlock
+import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.alloySmelter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bender
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
@@ -380,6 +382,37 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 }
                 process("gem", 8, "gem_flawless", 480) {
                     input("water", "liquid", 0.8)
+                }
+            }
+            assembler {
+                defaults {
+                    voltage(voltage)
+                    input("soldering_alloy", "molten", 0.5)
+                    tech(Technologies.SOLDERING)
+                }
+                output(material, "gear") {
+                    input(material, "plate")
+                    input(material, "stick", 2)
+                    workTicks(ticks(128))
+                }
+                output(material, "rotor") {
+                    input(material, "plate", 4)
+                    input(material, "ring")
+                    workTicks(ticks(160))
+                }
+                output(material, "pipe") {
+                    input(material, "plate", 3)
+                    workTicks(ticks(120))
+                }
+            }
+            assembler {
+                output(material, "gem_exquisite") {
+                    input(material, "gem_flawless")
+                    input(material, "gem", 4)
+                    input(material, "dust", 4)
+                    voltage(voltage)
+                    workTicks(ticks(400))
+                    tech(Technologies.MATERIAL_CUTTING)
                 }
             }
 

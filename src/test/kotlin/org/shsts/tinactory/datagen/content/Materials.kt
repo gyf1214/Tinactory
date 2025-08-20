@@ -42,6 +42,7 @@ object Materials {
         firstDegrees()
         higherDegrees()
         ores()
+        misc()
     }
 
     private fun woods() {
@@ -718,5 +719,22 @@ object Materials {
                 output("sulfuric_acid", "gas", 3)
             }
         }
+    }
+
+    private fun misc() {
+        material("test", DULL)
+        material("stone", ROUGH) {
+            toolProcess()
+        }
+        material("flint", DULL) {
+            toolProcess()
+        }
+        material("raw_rubber", DULL)
+        material("rubber", SHINY) {
+            toolProcess()
+        }
+        material("glowstone", SHINY)
+        material("rare_earth", ROUGH)
+        material("glass", SHINY)
     }
 }

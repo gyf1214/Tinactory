@@ -13,7 +13,7 @@ import org.shsts.tinactory.core.recipe.ProcessingIngredients
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ProcessingResults
 
-class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builder: B) {
+open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(protected val builder: B) {
     private var voltage: Long? = null
     var amperage: Double? = null
     var defaultInputItem: Int? = null

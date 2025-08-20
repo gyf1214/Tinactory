@@ -9,6 +9,7 @@ import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
+import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ToolRecipe
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
@@ -16,23 +17,12 @@ import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
 typealias ProcessingRecipeFactory = ProcessingRecipeFactoryBase<ProcessingRecipe.Builder>
 typealias BlastFurnaceRecipeFactory = ProcessingRecipeFactoryBase<BlastFurnaceRecipe.Builder>
+typealias AssemblyRecipeFactory = RecipeFactory<AssemblyRecipe.Builder, AssemblyRecipeBuilder>
 
 object RecipeFactories {
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> processing(name: String,
-        defaults: ProcessingRecipeBuilder<B>.() -> Unit):
-        RecipeFactory<B, ProcessingRecipeBuilder<B>> {
-
-        val recipeType = REGISTRATE.getRecipeType<B>(name)
-        return RecipeFactory(recipeType, ::ProcessingRecipeBuilder, defaults)
-    }
-
     fun vanilla(replace: Boolean = false, block: VanillaRecipeFactory.() -> Unit) {
         VanillaRecipeFactory(replace).apply(block)
     }
-
-    private fun simpleProcessing(name: String,
-        defaults: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit) =
-        processing(name, defaults)
 
     fun toolCrafting(loc: ResourceLocation, block: ToolRecipe.Builder.() -> Unit) {
         TOOL_CRAFTING.recipe(DATA_GEN, loc).apply {
@@ -70,6 +60,28 @@ object RecipeFactories {
             define('#', from)
             toolTag(tool)
         }
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> processing(name: String,
+        defaults: ProcessingRecipeBuilder<B>.() -> Unit):
+        RecipeFactory<B, ProcessingRecipeBuilder<B>> {
+
+        val recipeType = REGISTRATE.getRecipeType<B>(name)
+        return RecipeFactory(recipeType, ::ProcessingRecipeBuilder, defaults)
+    }
+
+    private fun simpleProcessing(name: String,
+        defaults: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit) =
+        processing(name, defaults)
+
+    fun assembler(block: AssemblyRecipeFactory.() -> Unit) {
+        val recipeType = REGISTRATE.getRecipeType<AssemblyRecipe.Builder>("assembler")
+        RecipeFactory(recipeType, ::AssemblyRecipeBuilder) {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
+            amperage = 0.375
+        }.block()
     }
 
     fun stoneGenerator(block: ProcessingRecipeFactory.() -> Unit) {

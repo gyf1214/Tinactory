@@ -22,7 +22,7 @@ import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder;
+import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder1;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;
@@ -466,19 +466,19 @@ public final class Components {
             this.baseVoltage = voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
         }
 
-        public AssemblyRecipeBuilder<ComponentRecipeFactory> recipe(
+        public AssemblyRecipeBuilder1<ComponentRecipeFactory> recipe(
             Map<Voltage, ? extends IEntry<? extends ItemLike>> component, int count) {
             if (!component.containsKey(voltage)) {
-                return new AssemblyRecipeBuilder<>(this);
+                return new AssemblyRecipeBuilder1<>(this);
             }
             var builder = ASSEMBLER.recipe(DATA_GEN, component.get(voltage))
                 .outputItem(component.get(voltage), count)
                 .voltage(baseVoltage)
                 .workTicks(ASSEMBLY_TICKS);
-            return new AssemblyRecipeBuilder<>(this, voltage, builder);
+            return new AssemblyRecipeBuilder1<>(this, voltage, builder);
         }
 
-        public AssemblyRecipeBuilder<ComponentRecipeFactory> recipe(
+        public AssemblyRecipeBuilder1<ComponentRecipeFactory> recipe(
             Map<Voltage, ? extends IEntry<? extends ItemLike>> component) {
             return recipe(component, 1);
         }
