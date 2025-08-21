@@ -20,6 +20,8 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
     var defaultInputFluid: Int? = null
     var defaultOutputItem: Int? = null
     var defaultOutputFluid: Int? = null
+    var defaultItemSub: String = "dust"
+    var defaultFluidSub: String = "fluid"
 
     fun defaults(inputItem: Int, inputFluid: Int, outputItem: Int, outputFluid: Int) {
         defaultInputItem = inputItem
@@ -37,6 +39,16 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
         defaultOutputItem = 1
     }
 
+    private fun defaultSub(material: MaterialSet): String {
+        if (material.hasItem(defaultItemSub)) {
+            return defaultItemSub
+        } else {
+            return defaultFluidSub
+        }
+    }
+
+    private fun defaultSub(name: String) = defaultSub(getMaterial(name))
+
     fun input(tag: TagKey<Item>, amount: Int = 1, port: Int = defaultInputItem!!) {
         builder.input(port) { ProcessingIngredients.TagIngredient(tag, amount) }
     }
@@ -49,7 +61,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
         builder.input(port) { ProcessingIngredients.FluidIngredient(FluidStack(fluid, amount)) }
     }
 
-    fun input(mat: MaterialSet, sub: String, amount: Number = 1, port: Int? = null) {
+    fun input(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1, port: Int? = null) {
         if (mat.hasFluid(sub)) {
             input(mat.fluid(sub).get(), mat.fluidAmount(amount.toFloat()),
                 port ?: defaultInputFluid!!)
@@ -58,26 +70,24 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
         }
     }
 
-    fun input(name: String, sub: String, amount: Number = 1, port: Int? = null) {
+    fun input(name: String, sub: String = defaultSub(name), amount: Number = 1, port: Int? = null) {
         input(getMaterial(name), sub, amount, port)
     }
 
-    fun output(item: ItemLike, amount: Int = 1,
-        port: Int = defaultOutputItem!!, rate: Double = 1.0) {
+    fun output(item: ItemLike, amount: Int = 1, port: Int = defaultOutputItem!!, rate: Double = 1.0) {
         builder.output(port) {
             ProcessingResults.ItemResult(rate, ItemStack(item, amount))
         }
     }
 
-    fun output(fluid: Fluid, amount: Int,
-        port: Int = defaultOutputFluid!!, rate: Double = 1.0) {
+    fun output(fluid: Fluid, amount: Int, port: Int = defaultOutputFluid!!, rate: Double = 1.0) {
         builder.output(port) {
             ProcessingResults.FluidResult(rate, FluidStack(fluid, amount))
         }
     }
 
-    fun output(mat: MaterialSet, sub: String, amount: Number = 1, port: Int? = null,
-        rate: Double = 1.0) {
+    fun output(mat: MaterialSet, sub: String = defaultSub(mat),
+        amount: Number = 1, port: Int? = null, rate: Double = 1.0) {
         if (mat.hasFluid(sub)) {
             output(mat.fluid(sub).get(), mat.fluidAmount(amount.toFloat()),
                 port ?: defaultOutputFluid!!, rate)
@@ -86,8 +96,8 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
         }
     }
 
-    fun output(name: String, sub: String, amount: Number = 1, port: Int? = null,
-        rate: Double = 1.0) {
+    fun output(name: String, sub: String = defaultSub(name),
+        amount: Number = 1, port: Int? = null, rate: Double = 1.0) {
         output(getMaterial(name), sub, amount, port, rate)
     }
 

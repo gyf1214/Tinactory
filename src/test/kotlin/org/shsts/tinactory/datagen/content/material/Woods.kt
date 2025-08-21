@@ -62,7 +62,7 @@ object Woods {
                 workTicks(1600)
             }
             input(sapling, suffix = "_with_bone_meal") {
-                input("water", "fluid")
+                input("water")
                 input(Items.BONE_MEAL, 2, port = 2)
                 output(leaves, 16)
                 workTicks(300)
@@ -70,7 +70,7 @@ object Woods {
         }
         autofarm {
             input(sapling, suffix = "_with_fertilizer") {
-                input("water", "fluid")
+                input("water")
                 input(FERTILIZER.get(), 2, port = 2)
                 output(log, 12)
                 if (isRubber) {
@@ -115,17 +115,17 @@ object Woods {
             }
             output(planks, 6) {
                 input(logsTag)
-                input("water", "liquid", 0.6)
+                input("water", amount = 0.6)
                 workTicks(240)
             }
             output(slab, 2) {
                 input(planks)
-                input("water", "liquid", 0.1)
+                input("water", amount = 0.1)
                 workTicks(80)
             }
             output(button, 8) {
                 input(pressurePlate)
-                input("water", "liquid", 0.05)
+                input("water", amount = 0.05)
                 workTicks(64)
             }
         }

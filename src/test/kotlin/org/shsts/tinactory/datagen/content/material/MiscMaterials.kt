@@ -57,7 +57,7 @@ object MiscMaterials {
                 voltage(Voltage.MV)
             }
             output("air", "liquid") {
-                input("air", "gas")
+                input("air")
                 workTicks(200)
             }
             output("water", "liquid") {

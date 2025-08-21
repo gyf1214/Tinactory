@@ -374,10 +374,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
             cutter {
                 process("bolt", "stick", 64, 4) {
-                    input("water", "liquid", 0.05)
+                    input("water", amount = 0.05)
                 }
                 process("gem", "gem_flawless", 480, 8) {
-                    input("water", "liquid", 0.8)
+                    input("water", amount = 0.8)
                 }
             }
             assembler {
@@ -648,12 +648,12 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 output(material, to, suffix = suffix) {
                     input(material, from)
                     if (from == "crushed") {
-                        input("water", "liquid")
+                        input("water")
                         output("stone", "dust", port = 3)
                         output(byProduct(0), "dust", port = 4, rate = 0.3)
                         workTicks(200)
                     } else {
-                        input("water", "liquid", 0.1)
+                        input("water", amount = 0.1)
                         workTicks(32)
                     }
                     if (primitive && from == "dust_impure") {

@@ -94,14 +94,14 @@ object Crops {
                 workTicks(800)
             }
             input(seed, suffix = "_with_bone_meal") {
-                input("water", "fluid", 0.5)
+                input("water", amount = 0.5)
                 input(Items.BONE_MEAL, 1, port = 2)
                 workTicks(300)
             }
         }
         autofarm {
             input(seed, suffix = "_with_fertilizer") {
-                input("water", "fluid", 0.5)
+                input("water", amount = 0.5)
                 input(FERTILIZER.get(), port = 2)
                 output(crop, if (crop == seed) 6 else 2)
                 if (outputSeed) {
