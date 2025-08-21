@@ -17,12 +17,15 @@ import org.shsts.tinactory.content.AllTags.TOOL_SHEARS
 import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.content.material.OreVariant
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.stoneGenerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolShapeless
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
@@ -48,11 +51,25 @@ object MiscMaterials {
                 200, suffix = "_from_iron")
         }
 
+        // freeze water and air
+        vacuumFreezer {
+            defaults {
+                voltage(Voltage.MV)
+            }
+            output("air", "liquid") {
+                input("air", "gas")
+                workTicks(200)
+            }
+            output("water", "liquid") {
+                input("water", "gas")
+                workTicks(32)
+            }
+        }
+
+        generateStone()
         stone()
         tags()
     }
-
-    private val VANILLA_METHODS = listOf("smelting", "blasting")
 
     private fun blast() {
         blastFurnace {
@@ -112,6 +129,8 @@ object MiscMaterials {
         }
     }
 
+    private val VANILLA_METHODS = listOf("smelting", "blasting")
+
     private fun disableVanilla(name: String, suffix: String = "ingot") {
         val fullName = if (suffix.isEmpty()) name else "${name}_$suffix"
 
@@ -150,6 +169,30 @@ object MiscMaterials {
                     nullRecipe("${fullName}_from_${method}_raw_$name")
                 }
             }
+        }
+    }
+
+    private fun generateStone() {
+        stoneGenerator {
+            for (variant in OreVariant.entries) {
+                output(variant.baseItem) {
+                    if (variant == OreVariant.STONE) {
+                        voltage(Voltage.PRIMITIVE)
+                    } else {
+                        voltage(variant.voltage)
+                    }
+                }
+            }
+            output("water", "liquid") {
+                voltage(Voltage.ULV)
+            }
+        }
+        stoneGenerator {
+            defaults {
+                voltage(Voltage.MV)
+            }
+            output("air", "gas")
+            output("sea_water", "liquid")
         }
     }
 
