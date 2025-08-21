@@ -209,6 +209,28 @@ object RecipeFactories {
         }.block()
     }
 
+    fun steamTurbine(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("steam_turbine") {
+            defaultInputFluid = 0
+            defaultOutputFluid = 1
+            amperage = 1.0
+        }.block()
+    }
+
+    fun gasTurbine(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("gas_turbine") {
+            defaultInputFluid = 0
+            amperage = 1.0
+        }.block()
+    }
+
+    fun combustionGenerator(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("combustion_generator") {
+            defaultInputFluid = 0
+            amperage = 1.0
+        }.block()
+    }
+
     fun blastFurnace(block: BlastFurnaceRecipeFactory.() -> Unit) {
         processing<BlastFurnaceRecipe.Builder>("blast_furnace") {
             fullDefaults()

@@ -89,19 +89,21 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     private fun newItem(sub: String, tag: TagKey<Item>, entry: IEntry<out Item>) {
-        val builder = DATA_GEN.item(material.loc(sub), entry).tag(tag)
-        if (sub.startsWith("tool/")) {
-            builder.model { toolModel(it, sub) }
-        } else if (sub == "wire") {
-            builder.model(Models::wireItem)
-        } else if (sub == "pipe") {
-            builder.model(Models::pipeItem)
-        } else if (sub == "raw") {
-            builder.model { basicItem(it, modLoc("items/material/raw")) }
-        } else {
-            builder.model { icon.itemModel(it, sub) }
+        DATA_GEN.item(material.loc(sub), entry).apply {
+            tag(tag)
+            if (sub.startsWith("tool/")) {
+                model { toolModel(it, sub) }
+            } else if (sub == "wire") {
+                model(Models::wireItem)
+            } else if (sub == "pipe") {
+                model(Models::pipeItem)
+            } else if (sub == "raw") {
+                model { basicItem(it, modLoc("items/material/raw")) }
+            } else {
+                model { icon.itemModel(it, sub) }
+            }
+            build()
         }
-        builder.build()
     }
 
     private fun buildItem(sub: String) {
@@ -133,12 +135,13 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     private fun buildOre() {
         val variant = material.oreVariant()
         val tierTag = variant.mineTier.tag!!
-        DATA_GEN.block(material.blockLoc("ore"), material.blockEntry("ore"))
-            .blockState { oreBlock(it, variant) }
-            .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-            .tag(tierTag)
-            .drop(material.entry("raw"))
-            .build()
+        DATA_GEN.block(material.blockLoc("ore"), material.blockEntry("ore")).apply {
+            blockState { oreBlock(it, variant) }
+            tag(BlockTags.MINEABLE_WITH_PICKAXE)
+            tag(tierTag)
+            drop(material.entry("raw"))
+            build()
+        }
     }
 
     private inner class CraftingBuilder(

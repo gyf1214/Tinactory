@@ -1,18 +1,27 @@
 package org.shsts.tinactory.datagen.content.material
 
+import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
-import org.shsts.tinactory.content.AllItems
 import org.shsts.tinactory.content.AllItems.FERTILIZER
 import org.shsts.tinactory.content.AllItems.RUBBER_LEAVES
 import org.shsts.tinactory.content.AllItems.RUBBER_LOG
 import org.shsts.tinactory.content.AllItems.RUBBER_SAPLING
-import org.shsts.tinactory.content.AllRecipes
+import org.shsts.tinactory.content.AllItems.STICKY_RESIN
+import org.shsts.tinactory.content.AllMaterials.getMaterial
+import org.shsts.tinactory.content.AllRecipes.has
 import org.shsts.tinactory.content.AllTags
+import org.shsts.tinactory.content.AllTags.TOOL_MORTAR
+import org.shsts.tinactory.content.AllTags.TOOL_SAW
+import org.shsts.tinactory.content.AllTags.TOOL_SHEARS
 import org.shsts.tinactory.content.electric.Voltage
-import org.shsts.tinactory.core.util.LocHelper
-import org.shsts.tinactory.datagen.content.RegistryHelper
+import org.shsts.tinactory.content.material.RubberLogBlock
+import org.shsts.tinactory.core.util.LocHelper.gregtech
+import org.shsts.tinactory.core.util.LocHelper.mcLoc
+import org.shsts.tinactory.datagen.content.Models
+import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.alloySmelter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autofarm
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
@@ -20,6 +29,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolShapeless
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 object Woods {
     fun init() {
@@ -32,13 +42,12 @@ object Woods {
         vanilla("crimson")
         vanilla("warped")
 
-        farm(RUBBER_SAPLING.get(), RUBBER_LOG.get(), RUBBER_LEAVES.get(), true)
-
+        rubber()
         misc()
     }
 
     private fun farm(sapling: ItemLike, log: ItemLike, leaves: ItemLike, isRubber: Boolean) {
-        val stickResin = AllItems.STICKY_RESIN.get()
+        val stickResin = STICKY_RESIN.get()
         autofarm {
             defaults {
                 output(log, 6)
@@ -78,8 +87,8 @@ object Woods {
     private fun vanilla(prefix: String) {
         val nether = prefix == "crimson" || prefix == "warped"
 
-        val planks = RegistryHelper.vanillaItem("${prefix}_planks")
-        val logsTag = AllTags.item(LocHelper.mcLoc(prefix + if (nether) "_stems" else "_logs"))
+        val planks = vanillaItem("${prefix}_planks")
+        val logsTag = AllTags.item(mcLoc(prefix + if (nether) "_stems" else "_logs"))
         val wood = prefix + if (nether) "_hyphae" else "_wood"
         val woodStripped = "stripped_$wood"
 
@@ -88,18 +97,18 @@ object Woods {
             nullRecipe(wood, woodStripped)
             shapeless(logsTag, planks, toAmount = 2)
         }
-        toolShapeless(logsTag, planks, AllTags.TOOL_SAW, amount = 4)
+        toolShapeless(logsTag, planks, TOOL_SAW, amount = 4)
 
         // wood components
-        val sign = RegistryHelper.vanillaItem("${prefix}_sign")
-        val pressurePlate = RegistryHelper.vanillaItem("${prefix}_pressure_plate")
-        val button = RegistryHelper.vanillaItem("${prefix}_button")
-        val slab = RegistryHelper.vanillaItem("${prefix}_slab")
+        val sign = vanillaItem("${prefix}_sign")
+        val pressurePlate = vanillaItem("${prefix}_pressure_plate")
+        val button = vanillaItem("${prefix}_button")
+        val slab = vanillaItem("${prefix}_slab")
         vanilla {
             nullRecipe(sign, pressurePlate, button, slab)
         }
-        toolShapeless(planks, slab, AllTags.TOOL_SAW, amount = 2)
-        toolShapeless(pressurePlate, button, AllTags.TOOL_SAW, amount = 4)
+        toolShapeless(planks, slab, TOOL_SAW, amount = 2)
+        toolShapeless(pressurePlate, button, TOOL_SAW, amount = 4)
         cutter {
             defaults {
                 voltage(Voltage.LV)
@@ -123,10 +132,70 @@ object Woods {
 
         // farm
         if (!nether) {
-            val sapling = RegistryHelper.vanillaItem("${prefix}_sapling")
-            val log = RegistryHelper.vanillaItem("${prefix}_log")
-            val leaves = RegistryHelper.vanillaItem("${prefix}_leaves")
+            val sapling = vanillaItem("${prefix}_sapling")
+            val log = vanillaItem("${prefix}_log")
+            val leaves = vanillaItem("${prefix}_leaves")
             farm(sapling, log, leaves, false)
+        }
+    }
+
+    private fun rubber() {
+        DATA_GEN.apply {
+            block(RUBBER_LOG).apply {
+                blockState { ctx ->
+                    ctx.provider().axisBlock(ctx.`object`(),
+                        gregtech("blocks/wood/rubber/log_rubber_side"),
+                        gregtech("blocks/wood/rubber/log_rubber_top"))
+                }
+                tag(listOf(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN))
+                itemTag(listOf(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN))
+                dropSelf()
+                dropOnState(STICKY_RESIN, RubberLogBlock.HAS_RUBBER, true)
+                build()
+            }
+            block(RUBBER_LEAVES).apply {
+                blockState(Models.cubeTint("wood/rubber/leaves_rubber"))
+                tag(BlockTags.LEAVES)
+                itemTag(ItemTags.LEAVES)
+                dropSelfOnTool(TOOL_SHEARS)
+                drop(RUBBER_SAPLING, 0.075f)
+                build()
+            }
+            block(RUBBER_SAPLING).apply {
+                blockState { ctx ->
+                    val provider = ctx.provider()
+                    provider.simpleBlock(ctx.`object`(), provider.models()
+                        .cross(ctx.id(), gregtech("blocks/wood/rubber/sapling_rubber")))
+                }
+                itemModel(Models.basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
+                tag(BlockTags.SAPLINGS)
+                itemTag(ItemTags.SAPLINGS)
+                build()
+            }
+        }
+
+        farm(RUBBER_SAPLING.get(), RUBBER_LOG.get(), RUBBER_LEAVES.get(), true)
+
+        toolShapeless(STICKY_RESIN.get(), getMaterial("raw_rubber").item("dust"), TOOL_MORTAR)
+        extractor {
+            output("raw_rubber", "dust", 3) {
+                input(STICKY_RESIN.get())
+                voltage(Voltage.LV)
+                workTicks(160)
+            }
+            output("raw_rubber", "dust", suffix = "from_log") {
+                input(RUBBER_LOG.get())
+                voltage(Voltage.LV)
+                workTicks(320)
+            }
+        }
+        alloySmelter {
+            output("rubber", "sheet", 3) {
+                input("raw_rubber", "dust", 3)
+                input("sulfur", "dust")
+                voltage(Voltage.ULV)
+                workTicks(300)
+            }
         }
     }
 
@@ -136,14 +205,14 @@ object Woods {
             pattern("#")
             pattern("#")
             define('#', ItemTags.PLANKS)
-            toolTag(AllTags.TOOL_SAW)
+            toolTag(TOOL_SAW)
         }
         vanilla(replace = true) {
             shaped(Items.STICK, 2) {
                 pattern("#")
                 pattern("#")
                 define('#', ItemTags.PLANKS)
-                unlockedBy("has_planks", AllRecipes.has(ItemTags.PLANKS))
+                unlockedBy("has_planks", has(ItemTags.PLANKS))
             }
         }
         lathe {

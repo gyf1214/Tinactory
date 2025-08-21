@@ -7,11 +7,19 @@ import org.shsts.tinactory.content.material.OreVariant
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.stoneGenerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
+import org.shsts.tinactory.datagen.content.material.Crops
+import org.shsts.tinactory.datagen.content.material.Generators
+import org.shsts.tinactory.datagen.content.material.Materials
+import org.shsts.tinactory.datagen.content.material.MiscMaterials
 import org.shsts.tinactory.datagen.content.material.Woods
 
-object RecipesKt {
+object AllDataKt {
     fun init() {
+        Materials.init()
         Woods.init()
+        Crops.init()
+        Generators.init()
+        MiscMaterials.init()
 
         vacuumFreezer {
             defaults {
