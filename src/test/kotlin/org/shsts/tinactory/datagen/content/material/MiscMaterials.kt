@@ -60,7 +60,7 @@ object MiscMaterials {
                 input("air")
                 workTicks(200)
             }
-            output("water", "liquid") {
+            output("water") {
                 input("water", "gas")
                 workTicks(32)
             }
@@ -81,47 +81,47 @@ object MiscMaterials {
                 }
             }
             input("chalcopyrite", amount = 2) {
-                input("oxygen", "gas", 9)
+                input("oxygen", amount = 9)
                 output("iron", "ingot", 3)
                 output("copper", "ingot", 3)
                 output("sulfuric_acid", "gas", 6)
             }
             input("pyrite", amount = 2) {
-                input("oxygen", "gas", 4.5)
+                input("oxygen", amount = 4.5)
                 output("iron", "ingot", 3)
                 output("sulfuric_acid", "gas", 3)
             }
-            input("limonite", "dust", 8) {
-                input("carbon", "dust", 9)
+            input("limonite", amount = 8) {
+                input("carbon", amount = 9)
                 output("iron", "ingot", 12)
-                output("carbon_dioxide", "gas", 9)
+                output("carbon_dioxide", amount = 9)
                 workTicks(1600)
             }
-            input("banded_iron", "dust", 8) {
-                input("carbon", "dust", 9)
+            input("banded_iron", amount = 8) {
+                input("carbon", amount = 9)
                 output("iron", "ingot", 12)
-                output("carbon_dioxide", "gas", 9)
+                output("carbon_dioxide", amount = 9)
                 workTicks(1600)
             }
-            input("garnierite", "dust", 4) {
-                input("carbon", "dust", 3)
+            input("garnierite", amount = 4) {
+                input("carbon", amount = 3)
                 output("nickel", "ingot", 6)
-                output("carbon_dioxide", "gas", 3)
+                output("carbon_dioxide", amount = 3)
                 workTicks(800)
             }
-            input("cassiterite", "dust", 2) {
-                input("carbon", "dust", 3)
+            input("cassiterite", amount = 2) {
+                input("carbon", amount = 3)
                 output("tin", "ingot", 3)
-                output("carbon_dioxide", "gas", 3)
+                output("carbon_dioxide", amount = 3)
             }
-            input("galena", "dust", 2) {
-                input("oxygen", "gas", 4.5)
+            input("galena", amount = 2) {
+                input("oxygen", amount = 4.5)
                 output("lead", "ingot", 3)
                 output("antimony", "ingot", 1)
                 output("sulfuric_acid", "gas", 3)
             }
-            input("sphalerite", "dust", 2) {
-                input("oxygen", "gas", 4.5)
+            input("sphalerite", amount = 2) {
+                input("oxygen", amount = 4.5)
                 output("zinc", "ingot", 3)
                 output("silver", "ingot", 1)
                 output("sulfuric_acid", "gas", 3)
@@ -183,7 +183,7 @@ object MiscMaterials {
                     }
                 }
             }
-            output("water", "liquid") {
+            output("water") {
                 voltage(Voltage.ULV)
             }
         }
@@ -191,8 +191,8 @@ object MiscMaterials {
             defaults {
                 voltage(Voltage.MV)
             }
-            output("air", "gas")
-            output("sea_water", "liquid")
+            output("air")
+            output("sea_water")
         }
     }
 

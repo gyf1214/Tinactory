@@ -490,11 +490,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         fun component(mat: MaterialSet, amount: Number = 1, sub: String? = null) {
-            val sub1 = sub ?: if (mat.hasItem("dust")) "dust" else "fluid"
             if (decompose) {
-                builder.output(mat, sub1, amount)
+                sub?.let { builder.output(mat, it, amount) } ?: builder.output(mat, amount = amount)
             } else {
-                builder.input(mat, sub1, amount)
+                sub?.let { builder.input(mat, it, amount) } ?: builder.input(mat, amount = amount)
             }
             inAmount += amount.toFloat()
         }
@@ -532,6 +531,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     fun centrifuge(voltage: Voltage,
         block: ComposeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
         centrifuge {
+            defaultItemSub = "dust"
             compose("dust", voltage, 60, true, block = block)
         }
     }

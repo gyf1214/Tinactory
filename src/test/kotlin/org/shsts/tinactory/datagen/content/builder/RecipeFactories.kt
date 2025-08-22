@@ -138,14 +138,20 @@ object RecipeFactories {
             defaultOutputItem = 1
             defaultOutputFluid = 2
             amperage = 0.5
-        }.block()
+        }.apply {
+            defaultItemSub = "dust"
+            block()
+        }
     }
 
     fun mixer(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("mixer") {
             fullDefaults()
             amperage = 0.5
-        }.block()
+        }.apply {
+            defaultItemSub = "dust"
+            block()
+        }
     }
 
     fun polarizer(block: ProcessingRecipeFactory.() -> Unit) {

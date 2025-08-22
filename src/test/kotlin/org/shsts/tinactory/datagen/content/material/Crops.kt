@@ -73,7 +73,7 @@ object Crops {
 
         extractor {
             input(Tags.Items.MUSHROOMS, 6) {
-                output("biomass", "fluid", 0.1)
+                output("biomass", amount = 0.1)
                 voltage(Voltage.MV)
                 workTicks(96)
             }
@@ -90,7 +90,7 @@ object Crops {
                 voltage(Voltage.LV)
             }
             input(seed) {
-                input("biomass", "fluid", 0.5)
+                input("biomass", amount = 0.5)
                 workTicks(800)
             }
             input(seed, suffix = "_with_bone_meal") {
@@ -126,7 +126,7 @@ object Crops {
     private fun toBiomass(crop: Item, amount: Int, outAmount: Double, workTicks: Long) {
         extractor {
             input(crop, amount) {
-                output("biomass", "fluid", outAmount)
+                output("biomass", amount = outAmount)
                 voltage(Voltage.MV)
                 workTicks(workTicks)
             }

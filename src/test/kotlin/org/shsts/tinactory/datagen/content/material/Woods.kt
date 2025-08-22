@@ -58,7 +58,7 @@ object Woods {
                 voltage(Voltage.LV)
             }
             input(sapling) {
-                input("biomass", "fluid")
+                input("biomass")
                 workTicks(1600)
             }
             input(sapling, suffix = "_with_bone_meal") {
@@ -191,8 +191,8 @@ object Woods {
         }
         alloySmelter {
             output("rubber", "sheet", 3) {
-                input("raw_rubber", "dust", 3)
-                input("sulfur", "dust")
+                input("raw_rubber", amount = 3)
+                input("sulfur")
                 voltage(Voltage.ULV)
                 workTicks(300)
             }
@@ -229,11 +229,11 @@ object Woods {
                 voltage(Voltage.MV)
             }
             input(ItemTags.LEAVES, 16) {
-                output("biomass", "fluid", 0.3)
+                output("biomass", amount = 0.3)
                 workTicks(128)
             }
             input(ItemTags.SAPLINGS, 16) {
-                output("biomass", "fluid", 0.1)
+                output("biomass", amount = 0.1)
                 workTicks(64)
             }
         }
