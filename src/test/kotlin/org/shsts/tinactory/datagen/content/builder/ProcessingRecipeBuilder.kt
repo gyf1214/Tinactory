@@ -20,8 +20,8 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
     var defaultInputFluid: Int? = null
     var defaultOutputItem: Int? = null
     var defaultOutputFluid: Int? = null
-    var defaultItemSub: String = "dust"
-    var defaultFluidSub: String = "fluid"
+    var defaultItemSub: String? = null
+    var defaultFluidSub = "fluid"
 
     fun defaults(inputItem: Int, inputFluid: Int, outputItem: Int, outputFluid: Int) {
         defaultInputItem = inputItem
@@ -39,13 +39,8 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
         defaultOutputItem = 1
     }
 
-    private fun defaultSub(material: MaterialSet): String {
-        if (material.hasItem(defaultItemSub)) {
-            return defaultItemSub
-        } else {
-            return defaultFluidSub
-        }
-    }
+    private fun defaultSub(mat: MaterialSet) =
+        defaultItemSub?.takeIf { mat.hasItem(it) } ?: defaultFluidSub
 
     private fun defaultSub(name: String) = defaultSub(getMaterial(name))
 

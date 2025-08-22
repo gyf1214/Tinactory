@@ -235,7 +235,10 @@ object RecipeFactories {
         processing<BlastFurnaceRecipe.Builder>("blast_furnace") {
             fullDefaults()
             amperage = 4.0
-        }.block()
+        }.apply {
+            defaultItemSub = "dust"
+            block()
+        }
     }
 
     fun vacuumFreezer(block: ProcessingRecipeFactory.() -> Unit) {

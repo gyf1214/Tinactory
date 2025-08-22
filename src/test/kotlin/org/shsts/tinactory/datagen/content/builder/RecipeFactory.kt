@@ -16,18 +16,25 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
     private val defaults: RB.() -> Unit = {}) {
 
     private var userDefaults: RB.() -> Unit = {}
+    var defaultItemSub: String? = null
+    var defaultFluidSub = "fluid"
 
-    companion object {
-        fun matLoc(mat: MaterialSet, sub: String, suffix: String = ""): ResourceLocation {
-            val loc = if (mat.hasFluid(sub)) mat.fluidLoc(sub) else mat.loc(sub)
-            return suffix(loc, suffix)
-        }
+    private fun defaultSub(mat: MaterialSet) =
+        defaultItemSub?.takeIf { mat.hasItem(it) } ?: defaultFluidSub
+
+    private fun defaultSub(name: String) = defaultSub(getMaterial(name))
+
+    private fun matLoc(mat: MaterialSet, sub: String, suffix: String = ""): ResourceLocation {
+        val loc = if (mat.hasFluid(sub)) mat.fluidLoc(sub) else mat.loc(sub)
+        return suffix(loc, suffix)
     }
 
     private fun apply(inner: B, block: RB.() -> Unit) {
         factory(inner).apply {
             defaults()
             userDefaults()
+            defaultItemSub = this@RecipeFactory.defaultItemSub
+            defaultFluidSub = this@RecipeFactory.defaultFluidSub
             block()
             build()
         }
@@ -35,6 +42,11 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
 
     fun recipe(loc: ResourceLocation, block: RB.() -> Unit) {
         apply(recipeType.recipe(DATA_GEN, loc), block)
+    }
+
+    fun recipe(mat: MaterialSet, sub: String = defaultSub(mat),
+        suffix: String = "", block: RB.() -> Unit) {
+        recipe(matLoc(mat, sub, suffix), block)
     }
 
     fun defaults(value: RB.() -> Unit) {
@@ -57,7 +69,7 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         }
     }
 
-    fun input(mat: MaterialSet, sub: String, amount: Number = 1,
+    fun input(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1,
         suffix: String = "", block: RB.() -> Unit = {}) {
         recipe(matLoc(mat, sub, suffix)) {
             input(mat, sub, amount)
@@ -65,7 +77,7 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         }
     }
 
-    fun input(name: String, sub: String, amount: Number = 1,
+    fun input(name: String, sub: String = defaultSub(name), amount: Number = 1,
         suffix: String = "", block: RB.() -> Unit = {}) {
         input(getMaterial(name), sub, amount, suffix, block)
     }
@@ -78,7 +90,7 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         }
     }
 
-    fun output(mat: MaterialSet, sub: String, amount: Number = 1,
+    fun output(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1,
         suffix: String = "", rate: Double = 1.0, block: RB.() -> Unit = {}) {
         recipe(matLoc(mat, sub, suffix)) {
             output(mat, sub, amount, rate = rate)
@@ -86,7 +98,7 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         }
     }
 
-    fun output(name: String, sub: String, amount: Number = 1,
+    fun output(name: String, sub: String = defaultSub(name), amount: Number = 1,
         suffix: String = "", rate: Double = 1.0, block: RB.() -> Unit = {}) {
         output(getMaterial(name), sub, amount, suffix, rate, block)
     }

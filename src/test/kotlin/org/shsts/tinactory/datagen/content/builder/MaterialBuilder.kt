@@ -50,7 +50,6 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
-import org.shsts.tinactory.datagen.content.builder.RecipeFactory.Companion.matLoc
 import org.shsts.tinactory.datagen.content.model.IconSet
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 import org.shsts.tinycorelib.api.registrate.entry.IEntry
@@ -509,7 +508,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         fun build(block: ComposeBuilder<B>.() -> Unit) {
-            factory.recipe(matLoc(material, sub, suffix)) {
+            factory.recipe(material, sub, suffix) {
                 _builder = this
                 block()
                 val amount = outAmount ?: inAmount

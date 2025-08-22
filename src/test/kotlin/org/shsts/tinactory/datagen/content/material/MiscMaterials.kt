@@ -80,13 +80,13 @@ object MiscMaterials {
                     temperature(2000)
                 }
             }
-            input("chalcopyrite", "dust", 2) {
+            input("chalcopyrite", amount = 2) {
                 input("oxygen", "gas", 9)
                 output("iron", "ingot", 3)
                 output("copper", "ingot", 3)
                 output("sulfuric_acid", "gas", 6)
             }
-            input("pyrite", "dust", 2) {
+            input("pyrite", amount = 2) {
                 input("oxygen", "gas", 4.5)
                 output("iron", "ingot", 3)
                 output("sulfuric_acid", "gas", 3)
