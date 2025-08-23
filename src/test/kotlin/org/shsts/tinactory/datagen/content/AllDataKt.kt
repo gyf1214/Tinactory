@@ -16,6 +16,7 @@ import org.shsts.tinactory.datagen.content.material.Woods
 
 object AllDataKt {
     fun init() {
+        Technologies.init()
         Materials.init()
         Woods.init()
         Crops.init()

@@ -124,5 +124,6 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
         if (requirePower || power != null) {
             builder.power(power!!)
         }
+        builder.build()
     }
 }

@@ -14,7 +14,6 @@ public final class AllData {
     public static void init() {
         DATA_GEN.addProvider(LanguageDataProvider::new);
         Models.init();
-        Technologies.init();
         AllDataKt.INSTANCE.init();
         Components.init();
         Machines.init();

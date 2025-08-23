@@ -28,7 +28,7 @@ object Markers {
                 input(AllMaterials.tag("crushed_purified"), port = 0)
             }
             for (variant in OreVariant.entries) {
-                recipe("analyze_${variant.name}") {
+                recipe("analyze_${variant.name.lowercase()}") {
                     baseType("ore_analyzer")
                     input(variant.baseItem, port = 0)
                     voltage(variant.voltage)

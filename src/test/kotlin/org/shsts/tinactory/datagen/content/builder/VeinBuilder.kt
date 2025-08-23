@@ -52,7 +52,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         assert(rate > 0)
         assert(ores.isNotEmpty())
 
-        val baseTech = BASE_ORE[variant1]
+        val baseTech = BASE_ORE.getValue(variant1)
         val tech = if (baseOre || primitive) {
             baseTech
         } else {
