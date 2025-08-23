@@ -267,8 +267,8 @@ object Materials {
         material("sodium_hydroxide", DULL)
         material("calcium_hydroxide", DULL)
         material("sulfuric_acid", DULL) {
-            fluidMix(Voltage.MV) {
-                component("sulfuric_acid", sub = "dilute")
+            fluidMix(Voltage.MV, sub = "dilute") {
+                component("sulfuric_acid")
                 component("water")
             }
         }

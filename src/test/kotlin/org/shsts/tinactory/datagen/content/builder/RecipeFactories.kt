@@ -139,7 +139,7 @@ object RecipeFactories {
             defaultInputItem = 0
             defaultOutputItem = 1
             defaultOutputFluid = 2
-            amperage = 0.5
+            amperage = 0.75
         }.apply {
             defaultItemSub = "dust"
             block()
@@ -305,7 +305,7 @@ object RecipeFactories {
         simpleProcessing("autofarm") {
             defaultInputItem = 0
             defaultInputFluid = 1
-            defaultOutputItem = 2
+            defaultOutputItem = 3
             amperage = 0.25
         }.block()
     }

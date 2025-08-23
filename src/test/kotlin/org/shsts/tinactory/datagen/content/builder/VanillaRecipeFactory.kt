@@ -32,22 +32,25 @@ class VanillaRecipeFactory(private val replace: Boolean) {
     }
 
     fun shapeless(from: ItemLike, to: ItemLike, fromAmount: Int = 1, toAmount: Int = 1,
-        suffix: String = "") {
+        suffix: String = "", block: ShapelessRecipeBuilder.() -> Unit = {}) {
         build(suffix) {
             ShapelessRecipeBuilder
                 .shapeless(to, toAmount)
                 .requires(from, fromAmount)
                 .unlockedBy("has_ingredient", has(from))
+                .also(block)
         }
     }
 
     fun shapeless(from: TagKey<Item>, to: ItemLike, fromAmount: Int = 1, toAmount: Int = 1,
-        suffix: String = "") {
+        suffix: String = "", criteria: String = "has_ingredient",
+        block: ShapelessRecipeBuilder.() -> Unit = {}) {
         build(suffix) {
             ShapelessRecipeBuilder
                 .shapeless(to, toAmount)
                 .requires(Ingredient.of(from), fromAmount)
-                .unlockedBy("has_ingredient", has(from))
+                .unlockedBy(criteria, has(from))
+                .also(block)
         }
     }
 

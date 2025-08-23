@@ -12,6 +12,7 @@ import org.shsts.tinactory.content.AllItems.STICKY_RESIN
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllRecipes.has
 import org.shsts.tinactory.content.AllTags
+import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.AllTags.TOOL_MORTAR
 import org.shsts.tinactory.content.AllTags.TOOL_SAW
 import org.shsts.tinactory.content.AllTags.TOOL_SHEARS
@@ -21,7 +22,9 @@ import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
+import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.alloySmelter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autofarm
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
@@ -96,7 +99,9 @@ object Woods {
         // logs to planks
         vanilla(replace = true) {
             nullRecipe(wood, woodStripped)
-            shapeless(logsTag, planks, toAmount = 2)
+            shapeless(logsTag, planks, toAmount = 2, criteria = "has_logs") {
+                group("planks")
+            }
         }
         toolShapeless(logsTag, planks, TOOL_SAW, amount = 4)
 
@@ -107,6 +112,23 @@ object Woods {
         val slab = vanillaItem("${prefix}_slab")
         vanilla {
             nullRecipe(sign, pressurePlate, button, slab)
+        }
+        assembler {
+            defaults {
+                voltage(Voltage.ULV)
+                tech(Technologies.SOLDERING)
+            }
+            output(sign) {
+                input(planks)
+                input(TOOL_HANDLE)
+                workTicks(64)
+            }
+            output(pressurePlate) {
+                input(slab)
+                input("iron", "ring")
+                input("redstone", "dust")
+                workTicks(128)
+            }
         }
         toolShapeless(planks, slab, TOOL_SAW, amount = 2)
         toolShapeless(pressurePlate, button, TOOL_SAW, amount = 4)
@@ -184,7 +206,7 @@ object Woods {
                 voltage(Voltage.LV)
                 workTicks(160)
             }
-            output("raw_rubber", "dust", suffix = "from_log") {
+            output("raw_rubber", "dust", suffix = "_from_log") {
                 input(RUBBER_LOG.get())
                 voltage(Voltage.LV)
                 workTicks(320)
@@ -227,7 +249,7 @@ object Woods {
         // to biomass
         extractor {
             defaults {
-                voltage(Voltage.MV)
+                voltage(Voltage.LV)
             }
             input(ItemTags.LEAVES, 16) {
                 output("biomass", amount = 0.3)

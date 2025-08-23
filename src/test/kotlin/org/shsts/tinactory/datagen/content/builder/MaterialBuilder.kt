@@ -185,7 +185,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     for ((i, input) in inputs.withIndex()) {
                         define('A' + i, input)
                     }
-                    unlockedBy("has_material", has(inputs[0]))
+                    unlockedBy("has_ingredient", has(inputs[0]))
                 }
             }
         }
@@ -223,6 +223,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     private fun crafting(result: String, input: String, tool: TagKey<Item>, amount: Int = 1) {
         crafting(result, amount) {
+            pattern("A")
             input(input)
             tool(tool)
         }
@@ -390,7 +391,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 process("rotor", "ring", 160) {
                     input(material, "plate", 4)
                 }
-                process("pipe", "ring", 120, inputAmount = 3)
+                process("pipe", "plate", 120, inputAmount = 3)
             }
             assembler {
                 process("gem_exquisite", "gem_flawless", 400) {
@@ -516,7 +517,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 } else {
                     output(material, sub, amount)
                 }
-                workTicks((workTicks * inAmount).toLong())
+                workTicks((workTicks * amount).toLong())
                 voltage(voltage)
             }
         }

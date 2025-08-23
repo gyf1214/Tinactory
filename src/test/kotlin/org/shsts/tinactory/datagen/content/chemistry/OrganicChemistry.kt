@@ -39,7 +39,7 @@ object OrganicChemistry {
                 input(Items.DIRT)
                 input("carbon")
             }
-            output(Items.COARSE_DIRT) {
+            output(Items.COARSE_DIRT, 2) {
                 input(Items.DIRT)
                 input(Items.GRAVEL)
             }

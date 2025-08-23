@@ -74,13 +74,13 @@ object Crops {
         extractor {
             input(Tags.Items.MUSHROOMS, 6) {
                 output("biomass", amount = 0.1)
-                voltage(Voltage.MV)
+                voltage(Voltage.LV)
                 workTicks(96)
             }
         }
     }
 
-    private fun farm(crop: ItemLike, seed: ItemLike = crop, outputSeed: Boolean = true) {
+    private fun farm(crop: ItemLike, seed: ItemLike = crop, outputSeed: Boolean = false) {
         autofarm {
             defaults {
                 output(crop, if (crop == seed) 3 else 1)
@@ -127,7 +127,7 @@ object Crops {
         extractor {
             input(crop, amount) {
                 output("biomass", amount = outAmount)
-                voltage(Voltage.MV)
+                voltage(Voltage.LV)
                 workTicks(workTicks)
             }
         }

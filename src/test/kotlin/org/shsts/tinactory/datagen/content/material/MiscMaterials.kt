@@ -230,7 +230,7 @@ object MiscMaterials {
                 input(Items.GRAVEL)
                 workTicks(64)
             }
-            output(Items.SAND, suffix = "_from_sandstone") {
+            output(Items.SAND, 4, suffix = "_from_sandstone") {
                 input(Items.SANDSTONE)
                 workTicks(240)
             }

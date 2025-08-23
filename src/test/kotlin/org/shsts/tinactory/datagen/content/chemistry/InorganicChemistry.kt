@@ -28,8 +28,8 @@ object InorganicChemistry {
             input("sea_water", amount = 10) {
                 output("sodium_chloride", amount = 5)
                 output("potassium_chloride")
-                output("magnesium_chloride", amount = 0.5)
-                output("calcium_chloride", amount = 0.2)
+                output("magnesium_chloride", rate = 0.5)
+                output("calcium_chloride", rate = 0.2)
                 output("water", "gas", 6.4)
                 output("lithium_brine", amount = 0.1)
                 workTicks(2000)
