@@ -235,5 +235,98 @@ object InorganicChemistry {
                 workTicks(160)
             }
         }
+
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.HV)
+                tech(Technologies.HYDROMETALLURGY)
+            }
+            input("ruby", amount = 2) {
+                input("hydrogen_chloride", amount = 2)
+                input("sodium_hydroxide", amount = 2)
+                output("aluminium_oxide", amount = 2)
+                output("salt_water", amount = 4)
+                output("chrome")
+                workTicks(320)
+            }
+            input("sapphire") {
+                input("hydrogen_chloride")
+                input("sodium_hydroxide")
+                output("aluminium_oxide")
+                output("salt_water", amount = 2)
+                workTicks(160)
+            }
+            input("topaz", amount = 2) {
+                input("hydrogen_chloride", amount = 6)
+                input("sodium_hydroxide", amount = 6)
+                output("aluminium_oxide", amount = 2)
+                output("silicon_dioxide")
+                output("salt_water", amount = 12)
+                output("hydrogen_fluoride", amount = 2)
+                workTicks(480)
+            }
+            input("blue_topaz", amount = 2) {
+                input("hydrogen_chloride", amount = 6)
+                input("sodium_hydroxide", amount = 6)
+                output("aluminium_oxide", amount = 2)
+                output("silicon_dioxide")
+                output("salt_water", amount = 12)
+                output("hydrogen_fluoride", amount = 1)
+                workTicks(480)
+            }
+        }
+
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.HV)
+                tech(Technologies.ADVANCED_CHEMISTRY)
+            }
+            output("ammonia") {
+                input("nitrogen", amount = 0.5)
+                input("hydrogen", amount = 1.5)
+                input("iron", "dust_tiny", 1)
+                workTicks(512)
+            }
+            output("sulfuric_acid", suffix = "_from_hydrogen_sulfide") {
+                input("hydrogen_sulfide")
+                input("oxygen", amount = 2)
+                requireMultiblock()
+                workTicks(160)
+            }
+            output("sulfuric_acid", suffix = "_from_sulfur") {
+                input("sulfur")
+                input("water")
+                input("oxygen", amount = 1.5)
+                requireMultiblock()
+                workTicks(240)
+            }
+            output("sodium_carbonate", suffix = "_from_salt_water") {
+                input("salt_water", amount = 2)
+                input("ammonia")
+                input("carbon_dioxide")
+                output("ammonium_chloride")
+                workTicks(160)
+            }
+            output("nitric_acid") {
+                input("ammonia")
+                input("oxygen", amount = 2)
+                output("water")
+                requireMultiblock()
+                workTicks(256)
+            }
+            output("lithium_carbonate") {
+                input("lithium_brine", amount = 4)
+                input("sodium_carbonate")
+                output("salt_water", amount = 4)
+                workTicks(128)
+            }
+            output("titanium_tetrachloride") {
+                input("rutile")
+                input("chlorine", amount = 2)
+                input("carbon")
+                output("carbon_dioxide")
+                workTicks(320)
+            }
+        }
     }
 }
