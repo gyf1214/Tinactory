@@ -260,7 +260,7 @@ public final class Materials {
             .unlockedBy("has_planks", has(ItemTags.PLANKS)));
         LATHE.recipe(DATA_GEN, Items.STICK)
             .inputItem(ItemTags.PLANKS, 1)
-            .outputItem(() -> Items.STICK, 1)
+            .outputItem(() -> Items.STICK, 2)
             .voltage(Voltage.LV)
             .workTicks(32)
             .build();
@@ -756,12 +756,12 @@ public final class Materials {
             .inputItem(Tags.Items.MUSHROOMS, 6)
             .outputFluid(BIOMASS.fluid(), BIOMASS.fluidAmount(0.1f))
             .workTicks(96)
-            .voltage(Voltage.MV)
+            .voltage(Voltage.LV)
             .build();
     }
 
     private static void crop(Item crop, Item seed, boolean outputSeed) {
-        var loc = crop.getRegistryName();
+        var loc = seed.getRegistryName();
         assert loc != null;
         AUTOFARM.recipe(DATA_GEN, loc)
             .inputItem(() -> seed, 1)
@@ -809,7 +809,7 @@ public final class Materials {
     }
 
     private static void cropToSeed(Item crop, Item seed, int amount, long workTicks) {
-        MACERATOR.recipe(DATA_GEN, crop)
+        MACERATOR.recipe(DATA_GEN, seed)
             .inputItem(() -> crop, 1)
             .outputItem(() -> seed, amount)
             .voltage(Voltage.LV)
@@ -842,7 +842,7 @@ public final class Materials {
         // smelt wrought iron nugget
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(IRON.tag("nugget")), WROUGHT_IRON.item("nugget"), 0, 200)
-            .unlockedBy("has_material", has(IRON.tag("nugget"))), "_from_iron");
+            .unlockedBy("has_ingredient", has(IRON.tag("nugget"))), "_from_iron");
 
         // stone -> gravel
         TOOL_CRAFTING.recipe(DATA_GEN, Items.GRAVEL)
@@ -877,7 +877,7 @@ public final class Materials {
         // rubber
         TOOL_CRAFTING.recipe(DATA_GEN, RAW_RUBBER.loc("dust"))
             .result(RAW_RUBBER.entry("dust"), 1)
-            .pattern("A").define('A', STICKY_RESIN)
+            .pattern("#").define('#', STICKY_RESIN)
             .toolTag(TOOL_MORTAR)
             .build();
 
@@ -1033,8 +1033,8 @@ public final class Materials {
         // saw plank
         TOOL_CRAFTING.recipe(DATA_GEN, planks)
             .result(planks, 4)
-            .pattern("X")
-            .define('X', logsTag)
+            .pattern("#")
+            .define('#', logsTag)
             .toolTag(TOOL_SAW)
             .build();
 
@@ -1060,7 +1060,7 @@ public final class Materials {
             .nullRecipe(slab.loc());
 
         TOOL_CRAFTING.recipe(DATA_GEN, slab)
-            .result(slab, 1)
+            .result(slab, 2)
             .pattern("#")
             .define('#', planks)
             .toolTag(TOOL_SAW)

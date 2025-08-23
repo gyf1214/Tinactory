@@ -275,7 +275,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             }
             var fluid = material.fluid();
 
-            EXTRACTOR.recipe(DATA_GEN, suffix(material.fluidLoc(), "_from_" + sub))
+            EXTRACTOR.recipe(DATA_GEN, material.loc(sub))
                 .outputFluid(fluid, material.fluidAmount(amount))
                 .inputItem(material.tag(sub), 1)
                 .voltage(v)
@@ -331,7 +331,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                     .outputItem(material.entry(target), outCount)
                     .inputItem(material.tag(sub), inCount)
                     .voltage(v)
-                    .workTicks(ticks(96L))
+                    .workTicks(ticks(96L * inCount))
                     .build();
             }
         }
@@ -366,7 +366,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                     .inputItem(material.tag("stick"), 1)
                     .inputFluid(WATER.fluid(), WATER.fluidAmount(0.05f))
                     .voltage(voltage)
-                    .workTicks(64L)
+                    .workTicks(ticks(64L))
                     .build();
             }
 
@@ -376,12 +376,12 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
                     .inputItem(material.tag("gem_flawless"), 1)
                     .inputFluid(WATER.fluid(), WATER.fluidAmount(0.8f))
                     .voltage(voltage)
-                    .workTicks(480L)
+                    .workTicks(ticks(480L))
                     .build();
             }
 
             assemble("gear", 128L, true, "plate", "stick", 2);
-            assemble("rotor", 160L, true, "plate", 4, "ring", 1);
+            assemble("rotor", 160L, true, "ring", 1, "plate", 4);
             assemble("pipe", 120L, true, "plate", 3);
             assemble("gem_exquisite", 400L, false, "gem_flawless", "gem", 4, "dust", 4);
 
@@ -415,7 +415,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
     public MaterialBuilder<P> smelt(MaterialSet to, String sub) {
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(material.tag("dust")), to.item(sub), 0, 200)
-            .unlockedBy("has_material", has(material.tag("dust"))), "_from_" + material.name);
+            .unlockedBy("has_ingredient", has(material.tag("dust"))), "_from_" + material.name);
         return this;
     }
 
@@ -530,7 +530,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             }
         }
 
-        builder.workTicks(workTicks * totalCount).build();
+        builder.workTicks(workTicks * alloyCount).build();
         return this;
     }
 
@@ -685,7 +685,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         if (unlock == null) {
             throw new IllegalArgumentException();
         }
-        return builder.unlockedBy("has_material", has(unlock));
+        return builder.unlockedBy("has_ingredient", has(unlock));
     }
 
     @SuppressWarnings("unchecked")
@@ -747,7 +747,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         }
         DATA_GEN.vanillaRecipe(() -> SimpleCookingRecipeBuilder
             .smelting(Ingredient.of(material.tag(input)), material.item(output), 0, 200)
-            .unlockedBy("has_material", has(material.tag(input))));
+            .unlockedBy("has_ingredient", has(material.tag(input))));
     }
 
     private void toolRecipe(String sub, String pattern, Object... args) {
@@ -794,7 +794,7 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
         }
 
         private void crush(String output, String input) {
-            MACERATOR.recipe(DATA_GEN, suffix(material.loc(output), "_from_centrifuged"))
+            MACERATOR.recipe(DATA_GEN, material.loc(output))
                 .inputItem(material.tag(input), 1)
                 .outputItem(material.entry(output), input.equals("raw") ? 2 * amount : 1)
                 .voltage(Voltage.LV)
@@ -804,8 +804,8 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
 
         private void wash(String output, String input) {
             var loc = material.loc(output);
-            if (input.equals("dust_pure")) {
-                loc = suffix(loc, "_from_pure");
+            if (input.equals("dust_impure")) {
+                loc = suffix(loc, "_from_impure");
             }
             var builder = ORE_WASHER.recipe(DATA_GEN, loc)
                 .inputItem(material.tag(input), 1)
@@ -914,11 +914,11 @@ public class MaterialBuilder<P> extends Builder<Unit, P, MaterialBuilder<P>> {
             DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(material.item("dust_tiny"), 9)
                 .requires(material.tag("dust"))
-                .unlockedBy("has_dust", has(material.tag("dust"))));
+                .unlockedBy("has_ingredient", has(material.tag("dust"))));
             DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
                 .shapeless(material.item("dust"))
                 .requires(Ingredient.of(material.tag("dust_tiny")), 9)
-                .unlockedBy("has_dust_small", has(material.tag("dust_tiny"))));
+                .unlockedBy("has_ingredient", has(material.tag("dust_tiny"))));
         }
         toolRecipes();
 
