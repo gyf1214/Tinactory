@@ -2,12 +2,19 @@ package org.shsts.tinactory.datagen.content.chemistry
 
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.electrolyzer
 
 object InorganicChemistry {
     fun init() {
+        mv()
+        hv()
+    }
+
+    private fun mv() {
         distillation {
             defaults {
                 voltage(Voltage.MV)
@@ -235,6 +242,55 @@ object InorganicChemistry {
                 workTicks(160)
             }
         }
+    }
+
+    private fun hv() {
+        electrolyzer {
+            defaults {
+                voltage(Voltage.HV)
+            }
+            input("sodium_chloride") {
+                output("sodium")
+                output("chlorine", amount = 0.5)
+                workTicks(400)
+            }
+            input("potassium_chloride") {
+                output("potassium")
+                output("chlorine", amount = 0.5)
+                workTicks(480)
+            }
+            input("magnesium_chloride") {
+                output("magnesium")
+                output("chlorine")
+                workTicks(320)
+            }
+            input("calcium_chloride") {
+                output("calcium")
+                output("chlorine")
+                workTicks(320)
+            }
+            input("lithium_chloride") {
+                output("lithium")
+                output("chlorine", amount = 0.5)
+                workTicks(400)
+            }
+        }
+
+        arcFurnace {
+            defaults {
+                voltage(Voltage.HV)
+            }
+            output("wrought_iron") {
+                input("iron")
+                input("oxygen", amount = 0.05)
+                workTicks(64)
+            }
+            output("annealed_copper") {
+                input("copper")
+                input("oxygen", amount = 0.075)
+                workTicks(96)
+            }
+        }
 
         chemicalReactor {
             defaults {
@@ -326,6 +382,19 @@ object InorganicChemistry {
                 input("carbon")
                 output("carbon_dioxide")
                 workTicks(320)
+            }
+        }
+
+        blastFurnace {
+            output("titanium", "ingot_hot", suffix = "_from_titanium_tetrachloride") {
+                input("magnesium", amount = 2)
+                input("titanium_tetrachloride")
+                output("magnesium_chloride", amount = 2)
+                voltage(Voltage.HV)
+                workTicks(800)
+                extra {
+                    temperature(2300)
+                }
             }
         }
     }

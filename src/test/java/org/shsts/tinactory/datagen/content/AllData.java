@@ -16,7 +16,6 @@ public final class AllData {
         Models.init();
         Technologies.init();
         AllDataKt.INSTANCE.init();
-        Chemistry.init();
         Components.init();
         Machines.init();
         Veins.init();

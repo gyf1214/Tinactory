@@ -32,9 +32,9 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
     private fun apply(inner: B, block: RB.() -> Unit) {
         factory(inner).apply {
             defaults()
-            userDefaults()
             defaultItemSub = this@RecipeFactory.defaultItemSub
             defaultFluidSub = this@RecipeFactory.defaultFluidSub
+            userDefaults()
             block()
             build()
         }

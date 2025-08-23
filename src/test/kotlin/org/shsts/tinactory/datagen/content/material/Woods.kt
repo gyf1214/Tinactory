@@ -26,6 +26,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autofarm
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.pyrolyseOven
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolShapeless
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
@@ -235,6 +236,22 @@ object Woods {
             input(ItemTags.SAPLINGS, 16) {
                 output("biomass", amount = 0.1)
                 workTicks(64)
+            }
+        }
+
+        // charcoal
+        pyrolyseOven {
+            defaults {
+                voltage(Voltage.LV)
+                input(ItemTags.LOGS_THAT_BURN, 16)
+                output("creosote_oil", amount = 4)
+            }
+            output("charcoal", amount = 16) {
+                workTicks(1280)
+            }
+            output("charcoal", amount = 16, suffix = "_with_nitrogen") {
+                input("nitrogen", amount = 4)
+                workTicks(320)
             }
         }
     }
