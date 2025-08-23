@@ -29,7 +29,7 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
         return suffix(loc, suffix)
     }
 
-    private fun apply(inner: B, block: RB.() -> Unit) {
+    private fun build(inner: B, block: RB.() -> Unit) {
         factory(inner).apply {
             defaults()
             defaultItemSub = this@RecipeFactory.defaultItemSub
@@ -41,7 +41,11 @@ class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecip
     }
 
     fun recipe(loc: ResourceLocation, block: RB.() -> Unit) {
-        apply(recipeType.recipe(DATA_GEN, loc), block)
+        build(recipeType.recipe(DATA_GEN, loc), block)
+    }
+
+    fun recipe(id: String, block: RB.() -> Unit) {
+        build(recipeType.recipe(DATA_GEN, id), block)
     }
 
     fun recipe(mat: MaterialSet, sub: String = defaultSub(mat),

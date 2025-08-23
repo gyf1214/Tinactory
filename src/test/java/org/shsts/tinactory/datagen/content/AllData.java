@@ -19,7 +19,6 @@ public final class AllData {
         Components.init();
         Machines.init();
         Veins.init();
-        Markers.init();
 
         MaterialExporter.init();
     }

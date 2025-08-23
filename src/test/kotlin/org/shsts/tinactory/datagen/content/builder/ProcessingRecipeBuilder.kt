@@ -106,12 +106,13 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
 
     fun voltage(value: Voltage) {
         voltage = value.value
+        builder.voltage(value.value)
     }
 
     open fun build() {
-        val voltage1 = voltage!!
-        val voltage2 = if (voltage1 == 0L) Voltage.ULV.value else voltage1
-        val power = (amperage!! * voltage2).toLong()
-        builder.voltage(voltage1).power(power).build()
+        voltage?.let {
+            val voltage1 = if (it == 0L) Voltage.ULV.value else it
+            amperage?.times(voltage1)?.toLong()?.let(builder::power)
+        }
     }
 }

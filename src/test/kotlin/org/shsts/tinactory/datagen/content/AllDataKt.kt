@@ -34,5 +34,7 @@ object AllDataKt {
                 tech(Technologies.SOLDERING)
             }
         }
+
+        Markers.init()
     }
 }
