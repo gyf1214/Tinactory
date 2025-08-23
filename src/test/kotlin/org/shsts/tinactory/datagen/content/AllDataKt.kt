@@ -11,6 +11,7 @@ import org.shsts.tinactory.datagen.content.material.Crops
 import org.shsts.tinactory.datagen.content.material.Generators
 import org.shsts.tinactory.datagen.content.material.Materials
 import org.shsts.tinactory.datagen.content.material.MiscMaterials
+import org.shsts.tinactory.datagen.content.material.Veins
 import org.shsts.tinactory.datagen.content.material.Woods
 
 object AllDataKt {
@@ -35,6 +36,7 @@ object AllDataKt {
             }
         }
 
+        Veins.init()
         Markers.init()
     }
 }

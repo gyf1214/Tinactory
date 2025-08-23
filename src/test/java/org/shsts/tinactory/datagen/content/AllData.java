@@ -18,7 +18,6 @@ public final class AllData {
         AllDataKt.INSTANCE.init();
         Components.init();
         Machines.init();
-        Veins.init();
 
         MaterialExporter.init();
     }

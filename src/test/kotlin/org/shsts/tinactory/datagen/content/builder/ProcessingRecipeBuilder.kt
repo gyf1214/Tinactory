@@ -14,7 +14,7 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ProcessingResults
 
 open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(protected val builder: B) {
-    private var voltage: Long? = null
+    private var voltage: Voltage? = null
     var amperage: Double? = null
     var defaultInputItem: Int? = null
     var defaultInputFluid: Int? = null
@@ -22,6 +22,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
     var defaultOutputFluid: Int? = null
     var defaultItemSub: String? = null
     var defaultFluidSub = "fluid"
+    var requirePower = true
 
     fun defaults(inputItem: Int, inputFluid: Int, outputItem: Int, outputFluid: Int) {
         defaultInputItem = inputItem
@@ -105,14 +106,23 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
     }
 
     fun voltage(value: Voltage) {
-        voltage = value.value
+        voltage = value
         builder.voltage(value.value)
     }
 
+    private fun power(voltage: Voltage?, amperage: Double?): Long? {
+        if (voltage != null && amperage != null) {
+            val voltage1 = if (voltage == Voltage.PRIMITIVE) Voltage.ULV.value else voltage.value
+            return (amperage * voltage1).toLong()
+        } else {
+            return null
+        }
+    }
+
     open fun build() {
-        voltage?.let {
-            val voltage1 = if (it == 0L) Voltage.ULV.value else it
-            amperage?.times(voltage1)?.toLong()?.let(builder::power)
+        val power = power(voltage, amperage)
+        if (requirePower || power != null) {
+            builder.power(power!!)
         }
     }
 }

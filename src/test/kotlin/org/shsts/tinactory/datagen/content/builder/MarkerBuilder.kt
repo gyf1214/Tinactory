@@ -6,6 +6,10 @@ import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase
 
 class MarkerBuilder(builder: MarkerRecipe.Builder) :
     ProcessingRecipeBuilder<MarkerRecipe.Builder>(builder) {
+    init {
+        requirePower = false
+    }
+
     fun baseType(name: String) {
         builder.baseType(REGISTRATE.getRecipeType<IRecipeBuilderBase<*>>(name))
     }
