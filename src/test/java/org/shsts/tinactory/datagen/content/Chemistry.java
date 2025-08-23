@@ -12,21 +12,16 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.content.AllItems.FERTILIZER;
-import static org.shsts.tinactory.content.AllMaterials.AIR;
-import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM_OXIDE;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIA;
 import static org.shsts.tinactory.content.AllMaterials.AMMONIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.ANNEALED_COPPER;
-import static org.shsts.tinactory.content.AllMaterials.ARGON;
-import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
 import static org.shsts.tinactory.content.AllMaterials.BENZENE;
 import static org.shsts.tinactory.content.AllMaterials.BIOMASS;
 import static org.shsts.tinactory.content.AllMaterials.BLUE_TOPAZ;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
-import static org.shsts.tinactory.content.AllMaterials.CALCIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
 import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CHARCOAL;
@@ -40,7 +35,6 @@ import static org.shsts.tinactory.content.AllMaterials.CREOSOTE_OIL;
 import static org.shsts.tinactory.content.AllMaterials.ETHANE;
 import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.ETHYLENE;
-import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_OIL;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN;
@@ -48,7 +42,6 @@ import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_FLUORIDE;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_SULFIDE;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
-import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_OIL;
 import static org.shsts.tinactory.content.AllMaterials.LITHIUM;
@@ -80,14 +73,11 @@ import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.RUTILE;
 import static org.shsts.tinactory.content.AllMaterials.SALT_WATER;
 import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
-import static org.shsts.tinactory.content.AllMaterials.SEA_WATER;
-import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILICON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
-import static org.shsts.tinactory.content.AllMaterials.SODIUM_SULFATE;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.SULFUR;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
@@ -117,225 +107,6 @@ public class Chemistry {
     }
 
     private static void inorganic() {
-        DISTILLATION.voltage(Voltage.MV)
-            .recipe(AIR, "liquid", 1f, 96, NITROGEN, 0.78f, OXYGEN, 0.21f, ARGON, 0.01f)
-            .recipe(SEA_WATER, 10f, 2000,
-                SODIUM_CHLORIDE, 5, POTASSIUM_CHLORIDE, 1, MAGNESIUM_CHLORIDE, 0.5,
-                CALCIUM_CHLORIDE, 0.2, WATER, "gas", 6.4f, LITHIUM_BRINE, 0.1f)
-            .recipe(SALT_WATER, 2f, 320, SODIUM_CHLORIDE, 1, WATER, "gas", 1f)
-            .recipe(SULFURIC_ACID, "dilute", 2f, 320, SULFURIC_ACID, 1f, WATER, "gas", 1f)
-            .recipe(WATER, 1f, 300, WATER, "gas", 1f);
-
-        ELECTROLYZER.voltage(Voltage.MV)
-            .recipe(WATER, 1f, 800, HYDROGEN, 1f, OXYGEN, 0.5f)
-            .recipe(SALT_WATER, 2f, 400, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
-            .recipe(SEA_WATER, 2f, 1600, HYDROGEN, 0.5f, CHLORINE, 0.5f, SODIUM_HYDROXIDE, 1)
-            .recipe(BAUXITE, 6, 640, ALUMINIUM, 6, OXYGEN, 4.5f, RUTILE, 1)
-            .recipe(CHARCOAL, 1, 64, CARBON, 1)
-            .recipe(COAL, 1, 40, CARBON, 2)
-            .recipe(COKE, 1, 32, CARBON, 2)
-            .recipe(GRAPHITE, 1, 64, CARBON, 4)
-            .recipe(SILICON_DIOXIDE, 1, 480, SILICON, 1, OXYGEN, 1f)
-            .recipe(ALUMINIUM_OXIDE, 1, 96, ALUMINIUM, 1, OXYGEN, 0.75f);
-
-        CHEMICAL_REACTOR.recipe(DATA_GEN, HYDROGEN_CHLORIDE.fluidLoc())
-            .input(HYDROGEN, 0.5f)
-            .input(CHLORINE, 0.5f)
-            .output(HYDROGEN_CHLORIDE)
-            .workTicks(64)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, CARBON_DIOXIDE.fluidLoc())
-            .input(CARBON)
-            .input(OXYGEN)
-            .output(CARBON_DIOXIDE)
-            .workTicks(240)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, CALCIUM_CARBONATE.loc("dust"))
-            .input(SODIUM_CARBONATE)
-            .input(CALCIUM_CHLORIDE)
-            .output(CALCIUM_CARBONATE)
-            .output(SODIUM_CHLORIDE, 2f)
-            .workTicks(64)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(SALT_WATER.fluidLoc(), "_from_carbonate"))
-            .input(SODIUM_CARBONATE)
-            .input(HYDROGEN_CHLORIDE, 2f)
-            .input(WATER)
-            .output(SALT_WATER, 4f)
-            .output(CARBON_DIOXIDE)
-            .workTicks(160)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, SODIUM_CARBONATE.loc("dust"))
-            .input(SODIUM_HYDROXIDE, 2f)
-            .input(CARBON_DIOXIDE)
-            .output(SODIUM_CARBONATE)
-            .output(WATER)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, SALT_WATER.fluidLoc())
-            .input(SODIUM_HYDROXIDE)
-            .input(HYDROGEN_CHLORIDE)
-            .output(SALT_WATER, 2f)
-            .workTicks(32)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, CALCIUM_HYDROXIDE.loc("dust"))
-            .input(CALCIUM_CARBONATE)
-            .input(WATER, "gas", 1f)
-            .output(CALCIUM_HYDROXIDE)
-            .output(CARBON_DIOXIDE)
-            .workTicks(400)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(CALCIUM_CHLORIDE.loc("dust"), "_from_carbonate"))
-            .input(CALCIUM_CARBONATE)
-            .input(HYDROGEN_CHLORIDE, 2f)
-            .output(CALCIUM_CHLORIDE)
-            .output(WATER)
-            .output(CARBON_DIOXIDE)
-            .workTicks(160)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, CALCIUM_CHLORIDE.loc("dust"))
-            .input(CALCIUM_HYDROXIDE)
-            .input(HYDROGEN_CHLORIDE, 2f)
-            .output(CALCIUM_CHLORIDE)
-            .output(WATER, 2f)
-            .workTicks(32)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, SODIUM_HYDROXIDE.loc("dust"))
-            .input(CALCIUM_HYDROXIDE)
-            .input(SODIUM_CARBONATE)
-            .output(SODIUM_HYDROXIDE, 2f)
-            .output(CALCIUM_CARBONATE)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, SULFURIC_ACID.fluidLoc("gas"))
-            .input(SULFUR)
-            .input(OXYGEN, 1.5f)
-            .output(SULFURIC_ACID, "gas", 1f)
-            .workTicks(480)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, SULFURIC_ACID.fluidLoc())
-            .input(SULFURIC_ACID, "gas", 1f)
-            .input(WATER, 1f)
-            .output(SULFURIC_ACID, 1f)
-            .workTicks(64)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, POTASSIUM_CARBONATE.loc("dust"))
-            .input(POTASSIUM_CHLORIDE, 2f)
-            .input(SODIUM_CARBONATE)
-            .output(POTASSIUM_CARBONATE)
-            .output(SODIUM_CHLORIDE, 2f)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, POTASSIUM_NITRATE.loc("dust"))
-            .input(NITRIC_ACID, 2f)
-            .input(POTASSIUM_CARBONATE)
-            .output(POTASSIUM_NITRATE, 2f)
-            .output(WATER)
-            .output(CARBON_DIOXIDE)
-            .workTicks(160)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, SODIUM_SULFATE.loc("dust"))
-            .input(SULFURIC_ACID)
-            .input(SODIUM_CHLORIDE, 2f)
-            .output(SODIUM_SULFATE)
-            .output(HYDROGEN_CHLORIDE, 2f)
-            .workTicks(320)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(SODIUM_SULFATE.loc("dust"), "_from_carbonate"))
-            .input(SODIUM_CARBONATE)
-            .input(SULFURIC_ACID, "dilute", 2f)
-            .output(SODIUM_SULFATE)
-            .output(WATER, 2f)
-            .output(CARBON_DIOXIDE)
-            .workTicks(160)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(SODIUM_SULFATE.loc("dust"), "_from_hydroxide"))
-            .input(SODIUM_HYDROXIDE, 2f)
-            .input(SULFURIC_ACID, "dilute", 2f)
-            .output(SODIUM_SULFATE)
-            .output(WATER, 3f)
-            .workTicks(64)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, SULFUR.loc("dust"))
-            .input(SODIUM_SULFATE)
-            .input(HYDROGEN_SULFIDE, 3f)
-            .input(HYDROGEN_CHLORIDE, 2f)
-            .output(SULFUR, 4f)
-            .output(SALT_WATER, 4f)
-            .workTicks(320)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, IRON_CHLORIDE.fluidLoc())
-            .input(IRON)
-            .input(HYDROGEN_CHLORIDE, 3f)
-            .output(IRON_CHLORIDE)
-            .output(HYDROGEN, 1.5f)
-            .workTicks(160)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, AMMONIUM_CHLORIDE.loc("dust"))
-            .input(AMMONIA)
-            .input(HYDROGEN_CHLORIDE)
-            .output(AMMONIUM_CHLORIDE)
-            .workTicks(64)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(AMMONIA.fluidLoc(), "_from_ammonium_chloride"))
-            .input(AMMONIUM_CHLORIDE)
-            .output(AMMONIA)
-            .output(HYDROGEN_CHLORIDE)
-            .workTicks(320)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, LITHIUM_CHLORIDE.loc("dust"))
-            .input(LITHIUM_CARBONATE)
-            .input(HYDROGEN_CHLORIDE, 2f)
-            .output(LITHIUM_CHLORIDE, 2f)
-            .output(WATER)
-            .output(CARBON_DIOXIDE)
-            .workTicks(160)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.CHEMISTRY)
-            .build();
-
         // HV
         CHEMICAL_REACTOR.recipe(DATA_GEN, RUBY.loc("dust"))
             .input(RUBY, "dust", 2f)

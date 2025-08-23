@@ -4,6 +4,7 @@ import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.chemistry.InorganicChemistry
 import org.shsts.tinactory.datagen.content.material.Crops
 import org.shsts.tinactory.datagen.content.material.Generators
 import org.shsts.tinactory.datagen.content.material.Materials
@@ -17,6 +18,8 @@ object AllDataKt {
         Crops.init()
         Generators.init()
         MiscMaterials.init()
+
+        InorganicChemistry.init()
 
         assembler {
             output(Items.NAME_TAG) {

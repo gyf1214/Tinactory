@@ -298,14 +298,14 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             return self();
         }
 
-        protected List<Input> getInputs() {
+        public List<Input> getInputs() {
             if (resolvedInputs == null) {
                 resolvedInputs = inputs.stream().map(Supplier::get).toList();
             }
             return resolvedInputs;
         }
 
-        protected List<Output> getOutputs() {
+        public List<Output> getOutputs() {
             if (resolvedOutputs == null) {
                 resolvedOutputs = outputs.stream().map(Supplier::get).toList();
             }

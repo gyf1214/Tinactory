@@ -9,6 +9,7 @@ import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
+import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ToolRecipe
@@ -18,6 +19,7 @@ typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuil
 typealias ProcessingRecipeFactory = ProcessingRecipeFactoryBase<ProcessingRecipe.Builder>
 typealias BlastFurnaceRecipeFactory = ProcessingRecipeFactoryBase<BlastFurnaceRecipe.Builder>
 typealias AssemblyRecipeFactory = RecipeFactory<AssemblyRecipe.Builder, AssemblyRecipeBuilder>
+typealias ChemicalRecipeFactory = RecipeFactory<ChemicalReactorRecipe.Builder, ChemicalRecipeBuilder>
 
 object RecipeFactories {
     fun vanilla(replace: Boolean = false, block: VanillaRecipeFactory.() -> Unit) {
@@ -215,6 +217,27 @@ object RecipeFactories {
         }.block()
     }
 
+    fun electrolyzer(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("electrolyzer") {
+            fullDefaults()
+            amperage = 0.75
+        }.apply {
+            defaultItemSub = "dust"
+            block()
+        }
+    }
+
+    fun chemicalReactor(block: ChemicalRecipeFactory.() -> Unit) {
+        val recipeType = REGISTRATE.getRecipeType<ChemicalReactorRecipe.Builder>("chemical_reactor")
+        RecipeFactory(recipeType, ::ChemicalRecipeBuilder) {
+            fullDefaults()
+            amperage = 0.375
+        }.apply {
+            defaultItemSub = "dust"
+            block()
+        }
+    }
+
     fun steamTurbine(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("steam_turbine") {
             defaultInputFluid = 0
@@ -252,6 +275,18 @@ object RecipeFactories {
             fullDefaults()
             amperage = 1.5
         }.block()
+    }
+
+    fun distillation(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("distillation") {
+            defaultInputFluid = 0
+            defaultOutputFluid = 1
+            defaultOutputItem = 2
+            amperage = 2.5
+        }.apply {
+            defaultItemSub = "dust"
+            block()
+        }
     }
 
     fun autofarm(block: ProcessingRecipeFactory.() -> Unit) {
