@@ -5,6 +5,7 @@ import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.chemistry.InorganicChemistry
+import org.shsts.tinactory.datagen.content.chemistry.OrganicChemistry
 import org.shsts.tinactory.datagen.content.material.Crops
 import org.shsts.tinactory.datagen.content.material.Generators
 import org.shsts.tinactory.datagen.content.material.Materials
@@ -20,6 +21,7 @@ object AllDataKt {
         MiscMaterials.init()
 
         InorganicChemistry.init()
+        OrganicChemistry.init()
 
         assembler {
             output(Items.NAME_TAG) {

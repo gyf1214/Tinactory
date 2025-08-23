@@ -21,22 +21,17 @@ import static org.shsts.tinactory.content.AllMaterials.CALCIUM;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CARBONATE;
 import static org.shsts.tinactory.content.AllMaterials.CALCIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.CARBON;
-import static org.shsts.tinactory.content.AllMaterials.CARBON_DIOXIDE;
 import static org.shsts.tinactory.content.AllMaterials.CHARCOAL;
 import static org.shsts.tinactory.content.AllMaterials.CHLORINE;
-import static org.shsts.tinactory.content.AllMaterials.CHLOROFORM;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COKE;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CREOSOTE_OIL;
 import static org.shsts.tinactory.content.AllMaterials.ETHANE;
-import static org.shsts.tinactory.content.AllMaterials.ETHANOL;
 import static org.shsts.tinactory.content.AllMaterials.ETHYLENE;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_FUEL;
 import static org.shsts.tinactory.content.AllMaterials.HEAVY_OIL;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN;
-import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_CHLORIDE;
-import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_FLUORIDE;
 import static org.shsts.tinactory.content.AllMaterials.HYDROGEN_SULFIDE;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.LIGHT_FUEL;
@@ -50,7 +45,6 @@ import static org.shsts.tinactory.content.AllMaterials.NAPHTHA;
 import static org.shsts.tinactory.content.AllMaterials.NATURAL_GAS;
 import static org.shsts.tinactory.content.AllMaterials.NITROGEN;
 import static org.shsts.tinactory.content.AllMaterials.OXYGEN;
-import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.PHENOL;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CARBONATE;
@@ -58,21 +52,13 @@ import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.POTASSIUM_NITRATE;
 import static org.shsts.tinactory.content.AllMaterials.PROPANE;
 import static org.shsts.tinactory.content.AllMaterials.PROPENE;
-import static org.shsts.tinactory.content.AllMaterials.PTFE;
-import static org.shsts.tinactory.content.AllMaterials.PVC;
-import static org.shsts.tinactory.content.AllMaterials.RAW_RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.REFINERY_GAS;
-import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM;
 import static org.shsts.tinactory.content.AllMaterials.SODIUM_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
-import static org.shsts.tinactory.content.AllMaterials.SULFUR;
-import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
-import static org.shsts.tinactory.content.AllMaterials.TETRA_FLUORO_ETHYLENE;
 import static org.shsts.tinactory.content.AllMaterials.TITANIUM;
 import static org.shsts.tinactory.content.AllMaterials.TITANIUM_TETRACHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.TOLUENE;
-import static org.shsts.tinactory.content.AllMaterials.VINYL_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.WROUGHT_IRON;
 import static org.shsts.tinactory.content.AllRecipes.ARC_FURNACE;
@@ -245,68 +231,6 @@ public class Chemistry {
             .workTicks(96)
             .build();
 
-        CHEMICAL_REACTOR
-            .recipe(DATA_GEN, ETHANOL.fluidLoc())
-            .input(BIOMASS, 3f)
-            .input(WATER, 2f)
-            .output(ETHANOL, 2f)
-            .output(CARBON_DIOXIDE)
-            .workTicks(400)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(CARBON_DIOXIDE.fluidLoc(), "_from_methane"))
-            .input(METHANE)
-            .input(WATER, 2f)
-            .output(CARBON_DIOXIDE)
-            .output(HYDROGEN, 4f)
-            .workTicks(128)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, PE.fluidLoc())
-            .input(ETHYLENE, 0.144f)
-            .input(OXYGEN)
-            .output(PE, 1.5f)
-            .workTicks(160)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, VINYL_CHLORIDE.fluidLoc())
-            .input(ETHANE)
-            .input(CHLORINE, 2f)
-            .output(VINYL_CHLORIDE, 1f)
-            .output(HYDROGEN_CHLORIDE, 3f)
-            .workTicks(256)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, PVC.fluidLoc())
-            .input(VINYL_CHLORIDE, 0.144f)
-            .input(OXYGEN)
-            .output(PVC, 1.5f)
-            .workTicks(200)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(ETHYLENE.fluidLoc(), "_from_ethanol"))
-            .input(ETHANOL)
-            .input(SULFURIC_ACID)
-            .output(ETHYLENE)
-            .output(SULFURIC_ACID, "dilute", 2f)
-            .workTicks(240)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, RUBBER.fluidLoc())
-            .input(RAW_RUBBER, 9f)
-            .input(SULFUR)
-            .output(RUBBER, "molten", 9f)
-            .workTicks(160)
-            .voltage(Voltage.MV)
-            .requireTech(Technologies.ORGANIC_CHEMISTRY)
-            .build();
-
         PYROLYSE_OVEN.recipe(DATA_GEN, COKE.loc("primary"))
             .inputItem(COAL.tag("primary"), 16)
             .outputItem(COKE.entry("primary"), 16)
@@ -336,81 +260,6 @@ public class Chemistry {
             .outputFluid(CREOSOTE_OIL.fluid(), CREOSOTE_OIL.fluidAmount(4f))
             .voltage(Voltage.LV)
             .workTicks(320)
-            .build();
-
-        // HV
-        CHEMICAL_REACTOR.recipe(DATA_GEN, CHLOROFORM.fluidLoc())
-            .input(METHANE)
-            .input(CHLORINE, 3f)
-            .output(CHLOROFORM)
-            .output(HYDROGEN_CHLORIDE, 3f)
-            .voltage(Voltage.HV)
-            .workTicks(128)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, TETRA_FLUORO_ETHYLENE.fluidLoc())
-            .input(CHLOROFORM, 2f)
-            .input(HYDROGEN_FLUORIDE, 4f)
-            .output(TETRA_FLUORO_ETHYLENE)
-            .output(HYDROGEN_CHLORIDE, 6f)
-            .voltage(Voltage.HV)
-            .workTicks(480)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, PTFE.fluidLoc())
-            .input(TETRA_FLUORO_ETHYLENE, 0.144f)
-            .input(OXYGEN)
-            .output(PTFE, 1.5f)
-            .voltage(Voltage.HV)
-            .workTicks(160)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(VINYL_CHLORIDE.fluidLoc(), "_from_lcr"))
-            .input(ETHYLENE)
-            .input(HYDROGEN_CHLORIDE)
-            .input(OXYGEN, 0.5f)
-            .output(VINYL_CHLORIDE)
-            .output(WATER)
-            .voltage(Voltage.HV)
-            .workTicks(160)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(TETRA_FLUORO_ETHYLENE.fluidLoc(), "_from_lcr"))
-            .input(METHANE, 2f)
-            .input(CHLORINE, 6f)
-            .input(HYDROGEN_FLUORIDE, 4f)
-            .output(TETRA_FLUORO_ETHYLENE)
-            .output(HYDROGEN_CHLORIDE, 12f)
-            .voltage(Voltage.HV)
-            .workTicks(320)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(PE.fluidLoc(), "_from_lcr"))
-            .input(ETHYLENE, 2.16f)
-            .input(OXYGEN, 7.5f)
-            .input(TITANIUM_TETRACHLORIDE, 0.1f)
-            .output(PE, 30f)
-            .voltage(Voltage.HV)
-            .workTicks(256)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(PVC.fluidLoc(), "_from_lcr"))
-            .input(VINYL_CHLORIDE, 2.16f)
-            .input(OXYGEN, 7.5f)
-            .input(TITANIUM_TETRACHLORIDE, 0.1f)
-            .output(PVC, 30f)
-            .voltage(Voltage.HV)
-            .workTicks(320)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
-            .build()
-            .recipe(DATA_GEN, suffix(PTFE.fluidLoc(), "_from_lcr"))
-            .input(TETRA_FLUORO_ETHYLENE, 2.16f)
-            .input(OXYGEN, 7.5f)
-            .input(TITANIUM_TETRACHLORIDE, 0.1f)
-            .output(PTFE, 30f)
-            .voltage(Voltage.HV)
-            .workTicks(512)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
             .build();
     }
 
