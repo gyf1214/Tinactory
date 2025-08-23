@@ -195,7 +195,7 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(0.25d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(3))
             .register();
 
-        PYROLYSE_OVEN = processing("pyrolyse_ove")
+        PYROLYSE_OVEN = processing("pyrolyse_oven")
             .defaults($ -> $.amperage(2d).transform(AllRecipes::fullDefaults))
             .register();
 
