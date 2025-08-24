@@ -3,13 +3,11 @@ package org.shsts.tinactory.datagen.content;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -28,10 +26,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-import static org.shsts.tinactory.content.AllItems.ADVANCED_BUZZSAW;
-import static org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER;
 import static org.shsts.tinactory.content.AllItems.ADVANCED_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.BASIC_INTEGRATED;
@@ -40,7 +35,6 @@ import static org.shsts.tinactory.content.AllItems.BOULES;
 import static org.shsts.tinactory.content.AllItems.CABLE;
 import static org.shsts.tinactory.content.AllItems.CAPACITOR;
 import static org.shsts.tinactory.content.AllItems.CHIPS;
-import static org.shsts.tinactory.content.AllItems.COMPONENT_ITEMS;
 import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.DIODE;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
@@ -48,9 +42,7 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
 import static org.shsts.tinactory.content.AllItems.EMITTER;
-import static org.shsts.tinactory.content.AllItems.FERTILIZER;
 import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
-import static org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL;
 import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
@@ -58,7 +50,6 @@ import static org.shsts.tinactory.content.AllItems.GOOD_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.INDUCTOR;
 import static org.shsts.tinactory.content.AllItems.INTEGRATED_PROCESSOR;
 import static org.shsts.tinactory.content.AllItems.ITEM_FILTER;
-import static org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.MAINFRAME;
 import static org.shsts.tinactory.content.AllItems.MICROPROCESSOR;
@@ -144,169 +135,30 @@ import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
 import static org.shsts.tinactory.content.AllTags.COIL;
-import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
-import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
-import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.content.electric.Circuits.board;
 import static org.shsts.tinactory.content.electric.Circuits.circuitBoard;
-import static org.shsts.tinactory.core.util.LocHelper.ae2;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.content.Models.basicItem;
-import static org.shsts.tinactory.datagen.content.Models.machineItem;
 import static org.shsts.tinactory.datagen.content.Models.solidBlock;
-import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Components {
-    private static final String RESEARCH_TEX = "metaitems/glass_vial/";
-    private static final String GRINDER_TEX = "metaitems/component.grinder";
-    private static final String BUZZSAW_TEX = "tools/buzzsaw";
     private static final int ASSEMBLY_TICKS = 100;
 
     public static void init() {
-        components();
-        circuits();
         misc();
-        ulvRecipes();
         componentRecipes();
         circuitRecipes();
         multiblockRecipes();
     }
 
-    private static void components() {
-        COMPONENT_ITEMS.forEach(entry -> DATA_GEN.item(entry)
-            .model(Models::componentItem)
-            .build());
-
-        BATTERY.forEach((v, entry) -> DATA_GEN.item(entry)
-            .model(Models::batteryItem)
-            .tag(AllTags.battery(v))
-            .build());
-
-        MACHINE_HULL.forEach((v, entry) -> DATA_GEN.item(entry)
-            .model(machineItem(v, IO_TEX))
-            .build());
-
-        RESEARCH_EQUIPMENT.forEach((v, entry) -> DATA_GEN.item(entry)
-            .model(basicItem(RESEARCH_TEX + "base", RESEARCH_TEX + "overlay"))
-            .build());
-
-        CABLE.forEach((v, entry) -> DATA_GEN.block(entry)
-            .blockState(Models::cableBlock)
-            .itemModel(Models::cableItem)
-            .tag(MINEABLE_WITH_CUTTER)
-            .build());
-
-        DATA_GEN.item(GOOD_GRINDER)
-            .model(basicItem(GRINDER_TEX + ".diamond"))
-            .build()
-            .item(ADVANCED_GRINDER)
-            .model(basicItem(GRINDER_TEX + ".tungsten"))
-            .build();
-
-        for (var item : List.of(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW)) {
-            DATA_GEN.item(item)
-                .model(basicItem(BUZZSAW_TEX))
-                .build();
-        }
-
-        Stream.concat(BOULES.stream(), RAW_WAFERS.stream())
-            .forEach(entry -> DATA_GEN.item(entry)
-                .model(basicItem("metaitems/" + entry.id()
-                    .replace('/', '.')
-                    .replace("wafer_raw.", "wafer.")
-                    .replace("glowstone", "phosphorus")))
-                .build());
-
-        chip("integrated_circuit", "integrated_logic_circuit");
-        chip("cpu", "central_processing_unit");
-        chip("nano_cpu", "nano_central_processing_unit");
-        chip("qbit_cpu", "qbit_central_processing_unit");
-        chip("ram", "random_access_memory");
-        chip("nand", "nand_memory_chip");
-        chip("nor", "nor_memory_chip");
-        chip("simple_soc", "simple_system_on_chip");
-        chip("soc", "system_on_chip");
-        chip("advanced_soc", "advanced_system_on_chip");
-        chip("low_pic", "low_power_integrated_circuit");
-        chip("pic", "power_integrated_circuit");
-        chip("high_pic", "high_power_integrated_circuit");
-
-        DATA_GEN.item(ITEM_FILTER)
-            .model(Models::simpleItem)
-            .build()
-            .item(FERTILIZER)
-            .model(Models::simpleItem)
-            .build();
-
-        for (var i = 0; i < ITEM_STORAGE_CELL.size(); i++) {
-            var k = 1 << (2 * i);
-            DATA_GEN.item(ITEM_STORAGE_CELL.get(i))
-                .model(basicItem(ae2("item/item_storage_cell_" + k + "k")))
-                .tag(AllTags.ITEM_STORAGE_CELL)
-                .build();
-            DATA_GEN.item(FLUID_STORAGE_CELL.get(i))
-                .model(basicItem(ae2("item/fluid_storage_cell_" + k + "k")))
-                .tag(AllTags.FLUID_STORAGE_CELL)
-                .build();
-        }
-    }
-
-    private static void chip(String name, String tex) {
-        List.of(WAFERS.get(name), CHIPS.get(name))
-            .forEach(entry -> DATA_GEN.item(entry)
-                .model(basicItem("metaitems/" + entry.id()
-                    .replace('/', '.')
-                    .replace("chip.", "plate.")
-                    .replace(name, tex)))
-                .build());
-    }
-
-    private static void circuits() {
-        Circuits.forEach((tier, level, item) -> DATA_GEN.item(item)
-            .model(basicItem("metaitems/" + item.id().replace('/', '.')))
-            .tag(AllTags.circuit(Circuits.getVoltage(tier, level)))
-            .build());
-        Circuits.forEachComponent((component, tier, item) -> {
-            var texKey = tier.prefix.isEmpty() ? component : tier.prefix + "." + component;
-            var builder = DATA_GEN.item(item)
-                .model(basicItem("metaitems/component." + texKey));
-            for (var tier1 : CircuitComponentTier.values()) {
-                if (tier1.rank <= tier.rank) {
-                    builder.tag(AllTags.circuitComponent(component, tier1));
-                }
-            }
-            builder.build();
-        });
-        for (var tier : CircuitTier.values()) {
-            var boardName = switch (tier) {
-                case NANO -> "epoxy";
-                case QUANTUM -> "fiber_reinforced";
-                case CRYSTAL -> "multilayer.fiber_reinforced";
-                default -> tier.board;
-            };
-
-            DATA_GEN.item(board(tier))
-                .model(basicItem("metaitems/board." + boardName))
-                .build()
-                .item(circuitBoard(tier))
-                .model(basicItem("metaitems/circuit_board." + tier.circuitBoard))
-                .build();
-        }
-    }
-
     private static void misc() {
-        DATA_GEN.item(STICKY_RESIN)
-            .model(basicItem("metaitems/rubber_drop"))
-            .build();
-
         SOLID_CASINGS.forEach(block -> DATA_GEN.block(block)
             .blockState(solidBlock("casings/solid/machine_casing_" + name(block.id(), -1)))
             .tag(MINEABLE_WITH_WRENCH)
@@ -351,47 +203,7 @@ public final class Components {
             .tag(MINEABLE_WITH_WRENCH)
             .build();
 
-        FLUID_CELL.forEach((v, item) -> {
-            var texBase = v == Voltage.ULV ? "metaitems/fluid_cell" :
-                "metaitems/large_fluid_cell." + name(item.id(), -1);
-            DATA_GEN.item(item)
-                .model(basicItem(texBase + "/base", texBase + "/overlay"))
-                .build();
-        });
-
         DATA_GEN.tag(BlockTags.DOORS, CLEANROOM_DOOR);
-    }
-
-    private static void ulvRecipes() {
-        DATA_GEN.vanillaRecipe(() -> ShapelessRecipeBuilder
-            .shapeless(CABLE.get(Voltage.ULV).get())
-            .requires(Ingredient.of(IRON.tag("wire")), 4)
-            .unlockedBy("has_wire", has(IRON.tag("wire"))));
-
-        TOOL_CRAFTING.recipe(DATA_GEN, MACHINE_HULL.get(Voltage.ULV))
-            .result(MACHINE_HULL.get(Voltage.ULV), 1)
-            .pattern("###").pattern("#W#").pattern("###")
-            .define('#', IRON.tag("plate"))
-            .define('W', CABLE.get(Voltage.ULV))
-            .toolTag(TOOL_WRENCH)
-            .build()
-            .recipe(DATA_GEN, FLUID_CELL.get(Voltage.ULV))
-            .result(FLUID_CELL.get(Voltage.ULV), 1)
-            .pattern("###").pattern("#G#").pattern(" # ")
-            .define('#', IRON.tag("plate"))
-            .define('G', GLASS.tag("primary"))
-            .toolTag(TOOL_HAMMER, TOOL_WRENCH)
-            .build();
-
-        ASSEMBLER.recipe(DATA_GEN, FLUID_CELL.get(Voltage.ULV))
-            .outputItem(FLUID_CELL.get(Voltage.ULV), 1)
-            .inputItem(IRON.tag("plate"), 4)
-            .inputItem(GLASS.tag("primary"), 1)
-            .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(1f))
-            .workTicks(ASSEMBLY_TICKS)
-            .voltage(Voltage.LV)
-            .requireTech(Technologies.SOLDERING)
-            .build();
     }
 
     private static void componentRecipes() {

@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.material
 
 import net.minecraft.world.item.Items
+import org.shsts.tinactory.content.AllItems.STICKY_RESIN
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags.FLUID_STORAGE_CELL
 import org.shsts.tinactory.content.AllTags.ITEM_STORAGE_CELL
@@ -18,6 +19,8 @@ import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.material.OreVariant
+import org.shsts.tinactory.datagen.content.Models.basicItem
+import org.shsts.tinactory.datagen.content.builder.DataFactories.item
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
@@ -31,6 +34,8 @@ import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 object MiscMaterials {
     fun init() {
+        item(STICKY_RESIN) { model(basicItem("metaitems/rubber_drop")) }
+
         // blast ores
         blast()
 
