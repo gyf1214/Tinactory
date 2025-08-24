@@ -5,6 +5,7 @@ import org.shsts.tinactory.datagen.content.chemistry.OilProcessing
 import org.shsts.tinactory.datagen.content.chemistry.OrganicChemistry
 import org.shsts.tinactory.datagen.content.component.Components
 import org.shsts.tinactory.datagen.content.component.MiscComponents
+import org.shsts.tinactory.datagen.content.machine.Multiblocks
 import org.shsts.tinactory.datagen.content.material.Crops
 import org.shsts.tinactory.datagen.content.material.Generators
 import org.shsts.tinactory.datagen.content.material.Materials
@@ -27,6 +28,8 @@ object AllDataKt {
 
         Components.init()
         MiscComponents.init()
+
+        Multiblocks.init()
 
         Veins.init()
         Markers.init()

@@ -11,7 +11,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.CircuitComponentTier;
 import org.shsts.tinactory.content.electric.CircuitTier;
@@ -19,11 +18,9 @@ import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
-import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder1;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -52,7 +49,6 @@ import static org.shsts.tinactory.content.AllItems.MAINFRAME;
 import static org.shsts.tinactory.content.AllItems.MICROPROCESSOR;
 import static org.shsts.tinactory.content.AllItems.PROCESSOR_ASSEMBLY;
 import static org.shsts.tinactory.content.AllItems.RAW_WAFERS;
-import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
 import static org.shsts.tinactory.content.AllItems.RESISTOR;
 import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
 import static org.shsts.tinactory.content.AllItems.SENSOR;
@@ -105,7 +101,6 @@ import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE;
 import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.CLEAR_GLASS;
-import static org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllMultiblocks.CUPRONICKEL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiblocks.FILTER_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
@@ -116,7 +111,6 @@ import static org.shsts.tinactory.content.AllMultiblocks.KANTHAL_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiblocks.NICHROME_COIL_BLOCK;
 import static org.shsts.tinactory.content.AllMultiblocks.PLASCRETE;
 import static org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING;
-import static org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
@@ -128,13 +122,11 @@ import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
-import static org.shsts.tinactory.content.AllTags.COIL;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.electric.Circuits.board;
 import static org.shsts.tinactory.content.electric.Circuits.circuitBoard;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
-import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.content.Models.solidBlock;
@@ -153,34 +145,7 @@ public final class Components {
     }
 
     private static void misc() {
-        SOLID_CASINGS.forEach(block -> DATA_GEN.block(block)
-            .blockState(solidBlock("casings/solid/machine_casing_" + name(block.id(), -1)))
-            .tag(MINEABLE_WITH_WRENCH)
-            .build());
-
-        COIL_BLOCKS.forEach(coil -> DATA_GEN.block(coil)
-            .blockState(solidBlock("casings/coils/machine_coil_" + name(coil.id(), -1)))
-            .tag(List.of(COIL, MINEABLE_WITH_WRENCH))
-            .build());
-
-        DATA_GEN.block(GRATE_MACHINE_CASING)
-            .blockState(solidBlock("casings/pipe/grate_steel_front/top"))
-            .tag(MINEABLE_WITH_WRENCH)
-            .build()
-            .block(AUTOFARM_BASE)
-            .blockState(ctx -> ctx.provider().simpleBlock(ctx.object(),
-                ctx.provider().models().cubeTop(ctx.id(),
-                    gregtech("blocks/casings/solid/machine_casing_solid_steel"),
-                    mcLoc("block/farmland_moist"))))
-            .tag(MINEABLE_WITH_WRENCH)
-            .build()
-            .block(CLEAR_GLASS)
-            .blockState(solidBlock("casings/transparent/fusion_glass"))
-            .tag(MINEABLE_WITH_WRENCH)
-            .tag(CLEANROOM_WALL)
-            .tag(Tags.Blocks.GLASS)
-            .build()
-            .block(PLASCRETE)
+        DATA_GEN.block(PLASCRETE)
             .blockState(solidBlock("casings/cleanroom/plascrete"))
             .tag(MINEABLE_WITH_WRENCH)
             .tag(CLEANROOM_WALL)
@@ -351,13 +316,6 @@ public final class Components {
             .workTicks(ASSEMBLY_TICKS)
             .requireTech(Technologies.BATTERY)
             .build();
-    }
-
-    private static AssemblyRecipe.Builder researchRecipe(Voltage voltage) {
-        return ASSEMBLER.recipe(DATA_GEN, RESEARCH_EQUIPMENT.get(voltage))
-            .outputItem(RESEARCH_EQUIPMENT.get(voltage), 1)
-            .workTicks(200L)
-            .voltage(voltage);
     }
 
     private static void circuitRecipes() {
