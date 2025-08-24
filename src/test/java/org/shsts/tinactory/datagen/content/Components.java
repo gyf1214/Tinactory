@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllItems.ADVANCED_INTEGRATED;
-import static org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.BASIC_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.BATTERY;
 import static org.shsts.tinactory.content.AllItems.BOULES;
@@ -43,9 +42,7 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
 import static org.shsts.tinactory.content.AllItems.EMITTER;
 import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
-import static org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
-import static org.shsts.tinactory.content.AllItems.GOOD_GRINDER;
 import static org.shsts.tinactory.content.AllItems.GOOD_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.INDUCTOR;
 import static org.shsts.tinactory.content.AllItems.INTEGRATED_PROCESSOR;
@@ -71,7 +68,6 @@ import static org.shsts.tinactory.content.AllMaterials.BRONZE;
 import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
 import static org.shsts.tinactory.content.AllMaterials.CHROME;
 import static org.shsts.tinactory.content.AllMaterials.COAL;
-import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
@@ -104,7 +100,6 @@ import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
 import static org.shsts.tinactory.content.AllMaterials.TITANIUM;
-import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE;
@@ -129,7 +124,6 @@ import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.LASER_ENGRAVER;
-import static org.shsts.tinactory.content.AllRecipes.LATHE;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
@@ -237,36 +231,6 @@ public final class Components {
         batteryRecipe(Voltage.LV, CADMIUM);
         batteryRecipe(Voltage.MV, SODIUM_HYDROXIDE);
         batteryRecipe(Voltage.HV, LITHIUM);
-
-        // TODO: advanced_buzzsaw
-        buzzsawRecipe(BASIC_BUZZSAW, COBALT_BRASS, Voltage.LV);
-        buzzsawRecipe(GOOD_BUZZSAW, VANADIUM_STEEL, Voltage.MV);
-
-        // TODO: advanced_grinder
-        ASSEMBLER.recipe(DATA_GEN, GOOD_GRINDER)
-            .outputItem(GOOD_GRINDER, 1)
-            .inputItem(DIAMOND.tag("gem_flawless"), 1)
-            .inputItem(STEEL.tag("plate"), 8)
-            .inputItem(DIAMOND.tag("dust"), 4)
-            .voltage(Voltage.MV)
-            .workTicks(ASSEMBLY_TICKS)
-            .requireTech(Technologies.MATERIAL_CUTTING)
-            .build();
-
-        researchRecipe(Voltage.ULV)
-            .inputItem(IRON.tag("plate"), 1)
-            .inputItem(COPPER.tag("wire"), 1)
-            .build();
-
-        researchRecipe(Voltage.LV)
-            .inputItem(ELECTRIC_MOTOR.get(Voltage.LV), 1)
-            .inputItem(STEEL.tag("gear"), 1)
-            .build();
-
-        researchRecipe(Voltage.MV)
-            .inputItem(ELECTRIC_PUMP.get(Voltage.MV), 1)
-            .inputItem(circuitBoard(CircuitTier.CPU), 1)
-            .build();
     }
 
     private static class ComponentRecipeFactory {
@@ -394,15 +358,6 @@ public final class Components {
             .outputItem(RESEARCH_EQUIPMENT.get(voltage), 1)
             .workTicks(200L)
             .voltage(voltage);
-    }
-
-    private static void buzzsawRecipe(IEntry<Item> item, MaterialSet material, Voltage v) {
-        LATHE.recipe(DATA_GEN, item)
-            .outputItem(item, 1)
-            .inputItem(material.tag("gear"), 1)
-            .voltage(v)
-            .workTicks(240L)
-            .build();
     }
 
     private static void circuitRecipes() {

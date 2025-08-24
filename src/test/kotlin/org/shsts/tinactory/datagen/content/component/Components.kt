@@ -37,6 +37,7 @@ import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
 object Components {
     private const val RESEARCH_TEX = "metaitems/glass_vial/"
     private const val GRINDER_TEX = "metaitems/component.grinder"
+    const val ASSEMBLY_TICKS = 100L
 
     fun init() {
         components()

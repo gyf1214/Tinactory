@@ -1,21 +1,79 @@
 package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Items
+import org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW
 import org.shsts.tinactory.content.AllItems.CABLE
+import org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR
+import org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP
 import org.shsts.tinactory.content.AllItems.FLUID_CELL
+import org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW
+import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
 import org.shsts.tinactory.content.AllItems.MACHINE_HULL
+import org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
+import org.shsts.tinactory.content.electric.CircuitTier
+import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.component.Components.ASSEMBLY_TICKS
 
 object MiscComponents {
     fun init() {
+        ulv()
+
+        // buzzsaw
+        lathe {
+            defaults {
+                workTicks(240)
+            }
+            output(BASIC_BUZZSAW.get()) {
+                input("cobalt_brass", "gear")
+                voltage(Voltage.LV)
+            }
+            output(GOOD_BUZZSAW.get()) {
+                input("vanadium_steel", "gear")
+                voltage(Voltage.MV)
+            }
+            // TODO: advanced_buzzsaw
+        }
+
+        assembler {
+            output(GOOD_GRINDER.get()) {
+                input("diamond", "gem_flawless")
+                input("steel", "plate", 8)
+                input("diamond", "dust", 4)
+                voltage(Voltage.MV)
+                workTicks(ASSEMBLY_TICKS)
+                tech(Technologies.MATERIAL_CUTTING)
+            }
+            // TODO: advanced_grinder
+        }
+
+        research(Voltage.LV) {
+            input("iron", "plate")
+            input("copper", "wire")
+        }
+
+        research(Voltage.MV) {
+            input(ELECTRIC_MOTOR.item(Voltage.LV))
+            input("steel", "gear")
+        }
+
+        research(Voltage.HV) {
+            input(ELECTRIC_PUMP.item(Voltage.MV))
+            input(circuitBoard(CircuitTier.CPU).get())
+        }
+    }
+
+    private fun ulv() {
         vanilla {
             shapeless(getMaterial("iron").tag("wire"),
                 CABLE.item(Voltage.ULV),
@@ -49,13 +107,23 @@ object MiscComponents {
                 input("glass", "primary")
                 input("soldering_alloy")
                 voltage(Voltage.ULV)
-                workTicks(100)
+                workTicks(ASSEMBLY_TICKS)
             }
             output(Items.NAME_TAG) {
                 input("iron", "plate")
                 input(TOOL_HANDLE)
-                voltage(Voltage.LV)
-                workTicks(64)
+                voltage(Voltage.ULV)
+                workTicks(ASSEMBLY_TICKS)
+            }
+        }
+    }
+
+    private fun research(voltage: Voltage, block: AssemblyRecipeBuilder.() -> Unit) {
+        assembler {
+            output(RESEARCH_EQUIPMENT.item(voltage)) {
+                voltage(voltage)
+                workTicks(200)
+                block()
             }
         }
     }

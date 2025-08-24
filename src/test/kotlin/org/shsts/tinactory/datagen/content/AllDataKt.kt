@@ -3,6 +3,7 @@ package org.shsts.tinactory.datagen.content
 import org.shsts.tinactory.datagen.content.chemistry.InorganicChemistry
 import org.shsts.tinactory.datagen.content.chemistry.OilProcessing
 import org.shsts.tinactory.datagen.content.chemistry.OrganicChemistry
+import org.shsts.tinactory.datagen.content.component.Components
 import org.shsts.tinactory.datagen.content.component.MiscComponents
 import org.shsts.tinactory.datagen.content.material.Crops
 import org.shsts.tinactory.datagen.content.material.Generators
