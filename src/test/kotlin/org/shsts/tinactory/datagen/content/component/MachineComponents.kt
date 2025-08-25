@@ -207,7 +207,7 @@ object MachineComponents {
         val wires = voltage.rank - 1
         val plates = wires * wires
         output(BATTERY, voltage = voltage) {
-            if (voltage.rank > Voltage.HV.rank) {
+            if (voltage.rank > Voltage.LV.rank) {
                 input(AllTags.battery(Voltage.fromRank(voltage.rank - 1)), 2)
             }
             input(CABLE, wires)

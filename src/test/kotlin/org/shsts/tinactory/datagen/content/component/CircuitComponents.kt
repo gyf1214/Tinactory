@@ -108,7 +108,7 @@ object CircuitComponents {
                 }
                 output(RESISTOR, 2) {
                     input("coal", "dust", 1)
-                    input("copper", "fine_wire", 4)
+                    input("copper", "wire_fine", 4)
                     input("rubber")
                     voltage(Voltage.ULV)
                 }
@@ -116,7 +116,7 @@ object CircuitComponents {
                     input("gallium_arsenide", "dust")
                     input("glass", "primary")
                     input("copper", "wire_fine", 4)
-                    input("rubber")
+                    input("rubber", amount = 2)
                     voltage(Voltage.LV)
                 }
             }
@@ -135,9 +135,9 @@ object CircuitComponents {
                 output(INDUCTOR, 4) {
                     input("nickel_zinc_ferrite", "ring")
                     input("copper", "wire_fine", 2)
-                    input("pe", amount = 0.25f)
+                    input("pe", amount = 0.25)
                 }
-                output(DIODE, 8, suffix = "from_wafer") {
+                output(DIODE, 8, suffix = "_from_wafer") {
                     input(RAW_WAFERS.item(0))
                     input("copper", "wire_fine", 4)
                     input("pe")
@@ -145,9 +145,9 @@ object CircuitComponents {
                 output(TRANSISTOR, 4) {
                     input("gallium_arsenide", "dust")
                     input("tin", "wire_fine", 6)
-                    input("rubber", amount = 2f)
+                    input("rubber", amount = 2)
                 }
-                output(TRANSISTOR, 8, suffix = "from_pe") {
+                output(TRANSISTOR, 8, suffix = "_from_pe") {
                     input("silicon", "dust")
                     input("tin", "wire_fine", 6)
                     input("pe")

@@ -57,17 +57,17 @@ object MiscComponents {
             // TODO: advanced_grinder
         }
 
-        research(Voltage.LV) {
+        research(Voltage.ULV) {
             input("iron", "plate")
             input("copper", "wire")
         }
 
-        research(Voltage.MV) {
+        research(Voltage.LV) {
             input(ELECTRIC_MOTOR.item(Voltage.LV))
             input("steel", "gear")
         }
 
-        research(Voltage.HV) {
+        research(Voltage.MV) {
             input(ELECTRIC_PUMP.item(Voltage.MV))
             input(circuitBoard(CircuitTier.CPU).get())
         }
@@ -92,7 +92,7 @@ object MiscComponents {
         toolCrafting(FLUID_CELL.item(Voltage.ULV)) {
             pattern("###")
             pattern("#G#")
-            pattern(" #")
+            pattern(" # ")
             define('#', getMaterial("iron").tag("plate"))
             define('G', getMaterial("glass").tag("primary"))
             toolTag(TOOL_HAMMER, TOOL_WRENCH)
@@ -101,6 +101,7 @@ object MiscComponents {
         assembler {
             componentVoltage = Voltage.ULV
             defaults {
+                voltage(Voltage.ULV)
                 workTicks(ASSEMBLY_TICKS)
                 tech(Technologies.SOLDERING)
             }

@@ -15,11 +15,13 @@ import org.shsts.tinactory.datagen.provider.TechProvider
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 object Technologies {
-    @JvmField val TECHS = DATA_GEN.createHandler(::TechProvider)
+    @JvmField
+    val TECHS = DATA_GEN.createHandler(::TechProvider)
 
-    @JvmField val BASE_ORE = Factory().run {
+    @JvmField
+    val BASE_ORE = Factory().run {
         OreVariant.entries.associateWith {
-            tech("ore_base/${it.name.lowercase()}") {
+            child("ore_base/${it.name.lowercase()}") {
                 maxProgress(20)
                 displayItem(it.baseItem)
                 researchVoltage(it.voltage)
@@ -28,36 +30,95 @@ object Technologies {
         }
     }
 
-    @JvmField val ALLOY_SMELTING: ResourceLocation
-    @JvmField val SOLDERING: ResourceLocation
-    @JvmField val STEEL: ResourceLocation
-    @JvmField val MOTOR: ResourceLocation
-    @JvmField val PUMP_AND_PISTON: ResourceLocation
-    @JvmField val ELECTRIC_HEATING: ResourceLocation
-    @JvmField val MATERIAL_CUTTING: ResourceLocation
-    @JvmField val CONVEYOR_MODULE: ResourceLocation
-    @JvmField val BATTERY: ResourceLocation
-    @JvmField val SENSOR_AND_EMITTER: ResourceLocation
-    @JvmField val HOT_WORKING: ResourceLocation
-    @JvmField val ROBOT_ARM: ResourceLocation
-    @JvmField val KANTHAL: ResourceLocation
-    @JvmField val SIFTING: ResourceLocation
-    @JvmField val AUTOFARM: ResourceLocation
-    @JvmField val INTEGRATED_CIRCUIT: ResourceLocation
-    @JvmField val COLD_WORKING: ResourceLocation
-    @JvmField val ELECTROLYZING: ResourceLocation
-    @JvmField val VACUUM_FREEZER: ResourceLocation
-    @JvmField val DISTILLATION: ResourceLocation
-    @JvmField val CHEMISTRY: ResourceLocation
-    @JvmField val PYROLYSE_OVEN: ResourceLocation
-    @JvmField val OIL_PROCESSING: ResourceLocation
-    @JvmField val ORGANIC_CHEMISTRY: ResourceLocation
-    @JvmField val CPU: ResourceLocation
-    @JvmField val CLEANROOM: ResourceLocation
-    @JvmField val NICHROME: ResourceLocation
-    @JvmField val ARC_FURNACE: ResourceLocation
-    @JvmField val HYDROMETALLURGY: ResourceLocation
-    @JvmField val ADVANCED_CHEMISTRY: ResourceLocation
+    @JvmField
+    val ALLOY_SMELTING: ResourceLocation
+
+    @JvmField
+    val SOLDERING: ResourceLocation
+
+    @JvmField
+    val STEEL: ResourceLocation
+
+    @JvmField
+    val MOTOR: ResourceLocation
+
+    @JvmField
+    val PUMP_AND_PISTON: ResourceLocation
+
+    @JvmField
+    val ELECTRIC_HEATING: ResourceLocation
+
+    @JvmField
+    val MATERIAL_CUTTING: ResourceLocation
+
+    @JvmField
+    val CONVEYOR_MODULE: ResourceLocation
+
+    @JvmField
+    val BATTERY: ResourceLocation
+
+    @JvmField
+    val SENSOR_AND_EMITTER: ResourceLocation
+
+    @JvmField
+    val HOT_WORKING: ResourceLocation
+
+    @JvmField
+    val ROBOT_ARM: ResourceLocation
+
+    @JvmField
+    val KANTHAL: ResourceLocation
+
+    @JvmField
+    val SIFTING: ResourceLocation
+
+    @JvmField
+    val AUTOFARM: ResourceLocation
+
+    @JvmField
+    val INTEGRATED_CIRCUIT: ResourceLocation
+
+    @JvmField
+    val COLD_WORKING: ResourceLocation
+
+    @JvmField
+    val ELECTROLYZING: ResourceLocation
+
+    @JvmField
+    val VACUUM_FREEZER: ResourceLocation
+
+    @JvmField
+    val DISTILLATION: ResourceLocation
+
+    @JvmField
+    val CHEMISTRY: ResourceLocation
+
+    @JvmField
+    val PYROLYSE_OVEN: ResourceLocation
+
+    @JvmField
+    val OIL_PROCESSING: ResourceLocation
+
+    @JvmField
+    val ORGANIC_CHEMISTRY: ResourceLocation
+
+    @JvmField
+    val CPU: ResourceLocation
+
+    @JvmField
+    val CLEANROOM: ResourceLocation
+
+    @JvmField
+    val NICHROME: ResourceLocation
+
+    @JvmField
+    val ARC_FURNACE: ResourceLocation
+
+    @JvmField
+    val HYDROMETALLURGY: ResourceLocation
+
+    @JvmField
+    val ADVANCED_CHEMISTRY: ResourceLocation
 
     init {
         Factory().apply {
@@ -242,6 +303,7 @@ object Technologies {
                 if (base != null) {
                     depends(base)
                 }
+                researchVoltage(voltage)
                 block()
                 register()
             }

@@ -16,6 +16,9 @@ class AssemblyRecipeFactory(
     fun output(component: Component, amount: Int = 1,
         suffix: String = "", voltage: Voltage = this.componentVoltage!!,
         rate: Double = 1.0, block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        if (!component.containsKey(voltage)) {
+            return
+        }
         output(component.item(voltage), amount, suffix, rate) {
             componentVoltage = voltage
             block()

@@ -76,5 +76,6 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
                 requireTech(tech)
             }
         }
+        builder.build()
     }
 }
