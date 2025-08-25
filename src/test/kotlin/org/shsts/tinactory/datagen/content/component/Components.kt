@@ -89,9 +89,11 @@ object Components {
             val k = 1 shl (2 * i)
             item(entry) {
                 model(basicItem(ae2("item/item_storage_cell_${k}k")))
+                tag(AllTags.ITEM_STORAGE_CELL)
             }
             item(FLUID_STORAGE_CELL[i]) {
                 model(basicItem(ae2("item/fluid_storage_cell_${k}k")))
+                tag(AllTags.FLUID_STORAGE_CELL)
             }
         }
     }
