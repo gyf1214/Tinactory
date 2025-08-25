@@ -99,21 +99,19 @@ object MiscComponents {
         }
 
         assembler {
+            componentVoltage = Voltage.ULV
             defaults {
+                workTicks(ASSEMBLY_TICKS)
                 tech(Technologies.SOLDERING)
             }
-            output(FLUID_CELL.item(Voltage.ULV)) {
+            output(FLUID_CELL) {
                 input("iron", "plate", 4)
                 input("glass", "primary")
                 input("soldering_alloy")
-                voltage(Voltage.ULV)
-                workTicks(ASSEMBLY_TICKS)
             }
             output(Items.NAME_TAG) {
                 input("iron", "plate")
                 input(TOOL_HANDLE)
-                voltage(Voltage.ULV)
-                workTicks(ASSEMBLY_TICKS)
             }
         }
     }

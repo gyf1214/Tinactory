@@ -23,7 +23,7 @@ import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.DataFactories.block
+import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.alloySmelter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autofarm
@@ -163,33 +163,35 @@ object Woods {
     }
 
     private fun rubber() {
-        block(RUBBER_LOG) {
-            blockState { ctx ->
-                ctx.provider().axisBlock(ctx.`object`(),
-                    gregtech("blocks/wood/rubber/log_rubber_side"),
-                    gregtech("blocks/wood/rubber/log_rubber_top"))
+        blockData {
+            block(RUBBER_LOG) {
+                blockState { ctx ->
+                    ctx.provider().axisBlock(ctx.`object`(),
+                        gregtech("blocks/wood/rubber/log_rubber_side"),
+                        gregtech("blocks/wood/rubber/log_rubber_top"))
+                }
+                tag(listOf(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN))
+                itemTag(listOf(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN))
+                dropSelf()
+                dropOnState(STICKY_RESIN, RubberLogBlock.HAS_RUBBER, true)
             }
-            tag(listOf(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN))
-            itemTag(listOf(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN))
-            dropSelf()
-            dropOnState(STICKY_RESIN, RubberLogBlock.HAS_RUBBER, true)
-        }
-        block(RUBBER_LEAVES) {
-            blockState(Models.cubeTint("wood/rubber/leaves_rubber"))
-            tag(BlockTags.LEAVES)
-            itemTag(ItemTags.LEAVES)
-            dropSelfOnTool(TOOL_SHEARS)
-            drop(RUBBER_SAPLING, 0.075f)
-        }
-        block(RUBBER_SAPLING) {
-            blockState { ctx ->
-                val provider = ctx.provider()
-                provider.simpleBlock(ctx.`object`(), provider.models()
-                    .cross(ctx.id(), gregtech("blocks/wood/rubber/sapling_rubber")))
+            block(RUBBER_LEAVES) {
+                blockState(Models.cubeTint("wood/rubber/leaves_rubber"))
+                tag(BlockTags.LEAVES)
+                itemTag(ItemTags.LEAVES)
+                dropSelfOnTool(TOOL_SHEARS)
+                drop(RUBBER_SAPLING, 0.075f)
             }
-            itemModel(Models.basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
-            tag(BlockTags.SAPLINGS)
-            itemTag(ItemTags.SAPLINGS)
+            block(RUBBER_SAPLING) {
+                blockState { ctx ->
+                    val provider = ctx.provider()
+                    provider.simpleBlock(ctx.`object`(), provider.models().cross(
+                        ctx.id(), gregtech("blocks/wood/rubber/sapling_rubber")))
+                }
+                itemModel(Models.basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
+                tag(BlockTags.SAPLINGS)
+                itemTag(ItemTags.SAPLINGS)
+            }
         }
 
         farm(RUBBER_SAPLING.get(), RUBBER_LOG.get(), RUBBER_LEAVES.get(), true)

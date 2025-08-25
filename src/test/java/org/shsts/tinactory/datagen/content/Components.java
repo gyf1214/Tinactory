@@ -4,99 +4,68 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.electric.CircuitComponentTier;
 import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder1;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllItems.ADVANCED_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.BASIC_INTEGRATED;
-import static org.shsts.tinactory.content.AllItems.BATTERY;
-import static org.shsts.tinactory.content.AllItems.BOULES;
-import static org.shsts.tinactory.content.AllItems.CABLE;
 import static org.shsts.tinactory.content.AllItems.CAPACITOR;
 import static org.shsts.tinactory.content.AllItems.CHIPS;
-import static org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE;
 import static org.shsts.tinactory.content.AllItems.DIODE;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR;
-import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
-import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT;
-import static org.shsts.tinactory.content.AllItems.EMITTER;
-import static org.shsts.tinactory.content.AllItems.FLUID_CELL;
 import static org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC;
 import static org.shsts.tinactory.content.AllItems.GOOD_INTEGRATED;
 import static org.shsts.tinactory.content.AllItems.INDUCTOR;
 import static org.shsts.tinactory.content.AllItems.INTEGRATED_PROCESSOR;
 import static org.shsts.tinactory.content.AllItems.ITEM_FILTER;
-import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.MAINFRAME;
 import static org.shsts.tinactory.content.AllItems.MICROPROCESSOR;
 import static org.shsts.tinactory.content.AllItems.PROCESSOR_ASSEMBLY;
 import static org.shsts.tinactory.content.AllItems.RAW_WAFERS;
 import static org.shsts.tinactory.content.AllItems.RESISTOR;
-import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
-import static org.shsts.tinactory.content.AllItems.SENSOR;
 import static org.shsts.tinactory.content.AllItems.STICKY_RESIN;
 import static org.shsts.tinactory.content.AllItems.TRANSISTOR;
 import static org.shsts.tinactory.content.AllItems.VACUUM_TUBE;
 import static org.shsts.tinactory.content.AllItems.WAFERS;
 import static org.shsts.tinactory.content.AllItems.WORKSTATION;
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
-import static org.shsts.tinactory.content.AllMaterials.BATTERY_ALLOY;
-import static org.shsts.tinactory.content.AllMaterials.BRASS;
 import static org.shsts.tinactory.content.AllMaterials.BRONZE;
-import static org.shsts.tinactory.content.AllMaterials.CADMIUM;
-import static org.shsts.tinactory.content.AllMaterials.CHROME;
-import static org.shsts.tinactory.content.AllMaterials.COAL;
 import static org.shsts.tinactory.content.AllMaterials.COPPER;
 import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.DIAMOND;
 import static org.shsts.tinactory.content.AllMaterials.ELECTRUM;
 import static org.shsts.tinactory.content.AllMaterials.EMERALD;
-import static org.shsts.tinactory.content.AllMaterials.GALLIUM_ARSENIDE;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.GOLD;
 import static org.shsts.tinactory.content.AllMaterials.INVAR;
-import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.IRON_CHLORIDE;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
-import static org.shsts.tinactory.content.AllMaterials.LITHIUM;
-import static org.shsts.tinactory.content.AllMaterials.NEODYMIUM;
 import static org.shsts.tinactory.content.AllMaterials.NICHROME;
-import static org.shsts.tinactory.content.AllMaterials.NICKEL_ZINC_FERRITE;
 import static org.shsts.tinactory.content.AllMaterials.PE;
 import static org.shsts.tinactory.content.AllMaterials.PTFE;
 import static org.shsts.tinactory.content.AllMaterials.PVC;
 import static org.shsts.tinactory.content.AllMaterials.RED_ALLOY;
-import static org.shsts.tinactory.content.AllMaterials.RUBBER;
 import static org.shsts.tinactory.content.AllMaterials.RUBY;
 import static org.shsts.tinactory.content.AllMaterials.SAPPHIRE;
-import static org.shsts.tinactory.content.AllMaterials.SILICON;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
-import static org.shsts.tinactory.content.AllMaterials.SODIUM_HYDROXIDE;
 import static org.shsts.tinactory.content.AllMaterials.SOLDERING_ALLOY;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.SULFURIC_ACID;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.content.AllMaterials.TITANIUM;
-import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.content.AllMaterials.ZINC;
 import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE;
 import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
@@ -113,251 +82,26 @@ import static org.shsts.tinactory.content.AllMultiblocks.PLASCRETE;
 import static org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
-import static org.shsts.tinactory.content.AllRecipes.BLAST_FURNACE;
 import static org.shsts.tinactory.content.AllRecipes.CHEMICAL_REACTOR;
 import static org.shsts.tinactory.content.AllRecipes.CIRCUIT_ASSEMBLER;
-import static org.shsts.tinactory.content.AllRecipes.CUTTER;
 import static org.shsts.tinactory.content.AllRecipes.LASER_ENGRAVER;
-import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
-import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
-import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
-import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
-import static org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER;
 import static org.shsts.tinactory.content.electric.Circuits.board;
 import static org.shsts.tinactory.content.electric.Circuits.circuitBoard;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
-import static org.shsts.tinactory.datagen.content.Models.solidBlock;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Components {
-    private static final int ASSEMBLY_TICKS = 100;
-
     public static void init() {
-        misc();
-        componentRecipes();
         circuitRecipes();
         multiblockRecipes();
     }
 
-    private static void misc() {
-        DATA_GEN.block(PLASCRETE)
-            .blockState(solidBlock("casings/cleanroom/plascrete"))
-            .tag(MINEABLE_WITH_WRENCH)
-            .tag(CLEANROOM_WALL)
-            .build()
-            .block(FILTER_CASING)
-            .blockState(ctx -> ctx.provider().simpleBlock(ctx.object(),
-                ctx.provider().models().cubeColumn(ctx.id(),
-                    gregtech("blocks/casings/cleanroom/plascrete"),
-                    gregtech("blocks/casings/cleanroom/filter_casing"))))
-            .tag(MINEABLE_WITH_WRENCH)
-            .build()
-            .block(PTFE_PIPE_CASING)
-            .blockState(solidBlock("casings/pipe/machine_casing_pipe_polytetrafluoroethylene"))
-            .tag(MINEABLE_WITH_WRENCH)
-            .build();
-
-        DATA_GEN.tag(BlockTags.DOORS, CLEANROOM_DOOR);
-    }
-
-    private static void componentRecipes() {
-        TOOL_CRAFTING.recipe(DATA_GEN, CABLE.get(Voltage.LV))
-            .result(CABLE.get(Voltage.LV), 1)
-            .pattern("WWR").pattern("WWR").pattern("RR ")
-            .define('W', TIN.tag("wire"))
-            .define('R', RUBBER.tag("sheet"))
-            .toolTag(TOOL_WIRE_CUTTER)
-            .build();
-
-        CABLE.forEach((v, cable) -> {
-            if (v != Voltage.ULV) {
-                ASSEMBLER.recipe(DATA_GEN, cable)
-                    .outputItem(cable, 1)
-                    .inputItem(cable.get().material.tag("wire"), 4)
-                    .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(2))
-                    .voltage(v == Voltage.LV ? Voltage.ULV : Voltage.LV)
-                    .requireTech(Technologies.HOT_WORKING)
-                    .workTicks(100L)
-                    .build();
-            }
-        });
-
-        componentRecipe(Voltage.LV, STEEL, COPPER, BRONZE, TIN, STEEL, BRASS, GLASS);
-        componentRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, BRASS, BRONZE, STEEL, ELECTRUM, RUBY);
-        componentRecipe(Voltage.HV, STAINLESS_STEEL, ELECTRUM, STAINLESS_STEEL, STEEL, STEEL, CHROME, EMERALD);
-        // TODO: sensor and emitter
-        componentRecipe(Voltage.EV, TITANIUM, KANTHAL, TITANIUM, STAINLESS_STEEL, NEODYMIUM, CHROME, EMERALD);
-
-        batteryRecipe(Voltage.LV, CADMIUM);
-        batteryRecipe(Voltage.MV, SODIUM_HYDROXIDE);
-        batteryRecipe(Voltage.HV, LITHIUM);
-    }
-
-    private static class ComponentRecipeFactory {
-        private final Voltage voltage;
-        private final Voltage baseVoltage;
-
-        public ComponentRecipeFactory(Voltage voltage) {
-            this.voltage = voltage;
-            this.baseVoltage = voltage == Voltage.LV ? Voltage.ULV : Voltage.LV;
-        }
-
-        public AssemblyRecipeBuilder1<ComponentRecipeFactory> recipe(
-            Map<Voltage, ? extends IEntry<? extends ItemLike>> component, int count) {
-            if (!component.containsKey(voltage)) {
-                return new AssemblyRecipeBuilder1<>(this);
-            }
-            var builder = ASSEMBLER.recipe(DATA_GEN, component.get(voltage))
-                .outputItem(component.get(voltage), count)
-                .voltage(baseVoltage)
-                .workTicks(ASSEMBLY_TICKS);
-            return new AssemblyRecipeBuilder1<>(this, voltage, builder);
-        }
-
-        public AssemblyRecipeBuilder1<ComponentRecipeFactory> recipe(
-            Map<Voltage, ? extends IEntry<? extends ItemLike>> component) {
-            return recipe(component, 1);
-        }
-    }
-
-    private static void componentRecipe(Voltage voltage, MaterialSet main,
-        MaterialSet motor, MaterialSet pipe,
-        MaterialSet rotor, MaterialSet magnetic,
-        MaterialSet sensor, MaterialSet quartz) {
-        var factory = new ComponentRecipeFactory(voltage);
-
-        factory.recipe(ELECTRIC_MOTOR)
-            .material(magnetic, "magnetic", 1)
-            .material(main, "stick", 2)
-            .material(motor, "wire", 2 * voltage.rank)
-            .component(CABLE, 2)
-            .tech(Technologies.MOTOR)
-            .build()
-            .recipe(ELECTRIC_PUMP)
-            .component(ELECTRIC_MOTOR, 1)
-            .material(pipe, "pipe", 1)
-            .material(rotor, "rotor", 1)
-            .material(rotor, "screw", 3)
-            .material(RUBBER, "ring", 2)
-            .component(CABLE, 1)
-            .tech(Technologies.PUMP_AND_PISTON)
-            .build()
-            .recipe(ELECTRIC_PISTON)
-            .component(ELECTRIC_MOTOR, 1)
-            .material(main, "plate", 3)
-            .material(main, "stick", 2)
-            .material(main, "gear", 1)
-            .component(CABLE, 2)
-            .tech(Technologies.PUMP_AND_PISTON)
-            .build()
-            .recipe(CONVEYOR_MODULE)
-            .component(ELECTRIC_MOTOR, 2)
-            .component(CABLE, 1)
-            .materialFluid(RUBBER, 6)
-            .tech(Technologies.CONVEYOR_MODULE)
-            .build()
-            .recipe(SENSOR)
-            .material(quartz, "gem", 1)
-            .circuit(1)
-            .material(sensor, "stick", 1)
-            .material(main, "plate", 4)
-            .tech(Technologies.SENSOR_AND_EMITTER)
-            .build()
-            .recipe(EMITTER)
-            .material(quartz, "gem", 1)
-            .circuit(2)
-            .component(CABLE, 2)
-            .material(sensor, "stick", 4)
-            .tech(Technologies.SENSOR_AND_EMITTER)
-            .build()
-            .recipe(ROBOT_ARM)
-            .circuit(1)
-            .component(CABLE, 3)
-            .component(ELECTRIC_MOTOR, 2)
-            .component(ELECTRIC_PISTON, 1)
-            .material(main, "stick", 2)
-            .tech(Technologies.ROBOT_ARM)
-            .build()
-            .recipe(MACHINE_HULL)
-            .material(main, "plate", 8)
-            .component(CABLE, 2)
-            .transform($ -> voltage.rank >= Voltage.HV.rank ? $.materialFluid(PE, 2f) : $)
-            .tech(Technologies.SOLDERING)
-            .build()
-            .recipe(FLUID_CELL)
-            .material(main, "plate", voltage.rank * 2)
-            .material(rotor, "ring", voltage.rank)
-            .materialFluid(SOLDERING_ALLOY, voltage.rank)
-            .tech(Technologies.SOLDERING)
-            .transformBuilder($ -> $.voltage(Voltage.LV))
-            .build();
-    }
-
-    private static void batteryRecipe(Voltage voltage, MaterialSet material) {
-        var wires = voltage.rank - 1;
-        var plates = wires * wires;
-
-        var builder = ASSEMBLER.recipe(DATA_GEN, BATTERY.get(voltage))
-            .outputItem(BATTERY.get(voltage), 1);
-        if (voltage.rank > Voltage.LV.rank) {
-            var bat1 = AllTags.battery(Voltage.fromRank(voltage.rank - 1));
-            builder.inputItem(bat1, 2);
-        }
-        builder.inputItem(CABLE.get(voltage), wires)
-            .inputItem(BATTERY_ALLOY.tag("plate"), plates)
-            .inputItem(material.tag("dust"), plates)
-            .inputFluid(SOLDERING_ALLOY.fluid(), SOLDERING_ALLOY.fluidAmount(wires))
-            .voltage(Voltage.LV)
-            .workTicks(ASSEMBLY_TICKS)
-            .requireTech(Technologies.BATTERY)
-            .build();
-    }
-
     private static void circuitRecipes() {
-        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-            .shaped(VACUUM_TUBE.getItem())
-            .pattern("BGB").pattern("WWW")
-            .define('G', GLASS.tag("primary"))
-            .define('W', COPPER.tag("wire"))
-            .define('B', IRON.tag("bolt"))
-            .unlockedBy("has_wire", has(COPPER.tag("wire"))));
-
-        ASSEMBLER.recipe(DATA_GEN, VACUUM_TUBE.item())
-            .outputItem(VACUUM_TUBE.item(), 1)
-            .inputItem(GLASS.tag("primary"), 1)
-            .inputItem(COPPER.tag("wire"), 1)
-            .inputItem(IRON.tag("bolt"), 1)
-            .workTicks(120L)
-            .voltage(Voltage.ULV)
-            .requireTech(Technologies.SOLDERING)
-            .build();
-
-        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-            .shaped(ELECTRONIC_CIRCUIT.getItem())
-            .pattern("RPR").pattern("TBT").pattern("WWW")
-            .define('R', RESISTOR.getItem(CircuitComponentTier.NORMAL))
-            .define('P', STEEL.tag("plate"))
-            .define('T', VACUUM_TUBE.getItem())
-            .define('B', circuitBoard(CircuitTier.ELECTRONIC).get())
-            .define('W', RED_ALLOY.tag("wire"))
-            .unlockedBy("has_board", has(circuitBoard(CircuitTier.ELECTRONIC).get())));
-
         circuitRecipe(ELECTRONIC_CIRCUIT, VACUUM_TUBE, 2, RESISTOR, 2, RED_ALLOY.tag("wire"), 2);
-
-        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-            .shaped(GOOD_ELECTRONIC.getItem())
-            .pattern("DPD").pattern("EBE").pattern("WEW")
-            .define('D', DIODE.getItem(CircuitComponentTier.NORMAL))
-            .define('P', STEEL.tag("plate"))
-            .define('E', ELECTRONIC_CIRCUIT.getItem())
-            .define('B', circuitBoard(CircuitTier.ELECTRONIC).get())
-            .define('W', COPPER.tag("wire"))
-            .unlockedBy("has_circuit", has(ELECTRONIC_CIRCUIT.getItem())));
 
         circuitRecipe(GOOD_ELECTRONIC, ELECTRONIC_CIRCUIT, 2, DIODE, 2, COPPER.tag("wire"), 2);
 
@@ -378,80 +122,6 @@ public final class Components {
             ELECTRUM.tag("wire_fine"), 16, GOLD.tag("bolt"), 16);
         circuitRecipe(MAINFRAME, ALUMINIUM.tag("stick"), 8, WORKSTATION, 2,
             CHIPS.get("ram"), 16, INDUCTOR, 8, CAPACITOR, 16, COPPER.tag("wire"), 16);
-
-        // circuit components
-        DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
-            .shaped(RESISTOR.getItem(CircuitComponentTier.NORMAL))
-            .pattern(" R ").pattern("WCW").pattern(" R ")
-            .define('R', STICKY_RESIN.get())
-            .define('W', COPPER.tag("wire"))
-            .define('C', COAL.tag("dust"))
-            .unlockedBy("has_resin", has(STICKY_RESIN.get())));
-
-        ASSEMBLER.recipe(DATA_GEN, RESISTOR.loc(CircuitComponentTier.NORMAL))
-            .outputItem(RESISTOR.item(CircuitComponentTier.NORMAL), 2)
-            .inputItem(COAL.tag("dust"), 1)
-            .inputItem(COPPER.tag("wire_fine"), 4)
-            .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(1f))
-            .workTicks(ASSEMBLY_TICKS)
-            .voltage(Voltage.ULV)
-            .requireTech(Technologies.SOLDERING)
-            .build()
-            .recipe(DATA_GEN, CAPACITOR.loc(CircuitComponentTier.NORMAL))
-            .outputItem(CAPACITOR.item(CircuitComponentTier.NORMAL), 8)
-            .inputItem(PVC.tag("foil"), 1)
-            .inputItem(ALUMINIUM.tag("foil"), 2)
-            .inputFluid(PE.fluid(), PE.fluidAmount(1f))
-            .workTicks(ASSEMBLY_TICKS)
-            .voltage(Voltage.LV)
-            .requireTech(Technologies.INTEGRATED_CIRCUIT)
-            .build()
-            .recipe(DATA_GEN, INDUCTOR.loc(CircuitComponentTier.NORMAL))
-            .outputItem(INDUCTOR.item(CircuitComponentTier.NORMAL), 4)
-            .inputItem(NICKEL_ZINC_FERRITE.tag("ring"), 1)
-            .inputItem(COPPER.tag("wire_fine"), 2)
-            .inputFluid(PE.fluid(), PE.fluidAmount(0.25f))
-            .workTicks(ASSEMBLY_TICKS)
-            .voltage(Voltage.LV)
-            .requireTech(Technologies.INTEGRATED_CIRCUIT)
-            .build()
-            .recipe(DATA_GEN, DIODE.loc(CircuitComponentTier.NORMAL))
-            .outputItem(DIODE.item(CircuitComponentTier.NORMAL), 4)
-            .inputItem(GALLIUM_ARSENIDE.tag("dust"), 1)
-            .inputItem(GLASS.tag("primary"), 1)
-            .inputItem(COPPER.tag("wire_fine"), 4)
-            .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(2f))
-            .workTicks(ASSEMBLY_TICKS)
-            .voltage(Voltage.LV)
-            .requireTech(Technologies.SOLDERING)
-            .build()
-            .recipe(DATA_GEN, suffix(DIODE.loc(CircuitComponentTier.NORMAL), "_from_wafer"))
-            .outputItem(DIODE.item(CircuitComponentTier.NORMAL), 8)
-            .inputItem(RAW_WAFERS.get(0), 1)
-            .inputItem(COPPER.tag("wire_fine"), 4)
-            .inputFluid(PE.fluid(), PE.fluidAmount(1f))
-            .workTicks(ASSEMBLY_TICKS)
-            .voltage(Voltage.LV)
-            .requireTech(Technologies.INTEGRATED_CIRCUIT)
-            .build()
-            .recipe(DATA_GEN, TRANSISTOR.loc(CircuitComponentTier.NORMAL))
-            .outputItem(TRANSISTOR.item(CircuitComponentTier.NORMAL), 4)
-            .inputItem(GALLIUM_ARSENIDE.tag("dust"), 1)
-            .inputItem(TIN.tag("wire_fine"), 6)
-            .inputFluid(RUBBER.fluid(), RUBBER.fluidAmount(2f))
-            .workTicks(ASSEMBLY_TICKS)
-            .voltage(Voltage.LV)
-            .requireTech(Technologies.INTEGRATED_CIRCUIT)
-            .build()
-            .recipe(DATA_GEN, suffix(TRANSISTOR.loc(CircuitComponentTier.NORMAL), "_from_pe"))
-            .outputItem(TRANSISTOR.item(CircuitComponentTier.NORMAL), 8)
-            .inputItem(SILICON.tag("dust"), 1)
-            .inputItem(TIN.tag("wire_fine"), 6)
-            .inputFluid(PE.fluid(), PE.fluidAmount(1f))
-            .workTicks(ASSEMBLY_TICKS)
-            .voltage(Voltage.LV)
-            .requireTech(Technologies.INTEGRATED_CIRCUIT)
-            .build();
 
         // boards
         DATA_GEN.vanillaRecipe(() -> ShapedRecipeBuilder
@@ -535,47 +205,11 @@ public final class Components {
             .requireTech(Technologies.CPU)
             .build();
 
-        // boules
-        BLAST_FURNACE.recipe(DATA_GEN, BOULES.get(0))
-            .outputItem(BOULES.get(0), 1)
-            .inputItem(SILICON.tag("dust"), 32)
-            .inputItem(GALLIUM_ARSENIDE.tag("dust"), 1)
-            .voltage(Voltage.LV)
-            .workTicks(6400L)
-            .temperature(2100)
-            .build();
-
-        // raw wafers
-        for (var i = 0; i < RAW_WAFERS.size(); i++) {
-            var boule = BOULES.get(i);
-            var wafer = RAW_WAFERS.get(i);
-            CUTTER.recipe(DATA_GEN, wafer)
-                .outputItem(wafer, 8 << i)
-                .inputItem(boule, 1)
-                .inputFluid(WATER.fluid(), WATER.fluidAmount(1 << i))
-                .voltage(Voltage.fromRank(2 + 2 * i))
-                .workTicks(400L << i)
-                .build();
-        }
-
         // engraving
         engravingRecipe("integrated_circuit", RUBY, 0, Voltage.LV, -1d, 0d);
         engravingRecipe("cpu", DIAMOND, 0, Voltage.MV, 0d, 0.5d);
         engravingRecipe("ram", SAPPHIRE, 0, Voltage.MV, -0.25d, 0.25d);
         engravingRecipe("low_pic", EMERALD, 0, Voltage.MV, -0.3d, 0.2d);
-
-        // chips
-        for (var entry : CHIPS.entrySet()) {
-            var wafer = WAFERS.get(entry.getKey());
-            var chip = entry.getValue();
-            CUTTER.recipe(DATA_GEN, chip)
-                .outputItem(chip, 6)
-                .inputItem(wafer, 1)
-                .inputFluid(WATER.fluid(), WATER.fluidAmount(0.75f))
-                .voltage(Voltage.LV)
-                .workTicks(300L)
-                .build();
-        }
     }
 
     private static void engravingRecipe(String name, MaterialSet lens, int level, Voltage voltage,

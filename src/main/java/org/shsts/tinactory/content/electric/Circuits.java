@@ -35,15 +35,15 @@ public final class Circuits {
         }
 
         public ResourceLocation loc(CircuitComponentTier tier) {
-            return item(tier).loc();
+            return entry(tier).loc();
         }
 
-        public IEntry<Item> item(CircuitComponentTier tier) {
+        public IEntry<Item> entry(CircuitComponentTier tier) {
             return COMPONENTS.get(new ComponentKey(component, tier));
         }
 
-        public Item getItem(CircuitComponentTier tier) {
-            return item(tier).get();
+        public Item item(CircuitComponentTier tier) {
+            return entry(tier).get();
         }
 
         public TagKey<Item> tag(CircuitComponentTier tier) {

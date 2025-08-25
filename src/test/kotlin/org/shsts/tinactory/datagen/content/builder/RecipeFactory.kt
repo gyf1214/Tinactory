@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.util.LocHelper.suffix
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
-class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<*>>(
+open class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<*>>(
     private val recipeType: IRecipeType<B>, private val factory: (B) -> RB,
     private val defaults: RB.() -> Unit = {}) {
 

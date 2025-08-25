@@ -31,8 +31,9 @@ import org.shsts.tinactory.datagen.content.Models.VOID_TEX
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.oreBlock
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.DataFactories.block
-import org.shsts.tinactory.datagen.content.builder.DataFactories.item
+import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
+import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
+import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.alloySmelter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bender
@@ -54,7 +55,6 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.model.IconSet
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 import org.shsts.tinycorelib.api.registrate.entry.IEntry
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext
 import kotlin.math.round
@@ -91,7 +91,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     private fun newItem(sub: String, tag: TagKey<Item>, entry: IEntry<out Item>) {
-        item(entry) {
+        itemData(entry) {
             tag(tag)
             if (sub.startsWith("tool/")) {
                 model { toolModel(it, sub) }
@@ -104,14 +104,13 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             } else {
                 model { icon.itemModel(it, sub) }
             }
-            build()
         }
     }
 
     private fun buildItem(sub: String) {
         val prefixTag = AllMaterials.tag(sub)
         val tag = material.tag(sub)
-        DATA_GEN.tag(tag, prefixTag)
+        dataGen { tag(tag, prefixTag) }
 
         if (material.isAlias(sub)) {
             // do nothing for alias
@@ -120,7 +119,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
         if (material.hasTarget(sub)) {
             // simply add tag for existing tag
-            DATA_GEN.tag(material.target(sub), tag)
+            dataGen { tag(material.target(sub), tag) }
             return
         }
 
@@ -130,14 +129,14 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             newItem(sub, tag, entry)
         } else {
             // simple add tag for existing item
-            DATA_GEN.tag(entry, tag)
+            dataGen { tag(entry, tag) }
         }
     }
 
     private fun buildOre() {
         val variant = material.oreVariant()
         val tierTag = variant.mineTier.tag!!
-        block(material.blockEntry("ore") as IEntry<out Block>) {
+        blockData(material.blockEntry("ore") as IEntry<out Block>) {
             blockState { oreBlock(it, variant) }
             tag(BlockTags.MINEABLE_WITH_PICKAXE)
             tag(tierTag)

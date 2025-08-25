@@ -19,7 +19,6 @@ import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
 typealias ProcessingRecipeFactory = ProcessingRecipeFactoryBase<ProcessingRecipe.Builder>
 typealias BlastFurnaceRecipeFactory = ProcessingRecipeFactoryBase<BlastFurnaceRecipe.Builder>
-typealias AssemblyRecipeFactory = RecipeFactory<AssemblyRecipe.Builder, AssemblyRecipeBuilder>
 typealias ChemicalRecipeFactory = RecipeFactory<ChemicalReactorRecipe.Builder, ChemicalRecipeBuilder>
 typealias MarkerFactory = RecipeFactory<MarkerRecipe.Builder, MarkerBuilder>
 
@@ -80,7 +79,7 @@ object RecipeFactories {
 
     fun assembler(block: AssemblyRecipeFactory.() -> Unit) {
         val recipeType = REGISTRATE.getRecipeType<AssemblyRecipe.Builder>("assembler")
-        RecipeFactory(recipeType, ::AssemblyRecipeBuilder) {
+        AssemblyRecipeFactory(recipeType) {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2

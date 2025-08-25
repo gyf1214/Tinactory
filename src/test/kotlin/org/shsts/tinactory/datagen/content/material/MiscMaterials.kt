@@ -20,7 +20,8 @@ import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.material.OreVariant
 import org.shsts.tinactory.datagen.content.Models.basicItem
-import org.shsts.tinactory.datagen.content.builder.DataFactories.item
+import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
+import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
@@ -30,11 +31,10 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolShapeless
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 object MiscMaterials {
     fun init() {
-        item(STICKY_RESIN) { model(basicItem("metaitems/rubber_drop")) }
+        itemData(STICKY_RESIN) { model(basicItem("metaitems/rubber_drop")) }
 
         // blast ores
         blast()
@@ -275,7 +275,7 @@ object MiscMaterials {
     }
 
     private fun tags() {
-        DATA_GEN.apply {
+        dataGen {
             tag(TOOL_HAMMER, TOOL)
             tag(TOOL_MORTAR, TOOL)
             tag(TOOL_FILE, TOOL)

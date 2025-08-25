@@ -14,7 +14,7 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ProcessingResults
 
 open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(protected val builder: B) {
-    private var voltage: Voltage? = null
+    protected var voltage: Voltage? = null
     var amperage: Double? = null
     var defaultInputItem: Int? = null
     var defaultInputFluid: Int? = null
@@ -24,15 +24,11 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(prote
     var defaultFluidSub = "fluid"
     var requirePower = true
 
-    fun defaults(inputItem: Int, inputFluid: Int, outputItem: Int, outputFluid: Int) {
-        defaultInputItem = inputItem
-        defaultInputFluid = inputFluid
-        defaultOutputItem = outputItem
-        defaultOutputFluid = outputFluid
-    }
-
     fun fullDefaults() {
-        defaults(0, 1, 2, 3)
+        defaultInputItem = 0
+        defaultInputFluid = 1
+        defaultOutputItem = 2
+        defaultOutputFluid = 3
     }
 
     fun simpleDefaults() {

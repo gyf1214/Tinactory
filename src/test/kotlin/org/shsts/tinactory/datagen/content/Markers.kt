@@ -4,9 +4,9 @@ import org.shsts.tinactory.content.AllBlockEntities
 import org.shsts.tinactory.content.AllMaterials
 import org.shsts.tinactory.content.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.modLoc
+import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.marker
 import org.shsts.tinactory.integration.jei.category.RecipeCategory
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 object Markers {
     fun init() {
@@ -75,7 +75,9 @@ object Markers {
         }
 
         for (type in allTypes) {
-            DATA_GEN.trackLang(RecipeCategory.categoryTitleId(type))
+            dataGen {
+                trackLang(RecipeCategory.categoryTitleId(type))
+            }
         }
     }
 }
