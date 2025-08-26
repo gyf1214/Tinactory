@@ -111,7 +111,6 @@ object MachineComponents {
                 }
                 workTicks(ASSEMBLY_TICKS)
             }
-
             output(ELECTRIC_MOTOR) {
                 input(magnetic, "magnetic")
                 input(main, "stick", 2)
@@ -119,7 +118,6 @@ object MachineComponents {
                 input(CABLE, 2)
                 tech(Technologies.MOTOR)
             }
-
             output(ELECTRIC_PUMP) {
                 input(ELECTRIC_MOTOR, 1)
                 input(pipe, "pipe")
@@ -129,7 +127,6 @@ object MachineComponents {
                 input(CABLE, 1)
                 tech(Technologies.PUMP_AND_PISTON)
             }
-
             output(ELECTRIC_PISTON) {
                 input(ELECTRIC_MOTOR, 1)
                 input(main, "plate", 3)
@@ -138,14 +135,12 @@ object MachineComponents {
                 input(CABLE, 2)
                 tech(Technologies.PUMP_AND_PISTON)
             }
-
             output(CONVEYOR_MODULE) {
                 input(ELECTRIC_MOTOR, 2)
                 input(CABLE, 1)
                 input("rubber", amount = 6)
                 tech(Technologies.CONVEYOR_MODULE)
             }
-
             output(SENSOR) {
                 input(quartz, "gem")
                 circuit(1)
@@ -153,7 +148,6 @@ object MachineComponents {
                 input(main, "plate", 4)
                 tech(Technologies.SENSOR_AND_EMITTER)
             }
-
             output(EMITTER) {
                 input(quartz, "gem")
                 circuit(2)
@@ -161,7 +155,6 @@ object MachineComponents {
                 input(sensor, "stick", 4)
                 tech(Technologies.SENSOR_AND_EMITTER)
             }
-
             output(ROBOT_ARM) {
                 circuit(1)
                 input(CABLE, 3)
@@ -170,7 +163,6 @@ object MachineComponents {
                 input(main, "stick", 2)
                 tech(Technologies.ROBOT_ARM)
             }
-
             output(MACHINE_HULL) {
                 input(main, "plate", 8)
                 input(CABLE, 2)
@@ -179,7 +171,6 @@ object MachineComponents {
                 }
                 tech(Technologies.SOLDERING)
             }
-
             output(FLUID_CELL) {
                 input(main, "plate", voltage.rank * 2)
                 input(rotor, "ring", voltage.rank)

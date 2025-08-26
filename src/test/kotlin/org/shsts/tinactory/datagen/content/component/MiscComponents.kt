@@ -8,6 +8,7 @@ import org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP
 import org.shsts.tinactory.content.AllItems.FLUID_CELL
 import org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW
 import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
+import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllItems.MACHINE_HULL
 import org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT
 import org.shsts.tinactory.content.AllMaterials.getMaterial
@@ -46,6 +47,13 @@ object MiscComponents {
         }
 
         assembler {
+            output(ITEM_FILTER.get()) {
+                input("steel", "plate")
+                input("zinc", "foil", 8)
+                voltage(Voltage.LV)
+                workTicks(200)
+                tech(Technologies.SIFTING)
+            }
             output(GOOD_GRINDER.get()) {
                 input("diamond", "gem_flawless")
                 input("steel", "plate", 8)
