@@ -399,7 +399,7 @@ object CircuitComponents {
             chemicalReactor {
                 defaults {
                     input("copper", "foil", 4)
-                    input("sulfuric_acid", "dilute", 0.5)
+                    input("sulfuric_acid", "dilute", 0.25)
                     voltage(Voltage.MV)
                     workTicks(240)
                     tech(Technologies.CPU)
@@ -434,7 +434,7 @@ object CircuitComponents {
         val circuitBoard = circuitBoard(tier).get()
 
         fun SimpleProcessingBuilder.input(component: CircuitComponent, amount: Int = 1) {
-            input(component.item(componentTier), amount)
+            input(component.tag(componentTier), amount)
         }
 
         fun SimpleProcessingBuilder.input(circuit: Circuit, amount: Int = 1) {
@@ -456,7 +456,7 @@ object CircuitComponents {
                 val voltage1 = if (voltage.rank < Voltage.LV.rank) Voltage.LV else voltage
                 val level = 1 + max(0, circuit.level().voltageOffset)
                 val solder = (1 shl (level - 1)) / 2.0
-                input("soldering", amount = solder)
+                input("soldering_alloy", amount = solder)
                 voltage(voltage1)
                 workTicks(200L * level)
             }

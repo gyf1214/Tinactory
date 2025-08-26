@@ -13,6 +13,11 @@ class AssemblyRecipeFactory(
         recipeType, ::AssemblyRecipeBuilder, defaults) {
     var componentVoltage: Voltage? = null
 
+    override fun classDefaults(builder: AssemblyRecipeBuilder) {
+        super.classDefaults(builder)
+        builder.componentVoltage = componentVoltage
+    }
+
     fun output(component: Component, amount: Int = 1,
         suffix: String = "", voltage: Voltage = this.componentVoltage!!,
         rate: Double = 1.0, block: AssemblyRecipeBuilder.() -> Unit = {}) {

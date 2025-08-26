@@ -29,11 +29,15 @@ open class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : Processing
         return suffix(loc, suffix)
     }
 
+    protected open fun classDefaults(builder: RB) {
+        builder.defaultItemSub = this@RecipeFactory.defaultItemSub
+        builder.defaultFluidSub = this@RecipeFactory.defaultFluidSub
+    }
+
     private fun build(inner: B, block: RB.() -> Unit) {
         factory(inner).apply {
             defaults()
-            defaultItemSub = this@RecipeFactory.defaultItemSub
-            defaultFluidSub = this@RecipeFactory.defaultFluidSub
+            classDefaults(this)
             userDefaults()
             block()
             build()
