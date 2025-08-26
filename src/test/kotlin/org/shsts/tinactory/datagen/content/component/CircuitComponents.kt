@@ -1,39 +1,61 @@
 package org.shsts.tinactory.datagen.content.component
 
+import net.minecraft.tags.ItemTags
+import net.minecraft.world.item.Item
+import org.shsts.tinactory.content.AllItems.ADVANCED_INTEGRATED
+import org.shsts.tinactory.content.AllItems.BASIC_INTEGRATED
 import org.shsts.tinactory.content.AllItems.BOULES
 import org.shsts.tinactory.content.AllItems.CAPACITOR
 import org.shsts.tinactory.content.AllItems.CHIPS
 import org.shsts.tinactory.content.AllItems.DIODE
 import org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT
 import org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC
+import org.shsts.tinactory.content.AllItems.GOOD_INTEGRATED
 import org.shsts.tinactory.content.AllItems.INDUCTOR
+import org.shsts.tinactory.content.AllItems.INTEGRATED_PROCESSOR
+import org.shsts.tinactory.content.AllItems.MAINFRAME
+import org.shsts.tinactory.content.AllItems.MICROPROCESSOR
+import org.shsts.tinactory.content.AllItems.PROCESSOR_ASSEMBLY
 import org.shsts.tinactory.content.AllItems.RAW_WAFERS
 import org.shsts.tinactory.content.AllItems.RESISTOR
 import org.shsts.tinactory.content.AllItems.STICKY_RESIN
 import org.shsts.tinactory.content.AllItems.TRANSISTOR
 import org.shsts.tinactory.content.AllItems.VACUUM_TUBE
 import org.shsts.tinactory.content.AllItems.WAFERS
+import org.shsts.tinactory.content.AllItems.WORKSTATION
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllRecipes.has
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
+import org.shsts.tinactory.content.electric.Circuits.Circuit
 import org.shsts.tinactory.content.electric.Circuits.CircuitComponent
+import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.SimpleProcessingBuilder
 import org.shsts.tinactory.datagen.content.component.Components.ASSEMBLY_TICKS
+import kotlin.math.max
 
 object CircuitComponents {
+    private const val CIRCUIT_TICKS = 200L
+
     fun init() {
         circuits()
-        circuitComponents()
+        boards()
         chips()
+        circuitComponents()
     }
 
     private fun circuits() {
@@ -83,6 +105,89 @@ object CircuitComponents {
                 voltage(Voltage.ULV)
                 workTicks(120)
                 tech(Technologies.SOLDERING)
+            }
+        }
+
+        circuitTier(CircuitTier.ELECTRONIC) {
+            circuitAssembler {
+                output(ELECTRONIC_CIRCUIT) {
+                    input(VACUUM_TUBE, 2)
+                    input(RESISTOR, 2)
+                    input("red_alloy", "wire", 2)
+                }
+                output(GOOD_ELECTRONIC) {
+                    input(ELECTRONIC_CIRCUIT, 2)
+                    input(DIODE, 2)
+                    input("copper", "wire", 2)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.INTEGRATED) {
+            circuitAssembler {
+                output(BASIC_INTEGRATED) {
+                    chip("integrated_circuit")
+                    input(RESISTOR, 2)
+                    input(DIODE, 2)
+                    input("copper", "wire_fine", 2)
+                    input("tin", "bolt", 2)
+                }
+                output(GOOD_INTEGRATED) {
+                    input(BASIC_INTEGRATED, 2)
+                    input(RESISTOR, 2)
+                    input(DIODE, 2)
+                    input("gold", "wire_fine", 4)
+                    input("silver", "bolt", 4)
+                }
+                output(ADVANCED_INTEGRATED) {
+                    input(GOOD_INTEGRATED, 2)
+                    chip("integrated_circuit", 2)
+                    chip("ram", 2)
+                    input(TRANSISTOR, 4)
+                    input("electrum", "wire_fine", 8)
+                    input("copper", "bolt", 8)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.CPU) {
+            circuitAssembler {
+                output(MICROPROCESSOR, 3) {
+                    chip("cpu")
+                    input(RESISTOR, 2)
+                    input(CAPACITOR, 2)
+                    input(TRANSISTOR, 2)
+                    input("copper", "wire_fine", 2)
+                }
+                output(INTEGRATED_PROCESSOR) {
+                    chip("cpu")
+                    input(RESISTOR, 2)
+                    input(CAPACITOR, 2)
+                    input(TRANSISTOR, 2)
+                    input("red_alloy", "wire_fine", 4)
+                }
+                output(PROCESSOR_ASSEMBLY) {
+                    input(INTEGRATED_PROCESSOR, 2)
+                    input(INDUCTOR, 2)
+                    input(CAPACITOR, 8)
+                    chip("ram", 4)
+                    input("red_alloy", "wire_fine", 8)
+                }
+                output(WORKSTATION) {
+                    input(PROCESSOR_ASSEMBLY, 2)
+                    input(DIODE, 4)
+                    chip("ram", 4)
+                    input("electrum", "wire_fine", 16)
+                    input("gold", "bolt", 16)
+                }
+                output(MAINFRAME) {
+                    input("aluminium", "stick", 8)
+                    input(WORKSTATION, 2)
+                    chip("ram", 16)
+                    input(INDUCTOR, 8)
+                    input(CAPACITOR, 16)
+                    input("copper", "wire", 16)
+                }
             }
         }
     }
@@ -191,12 +296,174 @@ object CircuitComponents {
             }
             for ((key, entry) in CHIPS) {
                 output(entry.get(), 6) {
-                    input(WAFERS.getValue(key).get())
+                    input(WAFERS.item(key))
                     input("water", amount = 0.75)
                     voltage(Voltage.LV)
                     workTicks(300)
                 }
             }
         }
+
+        engraving("integrated_circuit", "ruby", 0, Voltage.LV, -1.0, 0.0)
+        engraving("cpu", "diamond", 0, Voltage.MV, 0.0, 0.5)
+        engraving("ram", "sapphire", 0, Voltage.MV, -0.25, 0.25)
+        engraving("low_pic", "emerald", 0, Voltage.MV, -0.3, 0.2)
+    }
+
+    private fun engraving(name: String, lens: String, level: Int, voltage: Voltage,
+        minCleanness: Double, maxCleanness: Double) {
+        val wafer = WAFERS.item(name)
+        for (i in level..<RAW_WAFERS.size) {
+            val j = i - level
+            val rawWafer = RAW_WAFERS.item(i)
+            val rawId = name(rawWafer.asItem().registryName!!.path, -1)
+            val minC = 1 - (1 - minCleanness) / (1 shl i)
+            val maxC = 1 - (1 - maxCleanness) / (1 shl i)
+            laserEngraver {
+                output(wafer, 1 shl j, suffix = "_from_$rawId") {
+                    input(rawWafer)
+                    input(lens, "lens", 0, port = 1)
+                    voltage(Voltage.fromRank(voltage.rank + j))
+                    workTicks(1000L shl level)
+                    extra {
+                        requireCleanness(minC, maxC)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun boards() {
+        circuitTier(CircuitTier.ELECTRONIC) {
+            val resin = STICKY_RESIN.get()
+
+            vanilla {
+                shaped(board, 3) {
+                    pattern("SSS")
+                    pattern("WWW")
+                    pattern("SSS")
+                    define('S', resin)
+                    define('W', ItemTags.PLANKS)
+                    unlockedBy("has_resin", has(resin))
+                }
+
+                shaped(circuitBoard) {
+                    pattern("WWW")
+                    pattern("WBW")
+                    pattern("WWW")
+                    define('B', board)
+                    define('W', getMaterial("copper").tag("wire"))
+                    unlockedBy("has_board", has(board))
+                }
+            }
+
+            assembler {
+                defaults {
+                    voltage(Voltage.ULV)
+                    workTicks(CIRCUIT_TICKS)
+                    tech(Technologies.SOLDERING)
+                }
+                output(board) {
+                    input(ItemTags.PLANKS)
+                    input(resin, 2)
+                }
+                output(circuitBoard) {
+                    input(board)
+                    input("copper", "wire", 8)
+                    input("soldering_alloy", amount = 0.5)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.INTEGRATED) {
+            assembler {
+                defaults {
+                    voltage(Voltage.LV)
+                    workTicks(CIRCUIT_TICKS)
+                    tech(Technologies.INTEGRATED_CIRCUIT)
+                }
+                output(board) {
+                    input(lastBoard, 2)
+                    input("red_alloy", "wire", 8)
+                    input("soldering_alloy")
+                }
+                output(circuitBoard) {
+                    input(board)
+                    input("silver", "wire", 8)
+                    input("soldering_alloy", amount = 0.5)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.CPU) {
+            chemicalReactor {
+                defaults {
+                    input("copper", "foil", 4)
+                    input("sulfuric_acid", "dilute", 0.5)
+                    voltage(Voltage.MV)
+                    workTicks(240)
+                    tech(Technologies.CPU)
+                }
+                output(board) {
+                    input("pe", "sheet")
+                }
+                output(board, 2, suffix = "_from_pvc") {
+                    input("pvc", "sheet")
+                }
+            }
+            chemicalReactor {
+                output(circuitBoard) {
+                    input(board)
+                    input("copper", "foil", 6)
+                    input("iron_chloride", amount = 0.25)
+                    voltage(Voltage.MV)
+                    workTicks(320)
+                    tech(Technologies.CPU)
+                }
+            }
+        }
+    }
+
+    private class CircuitTierFactory(val tier: CircuitTier) {
+        val componentTier = tier.componentTier
+
+        val board = board(tier).get()
+
+        val lastBoard: Item by lazy { board(CircuitTier.fromRank(tier.rank - 1)).get() }
+
+        val circuitBoard = circuitBoard(tier).get()
+
+        fun SimpleProcessingBuilder.input(component: CircuitComponent, amount: Int = 1) {
+            input(component.item(componentTier), amount)
+        }
+
+        fun SimpleProcessingBuilder.input(circuit: Circuit, amount: Int = 1) {
+            input(circuit.item, amount)
+        }
+
+        fun SimpleProcessingBuilder.chip(name: String, amount: Int = 1) {
+            input(CHIPS.item(name), amount)
+        }
+
+        fun ProcessingRecipeFactory.output(circuit: Circuit, amount: Int = 1,
+            block: SimpleProcessingBuilder.() -> Unit) {
+            output(circuit.item, amount) {
+                if (circuit.level().voltageOffset < 2) {
+                    input(circuit.circuitBoard())
+                }
+                block()
+                val voltage = circuit.tier().baseVoltage
+                val voltage1 = if (voltage.rank < Voltage.LV.rank) Voltage.LV else voltage
+                val level = 1 + max(0, circuit.level().voltageOffset)
+                val solder = (1 shl (level - 1)) / 2.0
+                input("soldering", amount = solder)
+                voltage(voltage1)
+                workTicks(200L * level)
+            }
+        }
+    }
+
+    private fun circuitTier(tier: CircuitTier, block: CircuitTierFactory.() -> Unit) {
+        CircuitTierFactory(tier).apply(block)
     }
 }

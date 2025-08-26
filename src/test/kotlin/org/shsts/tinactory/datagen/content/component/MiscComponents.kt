@@ -85,7 +85,7 @@ object MiscComponents {
             pattern("#W#")
             pattern("###")
             define('#', getMaterial("iron").tag("plate"))
-            define('W', CABLE.getValue(Voltage.ULV))
+            define('W', CABLE.item(Voltage.ULV))
             toolTag(TOOL_WRENCH)
         }
 

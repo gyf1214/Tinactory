@@ -76,8 +76,8 @@ public final class Circuits {
             return key.level;
         }
 
-        public IEntry<Item> circuitBoard() {
-            return CIRCUIT_BOARDS.get(key.tier);
+        public Item circuitBoard() {
+            return CIRCUIT_BOARDS.get(key.tier).get();
         }
     }
 

@@ -10,12 +10,14 @@ import org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe
+import org.shsts.tinactory.content.recipe.CleanRecipe
 import org.shsts.tinactory.content.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ToolRecipe
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
+typealias SimpleProcessingBuilder = ProcessingRecipeBuilder<ProcessingRecipe.Builder>
 typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
 typealias ProcessingRecipeFactory = ProcessingRecipeFactoryBase<ProcessingRecipe.Builder>
 typealias BlastFurnaceRecipeFactory = ProcessingRecipeFactoryBase<BlastFurnaceRecipe.Builder>
@@ -84,6 +86,23 @@ object RecipeFactories {
             defaultInputFluid = 1
             defaultOutputItem = 2
             amperage = 0.375
+        }.block()
+    }
+
+    fun laserEngraver(block: ProcessingRecipeFactoryBase<CleanRecipe.Builder>.() -> Unit) {
+        processing<CleanRecipe.Builder>("laser_engraver") {
+            defaultInputItem = 0
+            defaultOutputItem = 2
+            amperage = 0.625
+        }.block()
+    }
+
+    fun circuitAssembler(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("circuit_assembler") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
+            amperage = 0.25
         }.block()
     }
 
