@@ -45,7 +45,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.SimpleProcessingBuilder
-import org.shsts.tinactory.datagen.content.component.Components.ASSEMBLY_TICKS
+import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 import kotlin.math.max
 
 object CircuitComponents {
@@ -208,7 +208,7 @@ object CircuitComponents {
 
             assembler {
                 defaults {
-                    workTicks(ASSEMBLY_TICKS)
+                    workTicks(COMPONENT_TICKS)
                     tech(Technologies.SOLDERING)
                 }
                 output(RESISTOR, 2) {
@@ -229,7 +229,7 @@ object CircuitComponents {
             assembler {
                 defaults {
                     voltage(Voltage.LV)
-                    workTicks(ASSEMBLY_TICKS)
+                    workTicks(COMPONENT_TICKS)
                     tech(Technologies.INTEGRATED_CIRCUIT)
                 }
                 output(CAPACITOR, 8) {

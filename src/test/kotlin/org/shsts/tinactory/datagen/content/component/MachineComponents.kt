@@ -19,7 +19,7 @@ import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
-import org.shsts.tinactory.datagen.content.component.Components.ASSEMBLY_TICKS
+import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object MachineComponents {
     fun init() {
@@ -52,7 +52,7 @@ object MachineComponents {
                     } else {
                         voltage(Voltage.LV)
                     }
-                    workTicks(ASSEMBLY_TICKS)
+                    workTicks(COMPONENT_TICKS)
                     tech(Technologies.HOT_WORKING)
                 }
             }
@@ -109,7 +109,7 @@ object MachineComponents {
                 } else {
                     voltage(Voltage.ULV)
                 }
-                workTicks(ASSEMBLY_TICKS)
+                workTicks(COMPONENT_TICKS)
             }
             output(ELECTRIC_MOTOR) {
                 input(magnetic, "magnetic")
@@ -185,7 +185,7 @@ object MachineComponents {
         assembler {
             defaults {
                 voltage(Voltage.LV)
-                workTicks(ASSEMBLY_TICKS)
+                workTicks(COMPONENT_TICKS)
                 tech(Technologies.BATTERY)
             }
             battery(Voltage.LV, "cadmium")

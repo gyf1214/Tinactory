@@ -44,8 +44,12 @@ public final class AllTags {
     public static final TagKey<Item> ITEM_STORAGE_CELL = extend(STORAGE_CELL, "item");
     public static final TagKey<Item> FLUID_STORAGE_CELL = extend(STORAGE_CELL, "fluid");
 
+    public static TagKey<Item> machineTag(String id) {
+        return extend(MACHINE, id);
+    }
+
     public static TagKey<Item> machineTag(IRecipeType<?> recipeType) {
-        return extend(MACHINE, recipeType.id());
+        return machineTag(recipeType.id());
     }
 
     public static TagKey<Item> circuit(Voltage v) {

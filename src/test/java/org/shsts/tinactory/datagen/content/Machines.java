@@ -1,11 +1,8 @@
 package org.shsts.tinactory.datagen.content;
 
-import com.google.common.collect.Streams;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
@@ -15,21 +12,13 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.shsts.tinactory.content.AllBlockEntities;
-import org.shsts.tinactory.content.AllRecipes;
-import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.machine.MachineSet;
-import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder1;
-import org.shsts.tinactory.datagen.content.model.MachineModel;
-import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER;
@@ -55,8 +44,6 @@ import static org.shsts.tinactory.content.AllBlockEntities.LATHE;
 import static org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER;
 import static org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER;
 import static org.shsts.tinactory.content.AllBlockEntities.MACERATOR;
-import static org.shsts.tinactory.content.AllBlockEntities.ME_DRIVER;
-import static org.shsts.tinactory.content.AllBlockEntities.ME_STORAGE_INTERFACE;
 import static org.shsts.tinactory.content.AllBlockEntities.MIXER;
 import static org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE;
 import static org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER;
@@ -82,7 +69,6 @@ import static org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON;
 import static org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP;
 import static org.shsts.tinactory.content.AllItems.EMITTER;
 import static org.shsts.tinactory.content.AllItems.GRINDER;
-import static org.shsts.tinactory.content.AllItems.ITEM_FILTER;
 import static org.shsts.tinactory.content.AllItems.MACHINE_HULL;
 import static org.shsts.tinactory.content.AllItems.ROBOT_ARM;
 import static org.shsts.tinactory.content.AllItems.SENSOR;
@@ -95,166 +81,33 @@ import static org.shsts.tinactory.content.AllMaterials.CUPRONICKEL;
 import static org.shsts.tinactory.content.AllMaterials.FLINT;
 import static org.shsts.tinactory.content.AllMaterials.GLASS;
 import static org.shsts.tinactory.content.AllMaterials.GRAPHITE;
-import static org.shsts.tinactory.content.AllMaterials.INVAR;
 import static org.shsts.tinactory.content.AllMaterials.IRON;
 import static org.shsts.tinactory.content.AllMaterials.KANTHAL;
-import static org.shsts.tinactory.content.AllMaterials.PE;
-import static org.shsts.tinactory.content.AllMaterials.PTFE;
 import static org.shsts.tinactory.content.AllMaterials.SILVER;
 import static org.shsts.tinactory.content.AllMaterials.STAINLESS_STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STEEL;
 import static org.shsts.tinactory.content.AllMaterials.STONE;
 import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM;
-import static org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE;
 import static org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE;
-import static org.shsts.tinactory.content.AllMultiblocks.CLEANROOM;
-import static org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING;
-import static org.shsts.tinactory.content.AllMultiblocks.DISTILLATION_TOWER;
-import static org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING;
 import static org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING;
-import static org.shsts.tinactory.content.AllMultiblocks.INERT_PTFE_CASING;
-import static org.shsts.tinactory.content.AllMultiblocks.LARGE_CHEMICAL_REACTOR;
-import static org.shsts.tinactory.content.AllMultiblocks.PLASCRETE;
-import static org.shsts.tinactory.content.AllMultiblocks.PYROLYSE_OVEN;
-import static org.shsts.tinactory.content.AllMultiblocks.SIFTER;
-import static org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING;
-import static org.shsts.tinactory.content.AllMultiblocks.VACUUM_FREEZER;
 import static org.shsts.tinactory.content.AllRecipes.ASSEMBLER;
 import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.content.AllRecipes.has;
-import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
-import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.TOOL_HAMMER;
 import static org.shsts.tinactory.content.AllTags.TOOL_WRENCH;
 import static org.shsts.tinactory.content.AllTags.circuit;
-import static org.shsts.tinactory.content.AllTags.machineTag;
-import static org.shsts.tinactory.datagen.content.Models.cubeBlock;
-import static org.shsts.tinactory.datagen.content.Models.machineBlock;
-import static org.shsts.tinactory.datagen.content.Models.multiblockInterface;
-import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_OUT_TEX;
-import static org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX;
-import static org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Machines {
-    private static final String BOILER_TEX = "generators/boiler/coal";
-    private static final long ASSEMBLE_TICKS = 200;
+    private static final long MACHINE_TICKS = 200;
 
     public static void init() {
-        machineItems();
         primitiveRecipes();
         ulvRecipes();
         basicRecipes();
         miscRecipes();
-    }
-
-    private static void machineItems() {
-        primitiveMachine(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR, "machines/rock_crusher");
-        primitiveMachine(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER, "machines/electromagnetic_separator");
-        primitiveMachine(ORE_WASHER, PRIMITIVE_ORE_WASHER, "machines/ore_washer");
-        machine(RESEARCH_BENCH, "overlay/machine/overlay_screen");
-        machine(AllBlockEntities.ASSEMBLER);
-        machine(LASER_ENGRAVER);
-        machine(CIRCUIT_ASSEMBLER, "machines/assembler");
-        machine(MACERATOR);
-        machine(CENTRIFUGE);
-        machine(THERMAL_CENTRIFUGE);
-        machine(ELECTRIC_FURNACE, "machines/electric_furnace");
-        machine(ALLOY_SMELTER);
-        machine(MIXER);
-        machine(POLARIZER);
-        machine(WIREMILL);
-        machine(BENDER);
-        machine(LATHE);
-        machine(CUTTER);
-        machine(EXTRUDER);
-        machine(EXTRACTOR);
-        machine(FLUID_SOLIDIFIER);
-        machine(ELECTROLYZER);
-        machine(CHEMICAL_REACTOR);
-        machine(ARC_FURNACE);
-        machine(STEAM_TURBINE, $ -> $
-            .overlay(Direction.NORTH, "generators/steam_turbine/overlay_side")
-            .overlay(Direction.SOUTH, "generators/steam_turbine/overlay_side"));
-        machine(GAS_TURBINE, $ -> $
-            .overlay(Direction.EAST, "generators/steam_turbine/overlay_side")
-            .overlay(Direction.WEST, "generators/steam_turbine/overlay_side"));
-        machine(COMBUSTION_GENERATOR, "generators/combustion");
-        machine(BATTERY_BOX, IO_OUT_TEX);
-        machine(ELECTRIC_CHEST, $ -> $
-            .overlay(Direction.UP, "overlay/machine/overlay_qchest")
-            .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
-        machine(ELECTRIC_TANK, $ -> $
-            .overlay(Direction.UP, "overlay/machine/overlay_qtank")
-            .overlay(Direction.NORTH, "overlay/machine/overlay_screen_glass"));
-        machine(LOGISTIC_WORKER, "cover/overlay_conveyor");
-        machine(ME_DRIVER, "overlay/automation/automation_superbuffer");
-        machine(ME_STORAGE_INTERFACE, "cover/overlay_storage");
-
-        DATA_GEN.block(NETWORK_CONTROLLER)
-            .child(MachineModel::builder)
-            .casing("casings/computer/computer_casing")
-            .overlay("overlay/machine/overlay_maintenance_full_auto")
-            .ioTex(ME_BUS)
-            .build()
-            .tag(MINEABLE_WITH_WRENCH)
-            .build()
-            .block(WORKBENCH)
-            .blockState(cubeBlock("casings/crafting_table"))
-            .tag(List.of(BlockTags.MINEABLE_WITH_AXE, MINEABLE_WITH_WRENCH))
-            .build()
-            .block(LOW_PRESSURE_BOILER)
-            .child(MachineModel::builder)
-            .casing(Voltage.ULV).overlay(BOILER_TEX).ioTex(ME_BUS)
-            .build()
-            .tag(MINEABLE_WITH_WRENCH)
-            .build()
-            .block(HIGH_PRESSURE_BOILER)
-            .child(MachineModel::builder)
-            .casing(Voltage.MV).overlay(BOILER_TEX).ioTex(ME_BUS)
-            .build()
-            .tag(MINEABLE_WITH_WRENCH)
-            .build();
-
-        multiblock(BLAST_FURNACE, "heatproof", "blast_furnace", AllRecipes.BLAST_FURNACE);
-        multiblock(SIFTER, "solid_steel", "blast_furnace", AllRecipes.SIFTER);
-        multiblock(AUTOFARM, "solid_steel", "blast_furnace", AllRecipes.AUTOFARM);
-        multiblock(VACUUM_FREEZER, "frost_proof", "vacuum_freezer", AllRecipes.VACUUM_FREEZER);
-        multiblock(DISTILLATION_TOWER, "clean_stainless_steel", "distillation_tower",
-            AllRecipes.DISTILLATION);
-        DATA_GEN.block(CLEANROOM)
-            .blockState(machineBlock("casings/cleanroom/plascrete", "multiblock/cleanroom"))
-            .tag(MINEABLE_WITH_WRENCH)
-            .build();
-        multiblock(PYROLYSE_OVEN, "heatproof", "pyrolyse_oven", AllRecipes.PYROLYSE_OVEN);
-        multiblock(LARGE_CHEMICAL_REACTOR, "inert_ptfe", "large_chemical_reactor", AllRecipes.CHEMICAL_REACTOR);
-
-        MULTIBLOCK_INTERFACE.values().forEach(b -> DATA_GEN.block(b)
-            .blockState(multiblockInterface(IO_TEX))
-            .tag(MINEABLE_WITH_WRENCH)
-            .build());
-
-        Streams.concat(TRANSFORMER.values().stream(), ELECTRIC_BUFFER.values().stream())
-            .forEach(b -> DATA_GEN.block(b)
-                .child(MachineModel::builder)
-                .overlay(Direction.NORTH, IO_TEX)
-                .overlay(Direction.SOUTH, IO_OUT_TEX)
-                .build()
-                .tag(MINEABLE_WITH_WRENCH)
-                .tag(CLEANROOM_CONNECTOR)
-                .build());
-    }
-
-    private static void multiblock(IEntry<? extends Block> block, String casing,
-        String overlay, IRecipeType<?> type) {
-        DATA_GEN.block(block)
-            .blockState(Models.multiblock(casing, overlay))
-            .tag(MINEABLE_WITH_WRENCH)
-            .itemTag(machineTag(type))
-            .build();
     }
 
     private static void primitiveRecipes() {
@@ -337,7 +190,7 @@ public final class Machines {
             .inputItem(CABLE.get(Voltage.ULV), 4)
             .requireTech(Technologies.ALLOY_SMELTING)
             .voltage(Voltage.ULV)
-            .workTicks(ASSEMBLE_TICKS)
+            .workTicks(MACHINE_TICKS)
             .build()
             .recipe(DATA_GEN, BLAST_FURNACE)
             .outputItem(BLAST_FURNACE, 1)
@@ -347,7 +200,7 @@ public final class Machines {
             .inputItem(CABLE.get(Voltage.ULV), 2)
             .requireTech(Technologies.STEEL)
             .voltage(Voltage.ULV)
-            .workTicks(ASSEMBLE_TICKS)
+            .workTicks(MACHINE_TICKS)
             .build()
             .recipe(DATA_GEN, MULTIBLOCK_INTERFACE.get(Voltage.ULV))
             .outputItem(MULTIBLOCK_INTERFACE.get(Voltage.ULV), 1)
@@ -357,7 +210,7 @@ public final class Machines {
             .inputItem(() -> Blocks.CHEST, 1)
             .inputItem(GLASS.tag("primary"), 1)
             .voltage(Voltage.ULV)
-            .workTicks(ASSEMBLE_TICKS)
+            .workTicks(MACHINE_TICKS)
             .requireTech(Technologies.STEEL)
             .build();
     }
@@ -366,91 +219,6 @@ public final class Machines {
         machineRecipe(Voltage.LV, STEEL, COPPER, TIN, BRONZE, TIN);
         machineRecipe(Voltage.MV, ALUMINIUM, CUPRONICKEL, COPPER, BRASS, BRONZE);
         machineRecipe(Voltage.HV, STAINLESS_STEEL, KANTHAL, SILVER, STAINLESS_STEEL, STEEL);
-
-        ASSEMBLER.recipe(DATA_GEN, SIFTER)
-            .outputItem(SIFTER, 1)
-            .inputItem(SOLID_STEEL_CASING, 1)
-            .inputItem(circuit(Voltage.MV), 3)
-            .inputItem(ELECTRIC_PISTON.get(Voltage.LV), 4)
-            .inputItem(CABLE.get(Voltage.LV), 4)
-            .inputItem(ITEM_FILTER, 4)
-            .inputItem(STEEL.tag("plate"), 4)
-            .voltage(Voltage.LV)
-            .workTicks(ASSEMBLE_TICKS)
-            .requireTech(Technologies.SIFTING)
-            .build()
-            .recipe(DATA_GEN, AUTOFARM)
-            .outputItem(AUTOFARM, 1)
-            .inputItem(AUTOFARM_BASE, 1)
-            .inputItem(circuit(Voltage.MV), 4)
-            .inputItem(ELECTRIC_PUMP.get(Voltage.LV), 4)
-            .inputItem(CABLE.get(Voltage.LV), 4)
-            .inputItem(BRASS.tag("pipe"), 4)
-            .inputItem(STEEL.tag("plate"), 4)
-            .voltage(Voltage.LV)
-            .workTicks(ASSEMBLE_TICKS)
-            .requireTech(Technologies.AUTOFARM)
-            .build()
-            .recipe(DATA_GEN, VACUUM_FREEZER)
-            .outputItem(VACUUM_FREEZER, 1)
-            .inputItem(FROST_PROOF_CASING, 1)
-            .inputItem(circuit(Voltage.HV), 3)
-            .inputItem(ELECTRIC_PUMP.get(Voltage.MV), 4)
-            .inputItem(CABLE.get(Voltage.MV), 4)
-            .inputItem(ALUMINIUM.tag("plate"), 4)
-            .voltage(Voltage.MV)
-            .workTicks(ASSEMBLE_TICKS)
-            .requireTech(Technologies.VACUUM_FREEZER)
-            .build()
-            .recipe(DATA_GEN, DISTILLATION_TOWER)
-            .outputItem(DISTILLATION_TOWER, 1)
-            .inputItem(CLEAN_STAINLESS_CASING, 1)
-            .inputItem(circuit(Voltage.HV), 4)
-            .inputItem(ELECTRIC_PUMP.get(Voltage.HV), 2)
-            .inputItem(CABLE.get(Voltage.HV), 4)
-            .inputItem(STAINLESS_STEEL.tag("pipe"), 4)
-            .inputItem(STAINLESS_STEEL.tag("plate"), 4)
-            .voltage(Voltage.MV)
-            .workTicks(ASSEMBLE_TICKS)
-            .requireTech(Technologies.DISTILLATION)
-            .build()
-            .recipe(DATA_GEN, PYROLYSE_OVEN)
-            .outputItem(PYROLYSE_OVEN, 1)
-            .inputItem(HEATPROOF_CASING, 1)
-            .inputItem(circuit(Voltage.MV), 3)
-            .inputItem(ELECTRIC_PISTON.get(Voltage.MV), 2)
-            .inputItem(ELECTRIC_PUMP.get(Voltage.MV), 2)
-            .inputItem(CABLE.get(Voltage.MV), 4)
-            .inputItem(CUPRONICKEL.tag("wire"), 16)
-            .inputItem(INVAR.tag("plate"), 4)
-            .voltage(Voltage.MV)
-            .workTicks(ASSEMBLE_TICKS)
-            .requireTech(Technologies.PYROLYSE_OVEN)
-            .build()
-            .recipe(DATA_GEN, CLEANROOM)
-            .outputItem(CLEANROOM, 1)
-            .inputItem(PLASCRETE, 1)
-            .inputItem(circuit(Voltage.HV), 3)
-            .inputItem(ELECTRIC_MOTOR.get(Voltage.HV), 2)
-            .inputItem(CABLE.get(Voltage.HV), 4)
-            .inputItem(ITEM_FILTER, 4)
-            .inputItem(PE.tag("sheet"), 4)
-            .voltage(Voltage.MV)
-            .workTicks(ASSEMBLE_TICKS)
-            .requireTech(Technologies.CLEANROOM)
-            .build()
-            .recipe(DATA_GEN, LARGE_CHEMICAL_REACTOR)
-            .outputItem(LARGE_CHEMICAL_REACTOR, 1)
-            .inputItem(INERT_PTFE_CASING, 1)
-            .inputItem(circuit(Voltage.HV), 4)
-            .inputItem(ELECTRIC_MOTOR.get(Voltage.HV), 4)
-            .inputItem(STAINLESS_STEEL.tag("rotor"), 4)
-            .inputItem(CABLE.get(Voltage.HV), 4)
-            .inputItem(PTFE.tag("pipe"), 4)
-            .voltage(Voltage.MV)
-            .workTicks(ASSEMBLE_TICKS)
-            .requireTech(Technologies.ADVANCED_CHEMISTRY)
-            .build();
     }
 
     private static void miscRecipes() {
@@ -471,7 +239,7 @@ public final class Machines {
             .inputItem(BRASS.tag("pipe"), 2)
             .inputItem(IRON.tag("plate"), 4)
             .voltage(Voltage.LV)
-            .workTicks(ASSEMBLE_TICKS)
+            .workTicks(MACHINE_TICKS)
             .requireTech(Technologies.SOLDERING, Technologies.STEEL)
             .build();
 
@@ -544,50 +312,6 @@ public final class Machines {
             .build();
     }
 
-    private static Optional<TagKey<Item>> getMachineTag(MachineSet set) {
-        if (set instanceof ProcessingSet processingSet) {
-            return Optional.of(machineTag(processingSet.recipeType));
-        } else if (set == ELECTRIC_FURNACE) {
-            return Optional.of(AllTags.ELECTRIC_FURNACE);
-        }
-        return Optional.empty();
-    }
-
-    private static void machine(MachineSet set,
-        Transformer<MachineModel.Builder<?>> model) {
-        var tag = getMachineTag(set);
-        tag.ifPresent($ -> DATA_GEN.tag($, AllTags.MACHINE));
-        for (var voltage : set.voltages) {
-            var builder = DATA_GEN.block(set.entry(voltage))
-                .child(MachineModel::builder)
-                .transform(model.cast())
-                .build()
-                .tag(MINEABLE_WITH_WRENCH);
-            tag.ifPresent(builder::itemTag);
-            builder.build();
-        }
-    }
-
-    private static void machine(MachineSet set, String overlay) {
-        machine(set, $ -> $.overlay(overlay));
-    }
-
-    private static void machine(ProcessingSet set) {
-        machine(set, "machines/" + set.recipeType.id());
-    }
-
-    private static void primitiveMachine(MachineSet set, IEntry<? extends Block> primitive,
-        String overlay) {
-        machine(set, overlay);
-        var tag = getMachineTag(set);
-        var builder = DATA_GEN.block(primitive)
-            .blockState(machineBlock(overlay))
-            .tag(MINEABLE_WITH_WRENCH)
-            .tag(BlockTags.MINEABLE_WITH_AXE);
-        tag.ifPresent(builder::itemTag);
-        builder.build();
-    }
-
     private static void ulvMachine(IEntry<? extends ItemLike> result,
         Supplier<? extends ItemLike> base) {
         TOOL_CRAFTING.recipe(DATA_GEN, result)
@@ -624,7 +348,7 @@ public final class Machines {
             var builder = ASSEMBLER.recipe(DATA_GEN, item)
                 .outputItem(item, 1)
                 .voltage(v1)
-                .workTicks(ASSEMBLE_TICKS)
+                .workTicks(MACHINE_TICKS)
                 .inputItem(MACHINE_HULL.get(voltage), 1);
             return new AssemblyRecipeBuilder1<>(this, voltage, builder) {
                 private int components = 0;

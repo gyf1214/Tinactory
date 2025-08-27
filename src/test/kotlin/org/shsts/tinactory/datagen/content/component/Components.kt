@@ -33,15 +33,15 @@ import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.machineItem
-import org.shsts.tinactory.datagen.content.builder.DataFactories.ItemDataFactory
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
+import org.shsts.tinactory.datagen.content.builder.ItemDataFactory
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
 
 object Components {
     private const val RESEARCH_TEX = "metaitems/glass_vial/"
     private const val GRINDER_TEX = "metaitems/component.grinder"
-    const val ASSEMBLY_TICKS = 100L
+    const val COMPONENT_TICKS = 100L
 
     fun init() {
         components()

@@ -24,7 +24,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
-import org.shsts.tinactory.datagen.content.component.Components.ASSEMBLY_TICKS
+import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object MiscComponents {
     fun init() {
@@ -59,7 +59,7 @@ object MiscComponents {
                 input("steel", "plate", 8)
                 input("diamond", "dust", 4)
                 voltage(Voltage.MV)
-                workTicks(ASSEMBLY_TICKS)
+                workTicks(COMPONENT_TICKS)
                 tech(Technologies.MATERIAL_CUTTING)
             }
             // TODO: advanced_grinder
@@ -110,7 +110,7 @@ object MiscComponents {
             componentVoltage = Voltage.ULV
             defaults {
                 voltage(Voltage.ULV)
-                workTicks(ASSEMBLY_TICKS)
+                workTicks(COMPONENT_TICKS)
                 tech(Technologies.SOLDERING)
             }
             output(FLUID_CELL) {

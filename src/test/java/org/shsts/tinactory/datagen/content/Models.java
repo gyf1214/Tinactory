@@ -204,37 +204,6 @@ public final class Models {
         CableModel.pipe(ctx);
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> machineBlock(String overlay) {
-        var model = MachineModel.builder()
-            .overlay(overlay)
-            .buildObject();
-        return model.blockState();
-    }
-
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> machineBlock(String casing, String overlay) {
-        var model = MachineModel.builder()
-            .casing(casing)
-            .overlay(overlay)
-            .buildObject();
-        return model.blockState();
-    }
-
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> machineBlock(Voltage voltage, String overlay) {
-        var model = MachineModel.builder()
-            .casing(voltage)
-            .overlay(overlay)
-            .buildObject();
-        return model.blockState();
-    }
-
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> multiblock(String casing, String overlay) {
-        return machineBlock("casings/solid/machine_casing_" + casing, "multiblock/" + overlay);
-    }
-
     public static Consumer<IEntryDataContext<Block,
         MachineBlock, BlockStateProvider>> multiblockInterface(String ioTex) {
         return ctx -> {
