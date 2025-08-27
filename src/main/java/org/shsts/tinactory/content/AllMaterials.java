@@ -219,6 +219,10 @@ public final class AllMaterials {
             .existing("gem", Items.GLASS)
             .alias("primary", "gem")
             .buildObject();
+
+        alias("pe", PE);
+        alias("pvc", PVC);
+        alias("ptfe", PTFE);
     }
 
     public static final Map<String, MaterialSet> SET;
@@ -272,6 +276,14 @@ public final class AllMaterials {
                 return burnTime;
             }
         };
+    }
+
+    private static void alias(String name, MaterialSet set) {
+        SET.put(name, set);
+    }
+
+    public static MaterialSet getMaterial(String name) {
+        return SET.get(name);
     }
 
     public static void init() {}

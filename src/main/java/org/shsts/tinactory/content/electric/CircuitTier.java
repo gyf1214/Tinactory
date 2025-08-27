@@ -1,5 +1,12 @@
 package org.shsts.tinactory.content.electric;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+
+import java.util.NoSuchElementException;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public enum CircuitTier {
     ELECTRONIC(Voltage.ULV, CircuitComponentTier.NORMAL, "coated", "basic"),
     INTEGRATED(Voltage.LV, CircuitComponentTier.NORMAL, "phenolic", "good"),
@@ -9,6 +16,7 @@ public enum CircuitTier {
     CRYSTAL(Voltage.IV, CircuitComponentTier.ADVANCED, "advanced_epoxy", "elite"),
     WETWARE(Voltage.LuV, CircuitComponentTier.ADVANCED, "wetware", "wetware");
 
+    public final int rank;
     public final Voltage baseVoltage;
     public final CircuitComponentTier componentTier;
     public final String board;
@@ -16,9 +24,19 @@ public enum CircuitTier {
 
     CircuitTier(Voltage baseVoltage, CircuitComponentTier componentTier,
         String board, String circuitBoard) {
+        this.rank = baseVoltage.rank - 1;
         this.baseVoltage = baseVoltage;
         this.componentTier = componentTier;
         this.board = board;
         this.circuitBoard = circuitBoard;
+    }
+
+    public static CircuitTier fromRank(int rank) {
+        for (var tier : CircuitTier.values()) {
+            if (tier.rank == rank) {
+                return tier;
+            }
+        }
+        throw new NoSuchElementException();
     }
 }

@@ -14,12 +14,8 @@ public final class AllData {
     public static void init() {
         DATA_GEN.addProvider(LanguageDataProvider::new);
         Models.init();
-        Technologies.init();
-        Materials.init();
-        Chemistry.init();
-        Components.init();
-        Machines.init();
-        Veins.init();
-        Markers.init();
+        AllDataKt.INSTANCE.init();
+
+        MaterialExporter.init();
     }
 }

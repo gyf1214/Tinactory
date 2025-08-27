@@ -76,6 +76,11 @@ public final class Models {
             .build();
     }
 
+    public static <U extends Item> void basicItem(IEntryDataContext<Item, U, ItemModelProvider> ctx,
+        ResourceLocation... layers) {
+        Models.<U>basicItem(layers).accept(ctx);
+    }
+
     public static <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> basicItem(
         ResourceLocation... layers) {
         return ctx -> {
@@ -137,6 +142,11 @@ public final class Models {
         };
     }
 
+    public static <U extends Block> void oreBlock(IEntryDataContext<Block,
+        U, BlockStateProvider> ctx, OreVariant variant) {
+        Models.<U>oreBlock(variant).accept(ctx);
+    }
+
     public static <U extends Block> Consumer<IEntryDataContext<Block,
         U, BlockStateProvider>> cubeBlock(String tex) {
         return ctx -> {
@@ -192,37 +202,6 @@ public final class Models {
 
     public static void pipeItem(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
         CableModel.pipe(ctx);
-    }
-
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> machineBlock(String overlay) {
-        var model = MachineModel.builder()
-            .overlay(overlay)
-            .buildObject();
-        return model.blockState();
-    }
-
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> machineBlock(String casing, String overlay) {
-        var model = MachineModel.builder()
-            .casing(casing)
-            .overlay(overlay)
-            .buildObject();
-        return model.blockState();
-    }
-
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> machineBlock(Voltage voltage, String overlay) {
-        var model = MachineModel.builder()
-            .casing(voltage)
-            .overlay(overlay)
-            .buildObject();
-        return model.blockState();
-    }
-
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> multiblock(String casing, String overlay) {
-        return machineBlock("casings/solid/machine_casing_" + casing, "multiblock/" + overlay);
     }
 
     public static Consumer<IEntryDataContext<Block,

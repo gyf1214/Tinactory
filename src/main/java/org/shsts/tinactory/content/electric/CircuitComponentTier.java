@@ -1,5 +1,10 @@
 package org.shsts.tinactory.content.electric;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public enum CircuitComponentTier {
     NORMAL(0, ""), SMD(1, "smd"), ADVANCED(2, "advanced_smd");
 

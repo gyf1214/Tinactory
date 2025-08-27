@@ -67,7 +67,7 @@ public final class AllItems {
     public static final Map<Voltage, IEntry<SubnetBlock>> TRANSFORMER;
     public static final Map<Voltage, IEntry<SubnetBlock>> ELECTRIC_BUFFER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
-    public static final Map<Voltage, Supplier<? extends ItemLike>> BUZZSAW;
+    public static final Map<Voltage, IEntry<Item>> BUZZSAW;
 
     // circuits
     public static final Circuits.Circuit VACUUM_TUBE;
@@ -229,7 +229,7 @@ public final class AllItems {
             .tint(VANADIUM_STEEL.color)
             .register();
 
-        // TODO
+        // TODO: tint
         ADVANCED_BUZZSAW = simple("component/buzzsaw/advanced");
 
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
@@ -303,10 +303,8 @@ public final class AllItems {
         }
     }
 
-    private static Map<Voltage, Supplier<? extends ItemLike>> set3(
-        Supplier<? extends ItemLike> basic,
-        Supplier<? extends ItemLike> good,
-        Supplier<? extends ItemLike> advanced) {
+    private static <S extends Supplier<? extends ItemLike>> Map<Voltage, S> set3(
+        S basic, S good, S advanced) {
         return Map.of(Voltage.LV, basic, Voltage.MV, basic,
             Voltage.HV, good, Voltage.EV, good, Voltage.IV, advanced);
     }

@@ -60,6 +60,11 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         return Optional.empty();
     }
 
+    public <U extends Item, P extends ItemModelProvider> void itemModel(
+        IEntryDataContext<Item, U, P> ctx, String sub) {
+        this.<U, P>itemModel(sub).accept(ctx);
+    }
+
     public <U extends Item, P extends ItemModelProvider> Consumer<IEntryDataContext<Item,
         U, P>> itemModel(String sub) {
         return ctx -> {

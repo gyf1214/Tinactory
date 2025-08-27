@@ -8,16 +8,17 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
-import org.shsts.tinactory.content.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
@@ -35,7 +36,6 @@ public final class AllRecipes {
     public static final IRecipeType<AssemblyRecipe.Builder> ASSEMBLER;
     public static final IRecipeType<CleanRecipe.Builder> LASER_ENGRAVER;
     public static final IRecipeType<ProcessingRecipe.Builder> CIRCUIT_ASSEMBLER;
-    public static final IRecipeType<ProcessingRecipe.Builder> STONE_GENERATOR;
     public static final IRecipeType<OreAnalyzerRecipe.Builder> ORE_ANALYZER;
     public static final IRecipeType<ProcessingRecipe.Builder> MACERATOR;
     public static final IRecipeType<ProcessingRecipe.Builder> ORE_WASHER;
@@ -92,10 +92,6 @@ public final class AllRecipes {
 
         CIRCUIT_ASSEMBLER = processing("circuit_assembler")
             .defaults($ -> $.amperage(0.25d).defaultInputItem(0).defaultInputFluid(1).defaultOutputItem(2))
-            .register();
-
-        STONE_GENERATOR = processing("stone_generator")
-            .defaults($ -> $.amperage(0.125d).workTicks(20L).defaultOutputItem(0).defaultOutputFluid(1))
             .register();
 
         ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.Builder::new)
@@ -183,9 +179,7 @@ public final class AllRecipes {
             .defaults($ -> $.amperage(4d).transform(AllRecipes::fullDefaults))
             .register();
 
-        VACUUM_FREEZER = processing("vacuum_freezer")
-            .defaults($ -> $.amperage(1.5d).transform(AllRecipes::fullDefaults))
-            .register();
+        VACUUM_FREEZER = processing("vacuum_freezer").register();
 
         DISTILLATION = processing("distillation", DistillationRecipe::builder)
             .defaults($ -> $.amperage(2.5d).defaultInputFluid(0).defaultOutputFluid(1).defaultOutputItem(2))
@@ -209,7 +203,7 @@ public final class AllRecipes {
         return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
     }
 
-    public static InventoryChangeTrigger.TriggerInstance has(Item item) {
+    public static InventoryChangeTrigger.TriggerInstance has(ItemLike item) {
         return inventoryTrigger(ItemPredicate.Builder.item().of(item).build());
     }
 
