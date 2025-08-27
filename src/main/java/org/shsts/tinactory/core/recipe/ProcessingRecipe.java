@@ -8,15 +8,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -24,7 +18,6 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
@@ -153,11 +146,6 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         protected long workTicks = 0;
         protected long voltage = 0;
         protected long power = 0;
-        protected double amperage = 0d;
-        protected int defaultInputItem = -1;
-        protected int defaultInputFluid = -1;
-        protected int defaultOutputItem = -1;
-        protected int defaultOutputFluid = -1;
         protected List<Input> resolvedInputs = null;
         protected List<Output> resolvedOutputs = null;
 
@@ -175,56 +163,6 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             return input(port, () -> ingredient);
         }
 
-        public S defaultInputItem(int port) {
-            defaultInputItem = port;
-            return self();
-        }
-
-        public S defaultInputFluid(int port) {
-            defaultInputFluid = port;
-            return self();
-        }
-
-        public S inputItem(int port, Supplier<? extends ItemLike> item, int amount) {
-            return input(port, () -> new ProcessingIngredients.ItemIngredient(
-                new ItemStack(item.get(), amount)));
-        }
-
-        public S inputItem(int port, TagKey<Item> tag, int amount) {
-            return input(port, () -> new ProcessingIngredients.TagIngredient(tag, amount));
-        }
-
-        public S inputItemNotConsumed(int port, TagKey<Item> tag) {
-            return input(port, () -> new ProcessingIngredients.TagIngredient(tag, 0));
-        }
-
-        public S inputItem(Supplier<? extends ItemLike> item, int amount) {
-            return inputItem(defaultInputItem, item, amount);
-        }
-
-        public S inputItem(TagKey<Item> tag, int amount) {
-            return inputItem(defaultInputItem, tag, amount);
-        }
-
-        public S inputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
-            return input(port, () -> new ProcessingIngredients.FluidIngredient(
-                new FluidStack(fluid.get(), amount)));
-        }
-
-        public S inputFluid(Supplier<? extends Fluid> fluid, int amount) {
-            return inputFluid(defaultInputFluid, fluid, amount);
-        }
-
-        public S defaultOutputItem(int port) {
-            defaultOutputItem = port;
-            return self();
-        }
-
-        public S defaultOutputFluid(int port) {
-            defaultOutputFluid = port;
-            return self();
-        }
-
         public S output(int port, Supplier<IProcessingResult> result) {
             outputs.add(() -> new Output(port, result.get()));
             return self();
@@ -234,52 +172,8 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             return output(port, () -> result);
         }
 
-        public S outputItem(int port, Supplier<? extends ItemLike> item, int amount, double rate) {
-            return output(port, () ->
-                new ProcessingResults.ItemResult(rate, new ItemStack(item.get(), amount)));
-        }
-
-        public S outputItem(int port, Supplier<? extends ItemLike> item, int amount) {
-            return outputItem(port, item, amount, 1d);
-        }
-
-        public S outputItem(Supplier<? extends ItemLike> item, int amount, double rate) {
-            return outputItem(defaultOutputItem, item, amount, rate);
-        }
-
-        public S outputItem(Supplier<? extends ItemLike> item, int amount) {
-            return outputItem(item, amount, 1d);
-        }
-
-        public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount, double rate) {
-            return output(port, () -> new ProcessingResults.FluidResult(
-                rate, new FluidStack(fluid.get(), amount)));
-        }
-
-        public S outputFluid(int port, Supplier<? extends Fluid> fluid, int amount) {
-            return outputFluid(port, fluid, amount, 1d);
-        }
-
-        public S outputFluid(Supplier<? extends Fluid> fluid, int amount, double rate) {
-            return outputFluid(defaultOutputFluid, fluid, amount, rate);
-        }
-
-        public S outputFluid(Supplier<? extends Fluid> fluid, int amount) {
-            return outputFluid(fluid, amount, 1d);
-        }
-
         public S workTicks(long value) {
             workTicks = value;
-            return self();
-        }
-
-        public S primitive() {
-            voltage = 0;
-            return self();
-        }
-
-        public S voltage(Voltage value) {
-            voltage = value.value;
             return self();
         }
 
@@ -290,11 +184,6 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
         public S power(long value) {
             power = value;
-            return self();
-        }
-
-        public S amperage(double value) {
-            amperage = value;
             return self();
         }
 
@@ -320,10 +209,6 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
         @Override
         public R buildObject() {
-            if (power <= 0) {
-                var voltage = this.voltage == 0 ? Voltage.ULV.value : this.voltage;
-                power = (long) (amperage * voltage);
-            }
             validate();
             return super.buildObject();
         }
