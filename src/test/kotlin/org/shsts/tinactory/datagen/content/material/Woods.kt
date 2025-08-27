@@ -198,9 +198,9 @@ object Woods {
         farm(RUBBER_SAPLING.get(), RUBBER_LOG.get(), RUBBER_LEAVES.get(), true)
 
         toolCrafting {
-            result(STICKY_RESIN.get()) {
+            result("raw_rubber", "dust") {
                 pattern("#")
-                define('#', "raw_rubber", "dust")
+                define('#', STICKY_RESIN.get())
                 toolTag(TOOL_MORTAR)
             }
         }
