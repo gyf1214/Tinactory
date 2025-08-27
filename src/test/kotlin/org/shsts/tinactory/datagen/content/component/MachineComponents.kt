@@ -11,7 +11,6 @@ import org.shsts.tinactory.content.AllItems.FLUID_CELL
 import org.shsts.tinactory.content.AllItems.MACHINE_HULL
 import org.shsts.tinactory.content.AllItems.ROBOT_ARM
 import org.shsts.tinactory.content.AllItems.SENSOR
-import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.electric.Voltage
@@ -29,13 +28,15 @@ object MachineComponents {
     }
 
     private fun cables() {
-        toolCrafting(CABLE.item(Voltage.LV)) {
-            pattern("WWR")
-            pattern("WWR")
-            pattern("RR ")
-            define('W', getMaterial("tin").tag("wire"))
-            define('R', getMaterial("rubber").tag("sheet"))
-            toolTag(TOOL_WIRE_CUTTER)
+        toolCrafting {
+            result(CABLE.item(Voltage.LV)) {
+                pattern("WWR")
+                pattern("WWR")
+                pattern("RR ")
+                define('W', "tin", "wire")
+                define('R', "rubber", "sheet")
+                toolTag(TOOL_WIRE_CUTTER)
+            }
         }
 
         assembler {

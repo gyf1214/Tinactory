@@ -9,6 +9,7 @@ import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.level.ItemLike
+import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllRecipes.has
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
@@ -67,5 +68,21 @@ class VanillaRecipeFactory(private val replace: Boolean) {
         build(suffix) {
             ShapedRecipeBuilder.shaped(output, amount).apply(block)
         }
+    }
+
+    fun ShapedRecipeBuilder.unlockedBy(name: String, item: ItemLike) {
+        unlockedBy(name, has(item))
+    }
+
+    fun ShapedRecipeBuilder.unlockedBy(name: String, tag: TagKey<Item>) {
+        unlockedBy(name, has(tag))
+    }
+
+    fun ShapedRecipeBuilder.unlockedBy(name: String, mat: String, sub: String) {
+        unlockedBy(name, getMaterial(mat).tag(sub))
+    }
+
+    fun ShapedRecipeBuilder.define(ch: Char, mat: String, sub: String) {
+        define(ch, getMaterial(mat).tag(sub))
     }
 }

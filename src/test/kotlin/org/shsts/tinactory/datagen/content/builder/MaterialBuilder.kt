@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.client.model.generators.ItemModelProvider
 import org.shsts.tinactory.content.AllMaterials
 import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.AllRecipes.has
 import org.shsts.tinactory.content.AllTags.TOOL_FILE
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
@@ -186,20 +185,22 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     for ((i, input) in inputs.withIndex()) {
                         define('A' + i, input)
                     }
-                    unlockedBy("has_ingredient", has(inputs[0]))
+                    unlockedBy("has_ingredient", inputs[0])
                 }
             }
         }
 
         private fun buildTools() {
-            toolCrafting(name, result, amount) {
-                for (pattern in patterns) {
-                    pattern(pattern)
+            toolCrafting {
+                result(name, result, amount) {
+                    for (pattern in patterns) {
+                        pattern(pattern)
+                    }
+                    for ((i, input) in inputs.withIndex()) {
+                        define('A' + i, input)
+                    }
+                    toolTag(*tools.toTypedArray())
                 }
-                for ((i, input) in inputs.withIndex()) {
-                    define('A' + i, input)
-                }
-                toolTag(*tools.toTypedArray())
             }
         }
 

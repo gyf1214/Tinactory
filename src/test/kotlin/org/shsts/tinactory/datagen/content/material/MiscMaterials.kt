@@ -28,7 +28,6 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.stoneGenerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolShapeless
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 
@@ -202,21 +201,23 @@ object MiscMaterials {
     }
 
     private fun stone() {
-        // stone -> gravel
-        toolCrafting(Items.GRAVEL) {
-            pattern("#")
-            pattern("#")
-            define('#', getMaterial("stone").tag("block"))
-            toolTag(TOOL_HAMMER)
+        toolCrafting {
+            // stone -> gravel
+            result(Items.GRAVEL) {
+                pattern("#")
+                pattern("#")
+                define('#', "stone", "block")
+                toolTag(TOOL_HAMMER)
+            }
+            // gravel -> flint
+            result("flint", "primary") {
+                pattern("###")
+                define('#', Items.GRAVEL)
+                toolTag(TOOL_HAMMER)
+            }
+            // gravel -> sand
+            shapeless(Items.GRAVEL, Items.SAND, TOOL_MORTAR)
         }
-        // gravel -> flint
-        toolCrafting("flint", "primary") {
-            pattern("###")
-            define('#', Items.GRAVEL)
-            toolTag(TOOL_HAMMER)
-        }
-        // gravel -> sand
-        toolShapeless(Items.GRAVEL, Items.SAND, TOOL_MORTAR)
 
         // macerate stones
         macerator {

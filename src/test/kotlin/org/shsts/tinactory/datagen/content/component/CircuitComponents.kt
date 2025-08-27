@@ -23,8 +23,6 @@ import org.shsts.tinactory.content.AllItems.TRANSISTOR
 import org.shsts.tinactory.content.AllItems.VACUUM_TUBE
 import org.shsts.tinactory.content.AllItems.WAFERS
 import org.shsts.tinactory.content.AllItems.WORKSTATION
-import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.AllRecipes.has
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.Circuits.Circuit
@@ -61,13 +59,12 @@ object CircuitComponents {
     private fun circuits() {
         vanilla {
             shaped(VACUUM_TUBE.item) {
-                val wire = getMaterial("copper").tag("wire")
                 pattern("BGB")
                 pattern("WWW")
-                define('G', getMaterial("glass").tag("primary"))
-                define('W', wire)
-                define('B', getMaterial("iron").tag("bolt"))
-                unlockedBy("has_wire", has(wire))
+                define('G', "glass", "primary")
+                define('W', "copper", "wire")
+                define('B', "iron", "bolt")
+                unlockedBy("has_wire", "copper", "wire")
             }
 
             shaped(ELECTRONIC_CIRCUIT.item) {
@@ -76,11 +73,11 @@ object CircuitComponents {
                 pattern("TBT")
                 pattern("WWW")
                 define('R', RESISTOR.item(CircuitComponentTier.NORMAL))
-                define('P', getMaterial("steel").tag("plate"))
+                define('P', "steel", "plate")
                 define('T', VACUUM_TUBE.item)
                 define('B', board)
-                define('W', getMaterial("red_alloy").tag("wire"))
-                unlockedBy("has_board", has(board))
+                define('W', "red_alloy", "wire")
+                unlockedBy("has_board", board)
             }
 
             shaped(GOOD_ELECTRONIC.item) {
@@ -89,11 +86,11 @@ object CircuitComponents {
                 pattern("EBE")
                 pattern("WEW")
                 define('D', DIODE.item(CircuitComponentTier.NORMAL))
-                define('P', getMaterial("steel").tag("plate"))
+                define('P', "steel", "plate")
                 define('E', circuit)
                 define('B', circuitBoard(CircuitTier.ELECTRONIC).get())
-                define('W', getMaterial("copper").tag("wire"))
-                unlockedBy("has_circuit", has(circuit))
+                define('W', "copper", "wire")
+                unlockedBy("has_circuit", circuit)
             }
         }
 
@@ -200,9 +197,9 @@ object CircuitComponents {
                     pattern("WCW")
                     pattern(" R ")
                     define('R', STICKY_RESIN.get())
-                    define('W', getMaterial("copper").tag("wire"))
-                    define('C', getMaterial("coal").tag("dust"))
-                    unlockedBy("has_resin", has(STICKY_RESIN.get()))
+                    define('W', "copper", "wire")
+                    define('C', "coal", "dust")
+                    unlockedBy("has_resin", STICKY_RESIN.get())
                 }
             }
 
@@ -344,7 +341,7 @@ object CircuitComponents {
                     pattern("SSS")
                     define('S', resin)
                     define('W', ItemTags.PLANKS)
-                    unlockedBy("has_resin", has(resin))
+                    unlockedBy("has_resin", resin)
                 }
 
                 shaped(circuitBoard) {
@@ -352,8 +349,8 @@ object CircuitComponents {
                     pattern("WBW")
                     pattern("WWW")
                     define('B', board)
-                    define('W', getMaterial("copper").tag("wire"))
-                    unlockedBy("has_board", has(board))
+                    define('W', "copper", "wire")
+                    unlockedBy("has_board", board)
                 }
             }
 

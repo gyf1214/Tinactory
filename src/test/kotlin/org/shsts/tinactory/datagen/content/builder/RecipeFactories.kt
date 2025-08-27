@@ -1,13 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder
 
-import net.minecraft.data.recipes.ShapedRecipeBuilder
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.tags.TagKey
-import net.minecraft.world.item.Item
-import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.Tinactory.REGISTRATE
 import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING
 import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe
@@ -16,7 +10,6 @@ import org.shsts.tinactory.content.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ToolRecipe
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 typealias SimpleProcessingBuilder = ProcessingRecipeBuilder<ProcessingRecipe.Builder>
 typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
@@ -30,42 +23,8 @@ object RecipeFactories {
         VanillaRecipeFactory(replace).apply(block)
     }
 
-    fun toolCrafting(loc: ResourceLocation, block: ToolRecipe.Builder.() -> Unit) {
-        TOOL_CRAFTING.recipe(DATA_GEN, loc).apply {
-            block()
-            build()
-        }
-    }
-
-    fun toolCrafting(result: ItemLike, amount: Int = 1, block: ToolRecipe.Builder.() -> Unit) {
-        toolCrafting(result.asItem().registryName!!) {
-            result({ result }, amount)
-            block()
-        }
-    }
-
-    fun toolCrafting(name: String, sub: String, amount: Int = 1, block: ToolRecipe.Builder.() -> Unit) {
-        val mat = getMaterial(name)
-        toolCrafting(mat.loc(sub)) {
-            result(mat.entry(sub), amount)
-            block()
-        }
-    }
-
-    fun toolShapeless(from: ItemLike, to: ItemLike, tool: TagKey<Item>, amount: Int = 1) {
-        toolCrafting(to, amount) {
-            pattern("#")
-            define('#') { from }
-            toolTag(tool)
-        }
-    }
-
-    fun toolShapeless(from: TagKey<Item>, to: ItemLike, tool: TagKey<Item>, amount: Int = 1) {
-        toolCrafting(to, amount) {
-            pattern("#")
-            define('#', from)
-            toolTag(tool)
-        }
+    fun toolCrafting(block: ToolRecipeFactory.() -> Unit) {
+        ToolRecipeFactory().apply(block)
     }
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> processing(name: String,
@@ -344,10 +303,6 @@ object RecipeFactories {
     fun marker(block: MarkerFactory.() -> Unit) {
         val recipeType = REGISTRATE.getRecipeType<MarkerRecipe.Builder>("marker")
         RecipeFactory(recipeType, ::MarkerBuilder).block()
-    }
-
-    fun ShapedRecipeBuilder.define(ch: Char, mat: String, sub: String) {
-        define(ch, getMaterial(mat).tag(sub))
     }
 
     fun ToolRecipe.Builder.define(ch: Char, mat: String, sub: String) {

@@ -28,10 +28,8 @@ import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllItems.CABLE
 import org.shsts.tinactory.content.AllItems.ELECTRIC_BUFFER
 import org.shsts.tinactory.content.AllItems.MACHINE_HULL
-import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE
 import org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING
-import org.shsts.tinactory.content.AllRecipes.has
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.AllTags.circuit
@@ -39,9 +37,9 @@ import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.define
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.ToolRecipeFactory
 import org.shsts.tinactory.datagen.content.component.Component
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
@@ -64,7 +62,7 @@ object MiscMachines {
                 define('S', "stone", "block")
                 define('W', Items.STICK)
                 define('C', Blocks.CRAFTING_TABLE)
-                unlockedBy("has_cobblestone", has(getMaterial("stone").tag("block")))
+                unlockedBy("has_cobblestone", "stone", "block")
             }
             shaped(PRIMITIVE_STONE_GENERATOR.get()) {
                 pattern("WLW")
@@ -72,7 +70,7 @@ object MiscMachines {
                 pattern("WLW")
                 define('W', ItemTags.PLANKS)
                 define('L', ItemTags.LOGS)
-                unlockedBy("has_planks", has(ItemTags.PLANKS))
+                unlockedBy("has_planks", ItemTags.PLANKS)
             }
             shaped(PRIMITIVE_ORE_ANALYZER.get()) {
                 pattern("WLW")
@@ -81,7 +79,7 @@ object MiscMachines {
                 define('W', ItemTags.PLANKS)
                 define('L', ItemTags.LOGS)
                 define('F', "flint", "primary")
-                unlockedBy("has_flint", has(getMaterial("flint").tag("primary")))
+                unlockedBy("has_flint", "flint", "primary")
             }
             shaped(PRIMITIVE_ORE_WASHER.get()) {
                 pattern("WLW")
@@ -90,41 +88,42 @@ object MiscMachines {
                 define('W', ItemTags.PLANKS)
                 define('L', ItemTags.LOGS)
                 define('F', Items.WATER_BUCKET)
-                unlockedBy("has_water_bucket", has(Items.WATER_BUCKET))
+                unlockedBy("has_water_bucket", Items.WATER_BUCKET)
             }
         }
     }
 
     private fun ulvs() {
-        ulv(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR)
-        ulv(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER)
-        ulv(ORE_WASHER, PRIMITIVE_ORE_WASHER)
-        ulv(RESEARCH_BENCH, Blocks.CRAFTING_TABLE)
-        ulv(ASSEMBLER, WORKBENCH)
-        ulv(ELECTRIC_FURNACE, Blocks.FURNACE)
-        ulv(ELECTRIC_CHEST, Blocks.CHEST)
-        ulv(ELECTRIC_TANK, getMaterial("glass").tag("primary"))
-        ulv(LOGISTIC_WORKER, Blocks.HOPPER)
-        ulv(ELECTRIC_BUFFER, CABLE.item(Voltage.ULV))
+        toolCrafting {
+            ulv(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR)
+            ulv(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER)
+            ulv(ORE_WASHER, PRIMITIVE_ORE_WASHER)
+            ulv(RESEARCH_BENCH, Blocks.CRAFTING_TABLE)
+            ulv(ASSEMBLER, WORKBENCH)
+            ulv(ELECTRIC_FURNACE, Blocks.FURNACE)
+            ulv(ELECTRIC_CHEST, Blocks.CHEST)
+            ulv(ELECTRIC_TANK, "glass", "primary")
+            ulv(LOGISTIC_WORKER, Blocks.HOPPER)
+            ulv(ELECTRIC_BUFFER, CABLE.item(Voltage.ULV))
 
-        toolCrafting(NETWORK_CONTROLLER.get()) {
-            pattern("VWV")
-            pattern("VHV")
-            pattern("WVW")
-            define('W', CABLE.item(Voltage.ULV))
-            define('H', MACHINE_HULL.item(Voltage.ULV))
-            define('V', circuit(Voltage.ULV))
-            toolTag(TOOL_WRENCH)
-        }
-
-        toolCrafting(STEAM_TURBINE.block(Voltage.ULV)) {
-            pattern("PVP").pattern("RHR").pattern("WVW")
-            define('P', "copper", "pipe")
-            define('R', "iron", "rotor")
-            define('W', CABLE.item(Voltage.ULV))
-            define('H', MACHINE_HULL.item(Voltage.ULV))
-            define('V', circuit(Voltage.ULV))
-            toolTag(TOOL_WRENCH)
+            result(NETWORK_CONTROLLER.get()) {
+                pattern("VWV")
+                pattern("VHV")
+                pattern("WVW")
+                define('W', CABLE.item(Voltage.ULV))
+                define('H', MACHINE_HULL.item(Voltage.ULV))
+                define('V', circuit(Voltage.ULV))
+                toolTag(TOOL_WRENCH)
+            }
+            result(STEAM_TURBINE.block(Voltage.ULV)) {
+                pattern("PVP").pattern("RHR").pattern("WVW")
+                define('P', "copper", "pipe")
+                define('R', "iron", "rotor")
+                define('W', CABLE.item(Voltage.ULV))
+                define('H', MACHINE_HULL.item(Voltage.ULV))
+                define('V', circuit(Voltage.ULV))
+                toolTag(TOOL_WRENCH)
+            }
         }
 
         assembler {
@@ -157,10 +156,15 @@ object MiscMachines {
         }
     }
 
-    private fun ulv(item: ItemLike, base: ItemLike) {
-        toolCrafting(item) {
+    @Suppress("UNCHECKED_CAST")
+    private fun ToolRecipeFactory.ulv(item: ItemLike, base: Any? = null, sub: String? = null) {
+        result(item) {
             pattern("BBB").pattern("VHV").pattern("WVW")
-            define('B', base.asItem())
+            when (base) {
+                is ItemLike -> define('B', base.asItem())
+                is TagKey<*> -> define('B', base as TagKey<Item>)
+                is String -> define('B', base, sub!!)
+            }
             define('W', CABLE.item(Voltage.ULV))
             define('H', MACHINE_HULL.item(Voltage.ULV))
             define('V', circuit(Voltage.ULV))
@@ -168,36 +172,25 @@ object MiscMachines {
         }
     }
 
-    private fun ulv(item: ItemLike, base: TagKey<Item>) {
-        toolCrafting(item) {
-            pattern("BBB").pattern("VHV").pattern("WVW")
-            define('B', base)
-            define('W', CABLE.item(Voltage.ULV))
-            define('H', MACHINE_HULL.item(Voltage.ULV))
-            define('V', circuit(Voltage.ULV))
-            toolTag(TOOL_WRENCH)
-        }
-    }
-
-    private fun ulv(machine: MachineSet, base: IEntry<out ItemLike>) {
+    private fun ToolRecipeFactory.ulv(machine: MachineSet, base: IEntry<out ItemLike>) {
         ulv(machine.block(Voltage.ULV), base.get())
     }
 
-    private fun ulv(machine: MachineSet, base: ItemLike) {
+    private fun ToolRecipeFactory.ulv(machine: MachineSet, base: ItemLike) {
         ulv(machine.block(Voltage.ULV), base)
     }
 
-    private fun ulv(machine: MachineSet, base: TagKey<Item>) {
-        ulv(machine.block(Voltage.ULV), base)
+    private fun ToolRecipeFactory.ulv(machine: MachineSet, name: String, sub: String) {
+        ulv(machine.block(Voltage.ULV), name, sub)
     }
 
-    private fun ulv(machine: Component, base: ItemLike) {
+    private fun ToolRecipeFactory.ulv(machine: Component, base: ItemLike) {
         ulv(machine.item(Voltage.ULV), base)
     }
 
     private fun vanillas() {
-        vanilla {
-            toolCrafting(Items.HOPPER) {
+        toolCrafting {
+            result(Items.HOPPER) {
                 pattern("P P")
                 pattern("PCP")
                 pattern(" P ")
@@ -205,13 +198,15 @@ object MiscMachines {
                 define('C', Items.CHEST)
                 toolTag(TOOL_WRENCH, TOOL_HAMMER)
             }
-            toolCrafting(Items.BUCKET) {
+            result(Items.BUCKET) {
                 pattern("P P")
                 pattern(" P ")
                 define('P', "iron", "plate")
                 toolTag(TOOL_HAMMER)
             }
+        }
 
+        vanilla {
             nullRecipe(Items.BLAST_FURNACE,
                 Items.SMOKER,
                 Items.STONECUTTER,
@@ -269,15 +264,17 @@ object MiscMachines {
     }
 
     private fun misc() {
-        toolCrafting(LOW_PRESSURE_BOILER.get()) {
-            pattern("PPP")
-            pattern("PWP")
-            pattern("VFV")
-            define('P', "iron", "plate")
-            define('W', CABLE.item(Voltage.ULV))
-            define('V', circuit(Voltage.ULV))
-            define('F', Blocks.FURNACE.asItem())
-            toolTag(TOOL_WRENCH)
+        toolCrafting {
+            result(LOW_PRESSURE_BOILER.get()) {
+                pattern("PPP")
+                pattern("PWP")
+                pattern("VFV")
+                define('P', "iron", "plate")
+                define('W', CABLE.item(Voltage.ULV))
+                define('V', circuit(Voltage.ULV))
+                define('F', Blocks.FURNACE.asItem())
+                toolTag(TOOL_WRENCH)
+            }
         }
 
         assembler {
