@@ -23,10 +23,10 @@ import org.shsts.tinactory.content.AllItems.TRANSISTOR
 import org.shsts.tinactory.content.AllItems.VACUUM_TUBE
 import org.shsts.tinactory.content.AllItems.WAFERS
 import org.shsts.tinactory.content.AllItems.WORKSTATION
+import org.shsts.tinactory.content.electric.Circuit
+import org.shsts.tinactory.content.electric.CircuitComponent
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
-import org.shsts.tinactory.content.electric.Circuits.Circuit
-import org.shsts.tinactory.content.electric.Circuits.CircuitComponent
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.electric.Voltage

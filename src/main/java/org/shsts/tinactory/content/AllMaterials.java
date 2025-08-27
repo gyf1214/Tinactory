@@ -3,7 +3,6 @@ package org.shsts.tinactory.content;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -263,10 +262,6 @@ public final class AllMaterials {
 
     public static MaterialSet fluid(String id, int color, String sub) {
         return fluid(id, color, sub, id);
-    }
-
-    public static TagKey<Item> tag(String sub) {
-        return MaterialSet.Builder.prefixTag(sub);
     }
 
     public static Function<Item.Properties, Item> fuelItem(int burnTime) {

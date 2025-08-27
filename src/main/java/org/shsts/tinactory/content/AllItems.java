@@ -13,13 +13,14 @@ import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
+import org.shsts.tinactory.content.electric.Circuit;
+import org.shsts.tinactory.content.electric.CircuitComponent;
 import org.shsts.tinactory.content.electric.CircuitLevel;
 import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.material.ComponentBuilder;
-import org.shsts.tinactory.content.material.MaterialSet;
 import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.content.material.RubberTreeGrower;
 import org.shsts.tinactory.content.network.CableBlock;
@@ -37,14 +38,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
-import static org.shsts.tinactory.content.AllMaterials.COBALT_BRASS;
-import static org.shsts.tinactory.content.AllMaterials.COPPER;
-import static org.shsts.tinactory.content.AllMaterials.GOLD;
-import static org.shsts.tinactory.content.AllMaterials.IRON;
-import static org.shsts.tinactory.content.AllMaterials.STEEL;
-import static org.shsts.tinactory.content.AllMaterials.TIN;
-import static org.shsts.tinactory.content.AllMaterials.VANADIUM_STEEL;
+import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.electric.Circuits.circuit;
 import static org.shsts.tinactory.content.electric.Circuits.circuitComponent;
 
@@ -70,25 +64,25 @@ public final class AllItems {
     public static final Map<Voltage, IEntry<Item>> BUZZSAW;
 
     // circuits
-    public static final Circuits.Circuit VACUUM_TUBE;
-    public static final Circuits.Circuit ELECTRONIC_CIRCUIT;
-    public static final Circuits.Circuit GOOD_ELECTRONIC;
-    public static final Circuits.Circuit BASIC_INTEGRATED;
-    public static final Circuits.Circuit GOOD_INTEGRATED;
-    public static final Circuits.Circuit ADVANCED_INTEGRATED;
-    public static final Circuits.Circuit NAND_CHIP;
-    public static final Circuits.Circuit MICROPROCESSOR;
-    public static final Circuits.Circuit INTEGRATED_PROCESSOR;
-    public static final Circuits.Circuit PROCESSOR_ASSEMBLY;
-    public static final Circuits.Circuit WORKSTATION;
-    public static final Circuits.Circuit MAINFRAME;
+    public static final Circuit VACUUM_TUBE;
+    public static final Circuit ELECTRONIC_CIRCUIT;
+    public static final Circuit GOOD_ELECTRONIC;
+    public static final Circuit BASIC_INTEGRATED;
+    public static final Circuit GOOD_INTEGRATED;
+    public static final Circuit ADVANCED_INTEGRATED;
+    public static final Circuit NAND_CHIP;
+    public static final Circuit MICROPROCESSOR;
+    public static final Circuit INTEGRATED_PROCESSOR;
+    public static final Circuit PROCESSOR_ASSEMBLY;
+    public static final Circuit WORKSTATION;
+    public static final Circuit MAINFRAME;
 
     // circuit components
-    public static final Circuits.CircuitComponent RESISTOR;
-    public static final Circuits.CircuitComponent CAPACITOR;
-    public static final Circuits.CircuitComponent INDUCTOR;
-    public static final Circuits.CircuitComponent DIODE;
-    public static final Circuits.CircuitComponent TRANSISTOR;
+    public static final CircuitComponent RESISTOR;
+    public static final CircuitComponent CAPACITOR;
+    public static final CircuitComponent INDUCTOR;
+    public static final CircuitComponent DIODE;
+    public static final CircuitComponent TRANSISTOR;
 
     // chips
     public static final List<IEntry<Item>> BOULES;
@@ -133,7 +127,7 @@ public final class AllItems {
         DIODE = circuitComponent("diode");
         TRANSISTOR = circuitComponent("transistor");
 
-        Circuits.addBoards();
+        Circuits.buildBoards();
 
         STICKY_RESIN = simple("rubber_tree/sticky_resin");
 
@@ -174,7 +168,7 @@ public final class AllItems {
             .buildObject();
 
         RESEARCH_EQUIPMENT = ComponentBuilder.simple(v -> REGISTRATE
-                .item("component/" + v.id + "/research_equipment", Item::new)
+                .item("component/" + v.id + "/research_equipment")
                 .tint(0xFFFFFFFF, v.color)
                 .register())
             .voltages(Voltage.ULV, Voltage.EV)
@@ -187,16 +181,19 @@ public final class AllItems {
             .voltages(Voltage.LV, Voltage.HV)
             .buildObject();
 
-        CABLE = ComponentBuilder.<CableBlock, MaterialSet>builder((v, mat) -> REGISTRATE
-                .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
-                .transform(CableBlock.tint(v, mat.color))
-                .translucent()
-                .register())
-            .voltage(Voltage.ULV, IRON)
-            .voltage(Voltage.LV, TIN)
-            .voltage(Voltage.MV, COPPER)
-            .voltage(Voltage.HV, GOLD)
-            .voltage(Voltage.EV, ALUMINIUM)
+        CABLE = ComponentBuilder.<CableBlock, String>builder((v, name) -> {
+                var mat = getMaterial(name);
+                return REGISTRATE
+                    .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
+                    .transform(CableBlock.tint(v, mat.color))
+                    .translucent()
+                    .register();
+            })
+            .voltage(Voltage.ULV, "iron")
+            .voltage(Voltage.LV, "tin")
+            .voltage(Voltage.MV, "copper")
+            .voltage(Voltage.HV, "gold")
+            .voltage(Voltage.EV, "aluminium")
             .buildObject();
 
         TRANSFORMER = ComponentBuilder.simple(v -> REGISTRATE
@@ -221,12 +218,12 @@ public final class AllItems {
         GOOD_GRINDER = simple("component/grinder/good");
         ADVANCED_GRINDER = simple("component/grinder/advanced");
 
-        BASIC_BUZZSAW = REGISTRATE.item("component/buzzsaw/basic", Item::new)
-            .tint(COBALT_BRASS.color)
+        BASIC_BUZZSAW = REGISTRATE.item("component/buzzsaw/basic")
+            .tint(getMaterial("cobalt_brass").color)
             .register();
 
         GOOD_BUZZSAW = REGISTRATE.item("component/buzzsaw/good")
-            .tint(VANADIUM_STEEL.color)
+            .tint(getMaterial("vanadium_steel").color)
             .register();
 
         // TODO: tint
@@ -245,13 +242,13 @@ public final class AllItems {
             "simple_soc", "soc", "advanced_soc",
             "low_pic", "pic", "high_pic");
 
-        FLUID_CELL = ComponentBuilder.<CellItem, MaterialSet>builder((v, mat) -> REGISTRATE
-                .item("tool/fluid_cell/" + mat.name, CellItem.factory(1 << (v.rank - 1)))
+        FLUID_CELL = ComponentBuilder.<CellItem, String>builder((v, name) -> REGISTRATE
+                .item("tool/fluid_cell/" + name, CellItem.factory(1 << (v.rank - 1)))
                 .tint(() -> () -> CellItem::getTint)
                 .register())
-            .voltage(Voltage.ULV, IRON)
-            .voltage(Voltage.LV, STEEL)
-            .voltage(Voltage.MV, ALUMINIUM)
+            .voltage(Voltage.ULV, "iron")
+            .voltage(Voltage.LV, "steel")
+            .voltage(Voltage.MV, "aluminium")
             .buildObject();
 
         ITEM_FILTER = simple("component/item_filter");
@@ -286,7 +283,7 @@ public final class AllItems {
     }
 
     private static IEntry<Item> simple(String name) {
-        return REGISTRATE.item(name, Item::new).register();
+        return REGISTRATE.item(name).register();
     }
 
     private static void boules(String... names) {

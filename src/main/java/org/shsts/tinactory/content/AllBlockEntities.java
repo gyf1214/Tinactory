@@ -41,6 +41,7 @@ import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
+import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -585,11 +586,12 @@ public final class AllBlockEntities {
     private static IEntry<MachineBlock> boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;
+        var water = getMaterial("water");
         return BlockEntityBuilder.builder(id,
                 MachineBlock.factory(Voltage.PRIMITIVE))
             .menu(AllMenus.BOILER)
             .blockEntity()
-            .transform(Boiler.factory(burnSpeed))
+            .transform(Boiler.factory(burnSpeed, water.fluid("liquid"), water.fluid("gas")))
             .transform(StackProcessingContainer.factory(layout))
             .end()
             .transform(baseMachine())

@@ -44,24 +44,8 @@ public final class AllTags {
     public static final TagKey<Item> ITEM_STORAGE_CELL = extend(STORAGE_CELL, "item");
     public static final TagKey<Item> FLUID_STORAGE_CELL = extend(STORAGE_CELL, "fluid");
 
-    public static TagKey<Item> machineTag(String id) {
-        return extend(MACHINE, id);
-    }
-
-    public static TagKey<Item> machineTag(IRecipeType<?> recipeType) {
-        return machineTag(recipeType.id());
-    }
-
-    public static TagKey<Item> circuit(Voltage v) {
-        return modItem("circuit/" + v.id);
-    }
-
-    public static TagKey<Item> battery(Voltage v) {
-        return modItem("battery/" + v.id);
-    }
-
-    public static TagKey<Item> circuitComponent(String component, CircuitComponentTier tier) {
-        return modItem(tier.getName(component));
+    public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {
+        return TagKey.create(tag.registry(), LocHelper.extend(tag.location(), suffix));
     }
 
     public static TagKey<Item> item(ResourceLocation loc) {
@@ -80,7 +64,27 @@ public final class AllTags {
         return block(modLoc(id));
     }
 
-    public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {
-        return TagKey.create(tag.registry(), LocHelper.extend(tag.location(), suffix));
+    public static TagKey<Item> material(String sub) {
+        return modItem(sub.startsWith("tool/") ? sub : "materials/" + sub);
+    }
+
+    public static TagKey<Item> circuit(Voltage v) {
+        return modItem("circuit/" + v.id);
+    }
+
+    public static TagKey<Item> battery(Voltage v) {
+        return modItem("battery/" + v.id);
+    }
+
+    public static TagKey<Item> circuitComponent(String component, CircuitComponentTier tier) {
+        return modItem(tier.getName(component));
+    }
+
+    public static TagKey<Item> machine(String id) {
+        return extend(MACHINE, id);
+    }
+
+    public static TagKey<Item> machine(IRecipeType<?> recipeType) {
+        return machine(recipeType.id());
     }
 }

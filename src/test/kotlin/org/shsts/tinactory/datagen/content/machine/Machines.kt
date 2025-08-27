@@ -168,7 +168,7 @@ object Machines {
     }
 
     private fun machineTag(set: MachineSet) = when (set) {
-        is ProcessingSet -> AllTags.machineTag(set.recipeType)
+        is ProcessingSet -> AllTags.machine(set.recipeType)
         ELECTRIC_FURNACE -> AllTags.ELECTRIC_FURNACE
         else -> null
     }

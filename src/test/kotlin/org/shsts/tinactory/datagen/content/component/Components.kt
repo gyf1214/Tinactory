@@ -145,20 +145,24 @@ object Components {
 
     private fun circuits() {
         itemData {
-            Circuits.forEach { tier, level, entry ->
-                item(entry) {
-                    model(basicItem("metaitems/${entry.id().replace('/', '.')}"))
-                    tag(AllTags.circuit(Circuits.getVoltage(tier, level)))
+            for (circuit in Circuits.CIRCUITS) {
+                item(circuit.entry) {
+                    model(basicItem("metaitems/${circuit.entry.id().replace('/', '.')}"))
+                    tag(AllTags.circuit(Circuits.getVoltage(circuit.tier, circuit.level)))
                 }
             }
 
-            Circuits.forEachComponent { component, tier, entry ->
-                val texKey = if (tier.prefix.isEmpty()) component else "${tier.prefix}.$component"
-                item(entry) {
-                    model(basicItem("metaitems/component.$texKey"))
-                    for (tier1 in CircuitComponentTier.entries) {
-                        if (tier1.rank <= tier.rank) {
-                            tag(AllTags.circuitComponent(component, tier1))
+            for (component in Circuits.COMPONENTS.values) {
+                for (tier in CircuitComponentTier.entries) {
+                    val name = component.name
+                    val entry = component.entry(tier)
+                    val texKey = if (tier.prefix.isEmpty()) name else "${tier.prefix}.$name"
+                    item(entry) {
+                        model(basicItem("metaitems/component.$texKey"))
+                        for (tier1 in CircuitComponentTier.entries) {
+                            if (tier1.rank <= tier.rank) {
+                                tag(AllTags.circuitComponent(name, tier1))
+                            }
                         }
                     }
                 }

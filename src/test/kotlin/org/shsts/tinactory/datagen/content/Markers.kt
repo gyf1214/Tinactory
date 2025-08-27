@@ -1,7 +1,7 @@
 package org.shsts.tinactory.datagen.content
 
 import org.shsts.tinactory.content.AllBlockEntities
-import org.shsts.tinactory.content.AllMaterials
+import org.shsts.tinactory.content.AllTags.material
 import org.shsts.tinactory.content.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
@@ -21,11 +21,11 @@ object Markers {
         marker {
             recipe("centrifuge_dust_pure") {
                 baseType("centrifuge")
-                input(AllMaterials.tag("dust_pure"), port = 0)
+                input(material("dust_pure"), port = 0)
             }
             recipe("thermal_centrifuge_crushed_purified") {
                 baseType("thermal_centrifuge")
-                input(AllMaterials.tag("crushed_purified"), port = 0)
+                input(material("crushed_purified"), port = 0)
             }
             for (variant in OreVariant.entries) {
                 recipe("analyze_${variant.name.lowercase()}") {
@@ -43,7 +43,7 @@ object Markers {
         marker {
             recipe("crush_$sub") {
                 baseType("macerator")
-                input(AllMaterials.tag(sub), port = 0)
+                input(material(sub), port = 0)
             }
         }
     }
@@ -52,7 +52,7 @@ object Markers {
         marker {
             recipe("wash_$sub") {
                 baseType("ore_washer")
-                input(AllMaterials.tag(sub), port = 0)
+                input(material(sub), port = 0)
                 input("water", port = 1)
             }
         }

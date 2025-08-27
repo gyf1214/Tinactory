@@ -55,7 +55,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
 
     fun input(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1, port: Int? = null) {
         if (mat.hasFluid(sub)) {
-            input(mat.fluid(sub).get(), mat.fluidAmount(amount.toFloat()),
+            input(mat.fluid(sub).get(), mat.fluidAmount(sub, amount.toFloat()),
                 port ?: defaultInputFluid!!)
         } else {
             input(mat.tag(sub), amount.toInt(), port ?: defaultInputItem!!)
@@ -81,7 +81,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
     fun output(mat: MaterialSet, sub: String = defaultSub(mat),
         amount: Number = 1, port: Int? = null, rate: Double = 1.0) {
         if (mat.hasFluid(sub)) {
-            output(mat.fluid(sub).get(), mat.fluidAmount(amount.toFloat()),
+            output(mat.fluid(sub).get(), mat.fluidAmount(sub, amount.toFloat()),
                 port ?: defaultOutputFluid!!, rate)
         } else {
             output(mat.item(sub), amount.toInt(), port ?: defaultOutputItem!!, rate)

@@ -48,8 +48,8 @@ public final class MaterialExporter {
 
             for (var sub : mat.fluidSubs()) {
                 if (sub.equals("fluid")) {
-                    if (mat.fluid().get() != Fluids.WATER) {
-                        var target = LocHelper.name(mat.fluidLoc().getPath(), -2);
+                    if (mat.fluid(sub).get() != Fluids.WATER) {
+                        var target = LocHelper.name(mat.fluidLoc(sub).getPath(), -2);
                         aliases.addProperty(sub, target);
                     } else {
                         aliases.addProperty(sub, "liquid");

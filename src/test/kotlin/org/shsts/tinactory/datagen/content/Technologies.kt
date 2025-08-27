@@ -140,7 +140,7 @@ object Technologies {
 
             INTEGRATED_CIRCUIT = tech("integrated_circuit") {
                 maxProgress(20)
-                displayItem(AllItems.GOOD_INTEGRATED.item())
+                displayItem(AllItems.GOOD_INTEGRATED.entry)
                 depends(SENSOR_AND_EMITTER, MATERIAL_CUTTING)
             }
 

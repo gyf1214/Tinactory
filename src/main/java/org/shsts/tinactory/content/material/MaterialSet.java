@@ -26,6 +26,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
+import static org.shsts.tinactory.content.AllTags.extend;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
@@ -152,17 +153,9 @@ public class MaterialSet {
         return fluids.containsKey(sub);
     }
 
-    public boolean hasFluid() {
-        return hasFluid("fluid");
-    }
-
     public ResourceLocation fluidLoc(String sub) {
         assert fluids.containsKey(sub);
         return fluids.get(sub).loc;
-    }
-
-    public ResourceLocation fluidLoc() {
-        return fluidLoc("fluid");
     }
 
     public Supplier<? extends Fluid> fluid(String sub) {
@@ -170,17 +163,9 @@ public class MaterialSet {
         return fluids.get(sub).fluid;
     }
 
-    public Supplier<? extends Fluid> fluid() {
-        return fluid("fluid");
-    }
-
     public int fluidAmount(String sub, float amount) {
         assert fluids.containsKey(sub);
         return Math.round(amount * fluids.get(sub).baseAmount);
-    }
-
-    public int fluidAmount(float amount) {
-        return fluidAmount("fluid", amount);
     }
 
     public OreVariant oreVariant() {
@@ -207,16 +192,8 @@ public class MaterialSet {
             return new MaterialSet(this);
         }
 
-        private static String prefix(String sub) {
-            return sub.startsWith("tool/") ? sub : "materials/" + sub;
-        }
-
-        public static TagKey<Item> prefixTag(String sub) {
-            return AllTags.modItem(prefix(sub));
-        }
-
         private TagKey<Item> newTag(String sub) {
-            return AllTags.modItem(prefix(sub) + "/" + name);
+            return extend(AllTags.material(sub), name);
         }
 
         public Builder<P> color(int value) {

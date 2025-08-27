@@ -8,8 +8,8 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.client.model.generators.ItemModelProvider
-import org.shsts.tinactory.content.AllMaterials
 import org.shsts.tinactory.content.AllMaterials.getMaterial
+import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.TOOL_FILE
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
@@ -107,7 +107,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     private fun buildItem(sub: String) {
-        val prefixTag = AllMaterials.tag(sub)
+        val prefixTag = AllTags.material(sub)
         val tag = material.tag(sub)
         dataGen { tag(tag, prefixTag) }
 
