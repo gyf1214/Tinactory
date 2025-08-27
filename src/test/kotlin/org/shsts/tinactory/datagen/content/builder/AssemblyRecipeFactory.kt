@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.datagen.content.component.Component
 import org.shsts.tinactory.datagen.content.component.item
@@ -18,13 +19,23 @@ class AssemblyRecipeFactory(
         builder.componentVoltage = componentVoltage
     }
 
-    fun output(component: Component, amount: Int = 1,
-        suffix: String = "", voltage: Voltage = this.componentVoltage!!,
-        rate: Double = 1.0, block: AssemblyRecipeBuilder.() -> Unit = {}) {
+    fun output(component: Component, voltage: Voltage = this.componentVoltage!!,
+        block: AssemblyRecipeBuilder.() -> Unit = {}) {
         if (!component.containsKey(voltage)) {
             return
         }
-        output(component.item(voltage), amount, suffix, rate) {
+        output(component.item(voltage)) {
+            componentVoltage = voltage
+            block()
+        }
+    }
+
+    fun output(machine: MachineSet, voltage: Voltage = this.componentVoltage!!,
+        block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        if (!machine.hasVoltage(voltage)) {
+            return
+        }
+        output(machine.block(voltage)) {
             componentVoltage = voltage
             block()
         }

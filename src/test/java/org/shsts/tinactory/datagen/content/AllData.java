@@ -15,7 +15,6 @@ public final class AllData {
         DATA_GEN.addProvider(LanguageDataProvider::new);
         Models.init();
         AllDataKt.INSTANCE.init();
-        Machines.init();
 
         MaterialExporter.init();
     }

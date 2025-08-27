@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
@@ -343,5 +344,13 @@ object RecipeFactories {
     fun marker(block: MarkerFactory.() -> Unit) {
         val recipeType = REGISTRATE.getRecipeType<MarkerRecipe.Builder>("marker")
         RecipeFactory(recipeType, ::MarkerBuilder).block()
+    }
+
+    fun ShapedRecipeBuilder.define(ch: Char, mat: String, sub: String) {
+        define(ch, getMaterial(mat).tag(sub))
+    }
+
+    fun ToolRecipe.Builder.define(ch: Char, mat: String, sub: String) {
+        define(ch, getMaterial(mat).tag(sub))
     }
 }

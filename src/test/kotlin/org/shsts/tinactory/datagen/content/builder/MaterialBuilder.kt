@@ -519,7 +519,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     output(material, sub, amount)
                 }
                 workTicks((workTicks * amount).toLong())
-                voltage(voltage)
+                voltage(this@ComposeBuilder.voltage)
             }
         }
     }
