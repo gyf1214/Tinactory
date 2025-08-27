@@ -14,8 +14,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.AllItems;
-import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -63,11 +61,6 @@ public class ResearchRecipe extends ProcessingRecipe {
         public Builder input(IProcessingIngredient ingredient) {
             var port = ingredient.type() == PortType.ITEM ? 0 : 1;
             return input(port, ingredient);
-        }
-
-        @Override
-        public Builder voltage(Voltage value) {
-            return super.voltage(value).inputItem(AllItems.RESEARCH_EQUIPMENT.get(value), 1);
         }
 
         public Builder target(ResourceLocation value) {

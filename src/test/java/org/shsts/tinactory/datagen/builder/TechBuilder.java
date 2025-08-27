@@ -6,11 +6,14 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.builder.Builder;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.datagen.provider.TechProvider;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
@@ -145,7 +148,11 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         if (researchVoltage != null) {
             RESEARCH_BENCH.recipe(DATA_GEN, loc)
                 .target(loc)
-                .voltage(researchVoltage)
+                .input(new ProcessingIngredients.ItemIngredient(
+                    new ItemStack(AllItems.RESEARCH_EQUIPMENT.get(researchVoltage).get(), 1)))
+                .voltage(researchVoltage.value)
+                .power((long) (0.25 * researchVoltage.value))
+                .workTicks(200)
                 .build();
         }
     }

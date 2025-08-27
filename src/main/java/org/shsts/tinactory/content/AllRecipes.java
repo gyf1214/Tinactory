@@ -147,10 +147,6 @@ public final class AllRecipes {
             MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
     }
 
-    private static IRecipeType<ProcessingRecipe.Builder> displayInput(String id) {
-        return processing(id, DisplayInputRecipe::builder);
-    }
-
     private static IRecipeType<ProcessingRecipe.Builder> processing(
         String id, IRecipeType.BuilderFactory<ProcessingRecipe.Builder> builderFactory) {
         return REGISTRATE.recipeType(id, builderFactory)
@@ -161,6 +157,10 @@ public final class AllRecipes {
 
     private static IRecipeType<ProcessingRecipe.Builder> processing(String id) {
         return processing(id, ProcessingRecipe.Builder::new);
+    }
+
+    private static IRecipeType<ProcessingRecipe.Builder> displayInput(String id) {
+        return processing(id, DisplayInputRecipe::builder);
     }
 
     public static void init() {}
