@@ -2,7 +2,7 @@ package org.shsts.tinactory.datagen.content.chemistry
 
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllItems.FERTILIZER
-import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation

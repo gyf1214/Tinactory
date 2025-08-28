@@ -18,7 +18,6 @@ import org.shsts.tinactory.content.electric.CircuitComponent;
 import org.shsts.tinactory.content.electric.CircuitLevel;
 import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
-import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.material.RubberLogBlock;
@@ -27,6 +26,7 @@ import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CellItem;
+import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;

@@ -25,12 +25,12 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.material.MaterialSet;
-import org.shsts.tinactory.content.tool.IWrenchable;
-import org.shsts.tinactory.content.tool.UsableToolItem;
+import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.material.MaterialSet;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
+import org.shsts.tinactory.core.tool.IWrenchable;
+import org.shsts.tinactory.core.tool.UsableToolItem;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 

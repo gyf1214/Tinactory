@@ -13,7 +13,7 @@ import org.shsts.tinactory.content.AllItems.ROBOT_ARM
 import org.shsts.tinactory.content.AllItems.SENSOR
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
-import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler

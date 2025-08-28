@@ -1,7 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder
 
-import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.machine.MachineSet
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.datagen.content.component.Component
 import org.shsts.tinactory.datagen.content.component.item

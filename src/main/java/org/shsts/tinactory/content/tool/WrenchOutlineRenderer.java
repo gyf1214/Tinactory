@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.core.tool.UsableToolItem;
 import org.shsts.tinactory.core.util.MathUtil;
 
 @OnlyIn(Dist.CLIENT)

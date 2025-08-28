@@ -20,9 +20,9 @@ import org.shsts.tinactory.content.AllTags.TOOL_SCREW
 import org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER
 import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
-import org.shsts.tinactory.content.electric.Voltage
-import org.shsts.tinactory.content.material.MaterialSet
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
+import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.modLoc

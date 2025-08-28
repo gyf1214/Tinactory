@@ -48,9 +48,9 @@ import org.shsts.tinactory.content.AllItems.TRANSFORMER
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
-import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.content.machine.ProcessingSet
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Models.cubeBlock
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen

@@ -14,8 +14,8 @@ import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.AllTags.TOOL_MORTAR
 import org.shsts.tinactory.content.AllTags.TOOL_SAW
 import org.shsts.tinactory.content.AllTags.TOOL_SHEARS
-import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.material.RubberLogBlock
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.datagen.content.Models

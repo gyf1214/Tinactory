@@ -47,7 +47,7 @@ import org.shsts.tinactory.content.AllItems.MACHINE_HULL
 import org.shsts.tinactory.content.AllItems.ROBOT_ARM
 import org.shsts.tinactory.content.AllItems.SENSOR
 import org.shsts.tinactory.content.AllItems.TRANSFORMER
-import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler

@@ -10,9 +10,9 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.TierSortingRegistry;
 import org.shsts.tinactory.content.AllMaterials;
-import org.shsts.tinactory.content.tool.ToolItem;
-import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.core.common.SimpleFluid;
+import org.shsts.tinactory.core.tool.ToolItem;
+import org.shsts.tinactory.core.tool.UsableToolItem;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 

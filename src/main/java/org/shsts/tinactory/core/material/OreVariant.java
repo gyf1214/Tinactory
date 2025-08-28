@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.material;
+package org.shsts.tinactory.core.material;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -10,7 +10,7 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.core.electric.Voltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

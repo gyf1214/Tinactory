@@ -1,6 +1,6 @@
 package org.shsts.tinactory.datagen.content.material
 
-import org.shsts.tinactory.content.material.OreVariant
+import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder
 
 object Veins {

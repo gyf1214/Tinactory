@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.electric;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.electric.Voltage;
 
 import java.util.NoSuchElementException;
 

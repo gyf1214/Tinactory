@@ -17,8 +17,8 @@ import org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER
 import org.shsts.tinactory.content.AllTags.TOOL_SHEARS
 import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
-import org.shsts.tinactory.content.electric.Voltage
-import org.shsts.tinactory.content.material.OreVariant
+import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData

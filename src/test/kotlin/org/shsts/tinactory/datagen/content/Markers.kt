@@ -2,7 +2,7 @@ package org.shsts.tinactory.datagen.content
 
 import org.shsts.tinactory.content.AllBlockEntities
 import org.shsts.tinactory.content.AllTags.material
-import org.shsts.tinactory.content.material.OreVariant
+import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.marker

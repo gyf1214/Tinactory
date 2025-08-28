@@ -27,7 +27,7 @@ import org.shsts.tinactory.content.electric.CircuitTier.QUANTUM
 import org.shsts.tinactory.content.electric.Circuits
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
-import org.shsts.tinactory.content.electric.Voltage.ULV
+import org.shsts.tinactory.core.electric.Voltage.ULV
 import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models
