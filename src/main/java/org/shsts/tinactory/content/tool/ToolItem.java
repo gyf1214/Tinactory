@@ -20,8 +20,15 @@ import static org.shsts.tinactory.core.util.I18n.tr;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class ToolItem extends Item {
+    protected final int durability;
+
     public ToolItem(Properties properties, int durability) {
         super(properties.defaultDurability(durability).setNoRepair());
+        this.durability = durability;
+    }
+
+    public int durability() {
+        return durability;
     }
 
     /**

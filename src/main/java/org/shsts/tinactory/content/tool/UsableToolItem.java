@@ -23,13 +23,17 @@ import org.shsts.tinactory.core.util.MathUtil;
 public class UsableToolItem extends ToolItem {
     public static final int WRENCH_RADIUS = 4;
     public static final double WRENCH_RADIUS_NORM = (double) WRENCH_RADIUS / 16d;
-    protected final Tier tier;
-    protected final TagKey<Block> blockTag;
+    private final Tier tier;
+    private final TagKey<Block> blockTag;
 
     public UsableToolItem(Properties properties, int durability, Tier tier, TagKey<Block> blockTag) {
         super(properties, durability);
         this.tier = tier;
         this.blockTag = blockTag;
+    }
+
+    public Tier tier() {
+        return tier;
     }
 
     private static Direction wrenchedDirection(BlockPos pos, Direction clickFace, Vec3 clickLoc) {
