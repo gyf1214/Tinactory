@@ -42,14 +42,14 @@ public class MaterialMeta extends MetaConsumer {
             var sub = GsonHelper.convertToString(item, "items");
             // TODO: more flexible
             if (sub.equals("primary") && burnTime > 0) {
-                builder.dummy(sub, properties -> new Item(properties) {
+                builder.item(sub, properties -> new Item(properties) {
                     @Override
                     public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
                         return burnTime;
                     }
                 });
             } else {
-                builder.dummies(sub);
+                builder.item(sub);
             }
         }
 
@@ -107,12 +107,12 @@ public class MaterialMeta extends MetaConsumer {
 
         for (var entry : ja1) {
             var category = GsonHelper.convertToString(entry, "items");
-            toolBuilder.toolItem(category);
+            toolBuilder.item(category);
         }
 
         for (var entry : ja2) {
             var category = GsonHelper.convertToString(entry, "usables");
-            toolBuilder.usableItem(category);
+            toolBuilder.usable(category);
         }
         toolBuilder.build();
     }

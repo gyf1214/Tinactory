@@ -24,10 +24,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
-import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER;
-import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.extend;
-import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -239,118 +236,15 @@ public class MaterialSet {
             return prefix + sub + "/" + name;
         }
 
-        public Builder<P> dummy(String sub, Function<Item.Properties, ? extends Item> factory) {
+        public Builder<P> item(String sub, Function<Item.Properties, ? extends Item> factory) {
             put(sub, () -> REGISTRATE.item(newId(sub), factory)
                 .tint(color)
                 .register());
             return this;
         }
 
-        private void dummy(String sub) {
-            dummy(sub, Item::new);
-        }
-
-        public Builder<P> dummies(String... subs) {
-            for (var sub : subs) {
-                dummy(sub);
-            }
-            return this;
-        }
-
-        public Builder<P> dust() {
-            return dummies("dust");
-        }
-
-        public Builder<P> dustPrimary() {
-            return dust().alias("primary", "dust");
-        }
-
-        public Builder<P> metal() {
-            return dust().dummies("ingot")
-                .alias("primary", "ingot");
-        }
-
-        public Builder<P> plate() {
-            return metal().dummies("plate");
-        }
-
-        public Builder<P> stick() {
-            return metal().dummies("stick", "dust_tiny");
-        }
-
-        public Builder<P> ring() {
-            return stick().dummies("ring");
-        }
-
-        public Builder<P> nugget() {
-            return metal().dummies("nugget", "dust_tiny");
-        }
-
-        public Builder<P> wire() {
-            return metal().dummies("wire", "dust_tiny");
-        }
-
-        public Builder<P> wireFine() {
-            return wire().dummies("wire_fine");
-        }
-
-        public Builder<P> metalExt() {
-            return metal().plate().stick();
-        }
-
-        public Builder<P> foil() {
-            return plate().dummies("foil", "dust_tiny");
-        }
-
-        public Builder<P> wireAndPlate() {
-            return plate().wire();
-        }
-
-        public Builder<P> pipe() {
-            return plate().dummies("pipe");
-        }
-
-        public Builder<P> magnetic() {
-            return stick().dummies("magnetic");
-        }
-
-        public Builder<P> gear() {
-            return metalExt().dummies("gear");
-        }
-
-        public Builder<P> bolt() {
-            return metalExt().dummies("bolt");
-        }
-
-        public Builder<P> mechanical() {
-            return bolt().dummies("screw");
-        }
-
-        public Builder<P> rotor() {
-            return mechanical().dummies("ring", "rotor");
-        }
-
-        public Builder<P> hot() {
-            return metal().dummies("ingot_hot");
-        }
-
-        public Builder<P> polymer() {
-            return dummies("sheet")
-                .alias("primary", "sheet")
-                .molten();
-        }
-
-        public Builder<P> polymerRing() {
-            return polymer().dummies("ring");
-        }
-
-        public Builder<P> polymerFoil() {
-            return polymer().dummies("foil");
-        }
-
-        public Builder<P> gem() {
-            return dummies("gem", "gem_flawless", "gem_exquisite", "lens")
-                .alias("primary", "gem");
+        public Builder<P> item(String sub) {
+            return item(sub, Item::new);
         }
 
         public Builder<P> fluid(String sub, ResourceLocation tex,
@@ -358,45 +252,6 @@ public class MaterialSet {
             var fluid = simpleFluid("material/" + sub + "/" + name, tex, texColor, displayColor);
             fluids.put(sub, new FluidEntry(fluid.loc(), fluid, baseAmount));
             return this;
-        }
-
-        public Builder<P> fluid(String sub, ResourceLocation tex, int baseAmount) {
-            return fluid(sub, tex, color, color, baseAmount);
-        }
-
-        public Builder<P> fluid(String sub, String tex, int displayColor, int baseAmount) {
-            return fluid(sub, gregtech("blocks/fluids/fluid." + tex), 0xFFFFFFFF, displayColor, baseAmount);
-        }
-
-        public Builder<P> fluid(String sub, String tex, int baseAmount) {
-            return fluid(sub, tex, color, baseAmount);
-        }
-
-        public Builder<P> fluidPrimary(String sub) {
-            assert fluids.containsKey(sub);
-            fluids.put("fluid", fluids.get(sub));
-            return this;
-        }
-
-        public Builder<P> molten() {
-            return fluid("molten", gregtech("blocks/material_sets/dull/liquid"), 144)
-                .fluidPrimary("molten");
-        }
-
-        public Builder<P> liquid(String sub, int color) {
-            return fluid(sub, gregtech("blocks/material_sets/dull/liquid"), color, color, 1000);
-        }
-
-        public Builder<P> liquid() {
-            return liquid("liquid", color).fluidPrimary("liquid");
-        }
-
-        public Builder<P> gas(String sub, int color) {
-            return fluid(sub, gregtech("blocks/material_sets/dull/gas"), color, color, 1000);
-        }
-
-        public Builder<P> gas() {
-            return gas("gas", color).fluidPrimary("gas");
         }
 
         public Builder<P> oreOnly(OreVariant variant) {
@@ -412,17 +267,6 @@ public class MaterialSet {
                 blocks.put("ore", new BlockEntry(ore.loc(), ore));
             }
             return this;
-        }
-
-        public Builder<P> rawOre(OreVariant variant) {
-            return oreOnly(variant).dummies("raw");
-        }
-
-        public Builder<P> ore(OreVariant variant) {
-            return rawOre(variant)
-                .dummies("crushed", "crushed_centrifuged", "crushed_purified")
-                .dummies("dust_impure", "dust_pure")
-                .dust();
         }
 
         public class ToolBuilder extends SimpleBuilder<Unit, Builder<P>, ToolBuilder> {
@@ -444,34 +288,14 @@ public class MaterialSet {
                 return this;
             }
 
-            public ToolBuilder toolItem(String category) {
+            public ToolBuilder item(String category) {
                 return item(category, p -> new ToolItem(p, durability));
             }
 
-            public ToolBuilder usableItem(String category, TagKey<Block> blockTag) {
-                assert tier != null;
-                return item(category, p -> new UsableToolItem(p, durability, tier, blockTag));
-            }
-
-            public ToolBuilder usableItem(String category) {
+            public ToolBuilder usable(String category) {
                 assert tier != null;
                 var tag = AllTags.modBlock("mineable/" + category);
                 return item(category, p -> new UsableToolItem(p, durability, tier, tag));
-            }
-
-            public ToolBuilder hammer() {
-                return toolItem("hammer");
-            }
-
-            public ToolBuilder mortar() {
-                return toolItem("mortar");
-            }
-
-            public ToolBuilder basic() {
-                return hammer().mortar().toolItem("file")
-                    .toolItem("saw").toolItem("screwdriver")
-                    .usableItem("wrench", MINEABLE_WITH_WRENCH)
-                    .usableItem("wire_cutter", MINEABLE_WITH_WIRE_CUTTER);
             }
 
             @Override
@@ -480,16 +304,8 @@ public class MaterialSet {
             }
         }
 
-        public Builder<P> toolSet(int durability, Tier tier) {
-            return (new ToolBuilder(durability, tier)).basic().build();
-        }
-
         public ToolBuilder tool(int durability, @Nullable Tier tier) {
             return new ToolBuilder(durability, tier);
-        }
-
-        public ToolBuilder tool(int durability) {
-            return tool(durability, null);
         }
     }
 
