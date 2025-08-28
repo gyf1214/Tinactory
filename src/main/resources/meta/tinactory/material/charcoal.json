@@ -1,0 +1,11 @@
+{
+  "color": "0xFF644646",
+  "items": [
+    "dust"
+  ],
+  "fluids": {},
+  "aliases": {},
+  "existings": {
+    "primary": "minecraft:charcoal"
+  }
+}

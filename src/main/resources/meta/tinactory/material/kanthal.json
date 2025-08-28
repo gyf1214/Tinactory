@@ -1,0 +1,14 @@
+{
+  "color": "0xFFC2D2DF",
+  "items": [
+    "dust",
+    "dust_tiny",
+    "ingot",
+    "wire"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "ingot"
+  },
+  "existings": {}
+}

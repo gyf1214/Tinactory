@@ -1,0 +1,12 @@
+{
+  "color": "0xFF000000",
+  "ore": "deepslate",
+  "items": [
+    "raw"
+  ],
+  "fluids": {},
+  "aliases": {
+    "fluid": "fluid"
+  },
+  "existings": {}
+}

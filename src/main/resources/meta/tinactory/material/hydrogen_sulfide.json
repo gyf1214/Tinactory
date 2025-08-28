@@ -1,0 +1,15 @@
+{
+  "color": "0xFFFC5304",
+  "items": [],
+  "fluids": {
+    "gas": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.hydrogen_sulfide",
+      "textureColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {
+    "fluid": "gas"
+  },
+  "existings": {}
+}

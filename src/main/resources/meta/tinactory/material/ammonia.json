@@ -1,0 +1,14 @@
+{
+  "color": "0xFF3F3480",
+  "items": [],
+  "fluids": {
+    "gas": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/dull/gas"
+    }
+  },
+  "aliases": {
+    "fluid": "gas"
+  },
+  "existings": {}
+}

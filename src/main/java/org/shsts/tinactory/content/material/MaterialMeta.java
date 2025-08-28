@@ -119,8 +119,14 @@ public class MaterialMeta extends MetaConsumer {
 
     @Override
     protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
+        if (jo.has("alias")) {
+            var sub2 = GsonHelper.getAsString(jo, "alias");
+            AllMaterials.alias(loc.getPath(), sub2);
+            return;
+        }
+
         var color = getColor(jo, "color");
-        var builder = AllMaterials.set(loc.getPath()).color(color);
+        var builder = AllMaterials.newMaterial(loc.getPath()).color(color);
         var burnTime = jo.has("burnTime") ? GsonHelper.getAsInt(jo, "burnTime") : -1;
 
         buildItems(builder, jo, burnTime);

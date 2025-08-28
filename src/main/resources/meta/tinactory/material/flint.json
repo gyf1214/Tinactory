@@ -1,0 +1,16 @@
+{
+  "color": "0xFF002040",
+  "tools": {
+    "durability": 16,
+    "items": [
+      "mortar"
+    ],
+    "usables": []
+  },
+  "items": [],
+  "fluids": {},
+  "aliases": {},
+  "existings": {
+    "primary": "minecraft:flint"
+  }
+}

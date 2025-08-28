@@ -1,0 +1,15 @@
+{
+  "color": "0xFF646464",
+  "items": [
+    "dust",
+    "dust_tiny",
+    "ingot",
+    "magnetic",
+    "stick"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "ingot"
+  },
+  "existings": {}
+}

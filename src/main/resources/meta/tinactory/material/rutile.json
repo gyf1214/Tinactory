@@ -1,0 +1,11 @@
+{
+  "color": "0xFFD40D5C",
+  "items": [
+    "dust"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "dust"
+  },
+  "existings": {}
+}

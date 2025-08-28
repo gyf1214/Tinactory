@@ -1,0 +1,28 @@
+{
+  "color": "0xFFFCECAC",
+  "items": [],
+  "fluids": {
+    "lightly_hydro_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.lightly_hydrocracked_heavy_fuel",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFD4C494"
+    },
+    "sulfuric": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.sulfuric_heavy_fuel",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFFCEC94"
+    },
+    "severely_hydro_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.severely_hydrocracked_heavy_fuel",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFBCAC84"
+    }
+  },
+  "aliases": {
+    "fluid": "fluid"
+  },
+  "existings": {}
+}

@@ -1,0 +1,33 @@
+{
+  "color": "0xFFFFE650",
+  "ore": "deepslate",
+  "items": [
+    "bolt",
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust",
+    "dust_impure",
+    "dust_pure",
+    "dust_tiny",
+    "plate",
+    "stick",
+    "wire",
+    "wire_fine"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {
+    "nugget": "minecraft:gold_nugget",
+    "raw": "minecraft:raw_gold",
+    "ingot": "minecraft:gold_ingot"
+  }
+}
