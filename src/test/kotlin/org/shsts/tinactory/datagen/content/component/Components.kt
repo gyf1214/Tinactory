@@ -18,7 +18,7 @@ import org.shsts.tinactory.content.AllItems.RAW_WAFERS
 import org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT
 import org.shsts.tinactory.content.AllItems.WAFERS
 import org.shsts.tinactory.content.AllTags
-import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER
+import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.CircuitTier.CRYSTAL
@@ -55,7 +55,7 @@ object Components {
             blockData(entry) {
                 blockState(Models::cableBlock)
                 itemModel(Models::cableItem)
-                tag(MINEABLE_WITH_CUTTER)
+                tag(MINEABLE_WITH_WIRE_CUTTER)
             }
         }
 

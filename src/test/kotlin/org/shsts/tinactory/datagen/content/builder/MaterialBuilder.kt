@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.client.model.generators.ItemModelProvider
+import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.TOOL_FILE
@@ -70,6 +71,18 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             "screwdriver" to "handle_screwdriver",
             "wire_cutter" to "wire_cutter_base")
 
+        private val EXISTING_TAGS = mapOf(
+            Pair("glowstone", "dust") to Tags.Items.DUSTS_GLOWSTONE,
+            Pair("iron", "ingot") to Tags.Items.INGOTS_IRON,
+            Pair("iron", "nugget") to Tags.Items.NUGGETS_IRON,
+            Pair("gold", "raw") to Tags.Items.RAW_MATERIALS_GOLD,
+            Pair("gold", "ingot") to Tags.Items.INGOTS_GOLD,
+            Pair("gold", "nugget") to Tags.Items.NUGGETS_GOLD,
+            Pair("copper", "ingot") to Tags.Items.INGOTS_COPPER,
+            Pair("redstone", "dust") to Tags.Items.DUSTS_REDSTONE,
+            Pair("diamond", "gem") to Tags.Items.GEMS_DIAMOND,
+            Pair("emerald", "gem") to Tags.Items.GEMS_EMERALD)
+
         fun material(name: String, icon: IconSet, block: MaterialBuilder.() -> Unit = {}) {
             MaterialBuilder(getMaterial(name), icon).apply {
                 block()
@@ -116,9 +129,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             return
         }
 
-        if (material.hasTarget(sub)) {
-            // simply add tag for existing tag
-            dataGen { tag(material.target(sub), tag) }
+        if (EXISTING_TAGS.containsKey(Pair(name, sub))) {
+            dataGen { tag(EXISTING_TAGS.getValue(Pair(name, sub)), tag) }
             return
         }
 

@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
-import net.minecraftforge.common.Tags;
 
 import static org.shsts.tinactory.content.AllMaterials.ALUMINIUM;
 import static org.shsts.tinactory.content.AllMaterials.ANTIMONY;
@@ -51,23 +50,23 @@ public final class Elements {
     static {
         IRON = set("iron")
             .color(0xFFC8C8C8)
-            .existing("ingot", Tags.Items.INGOTS_IRON, Items.IRON_INGOT)
-            .existing("nugget", Tags.Items.NUGGETS_IRON, Items.IRON_NUGGET)
+            .existing("ingot", Items.IRON_INGOT)
+            .existing("nugget", Items.IRON_NUGGET)
             .nugget().wire().rotor().molten()
             .buildObject();
 
         GOLD = set("gold")
             .color(0xFFFFE650)
-            .existing("raw", Tags.Items.RAW_MATERIALS_GOLD, Items.RAW_GOLD)
-            .existing("ingot", Tags.Items.INGOTS_GOLD, Items.GOLD_INGOT)
-            .existing("nugget", Tags.Items.NUGGETS_GOLD, Items.GOLD_NUGGET)
+            .existing("raw", Items.RAW_GOLD)
+            .existing("ingot", Items.GOLD_INGOT)
+            .existing("nugget", Items.GOLD_NUGGET)
             .bolt().wireFine().molten()
             .ore(OreVariant.DEEPSLATE)
             .buildObject();
 
         COPPER = set("copper")
             .color(0xFFFF6400)
-            .existing("ingot", Tags.Items.INGOTS_COPPER, Items.COPPER_INGOT)
+            .existing("ingot", Items.COPPER_INGOT)
             .foil().wireFine().bolt().pipe().molten()
             .buildObject();
 

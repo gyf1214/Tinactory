@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
-import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER;
+import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER;
 import static org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH;
 import static org.shsts.tinactory.content.AllTags.extend;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
@@ -36,20 +36,14 @@ public class MaterialSet {
     public final int color;
 
     private record ItemEntry(ResourceLocation loc, TagKey<Item> tag,
-        Supplier<? extends Item> item,
-        @Nullable TagKey<Item> target, boolean isAlias) {
+        Supplier<? extends Item> item, boolean isAlias) {
         public ItemEntry(ResourceLocation loc, TagKey<Item> tag,
             Supplier<? extends Item> item) {
-            this(loc, tag, item, null, false);
-        }
-
-        public ItemEntry(ResourceLocation loc, TagKey<Item> tag,
-            Supplier<? extends Item> item, TagKey<Item> target) {
-            this(loc, tag, item, target, false);
+            this(loc, tag, item, false);
         }
 
         public ItemEntry alias() {
-            return new ItemEntry(loc, tag, item, target, true);
+            return new ItemEntry(loc, tag, item, true);
         }
 
         public Item getItem() {
@@ -104,16 +98,6 @@ public class MaterialSet {
 
     public boolean isAlias(String sub) {
         return items.containsKey(sub) && items.get(sub).isAlias;
-    }
-
-    public boolean hasTarget(String sub) {
-        return items.containsKey(sub) && items.get(sub).target != null;
-    }
-
-    public TagKey<Item> target(String sub) {
-        var ret = safeItem(sub).target;
-        assert ret != null;
-        return ret;
     }
 
     public boolean hasItem(String sub) {
@@ -202,6 +186,10 @@ public class MaterialSet {
             return this;
         }
 
+        public int getColor() {
+            return color;
+        }
+
         private void put(String sub, ResourceLocation loc, Supplier<? extends Item> item) {
             if (items.containsKey(sub)) {
                 return;
@@ -227,15 +215,6 @@ public class MaterialSet {
             return this;
         }
 
-        public Builder<P> existing(String sub, TagKey<Item> targetTag, Item item) {
-            assert !items.containsKey(sub);
-            var tag = newTag(sub);
-            var loc = item.getRegistryName();
-            assert loc != null;
-            items.put(sub, new ItemEntry(loc, tag, () -> item, targetTag));
-            return this;
-        }
-
         public Builder<P> existing(String sub, Fluid fluid, int baseAmount) {
             assert !fluids.containsKey(sub);
             var loc = fluid.getRegistryName();
@@ -245,9 +224,13 @@ public class MaterialSet {
         }
 
         public Builder<P> alias(String sub, String sub2) {
-            var entry = items.get(sub2);
-            assert entry != null;
-            items.put(sub, entry.alias());
+            if (items.containsKey(sub2)) {
+                items.put(sub, items.get(sub2).alias());
+            } else if (fluids.containsKey(sub2)) {
+                fluids.put(sub, fluids.get(sub2));
+            } else {
+                throw new IllegalArgumentException("Alias " + sub2 + " does not exist in " + name);
+            }
             return this;
         }
 
@@ -416,7 +399,7 @@ public class MaterialSet {
             return gas("gas", color).fluidPrimary("gas");
         }
 
-        public Builder<P> rawOre(OreVariant variant) {
+        public Builder<P> oreOnly(OreVariant variant) {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
@@ -428,7 +411,11 @@ public class MaterialSet {
                     .register();
                 blocks.put("ore", new BlockEntry(ore.loc(), ore));
             }
-            return dummies("raw");
+            return this;
+        }
+
+        public Builder<P> rawOre(OreVariant variant) {
+            return oreOnly(variant).dummies("raw");
         }
 
         public Builder<P> ore(OreVariant variant) {
@@ -457,13 +444,19 @@ public class MaterialSet {
                 return this;
             }
 
-            private ToolBuilder toolItem(String category) {
+            public ToolBuilder toolItem(String category) {
                 return item(category, p -> new ToolItem(p, durability));
             }
 
-            private ToolBuilder usableItem(String category, TagKey<Block> blockTag) {
+            public ToolBuilder usableItem(String category, TagKey<Block> blockTag) {
                 assert tier != null;
                 return item(category, p -> new UsableToolItem(p, durability, tier, blockTag));
+            }
+
+            public ToolBuilder usableItem(String category) {
+                assert tier != null;
+                var tag = AllTags.modBlock("mineable/" + category);
+                return item(category, p -> new UsableToolItem(p, durability, tier, tag));
             }
 
             public ToolBuilder hammer() {
@@ -478,7 +471,7 @@ public class MaterialSet {
                 return hammer().mortar().toolItem("file")
                     .toolItem("saw").toolItem("screwdriver")
                     .usableItem("wrench", MINEABLE_WITH_WRENCH)
-                    .usableItem("wire_cutter", MINEABLE_WITH_CUTTER);
+                    .usableItem("wire_cutter", MINEABLE_WITH_WIRE_CUTTER);
             }
 
             @Override
@@ -491,8 +484,12 @@ public class MaterialSet {
             return (new ToolBuilder(durability, tier)).basic().build();
         }
 
+        public ToolBuilder tool(int durability, @Nullable Tier tier) {
+            return new ToolBuilder(durability, tier);
+        }
+
         public ToolBuilder tool(int durability) {
-            return new ToolBuilder(durability, null);
+            return tool(durability, null);
         }
     }
 

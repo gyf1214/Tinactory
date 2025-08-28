@@ -49,6 +49,10 @@ public enum OreVariant implements StringRepresentable {
         return name().toLowerCase();
     }
 
+    public static OreVariant fromName(String name) {
+        return valueOf(name.toUpperCase());
+    }
+
     public ResourceLocation getLoc() {
         var loc = baseItem.getRegistryName();
         assert loc != null;

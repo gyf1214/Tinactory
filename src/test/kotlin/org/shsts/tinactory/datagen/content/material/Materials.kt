@@ -40,8 +40,7 @@ object Materials {
                 Items.IRON_PICKAXE,
                 Items.IRON_SHOVEL,
                 Items.IRON_SWORD,
-                Items.COMPOSTER,
-            )
+                Items.COMPOSTER)
         }
     }
 

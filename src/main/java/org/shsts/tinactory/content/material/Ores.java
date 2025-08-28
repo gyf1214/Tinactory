@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.material;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.Tags;
 
 import static org.shsts.tinactory.content.AllMaterials.BANDED_IRON;
 import static org.shsts.tinactory.content.AllMaterials.BAUXITE;
@@ -73,7 +72,7 @@ public final class Ores {
 
         REDSTONE = set("redstone")
             .color(0xFFC80000)
-            .existing("dust", Tags.Items.DUSTS_REDSTONE, Items.REDSTONE)
+            .existing("dust", Items.REDSTONE)
             .ore(OreVariant.STONE)
             .buildObject();
 
@@ -110,7 +109,7 @@ public final class Ores {
 
         DIAMOND = set("diamond")
             .color(0xFFC8FFFF)
-            .existing("gem", Tags.Items.GEMS_DIAMOND, Items.DIAMOND)
+            .existing("gem", Items.DIAMOND)
             .gem()
             .ore(OreVariant.DEEPSLATE)
             .buildObject();
@@ -145,7 +144,7 @@ public final class Ores {
 
         EMERALD = set("emerald")
             .color(0xFF50FF50)
-            .existing("gem", Tags.Items.GEMS_EMERALD, Items.EMERALD)
+            .existing("gem", Items.EMERALD)
             .gem()
             .ore(OreVariant.DEEPSLATE)
             .buildObject();

@@ -9,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.material.Elements;
 import org.shsts.tinactory.content.material.FirstDegrees;
 import org.shsts.tinactory.content.material.HigherDegrees;
@@ -122,7 +121,6 @@ public final class AllMaterials {
 
     // Higher Degree
     public static MaterialSet COBALT_BRASS;
-    public static MaterialSet AIR;
     public static MaterialSet SALT_WATER;
     public static MaterialSet SEA_WATER;
     public static MaterialSet REFINERY_GAS;
@@ -208,7 +206,7 @@ public final class AllMaterials {
 
         GLOWSTONE = set("glowstone")
             .color(0xFFFFFF00)
-            .existing("dust", Tags.Items.DUSTS_GLOWSTONE, Items.GLOWSTONE_DUST)
+            .existing("dust", Items.GLOWSTONE_DUST)
             .buildObject();
 
         RARE_EARTH = dust("rare_earth", 0xFF808064);

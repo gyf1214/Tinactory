@@ -5,16 +5,19 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import org.shsts.tinycorelib.api.meta.IMetaConsumer;
-import org.shsts.tinycorelib.api.meta.MetaLoadingException;
+import org.shsts.tinactory.core.common.MetaConsumer;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeTypeMeta implements IMetaConsumer {
+public class RecipeTypeMeta extends MetaConsumer {
+    public RecipeTypeMeta() {
+        super("RecipeType");
+    }
+
     @Override
-    public void acceptMeta(ResourceLocation loc, JsonObject jo) throws MetaLoadingException {
+    protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
         var id = loc.getPath();
         var displayInput = GsonHelper.getAsBoolean(jo, "displayInput");
         var builder = displayInput ? REGISTRATE.recipeType(id, DisplayInputRecipe::builder) :
@@ -23,10 +26,5 @@ public class RecipeTypeMeta implements IMetaConsumer {
         builder.recipeClass(ProcessingRecipe.class)
             .serializer(ProcessingRecipe.SERIALIZER)
             .build();
-    }
-
-    @Override
-    public String name() {
-        return "RecipeType";
     }
 }
