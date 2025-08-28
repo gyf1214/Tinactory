@@ -4,9 +4,13 @@
   "items": [
     "raw"
   ],
-  "fluids": {},
-  "aliases": {
-    "fluid": "fluid"
+  "fluids": {
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.oil_heavy",
+      "textureColor": "0xFFFFFFFF"
+    }
   },
+  "aliases": {},
   "existings": {}
 }

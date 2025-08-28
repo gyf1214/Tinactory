@@ -14,6 +14,11 @@
       "textureColor": "0xFFE0E0E0",
       "displayColor": "0xFFE0E0E0"
     },
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.refinery_gas",
+      "textureColor": "0xFFFFFFFF"
+    },
     "sulfuric": {
       "baseAmount": 1000,
       "texture": "gregtech:blocks/fluids/fluid.sulfuric_gas",
@@ -33,8 +38,6 @@
       "displayColor": "0xFF919191"
     }
   },
-  "aliases": {
-    "fluid": "fluid"
-  },
+  "aliases": {},
   "existings": {}
 }

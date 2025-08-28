@@ -8,6 +8,11 @@
       "textureColor": "0xFFFFFFFF",
       "displayColor": "0xFFD4C494"
     },
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.heavy_fuel",
+      "textureColor": "0xFFFFFFFF"
+    },
     "sulfuric": {
       "baseAmount": 1000,
       "texture": "gregtech:blocks/fluids/fluid.sulfuric_heavy_fuel",
@@ -21,8 +26,6 @@
       "displayColor": "0xFFBCAC84"
     }
   },
-  "aliases": {
-    "fluid": "fluid"
-  },
+  "aliases": {},
   "existings": {}
 }

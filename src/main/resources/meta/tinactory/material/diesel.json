@@ -1,9 +1,13 @@
 {
   "color": "0xFFFCF404",
   "items": [],
-  "fluids": {},
-  "aliases": {
-    "fluid": "fluid"
+  "fluids": {
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.diesel",
+      "textureColor": "0xFFFFFFFF"
+    }
   },
+  "aliases": {},
   "existings": {}
 }
