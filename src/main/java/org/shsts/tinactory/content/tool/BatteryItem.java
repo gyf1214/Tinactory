@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.IItemRenderProperties;
-import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.List;

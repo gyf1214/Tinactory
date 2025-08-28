@@ -7,8 +7,8 @@ import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.electric.Voltage
-import org.shsts.tinactory.content.material.MaterialSet
+import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingIngredients
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ProcessingResults
@@ -55,7 +55,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
 
     fun input(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1, port: Int? = null) {
         if (mat.hasFluid(sub)) {
-            input(mat.fluid(sub).get(), mat.fluidAmount(amount.toFloat()),
+            input(mat.fluid(sub).get(), mat.fluidAmount(sub, amount.toFloat()),
                 port ?: defaultInputFluid!!)
         } else {
             input(mat.tag(sub), amount.toInt(), port ?: defaultInputItem!!)
@@ -81,7 +81,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
     fun output(mat: MaterialSet, sub: String = defaultSub(mat),
         amount: Number = 1, port: Int? = null, rate: Double = 1.0) {
         if (mat.hasFluid(sub)) {
-            output(mat.fluid(sub).get(), mat.fluidAmount(amount.toFloat()),
+            output(mat.fluid(sub).get(), mat.fluidAmount(sub, amount.toFloat()),
                 port ?: defaultOutputFluid!!, rate)
         } else {
             output(mat.item(sub), amount.toInt(), port ?: defaultOutputItem!!, rate)

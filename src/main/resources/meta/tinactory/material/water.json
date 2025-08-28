@@ -1,0 +1,20 @@
+{
+  "color": "0xFF0000FF",
+  "items": [],
+  "fluids": {
+    "liquid": {
+      "baseAmount": 1000,
+      "existing": "minecraft:water"
+    },
+    "gas": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.steam",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {
+    "fluid": "liquid"
+  },
+  "existings": {}
+}

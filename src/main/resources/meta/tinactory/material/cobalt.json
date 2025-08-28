@@ -1,0 +1,30 @@
+{
+  "color": "0xFF5050FA",
+  "tools": {
+    "tier": "minecraft:iron",
+    "durability": 400,
+    "items": [
+      "file",
+      "hammer",
+      "mortar",
+      "saw",
+      "screwdriver"
+    ],
+    "usables": [
+      "wire_cutter",
+      "wrench"
+    ]
+  },
+  "items": [
+    "dust",
+    "dust_tiny",
+    "ingot",
+    "plate",
+    "stick"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "ingot"
+  },
+  "existings": {}
+}

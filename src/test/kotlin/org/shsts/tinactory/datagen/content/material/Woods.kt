@@ -9,15 +9,13 @@ import org.shsts.tinactory.content.AllItems.RUBBER_LEAVES
 import org.shsts.tinactory.content.AllItems.RUBBER_LOG
 import org.shsts.tinactory.content.AllItems.RUBBER_SAPLING
 import org.shsts.tinactory.content.AllItems.STICKY_RESIN
-import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.AllRecipes.has
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.AllTags.TOOL_MORTAR
 import org.shsts.tinactory.content.AllTags.TOOL_SAW
 import org.shsts.tinactory.content.AllTags.TOOL_SHEARS
-import org.shsts.tinactory.content.electric.Voltage
 import org.shsts.tinactory.content.material.RubberLogBlock
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.datagen.content.Models
@@ -32,7 +30,6 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.pyrolyseOven
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolShapeless
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 
 object Woods {
@@ -103,7 +100,9 @@ object Woods {
                 group("planks")
             }
         }
-        toolShapeless(logsTag, planks, TOOL_SAW, amount = 4)
+        toolCrafting {
+            shapeless(logsTag, planks, TOOL_SAW, amount = 4)
+        }
 
         // wood components
         val sign = vanillaItem("${prefix}_sign")
@@ -130,8 +129,10 @@ object Woods {
                 workTicks(128)
             }
         }
-        toolShapeless(planks, slab, TOOL_SAW, amount = 2)
-        toolShapeless(pressurePlate, button, TOOL_SAW, amount = 4)
+        toolCrafting {
+            shapeless(planks, slab, TOOL_SAW, amount = 2)
+            shapeless(pressurePlate, button, TOOL_SAW, amount = 4)
+        }
         cutter {
             defaults {
                 voltage(Voltage.LV)
@@ -196,7 +197,13 @@ object Woods {
 
         farm(RUBBER_SAPLING.get(), RUBBER_LOG.get(), RUBBER_LEAVES.get(), true)
 
-        toolShapeless(STICKY_RESIN.get(), getMaterial("raw_rubber").item("dust"), TOOL_MORTAR)
+        toolCrafting {
+            result("raw_rubber", "dust") {
+                pattern("#")
+                define('#', STICKY_RESIN.get())
+                toolTag(TOOL_MORTAR)
+            }
+        }
         extractor {
             output("raw_rubber", "dust", 3) {
                 input(STICKY_RESIN.get())
@@ -221,18 +228,20 @@ object Woods {
 
     private fun misc() {
         // stick
-        toolCrafting(Items.STICK, 4) {
-            pattern("#")
-            pattern("#")
-            define('#', ItemTags.PLANKS)
-            toolTag(TOOL_SAW)
+        toolCrafting {
+            result(Items.STICK, 4) {
+                pattern("#")
+                pattern("#")
+                define('#', ItemTags.PLANKS)
+                toolTag(TOOL_SAW)
+            }
         }
         vanilla(replace = true) {
             shaped(Items.STICK, 2) {
                 pattern("#")
                 pattern("#")
                 define('#', ItemTags.PLANKS)
-                unlockedBy("has_planks", has(ItemTags.PLANKS))
+                unlockedBy("has_planks", ItemTags.PLANKS)
             }
         }
         lathe {

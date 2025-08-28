@@ -6,8 +6,8 @@ import org.shsts.tinactory.content.AllBlockEntities
 import org.shsts.tinactory.content.AllItems
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks
-import org.shsts.tinactory.content.electric.Voltage
-import org.shsts.tinactory.content.material.OreVariant
+import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.datagen.builder.TechBuilder
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder.Companion.VEIN_TECH_RANK
@@ -15,10 +15,8 @@ import org.shsts.tinactory.datagen.provider.TechProvider
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 object Technologies {
-    @JvmField
     val TECHS = DATA_GEN.createHandler(::TechProvider)
 
-    @JvmField
     val BASE_ORE = Factory().run {
         OreVariant.entries.associateWith {
             child("ore_base/${it.name.lowercase()}") {
@@ -30,116 +28,58 @@ object Technologies {
         }
     }
 
-    @JvmField
     val ALLOY_SMELTING: ResourceLocation
-
-    @JvmField
     val SOLDERING: ResourceLocation
-
-    @JvmField
     val STEEL: ResourceLocation
-
-    @JvmField
     val MOTOR: ResourceLocation
-
-    @JvmField
     val PUMP_AND_PISTON: ResourceLocation
-
-    @JvmField
     val ELECTRIC_HEATING: ResourceLocation
-
-    @JvmField
     val MATERIAL_CUTTING: ResourceLocation
-
-    @JvmField
     val CONVEYOR_MODULE: ResourceLocation
-
-    @JvmField
     val BATTERY: ResourceLocation
-
-    @JvmField
     val SENSOR_AND_EMITTER: ResourceLocation
-
-    @JvmField
     val HOT_WORKING: ResourceLocation
-
-    @JvmField
     val ROBOT_ARM: ResourceLocation
-
-    @JvmField
     val KANTHAL: ResourceLocation
-
-    @JvmField
     val SIFTING: ResourceLocation
-
-    @JvmField
     val AUTOFARM: ResourceLocation
-
-    @JvmField
     val INTEGRATED_CIRCUIT: ResourceLocation
-
-    @JvmField
     val COLD_WORKING: ResourceLocation
-
-    @JvmField
     val ELECTROLYZING: ResourceLocation
-
-    @JvmField
     val VACUUM_FREEZER: ResourceLocation
-
-    @JvmField
     val DISTILLATION: ResourceLocation
-
-    @JvmField
     val CHEMISTRY: ResourceLocation
-
-    @JvmField
     val PYROLYSE_OVEN: ResourceLocation
-
-    @JvmField
     val OIL_PROCESSING: ResourceLocation
-
-    @JvmField
     val ORGANIC_CHEMISTRY: ResourceLocation
-
-    @JvmField
     val CPU: ResourceLocation
-
-    @JvmField
     val CLEANROOM: ResourceLocation
-
-    @JvmField
     val NICHROME: ResourceLocation
-
-    @JvmField
     val ARC_FURNACE: ResourceLocation
-
-    @JvmField
     val HYDROMETALLURGY: ResourceLocation
-
-    @JvmField
     val ADVANCED_CHEMISTRY: ResourceLocation
 
     init {
         Factory().apply {
             ALLOY_SMELTING = child("alloy_smelting") {
                 maxProgress(20)
-                displayItem(AllBlockEntities.ALLOY_SMELTER.entry(Voltage.ULV))
+                displayItem(AllBlockEntities.ALLOY_SMELTER.entry(
+                    Voltage.ULV))
             }
 
             SOLDERING = tech("soldering") {
                 maxProgress(30)
-                displayItem(getMaterial("wrought_iron").entry("tool/screwdriver"))
+                displayItem("wrought_iron", "tool/screwdriver")
             }
 
             STEEL = child("steel") {
                 maxProgress(30)
-                displayItem(getMaterial("steel").entry("ingot"))
+                displayItem("steel", "ingot")
             }
 
             ELECTRIC_HEATING = tech("electric_heating") {
                 maxProgress(30)
-                displayItem(getMaterial("copper").entry("wire"))
+                displayItem("copper", "wire")
             }
 
             BATTERY = tech("battery") {
@@ -149,7 +89,8 @@ object Technologies {
 
             MOTOR = child("motor") {
                 maxProgress(30)
-                displayItem(AllItems.ELECTRIC_MOTOR.getValue(Voltage.LV))
+                displayItem(AllItems.ELECTRIC_MOTOR.getValue(
+                    Voltage.LV))
             }
 
             MATERIAL_CUTTING = tech("material_cutting") {
@@ -164,7 +105,8 @@ object Technologies {
 
             PUMP_AND_PISTON = child("pump_and_piston") {
                 maxProgress(35)
-                displayItem(AllItems.ELECTRIC_PISTON.getValue(Voltage.LV))
+                displayItem(AllItems.ELECTRIC_PISTON.getValue(
+                    Voltage.LV))
             }
 
             HOT_WORKING = child("hot_working") {
@@ -174,7 +116,8 @@ object Technologies {
 
             CONVEYOR_MODULE = child("conveyor_module") {
                 maxProgress(40)
-                displayItem(AllItems.CONVEYOR_MODULE.getValue(Voltage.LV))
+                displayItem(AllItems.CONVEYOR_MODULE.getValue(
+                    Voltage.LV))
             }
 
             ROBOT_ARM = child("robot_arm") {
@@ -201,7 +144,7 @@ object Technologies {
 
             INTEGRATED_CIRCUIT = tech("integrated_circuit") {
                 maxProgress(20)
-                displayItem(AllItems.GOOD_INTEGRATED.item())
+                displayItem(AllItems.GOOD_INTEGRATED.entry)
                 depends(SENSOR_AND_EMITTER, MATERIAL_CUTTING)
             }
 
@@ -212,7 +155,7 @@ object Technologies {
 
             ELECTROLYZING = tech("electrolyzing") {
                 maxProgress(40)
-                displayItem(getMaterial("gold").entry("wire"))
+                displayItem("gold", "wire")
             }
 
             VACUUM_FREEZER = tech("vacuum_freezer") {
@@ -227,7 +170,8 @@ object Technologies {
 
             CHEMISTRY = child("chemistry") {
                 maxProgress(40)
-                displayItem(AllItems.RESEARCH_EQUIPMENT.getValue(Voltage.LV))
+                displayItem(AllItems.RESEARCH_EQUIPMENT.getValue(
+                    Voltage.LV))
             }
 
             PYROLYSE_OVEN = tech("pyrolyse_oven") {
@@ -237,12 +181,12 @@ object Technologies {
 
             OIL_PROCESSING = tech("oil_processing") {
                 maxProgress(60)
-                displayItem(getMaterial("sulfur").entry("dust"))
+                displayItem("sulfur", "dust")
             }
 
             ORGANIC_CHEMISTRY = child("organic_chemistry") {
                 maxProgress(50)
-                displayItem(getMaterial("pe").entry("sheet"))
+                displayItem("pe", "sheet")
             }
 
             CPU = tech("cpu") {
@@ -264,12 +208,13 @@ object Technologies {
 
             HYDROMETALLURGY = tech("hydrometallurgy") {
                 maxProgress(30)
-                displayItem(getMaterial("aluminium_oxide").entry("dust"))
+                displayItem("aluminium_oxide", "dust")
             }
 
             ARC_FURNACE = tech("arc_furnace") {
                 maxProgress(30)
-                displayItem(AllBlockEntities.ARC_FURNACE.entry(Voltage.HV))
+                displayItem(AllBlockEntities.ARC_FURNACE.entry(
+                    Voltage.HV))
             }
 
             base = ORGANIC_CHEMISTRY
@@ -307,6 +252,10 @@ object Technologies {
                 block()
                 register()
             }
+
+        fun TechBuilder<*>.displayItem(name: String, sub: String) {
+            displayItem(getMaterial(name).loc(sub))
+        }
     }
 
     fun init() {}

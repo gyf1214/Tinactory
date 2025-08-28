@@ -5,9 +5,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.DrawSelectionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.shsts.tinactory.content.tool.IWrenchable;
-import org.shsts.tinactory.content.tool.UsableToolItem;
 import org.shsts.tinactory.content.tool.WrenchOutlineRenderer;
+import org.shsts.tinactory.core.tool.IWrenchable;
+import org.shsts.tinactory.core.tool.UsableToolItem;
 
 @OnlyIn(Dist.CLIENT)
 public final class AllClientEvents {

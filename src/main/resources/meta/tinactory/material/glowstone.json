@@ -1,0 +1,9 @@
+{
+  "color": "0xFFFFFF00",
+  "items": [],
+  "fluids": {},
+  "aliases": {},
+  "existings": {
+    "dust": "minecraft:glowstone_dust"
+  }
+}

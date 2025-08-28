@@ -1,0 +1,13 @@
+{
+  "color": "0xFF14CC04",
+  "items": [],
+  "fluids": {
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.biomass",
+      "textureColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {},
+  "existings": {}
+}

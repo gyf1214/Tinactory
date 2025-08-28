@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.shsts.tinactory.content.AllTags.machineTag;
+import static org.shsts.tinactory.content.AllTags.machine;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -49,7 +49,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     public ProcessingCategory(
         IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
         Layout layout, Block icon) {
-        super(recipeType, layout, Ingredient.of(machineTag(recipeType)), new ItemStack(icon));
+        super(recipeType, layout, Ingredient.of(machine(recipeType)), new ItemStack(icon));
     }
 
     public static TranslatableComponent tr(String key, Object... args) {

@@ -19,12 +19,12 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.electric.Voltage;
-import org.shsts.tinactory.content.tool.IWrenchable;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
+import org.shsts.tinactory.core.tool.IWrenchable;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 

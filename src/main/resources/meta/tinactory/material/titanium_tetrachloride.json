@@ -1,0 +1,15 @@
+{
+  "color": "0xFFD40D5C",
+  "items": [],
+  "fluids": {
+    "liquid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.titanium_tetrachloride",
+      "textureColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {
+    "fluid": "liquid"
+  },
+  "existings": {}
+}

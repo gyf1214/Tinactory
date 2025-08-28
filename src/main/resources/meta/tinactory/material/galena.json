@@ -1,0 +1,16 @@
+{
+  "color": "0xFF643C64",
+  "ore": "deepslate",
+  "items": [
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust",
+    "dust_impure",
+    "dust_pure",
+    "raw"
+  ],
+  "fluids": {},
+  "aliases": {},
+  "existings": {}
+}

@@ -5,7 +5,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllItems.FERTILIZER
-import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autofarm
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor

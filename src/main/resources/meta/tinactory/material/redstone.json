@@ -1,0 +1,17 @@
+{
+  "color": "0xFFC80000",
+  "ore": "stone",
+  "items": [
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust_impure",
+    "dust_pure",
+    "raw"
+  ],
+  "fluids": {},
+  "aliases": {},
+  "existings": {
+    "dust": "minecraft:redstone"
+  }
+}

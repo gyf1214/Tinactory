@@ -1,0 +1,15 @@
+{
+  "color": "0xFF2D8C8C",
+  "items": [],
+  "fluids": {
+    "gas": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.chlorine",
+      "textureColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {
+    "fluid": "gas"
+  },
+  "existings": {}
+}

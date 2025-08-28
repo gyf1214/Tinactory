@@ -1,0 +1,16 @@
+{
+  "color": "0xFFC8C800",
+  "ore": "stone",
+  "items": [
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust",
+    "dust_impure",
+    "dust_pure",
+    "raw"
+  ],
+  "fluids": {},
+  "aliases": {},
+  "existings": {}
+}

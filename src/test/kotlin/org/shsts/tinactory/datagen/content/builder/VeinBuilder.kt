@@ -2,10 +2,10 @@ package org.shsts.tinactory.datagen.content.builder
 
 import org.shsts.tinactory.Tinactory.REGISTRATE
 import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.electric.Voltage
-import org.shsts.tinactory.content.material.MaterialSet
-import org.shsts.tinactory.content.material.OreVariant
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
+import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.material.MaterialSet
+import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.datagen.builder.TechBuilder
 import org.shsts.tinactory.datagen.builder.TechBuilder.RANK_PER_VOLTAGE
 import org.shsts.tinactory.datagen.content.Technologies.BASE_ORE

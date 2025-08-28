@@ -1,0 +1,34 @@
+{
+  "color": "0xFFDCDCDC",
+  "ore": "stone",
+  "items": [
+    "bolt",
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust",
+    "dust_impure",
+    "dust_pure",
+    "dust_tiny",
+    "ingot",
+    "plate",
+    "raw",
+    "ring",
+    "rotor",
+    "screw",
+    "stick",
+    "wire",
+    "wire_fine"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

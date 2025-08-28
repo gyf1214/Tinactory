@@ -1,0 +1,23 @@
+{
+  "color": "0xFFC8FFFF",
+  "ore": "deepslate",
+  "items": [
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust",
+    "dust_impure",
+    "dust_pure",
+    "gem_exquisite",
+    "gem_flawless",
+    "lens",
+    "raw"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "gem"
+  },
+  "existings": {
+    "gem": "minecraft:diamond"
+  }
+}

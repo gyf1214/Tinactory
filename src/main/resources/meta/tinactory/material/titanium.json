@@ -1,0 +1,26 @@
+{
+  "color": "0xFFDCA0F0",
+  "items": [
+    "bolt",
+    "dust",
+    "dust_tiny",
+    "gear",
+    "ingot",
+    "ingot_hot",
+    "pipe",
+    "plate",
+    "screw",
+    "stick"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

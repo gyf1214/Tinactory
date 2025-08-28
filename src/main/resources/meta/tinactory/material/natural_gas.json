@@ -1,0 +1,16 @@
+{
+  "color": "0xFFDCDCDC",
+  "ore": "deepslate",
+  "items": [
+    "raw"
+  ],
+  "fluids": {
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.natural_gas",
+      "textureColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {},
+  "existings": {}
+}

@@ -2,6 +2,7 @@ package org.shsts.tinactory.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.content.material.MaterialMeta;
 import org.shsts.tinactory.core.recipe.RecipeTypeMeta;
 import org.shsts.tinycorelib.api.meta.IMetaConsumer;
 
@@ -13,10 +14,11 @@ import static org.shsts.tinactory.Tinactory.CORE;
 @MethodsReturnNonnullByDefault
 public class AllMeta {
     static {
-        registerAndExecute("recipe_type", RecipeTypeMeta::new);
+        execute("recipe_type", RecipeTypeMeta::new);
+        execute("material", MaterialMeta::new);
     }
 
-    private static void registerAndExecute(String folder, Supplier<? extends IMetaConsumer> supplier) {
+    private static void execute(String folder, Supplier<? extends IMetaConsumer> supplier) {
         CORE.registerMeta(folder, supplier.get()).execute();
     }
 

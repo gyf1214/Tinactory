@@ -18,7 +18,7 @@ import org.shsts.tinactory.content.AllItems.RAW_WAFERS
 import org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT
 import org.shsts.tinactory.content.AllItems.WAFERS
 import org.shsts.tinactory.content.AllTags
-import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_CUTTER
+import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.CircuitTier.CRYSTAL
@@ -27,7 +27,7 @@ import org.shsts.tinactory.content.electric.CircuitTier.QUANTUM
 import org.shsts.tinactory.content.electric.Circuits
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
-import org.shsts.tinactory.content.electric.Voltage.ULV
+import org.shsts.tinactory.core.electric.Voltage.ULV
 import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models
@@ -55,7 +55,7 @@ object Components {
             blockData(entry) {
                 blockState(Models::cableBlock)
                 itemModel(Models::cableItem)
-                tag(MINEABLE_WITH_CUTTER)
+                tag(MINEABLE_WITH_WIRE_CUTTER)
             }
         }
 
@@ -145,20 +145,24 @@ object Components {
 
     private fun circuits() {
         itemData {
-            Circuits.forEach { tier, level, entry ->
-                item(entry) {
-                    model(basicItem("metaitems/${entry.id().replace('/', '.')}"))
-                    tag(AllTags.circuit(Circuits.getVoltage(tier, level)))
+            for (circuit in Circuits.CIRCUITS) {
+                item(circuit.entry) {
+                    model(basicItem("metaitems/${circuit.entry.id().replace('/', '.')}"))
+                    tag(AllTags.circuit(Circuits.getVoltage(circuit.tier, circuit.level)))
                 }
             }
 
-            Circuits.forEachComponent { component, tier, entry ->
-                val texKey = if (tier.prefix.isEmpty()) component else "${tier.prefix}.$component"
-                item(entry) {
-                    model(basicItem("metaitems/component.$texKey"))
-                    for (tier1 in CircuitComponentTier.entries) {
-                        if (tier1.rank <= tier.rank) {
-                            tag(AllTags.circuitComponent(component, tier1))
+            for (component in Circuits.COMPONENTS.values) {
+                for (tier in CircuitComponentTier.entries) {
+                    val name = component.name
+                    val entry = component.entry(tier)
+                    val texKey = if (tier.prefix.isEmpty()) name else "${tier.prefix}.$name"
+                    item(entry) {
+                        model(basicItem("metaitems/component.$texKey"))
+                        for (tier1 in CircuitComponentTier.entries) {
+                            if (tier1.rank <= tier.rank) {
+                                tag(AllTags.circuitComponent(name, tier1))
+                            }
                         }
                     }
                 }

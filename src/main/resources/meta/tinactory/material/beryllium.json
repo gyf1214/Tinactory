@@ -1,0 +1,19 @@
+{
+  "color": "0xFF64B464",
+  "items": [
+    "dust",
+    "ingot",
+    "plate"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

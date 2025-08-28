@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.core.electric.Voltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

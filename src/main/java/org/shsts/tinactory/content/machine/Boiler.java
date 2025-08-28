@@ -7,6 +7,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -23,10 +24,10 @@ import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllMaterials.WATER;
 import static org.shsts.tinactory.core.machine.MachineProcessor.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
@@ -43,6 +44,8 @@ public class Boiler extends CapabilityProvider implements
 
     private final BlockEntity blockEntity;
     private final double burnSpeed;
+    private final Fluid water;
+    private final Fluid steam;
 
     private IItemCollection fuelPort;
     private IFluidCollection waterPort;
@@ -52,14 +55,17 @@ public class Boiler extends CapabilityProvider implements
     private long currentBurn = 0L;
     private double leftSteam = 0d;
 
-    private Boiler(BlockEntity blockEntity, double burnSpeed) {
+    private Boiler(BlockEntity blockEntity, double burnSpeed, Fluid water, Fluid steam) {
         this.blockEntity = blockEntity;
         this.burnSpeed = burnSpeed;
+        this.water = water;
+        this.steam = steam;
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
-        double burnSpeed) {
-        return $ -> $.capability(ID, be -> new Boiler(be, burnSpeed));
+        double burnSpeed, Supplier<? extends Fluid> water,
+        Supplier<? extends Fluid> steam) {
+        return $ -> $.capability(ID, be -> new Boiler(be, burnSpeed, water.get(), steam.get()));
     }
 
     public static double getHeat(IProcessor processor) {
@@ -73,7 +79,7 @@ public class Boiler extends CapabilityProvider implements
         outputPort = container.getPort(2, true).asFluid();
 
         fuelPort.asItemFilter().setFilters(List.of(item -> ForgeHooks.getBurnTime(item, null) > 0));
-        waterPort.asFluidFilter().setFilters(List.of(fluid -> fluid.getFluid() == WATER.fluid().get()));
+        waterPort.asFluidFilter().setFilters(List.of(fluid -> fluid.getFluid() == water));
     }
 
     @Override
@@ -115,11 +121,11 @@ public class Boiler extends CapabilityProvider implements
             var absorb = (heat - BURN_HEAT) * BASE_ABSORB;
             var leftSteam1 = leftSteam + absorb * BURN_EFFICIENCY;
             var amount = (int) Math.floor(leftSteam1);
-            var drained = waterPort.drain(new FluidStack(WATER.fluid().get(), amount), true);
+            var drained = waterPort.drain(new FluidStack(water, amount), true);
             var amount1 = drained.getAmount();
             if (!drained.isEmpty()) {
                 waterPort.drain(drained, false);
-                outputPort.fill(new FluidStack(WATER.fluid("gas").get(), amount1), false);
+                outputPort.fill(new FluidStack(steam, amount1), false);
                 leftSteam1 -= amount1;
             }
 

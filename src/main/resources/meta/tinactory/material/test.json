@@ -1,0 +1,22 @@
+{
+  "color": "0xFFFFFFFF",
+  "tools": {
+    "tier": "minecraft:netherite",
+    "durability": 12800000,
+    "items": [
+      "file",
+      "hammer",
+      "mortar",
+      "saw",
+      "screwdriver"
+    ],
+    "usables": [
+      "wire_cutter",
+      "wrench"
+    ]
+  },
+  "items": [],
+  "fluids": {},
+  "aliases": {},
+  "existings": {}
+}

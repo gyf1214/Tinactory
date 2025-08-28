@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
-import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
+import org.shsts.tinactory.core.electric.Voltage;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,0 +1,43 @@
+{
+  "color": "0xFFB4B4B4",
+  "items": [],
+  "fluids": {
+    "lightly_hydro_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/dull/gas",
+      "textureColor": "0xFFA0A0A0",
+      "displayColor": "0xFFA0A0A0"
+    },
+    "severely_steam_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/dull/gas",
+      "textureColor": "0xFFE0E0E0",
+      "displayColor": "0xFFE0E0E0"
+    },
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.refinery_gas",
+      "textureColor": "0xFFFFFFFF"
+    },
+    "sulfuric": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.sulfuric_gas",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFECDCCC"
+    },
+    "lightly_steam_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/dull/gas",
+      "textureColor": "0xFFC8C8C8",
+      "displayColor": "0xFFC8C8C8"
+    },
+    "severely_hydro_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/dull/gas",
+      "textureColor": "0xFF919191",
+      "displayColor": "0xFF919191"
+    }
+  },
+  "aliases": {},
+  "existings": {}
+}

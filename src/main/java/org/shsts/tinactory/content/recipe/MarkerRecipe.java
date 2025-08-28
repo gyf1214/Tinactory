@@ -6,18 +6,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.material.Fluid;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -50,18 +45,6 @@ public class MarkerRecipe extends ProcessingRecipe {
         public Builder baseType(IRecipeType<?> value) {
             baseType = value.loc();
             return this;
-        }
-
-        public Builder inputItem(int port, TagKey<Item> tag) {
-            return inputItem(port, tag, 1);
-        }
-
-        public Builder inputItem(int port, ItemLike item) {
-            return inputItem(port, () -> item, 1);
-        }
-
-        public Builder inputFluid(int port, Supplier<? extends Fluid> fluid) {
-            return inputFluid(port, fluid, 1);
         }
 
         @Override

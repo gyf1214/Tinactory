@@ -39,8 +39,8 @@ import org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR
 import org.shsts.tinactory.content.AllTags.CLEANROOM_WALL
 import org.shsts.tinactory.content.AllTags.COIL
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
-import org.shsts.tinactory.content.AllTags.machineTag
-import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.content.AllTags.machine
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.name
@@ -270,7 +270,7 @@ object Multiblocks {
                 casing("casings/solid/machine_casing_$casing")
                 overlay("multiblock/$overlay")
             }
-            itemTag(machineTag(type))
+            itemTag(machine(type))
         }
     }
 

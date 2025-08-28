@@ -1,0 +1,43 @@
+{
+  "color": "0xFFFFF404",
+  "items": [],
+  "fluids": {
+    "lightly_hydro_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.lightly_hydrocracked_naphtha",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFD4C404"
+    },
+    "severely_steam_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.severely_steamcracked_naphtha",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFCCC434"
+    },
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.naphtha",
+      "textureColor": "0xFFFFFFFF"
+    },
+    "sulfuric": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.sulfuric_naphtha",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFFCF404"
+    },
+    "lightly_steam_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.lightly_steamcracked_naphtha",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFBFB608"
+    },
+    "severely_hydro_cracked": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.severely_hydrocracked_naphtha",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFDCD40C"
+    }
+  },
+  "aliases": {},
+  "existings": {}
+}

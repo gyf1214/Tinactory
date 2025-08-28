@@ -1,0 +1,11 @@
+{
+  "color": "0xFFFAFAFA",
+  "items": [],
+  "fluids": {},
+  "aliases": {
+    "primary": "gem"
+  },
+  "existings": {
+    "gem": "minecraft:glass"
+  }
+}

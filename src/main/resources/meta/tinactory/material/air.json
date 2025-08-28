@@ -1,0 +1,21 @@
+{
+  "color": "0xFFA9D0F5",
+  "items": [],
+  "fluids": {
+    "liquid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.liquid_air",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFF84BCFC"
+    },
+    "gas": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.air",
+      "textureColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {
+    "fluid": "gas"
+  },
+  "existings": {}
+}

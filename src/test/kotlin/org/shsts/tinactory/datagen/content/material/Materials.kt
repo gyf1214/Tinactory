@@ -1,7 +1,7 @@
 package org.shsts.tinactory.datagen.content.material
 
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.builder.MaterialBuilder.Companion.material
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.model.IconSet.BRIGHT
@@ -40,8 +40,7 @@ object Materials {
                 Items.IRON_PICKAXE,
                 Items.IRON_SHOVEL,
                 Items.IRON_SWORD,
-                Items.COMPOSTER,
-            )
+                Items.COMPOSTER)
         }
     }
 

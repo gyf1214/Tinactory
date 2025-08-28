@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
-import org.shsts.tinactory.content.electric.Voltage;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
@@ -21,6 +20,7 @@ import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
@@ -41,6 +41,7 @@ import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
+import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -585,11 +586,12 @@ public final class AllBlockEntities {
     private static IEntry<MachineBlock> boiler(String name, double burnSpeed) {
         var id = "machine/boiler/" + name;
         var layout = AllLayouts.BOILER;
+        var water = getMaterial("water");
         return BlockEntityBuilder.builder(id,
                 MachineBlock.factory(Voltage.PRIMITIVE))
             .menu(AllMenus.BOILER)
             .blockEntity()
-            .transform(Boiler.factory(burnSpeed))
+            .transform(Boiler.factory(burnSpeed, water.fluid("liquid"), water.fluid("gas")))
             .transform(StackProcessingContainer.factory(layout))
             .end()
             .transform(baseMachine())

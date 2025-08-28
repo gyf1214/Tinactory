@@ -1,0 +1,18 @@
+{
+  "color": "0xFF646464",
+  "items": [
+    "pipe",
+    "sheet"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "primary": "sheet",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

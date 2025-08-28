@@ -1,0 +1,28 @@
+{
+  "color": "0xFFC8C8C8",
+  "items": [
+    "bolt",
+    "dust",
+    "dust_tiny",
+    "plate",
+    "ring",
+    "rotor",
+    "screw",
+    "stick",
+    "wire"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {
+    "nugget": "minecraft:iron_nugget",
+    "ingot": "minecraft:iron_ingot"
+  }
+}

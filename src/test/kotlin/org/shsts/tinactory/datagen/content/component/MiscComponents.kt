@@ -17,7 +17,7 @@ import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
-import org.shsts.tinactory.content.electric.Voltage
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
@@ -88,22 +88,23 @@ object MiscComponents {
                 fromAmount = 4, criteria = "has_wire")
         }
 
-        toolCrafting(MACHINE_HULL.item(Voltage.ULV)) {
-            pattern("###")
-            pattern("#W#")
-            pattern("###")
-            define('#', getMaterial("iron").tag("plate"))
-            define('W', CABLE.item(Voltage.ULV))
-            toolTag(TOOL_WRENCH)
-        }
-
-        toolCrafting(FLUID_CELL.item(Voltage.ULV)) {
-            pattern("###")
-            pattern("#G#")
-            pattern(" # ")
-            define('#', getMaterial("iron").tag("plate"))
-            define('G', getMaterial("glass").tag("primary"))
-            toolTag(TOOL_HAMMER, TOOL_WRENCH)
+        toolCrafting {
+            result(MACHINE_HULL.item(Voltage.ULV)) {
+                pattern("###")
+                pattern("#W#")
+                pattern("###")
+                define('#', "iron", "plate")
+                define('W', CABLE.item(Voltage.ULV))
+                toolTag(TOOL_WRENCH)
+            }
+            result(FLUID_CELL.item(Voltage.ULV)) {
+                pattern("###")
+                pattern("#G#")
+                pattern(" # ")
+                define('#', "iron", "plate")
+                define('G', "glass", "primary")
+                toolTag(TOOL_HAMMER, TOOL_WRENCH)
+            }
         }
 
         assembler {

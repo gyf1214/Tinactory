@@ -7,7 +7,7 @@ import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.content.electric.Voltage;
+import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import java.util.ArrayList;

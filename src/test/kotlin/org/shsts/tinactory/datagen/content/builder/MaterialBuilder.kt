@@ -8,9 +8,9 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.client.model.generators.ItemModelProvider
-import org.shsts.tinactory.content.AllMaterials
+import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.AllRecipes.has
+import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.TOOL_FILE
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
@@ -20,9 +20,9 @@ import org.shsts.tinactory.content.AllTags.TOOL_SCREW
 import org.shsts.tinactory.content.AllTags.TOOL_SCREWDRIVER
 import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
-import org.shsts.tinactory.content.electric.Voltage
-import org.shsts.tinactory.content.material.MaterialSet
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
+import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.modLoc
@@ -71,6 +71,18 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             "screwdriver" to "handle_screwdriver",
             "wire_cutter" to "wire_cutter_base")
 
+        private val EXISTING_TAGS = mapOf(
+            Pair("glowstone", "dust") to Tags.Items.DUSTS_GLOWSTONE,
+            Pair("iron", "ingot") to Tags.Items.INGOTS_IRON,
+            Pair("iron", "nugget") to Tags.Items.NUGGETS_IRON,
+            Pair("gold", "raw") to Tags.Items.RAW_MATERIALS_GOLD,
+            Pair("gold", "ingot") to Tags.Items.INGOTS_GOLD,
+            Pair("gold", "nugget") to Tags.Items.NUGGETS_GOLD,
+            Pair("copper", "ingot") to Tags.Items.INGOTS_COPPER,
+            Pair("redstone", "dust") to Tags.Items.DUSTS_REDSTONE,
+            Pair("diamond", "gem") to Tags.Items.GEMS_DIAMOND,
+            Pair("emerald", "gem") to Tags.Items.GEMS_EMERALD)
+
         fun material(name: String, icon: IconSet, block: MaterialBuilder.() -> Unit = {}) {
             MaterialBuilder(getMaterial(name), icon).apply {
                 block()
@@ -108,7 +120,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     private fun buildItem(sub: String) {
-        val prefixTag = AllMaterials.tag(sub)
+        val prefixTag = AllTags.material(sub)
         val tag = material.tag(sub)
         dataGen { tag(tag, prefixTag) }
 
@@ -117,9 +129,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             return
         }
 
-        if (material.hasTarget(sub)) {
-            // simply add tag for existing tag
-            dataGen { tag(material.target(sub), tag) }
+        if (EXISTING_TAGS.containsKey(Pair(name, sub))) {
+            dataGen { tag(EXISTING_TAGS.getValue(Pair(name, sub)), tag) }
             return
         }
 
@@ -186,20 +197,22 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     for ((i, input) in inputs.withIndex()) {
                         define('A' + i, input)
                     }
-                    unlockedBy("has_ingredient", has(inputs[0]))
+                    unlockedBy("has_ingredient", inputs[0])
                 }
             }
         }
 
         private fun buildTools() {
-            toolCrafting(name, result, amount) {
-                for (pattern in patterns) {
-                    pattern(pattern)
+            toolCrafting {
+                result(name, result, amount) {
+                    for (pattern in patterns) {
+                        pattern(pattern)
+                    }
+                    for ((i, input) in inputs.withIndex()) {
+                        define('A' + i, input)
+                    }
+                    toolTag(*tools.toTypedArray())
                 }
-                for ((i, input) in inputs.withIndex()) {
-                    define('A' + i, input)
-                }
-                toolTag(*tools.toTypedArray())
             }
         }
 
