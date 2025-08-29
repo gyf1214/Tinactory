@@ -26,7 +26,6 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,12 +55,6 @@ public final class AllItems {
     public static final Map<Voltage, IEntry<SubnetBlock>> ELECTRIC_BUFFER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
     public static final Map<Voltage, IEntry<Item>> BUZZSAW;
-
-    // chips
-    public static final List<IEntry<Item>> BOULES = new ArrayList<>();
-    public static final List<IEntry<Item>> RAW_WAFERS = new ArrayList<>();
-    public static final Map<String, IEntry<Item>> WAFERS;
-    public static final Map<String, IEntry<Item>> CHIPS;
 
     public static final IEntry<Item> STICKY_RESIN;
     public static final IEntry<RubberLogBlock> RUBBER_LOG;
@@ -186,14 +179,6 @@ public final class AllItems {
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
         BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);
 
-        WAFERS = new HashMap<>();
-        CHIPS = new HashMap<>();
-        boules("silicon", "glowstone", "naquadah", "neutronium");
-        wafers("integrated_circuit", "cpu", "nano_cpu", "qbit_cpu",
-            "ram", "nand", "nor",
-            "simple_soc", "soc", "advanced_soc",
-            "low_pic", "pic", "high_pic");
-
         FLUID_CELL = ComponentBuilder.<CellItem, String>builder((v, name) -> REGISTRATE
                 .item("tool/fluid_cell/" + name, CellItem.factory(1 << (v.rank - 1)))
                 .tint(() -> () -> CellItem::getTint)
@@ -236,20 +221,6 @@ public final class AllItems {
 
     private static IEntry<Item> simple(String name) {
         return REGISTRATE.item(name).register();
-    }
-
-    private static void boules(String... names) {
-        for (var name : names) {
-            BOULES.add(simple("boule/" + name));
-            RAW_WAFERS.add(simple("wafer_raw/" + name));
-        }
-    }
-
-    private static void wafers(String... names) {
-        for (var name : names) {
-            WAFERS.put(name, simple("wafer/" + name));
-            CHIPS.put(name, simple("chip/" + name));
-        }
     }
 
     private static <S extends Supplier<? extends ItemLike>> Map<Voltage, S> set3(

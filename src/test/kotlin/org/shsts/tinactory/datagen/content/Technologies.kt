@@ -192,7 +192,7 @@ object Technologies {
 
             CPU = tech("cpu") {
                 maxProgress(100)
-                displayItem(AllItems.WAFERS.getValue("cpu"))
+                displayItem(Circuits.WAFER.getValue("cpu"))
                 depends(INTEGRATED_CIRCUIT)
             }
 

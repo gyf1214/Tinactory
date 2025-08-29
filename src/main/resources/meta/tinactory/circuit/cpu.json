@@ -2,7 +2,7 @@
   "type": "circuit",
   "tier": "cpu",
   "baseLevel": "mini",
-  "circuits": [
+  "items": [
     "nand_chip",
     "microprocessor",
     "processor",

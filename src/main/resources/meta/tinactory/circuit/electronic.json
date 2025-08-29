@@ -2,7 +2,7 @@
   "type": "circuit",
   "tier": "electronic",
   "baseLevel": "normal",
-  "circuits": [
+  "items": [
     "vacuum_tube",
     "electronic",
     "good_electronic"

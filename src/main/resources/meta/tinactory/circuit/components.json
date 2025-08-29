@@ -1,6 +1,6 @@
 {
   "type": "component",
-  "components": [
+  "items": [
     "resistor",
     "capacitor",
     "inductor",

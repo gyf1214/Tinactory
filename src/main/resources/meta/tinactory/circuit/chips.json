@@ -1,0 +1,18 @@
+{
+  "type": "chip",
+  "items": [
+    "integrated_circuit",
+    "cpu",
+    "nano_cpu",
+    "qbit_cpu",
+    "ram",
+    "nand",
+    "nor",
+    "simple_soc",
+    "soc",
+    "advanced_soc",
+    "low_pic",
+    "pic",
+    "high_pic"
+  ]
+}

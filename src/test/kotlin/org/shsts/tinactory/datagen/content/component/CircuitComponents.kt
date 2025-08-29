@@ -2,13 +2,15 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Item
-import org.shsts.tinactory.content.AllItems.BOULES
-import org.shsts.tinactory.content.AllItems.CHIPS
-import org.shsts.tinactory.content.AllItems.RAW_WAFERS
 import org.shsts.tinactory.content.AllItems.STICKY_RESIN
-import org.shsts.tinactory.content.AllItems.WAFERS
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
+import org.shsts.tinactory.content.electric.Circuits.BOULE
+import org.shsts.tinactory.content.electric.Circuits.BOULE_LIST
+import org.shsts.tinactory.content.electric.Circuits.CHIP
+import org.shsts.tinactory.content.electric.Circuits.WAFER
+import org.shsts.tinactory.content.electric.Circuits.WAFER_RAW
+import org.shsts.tinactory.content.electric.Circuits.WAFER_RAW_LIST
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.electric.Circuits.getCircuit
@@ -229,7 +231,7 @@ object CircuitComponents {
                     input("pe", amount = 0.25)
                 }
                 component("diode", 8, suffix = "_from_wafer") {
-                    input(RAW_WAFERS.item(0))
+                    input(WAFER_RAW.item("silicon"))
                     input("copper", "wire_fine", 4)
                     input("pe")
                 }
@@ -260,7 +262,7 @@ object CircuitComponents {
 
     private fun chips() {
         blastFurnace {
-            output(BOULES.item(0)) {
+            output(BOULE.item("silicon")) {
                 input("silicon", amount = 32)
                 input("gallium_arsenide")
                 voltage(Voltage.LV)
@@ -272,17 +274,17 @@ object CircuitComponents {
         }
 
         cutter {
-            for ((i, entry) in RAW_WAFERS.withIndex()) {
+            for ((i, entry) in WAFER_RAW_LIST.withIndex()) {
                 output(entry.get(), 8 shl i) {
-                    input(BOULES.item(i))
+                    input(BOULE_LIST.item(i))
                     input("water", amount = 1 shl i)
                     voltage(Voltage.fromRank(2 + 2 * i))
                     workTicks(400L shl i)
                 }
             }
-            for ((key, entry) in CHIPS) {
+            for ((key, entry) in CHIP) {
                 output(entry.get(), 6) {
-                    input(WAFERS.item(key))
+                    input(WAFER.item(key))
                     input("water", amount = 0.75)
                     voltage(Voltage.LV)
                     workTicks(300)
@@ -298,10 +300,10 @@ object CircuitComponents {
 
     private fun engraving(name: String, lens: String, level: Int, voltage: Voltage,
         minCleanness: Double, maxCleanness: Double) {
-        val wafer = WAFERS.item(name)
-        for (i in level..<RAW_WAFERS.size) {
+        val wafer = WAFER.item(name)
+        for (i in level..<WAFER_RAW_LIST.size) {
             val j = i - level
-            val rawWafer = RAW_WAFERS.item(i)
+            val rawWafer = WAFER_RAW_LIST.item(i)
             val rawId = name(rawWafer.asItem().registryName!!.path, -1)
             val minC = 1 - (1 - minCleanness) / (1 shl i)
             val maxC = 1 - (1 - maxCleanness) / (1 shl i)
@@ -428,7 +430,7 @@ object CircuitComponents {
         }
 
         fun SimpleProcessingBuilder.chip(name: String, amount: Int = 1) {
-            input(CHIPS.item(name), amount)
+            input(CHIP.item(name), amount)
         }
 
         fun ProcessingRecipeFactory.circuit(name: String, amount: Int = 1,
