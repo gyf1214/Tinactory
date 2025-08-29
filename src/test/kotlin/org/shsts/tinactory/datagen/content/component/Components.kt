@@ -2,10 +2,8 @@ package org.shsts.tinactory.datagen.content.component
 
 import org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER
 import org.shsts.tinactory.content.AllItems.BATTERY
-import org.shsts.tinactory.content.AllItems.BOULES
 import org.shsts.tinactory.content.AllItems.BUZZSAW
 import org.shsts.tinactory.content.AllItems.CABLE
-import org.shsts.tinactory.content.AllItems.CHIPS
 import org.shsts.tinactory.content.AllItems.COMPONENT_ITEMS
 import org.shsts.tinactory.content.AllItems.FERTILIZER
 import org.shsts.tinactory.content.AllItems.FLUID_CELL
@@ -14,9 +12,7 @@ import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
 import org.shsts.tinactory.content.AllItems.MACHINE_HULL
-import org.shsts.tinactory.content.AllItems.RAW_WAFERS
 import org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT
-import org.shsts.tinactory.content.AllItems.WAFERS
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
 import org.shsts.tinactory.content.electric.CircuitComponentTier
@@ -24,7 +20,12 @@ import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.CircuitTier.CRYSTAL
 import org.shsts.tinactory.content.electric.CircuitTier.NANO
 import org.shsts.tinactory.content.electric.CircuitTier.QUANTUM
-import org.shsts.tinactory.content.electric.Circuits
+import org.shsts.tinactory.content.electric.Circuits.BOULE_LIST
+import org.shsts.tinactory.content.electric.Circuits.CHIP
+import org.shsts.tinactory.content.electric.Circuits.WAFER
+import org.shsts.tinactory.content.electric.Circuits.WAFER_RAW_LIST
+import org.shsts.tinactory.content.electric.Circuits.allCircuitComponents
+import org.shsts.tinactory.content.electric.Circuits.allCircuits
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.core.electric.Voltage.ULV
@@ -106,7 +107,7 @@ object Components {
 
     private fun chips() {
         itemData {
-            for (entry in BOULES + RAW_WAFERS) {
+            for (entry in BOULE_LIST + WAFER_RAW_LIST) {
                 val name = entry.id()
                     .replace('/', '.')
                     .replace("wafer_raw.", "wafer.")
@@ -132,7 +133,7 @@ object Components {
     }
 
     private fun ItemDataFactory.chip(name: String, tex: String) {
-        for (entry in listOf(WAFERS.getValue(name), CHIPS.getValue(name))) {
+        for (entry in listOf(WAFER.getValue(name), CHIP.getValue(name))) {
             val texName = entry.id()
                 .replace('/', '.')
                 .replace("chip.", "plate.")
@@ -145,14 +146,14 @@ object Components {
 
     private fun circuits() {
         itemData {
-            for (circuit in Circuits.CIRCUITS) {
+            for (circuit in allCircuits()) {
                 item(circuit.entry) {
                     model(basicItem("metaitems/${circuit.entry.id().replace('/', '.')}"))
-                    tag(AllTags.circuit(Circuits.getVoltage(circuit.tier, circuit.level)))
+                    tag(AllTags.circuit(circuit.voltage))
                 }
             }
 
-            for (component in Circuits.COMPONENTS.values) {
+            for (component in allCircuitComponents()) {
                 for (tier in CircuitComponentTier.entries) {
                     val name = component.name
                     val entry = component.entry(tier)

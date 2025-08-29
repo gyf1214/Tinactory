@@ -6,6 +6,7 @@ import org.shsts.tinactory.content.AllBlockEntities
 import org.shsts.tinactory.content.AllItems
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks
+import org.shsts.tinactory.content.electric.Circuits
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.gregtech
@@ -144,7 +145,7 @@ object Technologies {
 
             INTEGRATED_CIRCUIT = tech("integrated_circuit") {
                 maxProgress(20)
-                displayItem(AllItems.GOOD_INTEGRATED.entry)
+                displayItem(Circuits.getCircuit("good_integrated").entry())
                 depends(SENSOR_AND_EMITTER, MATERIAL_CUTTING)
             }
 
@@ -191,7 +192,7 @@ object Technologies {
 
             CPU = tech("cpu") {
                 maxProgress(100)
-                displayItem(AllItems.WAFERS.getValue("cpu"))
+                displayItem(Circuits.WAFER.getValue("cpu"))
                 depends(INTEGRATED_CIRCUIT)
             }
 

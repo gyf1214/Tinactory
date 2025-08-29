@@ -1,0 +1,10 @@
+{
+  "type": "circuit",
+  "tier": "integrated",
+  "baseLevel": "normal",
+  "items": [
+    "basic_integrated",
+    "good_integrated",
+    "advanced_integrated"
+  ]
+}

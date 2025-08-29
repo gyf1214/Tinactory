@@ -51,6 +51,10 @@ public enum Voltage {
         throw new NoSuchElementException();
     }
 
+    public static Voltage fromName(String id) {
+        return valueOf(id.toUpperCase());
+    }
+
     public String displayName() {
         return id.toUpperCase();
     }

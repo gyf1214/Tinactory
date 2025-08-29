@@ -13,10 +13,6 @@ import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
-import org.shsts.tinactory.content.electric.Circuit;
-import org.shsts.tinactory.content.electric.CircuitComponent;
-import org.shsts.tinactory.content.electric.CircuitLevel;
-import org.shsts.tinactory.content.electric.CircuitTier;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.material.ComponentBuilder;
@@ -30,7 +26,6 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +34,6 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
-import static org.shsts.tinactory.content.electric.Circuits.circuit;
-import static org.shsts.tinactory.content.electric.Circuits.circuitComponent;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -63,33 +56,6 @@ public final class AllItems {
     public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
     public static final Map<Voltage, IEntry<Item>> BUZZSAW;
 
-    // circuits
-    public static final Circuit VACUUM_TUBE;
-    public static final Circuit ELECTRONIC_CIRCUIT;
-    public static final Circuit GOOD_ELECTRONIC;
-    public static final Circuit BASIC_INTEGRATED;
-    public static final Circuit GOOD_INTEGRATED;
-    public static final Circuit ADVANCED_INTEGRATED;
-    public static final Circuit NAND_CHIP;
-    public static final Circuit MICROPROCESSOR;
-    public static final Circuit INTEGRATED_PROCESSOR;
-    public static final Circuit PROCESSOR_ASSEMBLY;
-    public static final Circuit WORKSTATION;
-    public static final Circuit MAINFRAME;
-
-    // circuit components
-    public static final CircuitComponent RESISTOR;
-    public static final CircuitComponent CAPACITOR;
-    public static final CircuitComponent INDUCTOR;
-    public static final CircuitComponent DIODE;
-    public static final CircuitComponent TRANSISTOR;
-
-    // chips
-    public static final List<IEntry<Item>> BOULES;
-    public static final List<IEntry<Item>> RAW_WAFERS;
-    public static final Map<String, IEntry<Item>> WAFERS;
-    public static final Map<String, IEntry<Item>> CHIPS;
-
     public static final IEntry<Item> STICKY_RESIN;
     public static final IEntry<RubberLogBlock> RUBBER_LOG;
     public static final IEntry<LeavesBlock> RUBBER_LEAVES;
@@ -107,25 +73,6 @@ public final class AllItems {
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
-
-        VACUUM_TUBE = circuit(CircuitTier.ELECTRONIC, CircuitLevel.NORMAL, "vacuum_tube");
-        ELECTRONIC_CIRCUIT = circuit(CircuitTier.ELECTRONIC, CircuitLevel.ASSEMBLY, "electronic");
-        GOOD_ELECTRONIC = circuit(CircuitTier.ELECTRONIC, CircuitLevel.WORKSTATION, "good_electronic");
-        BASIC_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.NORMAL, "basic_integrated");
-        GOOD_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.ASSEMBLY, "good_integrated");
-        ADVANCED_INTEGRATED = circuit(CircuitTier.INTEGRATED, CircuitLevel.WORKSTATION, "advanced_integrated");
-        NAND_CHIP = circuit(CircuitTier.CPU, CircuitLevel.MINI, "nand_chip");
-        MICROPROCESSOR = circuit(CircuitTier.CPU, CircuitLevel.MICRO, "microprocessor");
-        INTEGRATED_PROCESSOR = circuit(CircuitTier.CPU, CircuitLevel.NORMAL, "processor");
-        PROCESSOR_ASSEMBLY = circuit(CircuitTier.CPU, CircuitLevel.ASSEMBLY, "assembly");
-        WORKSTATION = circuit(CircuitTier.CPU, CircuitLevel.WORKSTATION, "workstation");
-        MAINFRAME = circuit(CircuitTier.CPU, CircuitLevel.MAINFRAME, "mainframe");
-
-        RESISTOR = circuitComponent("resistor");
-        CAPACITOR = circuitComponent("capacitor");
-        INDUCTOR = circuitComponent("inductor");
-        DIODE = circuitComponent("diode");
-        TRANSISTOR = circuitComponent("transistor");
 
         Circuits.buildBoards();
 
@@ -232,16 +179,6 @@ public final class AllItems {
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
         BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);
 
-        BOULES = new ArrayList<>();
-        RAW_WAFERS = new ArrayList<>();
-        WAFERS = new HashMap<>();
-        CHIPS = new HashMap<>();
-        boules("silicon", "glowstone", "naquadah", "neutronium");
-        wafers("integrated_circuit", "cpu", "nano_cpu", "qbit_cpu",
-            "ram", "nand", "nor",
-            "simple_soc", "soc", "advanced_soc",
-            "low_pic", "pic", "high_pic");
-
         FLUID_CELL = ComponentBuilder.<CellItem, String>builder((v, name) -> REGISTRATE
                 .item("tool/fluid_cell/" + name, CellItem.factory(1 << (v.rank - 1)))
                 .tint(() -> () -> CellItem::getTint)
@@ -284,20 +221,6 @@ public final class AllItems {
 
     private static IEntry<Item> simple(String name) {
         return REGISTRATE.item(name).register();
-    }
-
-    private static void boules(String... names) {
-        for (var name : names) {
-            BOULES.add(simple("boule/" + name));
-            RAW_WAFERS.add(simple("wafer_raw/" + name));
-        }
-    }
-
-    private static void wafers(String... names) {
-        for (var name : names) {
-            WAFERS.put(name, simple("wafer/" + name));
-            CHIPS.put(name, simple("chip/" + name));
-        }
     }
 
     private static <S extends Supplier<? extends ItemLike>> Map<Voltage, S> set3(

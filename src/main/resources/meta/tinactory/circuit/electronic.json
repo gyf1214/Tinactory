@@ -1,0 +1,10 @@
+{
+  "type": "circuit",
+  "tier": "electronic",
+  "baseLevel": "normal",
+  "items": [
+    "vacuum_tube",
+    "electronic",
+    "good_electronic"
+  ]
+}

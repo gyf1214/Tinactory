@@ -1,0 +1,13 @@
+{
+  "type": "circuit",
+  "tier": "cpu",
+  "baseLevel": "mini",
+  "items": [
+    "nand_chip",
+    "microprocessor",
+    "processor",
+    "assembly",
+    "workstation",
+    "mainframe"
+  ]
+}

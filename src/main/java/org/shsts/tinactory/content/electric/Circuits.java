@@ -6,54 +6,87 @@ import net.minecraft.world.item.Item;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Circuits {
-    public static final Set<Circuit> CIRCUITS = new HashSet<>();
-    public static final Map<String, CircuitComponent> COMPONENTS = new HashMap<>();
-    private static final Map<CircuitTier, IEntry<Item>> BOARDS = new HashMap<>();
-    private static final Map<CircuitTier, IEntry<Item>> CIRCUIT_BOARDS = new HashMap<>();
+    private static final Map<String, Circuit> CIRCUIT = new HashMap<>();
+    private static final Map<String, CircuitComponent> CIRCUIT_COMPONENT = new HashMap<>();
+    public static final List<IEntry<Item>> BOULE_LIST = new ArrayList<>();
+    public static final Map<String, IEntry<Item>> BOULE = new HashMap<>();
+    public static final List<IEntry<Item>> WAFER_RAW_LIST = new ArrayList<>();
+    public static final Map<String, IEntry<Item>> WAFER_RAW = new HashMap<>();
+    public static final Map<String, IEntry<Item>> WAFER = new HashMap<>();
+    public static final Map<String, IEntry<Item>> CHIP = new HashMap<>();
+    private static final Map<CircuitTier, IEntry<Item>> BOARD = new HashMap<>();
+    private static final Map<CircuitTier, IEntry<Item>> CIRCUIT_BOARD = new HashMap<>();
 
     public static Voltage getVoltage(CircuitTier tier, CircuitLevel level) {
         return Voltage.fromRank(tier.baseVoltage.rank + level.voltageOffset);
     }
 
-    public static Circuit circuit(CircuitTier tier, CircuitLevel level, String id) {
+    public static void newCircuit(CircuitTier tier, CircuitLevel level, String id) {
         var item = REGISTRATE.item("circuit/" + id).register();
-        var ret = new Circuit(tier, level, item);
-        CIRCUITS.add(ret);
-        return ret;
+        CIRCUIT.put(id, new Circuit(tier, level, item));
     }
 
-    public static CircuitComponent circuitComponent(String name) {
-        var ret = new CircuitComponent(name);
-        COMPONENTS.put(name, ret);
-        return ret;
+    public static Circuit getCircuit(String name) {
+        return CIRCUIT.get(name);
+    }
+
+    public static Collection<Circuit> allCircuits() {
+        return CIRCUIT.values();
+    }
+
+    public static void newCircuitComponent(String name) {
+        CIRCUIT_COMPONENT.put(name, new CircuitComponent(name));
+    }
+
+    public static CircuitComponent getCircuitComponent(String name) {
+        return CIRCUIT_COMPONENT.get(name);
+    }
+
+    public static Collection<CircuitComponent> allCircuitComponents() {
+        return CIRCUIT_COMPONENT.values();
+    }
+
+    public static void newWafer(String name) {
+        var boule = REGISTRATE.item("boule/" + name).register();
+        BOULE_LIST.add(boule);
+        BOULE.put(name, boule);
+        var wafer = REGISTRATE.item("wafer_raw/" + name).register();
+        WAFER_RAW_LIST.add(wafer);
+        WAFER_RAW.put(name, wafer);
+    }
+
+    public static void newChip(String name) {
+        WAFER.put(name, REGISTRATE.item("wafer/" + name).register());
+        CHIP.put(name, REGISTRATE.item("chip/" + name).register());
     }
 
     public static void buildBoards() {
         for (var tier : CircuitTier.values()) {
             var board = REGISTRATE.item("board/" + tier.board).register();
-            BOARDS.put(tier, board);
+            BOARD.put(tier, board);
         }
         for (var tier : CircuitTier.values()) {
             var circuitBoard = REGISTRATE.item("circuit_board/" + tier.circuitBoard).register();
-            CIRCUIT_BOARDS.put(tier, circuitBoard);
+            CIRCUIT_BOARD.put(tier, circuitBoard);
         }
     }
 
     public static IEntry<Item> board(CircuitTier tier) {
-        return BOARDS.get(tier);
+        return BOARD.get(tier);
     }
 
     public static IEntry<Item> circuitBoard(CircuitTier tier) {
-        return CIRCUIT_BOARDS.get(tier);
+        return CIRCUIT_BOARD.get(tier);
     }
 }

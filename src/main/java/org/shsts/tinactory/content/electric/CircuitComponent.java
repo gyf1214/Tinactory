@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.electric;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -11,6 +13,8 @@ import java.util.Map;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class CircuitComponent {
     public final String name;
     private final Map<CircuitComponentTier, IEntry<Item>> items;

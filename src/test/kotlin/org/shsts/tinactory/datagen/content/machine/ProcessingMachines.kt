@@ -35,7 +35,6 @@ import org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE
 import org.shsts.tinactory.content.AllBlockEntities.WIREMILL
 import org.shsts.tinactory.content.AllItems.BUZZSAW
 import org.shsts.tinactory.content.AllItems.CABLE
-import org.shsts.tinactory.content.AllItems.CHIPS
 import org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE
 import org.shsts.tinactory.content.AllItems.ELECTRIC_BUFFER
 import org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR
@@ -47,6 +46,7 @@ import org.shsts.tinactory.content.AllItems.MACHINE_HULL
 import org.shsts.tinactory.content.AllItems.ROBOT_ARM
 import org.shsts.tinactory.content.AllItems.SENSOR
 import org.shsts.tinactory.content.AllItems.TRANSFORMER
+import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
@@ -309,11 +309,11 @@ object ProcessingMachines {
         if (v.rank < Voltage.HV.rank) {
             return
         } else if (v.rank < Voltage.IV.rank) {
-            input(CHIPS.item("low_pic"), 2)
+            input(CHIP.item("low_pic"), 2)
         } else if (v.rank < Voltage.ZPM.rank) {
-            input(CHIPS.item("pic"), 2)
+            input(CHIP.item("pic"), 2)
         } else {
-            input(CHIPS.item("high_pic"), 2)
+            input(CHIP.item("high_pic"), 2)
         }
     }
 }
