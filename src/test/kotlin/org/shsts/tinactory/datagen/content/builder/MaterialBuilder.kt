@@ -266,33 +266,43 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
         }
 
-        private fun macerate(input: String, amount: Int = 1, output: String = "dust") {
-            macerator {
-                process(output, input, 128, amount, suffix = "_from_$input")
+        private fun ProcessingRecipeFactory.macerate(input: String,
+            amount: Int = 1, output: String = "dust") {
+            if (!valid(output, input)) {
+                return
+            }
+            input(material, input) {
+                output(material, output, amount)
             }
         }
 
-        private fun macerateTiny(input: String, amount: Int) {
+        private fun ProcessingRecipeFactory.macerateTiny(input: String, amount: Int) {
             macerate(input, amount, "dust_tiny")
         }
 
         private fun macerates() {
-            macerate("primary")
-            macerateTiny("nugget", 1)
-            macerate("magnetic")
-            macerateTiny("wire", 4)
-            macerateTiny("wire_fine", 1)
-            macerateTiny("ring", 2)
-            macerate("plate")
-            macerateTiny("foil", 2)
-            macerateTiny("stick", 4)
-            macerateTiny("screw", 1)
-            macerateTiny("bolt", 1)
-            macerate("gear")
-            macerate("rotor", 4)
-            macerate("pipe", 3)
-            macerate("gem_flawless", 8)
-            macerate("gem_exquisite", 16)
+            macerator {
+                defaults {
+                    voltage(this@ProcessBuilder.voltage)
+                    workTicks(ticks(128))
+                }
+                macerate("primary")
+                macerateTiny("nugget", 1)
+                macerate("magnetic")
+                macerateTiny("wire", 4)
+                macerateTiny("wire_fine", 1)
+                macerateTiny("ring", 2)
+                macerate("plate")
+                macerateTiny("foil", 2)
+                macerateTiny("stick", 4)
+                macerateTiny("screw", 1)
+                macerateTiny("bolt", 1)
+                macerate("gear")
+                macerate("rotor", 4)
+                macerate("pipe", 3)
+                macerate("gem_flawless", 8)
+                macerate("gem_exquisite", 16)
+            }
         }
 
         private fun molten(input: String, amount: Float, solidify: Boolean = true, output: String = "molten") {
@@ -648,8 +658,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         private fun crush(from: String, to: String) {
             val amount = if (from == "raw") 2 * amount else 1
             macerator {
-                output(material, to, amount) {
-                    input(material, from)
+                input(material, from) {
+                    output(material, to, amount)
                     voltage(Voltage.LV)
                     workTicks((variant.destroyTime * 40).toLong())
                 }
@@ -657,10 +667,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         private fun wash(from: String, to: String) {
-            val suffix = if (from == "dust_impure") "_from_impure" else ""
             oreWasher {
-                output(material, to, suffix = suffix) {
-                    input(material, from)
+                input(material, from) {
+                    output(material, to)
                     if (from == "crushed") {
                         input("water")
                         output("stone", "dust", port = 3)
@@ -712,8 +721,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
 
             thermalCentrifuge {
-                output(material, "crushed_centrifuged") {
-                    input(material, "crushed_purified")
+                input(material, "crushed_purified") {
+                    output(material, "crushed_centrifuged")
                     output(byProduct(2), "dust", port = 2, rate = 0.4)
                 }
             }

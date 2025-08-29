@@ -224,20 +224,20 @@ object MiscMaterials {
             defaults {
                 voltage(Voltage.LV)
             }
-            output("silicon_dioxide", "dust") {
-                input("glass", "primary")
+            input("glass", "primary") {
+                output("silicon_dioxide", "dust")
                 workTicks(128)
             }
-            output("silicon_dioxide", "dust", suffix = "_from_flint") {
-                input("flint", "primary")
+            input("flint", "primary") {
+                output("silicon_dioxide", "dust")
                 workTicks(128)
             }
-            output(Items.SAND) {
-                input(Items.GRAVEL)
+            input(Items.GRAVEL) {
+                output(Items.SAND)
                 workTicks(64)
             }
-            output(Items.SAND, 4, suffix = "_from_sandstone") {
-                input(Items.SANDSTONE)
+            input(Items.SANDSTONE) {
+                output(Items.SAND, 4)
                 workTicks(240)
             }
         }

@@ -205,13 +205,13 @@ object Woods {
             }
         }
         extractor {
-            output("raw_rubber", "dust", 3) {
-                input(STICKY_RESIN.get())
+            input(STICKY_RESIN.get()) {
+                output("raw_rubber", "dust", 3)
                 voltage(Voltage.LV)
                 workTicks(160)
             }
-            output("raw_rubber", "dust", suffix = "_from_log") {
-                input(RUBBER_LOG.get())
+            input(RUBBER_LOG.get()) {
+                output("raw_rubber", "dust")
                 voltage(Voltage.LV)
                 workTicks(320)
             }

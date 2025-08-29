@@ -115,8 +115,8 @@ object Crops {
 
     private fun toSeed(crop: Item, seed: Item, amount: Int = 1, workTicks: Long = 64L * amount) {
         macerator {
-            output(seed, amount) {
-                input(crop)
+            input(crop) {
+                output(seed, amount)
                 voltage(Voltage.LV)
                 workTicks(workTicks)
             }
