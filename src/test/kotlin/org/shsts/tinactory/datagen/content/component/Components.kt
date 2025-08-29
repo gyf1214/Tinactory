@@ -24,7 +24,8 @@ import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.CircuitTier.CRYSTAL
 import org.shsts.tinactory.content.electric.CircuitTier.NANO
 import org.shsts.tinactory.content.electric.CircuitTier.QUANTUM
-import org.shsts.tinactory.content.electric.Circuits
+import org.shsts.tinactory.content.electric.Circuits.CIRCUITS
+import org.shsts.tinactory.content.electric.Circuits.CIRCUIT_COMPONENTS
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.core.electric.Voltage.ULV
@@ -145,14 +146,14 @@ object Components {
 
     private fun circuits() {
         itemData {
-            for (circuit in Circuits.CIRCUITS) {
+            for (circuit in CIRCUITS.values) {
                 item(circuit.entry) {
                     model(basicItem("metaitems/${circuit.entry.id().replace('/', '.')}"))
-                    tag(AllTags.circuit(Circuits.getVoltage(circuit.tier, circuit.level)))
+                    tag(AllTags.circuit(circuit.voltage))
                 }
             }
 
-            for (component in Circuits.COMPONENTS.values) {
+            for (component in CIRCUIT_COMPONENTS.values) {
                 for (tier in CircuitComponentTier.entries) {
                     val name = component.name
                     val entry = component.entry(tier)

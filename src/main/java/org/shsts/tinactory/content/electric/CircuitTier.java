@@ -32,6 +32,10 @@ public enum CircuitTier {
         this.circuitBoard = circuitBoard;
     }
 
+    public static CircuitTier fromName(String name) {
+        return valueOf(name.toUpperCase());
+    }
+
     public static CircuitTier fromRank(int rank) {
         for (var tier : CircuitTier.values()) {
             if (tier.rank == rank) {

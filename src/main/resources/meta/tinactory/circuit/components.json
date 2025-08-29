@@ -1,0 +1,10 @@
+{
+  "type": "component",
+  "components": [
+    "resistor",
+    "capacitor",
+    "inductor",
+    "diode",
+    "transistor"
+  ]
+}

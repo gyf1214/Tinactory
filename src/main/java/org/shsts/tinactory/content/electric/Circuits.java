@@ -7,17 +7,15 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Circuits {
-    public static final Set<Circuit> CIRCUITS = new HashSet<>();
-    public static final Map<String, CircuitComponent> COMPONENTS = new HashMap<>();
+    public static final Map<String, Circuit> CIRCUITS = new HashMap<>();
+    public static final Map<String, CircuitComponent> CIRCUIT_COMPONENTS = new HashMap<>();
     private static final Map<CircuitTier, IEntry<Item>> BOARDS = new HashMap<>();
     private static final Map<CircuitTier, IEntry<Item>> CIRCUIT_BOARDS = new HashMap<>();
 
@@ -25,17 +23,21 @@ public final class Circuits {
         return Voltage.fromRank(tier.baseVoltage.rank + level.voltageOffset);
     }
 
-    public static Circuit circuit(CircuitTier tier, CircuitLevel level, String id) {
+    public static void newCircuit(CircuitTier tier, CircuitLevel level, String id) {
         var item = REGISTRATE.item("circuit/" + id).register();
-        var ret = new Circuit(tier, level, item);
-        CIRCUITS.add(ret);
-        return ret;
+        CIRCUITS.put(id, new Circuit(tier, level, item));
     }
 
-    public static CircuitComponent circuitComponent(String name) {
-        var ret = new CircuitComponent(name);
-        COMPONENTS.put(name, ret);
-        return ret;
+    public static Circuit getCircuit(String name) {
+        return CIRCUITS.get(name);
+    }
+
+    public static void newCircuitComponent(String name) {
+        CIRCUIT_COMPONENTS.put(name, new CircuitComponent(name));
+    }
+
+    public static CircuitComponent getCircuitComponent(String name) {
+        return CIRCUIT_COMPONENTS.get(name);
     }
 
     public static void buildBoards() {

@@ -2,33 +2,17 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Item
-import org.shsts.tinactory.content.AllItems.ADVANCED_INTEGRATED
-import org.shsts.tinactory.content.AllItems.BASIC_INTEGRATED
 import org.shsts.tinactory.content.AllItems.BOULES
-import org.shsts.tinactory.content.AllItems.CAPACITOR
 import org.shsts.tinactory.content.AllItems.CHIPS
-import org.shsts.tinactory.content.AllItems.DIODE
-import org.shsts.tinactory.content.AllItems.ELECTRONIC_CIRCUIT
-import org.shsts.tinactory.content.AllItems.GOOD_ELECTRONIC
-import org.shsts.tinactory.content.AllItems.GOOD_INTEGRATED
-import org.shsts.tinactory.content.AllItems.INDUCTOR
-import org.shsts.tinactory.content.AllItems.INTEGRATED_PROCESSOR
-import org.shsts.tinactory.content.AllItems.MAINFRAME
-import org.shsts.tinactory.content.AllItems.MICROPROCESSOR
-import org.shsts.tinactory.content.AllItems.PROCESSOR_ASSEMBLY
 import org.shsts.tinactory.content.AllItems.RAW_WAFERS
-import org.shsts.tinactory.content.AllItems.RESISTOR
 import org.shsts.tinactory.content.AllItems.STICKY_RESIN
-import org.shsts.tinactory.content.AllItems.TRANSISTOR
-import org.shsts.tinactory.content.AllItems.VACUUM_TUBE
 import org.shsts.tinactory.content.AllItems.WAFERS
-import org.shsts.tinactory.content.AllItems.WORKSTATION
-import org.shsts.tinactory.content.electric.Circuit
-import org.shsts.tinactory.content.electric.CircuitComponent
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
+import org.shsts.tinactory.content.electric.Circuits.getCircuit
+import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Technologies
@@ -50,15 +34,19 @@ object CircuitComponents {
     private const val CIRCUIT_TICKS = 200L
 
     fun init() {
+        ulvCircuits()
         circuits()
         boards()
         chips()
         circuitComponents()
     }
 
-    private fun circuits() {
+    private fun ulvCircuits() {
+        val vacuumTube = getCircuit("vacuum_tube").item
+        val electronic = getCircuit("electronic").item
+
         vanilla {
-            shaped(VACUUM_TUBE.item) {
+            shaped(vacuumTube) {
                 pattern("BGB")
                 pattern("WWW")
                 define('G', "glass", "primary")
@@ -67,35 +55,34 @@ object CircuitComponents {
                 unlockedBy("has_wire", "copper", "wire")
             }
 
-            shaped(ELECTRONIC_CIRCUIT.item) {
+            shaped(electronic) {
                 val board = circuitBoard(CircuitTier.ELECTRONIC).get()
                 pattern("RPR")
                 pattern("TBT")
                 pattern("WWW")
-                define('R', RESISTOR.item(CircuitComponentTier.NORMAL))
+                define('R', getCircuitComponent("resistor").item(CircuitComponentTier.NORMAL))
                 define('P', "steel", "plate")
-                define('T', VACUUM_TUBE.item)
+                define('T', vacuumTube)
                 define('B', board)
                 define('W', "red_alloy", "wire")
                 unlockedBy("has_board", board)
             }
 
-            shaped(GOOD_ELECTRONIC.item) {
-                val circuit = ELECTRONIC_CIRCUIT.item
+            shaped(getCircuit("good_electronic").item) {
                 pattern("DPD")
                 pattern("EBE")
                 pattern("WEW")
-                define('D', DIODE.item(CircuitComponentTier.NORMAL))
+                define('D', getCircuitComponent("diode").item(CircuitComponentTier.NORMAL))
                 define('P', "steel", "plate")
-                define('E', circuit)
+                define('E', electronic)
                 define('B', circuitBoard(CircuitTier.ELECTRONIC).get())
                 define('W', "copper", "wire")
-                unlockedBy("has_circuit", circuit)
+                unlockedBy("has_circuit", electronic)
             }
         }
 
         assembler {
-            output(VACUUM_TUBE.item) {
+            output(vacuumTube) {
                 input("glass", "primary")
                 input("copper", "wire")
                 input("iron", "bolt")
@@ -104,17 +91,19 @@ object CircuitComponents {
                 tech(Technologies.SOLDERING)
             }
         }
+    }
 
+    private fun circuits() {
         circuitTier(CircuitTier.ELECTRONIC) {
             circuitAssembler {
-                output(ELECTRONIC_CIRCUIT) {
-                    input(VACUUM_TUBE, 2)
-                    input(RESISTOR, 2)
+                circuit("electronic") {
+                    circuit("vacuum_tube", 2)
+                    component("resistor", 2)
                     input("red_alloy", "wire", 2)
                 }
-                output(GOOD_ELECTRONIC) {
-                    input(ELECTRONIC_CIRCUIT, 2)
-                    input(DIODE, 2)
+                circuit("good_electronic") {
+                    circuit("electronic", 2)
+                    component("diode", 2)
                     input("copper", "wire", 2)
                 }
             }
@@ -122,25 +111,25 @@ object CircuitComponents {
 
         circuitTier(CircuitTier.INTEGRATED) {
             circuitAssembler {
-                output(BASIC_INTEGRATED) {
+                circuit("basic_integrated") {
                     chip("integrated_circuit")
-                    input(RESISTOR, 2)
-                    input(DIODE, 2)
+                    component("resistor", 2)
+                    component("diode", 2)
                     input("copper", "wire_fine", 2)
                     input("tin", "bolt", 2)
                 }
-                output(GOOD_INTEGRATED) {
-                    input(BASIC_INTEGRATED, 2)
-                    input(RESISTOR, 2)
-                    input(DIODE, 2)
+                circuit("good_integrated") {
+                    circuit("basic_integrated", 2)
+                    component("resistor", 2)
+                    component("diode", 2)
                     input("gold", "wire_fine", 4)
                     input("silver", "bolt", 4)
                 }
-                output(ADVANCED_INTEGRATED) {
-                    input(GOOD_INTEGRATED, 2)
+                circuit("advanced_integrated") {
+                    circuit("good_integrated", 2)
                     chip("integrated_circuit", 2)
                     chip("ram", 2)
-                    input(TRANSISTOR, 4)
+                    component("transistor", 4)
                     input("electrum", "wire_fine", 8)
                     input("copper", "bolt", 8)
                 }
@@ -149,40 +138,40 @@ object CircuitComponents {
 
         circuitTier(CircuitTier.CPU) {
             circuitAssembler {
-                output(MICROPROCESSOR, 3) {
+                circuit("microprocessor", 3) {
                     chip("cpu")
-                    input(RESISTOR, 2)
-                    input(CAPACITOR, 2)
-                    input(TRANSISTOR, 2)
+                    component("resistor", 2)
+                    component("capacitor", 2)
+                    component("transistor", 2)
                     input("copper", "wire_fine", 2)
                 }
-                output(INTEGRATED_PROCESSOR) {
+                circuit("processor") {
                     chip("cpu")
-                    input(RESISTOR, 2)
-                    input(CAPACITOR, 2)
-                    input(TRANSISTOR, 2)
+                    component("resistor", 2)
+                    component("capacitor", 2)
+                    component("transistor", 2)
                     input("red_alloy", "wire_fine", 4)
                 }
-                output(PROCESSOR_ASSEMBLY) {
-                    input(INTEGRATED_PROCESSOR, 2)
-                    input(INDUCTOR, 2)
-                    input(CAPACITOR, 8)
+                circuit("assembly") {
+                    circuit("processor", 2)
+                    component("inductor", 2)
+                    component("capacitor", 8)
                     chip("ram", 4)
                     input("red_alloy", "wire_fine", 8)
                 }
-                output(WORKSTATION) {
-                    input(PROCESSOR_ASSEMBLY, 2)
-                    input(DIODE, 4)
+                circuit("workstation") {
+                    circuit("assembly", 2)
+                    component("diode", 4)
                     chip("ram", 4)
                     input("electrum", "wire_fine", 16)
                     input("gold", "bolt", 16)
                 }
-                output(MAINFRAME) {
+                circuit("mainframe") {
                     input("aluminium", "stick", 8)
-                    input(WORKSTATION, 2)
+                    circuit("workstation", 2)
                     chip("ram", 16)
-                    input(INDUCTOR, 8)
-                    input(CAPACITOR, 16)
+                    component("inductor", 8)
+                    component("capacitor", 16)
                     input("copper", "wire", 16)
                 }
             }
@@ -192,7 +181,7 @@ object CircuitComponents {
     private fun circuitComponents() {
         componentTier(CircuitComponentTier.NORMAL) {
             vanilla {
-                shaped(RESISTOR.item(tier)) {
+                shaped(getCircuitComponent("resistor").item(tier)) {
                     pattern(" R ")
                     pattern("WCW")
                     pattern(" R ")
@@ -208,13 +197,13 @@ object CircuitComponents {
                     workTicks(COMPONENT_TICKS)
                     tech(Technologies.SOLDERING)
                 }
-                output(RESISTOR, 2) {
+                component("resistor", 2) {
                     input("coal", "dust", 1)
                     input("copper", "wire_fine", 4)
                     input("rubber")
                     voltage(Voltage.ULV)
                 }
-                output(DIODE, 4) {
+                component("diode", 4) {
                     input("gallium_arsenide", "dust")
                     input("glass", "primary")
                     input("copper", "wire_fine", 4)
@@ -229,27 +218,27 @@ object CircuitComponents {
                     workTicks(COMPONENT_TICKS)
                     tech(Technologies.INTEGRATED_CIRCUIT)
                 }
-                output(CAPACITOR, 8) {
+                component("capacitor", 8) {
                     input("pvc", "foil")
                     input("aluminium", "foil", 2)
                     input("pe")
                 }
-                output(INDUCTOR, 4) {
+                component("inductor", 4) {
                     input("nickel_zinc_ferrite", "ring")
                     input("copper", "wire_fine", 2)
                     input("pe", amount = 0.25)
                 }
-                output(DIODE, 8, suffix = "_from_wafer") {
+                component("diode", 8, suffix = "_from_wafer") {
                     input(RAW_WAFERS.item(0))
                     input("copper", "wire_fine", 4)
                     input("pe")
                 }
-                output(TRANSISTOR, 4) {
+                component("transistor", 4) {
                     input("gallium_arsenide", "dust")
                     input("tin", "wire_fine", 6)
                     input("rubber", amount = 2)
                 }
-                output(TRANSISTOR, 8, suffix = "_from_pe") {
+                component("transistor", 8, suffix = "_from_pe") {
                     input("silicon", "dust")
                     input("tin", "wire_fine", 6)
                     input("pe")
@@ -259,9 +248,9 @@ object CircuitComponents {
     }
 
     private class ComponentTierFactory(val tier: CircuitComponentTier) {
-        fun AssemblyRecipeFactory.output(component: CircuitComponent, amount: Int,
+        fun AssemblyRecipeFactory.component(name: String, amount: Int,
             suffix: String = "", block: AssemblyRecipeBuilder.() -> Unit) {
-            output(component.item(tier), amount, suffix, block = block)
+            output(getCircuitComponent(name).item(tier), amount, suffix, block = block)
         }
     }
 
@@ -430,23 +419,24 @@ object CircuitComponents {
 
         val circuitBoard = circuitBoard(tier).get()
 
-        fun SimpleProcessingBuilder.input(component: CircuitComponent, amount: Int = 1) {
-            input(component.tag(componentTier), amount)
+        fun SimpleProcessingBuilder.component(name: String, amount: Int = 1) {
+            input(getCircuitComponent(name).tag(componentTier), amount)
         }
 
-        fun SimpleProcessingBuilder.input(circuit: Circuit, amount: Int = 1) {
-            input(circuit.item, amount)
+        fun SimpleProcessingBuilder.circuit(name: String, amount: Int = 1) {
+            input(getCircuit(name).item, amount)
         }
 
         fun SimpleProcessingBuilder.chip(name: String, amount: Int = 1) {
             input(CHIPS.item(name), amount)
         }
 
-        fun ProcessingRecipeFactory.output(circuit: Circuit, amount: Int = 1,
+        fun ProcessingRecipeFactory.circuit(name: String, amount: Int = 1,
             block: SimpleProcessingBuilder.() -> Unit) {
+            val circuit = getCircuit(name)
             output(circuit.item, amount) {
                 if (circuit.level().voltageOffset < 2) {
-                    input(circuit.circuitBoard())
+                    input(circuit.circuitBoard)
                 }
                 block()
                 val voltage = circuit.tier().baseVoltage
