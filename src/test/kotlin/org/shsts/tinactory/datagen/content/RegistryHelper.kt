@@ -9,4 +9,6 @@ object RegistryHelper {
     fun getItem(loc: ResourceLocation) = ITEMS.getEntry<Item>(loc).get()!!
 
     fun vanillaItem(id: String) = getItem(mcLoc(id))
+
+    fun modItem(id: String) = ITEMS.getEntry<Item>(id).get()
 }

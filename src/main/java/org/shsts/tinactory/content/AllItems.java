@@ -26,6 +26,7 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 @MethodsReturnNonnullByDefault
 public final class AllItems {
     public static final Set<IEntry<Item>> COMPONENT_ITEMS;
+    public static final Map<String, Map<Voltage, ? extends Supplier<? extends ItemLike>>> COMPONENTS;
     public static final Map<Voltage, IEntry<Item>> ELECTRIC_MOTOR;
     public static final Map<Voltage, IEntry<Item>> ELECTRIC_PUMP;
     public static final Map<Voltage, IEntry<Item>> ELECTRIC_PISTON;
@@ -73,6 +75,7 @@ public final class AllItems {
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
+        COMPONENTS = new HashMap<>();
 
         Circuits.buildBoards();
 
@@ -102,14 +105,14 @@ public final class AllItems {
             .renderType(() -> RenderType::cutout)
             .register();
 
-        ELECTRIC_MOTOR = component("electric_motor");
-        ELECTRIC_PUMP = component("electric_pump");
-        ELECTRIC_PISTON = component("electric_piston");
-        CONVEYOR_MODULE = component("conveyor_module");
-        ROBOT_ARM = component("robot_arm");
-        SENSOR = component("sensor");
-        EMITTER = component("emitter");
-        FIELD_GENERATOR = component("field_generator");
+        ELECTRIC_MOTOR = newComponent("electric_motor");
+        ELECTRIC_PUMP = newComponent("electric_pump");
+        ELECTRIC_PISTON = newComponent("electric_piston");
+        CONVEYOR_MODULE = newComponent("conveyor_module");
+        ROBOT_ARM = newComponent("robot_arm");
+        SENSOR = newComponent("sensor");
+        EMITTER = newComponent("emitter");
+        FIELD_GENERATOR = newComponent("field_generator");
         MACHINE_HULL = componentBuilder("machine_hull")
             .voltages(Voltage.ULV, Voltage.IV)
             .buildObject();
@@ -211,7 +214,7 @@ public final class AllItems {
         return ComponentBuilder.simple(v -> simple("component/" + v.id + "/" + name));
     }
 
-    private static Map<Voltage, IEntry<Item>> component(String name) {
+    private static Map<Voltage, IEntry<Item>> newComponent(String name) {
         var ret = componentBuilder(name)
             .voltages(Voltage.LV, Voltage.IV)
             .buildObject();

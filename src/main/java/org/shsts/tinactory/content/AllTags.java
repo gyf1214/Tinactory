@@ -52,7 +52,7 @@ public final class AllTags {
         return TagKey.create(Registry.ITEM_REGISTRY, loc);
     }
 
-    public static TagKey<Item> modItem(String id) {
+    private static TagKey<Item> modItem(String id) {
         return item(modLoc(id));
     }
 

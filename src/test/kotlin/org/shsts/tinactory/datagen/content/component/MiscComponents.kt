@@ -1,14 +1,10 @@
 package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW
 import org.shsts.tinactory.content.AllItems.CABLE
 import org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR
 import org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP
 import org.shsts.tinactory.content.AllItems.FLUID_CELL
-import org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW
-import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
-import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllItems.MACHINE_HULL
 import org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT
 import org.shsts.tinactory.content.AllMaterials.getMaterial
@@ -18,12 +14,15 @@ import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.datagen.content.RegistryHelper.modItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object MiscComponents {
@@ -35,11 +34,11 @@ object MiscComponents {
             defaults {
                 workTicks(240)
             }
-            output(BASIC_BUZZSAW.get()) {
+            componentItem("buzzsaw/basic") {
                 input("cobalt_brass", "gear")
                 voltage(Voltage.LV)
             }
-            output(GOOD_BUZZSAW.get()) {
+            componentItem("buzzsaw/basic") {
                 input("vanadium_steel", "gear")
                 voltage(Voltage.MV)
             }
@@ -47,14 +46,14 @@ object MiscComponents {
         }
 
         assembler {
-            output(ITEM_FILTER.get()) {
+            componentItem("item_filter") {
                 input("steel", "plate")
                 input("zinc", "foil", 8)
                 voltage(Voltage.LV)
                 workTicks(200)
                 tech(Technologies.SIFTING)
             }
-            output(GOOD_GRINDER.get()) {
+            componentItem("grinder/basic") {
                 input("diamond", "gem_flawless")
                 input("steel", "plate", 8)
                 input("diamond", "dust", 4)
@@ -134,5 +133,10 @@ object MiscComponents {
                 block()
             }
         }
+    }
+
+    private fun <RB : ProcessingRecipeBuilder<*>> RecipeFactory<*, RB>.componentItem(
+        id: String, block: RB.() -> Unit) {
+        output(modItem("component/$id"), block = block)
     }
 }

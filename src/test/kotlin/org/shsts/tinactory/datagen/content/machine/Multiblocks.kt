@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.content.machine
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
+import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
@@ -10,7 +11,6 @@ import org.shsts.tinactory.content.AllItems.CABLE
 import org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR
 import org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON
 import org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP
-import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE
 import org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE
@@ -46,6 +46,7 @@ import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.solidBlock
+import org.shsts.tinactory.datagen.content.RegistryHelper.modItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.BlockDataFactory
@@ -58,6 +59,8 @@ import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
 import org.shsts.tinycorelib.api.registrate.entry.IEntry
 
 object Multiblocks {
+    private val itemFilter: Item by lazy { modItem("component/item_filter") }
+
     fun init() {
         components()
         componentRecipes()
@@ -152,7 +155,7 @@ object Multiblocks {
                 input("steel", "stick", 4)
                 input(ELECTRIC_MOTOR)
                 input("tin", "rotor")
-                input(ITEM_FILTER.get(), 6)
+                input(itemFilter, 6)
                 input("soldering_alloy", amount = 2)
                 workTicks(140)
                 tech(Technologies.SIFTING)
@@ -189,7 +192,7 @@ object Multiblocks {
                 input("steel", "stick", 4)
                 input(ELECTRIC_MOTOR)
                 input("bronze", "rotor")
-                input(ITEM_FILTER.get(), 3)
+                input(itemFilter, 3)
                 input("pe", "sheet", 3)
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.CLEANROOM)
@@ -286,7 +289,7 @@ object Multiblocks {
                 circuit(3, Voltage.MV)
                 input(ELECTRIC_PISTON, 4)
                 input(CABLE, 4)
-                input(ITEM_FILTER.get(), 4)
+                input(itemFilter, 4)
                 input("steel", "plate", 4)
                 tech(Technologies.SIFTING)
             }
@@ -342,7 +345,7 @@ object Multiblocks {
                 circuit(3)
                 input(ELECTRIC_MOTOR, 2)
                 input(CABLE, 4)
-                input(ITEM_FILTER.get(), 4)
+                input(itemFilter, 4)
                 input("pe", "sheet", 4)
                 tech(Technologies.CLEANROOM)
             }
