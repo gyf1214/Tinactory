@@ -2,7 +2,6 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Item
 import org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER
-import org.shsts.tinactory.content.AllItems.COMPONENT_ITEMS
 import org.shsts.tinactory.content.AllItems.FERTILIZER
 import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
 import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
@@ -59,7 +58,16 @@ object Components {
         }
 
         itemData {
-            for (entry in COMPONENT_ITEMS) {
+            val components = listOf(
+                "electric_motor",
+                "electric_pump",
+                "electric_piston",
+                "conveyor_module",
+                "robot_arm",
+                "sensor",
+                "emitter",
+                "field_generator")
+            for (entry in components.flatMap { getComponentEntry<Item>(it).values }) {
                 item(entry) { model(Models::componentItem) }
             }
 

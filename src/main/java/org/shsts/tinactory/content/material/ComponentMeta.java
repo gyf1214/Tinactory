@@ -14,7 +14,6 @@ import java.util.HashMap;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllItems.COMPONENTS;
-import static org.shsts.tinactory.content.AllItems.COMPONENT_ITEMS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -37,7 +36,6 @@ public class ComponentMeta extends MetaConsumer {
             }
             var entry = builder.register();
             components.put(v, entry);
-            COMPONENT_ITEMS.add(entry);
         }
         COMPONENTS.put(name, components);
     }
