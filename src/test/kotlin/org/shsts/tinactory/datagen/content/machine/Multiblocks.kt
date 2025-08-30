@@ -2,15 +2,11 @@ package org.shsts.tinactory.datagen.content.machine
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
-import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
-import org.shsts.tinactory.content.AllItems.CABLE
-import org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR
-import org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON
-import org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP
+import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE
 import org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE
@@ -46,7 +42,6 @@ import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.solidBlock
-import org.shsts.tinactory.datagen.content.RegistryHelper.modItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.BlockDataFactory
@@ -59,8 +54,6 @@ import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
 import org.shsts.tinycorelib.api.registrate.entry.IEntry
 
 object Multiblocks {
-    private val itemFilter: Item by lazy { modItem("component/item_filter") }
-
     fun init() {
         components()
         componentRecipes()
@@ -153,9 +146,9 @@ object Multiblocks {
             }
             output(GRATE_MACHINE_CASING.get(), 2) {
                 input("steel", "stick", 4)
-                input(ELECTRIC_MOTOR)
+                component("electric_motor")
                 input("tin", "rotor")
-                input(itemFilter, 6)
+                input(ITEM_FILTER.get(), 6)
                 input("soldering_alloy", amount = 2)
                 workTicks(140)
                 tech(Technologies.SIFTING)
@@ -190,9 +183,9 @@ object Multiblocks {
             }
             output(FILTER_CASING.get(), 2) {
                 input("steel", "stick", 4)
-                input(ELECTRIC_MOTOR)
+                component("electric_motor")
                 input("bronze", "rotor")
-                input(itemFilter, 3)
+                input(ITEM_FILTER.get(), 3)
                 input("pe", "sheet", 3)
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.CLEANROOM)
@@ -287,17 +280,17 @@ object Multiblocks {
             output(SIFTER.get()) {
                 input(SOLID_STEEL_CASING.get())
                 circuit(3, Voltage.MV)
-                input(ELECTRIC_PISTON, 4)
-                input(CABLE, 4)
-                input(itemFilter, 4)
+                component("electric_piston", 4)
+                component("cable", 4)
+                input(ITEM_FILTER.get(), 4)
                 input("steel", "plate", 4)
                 tech(Technologies.SIFTING)
             }
             output(AUTOFARM.get()) {
                 input(AUTOFARM_BASE.get())
                 circuit(4, Voltage.MV)
-                input(ELECTRIC_PUMP, 4)
-                input(CABLE, 4)
+                component("electric_pump", 4)
+                component("cable", 4)
                 input("brass", "pipe", 4)
                 input("steel", "plate", 4)
                 tech(Technologies.AUTOFARM)
@@ -314,17 +307,17 @@ object Multiblocks {
             output(VACUUM_FREEZER.get()) {
                 input(FROST_PROOF_CASING.get())
                 circuit(3, Voltage.HV)
-                input(ELECTRIC_PUMP, 4)
-                input(CABLE, 4)
+                component("electric_pump", 4)
+                component("cable", 4)
                 input("aluminium", "plate", 4)
                 tech(Technologies.VACUUM_FREEZER)
             }
             output(PYROLYSE_OVEN.get()) {
                 input(HEATPROOF_CASING.get())
                 circuit(3)
-                input(ELECTRIC_PISTON, 2)
-                input(ELECTRIC_PUMP, 2)
-                input(CABLE, 4)
+                component("electric_piston", 2)
+                component("electric_pump", 2)
+                component("cable", 4)
                 input("cupronickel", "wire", 16)
                 input("invar", "plate", 4)
                 tech(Technologies.PYROLYSE_OVEN)
@@ -334,8 +327,8 @@ object Multiblocks {
             output(DISTILLATION_TOWER.get()) {
                 input(CLEAN_STAINLESS_CASING.get())
                 circuit(4)
-                input(ELECTRIC_PUMP, 2)
-                input(CABLE, 4)
+                component("electric_pump", 2)
+                component("cable", 4)
                 input("stainless_steel", "pipe", 4)
                 input("stainless_steel", "plate", 4)
                 tech(Technologies.DISTILLATION)
@@ -343,21 +336,22 @@ object Multiblocks {
             output(CLEANROOM.get()) {
                 input(PLASCRETE.get())
                 circuit(3)
-                input(ELECTRIC_MOTOR, 2)
-                input(CABLE, 4)
-                input(itemFilter, 4)
+                component("electric_motor", 2)
+                component("cable", 4)
+                input(ITEM_FILTER.get(), 4)
                 input("pe", "sheet", 4)
                 tech(Technologies.CLEANROOM)
             }
             output(LARGE_CHEMICAL_REACTOR.get()) {
                 input(INERT_PTFE_CASING.get())
                 circuit(4)
-                input(ELECTRIC_MOTOR, 4)
+                component("electric_motor", 4)
                 input("stainless_steel", "rotor", 4)
-                input(CABLE, 4)
+                component("cable", 4)
                 input("ptfe", "pipe", 4)
                 tech(Technologies.ADVANCED_CHEMISTRY)
             }
+
         }
     }
 }

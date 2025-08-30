@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
@@ -24,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllItems.getComponent;
 import static org.shsts.tinactory.content.AllRecipes.RESEARCH_BENCH;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
@@ -146,10 +146,10 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         dataGen.trackLang(details);
 
         if (researchVoltage != null) {
+            var input = getComponent("research_equipment").get(researchVoltage).get();
             RESEARCH_BENCH.recipe(DATA_GEN, loc)
                 .target(loc)
-                .input(new ProcessingIngredients.ItemIngredient(
-                    new ItemStack(AllItems.RESEARCH_EQUIPMENT.get(researchVoltage).get(), 1)))
+                .input(new ProcessingIngredients.ItemIngredient(new ItemStack(input, 1)))
                 .voltage(researchVoltage.value)
                 .power((long) (0.25 * researchVoltage.value))
                 .workTicks(200)

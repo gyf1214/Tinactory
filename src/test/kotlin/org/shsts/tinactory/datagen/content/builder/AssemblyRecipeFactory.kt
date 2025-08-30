@@ -1,9 +1,9 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
-import org.shsts.tinactory.datagen.content.component.Component
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
@@ -19,8 +19,9 @@ class AssemblyRecipeFactory(
         builder.componentVoltage = componentVoltage
     }
 
-    fun output(component: Component, voltage: Voltage = this.componentVoltage!!,
+    fun component(name: String, voltage: Voltage = this.componentVoltage!!,
         block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        val component = getComponent(name)
         if (!component.containsKey(voltage)) {
             return
         }

@@ -43,13 +43,13 @@ import org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR
 import org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE
 import org.shsts.tinactory.content.AllBlockEntities.WIREMILL
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
-import org.shsts.tinactory.content.AllItems.ELECTRIC_BUFFER
-import org.shsts.tinactory.content.AllItems.TRANSFORMER
+import org.shsts.tinactory.content.AllItems.getComponentEntry
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
 import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.content.machine.ProcessingSet
+import org.shsts.tinactory.content.network.SubnetBlock
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Models.cubeBlock
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
@@ -155,7 +155,10 @@ object Machines {
                     ioTex(ME_BUS)
                 }
             }
-            for (entry in TRANSFORMER.values + ELECTRIC_BUFFER.values) {
+
+            val subnets = listOf("transformer", "electric_buffer")
+                .flatMap { getComponentEntry<SubnetBlock>(it).values }
+            for (entry in subnets) {
                 block(entry) {
                     machineModel {
                         overlay(Direction.NORTH, IO_TEX)

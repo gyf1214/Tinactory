@@ -41,6 +41,7 @@ import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
+import static org.shsts.tinactory.content.AllItems.COMPONENTS;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
@@ -529,6 +530,9 @@ public final class AllBlockEntities {
         PRIMITIVE_STONE_GENERATOR = primitive(STONE_GENERATOR);
         PRIMITIVE_ORE_ANALYZER = primitive(ORE_ANALYZER);
         PRIMITIVE_ORE_WASHER = primitive(ORE_WASHER);
+
+        // TODO: make it a MachineSet without any layout
+        COMPONENTS.put("multiblock_interface", MULTIBLOCK_INTERFACE);
     }
 
     public static void init() {}

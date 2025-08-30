@@ -14,7 +14,6 @@ import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_TANK
 import org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER
 import org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER
-import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER
 import org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER
@@ -25,9 +24,7 @@ import org.shsts.tinactory.content.AllBlockEntities.RESEARCH_BENCH
 import org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE
 import org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
-import org.shsts.tinactory.content.AllItems.CABLE
-import org.shsts.tinactory.content.AllItems.ELECTRIC_BUFFER
-import org.shsts.tinactory.content.AllItems.MACHINE_HULL
+import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE
 import org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
@@ -46,6 +43,9 @@ import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinycorelib.api.registrate.entry.IEntry
 
 object MiscMachines {
+    private val ulvCable: Item by lazy { getComponent("cable").item(Voltage.ULV) }
+    private val ulvHull: Item by lazy { getComponent("machine_hull").item(Voltage.ULV) }
+
     fun init() {
         primitives()
         ulvs()
@@ -104,14 +104,14 @@ object MiscMachines {
             ulv(ELECTRIC_CHEST, Blocks.CHEST)
             ulv(ELECTRIC_TANK, "glass", "primary")
             ulv(LOGISTIC_WORKER, Blocks.HOPPER)
-            ulv(ELECTRIC_BUFFER, CABLE.item(Voltage.ULV))
+            ulv(getComponent("electric_buffer"), ulvCable)
 
             result(NETWORK_CONTROLLER.get()) {
                 pattern("VWV")
                 pattern("VHV")
                 pattern("WVW")
-                define('W', CABLE.item(Voltage.ULV))
-                define('H', MACHINE_HULL.item(Voltage.ULV))
+                define('W', ulvCable)
+                define('H', ulvHull)
                 define('V', circuit(Voltage.ULV))
                 toolTag(TOOL_WRENCH)
             }
@@ -119,8 +119,8 @@ object MiscMachines {
                 pattern("PVP").pattern("RHR").pattern("WVW")
                 define('P', "copper", "pipe")
                 define('R', "iron", "rotor")
-                define('W', CABLE.item(Voltage.ULV))
-                define('H', MACHINE_HULL.item(Voltage.ULV))
+                define('W', ulvCable)
+                define('H', ulvHull)
                 define('V', circuit(Voltage.ULV))
                 toolTag(TOOL_WRENCH)
             }
@@ -135,24 +135,25 @@ object MiscMachines {
             output(ALLOY_SMELTER) {
                 input(ELECTRIC_FURNACE)
                 circuit(2)
-                input(CABLE, 4)
+                component("cable", 4)
                 tech(Technologies.ALLOY_SMELTING)
             }
             output(BLAST_FURNACE.get()) {
                 input(HEATPROOF_CASING.get())
                 input(ELECTRIC_FURNACE, 3)
                 circuit(3)
-                input(CABLE, 2)
+                component("cable", 2)
                 tech(Technologies.STEEL)
             }
-            output(MULTIBLOCK_INTERFACE) {
-                input(MACHINE_HULL)
+            component("multiblock_interface") {
+                component("machine_hull")
                 circuit(2)
-                input(CABLE, 2)
+                component("cable", 2)
                 input(Blocks.CHEST)
                 input("glass", "primary")
                 tech(Technologies.STEEL)
             }
+
         }
     }
 
@@ -165,8 +166,8 @@ object MiscMachines {
                 is TagKey<*> -> define('B', base as TagKey<Item>)
                 is String -> define('B', base, sub!!)
             }
-            define('W', CABLE.item(Voltage.ULV))
-            define('H', MACHINE_HULL.item(Voltage.ULV))
+            define('W', ulvCable)
+            define('H', ulvHull)
             define('V', circuit(Voltage.ULV))
             toolTag(TOOL_WRENCH)
         }
@@ -270,7 +271,7 @@ object MiscMachines {
                 pattern("PWP")
                 pattern("VFV")
                 define('P', "iron", "plate")
-                define('W', CABLE.item(Voltage.ULV))
+                define('W', ulvCable)
                 define('V', circuit(Voltage.ULV))
                 define('F', Blocks.FURNACE.asItem())
                 toolTag(TOOL_WRENCH)
@@ -280,7 +281,7 @@ object MiscMachines {
         assembler {
             componentVoltage = Voltage.MV
             output(HIGH_PRESSURE_BOILER.get()) {
-                input(MACHINE_HULL)
+                component("machine_hull")
                 input(Blocks.FURNACE)
                 input("brass", "pipe", 2)
                 input("iron", "plate", 4)

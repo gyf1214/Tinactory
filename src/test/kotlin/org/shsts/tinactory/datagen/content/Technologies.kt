@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllBlockEntities
 import org.shsts.tinactory.content.AllItems
+import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks
 import org.shsts.tinactory.content.electric.Circuits
@@ -64,8 +65,7 @@ object Technologies {
         Factory().apply {
             ALLOY_SMELTING = child("alloy_smelting") {
                 maxProgress(20)
-                displayItem(AllBlockEntities.ALLOY_SMELTER.entry(
-                    Voltage.ULV))
+                displayItem(AllBlockEntities.ALLOY_SMELTER.entry(Voltage.ULV))
             }
 
             SOLDERING = tech("soldering") {
@@ -85,13 +85,12 @@ object Technologies {
 
             BATTERY = tech("battery") {
                 maxProgress(40)
-                displayItem(AllItems.BATTERY.getValue(Voltage.LV))
+                displayItem(getComponent("battery").getValue(Voltage.LV))
             }
 
             MOTOR = child("motor") {
                 maxProgress(30)
-                displayItem(AllItems.ELECTRIC_MOTOR.getValue(
-                    Voltage.LV))
+                displayItem(getComponent("electric_motor").getValue(Voltage.LV))
             }
 
             MATERIAL_CUTTING = tech("material_cutting") {
@@ -101,13 +100,12 @@ object Technologies {
 
             SENSOR_AND_EMITTER = tech("sensor_and_emitter") {
                 maxProgress(40)
-                displayItem(AllItems.EMITTER.getValue(Voltage.LV))
+                displayItem(getComponent("emitter").getValue(Voltage.LV))
             }
 
             PUMP_AND_PISTON = child("pump_and_piston") {
                 maxProgress(35)
-                displayItem(AllItems.ELECTRIC_PISTON.getValue(
-                    Voltage.LV))
+                displayItem(getComponent("electric_piston").getValue(Voltage.LV))
             }
 
             HOT_WORKING = child("hot_working") {
@@ -117,13 +115,12 @@ object Technologies {
 
             CONVEYOR_MODULE = child("conveyor_module") {
                 maxProgress(40)
-                displayItem(AllItems.CONVEYOR_MODULE.getValue(
-                    Voltage.LV))
+                displayItem(getComponent("conveyor_module").getValue(Voltage.LV))
             }
 
             ROBOT_ARM = child("robot_arm") {
                 maxProgress(50)
-                displayItem(AllItems.ROBOT_ARM.getValue(Voltage.LV))
+                displayItem(getComponent("robot_arm").getValue(Voltage.LV))
             }
 
             voltage = Voltage.LV
@@ -171,8 +168,7 @@ object Technologies {
 
             CHEMISTRY = child("chemistry") {
                 maxProgress(40)
-                displayItem(AllItems.RESEARCH_EQUIPMENT.getValue(
-                    Voltage.LV))
+                displayItem(getComponent("research_equipment").getValue(Voltage.LV))
             }
 
             PYROLYSE_OVEN = tech("pyrolyse_oven") {

@@ -24,7 +24,6 @@ import org.shsts.tinactory.content.AllBlockEntities.LATHE
 import org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER
 import org.shsts.tinactory.content.AllBlockEntities.MACERATOR
 import org.shsts.tinactory.content.AllBlockEntities.MIXER
-import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
 import org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER
 import org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER
 import org.shsts.tinactory.content.AllBlockEntities.POLARIZER
@@ -33,19 +32,6 @@ import org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE
 import org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR
 import org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE
 import org.shsts.tinactory.content.AllBlockEntities.WIREMILL
-import org.shsts.tinactory.content.AllItems.BUZZSAW
-import org.shsts.tinactory.content.AllItems.CABLE
-import org.shsts.tinactory.content.AllItems.CONVEYOR_MODULE
-import org.shsts.tinactory.content.AllItems.ELECTRIC_BUFFER
-import org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR
-import org.shsts.tinactory.content.AllItems.ELECTRIC_PISTON
-import org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP
-import org.shsts.tinactory.content.AllItems.EMITTER
-import org.shsts.tinactory.content.AllItems.GRINDER
-import org.shsts.tinactory.content.AllItems.MACHINE_HULL
-import org.shsts.tinactory.content.AllItems.ROBOT_ARM
-import org.shsts.tinactory.content.AllItems.SENSOR
-import org.shsts.tinactory.content.AllItems.TRANSFORMER
 import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
@@ -70,73 +56,73 @@ object ProcessingMachines {
         assembler {
             componentVoltage = v
             defaults {
-                input(MACHINE_HULL)
+                component("machine_hull")
                 autoCable = true
                 voltage(lastVoltage)
                 workTicks(MACHINE_TICKS)
             }
             output(RESEARCH_BENCH) {
                 circuit(2)
-                input(SENSOR)
-                input(EMITTER)
+                component("sensor")
+                component("emitter")
                 tech(Technologies.SENSOR_AND_EMITTER)
             }
             output(ASSEMBLER) {
                 circuit(2)
-                input(ROBOT_ARM, 2)
-                input(CONVEYOR_MODULE, 2)
+                component("robot_arm", 2)
+                component("conveyor_module", 2)
                 tech(Technologies.ROBOT_ARM, Technologies.CONVEYOR_MODULE)
             }
             output(LASER_ENGRAVER) {
                 circuit(3)
-                input(ELECTRIC_PISTON, 2)
-                input(EMITTER)
+                component("electric_piston", 2)
+                component("emitter")
                 tech(Technologies.INTEGRATED_CIRCUIT)
             }
 
             output(CIRCUIT_ASSEMBLER) {
                 circuit(4, nextVoltage)
-                input(ROBOT_ARM)
-                input(EMITTER)
-                input(CONVEYOR_MODULE, 2)
+                component("robot_arm")
+                component("emitter")
+                component("conveyor_module", 2)
                 tech(Technologies.INTEGRATED_CIRCUIT)
             }
             output(STONE_GENERATOR) {
                 circuit(2)
-                input(ELECTRIC_MOTOR)
-                input(ELECTRIC_PISTON)
-                input(GRINDER)
+                component("electric_motor")
+                component("electric_piston")
+                component("grinder")
                 input("glass", "primary")
                 tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
             }
             output(ORE_ANALYZER) {
                 circuit(2)
-                input(ELECTRIC_MOTOR, 3)
-                input(SENSOR)
+                component("electric_motor", 3)
+                component("sensor")
                 tech(Technologies.SENSOR_AND_EMITTER)
             }
             output(MACERATOR) {
                 circuit(3)
-                input(ELECTRIC_PISTON)
-                input(CONVEYOR_MODULE)
-                input(GRINDER)
+                component("electric_piston")
+                component("conveyor_module")
+                component("grinder")
                 tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
             }
             output(ORE_WASHER) {
                 circuit(2)
-                input(ELECTRIC_MOTOR)
+                component("electric_motor")
                 input(rotor, "rotor", 2)
                 input("glass", "primary")
                 tech(Technologies.MOTOR)
             }
             output(CENTRIFUGE) {
                 circuit(4)
-                input(ELECTRIC_MOTOR, 2)
+                component("electric_motor", 2)
                 tech(Technologies.MOTOR)
             }
             output(THERMAL_CENTRIFUGE) {
                 circuit(2)
-                input(ELECTRIC_MOTOR, 2)
+                component("electric_motor", 2)
                 input(heat, "wire", wireNumber)
                 tech(Technologies.MOTOR, Technologies.ELECTRIC_HEATING)
             }
@@ -154,7 +140,7 @@ object ProcessingMachines {
             }
             output(MIXER) {
                 circuit(2)
-                input(ELECTRIC_MOTOR)
+                component("electric_motor")
                 input(rotor, "rotor")
                 input("glass", "primary", 4)
                 tech(Technologies.MOTOR)
@@ -166,48 +152,48 @@ object ProcessingMachines {
             }
             output(WIREMILL) {
                 circuit(2)
-                input(ELECTRIC_MOTOR, 4)
+                component("electric_motor", 4)
                 tech(Technologies.MOTOR)
             }
             output(BENDER) {
                 circuit(2)
-                input(ELECTRIC_MOTOR, 2)
-                input(ELECTRIC_PISTON, 2)
+                component("electric_motor", 2)
+                component("electric_piston", 2)
                 input(main, "plate", 4)
                 tech(Technologies.PUMP_AND_PISTON)
             }
             output(LATHE) {
                 circuit(3)
-                input(ELECTRIC_MOTOR)
-                input(ELECTRIC_PISTON)
-                input(GRINDER)
+                component("electric_motor")
+                component("electric_piston")
+                component("grinder")
                 tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
             }
             output(CUTTER) {
                 circuit(3)
-                input(ELECTRIC_MOTOR)
-                input(CONVEYOR_MODULE)
-                input(BUZZSAW)
+                component("electric_motor")
+                component("conveyor_module")
+                component("buzzsaw")
                 tech(Technologies.CONVEYOR_MODULE, Technologies.MATERIAL_CUTTING)
             }
             output(EXTRUDER) {
                 circuit(4)
-                input(ELECTRIC_PISTON)
+                component("electric_piston")
                 input(heat, "wire", wireNumber)
                 input(pipe, "pipe")
                 tech(Technologies.COLD_WORKING)
             }
             output(EXTRACTOR) {
                 circuit(2)
-                input(ELECTRIC_PISTON)
-                input(ELECTRIC_PUMP)
+                component("electric_piston")
+                component("electric_pump")
                 input(heat, "wire", wireNumber)
                 input("glass", "primary", 2)
                 tech(Technologies.HOT_WORKING)
             }
             output(FLUID_SOLIDIFIER) {
                 circuit(2)
-                input(ELECTRIC_PUMP, 2)
+                component("electric_pump", 2)
                 input("glass", "primary", 2)
                 tech(Technologies.HOT_WORKING)
             }
@@ -219,7 +205,7 @@ object ProcessingMachines {
             }
             output(CHEMICAL_REACTOR) {
                 circuit(4)
-                input(ELECTRIC_MOTOR, 2)
+                component("electric_motor", 2)
                 input(rotor, "rotor", 2)
                 input("glass", "primary", 2)
                 tech(Technologies.CHEMISTRY)
@@ -233,35 +219,35 @@ object ProcessingMachines {
             }
             output(STEAM_TURBINE) {
                 circuit(2)
-                input(ELECTRIC_MOTOR, 2)
+                component("electric_motor", 2)
                 input(rotor, "rotor", 2)
                 input(pipe, "pipe", 2)
                 tech(Technologies.MOTOR)
             }
             output(GAS_TURBINE) {
                 circuit(3)
-                input(ELECTRIC_MOTOR)
-                input(ELECTRIC_PUMP)
+                component("electric_motor")
+                component("electric_pump")
                 input(rotor, "rotor", 2)
                 tech(Technologies.PUMP_AND_PISTON)
             }
             output(COMBUSTION_GENERATOR) {
                 circuit(3)
-                input(ELECTRIC_MOTOR)
-                input(ELECTRIC_PISTON)
+                component("electric_motor")
+                component("electric_piston")
                 input(main, "gear", 2)
                 tech(Technologies.PUMP_AND_PISTON)
             }
             output(ELECTRIC_CHEST) {
                 circuit(2)
-                input(CONVEYOR_MODULE)
+                component("conveyor_module")
                 input(main, "plate", 2)
                 input(Items.CHEST)
                 tech(Technologies.CONVEYOR_MODULE)
             }
             output(ELECTRIC_TANK) {
                 circuit(2)
-                input(ELECTRIC_PUMP)
+                component("electric_pump")
                 input(main, "plate", 2)
                 input("glass", "primary")
                 tech(Technologies.PUMP_AND_PISTON)
@@ -269,34 +255,34 @@ object ProcessingMachines {
             output(BATTERY_BOX) {
                 circuit(2)
                 pic()
-                input(CABLE, 4)
+                component("cable", 4)
                 input(Items.CHEST)
                 tech(Technologies.BATTERY)
             }
-            output(TRANSFORMER) {
+            component("transformer") {
                 circuit(4)
                 pic()
-                input(CABLE)
-                input(CABLE, 4, voltage = lastVoltage)
+                component("cable")
+                component("cable", 4, voltage = lastVoltage)
                 tech(Technologies.BATTERY)
             }
-            output(ELECTRIC_BUFFER) {
+            component("electric_buffer") {
                 circuit(4)
                 pic()
-                input(CABLE, 2)
+                component("cable", 2)
                 tech(Technologies.BATTERY)
             }
             output(LOGISTIC_WORKER) {
                 circuit(4)
-                input(CONVEYOR_MODULE, 2)
-                input(ELECTRIC_PUMP, 2)
+                component("conveyor_module", 2)
+                component("electric_pump", 2)
                 input(main, "plate", 4)
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             }
-            output(MULTIBLOCK_INTERFACE) {
+            component("multiblock_interface") {
                 circuit(2)
-                input(CONVEYOR_MODULE)
-                input(ELECTRIC_PUMP)
+                component("conveyor_module")
+                component("electric_pump")
                 input(Items.CHEST)
                 input("glass", "primary")
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)

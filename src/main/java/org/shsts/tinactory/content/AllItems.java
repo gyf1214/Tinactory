@@ -57,6 +57,9 @@ public final class AllItems {
     public static final Map<Voltage, IEntry<SubnetBlock>> ELECTRIC_BUFFER;
     public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
     public static final Map<Voltage, IEntry<Item>> BUZZSAW;
+    public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
+    public static final List<IEntry<MEStorageCell>> ITEM_STORAGE_CELL;
+    public static final List<IEntry<MEStorageCell>> FLUID_STORAGE_CELL;
 
     public static final IEntry<Item> STICKY_RESIN;
     public static final IEntry<RubberLogBlock> RUBBER_LOG;
@@ -67,11 +70,8 @@ public final class AllItems {
     public static final IEntry<Item> BASIC_BUZZSAW;
     public static final IEntry<Item> GOOD_BUZZSAW;
     public static final IEntry<Item> ADVANCED_BUZZSAW;
-    public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
     public static final IEntry<Item> ITEM_FILTER;
     public static final IEntry<Item> FERTILIZER;
-    public static final List<IEntry<MEStorageCell>> ITEM_STORAGE_CELL;
-    public static final List<IEntry<MEStorageCell>> FLUID_STORAGE_CELL;
 
     static {
         COMPONENT_ITEMS = new HashSet<>();
@@ -191,8 +191,14 @@ public final class AllItems {
             .voltage(Voltage.MV, "aluminium")
             .buildObject();
 
-        ITEM_FILTER = simple("component/item_filter");
-        FERTILIZER = simple("misc/fertilizer");
+        COMPONENTS.put("research_equipment", RESEARCH_EQUIPMENT);
+        COMPONENTS.put("battery", BATTERY);
+        COMPONENTS.put("cable", CABLE);
+        COMPONENTS.put("transformer", TRANSFORMER);
+        COMPONENTS.put("electric_buffer", ELECTRIC_BUFFER);
+        COMPONENTS.put("grinder", GRINDER);
+        COMPONENTS.put("buzzsaw", BUZZSAW);
+        COMPONENTS.put("fluid_cell", FLUID_CELL);
 
         ITEM_STORAGE_CELL = new ArrayList<>();
         FLUID_STORAGE_CELL = new ArrayList<>();
@@ -206,12 +212,17 @@ public final class AllItems {
                 "logistics/fluid_storage_cell/" + k + "m",
                 MEStorageCell.fluidCell(bytes)).register());
         }
+
+        ITEM_FILTER = simple("component/item_filter");
+        FERTILIZER = simple("misc/fertilizer");
     }
 
     public static void init() {}
 
     private static ComponentBuilder.Simple<Item, ?> componentBuilder(String name) {
-        return ComponentBuilder.simple(v -> simple("component/" + v.id + "/" + name));
+        var builder = ComponentBuilder.simple(v -> simple("component/" + v.id + "/" + name));
+        builder.onCreateObject(ret -> COMPONENTS.put(name, ret));
+        return builder;
     }
 
     private static Map<Voltage, IEntry<Item>> newComponent(String name) {
@@ -220,6 +231,15 @@ public final class AllItems {
             .buildObject();
         COMPONENT_ITEMS.addAll(ret.values());
         return ret;
+    }
+
+    public static Map<Voltage, ? extends Supplier<? extends ItemLike>> getComponent(String name) {
+        return COMPONENTS.get(name);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <U extends ItemLike> Map<Voltage, IEntry<U>> getComponentEntry(String name) {
+        return (Map<Voltage, IEntry<U>>) getComponent(name);
     }
 
     private static IEntry<Item> simple(String name) {
