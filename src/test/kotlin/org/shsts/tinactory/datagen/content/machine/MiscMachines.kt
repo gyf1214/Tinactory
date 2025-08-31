@@ -1,46 +1,34 @@
 package org.shsts.tinactory.datagen.content.machine
 
+import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Blocks
-import org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER
-import org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER
-import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST
 import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE
-import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_TANK
 import org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER
-import org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER
 import org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
-import org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER
-import org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER
-import org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_ANALYZER
-import org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_WASHER
-import org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_STONE_GENERATOR
-import org.shsts.tinactory.content.AllBlockEntities.RESEARCH_BENCH
-import org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE
-import org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
+import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.getComponent
+import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE
 import org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.AllTags.circuit
-import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.ToolRecipeFactory
-import org.shsts.tinactory.datagen.content.component.Component
+import org.shsts.tinactory.datagen.content.builder.VanillaRecipeFactory
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
-import org.shsts.tinycorelib.api.registrate.entry.IEntry
 
 object MiscMachines {
     private val ulvCable: Item by lazy { getComponent("cable").item(Voltage.ULV) }
@@ -64,7 +52,7 @@ object MiscMachines {
                 define('C', Blocks.CRAFTING_TABLE)
                 unlockedBy("has_cobblestone", "stone", "block")
             }
-            shaped(PRIMITIVE_STONE_GENERATOR.get()) {
+            primitive("stone_generator") {
                 pattern("WLW")
                 pattern("L L")
                 pattern("WLW")
@@ -72,7 +60,7 @@ object MiscMachines {
                 define('L', ItemTags.LOGS)
                 unlockedBy("has_planks", ItemTags.PLANKS)
             }
-            shaped(PRIMITIVE_ORE_ANALYZER.get()) {
+            primitive("ore_analyzer") {
                 pattern("WLW")
                 pattern("LFL")
                 pattern("WLW")
@@ -81,7 +69,7 @@ object MiscMachines {
                 define('F', "flint", "primary")
                 unlockedBy("has_flint", "flint", "primary")
             }
-            shaped(PRIMITIVE_ORE_WASHER.get()) {
+            primitive("ore_washer") {
                 pattern("WLW")
                 pattern("LFL")
                 pattern("WLW")
@@ -93,18 +81,23 @@ object MiscMachines {
         }
     }
 
+    private fun VanillaRecipeFactory.primitive(name: String,
+        block: ShapedRecipeBuilder.() -> Unit) {
+        shaped(getMachine(name).block(Voltage.PRIMITIVE), block = block)
+    }
+
     private fun ulvs() {
         toolCrafting {
-            ulv(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR)
-            ulv(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER)
-            ulv(ORE_WASHER, PRIMITIVE_ORE_WASHER)
-            ulv(RESEARCH_BENCH, Blocks.CRAFTING_TABLE)
-            ulv(ASSEMBLER, WORKBENCH)
-            ulv(ELECTRIC_FURNACE, Blocks.FURNACE)
-            ulv(ELECTRIC_CHEST, Blocks.CHEST)
-            ulv(ELECTRIC_TANK, "glass", "primary")
-            ulv(LOGISTIC_WORKER, Blocks.HOPPER)
-            ulv(getComponent("electric_buffer"), ulvCable)
+            ulv("stone_generator")
+            ulv("ore_analyzer")
+            ulv("ore_washer")
+            ulv("research_bench", Blocks.CRAFTING_TABLE)
+            ulv("assembler", WORKBENCH.get())
+            ulv("electric_furnace", Blocks.FURNACE)
+            ulv("electric_chest", Blocks.CHEST)
+            ulv("electric_tank", getMaterial("glass").tag("primary"))
+            ulv("logistic_worker", Blocks.HOPPER)
+            ulvComponent("electric_buffer", ulvCable)
 
             result(NETWORK_CONTROLLER.get()) {
                 pattern("VWV")
@@ -115,7 +108,7 @@ object MiscMachines {
                 define('V', circuit(Voltage.ULV))
                 toolTag(TOOL_WRENCH)
             }
-            result(STEAM_TURBINE.block(Voltage.ULV)) {
+            result(getMachine("steam_turbine").block(Voltage.ULV)) {
                 pattern("PVP").pattern("RHR").pattern("WVW")
                 define('P', "copper", "pipe")
                 define('R', "iron", "rotor")
@@ -132,7 +125,7 @@ object MiscMachines {
                 voltage(Voltage.ULV)
                 workTicks(MACHINE_TICKS)
             }
-            output(ALLOY_SMELTER) {
+            machine("alloy_smelter") {
                 input(ELECTRIC_FURNACE)
                 circuit(2)
                 component("cable", 4)
@@ -157,15 +150,10 @@ object MiscMachines {
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun ToolRecipeFactory.ulv(item: ItemLike, base: Any? = null, sub: String? = null) {
+    private fun ToolRecipeFactory.ulv(item: ItemLike, base: ItemLike) {
         result(item) {
             pattern("BBB").pattern("VHV").pattern("WVW")
-            when (base) {
-                is ItemLike -> define('B', base.asItem())
-                is TagKey<*> -> define('B', base as TagKey<Item>)
-                is String -> define('B', base, sub!!)
-            }
+            define('B', base.asItem())
             define('W', ulvCable)
             define('H', ulvHull)
             define('V', circuit(Voltage.ULV))
@@ -173,20 +161,32 @@ object MiscMachines {
         }
     }
 
-    private fun ToolRecipeFactory.ulv(machine: MachineSet, base: IEntry<out ItemLike>) {
-        ulv(machine.block(Voltage.ULV), base.get())
+    private fun ToolRecipeFactory.ulv(item: ItemLike, base: TagKey<Item>) {
+        result(item) {
+            pattern("BBB").pattern("VHV").pattern("WVW")
+            define('B', base)
+            define('W', ulvCable)
+            define('H', ulvHull)
+            define('V', circuit(Voltage.ULV))
+            toolTag(TOOL_WRENCH)
+        }
     }
 
-    private fun ToolRecipeFactory.ulv(machine: MachineSet, base: ItemLike) {
-        ulv(machine.block(Voltage.ULV), base)
+    private fun ToolRecipeFactory.ulv(name: String, base: ItemLike) {
+        ulv(getMachine(name).block(Voltage.ULV), base)
     }
 
-    private fun ToolRecipeFactory.ulv(machine: MachineSet, name: String, sub: String) {
-        ulv(machine.block(Voltage.ULV), name, sub)
+    private fun ToolRecipeFactory.ulv(name: String, base: TagKey<Item>) {
+        ulv(getMachine(name).block(Voltage.ULV), base)
     }
 
-    private fun ToolRecipeFactory.ulv(machine: Component, base: ItemLike) {
-        ulv(machine.item(Voltage.ULV), base)
+    private fun ToolRecipeFactory.ulv(name: String) {
+        val set = getMachine(name)
+        ulv(set.block(Voltage.ULV), set.block(Voltage.PRIMITIVE))
+    }
+
+    private fun ToolRecipeFactory.ulvComponent(name: String, base: ItemLike) {
+        ulv(getComponent(name).item(Voltage.ULV), base)
     }
 
     private fun vanillas() {

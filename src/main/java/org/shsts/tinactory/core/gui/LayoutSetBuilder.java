@@ -46,6 +46,12 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return this;
     }
 
+    public LayoutSetBuilder<P> slot(int port, SlotType type, int x, int y, Collection<Voltage> voltages) {
+        var slot = new Layout.SlotInfo(curSlot++, x, y, port, type);
+        slots.add(new SlotAndVoltages(slot, voltages));
+        return this;
+    }
+
     public LayoutSetBuilder<P> slot(int x, int y, Collection<Voltage> voltages) {
         assert curPort >= 0;
         var slot = new Layout.SlotInfo(curSlot++, x, y, curPort, curSlotType);
@@ -54,7 +60,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     }
 
     public LayoutSetBuilder<P> slot(int x, int y, Voltage fromVoltage) {
-        return slot(x, y, Voltage.between(fromVoltage, Voltage.MAXIMUM));
+        return slot(x, y, Voltage.between(fromVoltage, Voltage.MAX));
     }
 
     public LayoutSetBuilder<P> slot(int x, int y, Voltage fromVoltage, Voltage toVoltage) {
@@ -79,7 +85,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     }
 
     public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns, Voltage from) {
-        return slots(x, y, rows, columns, Voltage.between(from, Voltage.MAXIMUM));
+        return slots(x, y, rows, columns, Voltage.between(from, Voltage.MAX));
     }
 
     public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns, Voltage from, Voltage to) {
@@ -97,6 +103,11 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
 
     public LayoutSetBuilder<P> placeHolder(Rect rect) {
         return image(rect, VOID);
+    }
+
+    public LayoutSetBuilder<P> progressBar(Rect rect, Texture tex) {
+        progressBar = new Layout.WidgetInfo(rect, tex);
+        return this;
     }
 
     public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {
@@ -133,7 +144,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     }
 
     public Layout buildLayout() {
-        var slots = getSlots(Voltage.MAXIMUM);
+        var slots = getSlots(Voltage.MAX);
         return new Layout(slots, images, progressBar);
     }
 }

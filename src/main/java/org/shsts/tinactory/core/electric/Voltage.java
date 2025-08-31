@@ -1,9 +1,14 @@
 package org.shsts.tinactory.core.electric;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.util.GsonHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -13,7 +18,7 @@ public enum Voltage {
     PRIMITIVE(0, 0xFFFFFFFF), ULV(1, 0xFFC80000),
     LV(2, 0xFFDCDCDC), MV(3, 0xFFFF6400), HV(4, 0xFFFFFF1E),
     EV(5, 0xFF808080), IV(6, 0xFFF0F0F5), LuV(7, 0xFFE99797), ZPM(8, 0xFF7EC3C4),
-    MAXIMUM(15, 0xFFFFFFFF);
+    MAX(15, 0xFFFFFFFF);
 
     public final int rank;
     public final long value;
@@ -39,7 +44,7 @@ public enum Voltage {
                 return voltage;
             }
         }
-        return MAXIMUM;
+        return MAX;
     }
 
     public static Voltage fromRank(int rank) {
@@ -57,5 +62,29 @@ public enum Voltage {
 
     public String displayName() {
         return id.toUpperCase();
+    }
+
+    public static Collection<Voltage> parseJson(JsonObject jo, String field) {
+        if (!jo.has(field)) {
+            throw new JsonSyntaxException("Missing field " + field);
+        }
+        var je = jo.get(field);
+        if (je.isJsonArray()) {
+            var ret = new ArrayList<Voltage>();
+            for (var je1 : je.getAsJsonArray()) {
+                var v = Voltage.fromName(GsonHelper.convertToString(je1, field));
+                ret.add(v);
+            }
+            return ret;
+        } else if (je.isJsonPrimitive()) {
+            var str = GsonHelper.convertToString(je, field);
+            if (str.contains("-")) {
+                var fields = str.split("-");
+                return Voltage.between(Voltage.fromName(fields[0]), Voltage.fromName(fields[1]));
+            } else {
+                return List.of(Voltage.fromName(str));
+            }
+        }
+        throw new JsonSyntaxException("Cannot parse voltages from field " + field);
     }
 }

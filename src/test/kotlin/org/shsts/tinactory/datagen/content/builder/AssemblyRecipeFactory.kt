@@ -1,7 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.getComponent
-import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.datagen.content.component.item
@@ -31,8 +31,9 @@ class AssemblyRecipeFactory(
         }
     }
 
-    fun output(machine: MachineSet, voltage: Voltage = this.componentVoltage!!,
+    fun machine(name: String, voltage: Voltage = this.componentVoltage!!,
         block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        val machine = getMachine(name)
         if (!machine.hasVoltage(voltage)) {
             return
         }

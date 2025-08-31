@@ -1,6 +1,6 @@
 package org.shsts.tinactory.datagen.content
 
-import org.shsts.tinactory.content.AllBlockEntities
+import org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS
 import org.shsts.tinactory.content.AllTags.material
 import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.modLoc
@@ -60,7 +60,7 @@ object Markers {
 
     private fun trackJEICategory() {
         val allTypes = buildList {
-            for (set in AllBlockEntities.PROCESSING_SETS) {
+            for (set in PROCESSING_SETS) {
                 add(set.recipeType.loc())
             }
             add(modLoc("tool_crafting"))
@@ -74,8 +74,8 @@ object Markers {
             add(modLoc("pyrolyse_oven"))
         }
 
-        for (type in allTypes) {
-            dataGen {
+        dataGen {
+            for (type in allTypes) {
                 trackLang(RecipeCategory.categoryTitleId(type))
             }
         }

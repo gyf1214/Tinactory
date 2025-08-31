@@ -23,12 +23,11 @@ public class ComponentMeta extends MetaConsumer {
     }
 
     private void buildComponents(ResourceLocation loc, JsonObject jo) {
-        var ja = GsonHelper.getAsJsonArray(jo, "items");
         var tint = GsonHelper.getAsInt(jo, "voltageTint", -1);
         var components = new HashMap<Voltage, IEntry<Item>>();
         var name = loc.getPath();
-        for (var je : ja) {
-            var v = Voltage.fromName(GsonHelper.convertToString(je, "items"));
+        var voltages = Voltage.parseJson(jo, "items");
+        for (var v : voltages) {
             var id = "component/" + v.id + "/" + name;
             var builder = REGISTRATE.item(id);
             if (tint >= 0) {

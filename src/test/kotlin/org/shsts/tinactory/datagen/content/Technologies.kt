@@ -2,7 +2,7 @@ package org.shsts.tinactory.datagen.content
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllBlockEntities
+import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
@@ -65,7 +65,7 @@ object Technologies {
         Factory().apply {
             ALLOY_SMELTING = child("alloy_smelting") {
                 maxProgress(20)
-                displayItem(AllBlockEntities.ALLOY_SMELTER.entry(Voltage.ULV))
+                displayItem(getMachine("alloy_smelter").entry(Voltage.ULV))
             }
 
             SOLDERING = tech("soldering") {
@@ -210,8 +210,7 @@ object Technologies {
 
             ARC_FURNACE = tech("arc_furnace") {
                 maxProgress(30)
-                displayItem(AllBlockEntities.ARC_FURNACE.entry(
-                    Voltage.HV))
+                displayItem(getMachine("arc_furnace").entry(Voltage.HV))
             }
 
             base = ORGANIC_CHEMISTRY

@@ -1,10 +1,4 @@
 {
   "voltageTint": 1,
-  "items": [
-    "ulv",
-    "lv",
-    "mv",
-    "hv",
-    "ev"
-  ]
+  "items": "ulv-iv"
 }

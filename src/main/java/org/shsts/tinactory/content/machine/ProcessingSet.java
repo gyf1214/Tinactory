@@ -58,6 +58,14 @@ public class ProcessingSet extends MachineSet {
         this.recipeType = typeWrapper.type;
     }
 
+    public <R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>> ProcessingSet(
+        IRecipeType<B> type, Map<Voltage, Layout> layoutSet,
+        Map<Voltage, IEntry<? extends Block>> machines) {
+        super(layoutSet, machines);
+        this.typeWrapper = new RecipeTypeWrapper<>(type);
+        this.recipeType = type;
+    }
+
     public <T> T mapRecipeType(RecipeTypeFunction<T> func) {
         return typeWrapper.apply(func);
     }

@@ -15,7 +15,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.AllMultiblocks;
 import org.shsts.tinactory.content.AllRecipes;
@@ -57,6 +56,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.shsts.tinactory.Tinactory.CORE;
+import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @JeiPlugin
@@ -75,11 +75,11 @@ public class JEI implements IModPlugin {
         this.processingCategories = new HashMap<>();
 
         this.toolCategory = new ToolCategory();
-        for (var set : AllBlockEntities.getProcessingSets()) {
+        for (var set : PROCESSING_SETS) {
             var type = set.recipeType;
             var icon = set.icon();
             var layout = type == AllRecipes.CHEMICAL_REACTOR ? AllLayouts.LARGE_CHEMICAL_REACTOR :
-                set.layout(Voltage.MAXIMUM);
+                set.layout(Voltage.MAX);
 
             if (type == AllRecipes.RESEARCH_BENCH) {
                 addProcessingCategory(cast(type), new ResearchCategory(layout, icon));
