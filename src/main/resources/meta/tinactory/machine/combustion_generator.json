@@ -1,6 +1,6 @@
 {
   "recipe": "generator",
-  "voltages": "lv-iv",
+  "voltages": "lv-hv",
   "layout": {
     "slots": [
       {

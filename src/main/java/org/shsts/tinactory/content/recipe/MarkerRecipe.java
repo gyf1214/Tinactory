@@ -8,6 +8,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -17,7 +19,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MarkerRecipe extends ProcessingRecipe {
-    public final RecipeType<?> baseType;
+    private final RecipeType<?> baseType;
 
     private MarkerRecipe(BuilderBase<?, ?> builder, RecipeType<?> baseType) {
         super(builder);
@@ -27,6 +29,15 @@ public class MarkerRecipe extends ProcessingRecipe {
     @Override
     public Optional<String> getDescriptionId() {
         return Optional.of(getDescriptionId(loc));
+    }
+
+    @Override
+    public boolean matches(IMachine machine, Level world) {
+        return false;
+    }
+
+    public boolean matches(IRecipeType<?> type) {
+        return baseType == type.get();
     }
 
     public static class Builder extends BuilderBase<MarkerRecipe, Builder> {

@@ -86,7 +86,7 @@ public class MachineProcessor<R extends ProcessingRecipe>
         }
 
         var marker = manager.byLoc(MARKER, loc);
-        return marker.filter($ -> $.baseType == recipeType.get()).isPresent();
+        return marker.filter($ -> $.matches(recipeType)).isPresent();
     }
 
     @Override

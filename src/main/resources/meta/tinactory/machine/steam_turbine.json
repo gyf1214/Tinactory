@@ -1,6 +1,6 @@
 {
   "recipe": "generator",
-  "voltages": "ulv-iv",
+  "voltages": "ulv-hv",
   "layout": {
     "slots": [
       {

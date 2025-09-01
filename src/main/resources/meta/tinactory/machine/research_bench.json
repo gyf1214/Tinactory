@@ -10,6 +10,15 @@
         "y": 10
       }
     ],
+    "images": [
+      {
+        "texture": "tinactory:void",
+        "x": 54,
+        "y": 7,
+        "width": 24,
+        "height": 24
+      }
+    ],
     "progressBar": {
       "texture": "gregtech:gui/progress_bar/progress_bar_arrow_multiple",
       "x": 26,
