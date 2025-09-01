@@ -1,12 +1,8 @@
 package org.shsts.tinactory.core.gui;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -17,10 +13,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Texture.VOID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -124,10 +118,6 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return image(new Rect(x, y, tex.width(), tex.height()), tex);
     }
 
-    public LayoutSetBuilder<P> placeHolder(Rect rect) {
-        return image(rect, VOID);
-    }
-
     public LayoutSetBuilder<P> progressBar(Rect rect, Texture tex) {
         progressBar = new Layout.WidgetInfo(rect, tex);
         return this;
@@ -181,50 +171,5 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     public Layout buildLayout() {
         var slots = getSlots(Voltage.MAX);
         return new Layout(slots, images, progressBar);
-    }
-
-    private static void parseImage(JsonObject jo, int sh, BiConsumer<Rect, Texture> cons) {
-        var x = GsonHelper.getAsInt(jo, "x");
-        var y = GsonHelper.getAsInt(jo, "y");
-        var w = GsonHelper.getAsInt(jo, "width");
-        var h = GsonHelper.getAsInt(jo, "height");
-        var texLoc = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));
-        var tw = GsonHelper.getAsInt(jo, "textureWidth", w);
-        var th = GsonHelper.getAsInt(jo, "textureHeight", sh * h);
-        var tex = new Texture(texLoc, tw, th);
-        cons.accept(new Rect(x, y, w, h), tex);
-    }
-
-    public static LayoutSetBuilder<?> fromJson(JsonObject jo) {
-        var builder = Layout.builder();
-
-        var ja1 = GsonHelper.getAsJsonArray(jo, "slots");
-        for (var je1 : ja1) {
-            var jo1 = GsonHelper.convertToJsonObject(je1, "slots");
-            var port = GsonHelper.getAsInt(jo1, "port");
-            var type = SlotType.fromName(GsonHelper.getAsString(jo1, "type"));
-            var x = GsonHelper.getAsInt(jo1, "x");
-            var y = GsonHelper.getAsInt(jo1, "y");
-            Collection<Voltage> voltages;
-            if (jo1.has("voltages")) {
-                voltages = Voltage.parseJson(jo1, "voltages");
-            } else {
-                voltages = Arrays.asList(Voltage.values());
-            }
-            builder.slot(port, type, x, y, voltages);
-        }
-
-        var ja3 = GsonHelper.getAsJsonArray(jo, "images", new JsonArray());
-        for (var je3 : ja3) {
-            var jo2 = GsonHelper.convertToJsonObject(je3, "images");
-            parseImage(jo2, 1, builder::image);
-        }
-
-        if (jo.has("progressBar")) {
-            var jo3 = GsonHelper.getAsJsonObject(jo, "progressBar");
-            parseImage(jo3, 2, builder::progressBar);
-        }
-
-        return builder;
     }
 }

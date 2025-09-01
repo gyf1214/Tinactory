@@ -1,5 +1,6 @@
-package org.shsts.tinactory.core.machine;
+package org.shsts.tinactory.content.machine;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -7,10 +8,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
-import org.shsts.tinactory.content.machine.PrimitiveMachine;
-import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
@@ -24,6 +24,10 @@ import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
+import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.machine.Machine;
+import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -35,8 +39,11 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllBlockEntities.MACHINE_SETS;
@@ -51,27 +58,72 @@ public class MachineMeta extends MetaConsumer {
         super("Machine");
     }
 
-    private static class UnsupportedTypeException extends RuntimeException {
+    protected static class UnsupportedTypeException extends RuntimeException {
         public UnsupportedTypeException(String field, String value) {
             super("Unsupported " + field + ": " + value);
         }
     }
 
-    private static class Executor {
-        private final String id;
-        private final JsonObject jo;
+    protected static class Executor {
+        protected final String id;
+        protected final JsonObject jo;
 
-        private String recipeTypeStr;
-        private String machineType;
-        private String menuType;
+        protected String recipeTypeStr;
+        protected String machineType;
+        protected String menuType;
 
-        private IRecipeType<?> recipeType;
+        protected IRecipeType<?> recipeType;
         private IMenuType menu;
         private Map<Voltage, Layout> layoutSet;
 
         public Executor(ResourceLocation loc, JsonObject jo) {
             this.id = loc.getPath();
             this.jo = jo;
+        }
+
+        private void parseImage(JsonObject jo, int sh, BiConsumer<Rect, Texture> cons) {
+            var x = GsonHelper.getAsInt(jo, "x");
+            var y = GsonHelper.getAsInt(jo, "y");
+            var w = GsonHelper.getAsInt(jo, "width");
+            var h = GsonHelper.getAsInt(jo, "height");
+            var texLoc = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));
+            var tw = GsonHelper.getAsInt(jo, "textureWidth", w);
+            var th = GsonHelper.getAsInt(jo, "textureHeight", sh * h);
+            var tex = new Texture(texLoc, tw, th);
+            cons.accept(new Rect(x, y, w, h), tex);
+        }
+
+        protected LayoutSetBuilder<?> parseLayout(JsonObject jo) {
+            var builder = Layout.builder();
+
+            var ja1 = GsonHelper.getAsJsonArray(jo, "slots");
+            for (var je1 : ja1) {
+                var jo1 = GsonHelper.convertToJsonObject(je1, "slots");
+                var port = GsonHelper.getAsInt(jo1, "port");
+                var type = SlotType.fromName(GsonHelper.getAsString(jo1, "type"));
+                var x = GsonHelper.getAsInt(jo1, "x");
+                var y = GsonHelper.getAsInt(jo1, "y");
+                Collection<Voltage> voltages;
+                if (jo1.has("voltages")) {
+                    voltages = Voltage.parseJson(jo1, "voltages");
+                } else {
+                    voltages = Arrays.asList(Voltage.values());
+                }
+                builder.slot(port, type, x, y, voltages);
+            }
+
+            var ja3 = GsonHelper.getAsJsonArray(jo, "images", new JsonArray());
+            for (var je3 : ja3) {
+                var jo2 = GsonHelper.convertToJsonObject(je3, "images");
+                parseImage(jo2, 1, builder::image);
+            }
+
+            if (jo.has("progressBar")) {
+                var jo3 = GsonHelper.getAsJsonObject(jo, "progressBar");
+                parseImage(jo3, 2, builder::progressBar);
+            }
+
+            return builder;
         }
 
         private IRecipeType<ProcessingRecipe.Builder> processingRecipe(
@@ -82,7 +134,7 @@ public class MachineMeta extends MetaConsumer {
                 .register();
         }
 
-        private IRecipeType<?> getRecipeType() {
+        protected IRecipeType<?> getRecipeType() {
             return switch (recipeTypeStr) {
                 case "default" -> processingRecipe(ProcessingRecipe.Builder::new);
                 case "display_input" -> processingRecipe(DisplayInputRecipe::builder);
@@ -117,7 +169,7 @@ public class MachineMeta extends MetaConsumer {
         }
 
         @SuppressWarnings("unchecked")
-        private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> IRecipeType<B> recipeType() {
+        protected <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> IRecipeType<B> recipeType() {
             return (IRecipeType<B>) recipeType;
         }
 
@@ -190,13 +242,17 @@ public class MachineMeta extends MetaConsumer {
             return processing(v);
         }
 
-        public void run() {
+        protected void parseTypes() {
             recipeTypeStr = GsonHelper.getAsString(jo, "recipe", "default");
             menuType = GsonHelper.getAsString(jo, "menu", "default");
             machineType = GsonHelper.getAsString(jo, "machine", "default");
+        }
+
+        public void run() {
+            parseTypes();
 
             recipeType = getRecipeType();
-            layoutSet = LayoutSetBuilder.fromJson(GsonHelper.getAsJsonObject(jo, "layout")).buildObject();
+            layoutSet = parseLayout(GsonHelper.getAsJsonObject(jo, "layout")).buildObject();
             menu = getMenu();
 
             var machines = new HashMap<Voltage, IEntry<? extends Block>>();
@@ -210,10 +266,14 @@ public class MachineMeta extends MetaConsumer {
         }
     }
 
+    protected Executor getExecutor(ResourceLocation loc, JsonObject jo) {
+        return new Executor(loc, jo);
+    }
+
     @Override
     protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
         try {
-            new Executor(loc, jo).run();
+            getExecutor(loc, jo).run();
         } catch (UnsupportedTypeException ex) {
             LOGGER.debug("Skip unsupported type: " + loc, ex);
         }

@@ -3,9 +3,9 @@ package org.shsts.tinactory.content;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.content.electric.CircuitMeta;
+import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.material.ComponentMeta;
 import org.shsts.tinactory.content.material.MaterialMeta;
-import org.shsts.tinactory.core.machine.MachineMeta;
 import org.shsts.tinycorelib.api.meta.IMetaConsumer;
 
 import java.util.function.Supplier;
