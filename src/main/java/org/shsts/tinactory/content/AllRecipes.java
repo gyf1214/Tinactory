@@ -32,26 +32,9 @@ public final class AllRecipes {
     public static final IRecipeType<ResearchRecipe.Builder> RESEARCH_BENCH;
     public static final IRecipeType<AssemblyRecipe.Builder> ASSEMBLER;
     public static final IRecipeType<CleanRecipe.Builder> LASER_ENGRAVER;
-    public static final IRecipeType<ProcessingRecipe.Builder> CIRCUIT_ASSEMBLER;
     public static final IRecipeType<OreAnalyzerRecipe.Builder> ORE_ANALYZER;
-    public static final IRecipeType<ProcessingRecipe.Builder> MACERATOR;
-    public static final IRecipeType<ProcessingRecipe.Builder> ORE_WASHER;
-    public static final IRecipeType<ProcessingRecipe.Builder> CENTRIFUGE;
-    public static final IRecipeType<ProcessingRecipe.Builder> THERMAL_CENTRIFUGE;
     public static final IRecipeType<ProcessingRecipe.Builder> SIFTER;
-    public static final IRecipeType<ProcessingRecipe.Builder> ALLOY_SMELTER;
-    public static final IRecipeType<ProcessingRecipe.Builder> MIXER;
-    public static final IRecipeType<ProcessingRecipe.Builder> POLARIZER;
-    public static final IRecipeType<ProcessingRecipe.Builder> WIREMILL;
-    public static final IRecipeType<ProcessingRecipe.Builder> BENDER;
-    public static final IRecipeType<ProcessingRecipe.Builder> LATHE;
-    public static final IRecipeType<ProcessingRecipe.Builder> CUTTER;
-    public static final IRecipeType<ProcessingRecipe.Builder> EXTRUDER;
-    public static final IRecipeType<ProcessingRecipe.Builder> EXTRACTOR;
-    public static final IRecipeType<ProcessingRecipe.Builder> FLUID_SOLIDIFIER;
-    public static final IRecipeType<ProcessingRecipe.Builder> ELECTROLYZER;
     public static final IRecipeType<ChemicalReactorRecipe.Builder> CHEMICAL_REACTOR;
-    public static final IRecipeType<ProcessingRecipe.Builder> ARC_FURNACE;
     public static final IRecipeType<ProcessingRecipe.Builder> STEAM_TURBINE;
     public static final IRecipeType<ProcessingRecipe.Builder> GAS_TURBINE;
     public static final IRecipeType<ProcessingRecipe.Builder> COMBUSTION_GENERATOR;
@@ -84,36 +67,18 @@ public final class AllRecipes {
             .serializer(CleanRecipe.SERIALIZER)
             .register();
 
-        CIRCUIT_ASSEMBLER = processing("circuit_assembler");
-
         ORE_ANALYZER = REGISTRATE.recipeType("ore_analyzer", OreAnalyzerRecipe.Builder::new)
             .recipeClass(OreAnalyzerRecipe.class)
             .serializer(OreAnalyzerRecipe.SERIALIZER)
             .register();
 
-        MACERATOR = displayInput("macerator");
-        ORE_WASHER = displayInput("ore_washer");
-        CENTRIFUGE = displayInput("centrifuge");
-        THERMAL_CENTRIFUGE = displayInput("thermal_centrifuge");
         SIFTER = displayInput("sifter");
-        ALLOY_SMELTER = processing("alloy_smelter");
-        MIXER = processing("mixer");
-        POLARIZER = processing("polarizer");
-        WIREMILL = processing("wiremill");
-        BENDER = processing("bender");
-        LATHE = processing("lathe");
-        CUTTER = processing("cutter");
-        EXTRUDER = processing("extruder");
-        EXTRACTOR = displayInput("extractor");
-        FLUID_SOLIDIFIER = processing("fluid_solidifier");
-        ELECTROLYZER = displayInput("electrolyzer");
 
         CHEMICAL_REACTOR = REGISTRATE.recipeType("chemical_reactor", ChemicalReactorRecipe.Builder::new)
             .recipeClass(ChemicalReactorRecipe.class)
             .serializer(ChemicalReactorRecipe.SERIALIZER)
             .register();
 
-        ARC_FURNACE = processing("arc_furnace");
         STEAM_TURBINE = processing("steam_turbine", GeneratorRecipe::builder);
         GAS_TURBINE = processing("gas_turbine", GeneratorRecipe::builder);
         COMBUSTION_GENERATOR = processing("combustion_generator", GeneratorRecipe::builder);

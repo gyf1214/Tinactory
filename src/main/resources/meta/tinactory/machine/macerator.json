@@ -1,0 +1,71 @@
+{
+  "recipe": "displayInput",
+  "menu": "markerWithNormal",
+  "voltages": "lv-iv",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 10,
+        "voltages": "lv-hv"
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 10,
+        "voltages": "mv-hv"
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 10,
+        "voltages": "hv-hv"
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 1,
+        "voltages": "ev-max"
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 1,
+        "voltages": "ev-max"
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 19,
+        "voltages": "ev-max"
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 19,
+        "voltages": "ev-max"
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_macerate",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  }
+}

@@ -20,6 +20,8 @@ import static org.shsts.tinactory.core.gui.Texture.VOID;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
+//    private static final Logger LOGGER = LogUtils.getLogger();
+
     private record SlotAndVoltages(Layout.SlotInfo slot, Collection<Voltage> voltages) {}
 
     private final List<Layout.WidgetInfo> images = new ArrayList<>();
@@ -56,6 +58,22 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         assert curPort >= 0;
         var slot = new Layout.SlotInfo(curSlot++, x, y, curPort, curSlotType);
         slots.add(new SlotAndVoltages(slot, voltages));
+
+        /*
+        var jo = new JsonObject();
+        var minV = voltages.stream().min(Comparator.comparing(v -> v.rank)).orElseThrow();
+        var maxV = voltages.stream().max(Comparator.comparing(v -> v.rank)).orElseThrow();
+        jo.addProperty("port", curPort);
+        jo.addProperty("type", curSlotType.name().toLowerCase());
+        jo.addProperty("x", x);
+        jo.addProperty("y", y);
+        if (minV != Voltage.PRIMITIVE || maxV != Voltage.MAX) {
+            jo.addProperty("voltages", minV.id + "-" + maxV.id);
+        }
+        var gson = new Gson();
+        LOGGER.debug("layout: {}", gson.toJson(jo));
+        */
+
         return this;
     }
 
@@ -112,6 +130,18 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
 
     public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {
         progressBar = new Layout.WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
+
+        /*
+        var jo = new JsonObject();
+        jo.addProperty("texture", tex.loc().toString());
+        jo.addProperty("x", x);
+        jo.addProperty("y", y);
+        jo.addProperty("width", tex.width());
+        jo.addProperty("height", tex.height() / 2);
+        var gson = new Gson();
+        LOGGER.debug("progressBar: {}", gson.toJson(jo));
+        */
+
         return this;
     }
 
