@@ -279,7 +279,7 @@ public final class AllMultiblocks {
 
         LARGE_CHEMICAL_REACTOR = multiblock("large_chemical_reactor")
             .blockEntity()
-            .child(Multiblock.simple(AllRecipes.CHEMICAL_REACTOR, false))
+            .child(Multiblock.simple(REGISTRATE.getRecipeType("chemical_reactor"), false))
             .layout(AllLayouts.LARGE_CHEMICAL_REACTOR)
             .appearanceBlock(INERT_PTFE_CASING)
             .spec()

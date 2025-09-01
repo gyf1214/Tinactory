@@ -22,12 +22,14 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
+import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.integration.jei.category.AssemblyCategory;
 import org.shsts.tinactory.integration.jei.category.BlastFurnaceCategory;
 import org.shsts.tinactory.integration.jei.category.ChemicalReactorCategory;
@@ -78,12 +80,12 @@ public class JEI implements IModPlugin {
         for (var set : PROCESSING_SETS) {
             var type = set.recipeType;
             var icon = set.icon();
-            var layout = type == AllRecipes.CHEMICAL_REACTOR ? AllLayouts.LARGE_CHEMICAL_REACTOR :
-                set.layout(Voltage.MAX);
+            var layout = ChemicalReactorRecipe.class.isAssignableFrom(type.recipeClass()) ?
+                AllLayouts.LARGE_CHEMICAL_REACTOR : set.layout(Voltage.MAX);
 
-            if (type == AllRecipes.RESEARCH_BENCH) {
-                addProcessingCategory(cast(type), new ResearchCategory(layout, icon));
-            } else if (type == AllRecipes.CHEMICAL_REACTOR) {
+            if (ResearchRecipe.class.isAssignableFrom(type.recipeClass())) {
+                addProcessingCategory(cast(type), new ResearchCategory(cast(type), layout, icon));
+            } else if (ChemicalReactorRecipe.class.isAssignableFrom(type.recipeClass())) {
                 addProcessingCategory(cast(type), new ChemicalReactorCategory(cast(type), layout, icon));
             } else if (AssemblyRecipe.class.isAssignableFrom(type.recipeClass())) {
                 addProcessingCategory(cast(type), new AssemblyCategory<>(cast(type), layout, icon));

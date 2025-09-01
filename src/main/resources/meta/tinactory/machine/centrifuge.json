@@ -1,6 +1,6 @@
 {
-  "recipe": "displayInput",
-  "menu": "markerWithNormal",
+  "recipe": "display_input",
+  "menu": "marker_with_normal",
   "voltages": "lv-iv",
   "layout": {
     "slots": [

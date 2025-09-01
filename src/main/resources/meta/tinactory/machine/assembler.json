@@ -1,6 +1,7 @@
 {
+  "recipe": "assembly",
   "machine": "no_auto_recipe",
-  "voltages": "lv-iv",
+  "voltages": "ulv-iv",
   "layout": {
     "slots": [
       {
@@ -40,8 +41,14 @@
         "y": 19
       },
       {
-        "port": 1,
-        "type": "fluid_input",
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 37
+      },
+      {
+        "port": 0,
+        "type": "item_input",
         "x": 18,
         "y": 37
       },
@@ -56,16 +63,10 @@
         "type": "item_output",
         "x": 90,
         "y": 19
-      },
-      {
-        "port": 3,
-        "type": "fluid_output",
-        "x": 108,
-        "y": 19
       }
     ],
     "progressBar": {
-      "texture": "gregtech:gui/progress_bar/progress_bar_mixer",
+      "texture": "gregtech:gui/progress_bar/progress_bar_circuit",
       "x": 62,
       "y": 18,
       "width": 20,

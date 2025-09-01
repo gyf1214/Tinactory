@@ -1,5 +1,5 @@
 {
-  "recipe": "displayInput",
+  "recipe": "display_input",
   "voltages": "lv-iv",
   "layout": {
     "slots": [

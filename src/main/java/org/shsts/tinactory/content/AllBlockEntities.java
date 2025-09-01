@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content;
 
-import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
@@ -13,7 +12,6 @@ import org.shsts.tinactory.content.machine.ElectricTank;
 import org.shsts.tinactory.content.machine.MEDriver;
 import org.shsts.tinactory.content.machine.MEStorageInterface;
 import org.shsts.tinactory.content.machine.MachineSet;
-import org.shsts.tinactory.content.machine.PrimitiveMachine;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.material.ComponentBuilder;
@@ -22,25 +20,18 @@ import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.network.NetworkController;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.core.Transformer;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
-import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
-import static org.shsts.tinactory.api.logistics.SlotType.FLUID_OUTPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
 import static org.shsts.tinactory.content.AllItems.COMPONENTS;
@@ -49,26 +40,11 @@ import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.PROGRESS_ARROW;
-import static org.shsts.tinactory.core.gui.Texture.PROGRESS_CIRCUIT;
-import static org.shsts.tinactory.core.gui.Texture.PROGRESS_GAS;
-import static org.shsts.tinactory.core.gui.Texture.PROGRESS_MIXER;
-import static org.shsts.tinactory.core.gui.Texture.PROGRESS_MULTIPLE;
-import static org.shsts.tinactory.core.gui.Texture.PROGRESS_SIFT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllBlockEntities {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    public static final ProcessingSet RESEARCH_BENCH;
-    public static final ProcessingSet ASSEMBLER;
-    public static final ProcessingSet LASER_ENGRAVER;
-    public static final ProcessingSet ORE_ANALYZER;
     public static final MachineSet ELECTRIC_FURNACE;
-    public static final ProcessingSet CHEMICAL_REACTOR;
-    public static final ProcessingSet STEAM_TURBINE;
-    public static final ProcessingSet GAS_TURBINE;
-    public static final ProcessingSet COMBUSTION_GENERATOR;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
@@ -91,59 +67,6 @@ public final class AllBlockEntities {
 
         var set = new SetFactory();
 
-        RESEARCH_BENCH = set.processing(AllRecipes.RESEARCH_BENCH)
-            .menu(AllMenus.RESEARCH_BENCH)
-            .voltages(Voltage.ULV)
-            .layoutSet()
-            .port(ITEM_INPUT)
-            .slot(0, 1 + SLOT_SIZE / 2)
-            .placeHolder(new Rect(3 * SLOT_SIZE, SLOT_SIZE / 2 - 2, 24, 24))
-            .progressBar(PROGRESS_MULTIPLE, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-            .build()
-            .buildObject();
-
-        ASSEMBLER = set.processing(AllRecipes.ASSEMBLER)
-            .processor(RecipeProcessor::noAutoRecipe)
-            .voltages(Voltage.ULV)
-            .layoutSet()
-            .port(ITEM_INPUT)
-            .slots(0, 1, 2, 3)
-            .slots(0, 1 + SLOT_SIZE * 2, 1, 2)
-            .port(FLUID_INPUT)
-            .slot(SLOT_SIZE * 2, 1 + SLOT_SIZE * 2)
-            .port(ITEM_OUTPUT)
-            .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE)
-            .progressBar(PROGRESS_CIRCUIT, 8 + SLOT_SIZE * 3, SLOT_SIZE)
-            .build()
-            .buildObject();
-
-        LASER_ENGRAVER = set.processing(AllRecipes.LASER_ENGRAVER)
-            .layoutSet()
-            .port(ITEM_INPUT)
-            .slot(0, 1 + SLOT_SIZE / 2)
-            .port(ITEM_INPUT)
-            .slot(SLOT_SIZE, 1 + SLOT_SIZE / 2)
-            .port(ITEM_OUTPUT)
-            .slot(SLOT_SIZE * 4, 1 + SLOT_SIZE / 2)
-            .progressBar(PROGRESS_ARROW, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
-            .build()
-            .buildObject();
-
-        ORE_ANALYZER = set.processing(AllRecipes.ORE_ANALYZER)
-            .processor($ -> RecipeProcessor::oreProcessor)
-            .menu(AllMenus.MARKER)
-            .voltages(Voltage.ULV)
-            .layoutSet()
-            .port(ITEM_INPUT)
-            .slot(0, 1 + SLOT_SIZE / 2)
-            .port(ITEM_OUTPUT)
-            .slots(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2, 1, 2, Voltage.PRIMITIVE, Voltage.ULV)
-            .slot(SLOT_SIZE * 5, 1 + SLOT_SIZE / 2, List.of(Voltage.ULV))
-            .slots(SLOT_SIZE * 3, 1, 2, 3, Voltage.LV)
-            .progressBar(PROGRESS_SIFT, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-            .build()
-            .buildObject();
-
         ELECTRIC_FURNACE = set.machine("electric_furnace")
             .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::factory)
             .menu(AllMenus.ELECTRIC_FURNACE)
@@ -152,54 +75,6 @@ public final class AllBlockEntities {
             .tintVoltage(2)
             .voltages(Voltage.ULV)
             .transform(simpleLayout(PROGRESS_ARROW))
-            .buildObject();
-
-        CHEMICAL_REACTOR = set.processing(AllRecipes.CHEMICAL_REACTOR)
-            .processor(RecipeProcessor::noAutoRecipe)
-            .voltages(Voltage.MV)
-            .layoutSet()
-            .port(ITEM_INPUT)
-            .slots(0, 1, 1, 2)
-            .port(FLUID_INPUT)
-            .slots(0, 1 + SLOT_SIZE, 1, 2)
-            .port(ITEM_OUTPUT)
-            .slots(SLOT_SIZE * 4, 1, 1, 2)
-            .port(FLUID_OUTPUT)
-            .slots(SLOT_SIZE * 4, 1 + SLOT_SIZE, 1, 2)
-            .progressBar(PROGRESS_MIXER, 8 + SLOT_SIZE * 2, SLOT_SIZE / 2)
-            .build()
-            .buildObject();
-
-        STEAM_TURBINE = set.processing(AllRecipes.STEAM_TURBINE)
-            .processor(RecipeProcessor::generator)
-            .voltages(Voltage.ULV, Voltage.HV)
-            .layoutSet()
-            .port(FLUID_INPUT)
-            .slot(0, 1 + SLOT_SIZE / 2)
-            .port(FLUID_OUTPUT)
-            .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-            .progressBar(PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-            .build()
-            .buildObject();
-
-        GAS_TURBINE = set.processing(AllRecipes.GAS_TURBINE)
-            .processor(RecipeProcessor::generator)
-            .voltages(Voltage.LV, Voltage.HV)
-            .layoutSet()
-            .port(FLUID_INPUT)
-            .slot(0, 1 + SLOT_SIZE / 2)
-            .progressBar(PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-            .build()
-            .buildObject();
-
-        COMBUSTION_GENERATOR = set.processing(AllRecipes.COMBUSTION_GENERATOR)
-            .processor(RecipeProcessor::generator)
-            .voltages(Voltage.LV, Voltage.HV)
-            .layoutSet()
-            .port(FLUID_INPUT)
-            .slot(0, 1 + SLOT_SIZE / 2)
-            .progressBar(PROGRESS_GAS, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-            .build()
             .buildObject();
 
         LOW_PRESSURE_BOILER = boiler("low", 5d);
@@ -309,8 +184,6 @@ public final class AllBlockEntities {
             .end()
             .buildObject();
 
-        primitive(ORE_ANALYZER);
-
         // TODO: make it a MachineSet without any layout
         COMPONENTS.put("multiblock_interface", MULTIBLOCK_INTERFACE);
     }
@@ -327,35 +200,6 @@ public final class AllBlockEntities {
             return MachineSet.builder(this)
                 .onCreateObject($ -> MACHINE_SETS.put(id, $));
         }
-
-        public <R extends ProcessingRecipe, B extends IRecipeBuilder<R, B>> ProcessingSet.Builder<R,
-            B, SetFactory> processing(IRecipeType<B> recipeType) {
-            LOGGER.debug("processing {}", recipeType.id());
-            return ProcessingSet.builder(this, recipeType)
-                .tintVoltage(2)
-                .onCreateObject($ -> {
-                    var id = recipeType.id();
-                    PROCESSING_SETS.add($);
-                    MACHINE_SETS.put(id, $);
-                    LOGGER.debug("end processing");
-                });
-        }
-    }
-
-    private static void primitive(ProcessingSet set) {
-        var id = "primitive/" + set.recipeType.id();
-        var layout = set.layout(Voltage.PRIMITIVE);
-        var block = BlockEntityBuilder.builder(set, id, PrimitiveBlock::new)
-            .menu(AllMenus.PRIMITIVE_MACHINE)
-            .blockEntity()
-            .transform(PrimitiveMachine::factory)
-            .transform(set.mapRecipeType(RecipeProcessor::machine))
-            .transform(StackProcessingContainer.factory(layout))
-            .end()
-            .translucent()
-            .buildObject();
-        set.voltages.add(Voltage.PRIMITIVE);
-        set.machines.put(Voltage.PRIMITIVE, block);
     }
 
     private static IEntry<MachineBlock> boiler(String name, double burnSpeed) {

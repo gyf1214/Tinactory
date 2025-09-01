@@ -22,10 +22,10 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.electric.GeneratorProcessor;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
-import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
 import org.shsts.tinactory.content.multiblock.CoilProcessor;
 import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
+import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -93,9 +93,9 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         return $ -> $.capability(ID, be -> new MachineProcessor<>(be, type, false));
     }
 
-    public static <P> IBlockEntityTypeBuilder<P> oreProcessor(
-        IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, OreAnalyzerProcessor::new);
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> oreAnalyzer(
+        IRecipeType<OreAnalyzerRecipe.Builder> type) {
+        return $ -> $.capability(ID, be -> new MachineProcessor<>(be, type, false));
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> generator(

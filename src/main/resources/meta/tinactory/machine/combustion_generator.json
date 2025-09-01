@@ -1,5 +1,5 @@
 {
-  "machine": "no_auto_recipe",
+  "recipe": "generator",
   "voltages": "lv-iv",
   "layout": {
     "slots": [
@@ -8,16 +8,10 @@
         "type": "fluid_input",
         "x": 0,
         "y": 10
-      },
-      {
-        "port": 1,
-        "type": "item_output",
-        "x": 54,
-        "y": 10
       }
     ],
     "progressBar": {
-      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "texture": "gregtech:gui/progress_bar/progress_bar_gas_collector",
       "x": 26,
       "y": 9,
       "width": 20,

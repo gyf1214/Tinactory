@@ -1,7 +1,6 @@
 {
-  "recipe": "display_input",
-  "menu": "marker_with_normal",
-  "voltages": "lv-iv",
+  "recipe": "ore_analyzer",
+  "voltages": "primitive-iv",
   "layout": {
     "slots": [
       {
@@ -15,53 +14,67 @@
         "type": "item_output",
         "x": 54,
         "y": 10,
-        "voltages": "lv-hv"
+        "voltages": "primitive-ulv"
       },
       {
         "port": 1,
         "type": "item_output",
         "x": 72,
         "y": 10,
-        "voltages": "mv-hv"
+        "voltages": "primitive-ulv"
       },
       {
         "port": 1,
         "type": "item_output",
         "x": 90,
         "y": 10,
-        "voltages": "hv-hv"
+        "voltages": "ulv-ulv"
       },
       {
         "port": 1,
         "type": "item_output",
         "x": 54,
         "y": 1,
-        "voltages": "ev-max"
+        "voltages": "lv-max"
       },
       {
         "port": 1,
         "type": "item_output",
         "x": 72,
         "y": 1,
-        "voltages": "ev-max"
+        "voltages": "lv-max"
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 1,
+        "voltages": "lv-max"
       },
       {
         "port": 1,
         "type": "item_output",
         "x": 54,
         "y": 19,
-        "voltages": "ev-max"
+        "voltages": "lv-max"
       },
       {
         "port": 1,
         "type": "item_output",
         "x": 72,
         "y": 19,
-        "voltages": "ev-max"
+        "voltages": "lv-max"
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 19,
+        "voltages": "lv-max"
       }
     ],
     "progressBar": {
-      "texture": "gregtech:gui/progress_bar/progress_bar_macerate",
+      "texture": "gregtech:gui/progress_bar/progress_bar_sift",
       "x": 26,
       "y": 9,
       "width": 20,

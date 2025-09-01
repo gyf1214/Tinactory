@@ -1,5 +1,5 @@
 {
-  "machine": "noAutoRecipe",
+  "machine": "no_auto_recipe",
   "voltages": "lv-iv",
   "layout": {
     "slots": [

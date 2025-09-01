@@ -1,29 +1,23 @@
 {
-  "recipe": "display_input",
-  "voltages": "lv-iv",
+  "recipe": "generator",
+  "voltages": "ulv-iv",
   "layout": {
     "slots": [
       {
         "port": 0,
-        "type": "item_input",
+        "type": "fluid_input",
         "x": 0,
         "y": 10
       },
       {
         "port": 1,
-        "type": "item_output",
-        "x": 54,
-        "y": 10
-      },
-      {
-        "port": 2,
         "type": "fluid_output",
-        "x": 72,
+        "x": 54,
         "y": 10
       }
     ],
     "progressBar": {
-      "texture": "gregtech:gui/progress_bar/progress_bar_extract",
+      "texture": "gregtech:gui/progress_bar/progress_bar_gas_collector",
       "x": 26,
       "y": 9,
       "width": 20,
