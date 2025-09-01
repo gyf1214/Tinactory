@@ -1,4 +1,5 @@
 {
+  "machine": "noAutoRecipe",
   "voltages": "ulv-iv",
   "layout": {
     "slots": [
