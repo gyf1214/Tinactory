@@ -1,12 +1,10 @@
 package org.shsts.tinactory.content;
 
-import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinycorelib.api.core.Transformer;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +22,12 @@ import static org.shsts.tinactory.core.gui.Texture.PROGRESS_CLEANROOM;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllLayouts {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     public static final Layout WORKBENCH;
     public static final Layout BOILER;
     public static final List<Layout> DISTILLATION_TOWER;
     public static final Layout CLEANROOM;
 
     static {
-        LOGGER.debug("init all layouts");
-
         WORKBENCH = Layout.builder()
             .dummySlot(9 + 6 * SLOT_SIZE, SLOT_SIZE)
             .image(16 + 4 * SLOT_SIZE, 20, CRAFTING_ARROW)
@@ -59,8 +53,6 @@ public final class AllLayouts {
         CLEANROOM = Layout.builder()
             .progressBar(PROGRESS_CLEANROOM, 0, SLOT_SIZE / 2)
             .buildLayout();
-
-        LOGGER.debug("finish all layouts");
     }
 
     private static Layout distillationLayout(int slots) {
