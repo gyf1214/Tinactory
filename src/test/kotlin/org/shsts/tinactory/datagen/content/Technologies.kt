@@ -174,7 +174,7 @@ object Technologies {
 
             PYROLYSE_OVEN = tech("pyrolyse_oven") {
                 maxProgress(40)
-                displayItem(AllMultiblocks.PYROLYSE_OVEN.get())
+                displayItem(getMultiblock("pyrolyse_oven").block)
             }
 
             OIL_PROCESSING = tech("oil_processing") {
@@ -223,9 +223,8 @@ object Technologies {
 
             ADVANCED_CHEMISTRY = tech("advanced_chemistry") {
                 maxProgress(60)
-                displayItem(AllMultiblocks.LARGE_CHEMICAL_REACTOR)
+                displayItem(getMultiblock("large_chemical_reactor").block)
             }
-
         }
     }
 

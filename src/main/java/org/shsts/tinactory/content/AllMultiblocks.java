@@ -16,10 +16,12 @@ import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,12 +32,12 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
+import static org.shsts.tinactory.core.util.LocHelper.name;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMultiblocks {
     public static final Map<String, MultiblockSet> MULTIBLOCK_SETS;
-    public static final IEntry<PrimitiveBlock> BLAST_FURNACE;
     public static final IEntry<PrimitiveBlock> SIFTER;
     public static final IEntry<PrimitiveBlock> AUTOFARM;
     public static final IEntry<PrimitiveBlock> VACUUM_FREEZER;
@@ -98,31 +100,6 @@ public final class AllMultiblocks {
         PTFE_PIPE_CASING = misc("ptfe_pipe_casing");
 
         MULTIBLOCK_SETS = new HashMap<>();
-
-        BLAST_FURNACE = multiblock("blast_furnace")
-            .blockEntity()
-            .transform(RecipeProcessor::blastFurnace)
-            .child(Multiblock.builder(CoilMultiblock::new))
-            .layout(AllLayouts.BLAST_FURNACE)
-            .appearanceBlock(HEATPROOF_CASING)
-            .spec()
-            .layer()
-            .row('B', 3, 2)
-            .row("B$B").build()
-            .layer().height(2)
-            .row("CCC")
-            .row("CAC")
-            .row("CCC").build()
-            .layer()
-            .row('T', 3, 3).build()
-            .blockOrInterface('B', HEATPROOF_CASING)
-            .block('T', HEATPROOF_CASING)
-            .tagWithSameBlock('C', "coil", AllTags.COIL)
-            .air('A')
-            .build()
-            .build()
-            .end()
-            .buildObject();
 
         SIFTER = multiblock("sifter")
             .blockEntity()
@@ -306,6 +283,14 @@ public final class AllMultiblocks {
             .build()
             .end()
             .buildObject();
+
+        add(AllRecipes.SIFTER, AllLayouts.SIFTER, SIFTER);
+        add(AllRecipes.AUTOFARM, AllLayouts.AUTOFARM, AUTOFARM);
+        add(AllRecipes.VACUUM_FREEZER, AllLayouts.VACUUM_FREEZER, VACUUM_FREEZER);
+        add(AllRecipes.DISTILLATION, Layout.EMPTY, DISTILLATION_TOWER);
+        add(AllRecipes.PYROLYSE_OVEN, AllLayouts.PYROLYSE_OVEN, PYROLYSE_OVEN);
+        add(REGISTRATE.getRecipeType("chemical_reactor"), AllLayouts.LARGE_CHEMICAL_REACTOR,
+            LARGE_CHEMICAL_REACTOR);
     }
 
     private static BlockEntityBuilder<PrimitiveBlock, ?> multiblock(String name) {
@@ -333,6 +318,11 @@ public final class AllMultiblocks {
         return REGISTRATE.block("multiblock/misc/" + name, Block::new)
             .properties(CASING_PROPERTY)
             .register();
+    }
+
+    private static void add(IRecipeType<?> recipeType, Layout layout, IEntry<? extends Block> block) {
+        var name = name(block.id(), -1);
+        MULTIBLOCK_SETS.put(name, new MultiblockSet(recipeType, layout, block));
     }
 
     public static MultiblockSet getMultiblock(String name) {

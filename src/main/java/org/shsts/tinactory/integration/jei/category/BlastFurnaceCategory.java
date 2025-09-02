@@ -3,10 +3,11 @@ package org.shsts.tinactory.integration.jei.category;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.content.AllLayouts;
-import org.shsts.tinactory.content.AllMultiblocks;
-import org.shsts.tinactory.content.AllRecipes;
+import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
+import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
@@ -15,8 +16,10 @@ import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BlastFurnaceCategory extends ProcessingCategory<BlastFurnaceRecipe> {
-    public BlastFurnaceCategory() {
-        super(AllRecipes.BLAST_FURNACE, AllLayouts.BLAST_FURNACE, AllMultiblocks.BLAST_FURNACE.get());
+
+    public BlastFurnaceCategory(IRecipeType<? extends IRecipeBuilderBase<BlastFurnaceRecipe>> recipeType,
+        Layout layout, Block icon) {
+        super(recipeType, layout, icon);
     }
 
     @Override

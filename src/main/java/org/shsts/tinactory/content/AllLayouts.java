@@ -1,10 +1,12 @@
 package org.shsts.tinactory.content;
 
+import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinycorelib.api.core.Transformer;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,8 @@ import static org.shsts.tinactory.core.gui.Texture.PROGRESS_SIFT;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllLayouts {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     public static final Layout WORKBENCH;
     public static final Layout BOILER;
     public static final Layout BLAST_FURNACE;
@@ -38,6 +42,8 @@ public final class AllLayouts {
     public static final Layout LARGE_CHEMICAL_REACTOR;
 
     static {
+        LOGGER.debug("init all layouts");
+
         WORKBENCH = Layout.builder()
             .dummySlot(9 + 6 * SLOT_SIZE, SLOT_SIZE)
             .image(16 + 4 * SLOT_SIZE, 20, CRAFTING_ARROW)
@@ -131,6 +137,8 @@ public final class AllLayouts {
             .slots(SLOT_SIZE * 5, 1 + SLOT_SIZE, 2, 2)
             .progressBar(PROGRESS_MIXER, 8 + SLOT_SIZE * 3, SLOT_SIZE)
             .buildLayout();
+
+        LOGGER.debug("finish all layouts");
     }
 
     private static Layout distillationLayout(int slots) {

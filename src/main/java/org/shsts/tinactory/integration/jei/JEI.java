@@ -16,18 +16,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllLayouts;
-import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
+import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
+import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.integration.jei.category.AssemblyCategory;
 import org.shsts.tinactory.integration.jei.category.BlastFurnaceCategory;
@@ -70,38 +70,52 @@ public class JEI implements IModPlugin {
     public final ToolCategory toolCategory;
 
     private final List<RecipeCategory<?>> categories;
-    private final Map<IRecipeType<?>, RecipeCategory<?>> processingCategories;
+    private final Map<ResourceLocation, RecipeCategory<?>> processingCategories;
 
     public JEI() {
         this.categories = new ArrayList<>();
         this.processingCategories = new HashMap<>();
 
         this.toolCategory = new ToolCategory();
+        categories.add(toolCategory);
+
         for (var set : PROCESSING_SETS) {
             var type = set.recipeType;
             var icon = set.icon();
-            var layout = ChemicalReactorRecipe.class.isAssignableFrom(type.recipeClass()) ?
+            var clazz = type.recipeClass();
+            var layout = ChemicalReactorRecipe.class.isAssignableFrom(clazz) ?
                 AllLayouts.LARGE_CHEMICAL_REACTOR : set.layout(Voltage.MAX);
 
-            if (ResearchRecipe.class.isAssignableFrom(type.recipeClass())) {
-                addProcessingCategory(cast(type), new ResearchCategory(cast(type), layout, icon));
-            } else if (ChemicalReactorRecipe.class.isAssignableFrom(type.recipeClass())) {
-                addProcessingCategory(cast(type), new ChemicalReactorCategory(cast(type), layout, icon));
-            } else if (AssemblyRecipe.class.isAssignableFrom(type.recipeClass())) {
-                addProcessingCategory(cast(type), new AssemblyCategory<>(cast(type), layout, icon));
-            } else if (CleanRecipe.class.isAssignableFrom(type.recipeClass())) {
-                addProcessingCategory(cast(type), new CleanCategory(cast(type), layout, icon));
+            if (ResearchRecipe.class.isAssignableFrom(clazz)) {
+                addProcessingCategory(type, new ResearchCategory(cast(type), layout, icon));
+            } else if (ChemicalReactorRecipe.class.isAssignableFrom(clazz)) {
+                addProcessingCategory(type, new ChemicalReactorCategory(cast(type), layout, icon));
+            } else if (AssemblyRecipe.class.isAssignableFrom(clazz)) {
+                addProcessingCategory(type, new AssemblyCategory<>(cast(type), layout, icon));
+            } else if (CleanRecipe.class.isAssignableFrom(clazz)) {
+                addProcessingCategory(type, new CleanCategory(cast(type), layout, icon));
             } else {
-                addProcessingCategory(cast(type), layout, icon);
+                addProcessingCategory(type, layout, icon);
             }
         }
 
         for (var set : MULTIBLOCK_SETS.values()) {
-            addProcessingCategory(cast(set.recipeType()), set.layout(), set.block().get());
-        }
+            var type = set.recipeType();
+            var clazz = type.recipeClass();
+            var layout = set.layout();
+            var icon = set.block().get();
+            if (processingCategories.containsKey(type.loc())) {
+                continue;
+            }
 
-        addProcessingCategory(AllRecipes.BLAST_FURNACE, new BlastFurnaceCategory());
-        addProcessingCategory(AllRecipes.DISTILLATION, new DistillationCategory());
+            if (BlastFurnaceRecipe.class.isAssignableFrom(clazz)) {
+                addProcessingCategory(type, new BlastFurnaceCategory(cast(type), layout, icon));
+            } else if (DistillationRecipe.class.isAssignableFrom(clazz)) {
+                addProcessingCategory(type, new DistillationCategory(cast(type), icon));
+            } else {
+                addProcessingCategory(type, layout, icon);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -110,20 +124,18 @@ public class JEI implements IModPlugin {
         return (IRecipeType<B>) type;
     }
 
-    private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(
-        IRecipeType<B> recipeType, ProcessingCategory<R> category) {
+    private void addProcessingCategory(IRecipeType<?> recipeType, ProcessingCategory<?> category) {
         categories.add(category);
-        processingCategories.put(recipeType, category);
+        processingCategories.put(recipeType.loc(), category);
     }
 
-    private <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> void addProcessingCategory(
-        IRecipeType<B> recipeType, Layout layout, Block icon) {
-        var category = new ProcessingCategory<>(recipeType, layout, icon);
+    private void addProcessingCategory(IRecipeType<?> recipeType, Layout layout, Block icon) {
+        var category = new ProcessingCategory<>(cast(recipeType), layout, icon);
         addProcessingCategory(recipeType, category);
     }
 
     public Optional<RecipeCategory<?>> processingCategory(IRecipeType<?> recipeType) {
-        return Optional.ofNullable(processingCategories.get(recipeType));
+        return Optional.ofNullable(processingCategories.get(recipeType.loc()));
     }
 
     @Override
@@ -139,7 +151,6 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
-        toolCategory.registerCategory(registration);
         for (var category : categories) {
             category.registerCategory(registration);
         }
@@ -148,7 +159,6 @@ public class JEI implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         var recipeManager = CORE.clientRecipeManager();
-        toolCategory.registerRecipes(registration, recipeManager);
         for (var category : categories) {
             category.registerRecipes(registration, recipeManager);
         }
@@ -156,7 +166,6 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        toolCategory.registerCatalysts(registration);
         for (var category : categories) {
             category.registerCatalysts(registration);
         }

@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -37,7 +38,7 @@ public class MultiblockMeta extends MachineMeta {
             var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
             switch (recipeTypeStr) {
                 case "blast_furnace" -> {
-                    return builder.transform(RecipeProcessor::blastFurnace)
+                    return builder.transform(RecipeProcessor.blastFurnace(recipeType()))
                         .child(Multiblock.builder(CoilMultiblock::new));
                 }
                 case "distillation" -> {
@@ -107,17 +108,17 @@ public class MultiblockMeta extends MachineMeta {
 
         private <P> Transformer<MultiblockSpec.Builder<P>> parseDefine(Character ch, JsonElement je) {
             if (je.isJsonPrimitive() && je.getAsJsonPrimitive().isString()) {
-                var block = BLOCKS.getEntry(new ResourceLocation(je.getAsString()));
-                return $ -> $.block(ch, block);
+                var s = je.getAsString();
+                if (s.equals("air")) {
+                    return $ -> $.air(ch);
+                } else {
+                    return $ -> $.block(ch, BLOCKS.getEntry(new ResourceLocation(s)));
+                }
             }
 
             var jo = GsonHelper.convertToJsonObject(je, "defines");
             var type = GsonHelper.getAsString(jo, "type");
             switch (type) {
-                case "block" -> {
-                    var loc = new ResourceLocation(GsonHelper.getAsString(jo, "block"));
-                    return $ -> $.block(ch, BLOCKS.getEntry(loc));
-                }
                 case "block_or_interface" -> {
                     var loc = new ResourceLocation(GsonHelper.getAsString(jo, "block"));
                     return $ -> $.blockOrInterface(ch, BLOCKS.getEntry(loc));
@@ -130,9 +131,6 @@ public class MultiblockMeta extends MachineMeta {
                     var tag = new ResourceLocation(GsonHelper.getAsString(jo, "tag"));
                     var key = GsonHelper.getAsString(jo, "key");
                     return $ -> $.tagWithSameBlock(ch, key, AllTags.block(tag));
-                }
-                case "air" -> {
-                    return $ -> $.air(ch);
                 }
             }
             throw new UnsupportedTypeException("defines", type);
@@ -160,7 +158,7 @@ public class MultiblockMeta extends MachineMeta {
             parseTypes();
 
             recipeType = getRecipeType();
-            var layout = parseLayout().buildLayout();
+            var layout = jo.has("layout") ? parseLayout().buildLayout() : Layout.EMPTY;
 
             var appearance = new ResourceLocation(GsonHelper.getAsString(jo, "appearance"));
             var block = BlockEntityBuilder.builder("multiblock/" + id, PrimitiveBlock::new)

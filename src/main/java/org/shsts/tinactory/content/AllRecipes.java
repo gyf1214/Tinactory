@@ -9,7 +9,6 @@ import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
@@ -24,7 +23,6 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public final class AllRecipes {
     public static final IRecipeType<ToolRecipe.Builder> TOOL_CRAFTING;
     public static final IRecipeType<ProcessingRecipe.Builder> SIFTER;
-    public static final IRecipeType<BlastFurnaceRecipe.Builder> BLAST_FURNACE;
     public static final IRecipeType<ProcessingRecipe.Builder> VACUUM_FREEZER;
     public static final IRecipeType<ProcessingRecipe.Builder> DISTILLATION;
     public static final IRecipeType<ProcessingRecipe.Builder> AUTOFARM;
@@ -39,11 +37,6 @@ public final class AllRecipes {
             .register();
 
         SIFTER = displayInput("sifter");
-
-        BLAST_FURNACE = REGISTRATE.recipeType("blast_furnace", BlastFurnaceRecipe.Builder::new)
-            .recipeClass(BlastFurnaceRecipe.class)
-            .serializer(BlastFurnaceRecipe.SERIALIZER)
-            .register();
 
         VACUUM_FREEZER = processing("vacuum_freezer");
         DISTILLATION = processing("distillation", DistillationRecipe::builder);

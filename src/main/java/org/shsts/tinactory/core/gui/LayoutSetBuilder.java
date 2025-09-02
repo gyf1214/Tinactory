@@ -1,15 +1,20 @@
 package org.shsts.tinactory.core.gui;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +24,7 @@ import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
-//    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private record SlotAndVoltages(Layout.SlotInfo slot, Collection<Voltage> voltages) {}
 
@@ -33,6 +38,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
 
     public LayoutSetBuilder(P parent) {
         super(parent);
+        LOGGER.debug("start build layout");
     }
 
     public LayoutSetBuilder<P> dummySlot(int x, int y) {
@@ -58,7 +64,6 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         var slot = new Layout.SlotInfo(curSlot++, x, y, curPort, curSlotType);
         slots.add(new SlotAndVoltages(slot, voltages));
 
-        /*
         var jo = new JsonObject();
         var minV = voltages.stream().min(Comparator.comparing(v -> v.rank)).orElseThrow();
         var maxV = voltages.stream().max(Comparator.comparing(v -> v.rank)).orElseThrow();
@@ -71,7 +76,6 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         }
         var gson = new Gson();
         LOGGER.debug("layout: {}", gson.toJson(jo));
-        */
 
         return this;
     }
@@ -126,7 +130,6 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {
         progressBar = new Layout.WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
 
-        /*
         var jo = new JsonObject();
         jo.addProperty("texture", tex.loc().toString());
         jo.addProperty("x", x);
@@ -135,7 +138,6 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         jo.addProperty("height", tex.height() / 2);
         var gson = new Gson();
         LOGGER.debug("progressBar: {}", gson.toJson(jo));
-        */
 
         return this;
     }
@@ -169,6 +171,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     }
 
     public Layout buildLayout() {
+        LOGGER.debug("end build layout");
         var slots = getSlots(Voltage.MAX);
         return new Layout(slots, images, progressBar);
     }

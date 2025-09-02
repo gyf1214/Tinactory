@@ -243,7 +243,7 @@ object Multiblocks {
             multiblock("sifter", "solid_steel", "blast_furnace")
             multiblock("autofarm", "solid_steel", "blast_furnace")
             multiblock("vacuum_freezer", "frost_proof")
-            multiblock("distillation", "clean_stainless_steel", "distillation_tower")
+            multiblock("distillation_tower", "clean_stainless_steel")
             block(CLEANROOM) {
                 machineModel {
                     casing("casings/cleanroom/plascrete")
@@ -251,17 +251,18 @@ object Multiblocks {
                 }
             }
             multiblock("pyrolyse_oven", "heatproof")
-            multiblock("chemical_reactor", "inert_ptfe", "large_chemical_reactor")
+            multiblock("large_chemical_reactor", "inert_ptfe")
         }
     }
 
     private fun BlockDataFactory.multiblock(type: String, casing: String, overlay: String = type) {
-        block(getMultiblock(type).block) {
+        val set = getMultiblock(type)
+        block(set.block) {
             machineModel {
                 casing("casings/solid/machine_casing_$casing")
                 overlay("multiblock/$overlay")
             }
-            itemTag(machine(type))
+            itemTag(machine(set.recipeType))
         }
     }
 
@@ -343,7 +344,7 @@ object Multiblocks {
                 input("stainless_steel", "plate", 4)
                 tech(Technologies.DISTILLATION)
             }
-            multiblock("cleanroom") {
+            output(CLEANROOM.get()) {
                 input(PLASCRETE.get())
                 circuit(3)
                 component("electric_motor", 2)

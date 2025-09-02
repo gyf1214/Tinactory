@@ -26,6 +26,7 @@ import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
 import org.shsts.tinactory.content.multiblock.BlastFurnaceProcessor;
 import org.shsts.tinactory.content.multiblock.CoilProcessor;
 import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
+import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.multiblock.Multiblock;
@@ -126,9 +127,9 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         });
     }
 
-    public static <P> IBlockEntityTypeBuilder<P> blastFurnace(
-        IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, BlastFurnaceProcessor::new);
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> blastFurnace(
+        IRecipeType<BlastFurnaceRecipe.Builder> type) {
+        return $ -> $.capability(ID, be -> new BlastFurnaceProcessor(be, type));
     }
 
     protected Level getWorld() {
