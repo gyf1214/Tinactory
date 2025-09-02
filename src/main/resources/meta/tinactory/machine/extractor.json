@@ -1,0 +1,33 @@
+{
+  "recipe": "display_input",
+  "voltages": "lv-iv",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "fluid_output",
+        "x": 72,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_extract",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  }
+}

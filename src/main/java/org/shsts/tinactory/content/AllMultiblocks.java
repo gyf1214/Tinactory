@@ -7,38 +7,37 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
-import net.minecraftforge.common.Tags;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
-import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
+import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
+import static org.shsts.tinactory.core.util.LocHelper.name;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMultiblocks {
-    public static final IEntry<PrimitiveBlock> BLAST_FURNACE;
-    public static final IEntry<PrimitiveBlock> SIFTER;
-    public static final IEntry<PrimitiveBlock> AUTOFARM;
-    public static final IEntry<PrimitiveBlock> VACUUM_FREEZER;
+    public static final Map<String, MultiblockSet> MULTIBLOCK_SETS;
     public static final IEntry<PrimitiveBlock> DISTILLATION_TOWER;
-    public static final IEntry<PrimitiveBlock> PYROLYSE_OVEN;
     public static final IEntry<FixedBlock> CLEANROOM;
-    public static final IEntry<PrimitiveBlock> LARGE_CHEMICAL_REACTOR;
 
     // solid blocks
     public static final Set<IEntry<Block>> SOLID_CASINGS;
@@ -93,125 +92,14 @@ public final class AllMultiblocks {
         FILTER_CASING = misc("filter_casing");
         PTFE_PIPE_CASING = misc("ptfe_pipe_casing");
 
-        BLAST_FURNACE = multiblock("blast_furnace")
-            .blockEntity()
-            .transform(RecipeProcessor::blastFurnace)
-            .child(Multiblock.builder(CoilMultiblock::new))
-            .layout(AllLayouts.BLAST_FURNACE)
-            .appearanceBlock(HEATPROOF_CASING)
-            .spec()
-            .layer()
-            .row('B', 3, 2)
-            .row("B$B").build()
-            .layer().height(2)
-            .row("CCC")
-            .row("CAC")
-            .row("CCC").build()
-            .layer()
-            .row('T', 3, 3).build()
-            .blockOrInterface('B', HEATPROOF_CASING)
-            .block('T', HEATPROOF_CASING)
-            .sameBlockWithTag('C', "coil", AllTags.COIL)
-            .air('A')
-            .build()
-            .build()
-            .end()
-            .buildObject();
-
-        SIFTER = multiblock("sifter")
-            .blockEntity()
-            .child(Multiblock.simple(AllRecipes.SIFTER, true))
-            .layout(AllLayouts.SIFTER)
-            .appearanceBlock(SOLID_STEEL_CASING)
-            .spec()
-            .layer()
-            .empty()
-            .row(" BBB ", 3)
-            .empty().build()
-            .layer()
-            .empty()
-            .row(" CCC ")
-            .row(" CAC ")
-            .row(" CCC ")
-            .empty().build()
-            .layer()
-            .row(" CCC ")
-            .row("CAAAC", 3)
-            .row(" CCC ").build()
-            .layer()
-            .row(" CCC ")
-            .row("CGGGC", 3)
-            .row(" C$C ").build()
-            .layer()
-            .row(" CCC ")
-            .row("CGGGC", 3)
-            .row(" CCC ").build()
-            .blockOrInterface('B', SOLID_STEEL_CASING)
-            .block('C', SOLID_STEEL_CASING)
-            .block('G', GRATE_MACHINE_CASING)
-            .air('A')
-            .build()
-            .build()
-            .end()
-            .buildObject();
-
-        AUTOFARM = multiblock("autofarm")
-            .blockEntity()
-            .child(Multiblock.simple(AllRecipes.AUTOFARM, true))
-            .layout(AllLayouts.AUTOFARM)
-            .appearanceBlock(SOLID_STEEL_CASING)
-            .spec()
-            .layer()
-            .row("BBBBB")
-            .row("BDDDB", 3)
-            .row("BB$BB").build()
-            .layer().height(2)
-            .row("CWWWC")
-            .row("WAAAW", 3)
-            .row("CWWWC").build()
-            .layer()
-            .row("CCCCC")
-            .row("CGGGC", 3)
-            .row("CCCCC").build()
-            .blockOrInterface('B', SOLID_STEEL_CASING)
-            .block('D', AUTOFARM_BASE)
-            .block('C', SOLID_STEEL_CASING)
-            .tag('G', Tags.Blocks.GLASS)
-            .checkBlock('W', block -> block.is(Tags.Blocks.GLASS) || block.is(SOLID_STEEL_CASING.get()))
-            .air('A')
-            .build()
-            .build()
-            .end()
-            .buildObject();
-
-        VACUUM_FREEZER = multiblock("vacuum_freezer")
-            .blockEntity()
-            .child(Multiblock.simple(AllRecipes.VACUUM_FREEZER, true))
-            .layout(AllLayouts.VACUUM_FREEZER)
-            .appearanceBlock(FROST_PROOF_CASING)
-            .spec()
-            .layer()
-            .row('B', 3, 2)
-            .row("B$B").build()
-            .layer()
-            .row("CCC")
-            .row("CAC")
-            .row("CCC").build()
-            .layer()
-            .row('C', 3, 3).build()
-            .blockOrInterface('B', FROST_PROOF_CASING)
-            .block('C', FROST_PROOF_CASING)
-            .air('A')
-            .build()
-            .build()
-            .end()
-            .buildObject();
+        MULTIBLOCK_SETS = new HashMap<>();
 
         DISTILLATION_TOWER = multiblock("distillation_tower")
             .blockEntity()
             .transform(RecipeProcessor.multiblock(AllRecipes.DISTILLATION, true))
             .child(Multiblock.builder(DistillationTower::new))
             .appearanceBlock(CLEAN_STAINLESS_CASING)
+            .layout(Layout.EMPTY)
             .spec()
             .layer()
             .row('B', 3, 2)
@@ -224,34 +112,6 @@ public final class AllMultiblocks {
             .row('C', 3, 3).build()
             .blockOrInterface('B', CLEAN_STAINLESS_CASING)
             .block('C', CLEAN_STAINLESS_CASING)
-            .air('A')
-            .build()
-            .build()
-            .end()
-            .buildObject();
-
-        PYROLYSE_OVEN = multiblock("pyrolyse_oven")
-            .blockEntity()
-            .transform(RecipeProcessor.coil(AllRecipes.PYROLYSE_OVEN, false, 1500))
-            .child(Multiblock.builder(CoilMultiblock::new))
-            .layout(AllLayouts.PYROLYSE_OVEN)
-            .appearanceBlock(HEATPROOF_CASING)
-            .spec()
-            .layer()
-            .row("TTT")
-            .row("CCC")
-            .row("BBB").build()
-            .layer()
-            .row("TTT")
-            .row("CAC")
-            .row("B$B").build()
-            .layer()
-            .row("TTT")
-            .row("CCC")
-            .row("BBB").build()
-            .blockOrInterface('B', HEATPROOF_CASING)
-            .block('T', HEATPROOF_CASING)
-            .sameBlockWithTag('C', "coil", AllTags.COIL)
             .air('A')
             .build()
             .build()
@@ -277,29 +137,7 @@ public final class AllMultiblocks {
             .end()
             .buildObject();
 
-        LARGE_CHEMICAL_REACTOR = multiblock("large_chemical_reactor")
-            .blockEntity()
-            .child(Multiblock.simple(AllRecipes.CHEMICAL_REACTOR, false))
-            .layout(AllLayouts.LARGE_CHEMICAL_REACTOR)
-            .appearanceBlock(INERT_PTFE_CASING)
-            .spec()
-            .layer()
-            .row("BBB")
-            .row("BCB")
-            .row("BBB").build()
-            .layer()
-            .row("BBB")
-            .row("BPB")
-            .row("B$B").build()
-            .layer()
-            .row('B', 3, 3).build()
-            .blockOrInterface('B', INERT_PTFE_CASING)
-            .sameBlockWithTag('C', "coil", AllTags.COIL)
-            .block('P', PTFE_PIPE_CASING)
-            .build()
-            .build()
-            .end()
-            .buildObject();
+        add(AllRecipes.DISTILLATION, Layout.EMPTY, DISTILLATION_TOWER);
     }
 
     private static BlockEntityBuilder<PrimitiveBlock, ?> multiblock(String name) {
@@ -327,6 +165,15 @@ public final class AllMultiblocks {
         return REGISTRATE.block("multiblock/misc/" + name, Block::new)
             .properties(CASING_PROPERTY)
             .register();
+    }
+
+    private static void add(IRecipeType<?> recipeType, Layout layout, IEntry<? extends Block> block) {
+        var name = name(block.id(), -1);
+        MULTIBLOCK_SETS.put(name, new MultiblockSet(recipeType, layout, block));
+    }
+
+    public static MultiblockSet getMultiblock(String name) {
+        return MULTIBLOCK_SETS.get(name);
     }
 
     public static void init() {}

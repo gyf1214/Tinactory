@@ -1,18 +1,13 @@
 package org.shsts.tinactory.datagen.content.component
 
+import net.minecraft.world.item.Item
 import org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER
-import org.shsts.tinactory.content.AllItems.BATTERY
-import org.shsts.tinactory.content.AllItems.BUZZSAW
-import org.shsts.tinactory.content.AllItems.CABLE
-import org.shsts.tinactory.content.AllItems.COMPONENT_ITEMS
 import org.shsts.tinactory.content.AllItems.FERTILIZER
-import org.shsts.tinactory.content.AllItems.FLUID_CELL
 import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
 import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.MACHINE_HULL
-import org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT
+import org.shsts.tinactory.content.AllItems.getComponentEntry
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
 import org.shsts.tinactory.content.electric.CircuitComponentTier
@@ -28,6 +23,8 @@ import org.shsts.tinactory.content.electric.Circuits.allCircuitComponents
 import org.shsts.tinactory.content.electric.Circuits.allCircuits
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
+import org.shsts.tinactory.content.network.CableBlock
+import org.shsts.tinactory.content.tool.BatteryItem
 import org.shsts.tinactory.core.electric.Voltage.ULV
 import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.name
@@ -52,7 +49,7 @@ object Components {
     }
 
     private fun components() {
-        for (entry in CABLE.values) {
+        for (entry in getComponentEntry<CableBlock>("cable").values) {
             blockData(entry) {
                 blockState(Models::cableBlock)
                 itemModel(Models::cableItem)
@@ -61,29 +58,38 @@ object Components {
         }
 
         itemData {
-            for (entry in COMPONENT_ITEMS) {
+            val components = listOf(
+                "electric_motor",
+                "electric_pump",
+                "electric_piston",
+                "conveyor_module",
+                "robot_arm",
+                "sensor",
+                "emitter",
+                "field_generator")
+            for (entry in components.flatMap { getComponentEntry<Item>(it).values }) {
                 item(entry) { model(Models::componentItem) }
             }
 
-            for ((v, entry) in BATTERY) {
+            for ((v, entry) in getComponentEntry<BatteryItem>("battery")) {
                 item(entry) {
                     model(Models::batteryItem)
                     tag(AllTags.battery(v))
                 }
             }
 
-            for ((v, entry) in MACHINE_HULL) {
+            for ((v, entry) in getComponentEntry<Item>("machine_hull")) {
                 item(entry) { model(machineItem(v, IO_TEX)) }
             }
 
-            for (entry in RESEARCH_EQUIPMENT.values) {
+            for (entry in getComponentEntry<Item>("research_equipment").values) {
                 item(entry) { model(basicItem("${RESEARCH_TEX}base", "${RESEARCH_TEX}overlay")) }
             }
 
             item(GOOD_GRINDER) { model(basicItem("$GRINDER_TEX.diamond")) }
             item(ADVANCED_GRINDER) { model(basicItem("$GRINDER_TEX.tungsten")) }
 
-            for (entry in BUZZSAW.values) {
+            for (entry in getComponentEntry<Item>("buzzsaw").values) {
                 item(entry) { model(basicItem("tools/buzzsaw")) }
             }
 
@@ -190,7 +196,7 @@ object Components {
 
     private fun tools() {
         itemData {
-            for ((v, entry) in FLUID_CELL) {
+            for ((v, entry) in getComponentEntry<Item>("fluid_cell")) {
                 val texKey = if (v == ULV) {
                     "metaitems/fluid_cell"
                 } else {

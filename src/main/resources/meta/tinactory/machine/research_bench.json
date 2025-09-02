@@ -1,0 +1,30 @@
+{
+  "recipe": "research",
+  "voltages": "ulv-iv",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      }
+    ],
+    "images": [
+      {
+        "texture": "tinactory:void",
+        "x": 54,
+        "y": 7,
+        "width": 24,
+        "height": 24
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_arrow_multiple",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  }
+}

@@ -267,7 +267,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
             });
         }
 
-        public Builder<P> sameBlockWithTag(char ch, String key, TagKey<Block> tag) {
+        public Builder<P> tagWithSameBlock(char ch, String key, TagKey<Block> tag) {
             return check(ch, (ctx, pos) -> {
                 var block1 = ctx.getBlock(pos);
                 if (block1.isEmpty() || !block1.get().is(tag)) {

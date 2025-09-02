@@ -1,0 +1,70 @@
+{
+  "machine": "coil",
+  "baseTemperature": 1500,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 10
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_extract",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/heatproof",
+  "layers": [
+    [
+      "TTT",
+      "CCC",
+      "BBB"
+    ],
+    [
+      "TTT",
+      "CAC",
+      "B$B"
+    ],
+    [
+      "TTT",
+      "CCC",
+      "BBB"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/heatproof"
+    },
+    "T": "tinactory:multiblock/solid/heatproof",
+    "C": {
+      "type": "tag_with_same_block",
+      "key": "coil",
+      "tag": "tinactory:multiblock/coil"
+    },
+    "A": "air"
+  }
+}

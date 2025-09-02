@@ -7,10 +7,11 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Collections;
 
@@ -22,8 +23,10 @@ import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
-    public ResearchCategory(Layout layout, Block icon) {
-        super(AllRecipes.RESEARCH_BENCH, layout, icon);
+    public ResearchCategory(
+        IRecipeType<? extends IRecipeBuilderBase<ResearchRecipe>> recipeType,
+        Layout layout, Block icon) {
+        super(recipeType, layout, icon);
     }
 
     @Override

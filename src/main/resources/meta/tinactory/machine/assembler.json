@@ -1,0 +1,76 @@
+{
+  "recipe": "assembly",
+  "machine": "no_auto_recipe",
+  "voltages": "ulv-iv",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 19
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 19
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 19
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 37
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 36,
+        "y": 37
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 19
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_circuit",
+      "x": 62,
+      "y": 18,
+      "width": 20,
+      "height": 20
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "recipe": "display_input",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 19
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_sift",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/solid_steel",
+  "layers": [
+    [
+      "     ",
+      " BBB ",
+      " BBB ",
+      " BBB ",
+      "     "
+    ],
+    [
+      "     ",
+      " CCC ",
+      " CAC ",
+      " CCC ",
+      "     "
+    ],
+    [
+      " CCC ",
+      "CAAAC",
+      "CAAAC",
+      "CAAAC",
+      " CCC "
+    ],
+    [
+      " CCC ",
+      "CGGGC",
+      "CGGGC",
+      "CGGGC",
+      " C$C "
+    ],
+    [
+      " CCC ",
+      "CGGGC",
+      "CGGGC",
+      "CGGGC",
+      " CCC "
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/solid_steel"
+    },
+    "C": "tinactory:multiblock/solid/solid_steel",
+    "G": "tinactory:multiblock/misc/grate_machine_casing",
+    "A": "air"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_input",
+        "x": 36,
+        "y": 10
+      },
+      {
+        "port": 3,
+        "type": "item_output",
+        "x": 90,
+        "y": 1
+      },
+      {
+        "port": 3,
+        "type": "item_output",
+        "x": 108,
+        "y": 1
+      },
+      {
+        "port": 3,
+        "type": "item_output",
+        "x": 90,
+        "y": 19
+      },
+      {
+        "port": 3,
+        "type": "item_output",
+        "x": 108,
+        "y": 19
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_recycler",
+      "x": 62,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/solid_steel",
+  "layers": [
+    [
+      "BBBBB",
+      "BDDDB",
+      "BDDDB",
+      "BDDDB",
+      "BB$BB"
+    ],
+    [
+      "CWWWC",
+      "WAAAW",
+      "WAAAW",
+      "WAAAW",
+      "CWWWC"
+    ],
+    [
+      "CWWWC",
+      "WAAAW",
+      "WAAAW",
+      "WAAAW",
+      "CWWWC"
+    ],
+    [
+      "CCCCC",
+      "CGGGC",
+      "CGGGC",
+      "CGGGC",
+      "CCCCC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/solid_steel"
+    },
+    "D": "tinactory:multiblock/misc/autofarm_base",
+    "C": "tinactory:multiblock/solid/solid_steel",
+    "G": {
+      "type": "tag",
+      "tag": "forge:glass"
+    },
+    "W": {
+      "type": "tag_or_block",
+      "tag": "forge:glass",
+      "block": "tinactory:multiblock/solid/solid_steel"
+    },
+    "A": "air"
+  }
+}

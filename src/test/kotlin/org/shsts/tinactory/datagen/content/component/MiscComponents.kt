@@ -2,15 +2,10 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW
-import org.shsts.tinactory.content.AllItems.CABLE
-import org.shsts.tinactory.content.AllItems.ELECTRIC_MOTOR
-import org.shsts.tinactory.content.AllItems.ELECTRIC_PUMP
-import org.shsts.tinactory.content.AllItems.FLUID_CELL
 import org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW
 import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
-import org.shsts.tinactory.content.AllItems.MACHINE_HULL
-import org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT
+import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
@@ -71,33 +66,34 @@ object MiscComponents {
         }
 
         research(Voltage.LV) {
-            input(ELECTRIC_MOTOR.item(Voltage.LV))
+            input(getComponent("electric_motor").item(Voltage.LV))
             input("steel", "gear")
         }
 
         research(Voltage.MV) {
-            input(ELECTRIC_PUMP.item(Voltage.MV))
+            input(getComponent("electric_pump").item(Voltage.MV))
             input(circuitBoard(CircuitTier.CPU).get())
         }
     }
 
     private fun ulv() {
+        val cable = getComponent("cable").item(Voltage.ULV)
+
         vanilla {
             shapeless(getMaterial("iron").tag("wire"),
-                CABLE.item(Voltage.ULV),
-                fromAmount = 4, criteria = "has_wire")
+                cable, fromAmount = 4, criteria = "has_wire")
         }
 
         toolCrafting {
-            result(MACHINE_HULL.item(Voltage.ULV)) {
+            result(getComponent("machine_hull").item(Voltage.ULV)) {
                 pattern("###")
                 pattern("#W#")
                 pattern("###")
                 define('#', "iron", "plate")
-                define('W', CABLE.item(Voltage.ULV))
+                define('W', cable)
                 toolTag(TOOL_WRENCH)
             }
-            result(FLUID_CELL.item(Voltage.ULV)) {
+            result(getComponent("fluid_cell").item(Voltage.ULV)) {
                 pattern("###")
                 pattern("#G#")
                 pattern(" # ")
@@ -114,7 +110,7 @@ object MiscComponents {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.SOLDERING)
             }
-            output(FLUID_CELL) {
+            component("fluid_cell") {
                 input("iron", "plate", 4)
                 input("glass", "primary")
                 input("soldering_alloy")
@@ -128,7 +124,7 @@ object MiscComponents {
 
     private fun research(voltage: Voltage, block: AssemblyRecipeBuilder.() -> Unit) {
         assembler {
-            output(RESEARCH_EQUIPMENT.item(voltage)) {
+            output(getComponent("research_equipment").item(voltage)) {
                 voltage(voltage)
                 workTicks(200)
                 block()

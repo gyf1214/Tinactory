@@ -2,17 +2,19 @@ package org.shsts.tinactory.integration.jei.category;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.AllLayouts;
-import org.shsts.tinactory.content.AllMultiblocks;
-import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DistillationCategory extends ProcessingCategory<ProcessingRecipe> {
-    public DistillationCategory() {
-        super(AllRecipes.DISTILLATION, AllLayouts.DISTILLATION_TOWER.get(5),
-            AllMultiblocks.DISTILLATION_TOWER.get());
+
+    public DistillationCategory(
+        IRecipeType<? extends IRecipeBuilderBase<ProcessingRecipe>> recipeType, Block icon) {
+        super(recipeType, AllLayouts.DISTILLATION_TOWER.get(5), icon);
     }
 
     @Override

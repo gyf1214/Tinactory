@@ -35,13 +35,17 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public class MachineSet {
     public final Set<Voltage> voltages;
     protected final Map<Voltage, Layout> layoutSet;
-    protected final Map<Voltage, IEntry<? extends Block>> machines;
+    public final Map<Voltage, IEntry<? extends Block>> machines;
 
     public MachineSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
         Map<Voltage, IEntry<? extends Block>> machines) {
         this.layoutSet = layoutSet;
         this.machines = machines;
         this.voltages = new HashSet<>(voltages);
+    }
+
+    public MachineSet(Map<Voltage, Layout> layoutSet, Map<Voltage, IEntry<? extends Block>> machines) {
+        this(machines.keySet(), layoutSet, machines);
     }
 
     public boolean hasVoltage(Voltage voltage) {

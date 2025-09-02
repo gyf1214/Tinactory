@@ -52,7 +52,7 @@ public final class AllTags {
         return TagKey.create(Registry.ITEM_REGISTRY, loc);
     }
 
-    public static TagKey<Item> modItem(String id) {
+    private static TagKey<Item> modItem(String id) {
         return item(modLoc(id));
     }
 
@@ -80,11 +80,7 @@ public final class AllTags {
         return modItem(tier.getName(component));
     }
 
-    public static TagKey<Item> machine(String id) {
-        return extend(MACHINE, id);
-    }
-
     public static TagKey<Item> machine(IRecipeType<?> recipeType) {
-        return machine(recipeType.id());
+        return extend(MACHINE, recipeType.id());
     }
 }

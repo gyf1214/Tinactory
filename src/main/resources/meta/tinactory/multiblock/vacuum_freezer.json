@@ -1,0 +1,63 @@
+{
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 10
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/frost_proof",
+  "layers": [
+    [
+      "BBB",
+      "BBB",
+      "B$B"
+    ],
+    [
+      "CCC",
+      "CAC",
+      "CCC"
+    ],
+    [
+      "CCC",
+      "CCC",
+      "CCC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/frost_proof"
+    },
+    "C": "tinactory:multiblock/solid/frost_proof",
+    "A": "air"
+  }
+}

@@ -3,53 +3,19 @@ package org.shsts.tinactory.datagen.content.machine
 import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.level.block.Block
-import org.shsts.tinactory.content.AllBlockEntities.ALLOY_SMELTER
-import org.shsts.tinactory.content.AllBlockEntities.ARC_FURNACE
-import org.shsts.tinactory.content.AllBlockEntities.ASSEMBLER
-import org.shsts.tinactory.content.AllBlockEntities.BATTERY_BOX
-import org.shsts.tinactory.content.AllBlockEntities.BENDER
-import org.shsts.tinactory.content.AllBlockEntities.CENTRIFUGE
-import org.shsts.tinactory.content.AllBlockEntities.CHEMICAL_REACTOR
-import org.shsts.tinactory.content.AllBlockEntities.CIRCUIT_ASSEMBLER
-import org.shsts.tinactory.content.AllBlockEntities.COMBUSTION_GENERATOR
-import org.shsts.tinactory.content.AllBlockEntities.CUTTER
-import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_CHEST
 import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE
-import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_TANK
-import org.shsts.tinactory.content.AllBlockEntities.ELECTROLYZER
-import org.shsts.tinactory.content.AllBlockEntities.EXTRACTOR
-import org.shsts.tinactory.content.AllBlockEntities.EXTRUDER
-import org.shsts.tinactory.content.AllBlockEntities.FLUID_SOLIDIFIER
-import org.shsts.tinactory.content.AllBlockEntities.GAS_TURBINE
 import org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER
-import org.shsts.tinactory.content.AllBlockEntities.LASER_ENGRAVER
-import org.shsts.tinactory.content.AllBlockEntities.LATHE
-import org.shsts.tinactory.content.AllBlockEntities.LOGISTIC_WORKER
 import org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER
-import org.shsts.tinactory.content.AllBlockEntities.MACERATOR
-import org.shsts.tinactory.content.AllBlockEntities.ME_DRIVER
-import org.shsts.tinactory.content.AllBlockEntities.ME_STORAGE_INTERFACE
-import org.shsts.tinactory.content.AllBlockEntities.MIXER
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
-import org.shsts.tinactory.content.AllBlockEntities.ORE_ANALYZER
-import org.shsts.tinactory.content.AllBlockEntities.ORE_WASHER
-import org.shsts.tinactory.content.AllBlockEntities.POLARIZER
-import org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_ANALYZER
-import org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_ORE_WASHER
-import org.shsts.tinactory.content.AllBlockEntities.PRIMITIVE_STONE_GENERATOR
-import org.shsts.tinactory.content.AllBlockEntities.RESEARCH_BENCH
-import org.shsts.tinactory.content.AllBlockEntities.STEAM_TURBINE
-import org.shsts.tinactory.content.AllBlockEntities.STONE_GENERATOR
-import org.shsts.tinactory.content.AllBlockEntities.THERMAL_CENTRIFUGE
-import org.shsts.tinactory.content.AllBlockEntities.WIREMILL
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
-import org.shsts.tinactory.content.AllItems.ELECTRIC_BUFFER
-import org.shsts.tinactory.content.AllItems.TRANSFORMER
+import org.shsts.tinactory.content.AllBlockEntities.getMachine
+import org.shsts.tinactory.content.AllItems.getComponentEntry
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
 import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.content.machine.ProcessingSet
+import org.shsts.tinactory.content.network.SubnetBlock
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Models.cubeBlock
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
@@ -58,7 +24,6 @@ import org.shsts.tinactory.datagen.content.model.MachineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_OUT_TEX
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
 import org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS
-import org.shsts.tinycorelib.api.registrate.entry.IEntry
 import org.shsts.tinycorelib.datagen.api.builder.IBlockDataBuilder
 
 object Machines {
@@ -74,57 +39,57 @@ object Machines {
     }
 
     private fun processings() {
-        primitiveMachine(STONE_GENERATOR, PRIMITIVE_STONE_GENERATOR, "machines/rock_crusher")
-        primitiveMachine(ORE_ANALYZER, PRIMITIVE_ORE_ANALYZER, "machines/electromagnetic_separator")
-        primitiveMachine(ORE_WASHER, PRIMITIVE_ORE_WASHER, "machines/ore_washer")
-        machine(RESEARCH_BENCH, "overlay/machine/overlay_screen")
-        machine(ASSEMBLER)
-        machine(LASER_ENGRAVER)
-        machine(CIRCUIT_ASSEMBLER, "machines/assembler")
-        machine(MACERATOR)
-        machine(CENTRIFUGE)
-        machine(THERMAL_CENTRIFUGE)
-        machine(ELECTRIC_FURNACE, "machines/electric_furnace")
-        machine(ALLOY_SMELTER)
-        machine(MIXER)
-        machine(POLARIZER)
-        machine(WIREMILL)
-        machine(BENDER)
-        machine(LATHE)
-        machine(CUTTER)
-        machine(EXTRUDER)
-        machine(EXTRACTOR)
-        machine(FLUID_SOLIDIFIER)
-        machine(ELECTROLYZER)
-        machine(CHEMICAL_REACTOR)
-        machine(ARC_FURNACE)
-        machine(STEAM_TURBINE) {
+        primitiveMachine("stone_generator", "machines/rock_crusher")
+        primitiveMachine("ore_analyzer", "machines/electromagnetic_separator")
+        primitiveMachine("ore_washer", "machines/ore_washer")
+        machine("research_bench", "overlay/machine/overlay_screen")
+        machine("assembler")
+        machine("laser_engraver")
+        machine("circuit_assembler", "machines/assembler")
+        machine("macerator")
+        machine("centrifuge")
+        machine("thermal_centrifuge")
+        machine("electric_furnace", "machines/electric_furnace")
+        machine("alloy_smelter")
+        machine("mixer")
+        machine("polarizer")
+        machine("wiremill")
+        machine("bender")
+        machine("lathe")
+        machine("cutter")
+        machine("extruder")
+        machine("extractor")
+        machine("fluid_solidifier")
+        machine("electrolyzer")
+        machine("chemical_reactor")
+        machine("arc_furnace")
+        machine("steam_turbine") {
             overlay(Direction.NORTH, TURBINE_SIDE)
             overlay(Direction.SOUTH, TURBINE_SIDE)
         }
-        machine(GAS_TURBINE) {
+        machine("gas_turbine") {
             overlay(Direction.EAST, TURBINE_SIDE)
             overlay(Direction.WEST, TURBINE_SIDE)
         }
-        machine(COMBUSTION_GENERATOR, "generators/combustion")
+        machine("combustion_generator", "generators/combustion")
     }
 
     private fun logistics() {
-        machine(ELECTRIC_CHEST) {
+        machine("electric_chest") {
             overlay(Direction.UP, "overlay/machine/overlay_qchest")
             overlay(Direction.NORTH, SCREEN_GLASS)
         }
-        machine(ELECTRIC_TANK) {
+        machine("electric_tank") {
             overlay(Direction.UP, "overlay/machine/overlay_qtank")
             overlay(Direction.NORTH, SCREEN_GLASS)
         }
-        machine(LOGISTIC_WORKER, "cover/overlay_conveyor")
-        machine(ME_DRIVER, "overlay/automation/automation_superbuffer")
-        machine(ME_STORAGE_INTERFACE, "cover/overlay_storage")
+        machine("logistic_worker", "cover/overlay_conveyor")
+        machine("me_driver", "overlay/automation/automation_superbuffer")
+        machine("me_storage_interface", "cover/overlay_storage")
     }
 
     private fun misc() {
-        machine(BATTERY_BOX, IO_OUT_TEX)
+        machine("battery_box", IO_OUT_TEX)
 
         blockData {
             defaults {
@@ -155,7 +120,10 @@ object Machines {
                     ioTex(ME_BUS)
                 }
             }
-            for (entry in TRANSFORMER.values + ELECTRIC_BUFFER.values) {
+
+            val subnets = listOf("transformer", "electric_buffer")
+                .flatMap { getComponentEntry<SubnetBlock>(it).values }
+            for (entry in subnets) {
                 block(entry) {
                     machineModel {
                         overlay(Direction.NORTH, IO_TEX)
@@ -180,11 +148,12 @@ object Machines {
         }
     }
 
-    private fun machine(set: MachineSet, block: MachineModel.Builder<*>.() -> Unit) {
+    private fun machine(name: String, block: MachineModel.Builder<*>.() -> Unit) {
+        val set = getMachine(name)
         val tag = machineTag(set)
         tag?.let { dataGen { tag(it, AllTags.MACHINE) } }
         blockData {
-            for (v in set.voltages) {
+            for (v in set.voltages.filter { it != Voltage.PRIMITIVE }) {
                 block(set.entry(v)) {
                     machineModel(block)
                     tag(MINEABLE_WITH_WRENCH)
@@ -194,19 +163,19 @@ object Machines {
         }
     }
 
-    private fun machine(set: MachineSet, overlay: String) {
-        machine(set) { overlay(overlay) }
+    private fun machine(name: String, overlay: String) {
+        machine(name) { overlay(overlay) }
     }
 
-    private fun machine(set: ProcessingSet) {
-        machine(set, "machines/${set.recipeType.id()}")
+    private fun machine(name: String) {
+        machine(name, "machines/$name")
     }
 
-    private fun primitiveMachine(set: MachineSet, primitive: IEntry<out Block>,
-        overlay: String) {
-        machine(set, overlay)
+    private fun primitiveMachine(name: String, overlay: String) {
+        machine(name, overlay)
+        val set = getMachine(name)
         val tag = machineTag(set)
-        blockData(primitive) {
+        blockData(set.entry(Voltage.PRIMITIVE)) {
             machineModel { overlay(overlay) }
             tag(MINEABLE_WITH_WRENCH)
             tag(BlockTags.MINEABLE_WITH_AXE)

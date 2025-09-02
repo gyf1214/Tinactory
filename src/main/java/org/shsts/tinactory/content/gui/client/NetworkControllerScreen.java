@@ -31,8 +31,7 @@ import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 
-import static org.shsts.tinactory.content.AllItems.CABLE;
-import static org.shsts.tinactory.content.AllItems.RESEARCH_EQUIPMENT;
+import static org.shsts.tinactory.content.AllItems.getComponent;
 import static org.shsts.tinactory.content.AllMenus.RENAME;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.HEIGHT;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_MARGIN;
@@ -110,8 +109,8 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             new StaticWidget(menu, CRAFTING_ARROW));
         menu.onRefreshName(renameEdit::setValue);
 
-        this.tabs = new Tab(this, statePanel, CABLE.get(Voltage.LV),
-            techPanel, RESEARCH_EQUIPMENT.get(Voltage.LV),
+        this.tabs = new Tab(this, statePanel, getComponent("cable").get(Voltage.LV),
+            techPanel, getComponent("research_equipment").get(Voltage.LV),
             renamePanel, Items.NAME_TAG);
 
         rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);

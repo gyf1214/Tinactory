@@ -5,9 +5,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.AllRecipes;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.machine.MachineProcessor;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
 import java.util.Random;
@@ -17,8 +17,9 @@ import java.util.Random;
 public class OreAnalyzerProcessor extends MachineProcessor<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
-    public OreAnalyzerProcessor(BlockEntity blockEntity) {
-        super(blockEntity, AllRecipes.ORE_ANALYZER, true);
+    public OreAnalyzerProcessor(BlockEntity blockEntity,
+        IRecipeType<OreAnalyzerRecipe.Builder> recipeType) {
+        super(blockEntity, recipeType, true);
     }
 
     @Override

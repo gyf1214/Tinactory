@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 
 import static org.shsts.tinactory.content.AllLayouts.DISTILLATION_TOWER;
@@ -16,7 +15,7 @@ public class DistillationTower extends Multiblock {
     private int height = 0;
 
     public DistillationTower(BlockEntity blockEntity, Builder<?> builder) {
-        super(blockEntity, builder.layout(Layout.EMPTY));
+        super(blockEntity, builder);
     }
 
     public int getSlots() {

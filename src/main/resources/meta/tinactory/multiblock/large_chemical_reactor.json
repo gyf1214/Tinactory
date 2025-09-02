@@ -1,0 +1,128 @@
+{
+  "recipe": "tinactory:chemical_reactor",
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 36,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 36,
+        "y": 37
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 108,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 126,
+        "y": 1
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 19
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 108,
+        "y": 19
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 37
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 108,
+        "y": 37
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_mixer",
+      "x": 62,
+      "y": 18,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/inert_ptfe",
+  "layers": [
+    [
+      "BBB",
+      "BCB",
+      "BBB"
+    ],
+    [
+      "BBB",
+      "BPB",
+      "B$B"
+    ],
+    [
+      "BBB",
+      "BBB",
+      "BBB"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/inert_ptfe"
+    },
+    "C": {
+      "type": "tag",
+      "tag": "tinactory:multiblock/coil"
+    },
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing"
+  }
+}
