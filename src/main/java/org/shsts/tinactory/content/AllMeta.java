@@ -6,6 +6,7 @@ import org.shsts.tinactory.content.electric.CircuitMeta;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.material.ComponentMeta;
 import org.shsts.tinactory.content.material.MaterialMeta;
+import org.shsts.tinactory.content.multiblock.MultiblockMeta;
 import org.shsts.tinycorelib.api.meta.IMetaConsumer;
 
 import java.util.function.Supplier;
@@ -20,6 +21,7 @@ public class AllMeta {
         execute("circuit", CircuitMeta::new);
         execute("component", ComponentMeta::new);
         execute("machine", MachineMeta::new);
+        execute("multiblock", MultiblockMeta::new);
     }
 
     private static void execute(String folder, Supplier<? extends IMetaConsumer> supplier) {

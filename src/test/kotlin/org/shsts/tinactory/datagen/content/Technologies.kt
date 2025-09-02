@@ -7,6 +7,7 @@ import org.shsts.tinactory.content.AllItems
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks
+import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
 import org.shsts.tinactory.content.electric.Circuits
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.OreVariant
@@ -158,12 +159,12 @@ object Technologies {
 
             VACUUM_FREEZER = tech("vacuum_freezer") {
                 maxProgress(50)
-                displayItem(AllMultiblocks.VACUUM_FREEZER)
+                displayItem(getMultiblock("vacuum_freezer").block)
             }
 
             DISTILLATION = tech("distillation") {
                 maxProgress(50)
-                displayItem(AllMultiblocks.DISTILLATION_TOWER)
+                displayItem(getMultiblock("distillation_tower").block)
             }
 
             CHEMISTRY = child("chemistry") {

@@ -58,6 +58,10 @@ public class MachineMeta extends MetaConsumer {
         super("Machine");
     }
 
+    protected MachineMeta(String name) {
+        super(name);
+    }
+
     protected static class UnsupportedTypeException extends RuntimeException {
         public UnsupportedTypeException(String field, String value) {
             super("Unsupported " + field + ": " + value);
@@ -93,34 +97,35 @@ public class MachineMeta extends MetaConsumer {
             cons.accept(new Rect(x, y, w, h), tex);
         }
 
-        protected LayoutSetBuilder<?> parseLayout(JsonObject jo) {
+        protected LayoutSetBuilder<?> parseLayout() {
             var builder = Layout.builder();
 
-            var ja1 = GsonHelper.getAsJsonArray(jo, "slots");
+            var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
+            var ja1 = GsonHelper.getAsJsonArray(jo1, "slots");
             for (var je1 : ja1) {
-                var jo1 = GsonHelper.convertToJsonObject(je1, "slots");
-                var port = GsonHelper.getAsInt(jo1, "port");
-                var type = SlotType.fromName(GsonHelper.getAsString(jo1, "type"));
-                var x = GsonHelper.getAsInt(jo1, "x");
-                var y = GsonHelper.getAsInt(jo1, "y");
+                var jo2 = GsonHelper.convertToJsonObject(je1, "slots");
+                var port = GsonHelper.getAsInt(jo2, "port");
+                var type = SlotType.fromName(GsonHelper.getAsString(jo2, "type"));
+                var x = GsonHelper.getAsInt(jo2, "x");
+                var y = GsonHelper.getAsInt(jo2, "y");
                 Collection<Voltage> voltages;
-                if (jo1.has("voltages")) {
-                    voltages = Voltage.parseJson(jo1, "voltages");
+                if (jo2.has("voltages")) {
+                    voltages = Voltage.parseJson(jo2, "voltages");
                 } else {
                     voltages = Arrays.asList(Voltage.values());
                 }
                 builder.slot(port, type, x, y, voltages);
             }
 
-            var ja3 = GsonHelper.getAsJsonArray(jo, "images", new JsonArray());
+            var ja3 = GsonHelper.getAsJsonArray(jo1, "images", new JsonArray());
             for (var je3 : ja3) {
-                var jo2 = GsonHelper.convertToJsonObject(je3, "images");
-                parseImage(jo2, 1, builder::image);
+                var jo3 = GsonHelper.convertToJsonObject(je3, "images");
+                parseImage(jo3, 1, builder::image);
             }
 
-            if (jo.has("progressBar")) {
-                var jo3 = GsonHelper.getAsJsonObject(jo, "progressBar");
-                parseImage(jo3, 2, builder::progressBar);
+            if (jo1.has("progressBar")) {
+                var jo4 = GsonHelper.getAsJsonObject(jo1, "progressBar");
+                parseImage(jo4, 2, builder::progressBar);
             }
 
             return builder;
@@ -252,7 +257,7 @@ public class MachineMeta extends MetaConsumer {
             parseTypes();
 
             recipeType = getRecipeType();
-            layoutSet = parseLayout(GsonHelper.getAsJsonObject(jo, "layout")).buildObject();
+            layoutSet = parseLayout().buildObject();
             menu = getMenu();
 
             var machines = new HashMap<Voltage, IEntry<? extends Block>>();

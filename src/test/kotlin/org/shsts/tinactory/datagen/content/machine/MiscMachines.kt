@@ -15,8 +15,6 @@ import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.AllMultiblocks.BLAST_FURNACE
-import org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.AllTags.circuit
@@ -131,13 +129,6 @@ object MiscMachines {
                 component("cable", 4)
                 tech(Technologies.ALLOY_SMELTING)
             }
-            output(BLAST_FURNACE.get()) {
-                input(HEATPROOF_CASING.get())
-                input(ELECTRIC_FURNACE, 3)
-                circuit(3)
-                component("cable", 2)
-                tech(Technologies.STEEL)
-            }
             component("multiblock_interface") {
                 component("machine_hull")
                 circuit(2)
@@ -146,7 +137,6 @@ object MiscMachines {
                 input("glass", "primary")
                 tech(Technologies.STEEL)
             }
-
         }
     }
 

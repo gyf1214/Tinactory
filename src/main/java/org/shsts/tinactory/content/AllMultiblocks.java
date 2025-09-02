@@ -12,6 +12,7 @@ import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
+import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
@@ -20,7 +21,9 @@ import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -31,6 +34,7 @@ import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMultiblocks {
+    public static final Map<String, MultiblockSet> MULTIBLOCK_SETS;
     public static final IEntry<PrimitiveBlock> BLAST_FURNACE;
     public static final IEntry<PrimitiveBlock> SIFTER;
     public static final IEntry<PrimitiveBlock> AUTOFARM;
@@ -93,6 +97,8 @@ public final class AllMultiblocks {
         FILTER_CASING = misc("filter_casing");
         PTFE_PIPE_CASING = misc("ptfe_pipe_casing");
 
+        MULTIBLOCK_SETS = new HashMap<>();
+
         BLAST_FURNACE = multiblock("blast_furnace")
             .blockEntity()
             .transform(RecipeProcessor::blastFurnace)
@@ -111,7 +117,7 @@ public final class AllMultiblocks {
             .row('T', 3, 3).build()
             .blockOrInterface('B', HEATPROOF_CASING)
             .block('T', HEATPROOF_CASING)
-            .sameBlockWithTag('C', "coil", AllTags.COIL)
+            .tagWithSameBlock('C', "coil", AllTags.COIL)
             .air('A')
             .build()
             .build()
@@ -251,7 +257,7 @@ public final class AllMultiblocks {
             .row("BBB").build()
             .blockOrInterface('B', HEATPROOF_CASING)
             .block('T', HEATPROOF_CASING)
-            .sameBlockWithTag('C', "coil", AllTags.COIL)
+            .tagWithSameBlock('C', "coil", AllTags.COIL)
             .air('A')
             .build()
             .build()
@@ -294,7 +300,7 @@ public final class AllMultiblocks {
             .layer()
             .row('B', 3, 3).build()
             .blockOrInterface('B', INERT_PTFE_CASING)
-            .sameBlockWithTag('C', "coil", AllTags.COIL)
+            .tagWithSameBlock('C', "coil", AllTags.COIL)
             .block('P', PTFE_PIPE_CASING)
             .build()
             .build()
@@ -327,6 +333,10 @@ public final class AllMultiblocks {
         return REGISTRATE.block("multiblock/misc/" + name, Block::new)
             .properties(CASING_PROPERTY)
             .register();
+    }
+
+    public static MultiblockSet getMultiblock(String name) {
+        return MULTIBLOCK_SETS.get(name);
     }
 
     public static void init() {}
