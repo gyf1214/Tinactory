@@ -120,17 +120,22 @@ public class MultiblockMeta extends MachineMeta {
             var type = GsonHelper.getAsString(jo, "type");
             switch (type) {
                 case "block_or_interface" -> {
-                    var loc = new ResourceLocation(GsonHelper.getAsString(jo, "block"));
-                    return $ -> $.blockOrInterface(ch, BLOCKS.getEntry(loc));
+                    var block = BLOCKS.getEntry(new ResourceLocation(GsonHelper.getAsString(jo, "block")));
+                    return $ -> $.blockOrInterface(ch, block);
                 }
                 case "tag" -> {
-                    var tag = new ResourceLocation(GsonHelper.getAsString(jo, "tag"));
-                    return $ -> $.tag(ch, AllTags.block(tag));
+                    var tag = AllTags.block(new ResourceLocation(GsonHelper.getAsString(jo, "tag")));
+                    return $ -> $.tag(ch, tag);
                 }
                 case "tag_with_same_block" -> {
-                    var tag = new ResourceLocation(GsonHelper.getAsString(jo, "tag"));
+                    var tag = AllTags.block(new ResourceLocation(GsonHelper.getAsString(jo, "tag")));
                     var key = GsonHelper.getAsString(jo, "key");
-                    return $ -> $.tagWithSameBlock(ch, key, AllTags.block(tag));
+                    return $ -> $.tagWithSameBlock(ch, key, tag);
+                }
+                case "tag_or_block" -> {
+                    var block = BLOCKS.getEntry(new ResourceLocation(GsonHelper.getAsString(jo, "block")));
+                    var tag = AllTags.block(new ResourceLocation(GsonHelper.getAsString(jo, "tag")));
+                    return $ -> $.checkBlock(ch, blockState -> blockState.is(block.get()) || blockState.is(tag));
                 }
             }
             throw new UnsupportedTypeException("defines", type);

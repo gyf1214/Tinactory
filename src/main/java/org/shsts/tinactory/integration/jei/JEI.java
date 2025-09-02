@@ -15,7 +15,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
@@ -59,6 +58,7 @@ import java.util.Optional;
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
 import static org.shsts.tinactory.content.AllMultiblocks.MULTIBLOCK_SETS;
+import static org.shsts.tinactory.content.AllMultiblocks.getMultiblock;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @JeiPlugin
@@ -84,7 +84,7 @@ public class JEI implements IModPlugin {
             var icon = set.icon();
             var clazz = type.recipeClass();
             var layout = ChemicalReactorRecipe.class.isAssignableFrom(clazz) ?
-                AllLayouts.LARGE_CHEMICAL_REACTOR : set.layout(Voltage.MAX);
+                getMultiblock("large_chemical_reactor").layout() : set.layout(Voltage.MAX);
 
             if (ResearchRecipe.class.isAssignableFrom(clazz)) {
                 addProcessingCategory(type, new ResearchCategory(cast(type), layout, icon));
