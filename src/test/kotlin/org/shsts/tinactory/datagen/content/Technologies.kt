@@ -61,6 +61,7 @@ object Technologies {
     val ARC_FURNACE: ResourceLocation
     val HYDROMETALLURGY: ResourceLocation
     val ADVANCED_CHEMISTRY: ResourceLocation
+    val TNT: ResourceLocation
 
     init {
         Factory().apply {
@@ -224,6 +225,11 @@ object Technologies {
             ADVANCED_CHEMISTRY = tech("advanced_chemistry") {
                 maxProgress(60)
                 displayItem(getMultiblock("large_chemical_reactor").block)
+            }
+
+            TNT = tech("tnt") {
+                maxProgress(60)
+                displayItem(Items.TNT)
             }
         }
     }

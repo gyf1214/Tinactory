@@ -90,6 +90,11 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         return this;
     }
 
+    public TechBuilder<P> noResearch() {
+        researchVoltage = null;
+        return this;
+    }
+
     public TechBuilder<P> modifier(String key, int val) {
         modifiers.put(key, val);
         return this;

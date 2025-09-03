@@ -1,10 +1,12 @@
 package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Items
+import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
 import org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW
 import org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW
 import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
+import org.shsts.tinactory.content.AllItems.MIXED_METAL_INGOT
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
@@ -16,6 +18,7 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
@@ -58,22 +61,27 @@ object MiscComponents {
                 tech(Technologies.MATERIAL_CUTTING)
             }
             // TODO: advanced_grinder
+
+            output(MIXED_METAL_INGOT.get()) {
+                input("aluminium", "plate")
+                input("stainless_steel", "plate")
+                input("chrome", "plate")
+                input("soldering_alloy", amount = 2)
+                voltage(Voltage.HV)
+                workTicks(200)
+                tech(Technologies.TNT)
+            }
         }
 
-        research(Voltage.ULV) {
-            input("iron", "plate")
-            input("copper", "wire")
+        implosionCompressor {
+            output(ADVANCED_ALLOY.get()) {
+                input(MIXED_METAL_INGOT.get())
+                input(Items.TNT, 24, port = 1)
+                voltage(Voltage.HV)
+            }
         }
 
-        research(Voltage.LV) {
-            input(getComponent("electric_motor").item(Voltage.LV))
-            input("steel", "gear")
-        }
-
-        research(Voltage.MV) {
-            input(getComponent("electric_pump").item(Voltage.MV))
-            input(circuitBoard(CircuitTier.CPU).get())
-        }
+        researches()
     }
 
     private fun ulv() {
@@ -119,6 +127,23 @@ object MiscComponents {
                 input("iron", "plate")
                 input(TOOL_HANDLE)
             }
+        }
+    }
+
+    private fun researches() {
+        research(Voltage.ULV) {
+            input("iron", "plate")
+            input("copper", "wire")
+        }
+
+        research(Voltage.LV) {
+            input(getComponent("electric_motor").item(Voltage.LV))
+            input("steel", "gear")
+        }
+
+        research(Voltage.MV) {
+            input(getComponent("electric_pump").item(Voltage.MV))
+            input(circuitBoard(CircuitTier.CPU).get())
         }
     }
 

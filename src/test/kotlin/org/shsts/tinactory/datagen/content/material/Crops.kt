@@ -107,7 +107,7 @@ object Crops {
                 if (outputSeed) {
                     output(seed, 4)
                 }
-                voltage(Voltage.MV)
+                voltage(Voltage.LV)
                 workTicks(300)
             }
         }

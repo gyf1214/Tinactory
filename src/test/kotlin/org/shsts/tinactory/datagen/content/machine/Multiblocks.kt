@@ -252,6 +252,8 @@ object Multiblocks {
             }
             multiblock("pyrolyse_oven", "heatproof")
             multiblock("large_chemical_reactor", "inert_ptfe")
+            multiblock("implosion_compressor", "solid_steel")
+            multiblock("autoclave", "clean_stainless_steel", "blast_furnace")
         }
     }
 

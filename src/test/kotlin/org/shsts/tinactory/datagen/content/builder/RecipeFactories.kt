@@ -300,6 +300,24 @@ object RecipeFactories {
         }
     }
 
+    fun implosionCompressor(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("implosion_compressor") {
+            defaultInputItem = 0
+            defaultOutputItem = 2
+            amperage = 0.125
+            workTicks(10)
+        }.block()
+    }
+
+    fun autoclave(block: ProcessingRecipeFactoryBase<CleanRecipe.Builder>.() -> Unit) {
+        processing<CleanRecipe.Builder>("autoclave") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
+            amperage = 1.5
+        }.block()
+    }
+
     fun marker(block: MarkerFactory.() -> Unit) {
         val recipeType = REGISTRATE.getRecipeType<MarkerRecipe.Builder>("marker")
         RecipeFactory(recipeType, ::MarkerBuilder).block()

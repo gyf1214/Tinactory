@@ -59,6 +59,9 @@ public final class AllItems {
     public static final IEntry<Item> ADVANCED_BUZZSAW;
     public static final IEntry<Item> ITEM_FILTER;
     public static final IEntry<Item> FERTILIZER;
+    public static final IEntry<Item> GELLED_TOLUENE;
+    public static final IEntry<Item> MIXED_METAL_INGOT;
+    public static final IEntry<Item> ADVANCED_ALLOY;
 
     static {
         COMPONENTS = new HashMap<>();
@@ -181,6 +184,9 @@ public final class AllItems {
 
         ITEM_FILTER = simple("component/item_filter");
         FERTILIZER = simple("misc/fertilizer");
+        GELLED_TOLUENE = simple("misc/gelled_toluene");
+        MIXED_METAL_INGOT = simple("misc/mixed_meta_ingot");
+        ADVANCED_ALLOY = simple("misc/advanced_alloy");
     }
 
     public static void init() {}

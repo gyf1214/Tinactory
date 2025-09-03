@@ -25,6 +25,10 @@ public final class LocHelper {
         return new ResourceLocation("ae2", id);
     }
 
+    public static ResourceLocation ic2(String id) {
+        return new ResourceLocation("ic2", id);
+    }
+
     public static ResourceLocation extend(ResourceLocation loc, String suffix) {
         if (StringUtils.isEmpty(suffix)) {
             return loc;

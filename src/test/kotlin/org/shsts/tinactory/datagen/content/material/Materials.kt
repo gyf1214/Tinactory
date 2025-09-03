@@ -351,6 +351,14 @@ object Materials {
         material("ptfe", DULL) {
             machineProcess(Voltage.LV, 0.75)
         }
+        material("fluix", QUARTZ) {
+            mix(Voltage.HV) {
+                component("certus_quartz")
+                component("nether_quartz")
+                component("redstone")
+            }
+            machineProcess(Voltage.MV, 1.25)
+        }
     }
 
     private fun ores() {
@@ -491,11 +499,26 @@ object Materials {
             oreProcess {
                 byProducts("blue_topaz", "aluminium", "blue_topaz")
             }
+            machineProcess(Voltage.MV, 2.0)
         }
         material("blue_topaz", GEM_HORIZONTAL) {
             oreProcess {
                 byProducts("topaz", "aluminium", "topaz")
             }
+            machineProcess(Voltage.MV, 2.0)
+        }
+        material("nether_quartz", QUARTZ) {
+            oreProcess {
+                siftPrimary = true
+                byProducts("certus_quartz", "silicon_dioxide")
+            }
+            machineProcess(Voltage.MV)
+        }
+        material("certus_quartz", QUARTZ) {
+            oreProcess {
+                byProducts("nether_quartz", "silicon_dioxide")
+            }
+            machineProcess(Voltage.MV)
         }
     }
 

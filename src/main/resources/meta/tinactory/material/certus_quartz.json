@@ -1,0 +1,18 @@
+{
+  "color": "0xFFD2D2E6",
+  "ore": "netherrack",
+  "items": [
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust",
+    "dust_impure",
+    "dust_pure",
+    "raw",
+    "crystal",
+    "seed"
+  ],
+  "fluids": {},
+  "aliases": {},
+  "existings": {}
+}

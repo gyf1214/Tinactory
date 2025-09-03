@@ -1,0 +1,56 @@
+{
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_compress",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/solid_steel",
+  "layers": [
+    [
+      "BBB",
+      "BBB",
+      "BBB"
+    ],
+    [
+      "BBB",
+      "BAB",
+      "B$B"
+    ],
+    [
+      "BBB",
+      "BBB",
+      "BBB"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/solid_steel"
+    },
+    "A": "air"
+  }
+}

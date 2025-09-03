@@ -1,12 +1,15 @@
 package org.shsts.tinactory.datagen.content.chemistry
 
+import net.minecraft.world.item.Items
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.electrolyzer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 
 object InorganicChemistry {
     fun init() {
@@ -15,6 +18,26 @@ object InorganicChemistry {
     }
 
     private fun mv() {
+        mixer {
+            output(Items.GUNPOWDER) {
+                input("sulfur")
+                input("potassium_nitrate", amount = 2)
+                input("carbon", amount = 3)
+                voltage(Voltage.MV)
+                workTicks(384)
+            }
+        }
+
+        assembler {
+            output(Items.TNT) {
+                input(Items.GUNPOWDER, 5)
+                input(Items.SAND, 4)
+                voltage(Voltage.MV)
+                workTicks(100)
+                tech(Technologies.CHEMISTRY)
+            }
+        }
+
         distillation {
             defaults {
                 voltage(Voltage.MV)

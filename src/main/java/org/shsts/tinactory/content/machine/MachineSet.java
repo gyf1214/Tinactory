@@ -66,7 +66,7 @@ public class MachineSet {
 
     public Block icon() {
         var voltage = voltages.stream()
-            .filter(v -> v != Voltage.ULV)
+            .filter(v -> v.rank > Voltage.ULV.rank)
             .min(Comparator.comparingInt(v -> v.rank))
             .orElseThrow();
         return machines.get(voltage).get();

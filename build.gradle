@@ -84,6 +84,7 @@ minecraft {
             args '--existing', file('src/main/resources/')
             args '--existing', file('libs/gtceu_resources_2.8.7.zip')
             args '--existing', file('libs/ae2_resources_11.7.6.zip')
+            args '--existing', file('libs/ic2_resources_2.2.828.zip')
         }
     }
 }
@@ -119,6 +120,7 @@ dependencies {
 
     compileOnly files("libs/gtceu_resources_2.8.7.zip")
     compileOnly files("libs/ae2_resources_11.7.6.zip")
+    compileOnly files("libs/ic2_resources_2.2.828.zip")
 
     runtimeOnly fg.deobf("curse.maven:ctm-267602:3933537")
 

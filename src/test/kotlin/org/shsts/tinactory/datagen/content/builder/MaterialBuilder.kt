@@ -24,6 +24,7 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
+import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.Models
@@ -81,7 +82,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             Pair("copper", "ingot") to Tags.Items.INGOTS_COPPER,
             Pair("redstone", "dust") to Tags.Items.DUSTS_REDSTONE,
             Pair("diamond", "gem") to Tags.Items.GEMS_DIAMOND,
-            Pair("emerald", "gem") to Tags.Items.GEMS_EMERALD)
+            Pair("emerald", "gem") to Tags.Items.GEMS_EMERALD,
+            Pair("nether_quartz", "primary") to Tags.Items.GEMS_QUARTZ)
 
         fun material(name: String, icon: IconSet, block: MaterialBuilder.() -> Unit = {}) {
             MaterialBuilder(getMaterial(name), icon).apply {
@@ -113,6 +115,11 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 model(Models::pipeItem)
             } else if (sub == "raw") {
                 model { basicItem(it, modLoc("items/material/raw")) }
+            } else if (sub == "crystal") {
+                model { basicItem(it, ae2("item/${name}_crystal")) }
+            } else if (sub == "seed") {
+                val name1 = name.split("_")[0]
+                model { basicItem(it, ae2("item/crystal_seed_${name1}")) }
             } else {
                 model { icon.itemModel(it, sub) }
             }
@@ -632,6 +639,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         var amount = 1
         var primitive = false
         var siftAndHammer = false
+        var siftPrimary = false
         private val variant = material.oreVariant()
         private val byProducts = mutableListOf<MaterialSet>()
 
@@ -736,7 +744,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                         voltage(Voltage.LV)
                         workTicks(600)
                     }
-                } else if (siftAndHammer) {
+                } else if (siftAndHammer || siftPrimary) {
                     input(material, "crushed_purified") {
                         output(material, "primary", rate = 0.8)
                         output(material, "primary", rate = 0.35)

@@ -5,7 +5,8 @@
     "dust_tiny",
     "ingot",
     "ingot_hot",
-    "stick"
+    "stick",
+    "plate"
   ],
   "fluids": {
     "molten": {

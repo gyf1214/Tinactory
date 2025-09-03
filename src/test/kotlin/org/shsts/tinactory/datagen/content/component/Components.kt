@@ -1,12 +1,15 @@
 package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Item
+import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
 import org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER
 import org.shsts.tinactory.content.AllItems.FERTILIZER
 import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
+import org.shsts.tinactory.content.AllItems.GELLED_TOLUENE
 import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
+import org.shsts.tinactory.content.AllItems.MIXED_METAL_INGOT
 import org.shsts.tinactory.content.AllItems.getComponentEntry
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
@@ -27,6 +30,7 @@ import org.shsts.tinactory.content.network.CableBlock
 import org.shsts.tinactory.content.tool.BatteryItem
 import org.shsts.tinactory.core.electric.Voltage.ULV
 import org.shsts.tinactory.core.util.LocHelper.ae2
+import org.shsts.tinactory.core.util.LocHelper.ic2
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.basicItem
@@ -93,8 +97,16 @@ object Components {
                 item(entry) { model(basicItem("tools/buzzsaw")) }
             }
 
-            for (entry in listOf(ITEM_FILTER, FERTILIZER)) {
+            for (entry in listOf(ITEM_FILTER, FERTILIZER, GELLED_TOLUENE)) {
                 item(entry) { model(Models::simpleItem) }
+            }
+
+            item(MIXED_METAL_INGOT) {
+                model(basicItem(ic2("items/resource/ingot/alloy")))
+            }
+
+            item(ADVANCED_ALLOY) {
+                model(basicItem(ic2("items/crafting/alloy")))
             }
 
             for ((i, entry) in ITEM_STORAGE_CELL.withIndex()) {

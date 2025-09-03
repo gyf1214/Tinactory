@@ -1,0 +1,74 @@
+{
+  "recipe": "clean",
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_crystallization",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/clean_stainless_steel",
+  "layers": [
+    [
+      "BBB",
+      "BQB",
+      "B$B"
+    ],
+    [
+      "CCC",
+      "CAC",
+      "CCC"
+    ],
+    [
+      "CCC",
+      "CAC",
+      "CCC"
+    ],
+    [
+      "CCC",
+      "CPC",
+      "CCC"
+    ],
+    [
+      "   ",
+      " C ",
+      "   "
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/clean_stainless_steel"
+    },
+    "C": "tinactory:multiblock/solid/clean_stainless_steel",
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
+    "Q": {
+      "type": "tag",
+      "tag": "tinactory:multiblock/coil"
+    },
+    "A": "air"
+  }
+}
