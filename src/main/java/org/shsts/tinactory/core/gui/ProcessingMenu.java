@@ -17,7 +17,6 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.machine.Machine.getProcessor;
@@ -50,11 +49,10 @@ public class ProcessingMenu extends LayoutMenu {
     }
 
     public Optional<IRecipeType<?>> recipeType() {
-        var processor = PROCESSOR.tryGet(blockEntity).orElse(null);
-        if (processor instanceof MachineProcessor<?> machine) {
-            return Optional.of(machine.recipeType);
-        }
-        return Optional.empty();
+        return MACHINE.tryGet(blockEntity)
+            .flatMap(IMachine::processor)
+            .flatMap($ -> $ instanceof MachineProcessor<?> machine ?
+                Optional.of(machine.recipeType) : Optional.empty());
     }
 
     public static Component getTitle(BlockEntity be) {

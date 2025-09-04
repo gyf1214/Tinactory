@@ -10,6 +10,7 @@ import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
+import org.shsts.tinactory.content.multiblock.HalfBlock;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
@@ -58,6 +59,7 @@ public final class AllMultiblocks {
     public static final IEntry<Block> PLASCRETE;
     public static final IEntry<Block> FILTER_CASING;
     public static final IEntry<Block> PTFE_PIPE_CASING;
+    public static final IEntry<HalfBlock> LAUNCH_SITE_BASE;
 
     private static final Transformer<BlockBehaviour.Properties> CASING_PROPERTY;
 
@@ -91,6 +93,10 @@ public final class AllMultiblocks {
         PLASCRETE = misc("plascrete");
         FILTER_CASING = misc("filter_casing");
         PTFE_PIPE_CASING = misc("ptfe_pipe_casing");
+
+        LAUNCH_SITE_BASE = REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
+            .properties(CASING_PROPERTY)
+            .register();
 
         MULTIBLOCK_SETS = new HashMap<>();
 

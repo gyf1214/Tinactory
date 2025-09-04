@@ -64,6 +64,7 @@ object Technologies {
     val ADVANCED_CHEMISTRY: ResourceLocation
     val TNT: ResourceLocation
     val DIGITAL_STORAGE: ResourceLocation
+    val ROCKET_SCIENCE: ResourceLocation
 
     init {
         Factory().apply {
@@ -200,7 +201,7 @@ object Technologies {
             voltage = Voltage.MV
 
             NICHROME = tech("nichrome") {
-                maxProgress(20)
+                maxProgress(50)
                 displayItem(AllMultiblocks.NICHROME_COIL_BLOCK)
                 depends(KANTHAL)
             }
@@ -208,37 +209,44 @@ object Technologies {
             base = CHEMISTRY
 
             HYDROMETALLURGY = tech("hydrometallurgy") {
-                maxProgress(30)
+                maxProgress(80)
                 displayItem("aluminium_oxide", "dust")
             }
 
             ARC_FURNACE = tech("arc_furnace") {
-                maxProgress(30)
+                maxProgress(60)
                 displayItem(getMachine("arc_furnace").entry(Voltage.HV))
             }
 
             base = ORGANIC_CHEMISTRY
 
             CLEANROOM = tech("cleanroom") {
-                maxProgress(40)
+                maxProgress(160)
                 displayItem(AllMultiblocks.CLEANROOM)
             }
 
             ADVANCED_CHEMISTRY = tech("advanced_chemistry") {
-                maxProgress(60)
+                maxProgress(200)
                 displayItem(getMultiblock("large_chemical_reactor").block)
             }
 
             TNT = tech("tnt") {
-                maxProgress(60)
+                maxProgress(200)
                 displayItem(Items.TNT)
             }
 
             base = null
 
             DIGITAL_STORAGE = tech("digital_storage") {
-                maxProgress(100)
+                maxProgress(240)
                 displayItem(ITEM_STORAGE_CELL[0])
+            }
+
+            voltage = Voltage.HV
+            base = ADVANCED_CHEMISTRY
+
+            ROCKET_SCIENCE = tech("rocket_science") {
+                maxProgress(200)
             }
         }
     }

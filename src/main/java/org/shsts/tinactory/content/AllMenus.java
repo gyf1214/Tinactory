@@ -60,7 +60,6 @@ public final class AllMenus {
     public static final IMenuType BOILER;
     public static final IMenuType ELECTRIC_FURNACE;
     public static final IMenuType RESEARCH_BENCH;
-    public static final IMenuType MULTIBLOCK;
 
     static {
         CHANNEL
@@ -153,11 +152,6 @@ public final class AllMenus {
         RESEARCH_BENCH = REGISTRATE.menu("machine/research_bench", MachineMenu::machine)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> ResearchBenchScreen::new)
-            .register();
-
-        MULTIBLOCK = REGISTRATE.menu("multiblock", MachineMenu::multiblock)
-            .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> MachineScreen::new)
             .register();
     }
 

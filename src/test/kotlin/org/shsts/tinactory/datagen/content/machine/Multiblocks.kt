@@ -20,6 +20,7 @@ import org.shsts.tinactory.content.AllMultiblocks.GRATE_MACHINE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING
 import org.shsts.tinactory.content.AllMultiblocks.INERT_PTFE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.KANTHAL_COIL_BLOCK
+import org.shsts.tinactory.content.AllMultiblocks.LAUNCH_SITE_BASE
 import org.shsts.tinactory.content.AllMultiblocks.NICHROME_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.PLASCRETE
 import org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING
@@ -115,6 +116,15 @@ object Multiblocks {
 
             block(PTFE_PIPE_CASING) {
                 blockState(solidBlock("casings/pipe/machine_casing_pipe_polytetrafluoroethylene"))
+            }
+
+            block(LAUNCH_SITE_BASE) {
+                blockState { ctx ->
+                    val provider = ctx.provider()
+                    val tex = gregtech("blocks/foam/reinforced_stone")
+                    provider.simpleBlock(ctx.`object`(), provider.models().slab(
+                        ctx.id(), tex, tex, tex))
+                }
             }
         }
 

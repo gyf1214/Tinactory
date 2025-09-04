@@ -1,4 +1,5 @@
 {
+  "recipe": "assembly",
   "machine": "no_auto_recipe",
   "voltages": "primitive-iv",
   "layout": {

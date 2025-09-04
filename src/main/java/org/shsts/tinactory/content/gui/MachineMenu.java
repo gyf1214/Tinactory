@@ -8,10 +8,6 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
-
-import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
@@ -51,18 +47,6 @@ public class MachineMenu extends ProcessingMenu {
         }
     }
 
-    public static class Multiblock extends MachineMenu {
-        public Multiblock(Properties properties) {
-            super(properties);
-        }
-
-        @Override
-        public Optional<IRecipeType<?>> recipeType() {
-            var multiblockInterface = (MultiblockInterface) MACHINE.get(blockEntity);
-            return multiblockInterface.getRecipeType();
-        }
-    }
-
     public static class Boiler extends MachineMenu {
         public Boiler(Properties properties) {
             super(properties);
@@ -83,10 +67,6 @@ public class MachineMenu extends ProcessingMenu {
 
     public static ProcessingMenu machine(Properties properties) {
         return new MachineMenu(properties);
-    }
-
-    public static ProcessingMenu multiblock(Properties properties) {
-        return new Multiblock(properties);
     }
 
     public static ProcessingMenu boiler(Properties properties) {

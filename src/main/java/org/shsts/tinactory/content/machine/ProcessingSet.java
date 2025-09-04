@@ -31,7 +31,7 @@ public class ProcessingSet extends MachineSet {
     public static IEntry<MachineBlock> multiblockInterface(Voltage voltage) {
         var id = "multiblock/" + voltage.id + "/interface";
         return BlockEntityBuilder.builder(id, MachineBlock.multiblockInterface(voltage))
-            .menu(AllMenus.MULTIBLOCK)
+            .menu(AllMenus.PROCESSING_MACHINE)
             .blockEntity()
             .transform(MultiblockInterface::factory)
             .transform(FlexibleStackContainer::factory)

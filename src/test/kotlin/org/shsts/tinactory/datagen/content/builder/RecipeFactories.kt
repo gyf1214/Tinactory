@@ -39,9 +39,14 @@ object RecipeFactories {
         defaults: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit) =
         processing(name, defaults)
 
+    private fun assembly(name: String, defaults: AssemblyRecipeBuilder.() -> Unit):
+        AssemblyRecipeFactory {
+        val recipeType = REGISTRATE.getRecipeType<AssemblyRecipe.Builder>(name)
+        return AssemblyRecipeFactory(recipeType, defaults)
+    }
+
     fun assembler(block: AssemblyRecipeFactory.() -> Unit) {
-        val recipeType = REGISTRATE.getRecipeType<AssemblyRecipe.Builder>("assembler")
-        AssemblyRecipeFactory(recipeType) {
+        assembly("assembler") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
@@ -66,8 +71,8 @@ object RecipeFactories {
         }.block()
     }
 
-    fun stoneGenerator(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("stone_generator") {
+    fun stoneGenerator(block: AssemblyRecipeFactory.() -> Unit) {
+        assembly("stone_generator") {
             defaultOutputItem = 0
             defaultOutputFluid = 1
             amperage = 0.125
