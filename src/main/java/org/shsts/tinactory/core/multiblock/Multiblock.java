@@ -149,6 +149,11 @@ public class Multiblock extends MultiblockBase {
         }
 
         @Override
+        public void deleteProperty(String key) {
+            properties.remove(key);
+        }
+
+        @Override
         public boolean hasProperty(String key) {
             return properties.containsKey(key);
         }

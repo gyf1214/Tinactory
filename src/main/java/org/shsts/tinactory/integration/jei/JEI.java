@@ -81,40 +81,21 @@ public class JEI implements IModPlugin {
 
         for (var set : PROCESSING_SETS) {
             var type = set.recipeType;
-            var icon = set.icon();
             var clazz = type.recipeClass();
             var layout = ChemicalReactorRecipe.class.isAssignableFrom(clazz) ?
                 getMultiblock("large_chemical_reactor").layout() : set.layout(Voltage.MAX);
-
-            if (ResearchRecipe.class.isAssignableFrom(clazz)) {
-                addProcessingCategory(type, new ResearchCategory(cast(type), layout, icon));
-            } else if (ChemicalReactorRecipe.class.isAssignableFrom(clazz)) {
-                addProcessingCategory(type, new ChemicalReactorCategory(cast(type), layout, icon));
-            } else if (AssemblyRecipe.class.isAssignableFrom(clazz)) {
-                addProcessingCategory(type, new AssemblyCategory<>(cast(type), layout, icon));
-            } else if (CleanRecipe.class.isAssignableFrom(clazz)) {
-                addProcessingCategory(type, new CleanCategory(cast(type), layout, icon));
-            } else {
-                addProcessingCategory(type, layout, icon);
-            }
+            var icon = set.icon();
+            addProcessingCategory(type, layout, icon);
         }
 
         for (var set : MULTIBLOCK_SETS.values()) {
             var type = set.recipeType();
-            var clazz = type.recipeClass();
-            var layout = set.layout();
-            var icon = set.block().get();
             if (processingCategories.containsKey(type.loc())) {
                 continue;
             }
-
-            if (BlastFurnaceRecipe.class.isAssignableFrom(clazz)) {
-                addProcessingCategory(type, new BlastFurnaceCategory(cast(type), layout, icon));
-            } else if (DistillationRecipe.class.isAssignableFrom(clazz)) {
-                addProcessingCategory(type, new DistillationCategory(cast(type), icon));
-            } else {
-                addProcessingCategory(type, layout, icon);
-            }
+            var layout = set.layout();
+            var icon = set.block().get();
+            addProcessingCategory(type, layout, icon);
         }
     }
 
@@ -129,9 +110,23 @@ public class JEI implements IModPlugin {
         processingCategories.put(recipeType.loc(), category);
     }
 
-    private void addProcessingCategory(IRecipeType<?> recipeType, Layout layout, Block icon) {
-        var category = new ProcessingCategory<>(cast(recipeType), layout, icon);
-        addProcessingCategory(recipeType, category);
+    private void addProcessingCategory(IRecipeType<?> type, Layout layout, Block icon) {
+        var clazz = type.recipeClass();
+        if (ResearchRecipe.class.isAssignableFrom(clazz)) {
+            addProcessingCategory(type, new ResearchCategory(cast(type), layout, icon));
+        } else if (ChemicalReactorRecipe.class.isAssignableFrom(clazz)) {
+            addProcessingCategory(type, new ChemicalReactorCategory(cast(type), layout, icon));
+        } else if (AssemblyRecipe.class.isAssignableFrom(clazz)) {
+            addProcessingCategory(type, new AssemblyCategory<>(cast(type), layout, icon));
+        } else if (CleanRecipe.class.isAssignableFrom(clazz)) {
+            addProcessingCategory(type, new CleanCategory(cast(type), layout, icon));
+        } else if (BlastFurnaceRecipe.class.isAssignableFrom(clazz)) {
+            addProcessingCategory(type, new BlastFurnaceCategory(cast(type), layout, icon));
+        } else if (DistillationRecipe.class.isAssignableFrom(clazz)) {
+            addProcessingCategory(type, new DistillationCategory(cast(type), icon));
+        } else {
+            addProcessingCategory(type, new ProcessingCategory<>(cast(type), layout, icon));
+        }
     }
 
     public Optional<RecipeCategory<?>> processingCategory(IRecipeType<?> recipeType) {

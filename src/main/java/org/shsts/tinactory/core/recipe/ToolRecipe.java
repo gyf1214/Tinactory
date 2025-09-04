@@ -114,6 +114,11 @@ public class ToolRecipe implements IRecipe<Workbench> {
         }
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + loc + "]";
+    }
+
     private static class FinishedShaped extends ShapedRecipeBuilder.Result {
         @SuppressWarnings("ConstantConditions")
         public FinishedShaped(ResourceLocation loc, Item result,

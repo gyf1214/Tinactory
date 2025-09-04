@@ -41,12 +41,15 @@ public class CleanRecipe extends ProcessingRecipe {
             world.dimension().location(), pos, cleanness);
 
         if (cleanness >= maxCleanness) {
+            LOGGER.debug("recipe rate=1");
             return true;
         }
         if (cleanness <= minCleanness) {
+            LOGGER.debug("recipe rate=0");
             return false;
         }
         var rate = (cleanness - minCleanness) / (maxCleanness - minCleanness);
+        LOGGER.debug("recipe rate={}", rate);
         return random.nextDouble() < rate;
     }
 

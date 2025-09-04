@@ -139,6 +139,11 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + loc + "]";
+    }
+
     public abstract static class BuilderBase<R extends ProcessingRecipe, S extends BuilderBase<R, S>>
         extends RecipeBuilder<R, S> {
         protected final List<Supplier<Input>> inputs = new ArrayList<>();

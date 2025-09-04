@@ -6,6 +6,8 @@
     "seed"
   ],
   "fluids": {},
-  "aliases": {},
+  "aliases": {
+    "primary": "dust"
+  },
   "existings": {}
 }

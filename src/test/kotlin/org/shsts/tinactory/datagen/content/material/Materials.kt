@@ -358,6 +358,7 @@ object Materials {
                 component("redstone")
             }
             machineProcess(Voltage.MV, 1.25)
+            crystallize(Voltage.HV, 600, -0.1, 1.0, 10.0)
         }
     }
 
@@ -519,6 +520,7 @@ object Materials {
                 byProducts("nether_quartz", "silicon_dioxide")
             }
             machineProcess(Voltage.MV)
+            crystallize(Voltage.HV, 400, -0.5, 0.5, 5.0)
         }
     }
 

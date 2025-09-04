@@ -39,16 +39,6 @@
     ],
     [
       "CCC",
-      "CAC",
-      "CCC"
-    ],
-    [
-      "CCC",
-      "CAC",
-      "CCC"
-    ],
-    [
-      "CCC",
       "CPC",
       "CCC"
     ],
@@ -68,7 +58,6 @@
     "Q": {
       "type": "tag",
       "tag": "tinactory:multiblock/coil"
-    },
-    "A": "air"
+    }
   }
 }

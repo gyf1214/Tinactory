@@ -231,6 +231,14 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return true;
         }
 
+        private boolean checkGroundBlock(MultiblockCheckCtx ctx, BlockPos pos, BlockState block) {
+            if (MultiblockSpec.checkInterface(ctx, pos)) {
+                ctx.setProperty("interfaceSetByGround", true);
+                return !ctx.isFailed();
+            }
+            return block.is(baseBlock.get());
+        }
+
         private boolean checkGround(MultiblockCheckCtx ctx, int y) {
             if (y <= 1) {
                 return false;
@@ -242,11 +250,8 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             for (var x = -w; x <= w; x++) {
                 for (var z = -d; z <= d; z++) {
                     var pos = center.offset(x, 0, z);
-                    if (MultiblockSpec.checkInterface(ctx, pos)) {
-                        return !ctx.isFailed();
-                    }
                     var block = ctx.getBlock(pos);
-                    if (block.isEmpty() || !block.get().is(baseBlock.get())) {
+                    if (block.isEmpty() || !checkGroundBlock(ctx, pos, block.get())) {
                         return false;
                     }
                     blocks.add(pos);
@@ -260,10 +265,12 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
         @SuppressWarnings("unchecked")
         private boolean checkWallBlock(MultiblockCheckCtx ctx, BlockPos pos, BlockState block, Direction face) {
+            if (MultiblockSpec.checkInterface(ctx, pos)) {
+                return !ctx.isFailed();
+            }
             if (doorTag != null && block.is(doorTag)) {
                 var doors = (List<DoorState>) ctx.getProperty("doors");
                 if (doors.size() < maxDoor) {
-                    ctx.setProperty("doorFace", face);
                     doors.add(new DoorState(pos, face));
                     return true;
                 } else {
@@ -282,6 +289,13 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return block.is(wallTag);
         }
 
+        private boolean checkPillarBlock(MultiblockCheckCtx ctx, BlockPos pos, BlockState block) {
+            if (MultiblockSpec.checkInterface(ctx, pos)) {
+                return !ctx.isFailed();
+            }
+            return block.is(baseBlock.get());
+        }
+
         private boolean checkWall(MultiblockCheckCtx ctx, int y) {
             var center = ctx.getCenter().below(y);
             var w = (int) ctx.getProperty("w");
@@ -296,7 +310,8 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
                     return false;
                 }
                 if (corner) {
-                    if (!block1.get().is(baseBlock.get()) || !block2.get().is(baseBlock.get())) {
+                    if (!checkPillarBlock(ctx, pos1, block1.get()) ||
+                        !checkPillarBlock(ctx, pos2, block2.get())) {
                         return false;
                     }
                 } else {
@@ -329,6 +344,15 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         private boolean checkLayer(MultiblockCheckCtx ctx, int y) {
             if (checkGround(ctx, y)) {
                 return false;
+            } else {
+                if (ctx.isFailed()) {
+                    return false;
+                }
+                // TODO: deal with the problem that the "try" test will modify property
+                if (ctx.hasProperty("interfaceSetByGround")) {
+                    ctx.deleteProperty("interfaceSetByGround");
+                    ctx.deleteProperty("interface");
+                }
             }
             if (!checkWall(ctx, y)) {
                 ctx.setFailed();

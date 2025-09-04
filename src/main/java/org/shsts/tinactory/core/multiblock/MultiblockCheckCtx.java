@@ -27,5 +27,7 @@ public interface MultiblockCheckCtx {
 
     void setProperty(String key, Object val);
 
+    void deleteProperty(String key);
+
     boolean hasProperty(String key);
 }

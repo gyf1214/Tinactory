@@ -31,7 +31,10 @@ public final class AllRecipes {
             .serializer(ToolRecipe.SERIALIZER)
             .register();
 
-        DISTILLATION = processing("distillation", DistillationRecipe::builder);
+        DISTILLATION = REGISTRATE.recipeType("distillation", DistillationRecipe::builder)
+            .recipeClass(DistillationRecipe.class)
+            .serializer(ProcessingRecipe.SERIALIZER)
+            .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
             .recipeClass(MarkerRecipe.class)
@@ -50,14 +53,6 @@ public final class AllRecipes {
     private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {
         return new InventoryChangeTrigger.TriggerInstance(EntityPredicate.Composite.ANY,
             MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
-    }
-
-    private static IRecipeType<ProcessingRecipe.Builder> processing(
-        String id, IRecipeType.BuilderFactory<ProcessingRecipe.Builder> builderFactory) {
-        return REGISTRATE.recipeType(id, builderFactory)
-            .recipeClass(ProcessingRecipe.class)
-            .serializer(ProcessingRecipe.SERIALIZER)
-            .register();
     }
 
     public static void init() {}

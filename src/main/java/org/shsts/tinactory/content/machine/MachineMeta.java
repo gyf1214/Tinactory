@@ -132,19 +132,20 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IRecipeType<ProcessingRecipe.Builder> processingRecipe(
-            IRecipeType.BuilderFactory<ProcessingRecipe.Builder> builderFactory) {
+            IRecipeType.BuilderFactory<ProcessingRecipe.Builder> builderFactory,
+            Class<? extends ProcessingRecipe> clazz) {
             return REGISTRATE.recipeType(id, builderFactory)
-                .recipeClass(ProcessingRecipe.class)
+                .recipeClass(clazz)
                 .serializer(ProcessingRecipe.SERIALIZER)
                 .register();
         }
 
         protected IRecipeType<?> getRecipeType() {
             return switch (recipeTypeStr) {
-                case "default" -> processingRecipe(ProcessingRecipe.Builder::new);
-                case "display_input" -> processingRecipe(DisplayInputRecipe::builder);
-                case "generator" -> processingRecipe(GeneratorRecipe::builder);
-                case "distillation" -> processingRecipe(DistillationRecipe::builder);
+                case "default" -> processingRecipe(ProcessingRecipe.Builder::new, ProcessingRecipe.class);
+                case "display_input" -> processingRecipe(DisplayInputRecipe::builder, DisplayInputRecipe.class);
+                case "generator" -> processingRecipe(GeneratorRecipe::builder, GeneratorRecipe.class);
+                case "distillation" -> processingRecipe(DistillationRecipe::builder, DistillationRecipe.class);
                 case "research" -> REGISTRATE.recipeType(id, ResearchRecipe.Builder::new)
                     .recipeClass(ResearchRecipe.class)
                     .serializer(ResearchRecipe.SERIALIZER)

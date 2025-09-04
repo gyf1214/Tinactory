@@ -339,6 +339,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
             return this;
         }
 
+        // TODO: deal with the problem that the "try" test will modify property
         public LayerBuilder<P> height(int min, int max) {
             minHeight = min;
             maxHeight = max;
@@ -350,22 +351,11 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
             return this;
         }
 
-        public LayerBuilder<P> row(String str, int repeat) {
-            for (var i = 0; i < repeat; i++) {
-                rows.add(str);
-            }
-            return this;
-        }
-
         public LayerBuilder<P> row(char ch, int width, int depth) {
             for (var i = 0; i < depth; i++) {
                 rows.add(String.valueOf(ch).repeat(width));
             }
             return this;
-        }
-
-        public LayerBuilder<P> empty() {
-            return row("");
         }
 
         private int checkWidth() {

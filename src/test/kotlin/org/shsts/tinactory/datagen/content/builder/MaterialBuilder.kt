@@ -37,6 +37,7 @@ import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.alloySmelter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bender
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
@@ -402,6 +403,12 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 process("stick", "ingot", 64)
                 process("screw", "bolt", 16)
                 process("lens", "gem_exquisite", 600)
+                process("seed", "crystal", 256)
+            }
+            mixer {
+                process("seed", "seed", 64, 2) {
+                    input(material, "dust")
+                }
             }
             cutter {
                 process("bolt", "stick", 64, 4) {
@@ -633,6 +640,28 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     fun blast(voltage: Voltage, temperature: Int, workTicks: Long, from: String,
         block: ComposeBuilder<BlastFurnaceRecipe.Builder>.() -> Unit = {}) {
         blast(voltage, temperature, workTicks, getMaterial(from), block)
+    }
+
+    fun crystallize(voltage: Voltage, workTicks: Long,
+        baseCleanness: Double, normalCleanness: Double, idealCleanness: Double) {
+        autoclave {
+            defaults {
+                voltage(voltage)
+                workTicks(workTicks)
+            }
+            output(material, "crystal") {
+                input(material, "seed")
+                extra {
+                    requireCleanness(baseCleanness, normalCleanness)
+                }
+            }
+            output(material, "crystal", suffix = "_from_dust") {
+                input(material, "dust")
+                extra {
+                    requireCleanness(baseCleanness, idealCleanness)
+                }
+            }
+        }
     }
 
     inner class OreProcessBuilder {
