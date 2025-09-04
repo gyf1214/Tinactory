@@ -3,13 +3,16 @@ package org.shsts.tinactory.datagen.content.component
 import net.minecraft.world.item.Item
 import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
 import org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER
+import org.shsts.tinactory.content.AllItems.ANNIHILATION_CORE
 import org.shsts.tinactory.content.AllItems.FERTILIZER
 import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
+import org.shsts.tinactory.content.AllItems.FORMATION_CORE
 import org.shsts.tinactory.content.AllItems.GELLED_TOLUENE
 import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
 import org.shsts.tinactory.content.AllItems.MIXED_METAL_INGOT
+import org.shsts.tinactory.content.AllItems.STORAGE_COMPONENT
 import org.shsts.tinactory.content.AllItems.getComponentEntry
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
@@ -109,14 +112,25 @@ object Components {
                 model(basicItem(ic2("items/crafting/alloy")))
             }
 
-            for ((i, entry) in ITEM_STORAGE_CELL.withIndex()) {
+            item(ANNIHILATION_CORE) {
+                model(basicItem(ae2("items/material_annihilation_core")))
+            }
+
+            item(FORMATION_CORE) {
+                model(basicItem(ae2("items/material_formation_core")))
+            }
+
+            for ((i, entry) in STORAGE_COMPONENT.withIndex()) {
                 val k = 1 shl (2 * i)
                 item(entry) {
-                    model(basicItem(ae2("item/item_storage_cell_${k}k")))
+                    model(basicItem(ae2("items/material_cell${k}k_part")))
+                }
+                item(ITEM_STORAGE_CELL[i]) {
+                    model(basicItem(ae2("items/storage_cell_${k}k")))
                     tag(AllTags.ITEM_STORAGE_CELL)
                 }
                 item(FLUID_STORAGE_CELL[i]) {
-                    model(basicItem(ae2("item/fluid_storage_cell_${k}k")))
+                    model(basicItem(ae2("items/fluid_storage_cell_${k}k")))
                     tag(AllTags.FLUID_STORAGE_CELL)
                 }
             }

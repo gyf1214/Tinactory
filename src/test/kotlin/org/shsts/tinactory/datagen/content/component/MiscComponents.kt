@@ -2,11 +2,16 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
+import org.shsts.tinactory.content.AllItems.ANNIHILATION_CORE
 import org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW
+import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
+import org.shsts.tinactory.content.AllItems.FORMATION_CORE
 import org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW
 import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
+import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
 import org.shsts.tinactory.content.AllItems.MIXED_METAL_INGOT
+import org.shsts.tinactory.content.AllItems.STORAGE_COMPONENT
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
@@ -82,6 +87,7 @@ object MiscComponents {
         }
 
         researches()
+        ae()
     }
 
     private fun ulv() {
@@ -153,6 +159,50 @@ object MiscComponents {
                 voltage(voltage)
                 workTicks(200)
                 block()
+            }
+        }
+    }
+
+    private fun ae() {
+        assembler {
+            defaults {
+                voltage(Voltage.HV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.DIGITAL_STORAGE)
+            }
+            output(ANNIHILATION_CORE.get(), 2) {
+                circuit(1, Voltage.MV)
+                input("nether_quartz", "primary", 4)
+                input("fluix", "dust", 4)
+                input("pvc")
+            }
+            output(FORMATION_CORE.get(), 2) {
+                circuit(1, Voltage.MV)
+                input("certus_quartz", "crystal", 4)
+                input("fluix", "dust", 4)
+                input("pvc")
+            }
+            output(STORAGE_COMPONENT.item(0)) {
+                circuit(1, Voltage.LV)
+                input("certus_quartz", "crystal", 4)
+                input("redstone", "dust", 4)
+                input("pvc")
+            }
+            for ((i, entry) in STORAGE_COMPONENT.withIndex()) {
+                output(ITEM_STORAGE_CELL.item(i)) {
+                    input(entry.get())
+                    input(ANNIHILATION_CORE.get())
+                    input(FORMATION_CORE.get())
+                    input("aluminium", "plate", 3)
+                    input("soldering_alloy", amount = 3)
+                }
+                output(FLUID_STORAGE_CELL.item(i)) {
+                    input(entry.get())
+                    input(ANNIHILATION_CORE.get())
+                    input(FORMATION_CORE.get())
+                    input("stainless_steel", "plate", 3)
+                    input("soldering_alloy", amount = 3)
+                }
             }
         }
     }

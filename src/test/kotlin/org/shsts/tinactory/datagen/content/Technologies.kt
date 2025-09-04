@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems
+import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks
@@ -62,6 +63,7 @@ object Technologies {
     val HYDROMETALLURGY: ResourceLocation
     val ADVANCED_CHEMISTRY: ResourceLocation
     val TNT: ResourceLocation
+    val DIGITAL_STORAGE: ResourceLocation
 
     init {
         Factory().apply {
@@ -230,6 +232,13 @@ object Technologies {
             TNT = tech("tnt") {
                 maxProgress(60)
                 displayItem(Items.TNT)
+            }
+
+            base = null
+
+            DIGITAL_STORAGE = tech("digital_storage") {
+                maxProgress(100)
+                displayItem(ITEM_STORAGE_CELL[0])
             }
         }
     }

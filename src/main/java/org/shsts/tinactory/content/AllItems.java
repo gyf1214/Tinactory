@@ -45,6 +45,7 @@ public final class AllItems {
     public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
     public static final Map<Voltage, IEntry<Item>> BUZZSAW;
     public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
+    public static final List<IEntry<Item>> STORAGE_COMPONENT;
     public static final List<IEntry<MEStorageCell>> ITEM_STORAGE_CELL;
     public static final List<IEntry<MEStorageCell>> FLUID_STORAGE_CELL;
 
@@ -62,6 +63,8 @@ public final class AllItems {
     public static final IEntry<Item> GELLED_TOLUENE;
     public static final IEntry<Item> MIXED_METAL_INGOT;
     public static final IEntry<Item> ADVANCED_ALLOY;
+    public static final IEntry<Item> ANNIHILATION_CORE;
+    public static final IEntry<Item> FORMATION_CORE;
 
     static {
         COMPONENTS = new HashMap<>();
@@ -171,9 +174,12 @@ public final class AllItems {
 
         ITEM_STORAGE_CELL = new ArrayList<>();
         FLUID_STORAGE_CELL = new ArrayList<>();
-        for (var i = 0; i < 5; i++) {
+        STORAGE_COMPONENT = new ArrayList<>();
+        for (var i = 0; i < 4; i++) {
             var k = 1 << (2 * i);
             var bytes = 1048576 * k;
+            STORAGE_COMPONENT.add(REGISTRATE.item(
+                "component/storage_component/" + k + "m").register());
             ITEM_STORAGE_CELL.add(REGISTRATE.item(
                 "logistics/item_storage_cell/" + k + "m",
                 MEStorageCell.itemCell(bytes)).register());
@@ -185,8 +191,10 @@ public final class AllItems {
         ITEM_FILTER = simple("component/item_filter");
         FERTILIZER = simple("misc/fertilizer");
         GELLED_TOLUENE = simple("misc/gelled_toluene");
-        MIXED_METAL_INGOT = simple("misc/mixed_meta_ingot");
-        ADVANCED_ALLOY = simple("misc/advanced_alloy");
+        MIXED_METAL_INGOT = simple("component/mixed_meta_ingot");
+        ADVANCED_ALLOY = simple("component/advanced_alloy");
+        ANNIHILATION_CORE = simple("component/annihilation_core");
+        FORMATION_CORE = simple("component/formation_core");
     }
 
     public static void init() {}

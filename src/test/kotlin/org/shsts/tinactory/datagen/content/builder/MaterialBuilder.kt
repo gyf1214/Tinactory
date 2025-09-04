@@ -117,10 +117,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             } else if (sub == "raw") {
                 model { basicItem(it, modLoc("items/material/raw")) }
             } else if (sub == "crystal") {
-                model { basicItem(it, ae2("item/${name}_crystal")) }
+                model { IconSet.CERTUS.itemModel(it, "gem") }
             } else if (sub == "seed") {
-                val name1 = name.split("_")[0]
-                model { basicItem(it, ae2("item/crystal_seed_${name1}")) }
+                model { basicItem(it, ae2("items/crystal_seed_nether")) }
             } else {
                 model { icon.itemModel(it, sub) }
             }
@@ -406,8 +405,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 process("seed", "crystal", 256)
             }
             mixer {
-                process("seed", "seed", 64, 2) {
-                    input(material, "dust")
+                process("seed", "dust", 64, 2) {
+                    input(material, "seed")
                 }
             }
             cutter {

@@ -83,7 +83,7 @@ minecraft {
             args '--existing', file('src/test/resources/')
             args '--existing', file('src/main/resources/')
             args '--existing', file('libs/gtceu_resources_2.8.7.zip')
-            args '--existing', file('libs/ae2_resources_11.7.6.zip')
+            args '--existing', file('libs/ae2_resources_rv6.zip')
             args '--existing', file('libs/ic2_resources_2.2.828.zip')
         }
     }
@@ -119,7 +119,7 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 
     compileOnly files("libs/gtceu_resources_2.8.7.zip")
-    compileOnly files("libs/ae2_resources_11.7.6.zip")
+    compileOnly files("libs/ae2_resources_rv6.zip")
     compileOnly files("libs/ic2_resources_2.2.828.zip")
 
     runtimeOnly fg.deobf("curse.maven:ctm-267602:3933537")

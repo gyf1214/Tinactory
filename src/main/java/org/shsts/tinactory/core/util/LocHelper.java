@@ -22,7 +22,7 @@ public final class LocHelper {
     }
 
     public static ResourceLocation ae2(String id) {
-        return new ResourceLocation("ae2", id);
+        return new ResourceLocation("appliedenergistics2", id);
     }
 
     public static ResourceLocation ic2(String id) {
