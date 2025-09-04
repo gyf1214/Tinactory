@@ -204,6 +204,13 @@ object OrganicChemistry {
                 input("titanium_tetrachloride", amount = 0.1)
                 workTicks(512)
             }
+            output("cetane_boosted_diesel", amount = 2) {
+                input("diesel", amount = 2)
+                input("nitric_acid", amount = 0.25)
+                input("sulfuric_acid", amount = 0.25)
+                output("sulfuric_acid", "dilute", amount = 0.5)
+                workTicks(96)
+            }
         }
 
         chemicalReactor {

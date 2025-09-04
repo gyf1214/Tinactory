@@ -1,0 +1,13 @@
+{
+  "color": "0xFFC8FF00",
+  "items": [],
+  "fluids": {
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.nitro_fuel",
+      "textureColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {},
+  "existings": {}
+}

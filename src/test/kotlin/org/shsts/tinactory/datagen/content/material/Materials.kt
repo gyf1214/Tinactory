@@ -342,6 +342,7 @@ object Materials {
                 component("heavy_fuel")
             }
         }
+        material("cetane_boosted_diesel", DULL)
         material("vanadium_steel", METALLIC) {
             machineProcess(Voltage.MV, 1.5)
             blast(Voltage.MV, 2500, 1280) {
