@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE
 import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
+import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE
 import org.shsts.tinactory.content.AllMultiblocks.CLEANROOM
@@ -208,6 +209,21 @@ object Multiblocks {
                 tech(Technologies.ADVANCED_CHEMISTRY)
             }
         }
+
+        assembler {
+            componentVoltage = Voltage.HV
+            defaults {
+                voltage(Voltage.HV)
+            }
+
+            output(LAUNCH_SITE_BASE.get()) {
+                input("aluminium", "stick", 2)
+                input(ADVANCED_ALLOY.get(), 2)
+                input("soldering_alloy", amount = 1.5)
+                workTicks(140)
+                tech(Technologies.ROCKET_SCIENCE)
+            }
+        }
     }
 
     private fun AssemblyRecipeFactory.solid(block: IEntry<out Block>,
@@ -264,6 +280,7 @@ object Multiblocks {
             multiblock("large_chemical_reactor", "inert_ptfe")
             multiblock("implosion_compressor", "solid_steel")
             multiblock("autoclave", "clean_stainless_steel", "blast_furnace")
+            multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
         }
     }
 

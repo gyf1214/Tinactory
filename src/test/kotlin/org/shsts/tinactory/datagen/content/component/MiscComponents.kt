@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.component
 
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
 import org.shsts.tinactory.content.AllItems.ANNIHILATION_CORE
@@ -14,17 +15,23 @@ import org.shsts.tinactory.content.AllItems.MIXED_METAL_INGOT
 import org.shsts.tinactory.content.AllItems.STORAGE_COMPONENT
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
+import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.electric.CircuitTier
+import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.recipe.ResearchRecipe
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactoryBase
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.rocket
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
@@ -81,13 +88,14 @@ object MiscComponents {
         implosionCompressor {
             output(ADVANCED_ALLOY.get()) {
                 input(MIXED_METAL_INGOT.get())
-                input(Items.TNT, 24, port = 1)
+                input(Items.TNT, 12, port = 1)
                 voltage(Voltage.HV)
             }
         }
 
         researches()
         ae()
+        rockets()
     }
 
     private fun ulv() {
@@ -151,6 +159,11 @@ object MiscComponents {
             input(getComponent("electric_pump").item(Voltage.MV))
             input(circuitBoard(CircuitTier.CPU).get())
         }
+
+        research(Voltage.HV) {
+            input(getComponent("robot_arm").item(Voltage.HV))
+            input(ADVANCED_ALLOY.get())
+        }
     }
 
     private fun research(voltage: Voltage, block: AssemblyRecipeBuilder.() -> Unit) {
@@ -174,18 +187,21 @@ object MiscComponents {
                 circuit(1, Voltage.MV)
                 input("nether_quartz", "primary", 4)
                 input("fluix", "dust", 4)
+                input("annealed_copper", "wire_fine", 8)
                 input("pvc")
             }
             output(FORMATION_CORE.get(), 2) {
                 circuit(1, Voltage.MV)
                 input("certus_quartz", "crystal", 4)
                 input("fluix", "dust", 4)
+                input("annealed_copper", "wire_fine", 8)
                 input("pvc")
             }
             output(STORAGE_COMPONENT.item(0)) {
                 circuit(1, Voltage.LV)
+                input(CHIP.item("ram"), 4)
                 input("certus_quartz", "crystal", 4)
-                input("redstone", "dust", 4)
+                input("annealed_copper", "wire_fine", 16)
                 input("pvc")
             }
             for ((i, entry) in STORAGE_COMPONENT.withIndex()) {
@@ -204,6 +220,28 @@ object MiscComponents {
                     input("soldering_alloy", amount = 3)
                 }
             }
+        }
+    }
+
+    private fun rockets() {
+        rocket {
+            rocket(Technologies.ROCKET_T1) {
+                input(AllTags.circuit(Voltage.EV))
+                input(getComponent("electric_pump").item(Voltage.HV), 4)
+                input(ADVANCED_ALLOY.get(), 16)
+                input("cetane_boosted_diesel")
+                voltage(Voltage.HV)
+            }
+        }
+    }
+
+    private fun ProcessingRecipeFactoryBase<ResearchRecipe.Builder>.rocket(
+        loc: ResourceLocation, block: ProcessingRecipeBuilder<ResearchRecipe.Builder>.() -> Unit) {
+        recipe(loc) {
+            extra {
+                target(loc)
+            }
+            block()
         }
     }
 }

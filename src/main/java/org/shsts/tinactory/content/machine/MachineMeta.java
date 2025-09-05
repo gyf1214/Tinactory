@@ -73,6 +73,7 @@ public class MachineMeta extends MetaConsumer {
         protected final JsonObject jo;
 
         protected String recipeTypeStr;
+        protected String recipeTypeId;
         protected String machineType;
         protected String menuType;
 
@@ -134,7 +135,7 @@ public class MachineMeta extends MetaConsumer {
         private IRecipeType<ProcessingRecipe.Builder> processingRecipe(
             IRecipeType.BuilderFactory<ProcessingRecipe.Builder> builderFactory,
             Class<? extends ProcessingRecipe> clazz) {
-            return REGISTRATE.recipeType(id, builderFactory)
+            return REGISTRATE.recipeType(recipeTypeId, builderFactory)
                 .recipeClass(clazz)
                 .serializer(ProcessingRecipe.SERIALIZER)
                 .register();
@@ -146,27 +147,27 @@ public class MachineMeta extends MetaConsumer {
                 case "display_input" -> processingRecipe(DisplayInputRecipe::builder, DisplayInputRecipe.class);
                 case "generator" -> processingRecipe(GeneratorRecipe::builder, GeneratorRecipe.class);
                 case "distillation" -> processingRecipe(DistillationRecipe::builder, DistillationRecipe.class);
-                case "research" -> REGISTRATE.recipeType(id, ResearchRecipe.Builder::new)
+                case "research" -> REGISTRATE.recipeType(recipeTypeId, ResearchRecipe.Builder::new)
                     .recipeClass(ResearchRecipe.class)
                     .serializer(ResearchRecipe.SERIALIZER)
                     .register();
-                case "assembly" -> REGISTRATE.recipeType(id, AssemblyRecipe.Builder::new)
+                case "assembly" -> REGISTRATE.recipeType(recipeTypeId, AssemblyRecipe.Builder::new)
                     .recipeClass(AssemblyRecipe.class)
                     .serializer(AssemblyRecipe.SERIALIZER)
                     .register();
-                case "clean" -> REGISTRATE.recipeType(id, CleanRecipe.Builder::new)
+                case "clean" -> REGISTRATE.recipeType(recipeTypeId, CleanRecipe.Builder::new)
                     .recipeClass(CleanRecipe.class)
                     .serializer(CleanRecipe.SERIALIZER)
                     .register();
-                case "ore_analyzer" -> REGISTRATE.recipeType(id, OreAnalyzerRecipe.Builder::new)
+                case "ore_analyzer" -> REGISTRATE.recipeType(recipeTypeId, OreAnalyzerRecipe.Builder::new)
                     .recipeClass(OreAnalyzerRecipe.class)
                     .serializer(OreAnalyzerRecipe.SERIALIZER)
                     .register();
-                case "chemical_reactor" -> REGISTRATE.recipeType(id, ChemicalReactorRecipe.Builder::new)
+                case "chemical_reactor" -> REGISTRATE.recipeType(recipeTypeId, ChemicalReactorRecipe.Builder::new)
                     .recipeClass(ChemicalReactorRecipe.class)
                     .serializer(ChemicalReactorRecipe.SERIALIZER)
                     .register();
-                case "blast_furnace" -> REGISTRATE.recipeType(id, BlastFurnaceRecipe.Builder::new)
+                case "blast_furnace" -> REGISTRATE.recipeType(recipeTypeId, BlastFurnaceRecipe.Builder::new)
                     .recipeClass(BlastFurnaceRecipe.class)
                     .serializer(BlastFurnaceRecipe.SERIALIZER)
                     .register();
@@ -252,6 +253,11 @@ public class MachineMeta extends MetaConsumer {
             recipeTypeStr = GsonHelper.getAsString(jo, "recipe", "default");
             menuType = GsonHelper.getAsString(jo, "menu", "default");
             machineType = GsonHelper.getAsString(jo, "machine", "default");
+            if (jo.has("recipeTypeId")) {
+                recipeTypeId = GsonHelper.getAsString(jo, "recipeTypeId");
+            } else {
+                recipeTypeId = id;
+            }
         }
 
         public void run() {

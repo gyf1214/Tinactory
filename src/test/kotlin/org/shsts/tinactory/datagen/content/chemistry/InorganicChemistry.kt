@@ -19,7 +19,7 @@ object InorganicChemistry {
 
     private fun mv() {
         mixer {
-            output(Items.GUNPOWDER) {
+            output(Items.GUNPOWDER, 6) {
                 input("sulfur")
                 input("potassium_nitrate", amount = 2)
                 input("carbon", amount = 3)

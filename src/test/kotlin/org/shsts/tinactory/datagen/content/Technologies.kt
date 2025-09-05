@@ -65,6 +65,7 @@ object Technologies {
     val TNT: ResourceLocation
     val DIGITAL_STORAGE: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
+    val ROCKET_T1: ResourceLocation
 
     init {
         Factory().apply {
@@ -245,8 +246,16 @@ object Technologies {
             voltage = Voltage.HV
             base = ADVANCED_CHEMISTRY
 
-            ROCKET_SCIENCE = tech("rocket_science") {
+            ROCKET_SCIENCE = child("rocket_science") {
                 maxProgress(200)
+                displayItem(Items.FIREWORK_ROCKET)
+                depends(TNT)
+            }
+
+            ROCKET_T1 = tech("rocket_t1") {
+                maxProgress(250)
+                displayItem(Items.FIREWORK_ROCKET)
+                noResearch()
             }
         }
     }

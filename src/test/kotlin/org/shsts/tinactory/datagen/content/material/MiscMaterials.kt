@@ -18,8 +18,8 @@ import org.shsts.tinactory.content.AllTags.TOOL_SHEARS
 import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.datagen.content.Models.basicItem
+import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
@@ -178,17 +178,14 @@ object MiscMaterials {
 
     private fun generateStone() {
         stoneGenerator {
-            for (variant in OreVariant.entries) {
-                output(variant.baseItem) {
-                    if (variant == OreVariant.STONE) {
-                        voltage(Voltage.PRIMITIVE)
-                    } else {
-                        voltage(variant.voltage)
-                    }
-                }
+            output(Items.COBBLESTONE) {
+                voltage(Voltage.PRIMITIVE)
             }
             output("water") {
                 voltage(Voltage.ULV)
+            }
+            output(Items.DEEPSLATE) {
+                voltage(Voltage.LV)
             }
         }
         stoneGenerator {
@@ -197,6 +194,13 @@ object MiscMaterials {
             }
             output("air")
             output("sea_water")
+        }
+        stoneGenerator {
+            defaults {
+                voltage(Voltage.HV)
+                tech(Technologies.ROCKET_T1)
+            }
+            output(Items.NETHERRACK)
         }
     }
 

@@ -9,6 +9,7 @@ import org.shsts.tinactory.content.recipe.MarkerRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
+import org.shsts.tinactory.core.recipe.ResearchRecipe
 import org.shsts.tinactory.core.recipe.ToolRecipe
 
 typealias SimpleProcessingBuilder = ProcessingRecipeBuilder<ProcessingRecipe.Builder>
@@ -43,6 +44,15 @@ object RecipeFactories {
         AssemblyRecipeFactory {
         val recipeType = REGISTRATE.getRecipeType<AssemblyRecipe.Builder>(name)
         return AssemblyRecipeFactory(recipeType, defaults)
+    }
+
+    fun rocket(block: ProcessingRecipeFactoryBase<ResearchRecipe.Builder>.() -> Unit) {
+        processing<ResearchRecipe.Builder>("rocket") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            amperage = 0.125
+            workTicks(40)
+        }.block()
     }
 
     fun assembler(block: AssemblyRecipeFactory.() -> Unit) {
