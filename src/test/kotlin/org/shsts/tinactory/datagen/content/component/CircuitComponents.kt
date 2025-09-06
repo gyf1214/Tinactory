@@ -293,28 +293,41 @@ object CircuitComponents {
         }
 
         engraving("integrated_circuit", "ruby", 0, Voltage.LV, -1.0, 0.0)
-        engraving("cpu", "diamond", 0, Voltage.MV, 0.0, 0.5)
-        engraving("ram", "sapphire", 0, Voltage.MV, -0.25, 0.25)
-        engraving("low_pic", "emerald", 0, Voltage.MV, -0.3, 0.2)
+        engraving("cpu", "diamond", 0, Voltage.MV, 0.0, 1.0)
+        engraving("ram", "sapphire", 0, Voltage.MV, -0.5, 0.5)
+        engraving("low_pic", "emerald", 0, Voltage.MV, -0.3, 0.7)
+        engraving("nano_cpu", "emerald", 1, Voltage.HV, 0.75, 1.5, "cpu")
+        engraving("nor", "diamond", 1, Voltage.HV, 0.5, 1.25, "ram")
+        engraving("simple_soc", "blue_topaz", 1, Voltage.HV, 0.7, 1.45)
+        engraving("pic", "topaz", 1, Voltage.HV, 0.6, 1.35)
     }
 
     private fun engraving(name: String, lens: String, level: Int, voltage: Voltage,
-        minCleanness: Double, maxCleanness: Double) {
+        minCleanness: Double, maxCleanness: Double, source: String? = null) {
         val wafer = WAFER.item(name)
-        for (i in level..<WAFER_RAW_LIST.size) {
-            val j = i - level
-            val rawWafer = WAFER_RAW_LIST.item(i)
-            val rawId = name(rawWafer.asItem().registryName!!.path, -1)
-            val minC = 1 - (1 - minCleanness) / (1 shl i)
-            val maxC = 1 - (1 - maxCleanness) / (1 shl i)
-            laserEngraver {
-                output(wafer, 1 shl j, suffix = "_from_$rawId") {
-                    input(rawWafer)
-                    input(lens, "lens", 0, port = 1)
-                    voltage(Voltage.fromRank(voltage.rank + j))
-                    workTicks(1000L shl level)
-                    extra {
-                        requireCleanness(minC, maxC)
+
+        laserEngraver {
+            defaults {
+                input(lens, "lens", 0, port = 1)
+                workTicks(1000L shl level)
+                extra {
+                    requireCleanness(minCleanness, maxCleanness)
+                }
+            }
+
+            if (source != null) {
+                output(wafer) {
+                    input(WAFER.item(source))
+                    voltage(voltage)
+                }
+            } else {
+                for (i in level..<WAFER_RAW_LIST.size) {
+                    val j = i - level
+                    val rawWafer = WAFER_RAW_LIST.item(i)
+                    val rawId = name(rawWafer.asItem().registryName!!.path, -1)
+                    output(wafer, 1 shl j, suffix = "_from_$rawId") {
+                        input(rawWafer)
+                        voltage(Voltage.fromRank(voltage.rank + j))
                     }
                 }
             }
