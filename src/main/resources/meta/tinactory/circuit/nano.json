@@ -1,0 +1,11 @@
+{
+  "type": "circuit",
+  "tier": "nano",
+  "baseLevel": "normal",
+  "items": [
+    "nano_processor",
+    "nano_assembly",
+    "nano_computer",
+    "nano_mainframe"
+  ]
+}

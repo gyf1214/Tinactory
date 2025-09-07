@@ -140,6 +140,10 @@ object CircuitComponents {
 
         circuitTier(CircuitTier.CPU) {
             circuitAssembler {
+                circuit("nand_chip", 8) {
+                    chip("cpu")
+                    input("copper", "wire_fine", 2)
+                }
                 circuit("microprocessor", 3) {
                     chip("cpu")
                     component("resistor", 2)
@@ -157,12 +161,13 @@ object CircuitComponents {
                 circuit("assembly") {
                     circuit("processor", 2)
                     component("inductor", 2)
-                    component("capacitor", 8)
+                    component("capacitor", 4)
                     chip("ram", 4)
                     input("red_alloy", "wire_fine", 8)
                 }
                 circuit("workstation") {
                     circuit("assembly", 2)
+                    component("resistor", 4)
                     component("diode", 4)
                     chip("ram", 4)
                     input("electrum", "wire_fine", 16)
@@ -171,10 +176,45 @@ object CircuitComponents {
                 circuit("mainframe") {
                     input("aluminium", "stick", 8)
                     circuit("workstation", 2)
-                    chip("ram", 16)
                     component("inductor", 8)
                     component("capacitor", 16)
-                    input("copper", "wire", 16)
+                    chip("nor", 8)
+                    input("annealed_copper", "wire", 16)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.NANO) {
+            circuitAssembler {
+                circuit("nano_processor") {
+                    chip("nano_cpu")
+                    component("resistor", 2)
+                    component("capacitor", 2)
+                    component("transistor", 2)
+                    input("electrum", "wire_fine", 4)
+                }
+                circuit("nano_assembly") {
+                    circuit("nano_processor", 2)
+                    component("inductor", 2)
+                    component("capacitor", 4)
+                    chip("ram", 4)
+                    input("electrum", "wire_fine", 8)
+                }
+                circuit("nano_computer") {
+                    circuit("nano_assembly", 2)
+                    component("resistor", 4)
+                    component("diode", 4)
+                    chip("ram", 4)
+                    chip("nor", 4)
+                    input("annealed_copper", "wire_fine", 16)
+                }
+                circuit("nano_mainframe") {
+                    input("titanium", "stick", 8)
+                    circuit("nano_computer", 2)
+                    component("inductor", 8)
+                    component("capacitor", 16)
+                    chip("nor", 16)
+                    input("annealed_copper", "wire", 16)
                 }
             }
         }
