@@ -226,7 +226,7 @@ object OrganicChemistry {
         }
 
         assembler {
-            output(Items.TNT, 4, suffix = "_from_toluene") {
+            output(Items.TNT, 2, suffix = "_from_toluene") {
                 input(GELLED_TOLUENE.get())
                 input("pe", amount = 2)
                 voltage(Voltage.HV)

@@ -47,6 +47,9 @@ object MiscMaterials {
         disableVanilla("redstone", "")
         disableVanilla("lapis", "lazuli")
         disableVanilla("emerald", "")
+        vanilla {
+            nullRecipe("quartz", "quartz_from_blasting", "quartz_block")
+        }
 
         // smelt iron nugget to wrought iron
         vanilla {

@@ -218,6 +218,7 @@ object MiscMachines {
                 Items.BUCKET,
                 Items.SHEARS,
                 Items.FLINT_AND_STEEL,
+                Items.TNT,
                 Items.SPYGLASS,
                 Items.COMPASS,
                 Items.CROSSBOW,
@@ -250,7 +251,6 @@ object MiscMachines {
                 Items.HEAVY_WEIGHTED_PRESSURE_PLATE,
                 Items.STONE_BUTTON,
                 Items.POLISHED_BLACKSTONE_BUTTON)
-
         }
     }
 
