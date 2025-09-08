@@ -185,6 +185,7 @@ object MiscComponents {
             }
             output(ANNIHILATION_CORE.get(), 2) {
                 circuit(1, Voltage.MV)
+                component("robot_arm", 1, Voltage.MV)
                 input("nether_quartz", "primary", 4)
                 input("fluix", "dust", 4)
                 input("annealed_copper", "wire_fine", 8)
@@ -192,6 +193,7 @@ object MiscComponents {
             }
             output(FORMATION_CORE.get(), 2) {
                 circuit(1, Voltage.MV)
+                component("conveyor_module", 1, Voltage.MV)
                 input("certus_quartz", "crystal", 4)
                 input("fluix", "dust", 4)
                 input("annealed_copper", "wire_fine", 8)

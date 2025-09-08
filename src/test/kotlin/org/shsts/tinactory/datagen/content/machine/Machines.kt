@@ -84,7 +84,7 @@ object Machines {
             overlay(Direction.NORTH, SCREEN_GLASS)
         }
         machine("logistic_worker", "cover/overlay_conveyor")
-        machine("me_driver", "overlay/automation/automation_superbuffer")
+        machine("me_drive", "overlay/automation/automation_superbuffer")
         machine("me_storage_interface", "cover/overlay_storage")
     }
 

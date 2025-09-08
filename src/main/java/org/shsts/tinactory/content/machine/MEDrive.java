@@ -52,10 +52,10 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MEDriver extends CapabilityProvider
+public class MEDrive extends CapabilityProvider
     implements IEventSubscriber, ILayoutProvider, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String ID = "machine/me_driver";
+    private static final String ID = "machine/me_drive";
 
     private final BlockEntity blockEntity;
     private final Layout layout;
@@ -68,7 +68,7 @@ public class MEDriver extends CapabilityProvider
     private IMachine machine;
     private IMachineConfig machineConfig;
 
-    public MEDriver(BlockEntity blockEntity, Layout layout) {
+    public MEDrive(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
         this.layout = layout;
         var size = layout.slots.size();
@@ -86,12 +86,12 @@ public class MEDriver extends CapabilityProvider
         combinedFluids.onUpdate(blockEntity::setChanged);
 
         var electric = new SimpleElectricConsumer(getBlockVoltage(blockEntity),
-            CONFIG.meDriverAmperage.get());
+            CONFIG.meDriveAmperage.get());
         this.electricCap = LazyOptional.of(() -> electric);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
-        return $ -> $.capability(ID, be -> new MEDriver(be, layout));
+        return $ -> $.capability(ID, be -> new MEDrive(be, layout));
     }
 
     private boolean allowItem(ItemStack stack) {

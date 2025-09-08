@@ -9,7 +9,7 @@ import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.content.machine.ElectricTank;
-import org.shsts.tinactory.content.machine.MEDriver;
+import org.shsts.tinactory.content.machine.MEDrive;
 import org.shsts.tinactory.content.machine.MEStorageInterface;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -49,7 +49,7 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
     public static final MachineSet LOGISTIC_WORKER;
-    public static final MachineSet ME_DRIVER;
+    public static final MachineSet ME_DRIVE;
     public static final MachineSet ME_STORAGE_INTERFACE;
     public static final Map<Voltage, IEntry<MachineBlock>> MULTIBLOCK_INTERFACE;
 
@@ -147,10 +147,10 @@ public final class AllBlockEntities {
             .tintVoltage(2)
             .buildObject();
 
-        ME_DRIVER = set.machine("me_driver")
-            .machine(v -> "logistics/" + v.id + "/me_driver", MachineBlock::factory)
+        ME_DRIVE = set.machine("me_drive")
+            .machine(v -> "logistics/" + v.id + "/me_drive", MachineBlock::factory)
             .menu(AllMenus.SIMPLE_MACHINE)
-            .layoutMachine(MEDriver::factory)
+            .layoutMachine(MEDrive::factory)
             .voltages(Voltage.HV)
             .layoutSet()
             .port(ITEM_INPUT)

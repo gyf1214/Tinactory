@@ -25,7 +25,7 @@ public final class TinactoryConfig {
     public final ConfigValue<Integer> bytesPerFluidType;
     public final ConfigValue<Double> logisticWorkerAmperage;
     public final ConfigValue<Double> electricStorageAmperage;
-    public final ConfigValue<Double> meDriverAmperage;
+    public final ConfigValue<Double> meDriveAmperage;
     public final ConfigValue<Double> meStorageInterfaceAmperage;
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
@@ -75,8 +75,8 @@ public final class TinactoryConfig {
             .defineInRange("logistic_worker_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
         electricStorageAmperage = builder.comment("Amperage usage on Electric Storage")
             .defineInRange("electric_storage_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
-        meDriverAmperage = builder.comment("Amperage usage on ME Driver")
-            .defineInRange("me_driver_amperage", 0.25d, 0d, Double.POSITIVE_INFINITY);
+        meDriveAmperage = builder.comment("Amperage usage on ME Driver")
+            .defineInRange("me_drive_amperage", 0.25d, 0d, Double.POSITIVE_INFINITY);
         meStorageInterfaceAmperage = builder.comment("Amperage usage on ME Storage Interface")
             .defineInRange("me_storage_interface_amperage", 0.5d, 0d, Double.POSITIVE_INFINITY);
         builder.pop();
