@@ -228,13 +228,13 @@ object OrganicChemistry {
         }
 
         chemicalReactor {
-            output(GELLED_TOLUENE.get(), 25) {
-                input("toluene", amount = 3)
-                input("nitric_acid", amount = 10)
-                input("sulfuric_acid", amount = 10)
-                output("sulfuric_acid", "dilute", amount = 20)
+            output(GELLED_TOLUENE.get(), 12) {
+                input("toluene", amount = 1.8)
+                input("nitric_acid", amount = 5)
+                input("sulfuric_acid", amount = 5)
+                output("sulfuric_acid", "dilute", amount = 10)
                 voltage(Voltage.HV)
-                workTicks(720)
+                workTicks(360)
                 tech(Technologies.TNT)
             }
         }
