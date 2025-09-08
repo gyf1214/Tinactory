@@ -4,9 +4,10 @@ import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -30,12 +31,17 @@ public class CleanRecipe extends ProcessingRecipe {
         this.maxCleanness = builder.maxCleanness;
     }
 
-    private boolean checkCleanness(BlockEntity blockEntity, Random random) {
+    protected double getCleanness(IMachine machine, Level world, BlockPos pos) {
+        return Cleanroom.getCleanness(world, pos);
+    }
+
+    private boolean checkCleanness(IMachine machine, Random random) {
+        var blockEntity = machine.blockEntity();
         var world = blockEntity.getLevel();
         assert world != null;
         var pos = blockEntity.getBlockPos();
 
-        var cleanness = Cleanroom.getCleanness(world, pos);
+        var cleanness = getCleanness(machine, world, pos);
 
         LOGGER.debug("check cleanness pos={}:{}, cleanness={}",
             world.dimension().location(), pos, cleanness);
@@ -55,7 +61,7 @@ public class CleanRecipe extends ProcessingRecipe {
 
     @Override
     public void insertOutputs(IMachine machine, Random random) {
-        if (checkCleanness(machine.blockEntity(), random)) {
+        if (checkCleanness(machine, random)) {
             super.insertOutputs(machine, random);
         }
     }

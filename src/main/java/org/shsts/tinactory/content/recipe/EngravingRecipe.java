@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.recipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -63,6 +64,12 @@ public class EngravingRecipe extends CleanRecipe {
         return canCraft(machine) && container
             .filter($ -> matchInputs(machine, $) && matchOutputs($, world.random))
             .isPresent();
+    }
+
+    @Override
+    protected double getCleanness(IMachine machine, Level world, BlockPos pos) {
+        var factor = getLithography(machine).map(Lithography::getCleannessFactor).orElse(1d);
+        return factor * super.getCleanness(machine, world, pos);
     }
 
     public static Builder builder(IRecipeType<Builder> parent, ResourceLocation loc) {

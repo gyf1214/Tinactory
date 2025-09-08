@@ -36,6 +36,7 @@ public final class TinactoryConfig {
     public final ConfigValue<Double> cleanroomBaseClean;
     public final ConfigValue<Double> cleanroomBaseDecay;
     public final ConfigValue<Double> cleanroomOpenDecay;
+    public final ConfigValue<Double> lithographyCleannessFactor;
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
     public final ConfigValue<Integer> multiblockCheckCycle;
@@ -99,6 +100,8 @@ public final class TinactoryConfig {
             .defineInRange("cleanroom_base_decay", 1e-4d, 0d, 1d);
         cleanroomOpenDecay = builder.comment("Cleanroom decay when open")
             .defineInRange("cleanroom_open_decay", 0.01d, 0d, 1d);
+        lithographyCleannessFactor = builder.comment("Cleanness factor in lithography")
+            .defineInRange("lithography_cleanness_factory", 2d, 0d, Double.POSITIVE_INFINITY);
         builder.pop();
 
         builder.push("network");

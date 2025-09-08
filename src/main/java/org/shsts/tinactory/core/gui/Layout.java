@@ -45,16 +45,17 @@ public class Layout {
     public Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable WidgetInfo progressBar) {
         this.slots = slots;
         for (var slot : slots) {
-            if (slot.port >= portSlots.size()) {
-                var list = new ArrayList<SlotInfo>();
-                portSlots.add(list);
-                list.add(slot);
-            } else {
-                portSlots.get(slot.port).add(slot);
+            while (slot.port >= portSlots.size()) {
+                portSlots.add(new ArrayList<>());
             }
+            portSlots.get(slot.port).add(slot);
         }
         for (var portSlot : portSlots) {
-            ports.add(new PortInfo(portSlot.size(), portSlot.get(0).type));
+            if (portSlot.isEmpty()) {
+                ports.add(new PortInfo(0, SlotType.NONE));
+            } else {
+                ports.add(new PortInfo(portSlot.size(), portSlot.get(0).type));
+            }
         }
         this.images = images;
         this.progressBar = progressBar;
