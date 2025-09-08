@@ -207,7 +207,7 @@ object CircuitComponents {
                     component("diode", 4)
                     chip("nor", 4)
                     input("annealed_copper", "wire_fine", 16)
-                    input("silver", "bolt", 16)
+                    input("gold", "bolt", 16)
                 }
                 circuit("nano_mainframe") {
                     input("titanium", "stick", 8)
