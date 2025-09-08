@@ -104,7 +104,7 @@ public final class AllMultiblocks {
             .properties(CASING_PROPERTY)
             .register();
 
-        LITHOGRAPHY_LENS = REGISTRATE.block("multiblock/misc/lithography_glass",
+        LITHOGRAPHY_LENS = REGISTRATE.block("multiblock/misc/lithography_lens",
                 props -> new LensBlock(props, List.of(
                     getMaterial("ruby").entry("lens"),
                     getMaterial("diamond").entry("lens"),

@@ -333,6 +333,14 @@ object RecipeFactories {
         }.block()
     }
 
+    fun oilCracking(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("oil_cracking") {
+            defaultInputFluid = 0
+            defaultOutputFluid = 2
+            amperage = 2.5
+        }.block()
+    }
+
     fun marker(block: MarkerFactory.() -> Unit) {
         val recipeType = REGISTRATE.getRecipeType<MarkerRecipe.Builder>("marker")
         RecipeFactory(recipeType, ::MarkerBuilder).block()

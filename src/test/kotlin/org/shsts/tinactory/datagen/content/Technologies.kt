@@ -58,6 +58,7 @@ object Technologies {
     val OIL_PROCESSING: ResourceLocation
     val ORGANIC_CHEMISTRY: ResourceLocation
     val CPU: ResourceLocation
+    val OIL_CRACKING: ResourceLocation
     val CLEANROOM: ResourceLocation
     val NICHROME: ResourceLocation
     val ARC_FURNACE: ResourceLocation
@@ -208,6 +209,12 @@ object Technologies {
                 maxProgress(50)
                 displayItem(AllMultiblocks.NICHROME_COIL_BLOCK)
                 depends(KANTHAL)
+            }
+
+            OIL_CRACKING = tech("oil_cracking") {
+                maxProgress(100)
+                displayItem(getMultiblock("oil_cracking_unit").block)
+                depends(OIL_PROCESSING)
             }
 
             base = CHEMISTRY

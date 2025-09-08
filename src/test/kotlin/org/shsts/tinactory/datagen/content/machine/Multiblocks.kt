@@ -298,6 +298,7 @@ object Multiblocks {
                     overlay("multiblock/cleanroom")
                 }
             }
+            multiblock("oil_cracking_unit", "clean_stainless_steel", "blast_furnace")
             multiblock("pyrolyse_oven", "heatproof")
             multiblock("large_chemical_reactor", "inert_ptfe")
             multiblock("implosion_compressor", "solid_steel")
@@ -395,6 +396,15 @@ object Multiblocks {
                 input("stainless_steel", "pipe", 4)
                 input("stainless_steel", "plate", 4)
                 tech(Technologies.DISTILLATION)
+            }
+            multiblock("oil_cracking_unit") {
+                input(CLEAN_STAINLESS_CASING.get())
+                circuit(3)
+                component("electric_pump", 2)
+                component("electric_piston", 2)
+                component("cable", 4)
+                input("stainless_steel", "pipe", 4)
+                tech(Technologies.OIL_CRACKING)
             }
             output(CLEANROOM.get()) {
                 input(PLASCRETE.get())

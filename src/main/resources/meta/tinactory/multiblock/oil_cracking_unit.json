@@ -1,0 +1,65 @@
+{
+  "recipeTypeId": "oil_cracking",
+  "machine": "coil",
+  "autoRecipe": false,
+  "baseTemperature": 2000,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "fluid_output",
+        "x": 72,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_cracking",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/clean_stainless_steel",
+  "layers": [
+    [
+      "BCBCB",
+      "BCBCB",
+      "BCBCB"
+    ],
+    [
+      "BCBCB",
+      "BAAAB",
+      "BC$CB"
+    ],
+    [
+      "BCBCB",
+      "BCBCB",
+      "BCBCB"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/clean_stainless_steel"
+    },
+    "C": {
+      "type": "tag_with_same_block",
+      "key": "coil",
+      "tag": "tinactory:multiblock/coil"
+    },
+    "A": "air"
+  }
+}

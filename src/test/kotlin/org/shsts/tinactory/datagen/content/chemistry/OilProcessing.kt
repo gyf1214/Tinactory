@@ -1,9 +1,14 @@
 package org.shsts.tinactory.datagen.content.chemistry
 
+import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.oilCracking
+import kotlin.math.round
 
 object OilProcessing {
     fun init() {
@@ -11,6 +16,11 @@ object OilProcessing {
         sulfuric("naphtha", 240)
         sulfuric("light_fuel", 320)
         sulfuric("heavy_fuel", 432)
+
+        cracking("refinery_gas", 0.8)
+        cracking("naphtha", 1.0)
+        cracking("light_fuel", 1.2)
+        cracking("heavy_fuel", 1.4)
 
         distill()
     }
@@ -24,6 +34,34 @@ object OilProcessing {
                 voltage(Voltage.MV)
                 workTicks(workTicks)
                 tech(Technologies.OIL_PROCESSING)
+            }
+        }
+    }
+
+    private class CrackingFactory(val mat: MaterialSet, val factor: Double) {
+        fun ProcessingRecipeFactory.cracking(sub: String, mat2: String, workTicks: Long) {
+            if (!mat.hasFluid(sub)) {
+                return
+            }
+            output(mat, sub) {
+                input(mat)
+                input(mat2, "gas", port = 1)
+                workTicks(round(workTicks * factor).toLong())
+            }
+        }
+    }
+
+    private fun cracking(name: String, factor: Double) {
+        oilCracking {
+            defaults {
+                voltage(Voltage.MV)
+            }
+
+            CrackingFactory(getMaterial(name), factor).apply {
+                cracking("lightly_hydro_cracked", "hydrogen", 80)
+                cracking("severely_hydro_cracked", "hydrogen", 100)
+                cracking("lightly_steam_cracked", "water", 100)
+                cracking("severely_steam_cracked", "water", 120)
             }
         }
     }
