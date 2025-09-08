@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content
 
 import org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS
+import org.shsts.tinactory.content.AllMultiblocks.MULTIBLOCK_SETS
 import org.shsts.tinactory.content.AllTags.material
 import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.modLoc
@@ -60,18 +61,13 @@ object Markers {
 
     private fun trackJEICategory() {
         val allTypes = buildList {
+            add(modLoc("tool_crafting"))
             for (set in PROCESSING_SETS) {
                 add(set.recipeType.loc())
             }
-            add(modLoc("tool_crafting"))
-            // Multiblocks
-            add(modLoc("tool_crafting"))
-            add(modLoc("blast_furnace"))
-            add(modLoc("sifter"))
-            add(modLoc("vacuum_freezer"))
-            add(modLoc("distillation"))
-            add(modLoc("autofarm"))
-            add(modLoc("pyrolyse_oven"))
+            for (set in MULTIBLOCK_SETS.values) {
+                add(set.recipeType.loc())
+            }
         }
 
         dataGen {

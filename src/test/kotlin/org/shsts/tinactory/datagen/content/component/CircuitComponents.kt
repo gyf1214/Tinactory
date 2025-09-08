@@ -143,6 +143,7 @@ object CircuitComponents {
                 circuit("nand_chip", 8) {
                     chip("cpu")
                     input("copper", "wire_fine", 2)
+                    input("tin", "bolt", 2)
                 }
                 circuit("microprocessor", 3) {
                     chip("cpu")
@@ -153,15 +154,15 @@ object CircuitComponents {
                 }
                 circuit("processor") {
                     chip("cpu")
-                    component("resistor", 2)
-                    component("capacitor", 2)
-                    component("transistor", 2)
+                    component("resistor", 4)
+                    component("capacitor", 4)
+                    component("transistor", 4)
                     input("red_alloy", "wire_fine", 4)
                 }
                 circuit("assembly") {
                     circuit("processor", 2)
-                    component("inductor", 2)
-                    component("capacitor", 4)
+                    component("inductor", 4)
+                    component("capacitor", 8)
                     chip("ram", 4)
                     input("red_alloy", "wire_fine", 8)
                 }
@@ -188,15 +189,15 @@ object CircuitComponents {
             circuitAssembler {
                 circuit("nano_processor") {
                     chip("nano_cpu")
-                    component("resistor", 2)
-                    component("capacitor", 2)
-                    component("transistor", 2)
+                    component("resistor", 4)
+                    component("capacitor", 4)
+                    component("transistor", 4)
                     input("electrum", "wire_fine", 4)
                 }
                 circuit("nano_assembly") {
                     circuit("nano_processor", 2)
-                    component("inductor", 2)
-                    component("capacitor", 4)
+                    component("inductor", 4)
+                    component("capacitor", 8)
                     chip("ram", 4)
                     input("electrum", "wire_fine", 8)
                 }
@@ -204,9 +205,9 @@ object CircuitComponents {
                     circuit("nano_assembly", 2)
                     component("resistor", 4)
                     component("diode", 4)
-                    chip("ram", 4)
                     chip("nor", 4)
                     input("annealed_copper", "wire_fine", 16)
+                    input("silver", "bolt", 16)
                 }
                 circuit("nano_mainframe") {
                     input("titanium", "stick", 8)

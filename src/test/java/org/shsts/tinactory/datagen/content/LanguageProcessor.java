@@ -60,6 +60,8 @@ public class LanguageProcessor {
 
         pattern("item[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
             fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
+        pattern("item[.]tinactory[.]component[.]storage_component[.](.*)", matcher ->
+            fmt("%s ME Storage Component", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]component[.](.*)[.](basic|good|advanced)", matcher ->
             fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
         pattern("item[.]tinactory[.]component[.](.*)[.](.*)", matcher ->
@@ -90,8 +92,6 @@ public class LanguageProcessor {
             fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
         pattern("item[.]tinactory[.]tool[.](.*)[.](.*)", matcher ->
             fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]circuit[.](.*)", matcher ->
-            fmt("%s Circuit", normalize(matcher, 1)));
         pattern("item[.]tinactory[.](circuit_)?board[.](.*)", matcher ->
             fmt("%s Circuit Board", normalize(matcher, 2)));
         pattern("item[.]tinactory[.]circuit_component[.](.*).smd", matcher ->
@@ -104,12 +104,14 @@ public class LanguageProcessor {
             fmt("%s-doped Monocrystalline Silicon Boule", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]wafer_raw[.](.*)", matcher ->
             fmt("%s-doped Wafer", normalize(matcher, 1)));
+        pattern("item[.]tinactory[.]misc[.](.*)", matcher ->
+            fmt("%s", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]wafer[.](.*)", matcher ->
             fmt("%s Wafer", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]chip[.](.*)", matcher ->
             fmt("%s Chip", normalize(matcher, 1)));
         pattern("item[.]tinactory[.]logistics[.](.*_storage_cell)[.](.*)", matcher ->
-            fmt("%s %s", capitalize(matcher, 2), normalize(matcher, 1)));
+            fmt("%s ME %s", capitalize(matcher, 2), normalize(matcher, 1)));
         pattern("block[.]tinactory[.]material[.]ore[.](.*)", matcher ->
             fmt("%s Ore", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]network[.](.*)[.](.*)", matcher ->

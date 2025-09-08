@@ -64,6 +64,7 @@ object Technologies {
     val ADVANCED_CHEMISTRY: ResourceLocation
     val TNT: ResourceLocation
     val DIGITAL_STORAGE: ResourceLocation
+    val AUTOCLAVE: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
     val ROCKET_T1: ResourceLocation
 
@@ -238,12 +239,20 @@ object Technologies {
 
             base = null
 
+            // TODO
             DIGITAL_STORAGE = tech("digital_storage") {
                 maxProgress(240)
                 displayItem(ITEM_STORAGE_CELL[0])
             }
 
             voltage = Voltage.HV
+            base = CHEMISTRY
+
+            AUTOCLAVE = tech("autoclave") {
+                maxProgress(100)
+                displayItem(getMaterial("certus_quartz").item("crystal"))
+            }
+
             base = ADVANCED_CHEMISTRY
 
             ROCKET_SCIENCE = child("rocket_science") {

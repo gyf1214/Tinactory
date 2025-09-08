@@ -392,6 +392,42 @@ object Multiblocks {
                 tech(Technologies.ADVANCED_CHEMISTRY)
             }
         }
+
+        assembler {
+            defaults {
+                voltage(Voltage.HV)
+                workTicks(MACHINE_TICKS)
+            }
+
+            componentVoltage = Voltage.HV
+            multiblock("implosion_compressor") {
+                input(SOLID_STEEL_CASING.get())
+                circuit(3)
+                component("electric_piston", 4)
+                component("cable", 4)
+                input("stainless_steel", "plate", 4)
+                tech(Technologies.TNT)
+            }
+            multiblock("autoclave") {
+                input(CLEAN_STAINLESS_CASING.get())
+                circuit(3, Voltage.EV)
+                component("electric_motor", 2)
+                component("electric_pump", 2)
+                component("cable", 4)
+                input("stainless_steel", "rotor", 4)
+                tech(Technologies.AUTOCLAVE)
+            }
+
+            componentVoltage = Voltage.EV
+            multiblock("rocket_launch_site") {
+                input(SOLID_STEEL_CASING.get())
+                circuit(4)
+                component("robot_arm", 4)
+                component("cable", 4)
+                input(ADVANCED_ALLOY.get(), 4)
+                tech(Technologies.ROCKET_SCIENCE)
+            }
+        }
     }
 
     private fun AssemblyRecipeFactory.multiblock(name: String, block: AssemblyRecipeBuilder.() -> Unit) {

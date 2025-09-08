@@ -353,6 +353,13 @@ object InorganicChemistry {
                 output("hydrogen_fluoride", amount = 1)
                 workTicks(480)
             }
+            input("rare_earth") {
+                input("sulfuric_acid", amount = 0.6)
+                output("cadmium", rate = 0.6)
+                output("neodymium", rate = 0.4)
+                output("rare_earth_slurry", amount = 0.6)
+                workTicks(240)
+            }
         }
 
         chemicalReactor {
