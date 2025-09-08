@@ -18,7 +18,7 @@
         "port": 2,
         "type": "item_output",
         "x": 72,
-        "y": 1
+        "y": 10
       }
     ],
     "progressBar": {
