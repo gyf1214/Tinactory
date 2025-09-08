@@ -186,6 +186,14 @@ object OrganicChemistry {
                 output("hydrogen_chloride", amount = 12)
                 workTicks(320)
             }
+            output("styrene") {
+                input("benzene")
+                input("ethylene")
+                input("water", "gas")
+                output("hydrogen")
+                output("water")
+                workTicks(320)
+            }
             output("pe", amount = 30, suffix = "_from_lcr") {
                 input("ethylene", amount = 2.16)
                 input("oxygen", amount = 7.5)
@@ -203,6 +211,12 @@ object OrganicChemistry {
                 input("oxygen", amount = 7.5)
                 input("titanium_tetrachloride", amount = 0.1)
                 workTicks(512)
+            }
+            output("ps", amount = 30) {
+                input("styrene", amount = 2.16)
+                input("oxygen", amount = 7.5)
+                input("titanium_tetrachloride", amount = 0.1)
+                workTicks(320)
             }
             output("cetane_boosted_diesel", amount = 2) {
                 input("diesel", amount = 2)
