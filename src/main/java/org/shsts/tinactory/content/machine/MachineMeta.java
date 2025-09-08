@@ -17,6 +17,7 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
+import org.shsts.tinactory.content.recipe.EngravingRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
@@ -157,6 +158,10 @@ public class MachineMeta extends MetaConsumer {
                     .register();
                 case "clean" -> REGISTRATE.recipeType(recipeTypeId, CleanRecipe.Builder::new)
                     .recipeClass(CleanRecipe.class)
+                    .serializer(CleanRecipe.SERIALIZER)
+                    .register();
+                case "engraving" -> REGISTRATE.recipeType(recipeTypeId, EngravingRecipe::builder)
+                    .recipeClass(EngravingRecipe.class)
                     .serializer(CleanRecipe.SERIALIZER)
                     .register();
                 case "ore_analyzer" -> REGISTRATE.recipeType(recipeTypeId, OreAnalyzerRecipe.Builder::new)

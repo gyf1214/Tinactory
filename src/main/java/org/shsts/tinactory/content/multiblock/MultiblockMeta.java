@@ -55,6 +55,10 @@ public class MultiblockMeta extends MachineMeta {
                     return builder.transform(RecipeProcessor.coil(recipeType(), autoRecipe, baseTemp))
                         .child(Multiblock.builder(CoilMultiblock::new));
                 }
+                case "engraving" -> {
+                    return builder.transform(RecipeProcessor.multiblock(recipeType(), autoRecipe))
+                        .child(Multiblock.builder(Lithography::new));
+                }
             }
             throw new UnsupportedTypeException("machine", machineType);
         }

@@ -352,6 +352,9 @@ object Materials {
         material("ptfe", DULL) {
             machineProcess(Voltage.LV, 0.75)
         }
+        material("ps", DULL) {
+            machineProcess(Voltage.LV, 0.75)
+        }
         material("fluix", QUARTZ) {
             mix(Voltage.HV) {
                 component("certus_quartz")

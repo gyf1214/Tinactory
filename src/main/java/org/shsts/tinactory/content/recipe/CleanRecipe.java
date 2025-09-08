@@ -24,7 +24,7 @@ public class CleanRecipe extends ProcessingRecipe {
     public final double minCleanness;
     public final double maxCleanness;
 
-    private CleanRecipe(Builder builder) {
+    protected CleanRecipe(Builder builder) {
         super(builder);
         this.minCleanness = builder.minCleanness;
         this.maxCleanness = builder.maxCleanness;

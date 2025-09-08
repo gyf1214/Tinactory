@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.content.multiblock.HalfBlock;
+import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
@@ -24,10 +25,12 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
@@ -47,6 +50,7 @@ public final class AllMultiblocks {
     public static final IEntry<Block> FROST_PROOF_CASING;
     public static final IEntry<Block> CLEAN_STAINLESS_CASING;
     public static final IEntry<Block> INERT_PTFE_CASING;
+    public static final IEntry<Block> STABLE_TITANIUM;
     // coil blocks
     public static final Set<IEntry<CoilBlock>> COIL_BLOCKS;
     public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
@@ -60,6 +64,7 @@ public final class AllMultiblocks {
     public static final IEntry<Block> FILTER_CASING;
     public static final IEntry<Block> PTFE_PIPE_CASING;
     public static final IEntry<HalfBlock> LAUNCH_SITE_BASE;
+    public static final IEntry<LensBlock> LITHOGRAPHY_LENS;
 
     private static final Transformer<BlockBehaviour.Properties> CASING_PROPERTY;
 
@@ -74,6 +79,7 @@ public final class AllMultiblocks {
         FROST_PROOF_CASING = solid("frost_proof");
         CLEAN_STAINLESS_CASING = solid("clean_stainless_steel");
         INERT_PTFE_CASING = solid("inert_ptfe");
+        STABLE_TITANIUM = solid("stable_titanium");
 
         COIL_BLOCKS = new HashSet<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
@@ -96,6 +102,20 @@ public final class AllMultiblocks {
 
         LAUNCH_SITE_BASE = REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
             .properties(CASING_PROPERTY)
+            .register();
+
+        LITHOGRAPHY_LENS = REGISTRATE.block("multiblock/misc/lithography_glass",
+                props -> new LensBlock(props, List.of(
+                    getMaterial("ruby").entry("lens"),
+                    getMaterial("diamond").entry("lens"),
+                    getMaterial("sapphire").entry("lens"),
+                    getMaterial("emerald").entry("lens"),
+                    getMaterial("topaz").entry("lens"),
+                    getMaterial("blue_topaz").entry("lens"))))
+            .material(Material.GLASS)
+            .properties(CASING_PROPERTY)
+            .properties($ -> $.isViewBlocking(AllItems::never).noOcclusion())
+            .renderType(() -> RenderType::cutout)
             .register();
 
         MULTIBLOCK_SETS = new HashMap<>();

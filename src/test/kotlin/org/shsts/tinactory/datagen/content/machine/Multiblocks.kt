@@ -22,12 +22,15 @@ import org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING
 import org.shsts.tinactory.content.AllMultiblocks.INERT_PTFE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.KANTHAL_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.LAUNCH_SITE_BASE
+import org.shsts.tinactory.content.AllMultiblocks.LITHOGRAPHY_LENS
 import org.shsts.tinactory.content.AllMultiblocks.NICHROME_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.PLASCRETE
 import org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING
+import org.shsts.tinactory.content.AllMultiblocks.STABLE_TITANIUM
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
+import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR
 import org.shsts.tinactory.content.AllTags.CLEANROOM_WALL
 import org.shsts.tinactory.content.AllTags.COIL
@@ -127,6 +130,11 @@ object Multiblocks {
                         ctx.id(), tex, tex, tex))
                 }
             }
+
+            block(LITHOGRAPHY_LENS) {
+                blockState(solidBlock("casings/transparent/cleanroom_glass"))
+                tag(AllTags.LITHOGRAPHY_LENS)
+            }
         }
 
         dataGen {
@@ -140,6 +148,7 @@ object Multiblocks {
             solid(SOLID_STEEL_CASING, Voltage.LV, "steel", Technologies.STEEL)
             solid(FROST_PROOF_CASING, Voltage.LV, "aluminium", Technologies.VACUUM_FREEZER)
             solid(CLEAN_STAINLESS_CASING, Voltage.MV, "stainless_steel", Technologies.DISTILLATION)
+            solid(STABLE_TITANIUM, Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
 
             coil(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
             coil(KANTHAL_COIL_BLOCK, Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
@@ -223,6 +232,19 @@ object Multiblocks {
                 workTicks(140)
                 tech(Technologies.ROCKET_SCIENCE)
             }
+            output(LITHOGRAPHY_LENS.get()) {
+                input("titanium", "stick", 4)
+                component("robot_arm", 2, voltage = Voltage.EV)
+                input("ruby", "lens", 4)
+                input("diamond", "lens", 4)
+                input("sapphire", "lens", 4)
+                input("emerald", "lens", 4)
+                input("topaz", "lens", 4)
+                input("blue_topaz", "lens", 4)
+                input("soldering_alloy", amount = 3)
+                workTicks(320)
+                tech(Technologies.LITHOGRAPHY)
+            }
         }
     }
 
@@ -280,6 +302,7 @@ object Multiblocks {
             multiblock("large_chemical_reactor", "inert_ptfe")
             multiblock("implosion_compressor", "solid_steel")
             multiblock("autoclave", "clean_stainless_steel", "blast_furnace")
+            multiblock("lithography", "stable_titanium", "blast_furnace")
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
         }
     }
@@ -419,10 +442,20 @@ object Multiblocks {
             }
 
             componentVoltage = Voltage.EV
+            multiblock("lithography") {
+                input(STABLE_TITANIUM.get())
+                circuit(3, Voltage.IV)
+                component("emitter", 4, Voltage.HV)
+                component("conveyor_module", 4)
+                component("cable", 4)
+                input(LITHOGRAPHY_LENS.get())
+                tech(Technologies.LITHOGRAPHY)
+            }
             multiblock("rocket_launch_site") {
                 input(SOLID_STEEL_CASING.get())
                 circuit(4)
                 component("robot_arm", 4)
+                component("conveyor_module", 4)
                 component("cable", 4)
                 input(ADVANCED_ALLOY.get(), 4)
                 tech(Technologies.ROCKET_SCIENCE)

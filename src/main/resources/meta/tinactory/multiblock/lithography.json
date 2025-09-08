@@ -1,0 +1,61 @@
+{
+  "recipe": "tinactory:laser_engraver",
+  "machine": "engraving",
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 54,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/stable_titanium",
+  "layers": [
+    [
+      "CCC",
+      "CCC",
+      "CCC",
+      "BBB"
+    ],
+    [
+      "CCC",
+      "CLC",
+      "CLC",
+      "B$B"
+    ],
+    [
+      "CCC",
+      "CCC",
+      "CCC",
+      "BBB"
+    ]
+  ],
+  "defines": {
+    "C": "tinactory:multiblock/solid/stable_titanium",
+    "L": {
+      "type": "tag_with_same_block",
+      "key": "lens",
+      "tag": "tinactory:multiblock/lithography_lens"
+    },
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    }
+  }
+}

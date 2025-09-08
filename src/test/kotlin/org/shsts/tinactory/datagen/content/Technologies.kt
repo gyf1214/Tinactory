@@ -15,6 +15,7 @@ import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.datagen.builder.TechBuilder
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder.Companion.VEIN_TECH_RANK
+import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.provider.TechProvider
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
@@ -63,6 +64,7 @@ object Technologies {
     val HYDROMETALLURGY: ResourceLocation
     val ADVANCED_CHEMISTRY: ResourceLocation
     val TNT: ResourceLocation
+    val LITHOGRAPHY: ResourceLocation
     val DIGITAL_STORAGE: ResourceLocation
     val AUTOCLAVE: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
@@ -107,7 +109,7 @@ object Technologies {
 
             SENSOR_AND_EMITTER = tech("sensor_and_emitter") {
                 maxProgress(40)
-                displayItem(getComponent("emitter").getValue(Voltage.LV))
+                displayItem(getComponent("sensor").getValue(Voltage.LV))
             }
 
             PUMP_AND_PISTON = child("pump_and_piston") {
@@ -237,23 +239,25 @@ object Technologies {
                 displayItem(Items.TNT)
             }
 
-            base = null
+            voltage = Voltage.HV
+            base = CLEANROOM
 
-            // TODO
+            AUTOCLAVE = child("autoclave") {
+                maxProgress(100)
+                displayItem(getMaterial("certus_quartz").item("crystal"))
+            }
+
             DIGITAL_STORAGE = tech("digital_storage") {
                 maxProgress(240)
                 displayItem(ITEM_STORAGE_CELL[0])
             }
 
-            voltage = Voltage.HV
-            base = CHEMISTRY
-
-            AUTOCLAVE = tech("autoclave") {
-                maxProgress(100)
-                displayItem(getMaterial("certus_quartz").item("crystal"))
-            }
-
             base = ADVANCED_CHEMISTRY
+
+            LITHOGRAPHY = tech("lithography") {
+                maxProgress(160)
+                displayItem(getComponent("emitter").item(Voltage.HV))
+            }
 
             ROCKET_SCIENCE = child("rocket_science") {
                 maxProgress(200)
