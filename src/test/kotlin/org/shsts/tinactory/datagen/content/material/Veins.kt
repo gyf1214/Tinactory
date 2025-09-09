@@ -76,6 +76,10 @@ object Veins {
             ore("topaz", 0.3)
             ore("blue_topaz", 0.3)
         }
+        vein("quartz", 0.4) {
+            ore("nether_quartz", 0.6)
+            ore("certus_quartz", 0.6)
+        }
     }
 
     private var rank = 0
