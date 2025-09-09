@@ -337,10 +337,10 @@ object CircuitComponents {
         engraving("cpu", "diamond", 0, Voltage.MV, 0.0, 1.0)
         engraving("ram", "sapphire", 0, Voltage.MV, -0.5, 0.5)
         engraving("low_pic", "emerald", 0, Voltage.MV, -0.3, 0.7)
-        engraving("nano_cpu", "emerald", 1, Voltage.HV, 0.5, 1.5, "cpu")
-        engraving("nor", "diamond", 1, Voltage.HV, 0.25, 1.25, "ram")
-        engraving("simple_soc", "blue_topaz", 1, Voltage.HV, 0.3, 1.3)
-        engraving("pic", "topaz", 1, Voltage.HV, 0.4, 1.4)
+        engraving("nano_cpu", "emerald", 1, Voltage.HV, 0.25, 1.25, "cpu")
+        engraving("nor", "diamond", 1, Voltage.HV, 0.1, 1.1, "ram")
+        engraving("simple_soc", "blue_topaz", 1, Voltage.HV, 0.15, 1.15)
+        engraving("pic", "topaz", 1, Voltage.HV, 0.2, 1.2)
     }
 
     private fun engraving(name: String, lens: String, level: Int, voltage: Voltage,

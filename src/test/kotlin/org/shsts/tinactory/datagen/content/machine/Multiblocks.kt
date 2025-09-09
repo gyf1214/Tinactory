@@ -10,6 +10,7 @@ import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
 import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE
+import org.shsts.tinactory.content.AllMultiblocks.BASIC_LITHOGRAPHY_LENS
 import org.shsts.tinactory.content.AllMultiblocks.CLEANROOM
 import org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING
 import org.shsts.tinactory.content.AllMultiblocks.CLEAR_GLASS
@@ -17,12 +18,12 @@ import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
 import org.shsts.tinactory.content.AllMultiblocks.CUPRONICKEL_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.FILTER_CASING
 import org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING
+import org.shsts.tinactory.content.AllMultiblocks.GOOD_LITHOGRAPHY_LENS
 import org.shsts.tinactory.content.AllMultiblocks.GRATE_MACHINE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING
 import org.shsts.tinactory.content.AllMultiblocks.INERT_PTFE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.KANTHAL_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.LAUNCH_SITE_BASE
-import org.shsts.tinactory.content.AllMultiblocks.LITHOGRAPHY_LENS
 import org.shsts.tinactory.content.AllMultiblocks.NICHROME_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.PLASCRETE
 import org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING
@@ -131,8 +132,13 @@ object Multiblocks {
                 }
             }
 
-            block(LITHOGRAPHY_LENS) {
+            block(BASIC_LITHOGRAPHY_LENS) {
                 blockState(solidBlock("casings/transparent/cleanroom_glass"))
+                tag(AllTags.LITHOGRAPHY_LENS)
+            }
+
+            block(GOOD_LITHOGRAPHY_LENS) {
+                blockState(solidBlock("casings/transparent/laminated_glass"))
                 tag(AllTags.LITHOGRAPHY_LENS)
             }
         }
@@ -232,17 +238,28 @@ object Multiblocks {
                 workTicks(140)
                 tech(Technologies.ROCKET_SCIENCE)
             }
-            output(LITHOGRAPHY_LENS.get()) {
+            output(BASIC_LITHOGRAPHY_LENS.get()) {
                 input("titanium", "stick", 4)
                 component("robot_arm", 2, voltage = Voltage.EV)
                 input("ruby", "lens", 4)
                 input("diamond", "lens", 4)
                 input("sapphire", "lens", 4)
                 input("emerald", "lens", 4)
+                input("soldering_alloy", amount = 3)
+                workTicks(320)
+                tech(Technologies.LITHOGRAPHY)
+            }
+        }
+
+        assembler {
+            output(GOOD_LITHOGRAPHY_LENS.get()) {
+                input(BASIC_LITHOGRAPHY_LENS.get())
+                component("robot_arm", 2, voltage = Voltage.IV)
                 input("topaz", "lens", 4)
                 input("blue_topaz", "lens", 4)
                 input("soldering_alloy", amount = 3)
                 workTicks(320)
+                voltage(Voltage.EV)
                 tech(Technologies.LITHOGRAPHY)
             }
         }
@@ -303,7 +320,7 @@ object Multiblocks {
             multiblock("large_chemical_reactor", "inert_ptfe")
             multiblock("implosion_compressor", "solid_steel")
             multiblock("autoclave", "clean_stainless_steel", "blast_furnace")
-            multiblock("lithography", "stable_titanium", "blast_furnace")
+            multiblock("lithography_machine", "stable_titanium", "blast_furnace")
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
         }
     }
@@ -452,13 +469,13 @@ object Multiblocks {
             }
 
             componentVoltage = Voltage.EV
-            multiblock("lithography") {
+            multiblock("lithography_machine") {
                 input(STABLE_TITANIUM.get())
                 circuit(3, Voltage.IV)
                 component("emitter", 4, Voltage.HV)
                 component("conveyor_module", 4)
                 component("cable", 4)
-                input(LITHOGRAPHY_LENS.get())
+                input(BASIC_LITHOGRAPHY_LENS.get())
                 tech(Technologies.LITHOGRAPHY)
             }
             multiblock("rocket_launch_site") {

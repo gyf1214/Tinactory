@@ -2,7 +2,6 @@ package org.shsts.tinactory.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -20,9 +19,11 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +65,8 @@ public final class AllMultiblocks {
     public static final IEntry<Block> FILTER_CASING;
     public static final IEntry<Block> PTFE_PIPE_CASING;
     public static final IEntry<HalfBlock> LAUNCH_SITE_BASE;
-    public static final IEntry<LensBlock> LITHOGRAPHY_LENS;
+    public static final IEntry<LensBlock> BASIC_LITHOGRAPHY_LENS;
+    public static final IEntry<LensBlock> GOOD_LITHOGRAPHY_LENS;
 
     private static final Transformer<BlockBehaviour.Properties> CASING_PROPERTY;
 
@@ -90,10 +92,7 @@ public final class AllMultiblocks {
         AUTOFARM_BASE = misc("autofarm_base");
 
         CLEAR_GLASS = REGISTRATE.block("multiblock/misc/clear_glass", GlassBlock::new)
-            .material(Material.GLASS)
-            .properties(CASING_PROPERTY)
-            .properties($ -> $.isViewBlocking(AllItems::never).noOcclusion())
-            .renderType(() -> RenderType::cutout)
+            .transform(AllMultiblocks::glass)
             .register();
 
         PLASCRETE = misc("plascrete");
@@ -104,18 +103,24 @@ public final class AllMultiblocks {
             .properties(CASING_PROPERTY)
             .register();
 
-        LITHOGRAPHY_LENS = REGISTRATE.block("multiblock/misc/lithography_lens",
-                props -> new LensBlock(props, List.of(
-                    getMaterial("ruby").entry("lens"),
-                    getMaterial("diamond").entry("lens"),
-                    getMaterial("sapphire").entry("lens"),
-                    getMaterial("emerald").entry("lens"),
-                    getMaterial("topaz").entry("lens"),
-                    getMaterial("blue_topaz").entry("lens"))))
-            .material(Material.GLASS)
-            .properties(CASING_PROPERTY)
-            .properties($ -> $.isViewBlocking(AllItems::never).noOcclusion())
-            .renderType(() -> RenderType::cutout)
+        var basicLens = List.of(
+            getMaterial("ruby").entry("lens"),
+            getMaterial("diamond").entry("lens"),
+            getMaterial("sapphire").entry("lens"),
+            getMaterial("emerald").entry("lens"));
+
+        BASIC_LITHOGRAPHY_LENS = REGISTRATE.block("multiblock/misc/lithography_lens/basic",
+                props -> new LensBlock(props, basicLens))
+            .transform(AllMultiblocks::glass)
+            .register();
+
+        var goodLens = new ArrayList<>(basicLens);
+        goodLens.add(getMaterial("topaz").entry("lens"));
+        goodLens.add(getMaterial("blue_topaz").entry("lens"));
+
+        GOOD_LITHOGRAPHY_LENS = REGISTRATE.block("multiblock/misc/lithography_lens/good",
+                props -> new LensBlock(props, goodLens))
+            .transform(AllMultiblocks::glass)
             .register();
 
         MULTIBLOCK_SETS = new HashMap<>();
@@ -196,6 +201,13 @@ public final class AllMultiblocks {
     private static void add(IRecipeType<?> recipeType, Layout layout, IEntry<? extends Block> block) {
         var name = name(block.id(), -1);
         MULTIBLOCK_SETS.put(name, new MultiblockSet(recipeType, layout, block));
+    }
+
+    private static <U extends Block, P> IBlockBuilder<U, P> glass(IBlockBuilder<U, P> builder) {
+        return builder.material(Material.GLASS)
+            .properties(CASING_PROPERTY)
+            .properties($ -> $.isViewBlocking(AllItems::never).noOcclusion())
+            .translucent();
     }
 
     public static MultiblockSet getMultiblock(String name) {

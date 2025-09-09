@@ -133,5 +133,17 @@
   "tinactory.technology.pyrolyse_oven.details": "A high-temperature chamber that thermally decomposes organic materials in the absence of oxygen, used to recycle waste and produce valuable byproducts like creosote oil.",
   "tinactory.technology.soldering.details": "A technique that joins metal components by melting a filler metal, creating strong electrical and mechanical connections essential for assembling electronic circuits and devices.",
   "tinactory.technology.vacuum_freezer.details": "A specialized cooling system that removes air to lower pressure, allowing materials to freeze quickly at lower temperatures and preserving delicate items without ice crystal formation.",
+  "tinactory.technology.advanced_chemistry.details": "Unlocks complex reactions that allow the synthesis of powerful compounds and rare materials. This technology is key to producing advanced fuels, polymers, and high-efficiency catalysts.",
+  "tinactory.technology.arc_furnace.details": "Uses high electrical currents to reach extreme temperatures, melting even the toughest ores and alloys. It drastically increases smelting speed and purity compared to traditional furnaces.",
+  "tinactory.technology.autoclave.details": "A high-pressure chamber that enables precise chemical and material processing. It’s essential for sterilization, advanced composites, and extracting resources otherwise locked away.",
+  "tinactory.technology.digital_storage.details": "Replaces bulky warehouses with compact, high-capacity memory banks. This allows for instant data access, organization, and control of large production networks.",
+  "tinactory.technology.hydrometallurgy.details": "Extracts metals using aqueous chemistry instead of heat, making recovery of rare elements more efficient. It’s particularly useful for reclaiming valuable materials from low-grade ores.",
+  "tinactory.technology.lithography.details": "Etches microscopic circuits onto silicon wafers to create advanced microchips. This breakthrough enables the leap into high-speed computing and automation.",
+  "tinactory.technology.oil_cracking.details": "Breaks down heavy crude into lighter, more useful fuels and chemicals. This process unlocks plastics, synthetic materials, and efficient energy production.",
+  "tinactory.technology.rocket_science.details": "Opens the path to space exploration with advanced propulsion and guidance systems. Mastering it is crucial for building rockets and satellites.",
+  "tinactory.technology.rocket_t1": "Tier 1 Rocket",
+  "tinactory.technology.rocket_t1.details": "A basic spacecraft capable of reaching low orbit or nearby planetary bodies. It marks the first step toward interplanetary industry and colonization.",
+  "tinactory.technology.tnt": "TNT",
+  "tinactory.technology.tnt.details": "A powerful explosive useful for mining, demolition, and warfare. Its destructive force makes it both a valuable tool and a dangerous weapon.",
   "generator.tinactory.void": "Void"
 }
