@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MetaConsumer implements IMetaConsumer {
-    private final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private final String name;
 

@@ -104,7 +104,8 @@ public final class AllItems {
             .voltages(Voltage.LV, Voltage.HV)
             .buildObject();
 
-        CABLE = ComponentBuilder.<CableBlock, String>builder((v, name) -> {
+        CABLE = ComponentBuilder
+            .<CableBlock, String>builder((v, name) -> {
                 var mat = getMaterial(name);
                 return REGISTRATE
                     .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
