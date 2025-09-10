@@ -9,12 +9,12 @@
     "dust_impure",
     "dust_pure",
     "raw",
-    "crystal",
+    "gem",
     "seed"
   ],
   "fluids": {},
   "aliases": {
-    "primary": "dust"
+    "primary": "gem"
   },
   "existings": {}
 }

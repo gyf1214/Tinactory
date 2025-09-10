@@ -277,7 +277,7 @@ object ProcessingMachines {
             machine("me_drive") {
                 circuit(4)
                 input(Items.CHEST)
-                input("certus_quartz", "crystal", 4)
+                input("certus_quartz", "gem", 4)
                 input("fluix", "dust", 4)
                 input(main, "plate", 4)
                 tech(Technologies.DIGITAL_STORAGE)

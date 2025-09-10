@@ -251,7 +251,7 @@ object Technologies {
 
             AUTOCLAVE = child("autoclave") {
                 maxProgress(100)
-                displayItem(getMaterial("certus_quartz").item("crystal"))
+                displayItem(getMaterial("certus_quartz").item("gem"))
             }
 
             DIGITAL_STORAGE = tech("digital_storage") {

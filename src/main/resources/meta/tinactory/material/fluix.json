@@ -2,12 +2,12 @@
   "color": "0xFF915DCD",
   "items": [
     "dust",
-    "crystal",
+    "gem",
     "seed"
   ],
   "fluids": {},
   "aliases": {
-    "primary": "dust"
+    "primary": "gem"
   },
   "existings": {}
 }

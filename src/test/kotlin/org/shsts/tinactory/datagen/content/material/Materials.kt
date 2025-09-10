@@ -5,6 +5,7 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.builder.MaterialBuilder.Companion.material
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.model.IconSet.BRIGHT
+import org.shsts.tinactory.datagen.content.model.IconSet.CERTUS
 import org.shsts.tinactory.datagen.content.model.IconSet.DULL
 import org.shsts.tinactory.datagen.content.model.IconSet.FINE
 import org.shsts.tinactory.datagen.content.model.IconSet.GEM_HORIZONTAL
@@ -361,7 +362,7 @@ object Materials {
         material("ps", DULL) {
             machineProcess(Voltage.LV, 0.75)
         }
-        material("fluix", QUARTZ) {
+        material("fluix", CERTUS) {
             mix(Voltage.HV) {
                 component("certus_quartz")
                 component("nether_quartz")
@@ -525,7 +526,7 @@ object Materials {
             }
             machineProcess(Voltage.MV)
         }
-        material("certus_quartz", QUARTZ) {
+        material("certus_quartz", CERTUS) {
             oreProcess {
                 byProducts("nether_quartz", "silicon_dioxide")
             }

@@ -116,8 +116,6 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 model(Models::pipeItem)
             } else if (sub == "raw") {
                 model { basicItem(it, modLoc("items/material/raw")) }
-            } else if (sub == "crystal") {
-                model { IconSet.CERTUS.itemModel(it, "gem") }
             } else if (sub == "seed") {
                 model { basicItem(it, ae2("items/crystal_seed_nether")) }
             } else {
@@ -402,7 +400,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 process("stick", "ingot", 64)
                 process("screw", "bolt", 16)
                 process("lens", "gem_exquisite", 600)
-                process("seed", "crystal", 256)
+                process("seed", "gem", 256)
             }
             mixer {
                 process("seed", "dust", 64, 2) {
@@ -648,13 +646,13 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 voltage(voltage)
                 workTicks(workTicks)
             }
-            output(material, "crystal") {
+            output(material, "gem") {
                 input(material, "seed")
                 extra {
                     requireCleanness(baseCleanness, normalCleanness)
                 }
             }
-            output(material, "crystal", suffix = "_from_dust") {
+            output(material, "gem", suffix = "_from_dust") {
                 input(material, "dust")
                 extra {
                     requireCleanness(baseCleanness, idealCleanness)
@@ -764,7 +762,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
 
             sifter {
-                if (material.hasItem("gem")) {
+                if (material.hasItem("gem_flawless")) {
                     input(material, "crushed_purified") {
                         output(material, "gem_flawless", rate = 0.1)
                         output(material, "gem", rate = 0.35)

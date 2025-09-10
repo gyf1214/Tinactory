@@ -27,6 +27,8 @@
   "item.tinactory.rubber_tree.sticky_resin": "Sticky Resin",
   "item.tinactory.wafer_raw.silicon": "Wafer",
   "item.tinactory.boule.silicon": "Monocrystalline Silicon Boule",
+  "item.tinactory.material.gem.certus_quartz": "Certus Quartz Crystal",
+  "item.tinactory.material.gem.fluix": "Fluix Crystal",
   "fluid.tinactory.material.gas.water": "Steam",
   "fluid.tinactory.material.liquid.air": "Liquid Air",
   "fluid.tinactory.material.gas.sulfuric_acid": "Sulfur Trioxide",
