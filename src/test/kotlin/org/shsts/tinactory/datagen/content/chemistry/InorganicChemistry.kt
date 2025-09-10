@@ -241,6 +241,15 @@ object InorganicChemistry {
                 output("salt_water", amount = 4)
                 workTicks(320)
             }
+            output("sulfur", amount = 2, suffix = "_from_carbon") {
+                input("sodium_sulfate", amount = 2)
+                input("carbon", amount = 3)
+                input("hydrogen_chloride", amount = 4)
+                input("water", "gas", 2)
+                output("salt_water", amount = 8)
+                output("carbon_dioxide", amount = 3)
+                workTicks(640)
+            }
             output("iron_chloride") {
                 input("iron")
                 input("hydrogen_chloride", amount = 3)
@@ -354,10 +363,10 @@ object InorganicChemistry {
                 workTicks(480)
             }
             input("rare_earth") {
-                input("sulfuric_acid", amount = 0.6)
+                input("sulfuric_acid", "dilute", 0.6)
                 output("cadmium", rate = 0.6)
                 output("neodymium", rate = 0.4)
-                output("rare_earth_slurry", amount = 0.6)
+                output("rare_earth", "slurry", 0.6)
                 workTicks(240)
             }
         }

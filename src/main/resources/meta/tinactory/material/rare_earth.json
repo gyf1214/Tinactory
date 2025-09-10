@@ -3,7 +3,14 @@
   "items": [
     "dust"
   ],
-  "fluids": {},
+  "fluids": {
+    "slurry": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "textureColor": "0xFFAF6F40",
+      "displayColor": "0xFFAF6F40"
+    }
+  },
   "aliases": {
     "primary": "dust"
   },
