@@ -1,0 +1,18 @@
+{
+  "color": "0xFFEC0000",
+  "ore": "netherrack",
+  "items": [],
+  "fluids": {
+    "fluid": {
+      "baseAmount": 1000,
+      "existing": "minecraft:lava"
+    }
+  },
+  "aliases": {
+    "primary": "block",
+    "raw": "block"
+  },
+  "existings": {
+    "block": "minecraft:magma_block"
+  }
+}

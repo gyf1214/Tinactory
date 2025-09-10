@@ -1,0 +1,20 @@
+{
+  "color": "0xFF503264",
+  "items": [
+    "dust"
+  ],
+  "fluids": {
+    "slurry": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "textureColor": "0xFF885542",
+      "displayColor": "0xFF885542"
+    }
+  },
+  "aliases": {
+    "primary": "block"
+  },
+  "existings": {
+    "block": "minecraft:obsidian"
+  }
+}

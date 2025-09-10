@@ -273,6 +273,12 @@ object InorganicChemistry {
                 output("carbon_dioxide")
                 workTicks(160)
             }
+            output("obsidian", "block") {
+                input("lava")
+                input("water")
+                output("water", "gas")
+                workTicks(32)
+            }
         }
     }
 
@@ -385,6 +391,15 @@ object InorganicChemistry {
                 output("water", amount = 6)
                 workTicks(320)
             }
+            input("obsidian", "slurry") {
+                input("hydrogen_chloride", amount = 4)
+                input("sodium_hydroxide", amount = 2)
+                output("magnesium_chloride", amount = 2)
+                output("sodium_sulfate")
+                output("silicon_dioxide")
+                output("water", amount = 3)
+                workTicks(320)
+            }
         }
 
         chemicalReactor {
@@ -442,13 +457,23 @@ object InorganicChemistry {
 
         blastFurnace {
             output("titanium", "ingot_hot", suffix = "_from_titanium_tetrachloride") {
-                input("magnesium", amount = 2)
+                input("magnesium", amount = 3)
                 input("titanium_tetrachloride")
                 output("magnesium_chloride", amount = 2)
                 voltage(Voltage.HV)
                 workTicks(800)
                 extra {
                     temperature(2300)
+                }
+            }
+            output("obsidian", "slurry") {
+                input("obsidian", amount = 2)
+                input("sulfuric_acid")
+                output("platinum_group_sludge", rate = 0.1)
+                voltage(Voltage.HV)
+                workTicks(400)
+                extra {
+                    temperature(1300)
                 }
             }
         }

@@ -80,6 +80,10 @@ object Veins {
             ore("nether_quartz", 0.6)
             ore("certus_quartz", 0.6)
         }
+        vein("lava", 0.6) {
+            ore("lava", 1.0)
+            ore("lava", 0.4)
+        }
     }
 
     private var rank = 0

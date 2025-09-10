@@ -5,8 +5,8 @@ import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
+import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.client.model.generators.ItemModelProvider
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllMaterials.getMaterial
@@ -792,13 +792,13 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    fun oilOre(workTicks: Long) {
+    fun fluidOre(workTicks: Long, base: ItemLike, voltage: Voltage = Voltage.MV) {
         centrifuge {
             input(material, "raw") {
-                output(Blocks.SAND)
+                output(base)
                 output(material, "fluid")
                 workTicks(workTicks)
-                voltage(Voltage.MV)
+                voltage(voltage)
             }
         }
     }

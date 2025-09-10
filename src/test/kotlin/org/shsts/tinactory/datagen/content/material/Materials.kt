@@ -485,13 +485,13 @@ object Materials {
             }
         }
         material("natural_gas", DULL) {
-            oilOre(192)
+            fluidOre(192, Items.SAND)
         }
         material("light_oil", DULL) {
-            oilOre(240)
+            fluidOre(240, Items.SAND)
         }
         material("heavy_oil", DULL) {
-            oilOre(512)
+            fluidOre(512, Items.SAND)
         }
         material("emerald", SHINY) {
             oreProcess {
@@ -533,6 +533,10 @@ object Materials {
             machineProcess(Voltage.MV)
             crystallize(Voltage.HV, 400, -0.5, 0.5, 5.0)
         }
+        material("platinum_group_sludge", FINE)
+        material("lava", DULL) {
+            fluidOre(400, Items.NETHERRACK)
+        }
     }
 
     private fun misc() {
@@ -545,6 +549,9 @@ object Materials {
         }
         material("netherrack", ROUGH) {
             machineProcess(Voltage.LV, 0.5)
+        }
+        material("obsidian", DULL) {
+            machineProcess(Voltage.HV, 4.0)
         }
         material("raw_rubber", DULL)
         material("rubber", SHINY) {
