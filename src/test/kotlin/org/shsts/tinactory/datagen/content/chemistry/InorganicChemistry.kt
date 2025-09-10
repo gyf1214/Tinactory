@@ -369,6 +369,22 @@ object InorganicChemistry {
                 output("rare_earth", "slurry", 0.6)
                 workTicks(240)
             }
+            input("netherrack") {
+                input("sulfuric_acid", "dilute")
+                output("manganese", rate = 0.4)
+                output("vanadium", rate = 0.2)
+                output("molybdenum", rate = 0.2)
+                output("netherrack", "slurry")
+                workTicks(160)
+            }
+            input("netherrack", "slurry", 6) {
+                input("sodium_hydroxide", amount = 6)
+                output("sodium_sulfate", amount = 3)
+                output("silicon_dioxide", amount = 3)
+                output("banded_iron", amount = 4)
+                output("water", amount = 6)
+                workTicks(320)
+            }
         }
 
         chemicalReactor {

@@ -81,7 +81,6 @@ object MachineComponents {
             sensor = "chrome",
             quartz = "emerald")
 
-        // TODO: sensor and emitter
         component(Voltage.EV,
             main = "titanium",
             motor = "kanthal",
