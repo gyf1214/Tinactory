@@ -137,6 +137,12 @@ object Materials {
             machineProcess(Voltage.HV)
             blast(Voltage.MV, 1300, 2400)
         }
+        material("molybdenum", SHINY) {
+            machineProcess(Voltage.HV, 1.8)
+            blast(Voltage.HV, 2200, 1600) {
+                component("nitrogen")
+            }
+        }
     }
 
     private fun firstDegrees() {
@@ -535,6 +541,9 @@ object Materials {
         }
         material("flint", DULL) {
             toolProcess()
+        }
+        material("netherrack", ROUGH) {
+            machineProcess(Voltage.LV, 0.5)
         }
         material("raw_rubber", DULL)
         material("rubber", SHINY) {

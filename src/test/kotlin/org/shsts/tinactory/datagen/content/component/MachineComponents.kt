@@ -88,8 +88,8 @@ object MachineComponents {
             pipe = "titanium",
             rotor = "stainless_steel",
             magnetic = "neodymium",
-            sensor = "chrome",
-            quartz = "emerald")
+            sensor = "molybdenum",
+            quartz = "fluix")
     }
 
     private fun component(voltage: Voltage, main: String, motor: String,

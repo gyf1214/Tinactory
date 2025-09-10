@@ -13,9 +13,33 @@ import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 
 object ProcessingMachines {
     fun init() {
-        machine(Voltage.LV, "steel", "copper", "tin", "bronze", "tin")
-        machine(Voltage.MV, "aluminium", "cupronickel", "copper", "brass", "bronze")
-        machine(Voltage.HV, "stainless_steel", "kanthal", "silver", "stainless_steel", "steel")
+        machine(Voltage.LV,
+            main = "steel",
+            heat = "copper",
+            electric = "tin",
+            pipe = "bronze",
+            rotor = "tin")
+
+        machine(Voltage.MV,
+            main = "aluminium",
+            heat = "cupronickel",
+            electric = "copper",
+            pipe = "brass",
+            rotor = "bronze")
+
+        machine(Voltage.HV,
+            main = "stainless_steel",
+            heat = "kanthal",
+            electric = "silver",
+            pipe = "stainless_steel",
+            rotor = "steel")
+
+        machine(Voltage.EV,
+            main = "titanium",
+            heat = "annealed_copper",
+            electric = "electrum",
+            pipe = "titanium",
+            rotor = "stainless_steel")
     }
 
     private fun machine(v: Voltage, main: String,

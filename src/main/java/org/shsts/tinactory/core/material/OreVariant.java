@@ -15,10 +15,10 @@ import org.shsts.tinactory.core.electric.Voltage;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public enum OreVariant implements StringRepresentable {
-    STONE(0, Blocks.STONE, Tiers.IRON, Voltage.ULV, 3f, 6f),
-    DEEPSLATE(1, Blocks.DEEPSLATE, Tiers.IRON, Voltage.LV, 4.5f, 6f),
-    NETHERRACK(2, Blocks.NETHERRACK, Tiers.DIAMOND, Voltage.HV, 6f, 7.5f),
-    END_STONE(3, Blocks.END_STONE, Tiers.NETHERITE, Voltage.EV, 7.5f, 9f);
+    STONE(0, Blocks.STONE, Tiers.IRON, Voltage.ULV, 3f, 6f, "stone"),
+    DEEPSLATE(1, Blocks.DEEPSLATE, Tiers.IRON, Voltage.LV, 4.5f, 6f, "stone"),
+    NETHERRACK(2, Blocks.NETHERRACK, Tiers.DIAMOND, Voltage.HV, 6f, 7.5f, "netherrack"),
+    END_STONE(3, Blocks.END_STONE, Tiers.NETHERITE, Voltage.EV, 7.5f, 9f, "end_stone");
 
     public final int rank;
     public final Block baseBlock;
@@ -27,9 +27,10 @@ public enum OreVariant implements StringRepresentable {
     public final Voltage voltage;
     public final float destroyTime;
     public final float explodeResistance;
+    public final String material;
 
     OreVariant(int rank, Block baseBlock, Tier mineTier, Voltage voltage,
-        float destroyTime, float explodeResistance) {
+        float destroyTime, float explodeResistance, String material) {
         this.rank = rank;
         this.mineTier = mineTier;
         this.voltage = voltage;
@@ -43,6 +44,7 @@ public enum OreVariant implements StringRepresentable {
         } else {
             this.baseItem = baseBlock.asItem();
         }
+        this.material = material;
     }
 
     public String getName() {

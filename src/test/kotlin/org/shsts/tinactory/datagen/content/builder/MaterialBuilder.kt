@@ -708,7 +708,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     output(material, to)
                     if (from == "crushed") {
                         input("water")
-                        output("stone", "dust", port = 3)
+                        output(material.oreVariant().material, "dust", port = 3)
                         output(byProduct(0), "dust", port = 4, rate = 0.3)
                         workTicks(200)
                     } else {

@@ -1,0 +1,13 @@
+{
+  "color": "0xFFC80000",
+  "items": [
+    "dust"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "block"
+  },
+  "existings": {
+    "block": "minecraft:netherrack"
+  }
+}
