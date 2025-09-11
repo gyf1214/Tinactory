@@ -373,7 +373,6 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         private fun extrudes() {
             extrude("stick", 2, 1)
             extrude("plate", 1, 1)
-            extrude("foil", 4, 1)
             extrude("ring", 4, 1)
             extrude("wire", 2, 1)
             extrude("bolt", 8, 1)
