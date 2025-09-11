@@ -2,7 +2,8 @@
   "color": "0xFFD7E6E6",
   "items": [
     "foil",
-    "sheet"
+    "sheet",
+    "pipe"
   ],
   "fluids": {
     "molten": {

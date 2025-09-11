@@ -84,7 +84,7 @@ object MachineComponents {
         component(Voltage.EV,
             main = "titanium",
             motor = "kanthal",
-            pipe = "titanium",
+            pipe = "pvc",
             rotor = "stainless_steel",
             magnetic = "neodymium",
             sensor = "molybdenum",

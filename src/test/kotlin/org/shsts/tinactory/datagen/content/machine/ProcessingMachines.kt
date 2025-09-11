@@ -38,7 +38,7 @@ object ProcessingMachines {
             main = "titanium",
             heat = "annealed_copper",
             electric = "electrum",
-            pipe = "titanium",
+            pipe = "pvc",
             rotor = "stainless_steel")
     }
 
