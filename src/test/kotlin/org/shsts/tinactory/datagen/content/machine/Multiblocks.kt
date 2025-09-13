@@ -30,6 +30,7 @@ import org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING
 import org.shsts.tinactory.content.AllMultiblocks.STABLE_TITANIUM
+import org.shsts.tinactory.content.AllMultiblocks.TUNGSTEN_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR
@@ -76,13 +77,10 @@ object Multiblocks {
                 }
             }
 
-            for (entry in COIL_BLOCKS) {
-                val tex = "casings/coils/machine_coil_${name(entry.id(), -1)}"
-                block(entry) {
-                    blockState(solidBlock(tex))
-                    tag(COIL)
-                }
-            }
+            coil("cupronickel")
+            coil("kanthal")
+            coil("nichrome")
+            coil("tungsten", "rtm_alloy")
 
             block(GRATE_MACHINE_CASING) {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
@@ -148,6 +146,15 @@ object Multiblocks {
         }
     }
 
+    private fun BlockDataFactory.coil(name: String, texName: String = name) {
+        val entry = COIL_BLOCKS.getValue(name)
+        val tex = "casings/coils/machine_coil_$texName"
+        block(entry) {
+            blockState(solidBlock(tex))
+            tag(COIL)
+        }
+    }
+
     private fun componentRecipes() {
         assembler {
             solid(HEATPROOF_CASING, Voltage.ULV, "invar", Technologies.STEEL)
@@ -159,6 +166,7 @@ object Multiblocks {
             coil(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
             coil(KANTHAL_COIL_BLOCK, Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
             coil(NICHROME_COIL_BLOCK, Voltage.MV, "nichrome", "stainless_steel", Technologies.NICHROME)
+            coil(TUNGSTEN_COIL_BLOCK, Voltage.HV, "tungsten", "electrum", Technologies.HYDROMETALLURGY)
         }
 
         assembler {

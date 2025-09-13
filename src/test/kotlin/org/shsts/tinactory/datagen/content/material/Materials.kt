@@ -144,6 +144,12 @@ object Materials {
                 component("nitrogen")
             }
         }
+        material("tungsten", DULL) {
+            machineProcess(Voltage.HV, 2.0)
+            blast(Voltage.HV, 3600, 960) {
+                component("nitrogen")
+            }
+        }
     }
 
     private fun firstDegrees() {
@@ -313,6 +319,7 @@ object Materials {
         material("annealed_copper", BRIGHT) {
             machineProcess(Voltage.MV, 0.8)
         }
+        material("tungsten_trioxide", SHINY)
     }
 
     private fun higherDegrees() {
@@ -536,6 +543,9 @@ object Materials {
         material("platinum_group_sludge", FINE)
         material("lava", DULL) {
             fluidOre(400, Items.NETHERRACK)
+        }
+        material("tungstate", DULL) {
+            oreProcess()
         }
     }
 

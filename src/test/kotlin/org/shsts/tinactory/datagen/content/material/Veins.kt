@@ -82,7 +82,10 @@ object Veins {
         }
         vein("lava", 0.6) {
             ore("lava", 1.0)
-            ore("lava", 0.4)
+            ore("lava", 0.2)
+        }
+        vein("tungsten", 0.4) {
+            ore("tungstate", 1.0)
         }
     }
 

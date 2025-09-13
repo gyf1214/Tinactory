@@ -53,10 +53,11 @@ public final class AllMultiblocks {
     public static final IEntry<Block> INERT_PTFE_CASING;
     public static final IEntry<Block> STABLE_TITANIUM;
     // coil blocks
-    public static final Set<IEntry<CoilBlock>> COIL_BLOCKS;
+    public static final Map<String, IEntry<CoilBlock>> COIL_BLOCKS;
     public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
     public static final IEntry<CoilBlock> KANTHAL_COIL_BLOCK;
     public static final IEntry<CoilBlock> NICHROME_COIL_BLOCK;
+    public static final IEntry<CoilBlock> TUNGSTEN_COIL_BLOCK;
     // misc
     public static final IEntry<Block> GRATE_MACHINE_CASING;
     public static final IEntry<Block> AUTOFARM_BASE;
@@ -83,10 +84,11 @@ public final class AllMultiblocks {
         INERT_PTFE_CASING = solid("inert_ptfe");
         STABLE_TITANIUM = solid("stable_titanium");
 
-        COIL_BLOCKS = new HashSet<>();
+        COIL_BLOCKS = new HashMap<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
         KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
         NICHROME_COIL_BLOCK = coil("nichrome", 3600);
+        TUNGSTEN_COIL_BLOCK = coil("tungsten", 4500);
 
         GRATE_MACHINE_CASING = misc("grate_machine_casing");
         AUTOFARM_BASE = misc("autofarm_base");
@@ -188,7 +190,7 @@ public final class AllMultiblocks {
         var ret = REGISTRATE.block("multiblock/coil/" + name, CoilBlock.factory(temperature))
             .properties(CASING_PROPERTY)
             .register();
-        COIL_BLOCKS.add(ret);
+        COIL_BLOCKS.put(name, ret);
         return ret;
     }
 

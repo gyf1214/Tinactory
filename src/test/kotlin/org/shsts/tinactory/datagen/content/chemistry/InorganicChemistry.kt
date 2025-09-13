@@ -400,6 +400,12 @@ object InorganicChemistry {
                 output("water", amount = 3)
                 workTicks(320)
             }
+            output("tungsten_trioxide") {
+                input("tungstate")
+                input("hydrogen_chloride", amount = 2)
+                output("lithium_brine", amount = 4)
+                workTicks(400)
+            }
         }
 
         chemicalReactor {
@@ -456,11 +462,13 @@ object InorganicChemistry {
         }
 
         blastFurnace {
+            defaults {
+                voltage(Voltage.HV)
+            }
             output("titanium", "ingot_hot", suffix = "_from_titanium_tetrachloride") {
                 input("magnesium", amount = 3)
                 input("titanium_tetrachloride")
                 output("magnesium_chloride", amount = 2)
-                voltage(Voltage.HV)
                 workTicks(800)
                 extra {
                     temperature(2300)
@@ -470,10 +478,19 @@ object InorganicChemistry {
                 input("obsidian", amount = 2)
                 input("sulfuric_acid")
                 output("platinum_group_sludge", rate = 0.1)
-                voltage(Voltage.HV)
                 workTicks(400)
                 extra {
                     temperature(1300)
+                }
+            }
+            output("tungsten", "ingot_hot", suffix = "_from_tungsten_trioxide") {
+                input("tungsten_trioxide", amount = 2)
+                input("carbon", amount = 3)
+                input("nitrogen", amount = 2)
+                output("carbon_dioxide", amount = 3)
+                workTicks(2560)
+                extra {
+                    temperature(3600)
                 }
             }
         }
