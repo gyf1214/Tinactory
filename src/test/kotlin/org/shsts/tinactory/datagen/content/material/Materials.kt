@@ -370,7 +370,13 @@ object Materials {
                 component("heavy_fuel")
             }
         }
-        material("cetane_boosted_diesel", DULL)
+        material("cetane_boosted_diesel", DULL) {
+            fluidMix(Voltage.HV) {
+                component("diesel", 8)
+                component("ethanol", 2)
+                component("nitric_acid", 2)
+            }
+        }
         material("vanadium_steel", METALLIC) {
             machineProcess(Voltage.MV, 1.5)
             blast(Voltage.MV, 2500, 1280) {

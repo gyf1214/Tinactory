@@ -113,6 +113,11 @@ object OrganicChemistry {
                 output("carbon_dioxide")
                 workTicks(400)
             }
+            output("ethanol", suffix = "_from_ethylene") {
+                input("ethylene")
+                input("water")
+                workTicks(320)
+            }
             output("carbon_dioxide", suffix = "_from_methane") {
                 input("methane")
                 input("water", amount = 2)
@@ -222,13 +227,6 @@ object OrganicChemistry {
                 input("oxygen", amount = 7.5)
                 input("titanium_tetrachloride", amount = 0.1)
                 workTicks(320)
-            }
-            output("cetane_boosted_diesel", amount = 2) {
-                input("diesel", amount = 2)
-                input("nitric_acid", amount = 0.25)
-                input("sulfuric_acid", amount = 0.25)
-                output("sulfuric_acid", "dilute", amount = 0.5)
-                workTicks(96)
             }
             output("sbr", amount = 30) {
                 input("benzene", amount = 2.16)
