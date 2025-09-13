@@ -1,16 +1,15 @@
 {
-  "color": "0xFFDCA0F0",
+  "color": "0xFF6464A0",
   "items": [
     "bolt",
     "dust",
     "dust_tiny",
     "gear",
     "ingot",
-    "ingot_hot",
     "plate",
+    "ring",
     "screw",
-    "stick",
-    "rotor"
+    "stick"
   ],
   "fluids": {
     "molten": {

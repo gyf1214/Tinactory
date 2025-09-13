@@ -118,6 +118,7 @@ public final class AllItems {
             .voltage(Voltage.MV, "copper")
             .voltage(Voltage.HV, "gold")
             .voltage(Voltage.EV, "aluminium")
+            .voltage(Voltage.IV, "annealed_copper")
             .buildObject();
 
         TRANSFORMER = ComponentBuilder.simple(v -> REGISTRATE
@@ -150,8 +151,9 @@ public final class AllItems {
             .tint(getMaterial("vanadium_steel").color)
             .register();
 
-        // TODO: tint
-        ADVANCED_BUZZSAW = simple("component/buzzsaw/advanced");
+        ADVANCED_BUZZSAW = REGISTRATE.item("component/buzzsaw/advanced")
+            .tint(getMaterial("tungsten_carbide").color)
+            .register();
 
         GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
         BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);

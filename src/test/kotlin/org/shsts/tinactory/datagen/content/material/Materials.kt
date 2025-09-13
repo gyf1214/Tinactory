@@ -136,7 +136,7 @@ object Materials {
         }
         material("neodymium", METALLIC) {
             machineProcess(Voltage.HV)
-            blast(Voltage.MV, 1300, 2400)
+            blast(Voltage.MV, 1300, 1200)
         }
         material("molybdenum", SHINY) {
             machineProcess(Voltage.HV, 1.8)
@@ -145,7 +145,7 @@ object Materials {
             }
         }
         material("tungsten", DULL) {
-            machineProcess(Voltage.HV, 2.0)
+            machineProcess(Voltage.HV, 2.5)
             blast(Voltage.HV, 3600, 960) {
                 component("nitrogen")
             }
@@ -320,6 +320,16 @@ object Materials {
             machineProcess(Voltage.MV, 0.8)
         }
         material("tungsten_trioxide", SHINY)
+        material("tungsten_carbide", DULL) {
+            machineProcess(Voltage.HV, 4.0)
+            blast(Voltage.HV, 3200, 1800) {
+                component("nitrogen")
+            }
+            mix(Voltage.HV) {
+                component("tungsten")
+                component("carbon")
+            }
+        }
     }
 
     private fun higherDegrees() {
@@ -370,13 +380,21 @@ object Materials {
             machineProcess(Voltage.LV, 0.75)
         }
         material("fluix", CERTUS) {
+            machineProcess(Voltage.MV, 1.25)
             mix(Voltage.HV) {
                 component("certus_quartz")
                 component("nether_quartz")
                 component("redstone")
             }
-            machineProcess(Voltage.MV, 1.25)
             crystallize(Voltage.HV, 600, -0.1, 1.0, 10.0)
+        }
+        material("tungsten_steel", METALLIC) {
+            machineProcess(Voltage.HV, 2.0)
+            blast(Voltage.HV, 3000, 1280)
+            mix(Voltage.HV) {
+                component("steel")
+                component("tungsten")
+            }
         }
     }
 

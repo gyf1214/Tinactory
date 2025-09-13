@@ -3,6 +3,8 @@ package org.shsts.tinactory.datagen.content.component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
+import org.shsts.tinactory.content.AllItems.ADVANCED_BUZZSAW
+import org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER
 import org.shsts.tinactory.content.AllItems.ANNIHILATION_CORE
 import org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW
 import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
@@ -53,7 +55,10 @@ object MiscComponents {
                 input("vanadium_steel", "gear")
                 voltage(Voltage.MV)
             }
-            // TODO: advanced_buzzsaw
+            output(ADVANCED_BUZZSAW.get()) {
+                input("tungsten_carbide", "gear")
+                voltage(Voltage.HV)
+            }
         }
 
         assembler {
@@ -72,7 +77,14 @@ object MiscComponents {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.MATERIAL_CUTTING)
             }
-            // TODO: advanced_grinder
+            output(ADVANCED_GRINDER.get()) {
+                input("tungsten_carbide", "gear")
+                input("tungsten_steel", "plate", 8)
+                input("tungsten_carbide", "dust", 4)
+                voltage(Voltage.HV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.MATERIAL_CUTTING)
+            }
 
             output(MIXED_METAL_INGOT.get()) {
                 input("aluminium", "plate")

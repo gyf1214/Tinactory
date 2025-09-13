@@ -89,6 +89,16 @@ object MachineComponents {
             magnetic = "neodymium",
             sensor = "molybdenum",
             quartz = "fluix")
+
+        // TODO
+        component(Voltage.IV,
+            main = "tungsten_steel",
+            motor = "annealed_copper",
+            pipe = "ptfe",
+            rotor = "titanium",
+            magnetic = "neodymium",
+            sensor = "molybdenum",
+            quartz = "fluix")
     }
 
     private fun component(voltage: Voltage, main: String, motor: String,
