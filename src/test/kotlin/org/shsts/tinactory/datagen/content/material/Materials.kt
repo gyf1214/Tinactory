@@ -150,6 +150,10 @@ object Materials {
                 component("nitrogen")
             }
         }
+        material("platinum", SHINY) {
+            machineProcess(Voltage.HV)
+            smelt()
+        }
     }
 
     private fun firstDegrees() {

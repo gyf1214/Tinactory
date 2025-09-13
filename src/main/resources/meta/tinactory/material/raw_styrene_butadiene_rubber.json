@@ -1,0 +1,14 @@
+{
+  "color": "0xFF54403D",
+  "items": [],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "fluid": "molten"
+  },
+  "existings": {}
+}

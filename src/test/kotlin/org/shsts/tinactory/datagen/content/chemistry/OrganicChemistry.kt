@@ -146,6 +146,11 @@ object OrganicChemistry {
                 input("sulfur")
                 workTicks(160)
             }
+            output("rubber", "molten", 9, suffix = "_from_sbr") {
+                input("sbr", amount = 9)
+                input("sulfur")
+                workTicks(160)
+            }
         }
     }
 
@@ -224,6 +229,12 @@ object OrganicChemistry {
                 input("sulfuric_acid", amount = 0.25)
                 output("sulfuric_acid", "dilute", amount = 0.5)
                 workTicks(96)
+            }
+            output("sbr", amount = 30) {
+                input("benzene", amount = 2.16)
+                input("propene", amount = 2.16)
+                input("titanium_tetrachloride", amount = 0.1)
+                workTicks(280)
             }
         }
 

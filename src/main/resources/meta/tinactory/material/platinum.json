@@ -1,0 +1,27 @@
+{
+  "color": "0xFFFFFFC8",
+  "items": [
+    "bolt",
+    "dust",
+    "dust_tiny",
+    "ingot",
+    "foil",
+    "pipe",
+    "plate",
+    "stick",
+    "wire",
+    "wire_fine",
+    "nugget"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

@@ -493,6 +493,13 @@ object InorganicChemistry {
                     temperature(3600)
                 }
             }
+            output("platinum", "nugget", 2, suffix = "_from_sludge") {
+                input("platinum_group_sludge")
+                workTicks(640)
+                extra {
+                    temperature(2800)
+                }
+            }
         }
     }
 }

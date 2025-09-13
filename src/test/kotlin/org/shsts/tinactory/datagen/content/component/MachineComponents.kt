@@ -97,7 +97,7 @@ object MachineComponents {
             pipe = "ptfe",
             rotor = "titanium",
             magnetic = "neodymium",
-            sensor = "molybdenum",
+            sensor = "platinum",
             quartz = "fluix")
     }
 
