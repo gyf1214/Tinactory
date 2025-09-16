@@ -1,7 +1,6 @@
 package org.shsts.tinactory.content.machine;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -109,7 +108,6 @@ public class Workbench extends CapabilityProvider implements
             super(size);
         }
 
-        @Nonnull
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             return isItemValid(slot, stack) ? super.insertItem(slot, stack, simulate) : stack;

@@ -1,6 +1,5 @@
 package org.shsts.tinactory.core.multiblock;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -39,7 +38,6 @@ public class MultiblockInterfaceBlock extends SidedMachineBlock {
         builder.add(JOINED);
     }
 
-    @Nonnull
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return super.getStateForPlacement(ctx).setValue(JOINED, false);

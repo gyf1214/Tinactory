@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.network;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -37,7 +36,6 @@ public class SidedMachineBlock extends MachineBlock {
         builder.add(IO_FACING);
     }
 
-    @Nonnull
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return defaultBlockState().setValue(IO_FACING, ctx.getHorizontalDirection().getOpposite());

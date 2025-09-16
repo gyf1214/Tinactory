@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.electric;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -147,7 +146,6 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
             StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), items));
     }
 
-    @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == ELECTRIC_MACHINE.get() || cap == PROCESSOR.get() ||

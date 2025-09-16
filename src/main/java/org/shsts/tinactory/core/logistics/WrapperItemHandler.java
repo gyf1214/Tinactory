@@ -1,6 +1,5 @@
 package org.shsts.tinactory.core.logistics;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
@@ -81,13 +80,11 @@ public class WrapperItemHandler implements IItemHandlerModifiable, IPortNotifier
         return compose.getSlots();
     }
 
-    @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
         return compose.getStackInSlot(slot);
     }
 
-    @Nonnull
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
         if (!isItemValid(slot, stack)) {
@@ -100,7 +97,6 @@ public class WrapperItemHandler implements IItemHandlerModifiable, IPortNotifier
         return reminder;
     }
 
-    @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (!allowOutputs[slot]) {

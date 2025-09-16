@@ -1,7 +1,6 @@
 package org.shsts.tinactory.core.machine;
 
 import com.google.common.collect.ArrayListMultimap;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -202,7 +201,6 @@ public class MachineProcessor<R extends ProcessingRecipe>
         return currentRecipe == null ? 0d : currentRecipe.power * energyFactor;
     }
 
-    @Nonnull
     @Override
     public <T1> LazyOptional<T1> getCapability(Capability<T1> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.ELECTRIC_MACHINE.get()) {

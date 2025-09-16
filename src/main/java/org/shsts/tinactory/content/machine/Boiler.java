@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.machine;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -143,7 +142,6 @@ public class Boiler extends CapabilityProvider implements
         return maxBurn <= 0 ? 0d : 1d - ((double) currentBurn / (double) maxBurn);
     }
 
-    @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.PROCESSOR.get()) {

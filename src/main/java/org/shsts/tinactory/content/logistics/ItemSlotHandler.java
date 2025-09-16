@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +21,7 @@ public class ItemSlotHandler extends ItemStackHandler {
     }
 
     @Override
-    protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
+    protected int getStackLimit(int slot, ItemStack stack) {
         return limit;
     }
 }

@@ -1,7 +1,6 @@
 package org.shsts.tinactory.core.machine;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -321,7 +320,6 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }
 
-    @Nonnull
     @Override
     public <T1> LazyOptional<T1> getCapability(Capability<T1> cap, @Nullable Direction side) {
         if (cap == AllCapabilities.PROCESSOR.get()) {

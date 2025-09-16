@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.machine;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -169,7 +168,6 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
         return currentRecipe == null ? 0d : getVoltage() * 0.625d;
     }
 
-    @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == ELECTRIC_MACHINE.get()) {

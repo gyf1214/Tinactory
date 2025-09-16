@@ -1,6 +1,5 @@
 package org.shsts.tinactory.core.logistics;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
@@ -60,7 +59,6 @@ public class WrapperFluidTank implements IFluidTankModifiable, IPortNotifier,
         filter = TRUE_FLUID_FILTER;
     }
 
-    @Nonnull
     @Override
     public FluidStack getFluid() {
         return tank.getFluid();
@@ -90,7 +88,6 @@ public class WrapperFluidTank implements IFluidTankModifiable, IPortNotifier,
         return ret;
     }
 
-    @Nonnull
     @Override
     public FluidStack drain(FluidStack fluid, IFluidHandler.FluidAction action) {
         var ret = allowOutput ? tank.drain(fluid, action) : FluidStack.EMPTY;
@@ -100,7 +97,6 @@ public class WrapperFluidTank implements IFluidTankModifiable, IPortNotifier,
         return ret;
     }
 
-    @Nonnull
     @Override
     public FluidStack drain(int maxDrain, IFluidHandler.FluidAction action) {
         var ret = allowOutput ? tank.drain(maxDrain, action) : FluidStack.EMPTY;
