@@ -38,9 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.TinactoryConfig.listConfig;
-
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class CableBlock extends Block implements IWrenchable, IConnector, IElectricBlock {
@@ -59,13 +56,15 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     private final int radius;
     public final Voltage voltage;
-    private final Map<BlockState, VoxelShape> shapes;
+    private final double resistance;
     public final MaterialSet material;
+    private final Map<BlockState, VoxelShape> shapes;
 
-    public CableBlock(Properties properties, int radius, Voltage voltage, MaterialSet mat) {
+    public CableBlock(Properties properties, int radius, Voltage voltage, double resistance, MaterialSet mat) {
         super(properties.strength(2f).requiresCorrectToolForDrops());
         this.radius = radius;
         this.voltage = voltage;
+        this.resistance = resistance;
         this.shapes = makeShapes();
         this.material = mat;
 
@@ -78,14 +77,15 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
             .setValue(DOWN, false));
     }
 
-    public static Function<Properties, CableBlock> cable(Voltage voltage, MaterialSet mat) {
-        var radius = voltage == Voltage.ULV ? WIRE_RADIUS : RADIUS;
-        return prop -> new CableBlock(prop, radius, voltage, mat);
+    public static Function<Properties, CableBlock> cable(Voltage voltage, double resistance,
+        MaterialSet mat, boolean bare) {
+        var radius = bare ? WIRE_RADIUS : RADIUS;
+        return prop -> new CableBlock(prop, radius, voltage, resistance, mat);
     }
 
     public static <U extends Block, P> Transformer<IBlockBuilder<U, P>> tint(
-        Voltage voltage, int color) {
-        if (voltage == Voltage.ULV) {
+        int color, boolean bare) {
+        if (bare) {
             return $ -> $.tint(color);
         } else {
             return $ -> $.tint(CableBlock.INSULATION_COLOR, color);
@@ -201,7 +201,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
 
     @Override
     public double getResistance(BlockState state) {
-        return listConfig(CONFIG.cableResistanceFactor, voltage.rank - 1);
+        return resistance;
     }
 
     @Override

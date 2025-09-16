@@ -497,7 +497,7 @@ object InorganicChemistry {
                 input("platinum_group_sludge")
                 workTicks(640)
                 extra {
-                    temperature(2800)
+                    temperature(2300)
                 }
             }
         }

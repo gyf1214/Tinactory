@@ -31,7 +31,7 @@ import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.network.CableBlock
 import org.shsts.tinactory.content.tool.BatteryItem
-import org.shsts.tinactory.core.electric.Voltage.ULV
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.ic2
 import org.shsts.tinactory.core.util.LocHelper.name
@@ -223,10 +223,10 @@ object Components {
     private fun tools() {
         itemData {
             for ((v, entry) in getComponentEntry<Item>("fluid_cell")) {
-                val texKey = if (v == ULV) {
-                    "metaitems/fluid_cell"
-                } else {
-                    "metaitems/large_fluid_cell.${name(entry.id(), -1)}"
+                val texKey = when (v) {
+                    Voltage.ULV -> "metaitems/fluid_cell"
+                    Voltage.IV -> "metaitems/large_fluid_cell.tungstensteel"
+                    else -> "metaitems/large_fluid_cell.${name(entry.id(), -1)}"
                 }
                 item(entry) { model(basicItem("$texKey/base", "$texKey/overlay")) }
             }

@@ -166,7 +166,7 @@ object Multiblocks {
             coil(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
             coil(KANTHAL_COIL_BLOCK, Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
             coil(NICHROME_COIL_BLOCK, Voltage.MV, "nichrome", "stainless_steel", Technologies.NICHROME)
-            coil(TUNGSTEN_COIL_BLOCK, Voltage.HV, "tungsten", "electrum", Technologies.HYDROMETALLURGY)
+            coil(TUNGSTEN_COIL_BLOCK, Voltage.HV, "tungsten", "platinum", Technologies.HYDROMETALLURGY)
         }
 
         assembler {

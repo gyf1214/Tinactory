@@ -63,12 +63,6 @@ public class MachineMeta extends MetaConsumer {
         super(name);
     }
 
-    protected static class UnsupportedTypeException extends RuntimeException {
-        public UnsupportedTypeException(String field, String value) {
-            super("Unsupported " + field + ": " + value);
-        }
-    }
-
     protected static class Executor {
         protected final String id;
         protected final JsonObject jo;
@@ -292,7 +286,7 @@ public class MachineMeta extends MetaConsumer {
         try {
             getExecutor(loc, jo).run();
         } catch (UnsupportedTypeException ex) {
-            LOGGER.debug("Skip unsupported type: " + loc, ex);
+            LOGGER.debug("Skip unsupported type: {}", loc, ex);
         }
     }
 }

@@ -1,0 +1,30 @@
+{
+  "type": "cable",
+  "items": {
+    "ulv": {
+      "resistance": 0.05,
+      "material": "iron",
+      "bare": true
+    },
+    "lv": {
+      "resistance": 0.05,
+      "material": "tin"
+    },
+    "mv": {
+      "resistance": 0.05,
+      "material": "copper"
+    },
+    "hv": {
+      "resistance": 0.05,
+      "material": "gold"
+    },
+    "ev": {
+      "resistance": 0.05,
+      "material": "aluminium"
+    },
+    "iv": {
+      "resistance": 0.05,
+      "material": "annealed_copper"
+    }
+  }
+}

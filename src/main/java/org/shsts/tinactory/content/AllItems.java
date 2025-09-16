@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -15,13 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
-import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.content.material.RubberTreeGrower;
-import org.shsts.tinactory.content.network.CableBlock;
-import org.shsts.tinactory.content.network.SubnetBlock;
-import org.shsts.tinactory.content.tool.BatteryItem;
-import org.shsts.tinactory.core.common.CellItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
@@ -38,13 +32,6 @@ import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 @MethodsReturnNonnullByDefault
 public final class AllItems {
     public static final Map<String, Map<Voltage, ? extends Supplier<? extends ItemLike>>> COMPONENTS;
-    public static final Map<Voltage, IEntry<BatteryItem>> BATTERY;
-    public static final Map<Voltage, IEntry<CableBlock>> CABLE;
-    public static final Map<Voltage, IEntry<SubnetBlock>> TRANSFORMER;
-    public static final Map<Voltage, IEntry<SubnetBlock>> ELECTRIC_BUFFER;
-    public static final Map<Voltage, Supplier<? extends ItemLike>> GRINDER;
-    public static final Map<Voltage, IEntry<Item>> BUZZSAW;
-    public static final Map<Voltage, IEntry<CellItem>> FLUID_CELL;
     public static final List<IEntry<Item>> STORAGE_COMPONENT;
     public static final List<IEntry<MEStorageCell>> ITEM_STORAGE_CELL;
     public static final List<IEntry<MEStorageCell>> FLUID_STORAGE_CELL;
@@ -97,49 +84,6 @@ public final class AllItems {
             .renderType(() -> RenderType::cutout)
             .register();
 
-        BATTERY = ComponentBuilder.simple(v -> REGISTRATE
-                .item("network/" + v.id + "/battery", prop ->
-                    new BatteryItem(prop, v, 12000 * v.value))
-                .register())
-            .voltages(Voltage.LV, Voltage.HV)
-            .buildObject();
-
-        CABLE = ComponentBuilder
-            .<CableBlock, String>builder((v, name) -> {
-                var mat = getMaterial(name);
-                return REGISTRATE
-                    .block("network/" + v.id + "/cable", CableBlock.cable(v, mat))
-                    .transform(CableBlock.tint(v, mat.color))
-                    .translucent()
-                    .register();
-            })
-            .voltage(Voltage.ULV, "iron")
-            .voltage(Voltage.LV, "tin")
-            .voltage(Voltage.MV, "copper")
-            .voltage(Voltage.HV, "gold")
-            .voltage(Voltage.EV, "aluminium")
-            .voltage(Voltage.IV, "annealed_copper")
-            .buildObject();
-
-        TRANSFORMER = ComponentBuilder.simple(v -> REGISTRATE
-                .block("network/" + v.id + "/transformer", SubnetBlock.transformer(v))
-                .translucent()
-                .tint(i -> switch (i) {
-                    case 0 -> v.color;
-                    case 1 -> Voltage.fromRank(v.rank - 1).color;
-                    default -> 0xFFFFFFFF;
-                }).register())
-            .voltages(Voltage.LV, Voltage.IV)
-            .buildObject();
-
-        ELECTRIC_BUFFER = ComponentBuilder.simple(v -> REGISTRATE
-                .block("network/" + v.id + "/electric_buffer", SubnetBlock.buffer(v))
-                .translucent()
-                .tint(i -> i < 2 ? v.color : 0xFFFFFFFF)
-                .register())
-            .voltages(Voltage.ULV, Voltage.IV)
-            .buildObject();
-
         GOOD_GRINDER = simple("component/grinder/good");
         ADVANCED_GRINDER = simple("component/grinder/advanced");
 
@@ -154,26 +98,6 @@ public final class AllItems {
         ADVANCED_BUZZSAW = REGISTRATE.item("component/buzzsaw/advanced")
             .tint(getMaterial("tungsten_carbide").color)
             .register();
-
-        GRINDER = set3(() -> Items.DIAMOND, GOOD_GRINDER, ADVANCED_GRINDER);
-        BUZZSAW = set3(BASIC_BUZZSAW, GOOD_BUZZSAW, ADVANCED_BUZZSAW);
-
-        FLUID_CELL = ComponentBuilder.<CellItem, String>builder((v, name) -> REGISTRATE
-                .item("tool/fluid_cell/" + name, CellItem.factory(1 << (v.rank - 1)))
-                .tint(() -> () -> CellItem::getTint)
-                .register())
-            .voltage(Voltage.ULV, "iron")
-            .voltage(Voltage.LV, "steel")
-            .voltage(Voltage.MV, "aluminium")
-            .buildObject();
-
-        COMPONENTS.put("battery", BATTERY);
-        COMPONENTS.put("cable", CABLE);
-        COMPONENTS.put("transformer", TRANSFORMER);
-        COMPONENTS.put("electric_buffer", ELECTRIC_BUFFER);
-        COMPONENTS.put("grinder", GRINDER);
-        COMPONENTS.put("buzzsaw", BUZZSAW);
-        COMPONENTS.put("fluid_cell", FLUID_CELL);
 
         ITEM_STORAGE_CELL = new ArrayList<>();
         FLUID_STORAGE_CELL = new ArrayList<>();
@@ -213,12 +137,6 @@ public final class AllItems {
 
     private static IEntry<Item> simple(String name) {
         return REGISTRATE.item(name).register();
-    }
-
-    private static <S extends Supplier<? extends ItemLike>> Map<Voltage, S> set3(
-        S basic, S good, S advanced) {
-        return Map.of(Voltage.LV, basic, Voltage.MV, basic,
-            Voltage.HV, good, Voltage.EV, good, Voltage.IV, advanced);
     }
 
     public static <A> boolean never(BlockState state, BlockGetter world, BlockPos pos, A val) {

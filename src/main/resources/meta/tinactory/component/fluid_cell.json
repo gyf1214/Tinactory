@@ -1,0 +1,29 @@
+{
+  "type": "fluid_cell",
+  "items": {
+    "ulv": {
+      "material": "iron",
+      "capacity": 4000
+    },
+    "lv": {
+      "material": "steel",
+      "capacity": 8000
+    },
+    "mv": {
+      "material": "aluminium",
+      "capacity": 16000
+    },
+    "hv": {
+      "material": "stainless_steel",
+      "capacity": 32000
+    },
+    "ev": {
+      "material": "titanium",
+      "capacity": 64000
+    },
+    "iv": {
+      "material": "tungsten_steel",
+      "capacity": 128000
+    }
+  }
+}

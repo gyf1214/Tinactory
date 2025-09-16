@@ -400,7 +400,9 @@ object Materials {
         }
         material("tungsten_steel", METALLIC) {
             machineProcess(Voltage.HV, 2.0)
-            blast(Voltage.HV, 3000, 1280)
+            blast(Voltage.HV, 3000, 1280) {
+                component("nitrogen")
+            }
             mix(Voltage.HV) {
                 component("steel")
                 component("tungsten")

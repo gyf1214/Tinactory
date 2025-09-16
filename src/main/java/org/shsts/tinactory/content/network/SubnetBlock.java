@@ -39,6 +39,10 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
         registerDefaultState(stateDefinition.any().setValue(IO_FACING, Direction.NORTH));
     }
 
+    public static Function<Properties, SubnetBlock> factory(Voltage voltage, Voltage subVoltage) {
+        return prop -> new SubnetBlock(prop, voltage, subVoltage);
+    }
+
     public static Function<Properties, SubnetBlock> transformer(Voltage voltage) {
         var subVoltage = Voltage.fromRank(voltage.rank - 1);
         return prop -> new SubnetBlock(prop, voltage, subVoltage);

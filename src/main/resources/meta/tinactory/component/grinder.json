@@ -1,0 +1,10 @@
+{
+  "type": "set",
+  "items": {
+    "lv": "minecraft:diamond",
+    "mv": "minecraft:diamond",
+    "hv": "tinactory:component/grinder/good",
+    "ev": "tinactory:component/grinder/good",
+    "iv": "tinactory:component/grinder/advanced"
+  }
+}

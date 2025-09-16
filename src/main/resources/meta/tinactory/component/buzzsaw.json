@@ -1,0 +1,10 @@
+{
+  "type": "set",
+  "items": {
+    "lv": "tinactory:component/buzzsaw/basic",
+    "mv": "tinactory:component/buzzsaw/basic",
+    "hv": "tinactory:component/buzzsaw/good",
+    "ev": "tinactory:component/buzzsaw/good",
+    "iv": "tinactory:component/buzzsaw/advanced"
+  }
+}

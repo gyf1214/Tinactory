@@ -18,21 +18,20 @@ import org.shsts.tinactory.core.util.I18n;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CellItem extends CapabilityItem {
-    private final int capacityFactor;
+    private final int capacity;
 
-    public CellItem(Properties properties, int capacityFactor) {
+    public CellItem(Properties properties, int capacity) {
         super(properties);
-        this.capacityFactor = capacityFactor;
+        this.capacity = capacity;
     }
 
-    public static Function<Properties, CellItem> factory(int capacityFactor) {
-        return prop -> new CellItem(prop, capacityFactor);
+    public static Function<Properties, CellItem> factory(int capacity) {
+        return prop -> new CellItem(prop, capacity);
     }
 
     private static FluidStack getFluid(ItemStack item) {
@@ -47,7 +46,7 @@ public class CellItem extends CapabilityItem {
         }
         var fluid = getFluid(item);
         if (fluid.isEmpty()) {
-            return 0xFF000000;
+            return 0x00000000;
         } else if (fluid.getFluid() instanceof SimpleFluid simpleFluid) {
             return simpleFluid.displayColor;
         } else {
@@ -55,16 +54,12 @@ public class CellItem extends CapabilityItem {
         }
     }
 
-    private int capacity() {
-        return capacityFactor * CONFIG.baseFluidCellSize.get();
-    }
-
     @Override
     public void appendHoverText(ItemStack item, @Nullable Level world,
         List<Component> components, TooltipFlag flag) {
         var fluid = getFluid(item);
         var amount = I18n.tr("tinactory.tooltip.fluidCell",
-            ClientUtil.fluidAmount(fluid), ClientUtil.fluidAmount(capacity()));
+            ClientUtil.fluidAmount(fluid), ClientUtil.fluidAmount(capacity));
         components.add(ClientUtil.fluidName(fluid).withStyle(ChatFormatting.GRAY));
         components.add(amount.withStyle(ChatFormatting.GRAY));
     }
@@ -72,6 +67,6 @@ public class CellItem extends CapabilityItem {
     @Override
     public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
         event.addCapability(modLoc("fluid_cell"),
-            new FluidHandlerItemStack(event.getObject(), capacity()));
+            new FluidHandlerItemStack(event.getObject(), capacity));
     }
 }
