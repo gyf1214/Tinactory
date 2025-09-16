@@ -29,7 +29,7 @@ import org.shsts.tinactory.content.AllMultiblocks.PLASCRETE
 import org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING
-import org.shsts.tinactory.content.AllMultiblocks.STABLE_TITANIUM
+import org.shsts.tinactory.content.AllMultiblocks.STABLE_TITANIUM_CASING
 import org.shsts.tinactory.content.AllMultiblocks.TUNGSTEN_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
 import org.shsts.tinactory.content.AllTags
@@ -161,7 +161,7 @@ object Multiblocks {
             solid(SOLID_STEEL_CASING, Voltage.LV, "steel", Technologies.STEEL)
             solid(FROST_PROOF_CASING, Voltage.LV, "aluminium", Technologies.VACUUM_FREEZER)
             solid(CLEAN_STAINLESS_CASING, Voltage.MV, "stainless_steel", Technologies.DISTILLATION)
-            solid(STABLE_TITANIUM, Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
+            solid(STABLE_TITANIUM_CASING, Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
 
             coil(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
             coil(KANTHAL_COIL_BLOCK, Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
@@ -478,7 +478,7 @@ object Multiblocks {
 
             componentVoltage = Voltage.EV
             multiblock("lithography_machine") {
-                input(STABLE_TITANIUM.get())
+                input(STABLE_TITANIUM_CASING.get())
                 circuit(3, Voltage.IV)
                 component("emitter", 4, Voltage.HV)
                 component("conveyor_module", 4)

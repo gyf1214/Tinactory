@@ -51,7 +51,7 @@ public final class AllMultiblocks {
     public static final IEntry<Block> FROST_PROOF_CASING;
     public static final IEntry<Block> CLEAN_STAINLESS_CASING;
     public static final IEntry<Block> INERT_PTFE_CASING;
-    public static final IEntry<Block> STABLE_TITANIUM;
+    public static final IEntry<Block> STABLE_TITANIUM_CASING;
     // coil blocks
     public static final Map<String, IEntry<CoilBlock>> COIL_BLOCKS;
     public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
@@ -82,7 +82,7 @@ public final class AllMultiblocks {
         FROST_PROOF_CASING = solid("frost_proof");
         CLEAN_STAINLESS_CASING = solid("clean_stainless_steel");
         INERT_PTFE_CASING = solid("inert_ptfe");
-        STABLE_TITANIUM = solid("stable_titanium");
+        STABLE_TITANIUM_CASING = solid("stable_titanium");
 
         COIL_BLOCKS = new HashMap<>();
         CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
