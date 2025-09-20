@@ -12,7 +12,6 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 public final class TinactoryConfig {
     public final ConfigValue<Integer> fluidSlotSize;
-    public final ConfigValue<Integer> baseFluidCellSize;
     public final ConfigValue<Integer> chestSize;
     public final ConfigValue<Integer> tankSize;
     public final ConfigValue<List<? extends Integer>> logisticWorkerSize;
@@ -29,7 +28,6 @@ public final class TinactoryConfig {
     public final ConfigValue<Double> meStorageInterfaceAmperage;
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
-    public final ConfigValue<List<? extends Double>> cableResistanceFactor;
     public final ConfigValue<Double> workFactorExponent;
     public final ConfigValue<Double> blastFurnaceTempFactor;
     public final ConfigValue<Double> cleanroomAmperage;
@@ -45,8 +43,6 @@ public final class TinactoryConfig {
         builder.push("logistics");
         fluidSlotSize = builder.comment("Default size of a fluid slot.")
             .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
-        baseFluidCellSize = builder.comment("Size of the base fluid cell.")
-            .defineInRange("base_fluid_cell_size", 4000, 0, Integer.MAX_VALUE);
         chestSize = builder.comment("Size of the electric chest")
             .defineInRange("chest_size", 1024, 1, Integer.MAX_VALUE);
         tankSize = builder.comment("Size of the electric tank")
@@ -86,8 +82,6 @@ public final class TinactoryConfig {
             .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
         machineResistanceFactor = builder.comment("Machine resistance factor")
             .defineList("machine_resistance_factor", List.of(0.05d, 0.1d, 0.1d, 0.2d, 0.2d, 0.4d), validator);
-        cableResistanceFactor = builder.comment("Cable resistance factor")
-            .defineList("cable_resistance_factor", List.of(0.05d), validator);
         workFactorExponent = builder.comment("Work factor exponent")
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
         blastFurnaceTempFactor = builder.comment("Temperature factor for blast furnace")

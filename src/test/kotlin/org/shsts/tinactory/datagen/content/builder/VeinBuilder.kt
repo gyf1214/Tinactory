@@ -24,7 +24,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         ProcessingRecipeBuilder(builder).apply {
             simpleDefaults()
             amperage = 0.125
-            workTicks(32)
+            workTicks(128)
         }
     }
     private val ores = mutableListOf<MaterialSet>()

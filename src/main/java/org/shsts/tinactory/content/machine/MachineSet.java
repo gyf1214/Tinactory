@@ -35,7 +35,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public class MachineSet {
     public final Set<Voltage> voltages;
     protected final Map<Voltage, Layout> layoutSet;
-    public final Map<Voltage, IEntry<? extends Block>> machines;
+    protected final Map<Voltage, IEntry<? extends Block>> machines;
 
     public MachineSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
         Map<Voltage, IEntry<? extends Block>> machines) {
@@ -106,7 +106,6 @@ public class MachineSet {
         }
 
         public Layout getLayout(Voltage voltage) {
-            assert layoutSet != null;
             return layoutSet.get(voltage);
         }
 
