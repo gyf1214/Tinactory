@@ -187,7 +187,7 @@ object MiscMaterials {
             output("water") {
                 voltage(Voltage.ULV)
             }
-            output(Items.DEEPSLATE) {
+            output(Items.COBBLED_DEEPSLATE) {
                 voltage(Voltage.LV)
             }
         }
