@@ -86,9 +86,8 @@ object ProcessingMachines {
                 circuit(2)
                 component("electric_motor")
                 component("electric_piston")
-                component("grinder")
                 input("glass", "primary")
-                tech(Technologies.PUMP_AND_PISTON, Technologies.MATERIAL_CUTTING)
+                tech(Technologies.PUMP_AND_PISTON)
             }
             machine("ore_analyzer") {
                 circuit(2)
