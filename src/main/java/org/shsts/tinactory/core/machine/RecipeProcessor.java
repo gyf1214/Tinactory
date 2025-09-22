@@ -28,7 +28,6 @@ import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -218,12 +217,7 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
     }
 
     private void updateTargetRecipe() {
-        var recipe = Multiblock.tryGet(blockEntity)
-            .flatMap(Multiblock::getInterface)
-            .map($ -> (IMachine) $)
-            .or(() -> MACHINE.tryGet(blockEntity))
-            .flatMap($ -> $.config().getLoc("targetRecipe"));
-
+        var recipe = getMachine().flatMap($ -> $.config().getLoc("targetRecipe"));
         recipe.ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
     }
 
@@ -276,10 +270,7 @@ public abstract class RecipeProcessor<T> extends CapabilityProvider implements
     }
 
     protected Optional<IMachine> getMachine() {
-        return Multiblock.tryGet(blockEntity)
-            .flatMap(Multiblock::getInterface)
-            .map($ -> (IMachine) $)
-            .or(() -> MACHINE.tryGet(blockEntity));
+        return MACHINE.tryGet(blockEntity);
     }
 
     protected Optional<IContainer> getContainer() {
