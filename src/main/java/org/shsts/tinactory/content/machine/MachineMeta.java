@@ -20,6 +20,7 @@ import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.EngravingRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
+import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -49,6 +50,7 @@ import java.util.function.BiConsumer;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllBlockEntities.MACHINE_SETS;
 import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
+import static org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -257,13 +259,23 @@ public class MachineMeta extends MetaConsumer {
             menu = getMenu();
 
             var machines = new HashMap<Voltage, IEntry<? extends Block>>();
+            IEntry<? extends Block> icon = null;
             for (var v : Voltage.parseJson(jo, "voltages")) {
-                machines.put(v, buildMachine(v));
+                var block = buildMachine(v);
+                if (v.rank > Voltage.ULV.rank && icon == null) {
+                    icon = block;
+                }
+                machines.put(v, block);
             }
 
             var set = new ProcessingSet(recipeType, layoutSet, machines);
             PROCESSING_SETS.add(set);
             MACHINE_SETS.put(id, set);
+
+            if (!recipeTypeStr.equals("chemical_reactor") && icon != null) {
+                PROCESSING_TYPES.add(new RecipeTypeInfo(recipeType,
+                    layoutSet.get(Voltage.MAX), icon));
+            }
         }
     }
 

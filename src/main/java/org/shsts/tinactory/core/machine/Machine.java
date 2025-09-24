@@ -173,7 +173,14 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         return Optional.of(state);
     }
 
-    protected Optional<BlockState> getWorkBlock(Level world) {
+    @Override
+    public Optional<BlockState> workBlock() {
+        var world = blockEntity.getLevel();
+        assert world != null;
+        return workBlock(world);
+    }
+
+    protected Optional<BlockState> workBlock(Level world) {
         return getRealBlockState(world, blockEntity);
     }
 
@@ -182,7 +189,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     protected void updateWorkBlock(Level world, boolean working) {
-        getWorkBlock(world)
+        workBlock(world)
             .filter(state -> state.hasProperty(WORKING) && state.getValue(WORKING) != working)
             .ifPresent(state -> setWorkBlock(world, state.setValue(WORKING, working)));
     }

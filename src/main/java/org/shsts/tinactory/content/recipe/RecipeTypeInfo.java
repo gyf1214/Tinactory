@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.multiblock;
+package org.shsts.tinactory.content.recipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -7,12 +7,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.List;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record MultiblockSet(List<IRecipeType<?>> types, Layout layout, IEntry<? extends Block> block) {
-    public MultiblockSet(IRecipeType<?> type, Layout layout, IEntry<? extends Block> block) {
-        this(List.of(type), layout, block);
-    }
+public record RecipeTypeInfo(IRecipeType<?> recipeType, Layout layout, IEntry<? extends Block> icon) {
 }

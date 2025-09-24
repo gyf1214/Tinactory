@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 
 import java.util.Collection;
@@ -33,9 +34,13 @@ public class ProcessingHandler extends MenuScreenHandler<ProcessingScreen> {
         double mouseX, double mouseY) {
         var menu = screen.menu();
         var layout = menu.layout();
-        var item = new ItemStack(menu.blockEntity().getBlockState().getBlock());
+        var block = menu.machineBlock();
+        if (layout.progressBar == null || block.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        if (layout.progressBar == null || item.isEmpty()) {
+        var item = new ItemStack(block.get());
+        if (!item.is(AllTags.MACHINE)) {
             return Collections.emptyList();
         }
 
@@ -51,7 +56,9 @@ public class ProcessingHandler extends MenuScreenHandler<ProcessingScreen> {
 
             @Override
             public void onClick(IFocusFactory focusFactory, IRecipesGui recipesGui) {
-                focusFactory.createFocus(RecipeIngredientRole.CATALYST, VanillaTypes.ITEM_STACK, item);
+                var focus = focusFactory.createFocus(RecipeIngredientRole.CATALYST,
+                    VanillaTypes.ITEM_STACK, item);
+                recipesGui.show(focus);
             }
         };
 

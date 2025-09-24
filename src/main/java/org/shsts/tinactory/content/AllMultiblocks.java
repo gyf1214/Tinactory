@@ -14,6 +14,7 @@ import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
+import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
@@ -21,7 +22,6 @@ import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,10 +32,10 @@ import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
+import static org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
-import static org.shsts.tinactory.core.util.LocHelper.name;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -170,7 +170,11 @@ public final class AllMultiblocks {
             .end()
             .buildObject();
 
-        add(AllRecipes.DISTILLATION, Layout.EMPTY, DISTILLATION_TOWER);
+        MULTIBLOCK_SETS.put("distillation_tower",
+            new MultiblockSet(AllRecipes.DISTILLATION, Layout.EMPTY, DISTILLATION_TOWER));
+
+        PROCESSING_TYPES.add(new RecipeTypeInfo(AllRecipes.DISTILLATION,
+            AllLayouts.DISTILLATION_TOWER.get(5), DISTILLATION_TOWER));
     }
 
     private static BlockEntityBuilder<PrimitiveBlock, ?> multiblock(String name) {
@@ -198,11 +202,6 @@ public final class AllMultiblocks {
         return REGISTRATE.block("multiblock/misc/" + name, Block::new)
             .properties(CASING_PROPERTY)
             .register();
-    }
-
-    private static void add(IRecipeType<?> recipeType, Layout layout, IEntry<? extends Block> block) {
-        var name = name(block.id(), -1);
-        MULTIBLOCK_SETS.put(name, new MultiblockSet(recipeType, layout, block));
     }
 
     private static <U extends Block, P> IBlockBuilder<U, P> glass(IBlockBuilder<U, P> builder) {

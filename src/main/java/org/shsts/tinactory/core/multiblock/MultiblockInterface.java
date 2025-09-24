@@ -183,7 +183,7 @@ public class MultiblockInterface extends Machine {
     }
 
     @Override
-    protected Optional<BlockState> getWorkBlock(Level world) {
+    protected Optional<BlockState> workBlock(Level world) {
         if (multiblock == null) {
             return Optional.empty();
         }

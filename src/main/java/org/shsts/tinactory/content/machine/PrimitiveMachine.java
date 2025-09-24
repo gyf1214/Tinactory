@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -139,6 +140,11 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
     @Override
     public BlockEntity blockEntity() {
         return blockEntity;
+    }
+
+    @Override
+    public Optional<BlockState> workBlock() {
+        return Optional.of(blockEntity.getBlockState());
     }
 
     @Override

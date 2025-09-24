@@ -10,6 +10,7 @@ import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.getComponentEntry
+import org.shsts.tinactory.content.AllRecipes
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
@@ -72,6 +73,14 @@ object Machines {
             overlay(Direction.WEST, TURBINE_SIDE)
         }
         machine("combustion_generator", "generators/combustion")
+
+        dataGen {
+            for (type in AllRecipes.PROCESSING_TYPES) {
+                val tag = AllTags.machine(type.recipeType)
+                tag(tag, AllTags.MACHINE)
+            }
+            tag(AllTags.ELECTRIC_FURNACE, AllTags.MACHINE)
+        }
     }
 
     private fun logistics() {
@@ -151,7 +160,6 @@ object Machines {
     private fun machine(name: String, block: MachineModel.Builder<*>.() -> Unit) {
         val set = getMachine(name)
         val tag = machineTag(set)
-        tag?.let { dataGen { tag(it, AllTags.MACHINE) } }
         blockData {
             for (v in set.voltages.filter { it != Voltage.PRIMITIVE }) {
                 block(set.entry(v)) {

@@ -23,7 +23,6 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
-import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
@@ -50,14 +49,10 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
-import static org.shsts.tinactory.content.AllMultiblocks.MULTIBLOCK_SETS;
-import static org.shsts.tinactory.content.AllMultiblocks.getMultiblock;
+import static org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @JeiPlugin
@@ -66,35 +61,17 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 public class JEI implements IModPlugin {
     private static final ResourceLocation LOC = modLoc("jei");
 
-    public final ToolCategory toolCategory;
-
+    private final ToolCategory toolCategory;
     private final List<RecipeCategory<?>> categories;
-    private final Map<ResourceLocation, RecipeCategory<?>> processingCategories;
 
     public JEI() {
         this.categories = new ArrayList<>();
-        this.processingCategories = new HashMap<>();
 
         this.toolCategory = new ToolCategory();
         categories.add(toolCategory);
 
-        for (var set : PROCESSING_SETS) {
-            var type = set.recipeType;
-            var clazz = type.recipeClass();
-            var layout = ChemicalReactorRecipe.class.isAssignableFrom(clazz) ?
-                getMultiblock("large_chemical_reactor").layout() : set.layout(Voltage.MAX);
-            var icon = set.icon();
-            addProcessingCategory(type, layout, icon);
-        }
-
-        for (var set : MULTIBLOCK_SETS.values()) {
-            var type = set.recipeType();
-            if (processingCategories.containsKey(type.loc())) {
-                continue;
-            }
-            var layout = set.layout();
-            var icon = set.block().get();
-            addProcessingCategory(type, layout, icon);
+        for (var type : PROCESSING_TYPES) {
+            addProcessingCategory(type.recipeType(), type.layout(), type.icon().get());
         }
     }
 
@@ -104,28 +81,27 @@ public class JEI implements IModPlugin {
         return (IRecipeType<B>) type;
     }
 
-    private void addProcessingCategory(IRecipeType<?> recipeType, ProcessingCategory<?> category) {
-        categories.add(category);
-        processingCategories.put(recipeType.loc(), category);
+    private ProcessingCategory<?> processingCategory(IRecipeType<?> type, Layout layout, Block icon) {
+        var clazz = type.recipeClass();
+        if (ResearchRecipe.class.isAssignableFrom(clazz)) {
+            return new ResearchCategory(cast(type), layout, icon);
+        } else if (ChemicalReactorRecipe.class.isAssignableFrom(clazz)) {
+            return new ChemicalReactorCategory(cast(type), layout, icon);
+        } else if (AssemblyRecipe.class.isAssignableFrom(clazz)) {
+            return new AssemblyCategory<>(cast(type), layout, icon);
+        } else if (CleanRecipe.class.isAssignableFrom(clazz)) {
+            return new CleanCategory(cast(type), layout, icon);
+        } else if (BlastFurnaceRecipe.class.isAssignableFrom(clazz)) {
+            return new BlastFurnaceCategory(cast(type), layout, icon);
+        } else if (DistillationRecipe.class.isAssignableFrom(clazz)) {
+            return new DistillationCategory(cast(type), icon);
+        } else {
+            return new ProcessingCategory<>(cast(type), layout, icon);
+        }
     }
 
     private void addProcessingCategory(IRecipeType<?> type, Layout layout, Block icon) {
-        var clazz = type.recipeClass();
-        if (ResearchRecipe.class.isAssignableFrom(clazz)) {
-            addProcessingCategory(type, new ResearchCategory(cast(type), layout, icon));
-        } else if (ChemicalReactorRecipe.class.isAssignableFrom(clazz)) {
-            addProcessingCategory(type, new ChemicalReactorCategory(cast(type), layout, icon));
-        } else if (AssemblyRecipe.class.isAssignableFrom(clazz)) {
-            addProcessingCategory(type, new AssemblyCategory<>(cast(type), layout, icon));
-        } else if (CleanRecipe.class.isAssignableFrom(clazz)) {
-            addProcessingCategory(type, new CleanCategory(cast(type), layout, icon));
-        } else if (BlastFurnaceRecipe.class.isAssignableFrom(clazz)) {
-            addProcessingCategory(type, new BlastFurnaceCategory(cast(type), layout, icon));
-        } else if (DistillationRecipe.class.isAssignableFrom(clazz)) {
-            addProcessingCategory(type, new DistillationCategory(cast(type), icon));
-        } else {
-            addProcessingCategory(type, new ProcessingCategory<>(cast(type), layout, icon));
-        }
+        categories.add(processingCategory(type, layout, icon));
     }
 
     @Override

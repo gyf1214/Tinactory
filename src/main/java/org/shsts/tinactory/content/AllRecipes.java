@@ -11,9 +11,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
+import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
@@ -24,6 +28,8 @@ public final class AllRecipes {
     public static final IRecipeType<ProcessingRecipe.Builder> DISTILLATION;
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
+
+    public static final Set<RecipeTypeInfo> PROCESSING_TYPES = new HashSet<>();
 
     static {
         TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)

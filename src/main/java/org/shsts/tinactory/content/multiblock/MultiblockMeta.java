@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
+import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
@@ -21,6 +22,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMultiblocks.MULTIBLOCK_SETS;
+import static org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES;
 import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
@@ -184,6 +186,7 @@ public class MultiblockMeta extends MachineMeta {
 
             var set = new MultiblockSet(recipeType, layout, block);
             MULTIBLOCK_SETS.put(id, set);
+            PROCESSING_TYPES.add(new RecipeTypeInfo(recipeType, layout, block));
         }
     }
 

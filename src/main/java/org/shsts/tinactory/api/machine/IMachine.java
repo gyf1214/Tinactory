@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.network.INetwork;
@@ -43,6 +44,8 @@ public interface IMachine {
     ItemStack icon();
 
     BlockEntity blockEntity();
+
+    Optional<BlockState> workBlock();
 
     Optional<IProcessor> processor();
 

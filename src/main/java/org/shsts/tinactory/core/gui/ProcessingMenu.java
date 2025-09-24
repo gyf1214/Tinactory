@@ -4,12 +4,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
+
+import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -42,6 +46,12 @@ public class ProcessingMenu extends LayoutMenu {
         }
 
         onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
+    }
+
+    public Optional<Block> machineBlock() {
+        return MACHINE.tryGet(blockEntity)
+            .flatMap(IMachine::workBlock)
+            .map(BlockState::getBlock);
     }
 
     public static Component getTitle(BlockEntity be) {

@@ -340,7 +340,9 @@ object Multiblocks {
                 casing("casings/solid/machine_casing_$casing")
                 overlay("multiblock/$overlay")
             }
-            itemTag(machine(set.recipeType))
+            for (type in set.types) {
+                itemTag(machine(type))
+            }
         }
     }
 
