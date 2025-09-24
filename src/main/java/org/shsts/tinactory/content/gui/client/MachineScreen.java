@@ -13,7 +13,6 @@ import org.shsts.tinactory.core.gui.client.ProgressBar;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinycorelib.api.gui.client.IMenuScreenFactory;
 
 import java.util.function.Function;
 
@@ -33,10 +32,10 @@ import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 @MethodsReturnNonnullByDefault
 public class MachineScreen extends ProcessingScreen {
     @Nullable
-    protected final AbstractRecipeBook<?> recipeBook;
+    protected final AbstractRecipeBook recipeBook;
 
     protected MachineScreen(ProcessingMenu menu, Component title,
-        @Nullable Function<MachineScreen, AbstractRecipeBook<?>> recipeBookFactory) {
+        @Nullable Function<MachineScreen, AbstractRecipeBook> recipeBookFactory) {
         super(menu, title);
 
         var buttonY = layout.rect.endY() + SPACING;
@@ -104,21 +103,5 @@ public class MachineScreen extends ProcessingScreen {
             var rect = new Rect(SLOT_SIZE * 2, 1, HEAT_EMPTY.width(), HEAT_EMPTY.height());
             layoutPanel.addWidget(rect, heatBar);
         }
-    }
-
-    public static class ElectricFurnace extends MachineScreen {
-        public ElectricFurnace(ProcessingMenu menu, Component title) {
-            super(menu, title, ElectricFurnaceRecipeBook::new);
-        }
-    }
-
-    public static class Marker extends MachineScreen {
-        public Marker(ProcessingMenu menu, Component title, boolean includeNormal) {
-            super(menu, title, screen -> new MarkerRecipeBook(screen, includeNormal));
-        }
-    }
-
-    public static IMenuScreenFactory<ProcessingMenu, MachineScreen> marker(boolean includeNormal) {
-        return (menu, title) -> new Marker(menu, title, includeNormal);
     }
 }

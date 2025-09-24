@@ -2,6 +2,7 @@ package org.shsts.tinactory.core.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.renderer.Rect2i;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -43,5 +44,9 @@ public record Rect(int x, int y, int width, int height) {
     public boolean in(double pX, double pY) {
         return pX >= (double) (x) && pX < (double) (x + width) &&
             pY >= (double) (y) && pY < (double) (y + height);
+    }
+
+    public Rect2i toRect2i() {
+        return new Rect2i(x, y, width, height);
     }
 }

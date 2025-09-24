@@ -11,6 +11,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
@@ -20,9 +21,7 @@ import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -39,7 +38,7 @@ import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class AbstractRecipeBook<T> extends Panel {
+public abstract class AbstractRecipeBook extends Panel {
     public static final int BUTTON_SIZE = SLOT_SIZE + 3;
     private static final int BUTTON_PER_LINE = 4;
     public static final int BUTTON_TOP_MARGIN = BUTTON_SIZE / 2;
@@ -59,29 +58,19 @@ public abstract class AbstractRecipeBook<T> extends Panel {
 
         @Override
         protected int getItemCount() {
-            return recipeList.size() + 1;
+            return recipes.size() + 1;
         }
 
         @Nullable
-        private ResourceLocation getLoc(int index) {
-            return index >= 1 && index < recipeList.size() + 1 ? recipeList.get(index - 1) : null;
-        }
-
-        @Nullable
-        private T getRecipe(@Nullable ResourceLocation loc) {
-            return loc == null ? null : recipes.getOrDefault(loc, null);
-        }
-
-        @Nullable
-        private T getRecipe(int index) {
-            return getRecipe(getLoc(index));
+        private IRecipeBookItem getRecipe(int index) {
+            return index >= 1 && index < recipes.size() + 1 ? recipes.get(index - 1) : null;
         }
 
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
-            var loc = getLoc(index);
-            var recipe = getRecipe(loc);
+            var recipe = getRecipe(index);
+            var loc = recipe == null ? null : recipe.loc();
             var z = getBlitOffset();
             if (Objects.equals(getCurrentRecipeLoc(), loc)) {
                 RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect, 21, 0);
@@ -91,14 +80,14 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             if (recipe == null) {
                 RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect.offset(2, 2).enlarge(-5, -5));
             } else {
-                AbstractRecipeBook.this.renderButton(poseStack, mouseX, mouseY, partialTick, recipe, rect, z);
+                recipe.renderButton(poseStack, mouseX, mouseY, partialTick, rect, z);
             }
         }
 
         @Override
         protected void onSelect(int index, double mouseX, double mouseY, int button) {
-            var loc = getLoc(index);
-            var recipe = getRecipe(loc);
+            var recipe = getRecipe(index);
+            var loc = recipe == null ? null : recipe.loc();
             ghostRecipe.clear();
             if (recipe == null) {
                 menu.triggerEvent(SET_MACHINE_CONFIG,
@@ -106,7 +95,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             } else {
                 menu.triggerEvent(SET_MACHINE_CONFIG,
                     SetMachineConfigPacket.builder().set("targetRecipe", loc));
-                selectRecipe(recipe);
+                recipe.select(layout, ghostRecipe);
             }
         }
 
@@ -116,25 +105,25 @@ public abstract class AbstractRecipeBook<T> extends Panel {
             if (recipe == null) {
                 return Optional.of(List.of(I18n.tr("tinactory.tooltip.unselectRecipe")));
             } else {
-                return buttonToolTip(recipe);
+                return recipe.buttonToolTip();
             }
         }
     }
 
     protected final BlockEntity blockEntity;
     protected final IMachineConfig machineConfig;
+    protected final Layout layout;
     protected final Panel bookPanel;
     protected final ButtonPanel buttonPanel;
     protected final GhostRecipe ghostRecipe;
+    protected final List<IRecipeBookItem> recipes = new ArrayList<>();
 
-    protected final Map<ResourceLocation, T> recipes = new HashMap<>();
-    private final List<ResourceLocation> recipeList = new ArrayList<>();
-
-    public AbstractRecipeBook(ProcessingScreen screen, int xOffset) {
+    public AbstractRecipeBook(ProcessingScreen screen) {
         super(screen);
         this.blockEntity = menu.blockEntity();
         this.machineConfig = MACHINE.get(blockEntity).config();
         this.bookPanel = new Panel(screen);
+        this.layout = screen.menu().layout();
         this.ghostRecipe = new GhostRecipe(menu);
 
         buttonPanel = new RecipeButtonPanel();
@@ -144,7 +133,7 @@ public abstract class AbstractRecipeBook<T> extends Panel {
         bookPanel.setActive(false);
 
         addPanel(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
-        addWidget(new Rect(xOffset, 0, 0, 0), ghostRecipe);
+        addWidget(new Rect(layout.getXOffset(), 0, 0, 0), ghostRecipe);
     }
 
     @Override
@@ -152,8 +141,13 @@ public abstract class AbstractRecipeBook<T> extends Panel {
         refreshRecipes();
         ghostRecipe.clear();
         var loc = getCurrentRecipeLoc();
-        if (loc != null && recipes.containsKey(loc)) {
-            selectRecipe(recipes.get(loc));
+        if (loc != null) {
+            for (var recipe : recipes) {
+                if (loc.equals(recipe.loc())) {
+                    recipe.select(layout, ghostRecipe);
+                    break;
+                }
+            }
         }
         super.initPanel();
     }
@@ -167,23 +161,9 @@ public abstract class AbstractRecipeBook<T> extends Panel {
 
     protected abstract void doRefreshRecipes();
 
-    protected abstract int compareRecipes(T r1, T r2);
-
-    protected abstract void selectRecipe(T recipe);
-
-    protected abstract Optional<List<Component>> buttonToolTip(T recipe);
-
-    protected abstract void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick,
-        T recipe, Rect rect, int z);
-
     protected void refreshRecipes() {
         recipes.clear();
         doRefreshRecipes();
-        recipeList.clear();
-        recipeList.addAll(recipes.entrySet().stream()
-            .sorted(Map.Entry.comparingByValue(this::compareRecipes))
-            .map(Map.Entry::getKey)
-            .toList());
     }
 
     public void setBookActive(boolean value) {

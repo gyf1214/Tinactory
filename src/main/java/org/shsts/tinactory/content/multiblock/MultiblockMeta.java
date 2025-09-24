@@ -13,7 +13,7 @@ import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -39,11 +39,11 @@ public class MultiblockMeta extends MachineMeta {
             var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
             switch (recipeTypeStr) {
                 case "blast_furnace" -> {
-                    return builder.transform(RecipeProcessor.blastFurnace(recipeType()))
+                    return builder.transform(RecipeProcessors.blastFurnace(recipeType()))
                         .child(Multiblock.builder(CoilMultiblock::new));
                 }
                 case "distillation" -> {
-                    return builder.transform(RecipeProcessor.multiblock(recipeType(), autoRecipe))
+                    return builder.transform(RecipeProcessors.multiblock(recipeType(), autoRecipe))
                         .child(Multiblock.builder(DistillationTower::new));
                 }
             }
@@ -53,11 +53,11 @@ public class MultiblockMeta extends MachineMeta {
                 }
                 case "coil" -> {
                     var baseTemp = GsonHelper.getAsInt(jo, "baseTemperature");
-                    return builder.transform(RecipeProcessor.coil(recipeType(), autoRecipe, baseTemp))
+                    return builder.transform(RecipeProcessors.coil(recipeType(), autoRecipe, baseTemp))
                         .child(Multiblock.builder(CoilMultiblock::new));
                 }
                 case "engraving" -> {
-                    return builder.transform(RecipeProcessor.multiblock(recipeType(), autoRecipe))
+                    return builder.transform(RecipeProcessors.multiblock(recipeType(), autoRecipe))
                         .child(Multiblock.builder(Lithography::new));
                 }
             }

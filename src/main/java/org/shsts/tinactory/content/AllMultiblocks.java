@@ -16,7 +16,7 @@ import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
@@ -129,7 +129,7 @@ public final class AllMultiblocks {
 
         DISTILLATION_TOWER = multiblock("distillation_tower")
             .blockEntity()
-            .transform(RecipeProcessor.multiblock(AllRecipes.DISTILLATION, true))
+            .transform(RecipeProcessors.multiblock(AllRecipes.DISTILLATION, true))
             .child(Multiblock.builder(DistillationTower::new))
             .appearanceBlock(CLEAN_STAINLESS_CASING)
             .layout(Layout.EMPTY)

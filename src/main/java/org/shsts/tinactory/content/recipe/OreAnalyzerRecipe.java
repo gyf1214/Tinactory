@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.content.machine.OreAnalyzerProcessor;
+import org.shsts.tinactory.content.machine.OreAnalyzer;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -34,7 +34,7 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
     }
 
     /**
-     * This is called in {@link OreAnalyzerProcessor}.
+     * This is called in {@link OreAnalyzer}.
      */
     public void doInsertOutputs(IContainer container, Random random) {
         super.insertOutputs(container, random);

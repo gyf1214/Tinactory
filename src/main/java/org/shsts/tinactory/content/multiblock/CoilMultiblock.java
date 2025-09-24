@@ -7,7 +7,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 
 import java.util.OptionalInt;
 
@@ -35,6 +37,16 @@ public class CoilMultiblock extends Multiblock {
 
     public OptionalInt getTemperature() {
         return coilBlock == null ? OptionalInt.empty() : OptionalInt.of(coilBlock.temperature);
+    }
+
+    public static OptionalInt getTemperature(IMachine machine) {
+        if (!(machine instanceof MultiblockInterface multiblockInterface)) {
+            return OptionalInt.empty();
+        }
+        return multiblockInterface.getMultiblock()
+            .filter($ -> $ instanceof CoilMultiblock)
+            .map($ -> ((CoilMultiblock) $).getTemperature())
+            .orElse(OptionalInt.empty());
     }
 
     @Override

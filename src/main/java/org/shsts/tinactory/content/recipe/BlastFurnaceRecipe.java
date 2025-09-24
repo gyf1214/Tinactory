@@ -7,12 +7,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
-
-import java.util.OptionalInt;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -24,19 +21,9 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
         this.temperature = builder.temperature;
     }
 
-    private OptionalInt getTemperature(IMachine machine) {
-        if (!(machine instanceof MultiblockInterface multiblockInterface)) {
-            return OptionalInt.empty();
-        }
-        return multiblockInterface.getMultiblock()
-            .filter($ -> $ instanceof CoilMultiblock)
-            .map($ -> ((CoilMultiblock) $).getTemperature())
-            .orElse(OptionalInt.empty());
-    }
-
     @Override
     public boolean canCraft(IMachine machine) {
-        var machineTemp = getTemperature(machine);
+        var machineTemp = CoilMultiblock.getTemperature(machine);
         return super.canCraft(machine) && machineTemp.isPresent() &&
             temperature <= machineTemp.getAsInt();
     }

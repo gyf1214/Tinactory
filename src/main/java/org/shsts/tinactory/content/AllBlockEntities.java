@@ -21,7 +21,7 @@ import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -69,9 +69,9 @@ public final class AllBlockEntities {
 
         ELECTRIC_FURNACE = set.machine("electric_furnace")
             .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::factory)
-            .menu(AllMenus.ELECTRIC_FURNACE)
+            .menu(AllMenus.PROCESSING_MACHINE)
             .layoutMachine(StackProcessingContainer::factory)
-            .machine(RecipeProcessor::electricFurnace)
+            .machine(RecipeProcessors::electricFurnace)
             .tintVoltage(2)
             .voltages(Voltage.ULV)
             .transform(simpleLayout(PROGRESS_ARROW))

@@ -1,211 +1,372 @@
 package org.shsts.tinactory.core.machine;
 
-import com.google.common.collect.ArrayListMultimap;
+import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.core.DistLazy;
+import org.slf4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 
-import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.content.AllRecipes.MARKER;
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MachineProcessor<R extends ProcessingRecipe>
-    extends RecipeProcessor<R> implements IElectricMachine {
-    public final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
-    protected final Voltage voltage;
+public class MachineProcessor extends CapabilityProvider implements
+    IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected double workFactor = 1d;
-    protected double energyFactor = 1d;
+    protected final BlockEntity blockEntity;
+    private final List<IRecipeProcessor<?>> processors;
+    private final boolean autoRecipe;
 
-    public MachineProcessor(BlockEntity blockEntity,
-        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType, boolean autoRecipe) {
-        this(blockEntity, recipeType, getBlockVoltage(blockEntity), autoRecipe);
-    }
+    /**
+     * This is only used during deserializeNBT when world is not available.
+     */
+    @Nullable
+    private ResourceLocation currentRecipeLoc = null;
 
-    public MachineProcessor(BlockEntity blockEntity,
-        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
-        Voltage voltage, boolean autoRecipe) {
-        super(blockEntity, autoRecipe);
-        this.recipeType = recipeType;
-        this.voltage = voltage;
-    }
-
-    @Override
-    protected boolean matches(Level world, R recipe, IMachine machine) {
-        return recipe.matches(machine, world);
-    }
-
-    @Override
-    protected List<R> getMatchedRecipes(Level world, IMachine machine) {
-        return CORE.recipeManager(world).getRecipesFor(recipeType, machine, world);
-    }
-
-    @Override
-    protected Optional<R> fromLoc(Level world, ResourceLocation loc) {
-        return CORE.recipeManager(world).byLoc(recipeType, loc);
-    }
-
-    @Override
-    protected ResourceLocation toLoc(R recipe) {
-        return recipe.loc();
-    }
-
-    @Override
-    public boolean allowTargetRecipe(Level world, ResourceLocation loc) {
-        var manager = CORE.recipeManager(world);
-
-        var recipe = manager.byLoc(recipeType, loc);
-        if (recipe.isPresent()) {
-            return true;
+    private record ProcessorRecipe<T>(IRecipeProcessor<T> processor, T recipe) {
+        public void onWorkBegin(IMachine machine) {
+            processor.onWorkBegin(recipe, machine);
         }
 
-        var marker = manager.byLoc(MARKER, loc);
-        return marker.filter($ -> $.matches(recipeType)).isPresent();
+        public void onWorkContinue(IMachine machine) {
+            processor.onWorkContinue(recipe, machine);
+        }
+
+        public long onWorkProcess(double partial) {
+            return processor.onWorkProgress(recipe, partial);
+        }
+
+        public void onWorkDone(IMachine machine, Random random) {
+            processor.onWorkDone(recipe, machine, random);
+        }
+
+        public long maxProcess() {
+            return processor.getMaxWorkProgress(recipe);
+        }
+
+        public ResourceLocation loc() {
+            return processor.toLoc(recipe);
+        }
+
+        public ElectricMachineType machineType() {
+            return processor.electricMachineType(recipe);
+        }
+
+        public double powerGen() {
+            return processor.powerGen(recipe);
+        }
+
+        public double powerCons() {
+            return processor.powerCons(recipe);
+        }
     }
 
-    @Override
-    protected void doSetTargetRecipe(Level world, ResourceLocation loc) {
-        var manager = CORE.recipeManager(world);
+    @Nullable
+    private ProcessorRecipe<?> currentRecipe = null;
+    private boolean needUpdate = true;
 
-        ProcessingRecipe marker;
-        var recipe = manager.byLoc(recipeType, loc);
-        if (recipe.isPresent()) {
-            marker = recipe.get();
-            targetRecipe = recipe.get();
-        } else {
-            targetRecipe = null;
-            marker = manager.byLoc(MARKER, loc).orElse(null);
+    private long workProgress = 0;
+
+    private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
+
+    public MachineProcessor(BlockEntity blockEntity, Collection<IRecipeProcessor<?>> processors,
+        boolean autoRecipe) {
+        this.blockEntity = blockEntity;
+        this.processors = new ArrayList<>(processors);
+        this.autoRecipe = autoRecipe;
+    }
+
+    private Level world() {
+        var world = blockEntity.getLevel();
+        assert world != null;
+        return world;
+    }
+
+    protected Optional<IMachine> machine() {
+        return MACHINE.tryGet(blockEntity);
+    }
+
+    private Optional<IContainer> container() {
+        return machine().flatMap(IMachine::container);
+    }
+
+    private Optional<ResourceLocation> targetRecipe() {
+        return machine().flatMap($ -> $.config().getLoc("targetRecipe"));
+    }
+
+    public DistLazy<List<IRecipeBookItem>> targetRecipes() {
+        var machine = machine();
+        if (machine.isEmpty()) {
+            return () -> Collections::emptyList;
         }
+        var world = world();
+        return () -> () -> {
+            var ret = new ArrayList<IRecipeBookItem>();
+            for (var processor : processors) {
+                ret.addAll(processor.recipeBookItems(world, machine.get()).getValue());
+            }
+            return ret;
+        };
+    }
 
-        if (marker == null) {
-            return;
+    private void setTargetRecipe(ResourceLocation loc) {
+        var world = world();
+        var machine = machine().orElseThrow();
+
+        for (var processor : processors) {
+            if (processor.allowTargetRecipe(world, loc, machine)) {
+                LOGGER.debug("{}: update target recipe = {}", blockEntity, loc);
+                processor.setTargetRecipe(world, loc, machine);
+                return;
+            }
         }
-        getContainer().ifPresent(container -> {
-            var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
-            var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
+        /* No processor can handle this target recipe */
+        resetTargetRecipe();
+    }
 
-            for (var input : marker.inputs) {
-                var idx = input.port();
-                var ingredient = input.ingredient();
-                if (!container.hasPort(idx)) {
+    private void resetTargetRecipe() {
+        LOGGER.debug("{}: update target recipe = <null>", blockEntity);
+        container().ifPresent(container -> {
+            var portSize = container.portSize();
+            for (var i = 0; i < portSize; i++) {
+                if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
                     continue;
                 }
-                if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
-                    itemFilters.put(idx, item.ingredient);
-                } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                    var stack1 = item.stack();
-                    itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
-                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                    var stack1 = fluid.fluid();
-                    fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
-                }
-            }
-
-            for (var idx : itemFilters.keys().elementSet()) {
-                var port = container.getPort(idx, true);
-                if (port.type() == PortType.ITEM) {
-                    port.asItemFilter().setFilters(itemFilters.get(idx));
-                }
-            }
-
-            for (var idx : fluidFilters.keys().elementSet()) {
-                var port = container.getPort(idx, true);
-                if (port.type() == PortType.FLUID) {
-                    port.asFluidFilter().setFilters(fluidFilters.get(idx));
+                var port = container.getPort(i, true);
+                switch (port.type()) {
+                    case ITEM -> port.asItemFilter().resetFilters();
+                    case FLUID -> port.asFluidFilter().resetFilters();
                 }
             }
         });
     }
 
-    protected void calculateFactors(R recipe) {
-        var baseVoltage = recipe.voltage == 0 ? Voltage.ULV.value : recipe.voltage;
-        var voltage = getVoltage();
-        var voltageFactor = 1L;
-        var overclock = 1L;
-        while (baseVoltage * voltageFactor * 4 <= voltage) {
-            overclock *= 2;
-            voltageFactor *= 4;
+    private void updateTargetRecipe() {
+        targetRecipe().ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
+    }
+
+    private <T> boolean newRecipe(IRecipeProcessor<T> processor, Level world,
+        IMachine machine, Optional<ResourceLocation> target) {
+        if (!autoRecipe && target.isEmpty()) {
+            return false;
         }
-        energyFactor = voltageFactor;
-        workFactor = overclock;
+        var recipe = processor.newRecipe(world, machine, target);
+        if (recipe.isPresent()) {
+            currentRecipe = new ProcessorRecipe<>(processor, recipe.get());
+            return true;
+        }
+        return false;
+    }
+
+    private void updateRecipe() {
+        if (currentRecipe != null || !needUpdate) {
+            return;
+        }
+        var world = world();
+        assert currentRecipeLoc == null;
+        var machine = machine();
+        if (machine.isEmpty()) {
+            return;
+        }
+
+        var target = targetRecipe();
+        for (var processor : processors) {
+            if (newRecipe(processor, world, machine.get(), target)) {
+                break;
+            }
+        }
+
+        workProgress = 0;
+        if (currentRecipe != null) {
+            currentRecipe.onWorkBegin(machine.get());
+        }
+        needUpdate = false;
+        blockEntity.setChanged();
+    }
+
+    private void setUpdateRecipe() {
+        if (currentRecipe == null) {
+            needUpdate = true;
+        }
+    }
+
+    private void onTechChange(ITeamProfile team) {
+        if (team == machine().flatMap(IMachine::owner).orElse(null)) {
+            setUpdateRecipe();
+        }
     }
 
     @Override
-    protected void onWorkBegin(R recipe, IMachine machine) {
-        recipe.consumeInputs(machine.container().orElseThrow());
-        calculateFactors(recipe);
+    public void onPreWork() {
+        updateRecipe();
     }
 
     @Override
-    protected void onWorkContinue(R recipe) {
-        calculateFactors(recipe);
+    public void onWorkTick(double partial) {
+        if (currentRecipe == null) {
+            return;
+        }
+        var machine = machine();
+        if (machine.isEmpty()) {
+            return;
+        }
+
+        var progress = currentRecipe.onWorkProcess(partial);
+        workProgress += progress;
+        if (workProgress >= currentRecipe.maxProcess()) {
+            currentRecipe.onWorkDone(machine.get(), world().random);
+            currentRecipe = null;
+            needUpdate = true;
+        }
+        blockEntity.setChanged();
     }
 
     @Override
-    protected long onWorkProgress(R recipe, double partial) {
-        return (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
-    }
-
-    @Override
-    protected void onWorkDone(R recipe, IMachine machine, Random random) {
-        recipe.insertOutputs(machine, random);
-    }
-
-    @Override
-    protected long getMaxWorkProgress(R recipe) {
-        return recipe.workTicks * PROGRESS_PER_TICK;
+    public double getProgress() {
+        if (currentRecipe == null) {
+            return 0;
+        }
+        return (double) workProgress / (double) currentRecipe.maxProcess();
     }
 
     @Override
     public long getVoltage() {
-        return voltage.value;
+        return machine().map($ -> getBlockVoltage($.blockEntity()).value).orElse(0L);
     }
 
     @Override
     public ElectricMachineType getMachineType() {
-        return ElectricMachineType.CONSUMER;
+        return currentRecipe == null ? ElectricMachineType.NONE : currentRecipe.machineType();
     }
 
     @Override
     public double getPowerGen() {
-        return 0;
+        return currentRecipe == null ? 0 : currentRecipe.powerGen();
     }
 
     @Override
     public double getPowerCons() {
-        return currentRecipe == null ? 0d : currentRecipe.power * energyFactor;
+        return currentRecipe == null ? 0 : currentRecipe.powerCons();
+    }
+
+    private <T> boolean recoverRecipe(IRecipeProcessor<T> processor, Level world, ResourceLocation loc) {
+        var recipe = processor.byLoc(world, loc);
+        if (recipe.isPresent()) {
+            currentRecipe = new ProcessorRecipe<>(processor, recipe.get());
+            return true;
+        }
+        return false;
+    }
+
+    private void onServerLoad(Level world) {
+        if (currentRecipeLoc != null) {
+            for (var processor : processors) {
+                if (recoverRecipe(processor, world, currentRecipeLoc)) {
+                    break;
+                }
+            }
+        }
+        currentRecipeLoc = null;
+
+        if (currentRecipe != null) {
+            machine().ifPresent(currentRecipe::onWorkContinue);
+            needUpdate = false;
+        }
+
+        updateTargetRecipe();
+        TechManager.server().onProgressChange(onTechChange);
+    }
+
+    private void onRemoved(Level world) {
+        if (!world.isClientSide) {
+            TechManager.server().removeProgressChangeListener(onTechChange);
+        }
+    }
+
+    private void onMachineConfig() {
+        updateTargetRecipe();
+        setUpdateRecipe();
     }
 
     @Override
-    public <T1> LazyOptional<T1> getCapability(Capability<T1> cap, @Nullable Direction side) {
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
+        eventManager.subscribe(CONTAINER_CHANGE.get(), this::setUpdateRecipe);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == AllCapabilities.PROCESSOR.get()) {
+            return myself();
+        }
         if (cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
             return myself();
         }
-        return super.getCapability(cap, side);
+        return LazyOptional.empty();
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        var tag = new CompoundTag();
+        if (currentRecipe != null) {
+            tag.putString("currentRecipe", currentRecipe.loc().toString());
+            tag.putLong("workProgress", workProgress);
+        } else if (currentRecipeLoc != null) {
+            tag.putString("currentRecipe", currentRecipeLoc.toString());
+            tag.putLong("workProgress", workProgress);
+        }
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        currentRecipe = null;
+        if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
+            currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
+            workProgress = tag.getLong("workProgress");
+        } else {
+            currentRecipeLoc = null;
+        }
     }
 }

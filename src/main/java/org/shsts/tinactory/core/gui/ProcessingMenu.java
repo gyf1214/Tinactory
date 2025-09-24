@@ -10,10 +10,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
-import org.shsts.tinactory.core.machine.MachineProcessor;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
-
-import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -46,13 +42,6 @@ public class ProcessingMenu extends LayoutMenu {
         }
 
         onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
-    }
-
-    public Optional<IRecipeType<?>> recipeType() {
-        return MACHINE.tryGet(blockEntity)
-            .flatMap(IMachine::processor)
-            .flatMap($ -> $ instanceof MachineProcessor<?> machine ?
-                Optional.of(machine.recipeType) : Optional.empty());
     }
 
     public static Component getTitle(BlockEntity be) {

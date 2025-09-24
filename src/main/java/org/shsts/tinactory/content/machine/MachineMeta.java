@@ -28,7 +28,7 @@ import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.Machine;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -180,20 +180,10 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IMenuType getMenu() {
-            switch (recipeTypeStr) {
-                case "ore_analyzer" -> {
-                    return AllMenus.MARKER;
-                }
-                case "research" -> {
-                    return AllMenus.RESEARCH_BENCH;
-                }
+            if (recipeTypeStr.equals("research")) {
+                return AllMenus.RESEARCH_BENCH;
             }
-            return switch (menuType) {
-                case "default" -> AllMenus.PROCESSING_MACHINE;
-                case "marker" -> AllMenus.MARKER;
-                case "marker_with_normal" -> AllMenus.MARKER_WITH_NORMAL;
-                default -> throw new UnsupportedTypeException("menu", menuType);
-            };
+            return AllMenus.PROCESSING_MACHINE;
         }
 
         private Layout getLayout(Voltage v) {
@@ -206,7 +196,7 @@ public class MachineMeta extends MetaConsumer {
                 .menu(AllMenus.PRIMITIVE_MACHINE)
                 .blockEntity()
                 .transform(PrimitiveMachine::factory)
-                .transform(RecipeProcessor.machine(recipeType()))
+                .transform(RecipeProcessors.machine(recipeType()))
                 .transform(StackProcessingContainer.factory(getLayout(Voltage.PRIMITIVE)))
                 .end()
                 .translucent()
@@ -215,13 +205,13 @@ public class MachineMeta extends MetaConsumer {
 
         private <P> IBlockEntityTypeBuilder<P> processor(IBlockEntityTypeBuilder<P> builder) {
             if (recipeTypeStr.equals("ore_analyzer")) {
-                return builder.transform(RecipeProcessor.oreAnalyzer(recipeType()));
+                return builder.transform(RecipeProcessors.oreAnalyzer(recipeType()));
             } else if (recipeTypeStr.equals("generator")) {
-                return builder.transform(RecipeProcessor.generator(recipeType()));
+                return builder.transform(RecipeProcessors.generator(recipeType()));
             } else if (machineType.equals("no_auto_recipe")) {
-                return builder.transform(RecipeProcessor.noAutoRecipe(recipeType()));
+                return builder.transform(RecipeProcessors.noAutoRecipe(recipeType()));
             } else {
-                return builder.transform(RecipeProcessor.machine(recipeType()));
+                return builder.transform(RecipeProcessors.machine(recipeType()));
             }
         }
 

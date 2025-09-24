@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -21,38 +21,20 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe> {
-    private final Layout.SlotInfo inputSlot;
-    private final Layout.SlotInfo outputSlot;
+public record SmeltingRecipeBookItem(SmeltingRecipe recipe) implements IRecipeBookItem {
+    @Override
+    public ResourceLocation loc() {
+        return recipe.getId();
+    }
 
-    private ElectricFurnaceRecipeBook(ProcessingScreen screen, Layout layout) {
-        super(screen, layout.getXOffset());
-        this.inputSlot = layout.slots.stream()
+    @Override
+    public void select(Layout layout, GhostRecipe ghostRecipe) {
+        var inputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == 0)
             .findFirst().orElseThrow();
-        this.outputSlot = layout.slots.stream()
+        var outputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == 1)
             .findFirst().orElseThrow();
-    }
-
-    public ElectricFurnaceRecipeBook(ProcessingScreen screen) {
-        this(screen, screen.menu().layout());
-    }
-
-    @Override
-    protected void doRefreshRecipes() {
-        var recipeManager = ClientUtil.getRecipeManager();
-        recipeManager.getAllRecipesFor(RecipeType.SMELTING)
-            .forEach(r -> recipes.put(r.getId(), r));
-    }
-
-    @Override
-    protected int compareRecipes(SmeltingRecipe r1, SmeltingRecipe r2) {
-        return r1.getId().compareNamespaced(r2.getId());
-    }
-
-    @Override
-    protected void selectRecipe(SmeltingRecipe recipe) {
         var ingredient = ProcessingIngredients.ItemsIngredientBase.of(recipe.getIngredients().get(0), 1);
         var result = new ProcessingResults.ItemResult(1d, recipe.getResultItem());
         ghostRecipe.addIngredient(inputSlot, ingredient);
@@ -60,14 +42,13 @@ public class ElectricFurnaceRecipeBook extends AbstractRecipeBook<SmeltingRecipe
     }
 
     @Override
-    protected Optional<List<Component>> buttonToolTip(SmeltingRecipe recipe) {
+    public Optional<List<Component>> buttonToolTip() {
         return RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
             .map(ClientUtil::itemTooltip);
     }
 
     @Override
-    protected void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick,
-        SmeltingRecipe recipe, Rect rect, int z) {
+    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick, Rect rect, int z) {
         RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
             .ifPresent(item -> RenderUtil.renderItem(item, rect.x() + 2, rect.y() + 2));
     }

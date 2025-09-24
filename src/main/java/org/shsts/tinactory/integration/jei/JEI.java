@@ -53,7 +53,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
@@ -129,10 +128,6 @@ public class JEI implements IModPlugin {
         }
     }
 
-    public Optional<RecipeCategory<?>> processingCategory(IRecipeType<?> recipeType) {
-        return Optional.ofNullable(processingCategories.get(recipeType.loc()));
-    }
-
     @Override
     public ResourceLocation getPluginUid() {
         return LOC;
@@ -173,7 +168,7 @@ public class JEI implements IModPlugin {
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addGenericGuiContainerHandler(MenuScreen.class, MenuScreenHandler.fluid());
         registration.addGuiContainerHandler(NetworkControllerScreen.class, new NetworkControllerHandler());
-        registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler(this));
+        registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler());
         registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchBenchHandler());
         WorkbenchHandler.addWorkbenchClickArea(registration, toolCategory);
     }

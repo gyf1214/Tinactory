@@ -55,10 +55,7 @@ public final class AllMenus {
     public static final IMenuType ME_STORAGE_INTERFACE;
     public static final IMenuType PRIMITIVE_MACHINE;
     public static final IMenuType PROCESSING_MACHINE;
-    public static final IMenuType MARKER;
-    public static final IMenuType MARKER_WITH_NORMAL;
     public static final IMenuType BOILER;
-    public static final IMenuType ELECTRIC_FURNACE;
     public static final IMenuType RESEARCH_BENCH;
 
     static {
@@ -129,24 +126,9 @@ public final class AllMenus {
             .screen(() -> () -> MachineScreen::new)
             .register();
 
-        MARKER = REGISTRATE.menu("machine/marker", MachineMenu::machine)
-            .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> MachineScreen.marker(false))
-            .register();
-
-        MARKER_WITH_NORMAL = REGISTRATE.menu("machine/marker_with_normal", MachineMenu::machine)
-            .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> MachineScreen.marker(true))
-            .register();
-
         BOILER = REGISTRATE.menu("machine/boiler", MachineMenu::boiler)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> MachineScreen.Boiler::new)
-            .register();
-
-        ELECTRIC_FURNACE = REGISTRATE.menu("machine/electric_furnace", MachineMenu::machine)
-            .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> MachineScreen.ElectricFurnace::new)
             .register();
 
         RESEARCH_BENCH = REGISTRATE.menu("machine/research_bench", MachineMenu::machine)

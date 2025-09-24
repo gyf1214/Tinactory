@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
@@ -32,12 +33,22 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     @Override
+    protected boolean matchElectric(Optional<IElectricMachine> electric) {
+        return true;
+    }
+
+    @Override
     public boolean matches(IMachine machine, Level world) {
         return false;
     }
 
     public boolean matches(IRecipeType<?> type) {
         return baseType == type.get();
+    }
+
+    // TODO
+    public boolean matches(ProcessingRecipe recipe) {
+        return true;
     }
 
     public static class Builder extends BuilderBase<MarkerRecipe, Builder> {

@@ -1,45 +1,37 @@
 package org.shsts.tinactory.content.machine;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
-import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinactory.core.machine.RecipeProcessor;
+import org.shsts.tinactory.core.machine.IRecipeProcessor;
+import org.shsts.tinycorelib.api.core.DistLazy;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.core.machine.RecipeProcessors.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements IElectricMachine {
-    private final Voltage voltage;
+public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
+    private long voltage = 0L;
     private double workFactor;
-
-    public ElectricFurnace(BlockEntity blockEntity) {
-        super(blockEntity, true);
-        this.voltage = getBlockVoltage(blockEntity);
-    }
 
     private IItemCollection getInputPort(IContainer container) {
         return container.getPort(0, true).asItem();
@@ -61,55 +53,74 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     }
 
     @Override
-    protected boolean matches(Level world, SmeltingRecipe recipe, IMachine machine) {
-        return machine.container()
-            .filter(container -> recipe.matches(getInputWrapper(container), world) &&
-                canOutput(recipe, container))
-            .isPresent();
+    public Class<SmeltingRecipe> baseClass() {
+        return SmeltingRecipe.class;
     }
 
     @Override
-    protected List<SmeltingRecipe> getMatchedRecipes(Level world, IMachine machine) {
-        return machine.container()
-            .flatMap(container -> world.getRecipeManager()
-                .getRecipeFor(RecipeType.SMELTING, getInputWrapper(container), world)
-                .filter(recipe -> canOutput(recipe, container))
-                .map(List::of))
-            .orElse(Collections.emptyList());
-    }
-
-    @Override
-    protected Optional<SmeltingRecipe> fromLoc(Level world, ResourceLocation loc) {
+    public Optional<SmeltingRecipe> byLoc(Level world, ResourceLocation loc) {
         return world.getRecipeManager().byKey(loc)
             .flatMap(r -> r instanceof SmeltingRecipe smelting ?
                 Optional.of(smelting) : Optional.empty());
     }
 
     @Override
-    protected ResourceLocation toLoc(SmeltingRecipe recipe) {
+    public ResourceLocation toLoc(SmeltingRecipe recipe) {
         return recipe.getId();
     }
 
     @Override
-    public boolean allowTargetRecipe(Level world, ResourceLocation loc) {
+    public DistLazy<List<IRecipeBookItem>> recipeBookItems(Level world, IMachine machine) {
+        var recipes = world.getRecipeManager().getAllRecipesFor(RecipeType.SMELTING);
+        return () -> () -> recipes.stream()
+            .<IRecipeBookItem>map(SmeltingRecipeBookItem::new)
+            .toList();
+    }
+
+    @Override
+    public boolean allowTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
         return world.getRecipeManager().byKey(loc)
             .filter(r -> r.getType() == RecipeType.SMELTING)
             .isPresent();
     }
 
     @Override
-    protected void doSetTargetRecipe(Level world, ResourceLocation loc) {
-        targetRecipe = (SmeltingRecipe) world.getRecipeManager().byKey(loc).orElseThrow();
-        getContainer().ifPresent(container -> {
+    public void setTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
+        var recipe = world.getRecipeManager().byKey(loc);
+        if (recipe.isEmpty() || !(recipe.get() instanceof SmeltingRecipe smeltingRecipe)) {
+            return;
+        }
+        machine.container().ifPresent(container -> {
             if (container.hasPort(0) && container.getPort(0, true) instanceof IItemCollection itemPort) {
-                itemPort.asItemFilter().setFilters(targetRecipe.getIngredients());
+                itemPort.asItemFilter().setFilters(smeltingRecipe.getIngredients());
             }
         });
     }
 
-    private void calculateFactors() {
+    @Override
+    public Optional<SmeltingRecipe> newRecipe(Level world, IMachine machine) {
+        return machine.container().flatMap(container -> world.getRecipeManager()
+            .getRecipeFor(RecipeType.SMELTING, getInputWrapper(container), world)
+            .filter(recipe -> canOutput(recipe, container)));
+    }
+
+    @Override
+    public Optional<SmeltingRecipe> newRecipe(Level world, IMachine machine, ResourceLocation target) {
+        var container = machine.container();
+        if (container.isEmpty()) {
+            return Optional.empty();
+        }
+        var input = getInputWrapper(container.get());
+        return world.getRecipeManager().byKey(target)
+            .filter(recipe -> recipe instanceof SmeltingRecipe smeltingRecipe &&
+                smeltingRecipe.matches(input, world) &&
+                canOutput(smeltingRecipe, container.get()))
+            .map($ -> (SmeltingRecipe) $);
+    }
+
+    private void calculateFactors(IMachine machine) {
         var baseVoltage = Voltage.ULV.value;
-        var voltage = getVoltage();
+        voltage = getBlockVoltage(machine.blockEntity()).value;
         var voltageFactor = 1L;
         var overclock = 1L;
         while (baseVoltage * voltageFactor * 4 <= voltage) {
@@ -120,59 +131,46 @@ public class ElectricFurnace extends RecipeProcessor<SmeltingRecipe> implements 
     }
 
     @Override
-    protected void onWorkBegin(SmeltingRecipe recipe, IMachine machine) {
+    public void onWorkBegin(SmeltingRecipe recipe, IMachine machine) {
         var container = machine.container().orElseThrow();
         var ingredient = recipe.getIngredients().get(0);
         StackHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false);
-        calculateFactors();
+        calculateFactors(machine);
     }
 
     @Override
-    protected void onWorkContinue(SmeltingRecipe recipe) {
-        calculateFactors();
+    public void onWorkContinue(SmeltingRecipe recipe, IMachine machine) {
+        calculateFactors(machine);
     }
 
     @Override
-    protected long onWorkProgress(SmeltingRecipe recipe, double partial) {
+    public long onWorkProgress(SmeltingRecipe recipe, double partial) {
         return (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
     }
 
     @Override
-    protected void onWorkDone(SmeltingRecipe recipe, IMachine machine, Random random) {
+    public void onWorkDone(SmeltingRecipe recipe, IMachine machine, Random random) {
         var container = machine.container().orElseThrow();
         getOutputPort(container).insertItem(recipe.assemble(getInputWrapper(container)), false);
     }
 
     @Override
-    protected long getMaxWorkProgress(SmeltingRecipe recipe) {
+    public long getMaxWorkProgress(SmeltingRecipe recipe) {
         return recipe.getCookingTime() * PROGRESS_PER_TICK;
     }
 
     @Override
-    public long getVoltage() {
-        return voltage.value;
-    }
-
-    @Override
-    public ElectricMachineType getMachineType() {
+    public ElectricMachineType electricMachineType(SmeltingRecipe recipe) {
         return ElectricMachineType.CONSUMER;
     }
 
     @Override
-    public double getPowerGen() {
+    public double powerGen(SmeltingRecipe recipe) {
         return 0;
     }
 
     @Override
-    public double getPowerCons() {
-        return currentRecipe == null ? 0d : getVoltage() * 0.625d;
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ELECTRIC_MACHINE.get()) {
-            return myself();
-        }
-        return super.getCapability(cap, side);
+    public double powerCons(SmeltingRecipe recipe) {
+        return voltage * 0.625d;
     }
 }
