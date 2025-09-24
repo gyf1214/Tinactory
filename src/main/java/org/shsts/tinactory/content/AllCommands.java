@@ -27,13 +27,13 @@ import static org.shsts.tinactory.content.AllWorldGens.PLAYER_START_FEATURE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllCommands {
-    private static final SimpleCommandExceptionType PLAYER_HAS_TEAM = new SimpleCommandExceptionType(
+    public static final SimpleCommandExceptionType PLAYER_HAS_TEAM = new SimpleCommandExceptionType(
         I18n.tr("tinactory.chat.exception.hasTeam"));
-    private static final SimpleCommandExceptionType PLAYER_NO_TEAM = new SimpleCommandExceptionType(
+    public static final SimpleCommandExceptionType PLAYER_NO_TEAM = new SimpleCommandExceptionType(
         I18n.tr("tinactory.chat.exception.noTeam"));
-    private static final DynamicCommandExceptionType TEAM_ALREADY_EXISTS = new DynamicCommandExceptionType(
+    public static final DynamicCommandExceptionType TEAM_ALREADY_EXISTS = new DynamicCommandExceptionType(
         t -> I18n.tr("tinactory.chat.exception.teamExists", t));
-    private static final DynamicCommandExceptionType TECH_NOT_FOUND = new DynamicCommandExceptionType(
+    public static final DynamicCommandExceptionType TECH_NOT_FOUND = new DynamicCommandExceptionType(
         t -> I18n.tr("tinactory.chat.exception.noTech", t));
 
     private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

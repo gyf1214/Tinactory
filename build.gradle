@@ -40,9 +40,15 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             jvmArgs '-ea'
 
+            ideaModule project.name + ".test"
+
             mods {
-                tinydevices {
+                tinactory {
                     source sourceSets.main
+                }
+
+                tinactory_test {
+                    source sourceSets.test
                 }
             }
         }
@@ -54,9 +60,15 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             jvmArgs '-ea'
 
+            ideaModule project.name + ".test"
+
             mods {
-                tinydevices {
+                tinactory {
                     source sourceSets.main
+                }
+
+                tinactory_test {
+                    source sourceSets.test
                 }
             }
         }
@@ -69,11 +81,11 @@ minecraft {
             ideaModule project.name + ".test"
 
             mods {
-                tinydevices {
+                tinactory {
                     source sourceSets.main
                 }
 
-                tinydevices_test {
+                tinactory_test {
                     source sourceSets.test
                 }
             }
