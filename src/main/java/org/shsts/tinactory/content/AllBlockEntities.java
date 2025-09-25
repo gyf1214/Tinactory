@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
+import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.content.machine.ElectricTank;
 import org.shsts.tinactory.content.machine.MEDrive;
 import org.shsts.tinactory.content.machine.MEStorageInterface;
 import org.shsts.tinactory.content.machine.MachineSet;
-import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.material.ComponentBuilder;
 import org.shsts.tinactory.content.network.MachineBlock;
@@ -20,16 +20,15 @@ import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
+import org.shsts.tinactory.core.multiblock.client.MultiblockInterfaceRenderer;
 import org.shsts.tinactory.core.network.NetworkController;
-import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
@@ -59,10 +58,8 @@ public final class AllBlockEntities {
     public static final IEntry<MachineBlock> HIGH_PRESSURE_BOILER;
 
     public static final Map<String, MachineSet> MACHINE_SETS;
-    public static final Set<ProcessingSet> PROCESSING_SETS;
 
     static {
-        PROCESSING_SETS = new HashSet<>();
         MACHINE_SETS = new HashMap<>();
 
         var set = new SetFactory();
@@ -71,17 +68,36 @@ public final class AllBlockEntities {
             .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::factory)
             .menu(AllMenus.PROCESSING_MACHINE)
             .layoutMachine(StackProcessingContainer::factory)
-            .machine(RecipeProcessors::electricFurnace)
+            .machine(RecipeProcessors.electricFurnace(0.625d))
             .tintVoltage(2)
             .voltages(Voltage.ULV)
-            .transform(simpleLayout(PROGRESS_ARROW))
+            .layoutSet()
+            .port(ITEM_INPUT)
+            .slot(0, 1 + SLOT_SIZE / 2)
+            .port(ITEM_OUTPUT)
+            .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
+            .progressBar(PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
+            .build()
             .buildObject();
 
         LOW_PRESSURE_BOILER = boiler("low", 5d);
         HIGH_PRESSURE_BOILER = boiler("high", 17d);
 
         MULTIBLOCK_INTERFACE = ComponentBuilder
-            .simple(ProcessingSet::multiblockInterface)
+            .simple(v -> BlockEntityBuilder.builder("multiblock/" + v.id + "/interface",
+                    MachineBlock.multiblockInterface(v))
+                .menu(AllMenus.PROCESSING_MACHINE)
+                .blockEntity()
+                .transform(MultiblockInterface::factory)
+                .transform(FlexibleStackContainer::factory)
+                .renderer(() -> () -> MultiblockInterfaceRenderer::new)
+                .end()
+                .block()
+                .tint(() -> () -> (state, $2, $3, i) ->
+                    MultiblockInterfaceBlock.tint(v, state, i))
+                .translucent()
+                .end()
+                .buildObject())
             .voltages(Voltage.ULV, Voltage.LuV)
             .buildObject();
 
@@ -215,17 +231,6 @@ public final class AllBlockEntities {
             .end()
             .transform(baseMachine())
             .buildObject();
-    }
-
-    private static <S extends MachineSet.BuilderBase<?, ?,
-        S>> Transformer<S> simpleLayout(Texture progressBar) {
-        return $ -> $.layoutSet()
-            .port(ITEM_INPUT)
-            .slot(0, 1 + SLOT_SIZE / 2)
-            .port(ITEM_OUTPUT)
-            .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-            .progressBar(progressBar, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-            .build();
     }
 
     public static MachineSet getMachine(String name) {

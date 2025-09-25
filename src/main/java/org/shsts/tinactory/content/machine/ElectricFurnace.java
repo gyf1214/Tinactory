@@ -30,8 +30,13 @@ import static org.shsts.tinactory.core.machine.RecipeProcessors.PROGRESS_PER_TIC
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
+    private final double amperage;
     private long voltage = 0L;
     private double workFactor;
+
+    public ElectricFurnace(double amperage) {
+        this.amperage = amperage;
+    }
 
     private IItemCollection getInputPort(IContainer container) {
         return container.getPort(0, true).asItem();
@@ -171,6 +176,6 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public double powerCons(SmeltingRecipe recipe) {
-        return voltage * 0.625d;
+        return voltage * amperage;
     }
 }

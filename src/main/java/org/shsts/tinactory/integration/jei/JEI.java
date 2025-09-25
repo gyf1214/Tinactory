@@ -70,7 +70,7 @@ public class JEI implements IModPlugin {
         this.toolCategory = new ToolCategory();
         categories.add(toolCategory);
 
-        for (var type : PROCESSING_TYPES) {
+        for (var type : PROCESSING_TYPES.values()) {
             addProcessingCategory(type.recipeType(), type.layout(), type.icon().get());
         }
     }

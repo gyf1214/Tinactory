@@ -2,20 +2,18 @@ package org.shsts.tinactory.core.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.content.electric.Generator;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
-import org.shsts.tinactory.content.machine.OreAnalyzer;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.CoilMachine;
 import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
-import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.Collection;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
@@ -31,28 +29,14 @@ public final class RecipeProcessors {
         return $ -> $.capability(ID, be -> new MachineProcessor(be, List.of(processor), true));
     }
 
-    public static <P, R extends ProcessingRecipe,
-        B extends IRecipeBuilderBase<R>> Transformer<IBlockEntityTypeBuilder<P>> noAutoRecipe(
-        IRecipeType<B> type) {
-        var processor = new ProcessingMachine<>(type);
-        return $ -> $.capability(ID, be -> new MachineProcessor(be, List.of(processor), false));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> machine(
+        Collection<IRecipeProcessor<?>> processors, boolean autoRecipe) {
+        return $ -> $.capability(ID, be -> new MachineProcessor(be, processors, autoRecipe));
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> oreAnalyzer(
-        IRecipeType<OreAnalyzerRecipe.Builder> type) {
-        var processor = new OreAnalyzer(type);
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> electricFurnace(double amperage) {
+        var processor = new ElectricFurnace(amperage);
         return $ -> $.capability(ID, be -> new MachineProcessor(be, List.of(processor), true));
-    }
-
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> generator(
-        IRecipeType<ProcessingRecipe.Builder> type) {
-        var processor = new Generator(type);
-        return $ -> $.capability(ID, be -> new MachineProcessor(be, List.of(processor), true));
-    }
-
-    public static <P> IBlockEntityTypeBuilder<P> electricFurnace(IBlockEntityTypeBuilder<P> builder) {
-        var processor = new ElectricFurnace();
-        return builder.capability(ID, be -> new MachineProcessor(be, List.of(processor), true));
     }
 
     public static <P, R extends ProcessingRecipe,

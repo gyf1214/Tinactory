@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.machine;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +11,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllMenus;
+import org.shsts.tinactory.content.electric.Generator;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
@@ -20,7 +22,6 @@ import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.EngravingRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
-import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -29,6 +30,7 @@ import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.Machine;
+import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
@@ -44,13 +46,13 @@ import org.slf4j.Logger;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllBlockEntities.MACHINE_SETS;
-import static org.shsts.tinactory.content.AllBlockEntities.PROCESSING_SETS;
-import static org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES;
+import static org.shsts.tinactory.content.AllRecipes.putRecipeType;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -65,7 +67,7 @@ public class MachineMeta extends MetaConsumer {
         super(name);
     }
 
-    protected static class Executor {
+    protected static class Executor implements Runnable {
         protected final String id;
         protected final JsonObject jo;
 
@@ -73,7 +75,7 @@ public class MachineMeta extends MetaConsumer {
         protected String recipeTypeId;
         protected String machineType;
         protected String menuType;
-
+        @Nullable
         protected IRecipeType<?> recipeType;
         private IMenuType menu;
         private Map<Voltage, Layout> layoutSet;
@@ -138,8 +140,8 @@ public class MachineMeta extends MetaConsumer {
                 .register();
         }
 
-        protected IRecipeType<?> getRecipeType() {
-            return switch (recipeTypeStr) {
+        protected void parseRecipeType() {
+            recipeType = switch (recipeTypeStr) {
                 case "default" -> processingRecipe(ProcessingRecipe.Builder::new, ProcessingRecipe.class);
                 case "display_input" -> processingRecipe(DisplayInputRecipe::builder, DisplayInputRecipe.class);
                 case "generator" -> processingRecipe(GeneratorRecipe::builder, GeneratorRecipe.class);
@@ -172,12 +174,14 @@ public class MachineMeta extends MetaConsumer {
                     .recipeClass(BlastFurnaceRecipe.class)
                     .serializer(BlastFurnaceRecipe.SERIALIZER)
                     .register();
+                case "electric_furnace" -> null;
                 default -> throw new UnsupportedTypeException("recipe", recipeTypeStr);
             };
         }
 
         @SuppressWarnings("unchecked")
         protected <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> IRecipeType<B> recipeType() {
+            assert recipeType != null;
             return (IRecipeType<B>) recipeType;
         }
 
@@ -206,15 +210,18 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private <P> IBlockEntityTypeBuilder<P> processor(IBlockEntityTypeBuilder<P> builder) {
-            if (recipeTypeStr.equals("ore_analyzer")) {
-                return builder.transform(RecipeProcessors.oreAnalyzer(recipeType()));
-            } else if (recipeTypeStr.equals("generator")) {
-                return builder.transform(RecipeProcessors.generator(recipeType()));
-            } else if (machineType.equals("no_auto_recipe")) {
-                return builder.transform(RecipeProcessors.noAutoRecipe(recipeType()));
-            } else {
-                return builder.transform(RecipeProcessors.machine(recipeType()));
-            }
+            var processor = switch (recipeTypeStr) {
+                case "electric_furnace" -> new ElectricFurnace(GsonHelper.getAsDouble(jo, "amperage"));
+                case "ore_analyzer" -> new OreAnalyzer(recipeType());
+                case "generator" -> new Generator(recipeType());
+                default -> new ProcessingMachine<>(recipeType());
+            };
+            var autoRecipe = switch (machineType) {
+                case "no_auto_recipe" -> false;
+                case "default" -> true;
+                default -> throw new UnsupportedTypeException("machine", machineType);
+            };
+            return builder.transform(RecipeProcessors.machine(List.of(processor), autoRecipe));
         }
 
         private IEntry<MachineBlock> processing(Voltage v) {
@@ -251,10 +258,11 @@ public class MachineMeta extends MetaConsumer {
             }
         }
 
+        @Override
         public void run() {
             parseTypes();
 
-            recipeType = getRecipeType();
+            parseRecipeType();
             layoutSet = parseLayout().buildObject();
             menu = getMenu();
 
@@ -268,18 +276,19 @@ public class MachineMeta extends MetaConsumer {
                 machines.put(v, block);
             }
 
-            var set = new ProcessingSet(recipeType, layoutSet, machines);
-            PROCESSING_SETS.add(set);
-            MACHINE_SETS.put(id, set);
+            if (recipeType != null) {
+                MACHINE_SETS.put(id, new ProcessingSet(recipeType, layoutSet, machines));
+            } else {
+                MACHINE_SETS.put(id, new MachineSet(layoutSet, machines));
+            }
 
-            if (!recipeTypeStr.equals("chemical_reactor") && icon != null) {
-                PROCESSING_TYPES.add(new RecipeTypeInfo(recipeType,
-                    layoutSet.get(Voltage.MAX), icon));
+            if (recipeType != null && !recipeTypeStr.equals("chemical_reactor") && icon != null) {
+                putRecipeType(recipeType, layoutSet.get(Voltage.MAX), icon);
             }
         }
     }
 
-    protected Executor getExecutor(ResourceLocation loc, JsonObject jo) {
+    protected Runnable getExecutor(ResourceLocation loc, JsonObject jo) {
         return new Executor(loc, jo);
     }
 

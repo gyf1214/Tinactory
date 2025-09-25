@@ -10,7 +10,7 @@ import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.getComponentEntry
-import org.shsts.tinactory.content.AllRecipes
+import org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
@@ -75,7 +75,7 @@ object Machines {
         machine("combustion_generator", "generators/combustion")
 
         dataGen {
-            for (type in AllRecipes.PROCESSING_TYPES) {
+            for (type in PROCESSING_TYPES.values) {
                 val tag = AllTags.machine(type.recipeType)
                 tag(tag, AllTags.MACHINE)
             }

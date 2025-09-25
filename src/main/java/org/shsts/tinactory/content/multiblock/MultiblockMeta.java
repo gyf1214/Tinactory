@@ -11,7 +11,6 @@ import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
-import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
@@ -20,19 +19,25 @@ import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMultiblocks.MULTIBLOCK_SETS;
-import static org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES;
+import static org.shsts.tinactory.content.AllRecipes.putRecipeType;
 import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MultiblockMeta extends MachineMeta {
+
     public MultiblockMeta() {
         super("Multiblock");
     }
 
     private static class Executor extends MachineMeta.Executor {
+        private final List<IRecipeType<?>> recipeTypes = new ArrayList<>();
+
         public Executor(ResourceLocation loc, JsonObject jo) {
             super(loc, jo);
         }
@@ -67,11 +72,14 @@ public class MultiblockMeta extends MachineMeta {
         }
 
         @Override
-        protected IRecipeType<?> getRecipeType() {
+        protected void parseRecipeType() {
             if (recipeTypeStr.contains(":")) {
-                return REGISTRATE.getRecipeType(new ResourceLocation(recipeTypeStr));
+                recipeType = REGISTRATE.getRecipeType(new ResourceLocation(recipeTypeStr));
+                recipeTypes.add(recipeType);
+            } else {
+                super.parseRecipeType();
+                recipeTypes.add(recipeType);
             }
-            return super.getRecipeType();
         }
 
         private <P> Transformer<MultiblockSpec.Builder<P>> parseLayer(JsonElement je) {
@@ -169,7 +177,7 @@ public class MultiblockMeta extends MachineMeta {
         public void run() {
             parseTypes();
 
-            recipeType = getRecipeType();
+            parseRecipeType();
             var layout = jo.has("layout") ? parseLayout().buildLayout() : Layout.EMPTY;
 
             var appearance = new ResourceLocation(GsonHelper.getAsString(jo, "appearance"));
@@ -184,14 +192,16 @@ public class MultiblockMeta extends MachineMeta {
                 .end()
                 .buildObject();
 
-            var set = new MultiblockSet(recipeType, layout, block);
+            var set = new MultiblockSet(recipeTypes, layout, block);
             MULTIBLOCK_SETS.put(id, set);
-            PROCESSING_TYPES.add(new RecipeTypeInfo(recipeType, layout, block));
+            if (recipeType != null) {
+                putRecipeType(recipeType, layout, block);
+            }
         }
     }
 
     @Override
-    protected MachineMeta.Executor getExecutor(ResourceLocation loc, JsonObject jo) {
+    protected Runnable getExecutor(ResourceLocation loc, JsonObject jo) {
         return new Executor(loc, jo);
     }
 }
