@@ -3,7 +3,6 @@ package org.shsts.tinactory.datagen.content.machine
 import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.level.block.Block
-import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE
 import org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
@@ -146,7 +145,7 @@ object Machines {
 
     private fun machineTag(set: MachineSet) = when (set) {
         is ProcessingSet -> AllTags.machine(set.recipeType)
-        ELECTRIC_FURNACE -> AllTags.ELECTRIC_FURNACE
+        getMachine("electric_furnace") -> AllTags.ELECTRIC_FURNACE
         else -> null
     }
 

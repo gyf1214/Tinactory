@@ -31,4 +31,14 @@ public abstract class CoilMachine<R extends ProcessingRecipe> extends Processing
             CONFIG.blastFurnaceTempFactor.get());
         energyFactor /= factor;
     }
+
+    public static <R extends ProcessingRecipe> CoilMachine<R> simple(
+        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType, int baseTemperature) {
+        return new CoilMachine<>(recipeType) {
+            @Override
+            protected int getRecipeTemperature(R recipe) {
+                return baseTemperature;
+            }
+        };
+    }
 }

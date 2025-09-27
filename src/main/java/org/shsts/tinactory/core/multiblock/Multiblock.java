@@ -21,14 +21,10 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.machine.RecipeProcessors;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.IBuilder;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -328,13 +324,6 @@ public class Multiblock extends MultiblockBase {
     public static <P> Function<IBlockEntityTypeBuilder<P>, Builder<P>> builder(
         BiFunction<BlockEntity, Multiblock.Builder<P>, Multiblock> factory) {
         return $ -> new Builder<>($, factory);
-    }
-
-    public static <P, R extends ProcessingRecipe,
-        B extends IRecipeBuilderBase<R>> Function<IBlockEntityTypeBuilder<P>, Builder<P>> simple(
-        IRecipeType<B> recipeType, boolean autoRecipe) {
-        return $ -> $.transform(RecipeProcessors.multiblock(recipeType, autoRecipe))
-            .child(builder(Multiblock::new));
     }
 
     public static Optional<Multiblock> tryGet(BlockEntity be) {

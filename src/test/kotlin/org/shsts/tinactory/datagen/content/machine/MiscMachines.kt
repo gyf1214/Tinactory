@@ -7,7 +7,6 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Blocks
-import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE
 import org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
@@ -124,7 +123,7 @@ object MiscMachines {
                 workTicks(MACHINE_TICKS)
             }
             machine("alloy_smelter") {
-                input(ELECTRIC_FURNACE)
+                machine("electric_furnace")
                 circuit(2)
                 component("cable", 4)
                 tech(Technologies.ALLOY_SMELTING)

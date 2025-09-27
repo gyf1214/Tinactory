@@ -198,11 +198,12 @@ public class MachineMeta extends MetaConsumer {
 
         private IEntry<PrimitiveBlock> primitive() {
             var machineId = "primitive/" + id;
+            var processor = new ProcessingMachine<>(recipeType());
             return BlockEntityBuilder.builder(machineId, PrimitiveBlock::new)
                 .menu(AllMenus.PRIMITIVE_MACHINE)
                 .blockEntity()
                 .transform(PrimitiveMachine::factory)
-                .transform(RecipeProcessors.machine(recipeType()))
+                .transform(RecipeProcessors.machine(List.of(processor), true))
                 .transform(StackProcessingContainer.factory(getLayout(Voltage.PRIMITIVE)))
                 .end()
                 .translucent()

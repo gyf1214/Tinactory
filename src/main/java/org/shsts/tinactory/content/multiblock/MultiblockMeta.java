@@ -8,11 +8,16 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.electric.Generator;
+import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.MachineMeta;
+import org.shsts.tinactory.content.machine.OreAnalyzer;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.machine.IRecipeProcessor;
+import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -36,6 +41,7 @@ public class MultiblockMeta extends MachineMeta {
     }
 
     private static class Executor extends MachineMeta.Executor {
+        private final List<IRecipeProcessor<?>> processors = new ArrayList<>();
         private final List<IRecipeType<?>> recipeTypes = new ArrayList<>();
 
         public Executor(ResourceLocation loc, JsonObject jo) {
@@ -44,40 +50,33 @@ public class MultiblockMeta extends MachineMeta {
 
         private <P> Multiblock.Builder<P> multiblock(IBlockEntityTypeBuilder<P> builder) {
             var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
+            builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
+
             switch (recipeTypeStr) {
                 case "blast_furnace" -> {
-                    return builder.transform(RecipeProcessors.blastFurnace(recipeType()))
-                        .child(Multiblock.builder(CoilMultiblock::new));
+                    return builder.child(Multiblock.builder(CoilMultiblock::new));
                 }
                 case "distillation" -> {
-                    return builder.transform(RecipeProcessors.multiblock(recipeType(), autoRecipe))
-                        .child(Multiblock.builder(DistillationTower::new));
+                    return builder.child(Multiblock.builder(DistillationTower::new));
                 }
             }
-            switch (machineType) {
-                case "default" -> {
-                    return builder.child(Multiblock.simple(recipeType(), autoRecipe));
-                }
-                case "coil" -> {
-                    var baseTemp = GsonHelper.getAsInt(jo, "baseTemperature");
-                    return builder.transform(RecipeProcessors.coil(recipeType(), autoRecipe, baseTemp))
-                        .child(Multiblock.builder(CoilMultiblock::new));
-                }
-                case "engraving" -> {
-                    return builder.transform(RecipeProcessors.multiblock(recipeType(), autoRecipe))
-                        .child(Multiblock.builder(Lithography::new));
-                }
-            }
-            throw new UnsupportedTypeException("machine", machineType);
+
+            return switch (machineType) {
+                case "default" -> builder.child(Multiblock.builder(Multiblock::new));
+                case "coil" -> builder.child(Multiblock.builder(CoilMultiblock::new));
+                case "engraving" -> builder.child(Multiblock.builder(Lithography::new));
+                default -> throw new UnsupportedTypeException("machine", machineType);
+            };
         }
 
         @Override
         protected void parseRecipeType() {
             if (recipeTypeStr.contains(":")) {
                 recipeType = REGISTRATE.getRecipeType(new ResourceLocation(recipeTypeStr));
-                recipeTypes.add(recipeType);
             } else {
                 super.parseRecipeType();
+            }
+            if (recipeType != null) {
                 recipeTypes.add(recipeType);
             }
         }
@@ -173,11 +172,49 @@ public class MultiblockMeta extends MachineMeta {
             return spec.build();
         }
 
+        private IRecipeProcessor<?> getProcessor(JsonObject jo, String machineType) {
+            if (recipeTypeStr.equals("electric_furnace")) {
+                var amperage = GsonHelper.getAsDouble(jo, "amperage");
+                return new ElectricFurnace(amperage);
+            } else {
+                parseRecipeType();
+                return switch (machineType) {
+                    case "default", "engraving" -> new ProcessingMachine<>(recipeType());
+                    case "coil" -> {
+                        var baseTemp = GsonHelper.getAsInt(jo, "baseTemperature");
+                        yield CoilMachine.simple(recipeType(), baseTemp);
+                    }
+                    case "blast_furnace" -> new BlastFurnace(recipeType());
+                    case "ore_analyzer" -> new OreAnalyzer(recipeType());
+                    case "generator" -> new Generator(recipeType());
+                    default -> {
+                        if (machineType.equals(recipeTypeStr)) {
+                            yield new ProcessingMachine<>(recipeType());
+                        } else {
+                            throw new UnsupportedTypeException("machine", machineType);
+                        }
+                    }
+                };
+            }
+        }
+
         @Override
         public void run() {
             parseTypes();
 
-            parseRecipeType();
+            if (jo.has("recipes")) {
+                var jo1 = GsonHelper.getAsJsonObject(jo, "recipes");
+                for (var entry : jo1.entrySet()) {
+                    recipeTypeStr = entry.getKey();
+                    var jo2 = GsonHelper.convertToJsonObject(entry.getValue(), "recipes");
+                    var defaultType = recipeTypeStr.contains(":") ? "default" : recipeTypeStr;
+                    var machineType = GsonHelper.getAsString(jo2, "machine", defaultType);
+                    processors.add(getProcessor(jo2, machineType));
+                }
+            } else {
+                processors.add(getProcessor(jo, machineType));
+            }
+
             var layout = jo.has("layout") ? parseLayout().buildLayout() : Layout.EMPTY;
 
             var appearance = new ResourceLocation(GsonHelper.getAsString(jo, "appearance"));

@@ -1,9 +1,9 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import net.minecraft.resources.ResourceLocation
+import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllTags
-import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.datagen.content.component.item
@@ -31,9 +31,9 @@ class AssemblyRecipeBuilder(builder: AssemblyRecipe.Builder) :
         }
     }
 
-    fun input(machine: MachineSet, amount: Int = 1,
+    fun machine(name: String, amount: Int = 1,
         voltage: Voltage = this.componentVoltage!!, port: Int = defaultInputItem!!) {
-        input(machine.block(voltage), amount, port)
+        input(getMachine(name).block(voltage), amount, port)
     }
 
     fun circuit(amount: Int, voltage: Voltage = this.componentVoltage!!,

@@ -236,8 +236,8 @@ object RecipeFactories {
     fun arcFurnace(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("arc_furnace") {
             defaultInputItem = 0
-            defaultInputFluid = 1
-            defaultOutputItem = 2
+            defaultInputFluid = 2
+            defaultOutputItem = 1
             amperage = 1.0
         }.apply {
             defaultItemSub = "ingot"

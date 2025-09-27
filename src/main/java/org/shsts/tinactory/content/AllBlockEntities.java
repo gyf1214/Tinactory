@@ -20,7 +20,6 @@ import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.core.multiblock.client.MultiblockInterfaceRenderer;
@@ -32,18 +31,15 @@ import java.util.Map;
 
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
-import static org.shsts.tinactory.api.logistics.SlotType.ITEM_OUTPUT;
 import static org.shsts.tinactory.content.AllItems.COMPONENTS;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Texture.PROGRESS_ARROW;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllBlockEntities {
-    public static final MachineSet ELECTRIC_FURNACE;
     public static final MachineSet BATTERY_BOX;
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
@@ -63,22 +59,6 @@ public final class AllBlockEntities {
         MACHINE_SETS = new HashMap<>();
 
         var set = new SetFactory();
-
-        ELECTRIC_FURNACE = set.machine("electric_furnace")
-            .machine(v -> "machine/" + v.id + "/electric_furnace", MachineBlock::factory)
-            .menu(AllMenus.PROCESSING_MACHINE)
-            .layoutMachine(StackProcessingContainer::factory)
-            .machine(RecipeProcessors.electricFurnace(0.625d))
-            .tintVoltage(2)
-            .voltages(Voltage.ULV)
-            .layoutSet()
-            .port(ITEM_INPUT)
-            .slot(0, 1 + SLOT_SIZE / 2)
-            .port(ITEM_OUTPUT)
-            .slot(SLOT_SIZE * 3, 1 + SLOT_SIZE / 2)
-            .progressBar(PROGRESS_ARROW, 8 + SLOT_SIZE, SLOT_SIZE / 2)
-            .build()
-            .buildObject();
 
         LOW_PRESSURE_BOILER = boiler("low", 5d);
         HIGH_PRESSURE_BOILER = boiler("high", 17d);

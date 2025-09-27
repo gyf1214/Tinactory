@@ -5,7 +5,6 @@ import net.minecraft.tags.BlockTags
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
-import org.shsts.tinactory.content.AllBlockEntities.ELECTRIC_FURNACE
 import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
 import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
@@ -355,7 +354,7 @@ object Multiblocks {
             }
             multiblock("blast_furnace") {
                 input(HEATPROOF_CASING.get())
-                input(ELECTRIC_FURNACE, 3)
+                machine("electric_furnace", 3)
                 circuit(3)
                 component("cable", 2)
                 tech(Technologies.STEEL)
