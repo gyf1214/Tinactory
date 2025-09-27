@@ -8,16 +8,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.electric.Generator;
 import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.MachineMeta;
-import org.shsts.tinactory.content.machine.OreAnalyzer;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
-import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -26,6 +23,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMultiblocks.MULTIBLOCK_SETS;
@@ -41,7 +39,7 @@ public class MultiblockMeta extends MachineMeta {
     }
 
     private static class Executor extends MachineMeta.Executor {
-        private final List<IRecipeProcessor<?>> processors = new ArrayList<>();
+        private final List<Supplier<? extends IRecipeProcessor<?>>> processors = new ArrayList<>();
         private final List<IRecipeType<?>> recipeTypes = new ArrayList<>();
 
         public Executor(ResourceLocation loc, JsonObject jo) {
@@ -172,24 +170,24 @@ public class MultiblockMeta extends MachineMeta {
             return spec.build();
         }
 
-        private IRecipeProcessor<?> getProcessor(JsonObject jo, String machineType) {
+        private Supplier<? extends IRecipeProcessor<?>> getProcessor(JsonObject jo, String machineType) {
             if (recipeTypeStr.equals("electric_furnace")) {
                 var amperage = GsonHelper.getAsDouble(jo, "amperage");
-                return new ElectricFurnace(amperage);
+                return () -> new ElectricFurnace(amperage);
             } else {
                 parseRecipeType();
                 return switch (machineType) {
-                    case "default", "engraving" -> new ProcessingMachine<>(recipeType());
+                    case "default", "engraving" -> RecipeProcessors.processing(recipeType());
                     case "coil" -> {
                         var baseTemp = GsonHelper.getAsInt(jo, "baseTemperature");
-                        yield CoilMachine.simple(recipeType(), baseTemp);
+                        yield RecipeProcessors.coil(recipeType(), baseTemp);
                     }
-                    case "blast_furnace" -> new BlastFurnace(recipeType());
-                    case "ore_analyzer" -> new OreAnalyzer(recipeType());
-                    case "generator" -> new Generator(recipeType());
+                    case "blast_furnace" -> RecipeProcessors.blastFurnace(recipeType());
+                    case "ore_analyzer" -> RecipeProcessors.oreAnalyzer(recipeType());
+                    case "generator" -> RecipeProcessors.generator(recipeType());
                     default -> {
                         if (machineType.equals(recipeTypeStr)) {
-                            yield new ProcessingMachine<>(recipeType());
+                            yield RecipeProcessors.processing(recipeType());
                         } else {
                             throw new UnsupportedTypeException("machine", machineType);
                         }

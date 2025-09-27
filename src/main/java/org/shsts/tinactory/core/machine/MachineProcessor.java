@@ -107,7 +107,7 @@ public class MachineProcessor extends CapabilityProvider implements
 
     private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
 
-    public MachineProcessor(BlockEntity blockEntity, Collection<IRecipeProcessor<?>> processors,
+    public MachineProcessor(BlockEntity blockEntity, Collection<? extends IRecipeProcessor<?>> processors,
         boolean autoRecipe) {
         this.blockEntity = blockEntity;
         this.processors = new ArrayList<>(processors);

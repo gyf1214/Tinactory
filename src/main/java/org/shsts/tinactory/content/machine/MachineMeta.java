@@ -11,7 +11,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllMenus;
-import org.shsts.tinactory.content.electric.Generator;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
@@ -30,7 +29,6 @@ import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.Machine;
-import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
@@ -198,7 +196,7 @@ public class MachineMeta extends MetaConsumer {
 
         private IEntry<PrimitiveBlock> primitive() {
             var machineId = "primitive/" + id;
-            var processor = new ProcessingMachine<>(recipeType());
+            var processor = RecipeProcessors.processing(recipeType());
             return BlockEntityBuilder.builder(machineId, PrimitiveBlock::new)
                 .menu(AllMenus.PRIMITIVE_MACHINE)
                 .blockEntity()
@@ -212,10 +210,10 @@ public class MachineMeta extends MetaConsumer {
 
         private <P> IBlockEntityTypeBuilder<P> processor(IBlockEntityTypeBuilder<P> builder) {
             var processor = switch (recipeTypeStr) {
-                case "electric_furnace" -> new ElectricFurnace(GsonHelper.getAsDouble(jo, "amperage"));
-                case "ore_analyzer" -> new OreAnalyzer(recipeType());
-                case "generator" -> new Generator(recipeType());
-                default -> new ProcessingMachine<>(recipeType());
+                case "electric_furnace" -> RecipeProcessors.electricFurnace(GsonHelper.getAsDouble(jo, "amperage"));
+                case "ore_analyzer" -> RecipeProcessors.oreAnalyzer(recipeType());
+                case "generator" -> RecipeProcessors.generator(recipeType());
+                default -> RecipeProcessors.processing(recipeType());
             };
             var autoRecipe = switch (machineType) {
                 case "no_auto_recipe" -> false;

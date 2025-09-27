@@ -15,7 +15,7 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class MultiblockProcessor extends MachineProcessor {
     public MultiblockProcessor(BlockEntity blockEntity,
-        Collection<IRecipeProcessor<?>> processors, boolean autoRecipe) {
+        Collection<? extends IRecipeProcessor<?>> processors, boolean autoRecipe) {
         super(blockEntity, processors, autoRecipe);
     }
 
