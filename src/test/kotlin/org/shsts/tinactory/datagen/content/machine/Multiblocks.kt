@@ -329,6 +329,7 @@ object Multiblocks {
             multiblock("autoclave", "clean_stainless_steel", "blast_furnace")
             multiblock("lithography_machine", "stable_titanium", "blast_furnace")
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
+            multiblock("multi_smelter", "heatproof", "blast_furnace")
         }
     }
 

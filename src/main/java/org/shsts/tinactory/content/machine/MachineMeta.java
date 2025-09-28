@@ -224,7 +224,10 @@ public class MachineMeta extends MetaConsumer {
 
         private <P> IBlockEntityTypeBuilder<P> processor(IBlockEntityTypeBuilder<P> builder) {
             var processor = switch (recipeTypeStr) {
-                case "electric_furnace" -> RecipeProcessors.electricFurnace(GsonHelper.getAsDouble(jo, "amperage"));
+                case "electric_furnace" -> RecipeProcessors.electricFurnace(
+                    GsonHelper.getAsInt(jo, "inputPort"),
+                    GsonHelper.getAsInt(jo, "outputPort"),
+                    GsonHelper.getAsDouble(jo, "amperage"));
                 case "ore_analyzer" -> RecipeProcessors.oreAnalyzer(recipeType());
                 case "generator" -> RecipeProcessors.generator(recipeType());
                 default -> RecipeProcessors.processing(recipeType());

@@ -14,6 +14,7 @@ import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
+import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -24,26 +25,35 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 import static org.shsts.tinactory.core.machine.RecipeProcessors.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
+    private final int inputPort;
+    private final int outputPort;
     private final double amperage;
+    private final int baseTemperature;
     private long voltage = 0L;
-    private double workFactor;
+    private double workFactor = 1d;
+    private double energyFactor = 1d;
 
-    public ElectricFurnace(double amperage) {
+    public ElectricFurnace(int inputPort, int outputPort,
+        double amperage, int baseTemperature) {
+        this.inputPort = inputPort;
+        this.outputPort = outputPort;
         this.amperage = amperage;
+        this.baseTemperature = baseTemperature;
     }
 
     private IItemCollection getInputPort(IContainer container) {
-        return container.getPort(0, true).asItem();
+        return container.getPort(inputPort, true).asItem();
     }
 
     private IItemCollection getOutputPort(IContainer container) {
-        return container.getPort(1, true).asItem();
+        return container.getPort(outputPort, true).asItem();
     }
 
     private RecipeWrapper getInputWrapper(IContainer container) {
@@ -78,7 +88,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     public DistLazy<List<IRecipeBookItem>> recipeBookItems(Level world, IMachine machine) {
         var recipes = world.getRecipeManager().getAllRecipesFor(RecipeType.SMELTING);
         return () -> () -> recipes.stream()
-            .<IRecipeBookItem>map(SmeltingRecipeBookItem::new)
+            .<IRecipeBookItem>map(recipe -> new SmeltingRecipeBookItem(recipe, inputPort, outputPort))
             .toList();
     }
 
@@ -95,11 +105,8 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         if (recipe.isEmpty() || !(recipe.get() instanceof SmeltingRecipe smeltingRecipe)) {
             return;
         }
-        machine.container().ifPresent(container -> {
-            if (container.hasPort(0) && container.getPort(0, true) instanceof IItemCollection itemPort) {
-                itemPort.asItemFilter().setFilters(smeltingRecipe.getIngredients());
-            }
-        });
+        machine.container().ifPresent(container -> getInputPort(container)
+            .asItemFilter().setFilters(smeltingRecipe.getIngredients()));
     }
 
     @Override
@@ -123,6 +130,10 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             .map($ -> (SmeltingRecipe) $);
     }
 
+    private int getTemperature(IMachine machine) {
+        return CoilMultiblock.getTemperature(machine).orElse(0);
+    }
+
     private void calculateFactors(IMachine machine) {
         var baseVoltage = Voltage.ULV.value;
         voltage = getBlockVoltage(machine.blockEntity()).value;
@@ -133,6 +144,15 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             voltageFactor *= 4;
         }
         workFactor = overclock;
+
+        var temp = getTemperature(machine);
+        if (temp > 0 && baseTemperature > 0) {
+            var factor = Math.max(1d, (temp - baseTemperature) /
+                CONFIG.blastFurnaceTempFactor.get());
+            energyFactor = 1 / factor;
+        } else {
+            energyFactor = 1;
+        }
     }
 
     @Override
@@ -176,6 +196,6 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public double powerCons(SmeltingRecipe recipe) {
-        return voltage * amperage;
+        return voltage * amperage * energyFactor;
     }
 }

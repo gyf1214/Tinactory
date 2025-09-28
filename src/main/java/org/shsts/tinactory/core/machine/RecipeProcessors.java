@@ -31,8 +31,14 @@ public final class RecipeProcessors {
         return () -> new ProcessingMachine<>(recipeType);
     }
 
-    public static Supplier<IRecipeProcessor<SmeltingRecipe>> electricFurnace(double amperage) {
-        return () -> new ElectricFurnace(amperage);
+    public static Supplier<IRecipeProcessor<SmeltingRecipe>> electricFurnace(
+        int inputPort, int outputPort, double amperage) {
+        return electricFurnace(inputPort, outputPort, amperage, 0);
+    }
+
+    public static Supplier<IRecipeProcessor<SmeltingRecipe>> electricFurnace(
+        int inputPort, int outputPort, double amperage, int baseTemperature) {
+        return () -> new ElectricFurnace(inputPort, outputPort, amperage, baseTemperature);
     }
 
     public static Supplier<IRecipeProcessor<ProcessingRecipe>> generator(

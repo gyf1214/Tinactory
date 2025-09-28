@@ -132,8 +132,8 @@ object RecipeFactories {
     fun alloySmelter(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("alloy_smelter") {
             defaultInputItem = 0
-            defaultOutputItem = 1
-            defaultOutputFluid = 2
+            defaultOutputItem = 2
+            defaultOutputFluid = 3
             amperage = 0.75
         }.apply {
             defaultItemSub = "dust"
@@ -236,8 +236,8 @@ object RecipeFactories {
     fun arcFurnace(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("arc_furnace") {
             defaultInputItem = 0
-            defaultInputFluid = 2
-            defaultOutputItem = 1
+            defaultInputFluid = 1
+            defaultOutputItem = 2
             amperage = 1.0
         }.apply {
             defaultItemSub = "ingot"

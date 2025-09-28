@@ -8,7 +8,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.ElectricFurnace;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
@@ -33,7 +32,6 @@ import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MultiblockMeta extends MachineMeta {
-
     public MultiblockMeta() {
         super("Multiblock");
     }
@@ -174,8 +172,11 @@ public class MultiblockMeta extends MachineMeta {
 
         private Supplier<? extends IRecipeProcessor<?>> getProcessor(JsonObject jo, String machineType) {
             if (recipeTypeStr.equals("electric_furnace")) {
-                var amperage = GsonHelper.getAsDouble(jo, "amperage");
-                return () -> new ElectricFurnace(amperage);
+                return RecipeProcessors.electricFurnace(
+                    GsonHelper.getAsInt(jo, "inputPort"),
+                    GsonHelper.getAsInt(jo, "outputPort"),
+                    GsonHelper.getAsDouble(jo, "amperage"),
+                    GsonHelper.getAsInt(jo, "baseTemperature", 0));
             } else {
                 parseRecipeType();
                 return switch (machineType) {
@@ -233,7 +234,7 @@ public class MultiblockMeta extends MachineMeta {
 
             var set = new MultiblockSet(recipeTypes, block);
             MULTIBLOCK_SETS.put(id, set);
-            if (recipeType != null) {
+            for (var recipeType : recipeTypes) {
                 putRecipeType(recipeType, layout, block);
             }
         }

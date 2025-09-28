@@ -9,13 +9,13 @@
         "y": 10
       },
       {
-        "port": 2,
+        "port": 1,
         "type": "fluid_input",
         "x": 18,
         "y": 10
       },
       {
-        "port": 1,
+        "port": 2,
         "type": "item_output",
         "x": 72,
         "y": 10

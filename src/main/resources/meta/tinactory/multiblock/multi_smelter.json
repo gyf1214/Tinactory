@@ -1,0 +1,95 @@
+{
+  "recipes": {
+    "electric_furnace": {
+      "amperage": 0.625,
+      "baseTemperature": 900,
+      "inputPort": 0,
+      "outputPort": 2
+    },
+    "tinactory:alloy_smelter": {
+      "machine": "coil",
+      "baseTemperature": 1200
+    },
+    "tinactory:arc_furnace": {}
+  },
+  "autoRecipe": false,
+  "machine": "coil",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 36,
+        "y": 19
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 10
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 108,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "x": 62,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/heatproof",
+  "layers": [
+    [
+      "BBB",
+      "BBB",
+      "B$B"
+    ],
+    [
+      "CCC",
+      "CAC",
+      "CCC"
+    ],
+    [
+      "TTT",
+      "TTT",
+      "TTT"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/heatproof"
+    },
+    "T": "tinactory:multiblock/solid/heatproof",
+    "C": {
+      "type": "tag_with_same_block",
+      "key": "coil",
+      "tag": "tinactory:multiblock/coil"
+    },
+    "A": "air"
+  }
+}

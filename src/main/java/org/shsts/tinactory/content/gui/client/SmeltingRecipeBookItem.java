@@ -21,7 +21,17 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record SmeltingRecipeBookItem(SmeltingRecipe recipe) implements IRecipeBookItem {
+public class SmeltingRecipeBookItem implements IRecipeBookItem {
+    private final SmeltingRecipe recipe;
+    private final int inputPort;
+    private final int outputPort;
+
+    public SmeltingRecipeBookItem(SmeltingRecipe recipe, int inputPort, int outputPort) {
+        this.recipe = recipe;
+        this.inputPort = inputPort;
+        this.outputPort = outputPort;
+    }
+
     @Override
     public ResourceLocation loc() {
         return recipe.getId();
@@ -30,10 +40,10 @@ public record SmeltingRecipeBookItem(SmeltingRecipe recipe) implements IRecipeBo
     @Override
     public void select(Layout layout, GhostRecipe ghostRecipe) {
         var inputSlot = layout.slots.stream()
-            .filter(slot -> slot.port() == 0)
+            .filter(slot -> slot.port() == inputPort)
             .findFirst().orElseThrow();
         var outputSlot = layout.slots.stream()
-            .filter(slot -> slot.port() == 1)
+            .filter(slot -> slot.port() == outputPort)
             .findFirst().orElseThrow();
         var ingredient = ProcessingIngredients.ItemsIngredientBase.of(recipe.getIngredients().get(0), 1);
         var result = new ProcessingResults.ItemResult(1d, recipe.getResultItem());
