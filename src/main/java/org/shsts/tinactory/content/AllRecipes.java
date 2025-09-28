@@ -11,11 +11,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -29,7 +27,6 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
     public static final IRecipeType<ToolRecipe.Builder> TOOL_CRAFTING;
-    public static final IRecipeType<ProcessingRecipe.Builder> DISTILLATION;
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
 
@@ -39,11 +36,6 @@ public final class AllRecipes {
         TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)
             .recipeClass(ToolRecipe.class)
             .serializer(ToolRecipe.SERIALIZER)
-            .register();
-
-        DISTILLATION = REGISTRATE.recipeType("distillation", DistillationRecipe::builder)
-            .recipeClass(DistillationRecipe.class)
-            .serializer(ProcessingRecipe.SERIALIZER)
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)

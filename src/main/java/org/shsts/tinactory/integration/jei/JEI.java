@@ -94,7 +94,7 @@ public class JEI implements IModPlugin {
         } else if (BlastFurnaceRecipe.class.isAssignableFrom(clazz)) {
             return new BlastFurnaceCategory(cast(type), layout, icon);
         } else if (DistillationRecipe.class.isAssignableFrom(clazz)) {
-            return new DistillationCategory(cast(type), icon);
+            return new DistillationCategory(cast(type), layout, icon);
         } else {
             return new ProcessingCategory<>(cast(type), layout, icon);
         }

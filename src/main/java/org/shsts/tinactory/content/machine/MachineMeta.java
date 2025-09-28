@@ -95,11 +95,10 @@ public class MachineMeta extends MetaConsumer {
             cons.accept(new Rect(x, y, w, h), tex);
         }
 
-        protected LayoutSetBuilder<?> parseLayout() {
+        protected LayoutSetBuilder<?> parseLayout(JsonObject jo) {
             var builder = Layout.builder();
 
-            var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
-            var ja1 = GsonHelper.getAsJsonArray(jo1, "slots");
+            var ja1 = GsonHelper.getAsJsonArray(jo, "slots");
             for (var je1 : ja1) {
                 var jo2 = GsonHelper.convertToJsonObject(je1, "slots");
                 var port = GsonHelper.getAsInt(jo2, "port");
@@ -109,24 +108,39 @@ public class MachineMeta extends MetaConsumer {
                 Collection<Voltage> voltages;
                 if (jo2.has("voltages")) {
                     voltages = Voltage.parseJson(jo2, "voltages");
+                } else if (jo2.has("levels")) {
+                    var str = GsonHelper.getAsString(jo2, "levels");
+                    if (str.contains("-")) {
+                        var fields = str.split("-");
+                        var low = Voltage.fromRank(Integer.parseInt(fields[0]));
+                        var high = fields.length > 1 ? Voltage.fromRank(Integer.parseInt(fields[1])) :
+                            Voltage.MAX;
+                        voltages = Voltage.between(low, high);
+                    } else {
+                        voltages = List.of(Voltage.fromRank(Integer.parseInt(str)));
+                    }
                 } else {
                     voltages = Arrays.asList(Voltage.values());
                 }
                 builder.slot(port, type, x, y, voltages);
             }
 
-            var ja3 = GsonHelper.getAsJsonArray(jo1, "images", new JsonArray());
+            var ja3 = GsonHelper.getAsJsonArray(jo, "images", new JsonArray());
             for (var je3 : ja3) {
                 var jo3 = GsonHelper.convertToJsonObject(je3, "images");
                 parseImage(jo3, 1, builder::image);
             }
 
-            if (jo1.has("progressBar")) {
-                var jo4 = GsonHelper.getAsJsonObject(jo1, "progressBar");
+            if (jo.has("progressBar")) {
+                var jo4 = GsonHelper.getAsJsonObject(jo, "progressBar");
                 parseImage(jo4, 2, builder::progressBar);
             }
 
             return builder;
+        }
+
+        protected LayoutSetBuilder<?> parseLayout() {
+            return parseLayout(GsonHelper.getAsJsonObject(jo, "layout"));
         }
 
         private IRecipeType<ProcessingRecipe.Builder> processingRecipe(

@@ -8,15 +8,11 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
-import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.content.multiblock.HalfBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.network.FixedBlock;
-import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
-import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.machine.RecipeProcessors;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
@@ -31,7 +27,6 @@ import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
-import static org.shsts.tinactory.content.AllRecipes.putRecipeType;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
@@ -40,7 +35,6 @@ import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
 @MethodsReturnNonnullByDefault
 public final class AllMultiblocks {
     public static final Map<String, MultiblockSet> MULTIBLOCK_SETS;
-    public static final IEntry<PrimitiveBlock> DISTILLATION_TOWER;
     public static final IEntry<FixedBlock> CLEANROOM;
 
     // solid blocks
@@ -126,31 +120,6 @@ public final class AllMultiblocks {
 
         MULTIBLOCK_SETS = new HashMap<>();
 
-        var processor = RecipeProcessors.processing(AllRecipes.DISTILLATION);
-        DISTILLATION_TOWER = multiblock("distillation_tower")
-            .blockEntity()
-            .transform(RecipeProcessors.multiblock(List.of(processor), true))
-            .child(Multiblock.builder(DistillationTower::new))
-            .appearanceBlock(CLEAN_STAINLESS_CASING)
-            .layout(Layout.EMPTY)
-            .spec()
-            .layer()
-            .row('B', 3, 2)
-            .row("B$B").build()
-            .layer().height(1, 6)
-            .row("CCC")
-            .row("CAC")
-            .row("CCC").build()
-            .layer()
-            .row('C', 3, 3).build()
-            .blockOrInterface('B', CLEAN_STAINLESS_CASING)
-            .block('C', CLEAN_STAINLESS_CASING)
-            .air('A')
-            .build()
-            .build()
-            .end()
-            .buildObject();
-
         CLEANROOM = BlockEntityBuilder.builder("multiblock/cleanroom", FixedBlock::new)
             .translucent()
             .blockEntity()
@@ -169,17 +138,6 @@ public final class AllMultiblocks {
             .build()
             .end()
             .buildObject();
-
-        MULTIBLOCK_SETS.put("distillation_tower",
-            new MultiblockSet(AllRecipes.DISTILLATION, Layout.EMPTY, DISTILLATION_TOWER));
-
-        putRecipeType(AllRecipes.DISTILLATION, AllLayouts.DISTILLATION_TOWER.get(5),
-            DISTILLATION_TOWER);
-    }
-
-    private static BlockEntityBuilder<PrimitiveBlock, ?> multiblock(String name) {
-        return BlockEntityBuilder.builder("multiblock/" + name, PrimitiveBlock::new)
-            .translucent();
     }
 
     private static IEntry<Block> solid(String name) {

@@ -50,20 +50,22 @@ public class MultiblockMeta extends MachineMeta {
             var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
             builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
 
-            switch (recipeTypeStr) {
-                case "blast_furnace" -> {
-                    return builder.child(Multiblock.builder(CoilMultiblock::new));
-                }
-                case "distillation" -> {
-                    return builder.child(Multiblock.builder(DistillationTower::new));
-                }
-            }
-
             return switch (machineType) {
                 case "default" -> builder.child(Multiblock.builder(Multiblock::new));
-                case "coil" -> builder.child(Multiblock.builder(CoilMultiblock::new));
+                case "coil", "blast_furnace" -> builder.child(Multiblock.builder(CoilMultiblock::new));
                 case "engraving" -> builder.child(Multiblock.builder(Lithography::new));
-                default -> throw new UnsupportedTypeException("machine", machineType);
+                case "distillation" -> {
+                    var maxHeight = GsonHelper.getAsInt(jo, "maxHeight");
+                    var layouts = parseLayout().buildList(maxHeight - 2);
+                    yield builder.child(Multiblock.builder((be, $) -> new DistillationTower(be, $, layouts)));
+                }
+                default -> {
+                    if (machineType.equals(recipeTypeStr)) {
+                        yield builder.child(Multiblock.builder(Multiblock::new));
+                    } else {
+                        throw new UnsupportedTypeException("machine", machineType);
+                    }
+                }
             };
         }
 
@@ -210,6 +212,8 @@ public class MultiblockMeta extends MachineMeta {
                     processors.add(getProcessor(jo2, machineType));
                 }
             } else {
+                var defaultType = recipeTypeStr.contains(":") ? "default" : recipeTypeStr;
+                machineType = GsonHelper.getAsString(jo, "machine", defaultType);
                 processors.add(getProcessor(jo, machineType));
             }
 
@@ -227,7 +231,7 @@ public class MultiblockMeta extends MachineMeta {
                 .end()
                 .buildObject();
 
-            var set = new MultiblockSet(recipeTypes, layout, block);
+            var set = new MultiblockSet(recipeTypes, block);
             MULTIBLOCK_SETS.put(id, set);
             if (recipeType != null) {
                 putRecipeType(recipeType, layout, block);

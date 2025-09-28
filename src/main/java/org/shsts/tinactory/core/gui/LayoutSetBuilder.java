@@ -138,6 +138,15 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return ret;
     }
 
+    public List<Layout> buildList(int size) {
+        var ret = new ArrayList<Layout>();
+        for (var i = 0; i < size; i++) {
+            var slots = getSlots(Voltage.fromRank(i));
+            ret.add(new Layout(slots, images, progressBar));
+        }
+        return ret;
+    }
+
     public Layout buildLayout() {
         var slots = getSlots(Voltage.MAX);
         return new Layout(slots, images, progressBar);

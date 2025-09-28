@@ -28,7 +28,7 @@
         "type": "item_output",
         "x": 90,
         "y": 10,
-        "voltages": "ulv-ulv"
+        "voltages": "ulv"
       },
       {
         "port": 1,

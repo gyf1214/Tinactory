@@ -1,0 +1,155 @@
+{
+  "recipe": "distillation",
+  "recipeTypeId": "distillation",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 54,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 72,
+        "y": 1,
+        "levels": "1-"
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 1,
+        "levels": "2-"
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 54,
+        "y": 19,
+        "levels": "3-"
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 72,
+        "y": 19,
+        "levels": "4-"
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 19,
+        "levels": "5-"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 54,
+        "y": 27,
+        "levels": "0-2"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 27,
+        "levels": "1-2"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 27,
+        "levels": "2"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 54,
+        "y": 45,
+        "levels": "3-"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 45,
+        "levels": "3-"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 45,
+        "levels": "3-"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 54,
+        "y": 63,
+        "levels": "3-"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 63,
+        "levels": "4-"
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 63,
+        "levels": "5-"
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "x": 26,
+      "y": 10,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "maxHeight": 8,
+  "appearance": "tinactory:multiblock/solid/clean_stainless_steel",
+  "layers": [
+    [
+      "BBB",
+      "BBB",
+      "B$B"
+    ],
+    {
+      "rows": [
+        "CCC",
+        "CAC",
+        "CCC"
+      ],
+      "height": "1-6"
+    },
+    [
+      "CCC",
+      "CCC",
+      "CCC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/clean_stainless_steel"
+    },
+    "C": "tinactory:multiblock/solid/clean_stainless_steel",
+    "A": "air"
+  }
+}

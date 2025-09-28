@@ -5,17 +5,20 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 
-import static org.shsts.tinactory.content.AllLayouts.DISTILLATION_TOWER;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DistillationTower extends Multiblock {
+    private final List<Layout> layouts;
     private int height = 0;
 
-    public DistillationTower(BlockEntity blockEntity, Builder<?> builder) {
+    public DistillationTower(BlockEntity blockEntity, Builder<?> builder, List<Layout> layouts) {
         super(blockEntity, builder);
+        this.layouts = layouts;
     }
 
     public int getSlots() {
@@ -27,7 +30,7 @@ public class DistillationTower extends Multiblock {
         super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
             height = (int) ctx.getProperty("height");
-            setLayout(DISTILLATION_TOWER.get(height - 3));
+            setLayout(layouts.get(height - 3));
         }
     }
 
@@ -44,7 +47,7 @@ public class DistillationTower extends Multiblock {
     protected void updateMultiblockInterface() {
         super.updateMultiblockInterface();
         if (multiblockInterface != null) {
-            setLayout(DISTILLATION_TOWER.get(height - 3));
+            setLayout(layouts.get(height - 3));
         }
     }
 
