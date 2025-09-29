@@ -94,9 +94,7 @@ minecraft {
             args '--mod', 'tinactory_test', '--all', '--output', file('src/generated/resources/')
             args '--existing', file('src/test/resources/')
             args '--existing', file('src/main/resources/')
-            args '--existing', file('libs/gtceu_resources_2.8.7.zip')
-            args '--existing', file('libs/ae2_resources_rv6.zip')
-            args '--existing', file('libs/ic2_resources_2.2.828.zip')
+            args '--existing', file("libs/tinactory_extra_resources_${extra_resources_version}.zip")
         }
     }
 }
@@ -130,9 +128,7 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 
-    compileOnly files("libs/gtceu_resources_2.8.7.zip")
-    compileOnly files("libs/ae2_resources_rv6.zip")
-    compileOnly files("libs/ic2_resources_2.2.828.zip")
+    compileOnly files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
 
     runtimeOnly fg.deobf("curse.maven:ctm-267602:3933537")
 
