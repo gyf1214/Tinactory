@@ -2,6 +2,8 @@ package org.shsts.tinactory.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
@@ -33,6 +35,7 @@ import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
 import static org.shsts.tinactory.content.AllItems.COMPONENTS;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
+import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
 import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -56,6 +59,7 @@ public final class AllBlockEntities {
     public static final Map<String, MachineSet> MACHINE_SETS;
 
     static {
+
         MACHINE_SETS = new HashMap<>();
 
         var set = new SetFactory();
@@ -73,6 +77,8 @@ public final class AllBlockEntities {
                 .renderer(() -> () -> MultiblockInterfaceRenderer::new)
                 .end()
                 .block()
+                .material(Material.HEAVY_METAL)
+                .properties(MACHINE_PROPERTY)
                 .tint(() -> () -> (state, $2, $3, i) ->
                     MultiblockInterfaceBlock.tint(v, state, i))
                 .translucent()
@@ -169,7 +175,11 @@ public final class AllBlockEntities {
             .blockEntity()
             .transform(NetworkController::factory)
             .end()
+            .block()
+            .material(Material.HEAVY_METAL)
+            .properties(MACHINE_PROPERTY)
             .translucent()
+            .end()
             .buildObject();
 
         WORKBENCH = set.blockEntity("primitive/workbench",
@@ -177,6 +187,10 @@ public final class AllBlockEntities {
             .menu(AllMenus.WORKBENCH)
             .blockEntity()
             .transform(Workbench::factory)
+            .end()
+            .block()
+            .material(Material.WOOD)
+            .properties($ -> $.strength(2f).sound(SoundType.WOOD))
             .end()
             .buildObject();
 

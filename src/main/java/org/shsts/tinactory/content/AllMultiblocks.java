@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.GlassBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
@@ -30,6 +31,7 @@ import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
 import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
+import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -65,7 +67,8 @@ public final class AllMultiblocks {
     private static final Transformer<BlockBehaviour.Properties> CASING_PROPERTY;
 
     static {
-        CASING_PROPERTY = $ -> $.strength(2f, 8f)
+        CASING_PROPERTY = $ -> $.strength(3f, 8f)
+            .sound(SoundType.METAL)
             .requiresCorrectToolForDrops()
             .isValidSpawn(AllItems::never);
 
@@ -95,6 +98,7 @@ public final class AllMultiblocks {
         PTFE_PIPE_CASING = misc("ptfe_pipe_casing");
 
         LAUNCH_SITE_BASE = REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
+            .material(Material.HEAVY_METAL)
             .properties(CASING_PROPERTY)
             .register();
 
@@ -121,7 +125,6 @@ public final class AllMultiblocks {
         MULTIBLOCK_SETS = new HashMap<>();
 
         CLEANROOM = BlockEntityBuilder.builder("multiblock/cleanroom", FixedBlock::new)
-            .translucent()
             .blockEntity()
             .child(Multiblock.builder(Cleanroom::new))
             .appearanceBlock(PLASCRETE)
@@ -137,11 +140,17 @@ public final class AllMultiblocks {
             .build()
             .build()
             .end()
+            .block()
+            .material(Material.HEAVY_METAL)
+            .properties(MACHINE_PROPERTY)
+            .translucent()
+            .end()
             .buildObject();
     }
 
     private static IEntry<Block> solid(String name) {
         var ret = REGISTRATE.block("multiblock/solid/" + name, Block::new)
+            .material(Material.HEAVY_METAL)
             .properties(CASING_PROPERTY)
             .register();
         SOLID_CASINGS.add(ret);
@@ -150,6 +159,7 @@ public final class AllMultiblocks {
 
     private static IEntry<CoilBlock> coil(String name, int temperature) {
         var ret = REGISTRATE.block("multiblock/coil/" + name, CoilBlock.factory(temperature))
+            .material(Material.HEAVY_METAL)
             .properties(CASING_PROPERTY)
             .register();
         COIL_BLOCKS.put(name, ret);
@@ -158,14 +168,17 @@ public final class AllMultiblocks {
 
     private static IEntry<Block> misc(String name) {
         return REGISTRATE.block("multiblock/misc/" + name, Block::new)
+            .material(Material.HEAVY_METAL)
             .properties(CASING_PROPERTY)
             .register();
     }
 
     private static <U extends Block, P> IBlockBuilder<U, P> glass(IBlockBuilder<U, P> builder) {
-        return builder.material(Material.GLASS)
+        return builder.material(Material.BARRIER)
             .properties(CASING_PROPERTY)
-            .properties($ -> $.isViewBlocking(AllItems::never).noOcclusion())
+            .properties($ -> $.isViewBlocking(AllItems::never)
+                .noOcclusion()
+                .sound(SoundType.GLASS))
             .translucent();
     }
 

@@ -17,7 +17,7 @@ public class RubberLogBlock extends RotatedPillarBlock {
     public static final BooleanProperty HAS_RUBBER = BooleanProperty.create("has_rubber");
 
     public RubberLogBlock(Properties prop) {
-        super(prop.strength(2f));
+        super(prop);
         registerDefaultState(defaultBlockState().setValue(HAS_RUBBER, false));
     }
 

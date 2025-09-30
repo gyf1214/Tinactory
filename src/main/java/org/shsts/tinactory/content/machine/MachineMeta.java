@@ -9,6 +9,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
@@ -34,6 +37,7 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
+import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -56,6 +60,8 @@ import static org.shsts.tinactory.content.AllRecipes.putRecipeType;
 @MethodsReturnNonnullByDefault
 public class MachineMeta extends MetaConsumer {
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Transformer<BlockBehaviour.Properties> MACHINE_PROPERTY =
+        $ -> $.strength(2f, 6f).sound(SoundType.METAL);
 
     public MachineMeta() {
         super("Machine");
@@ -218,7 +224,11 @@ public class MachineMeta extends MetaConsumer {
                 .transform(RecipeProcessors.machine(List.of(processor), true))
                 .transform(StackProcessingContainer.factory(getLayout(Voltage.PRIMITIVE)))
                 .end()
+                .block()
+                .material(Material.WOOD)
+                .properties($ -> $.strength(2f).sound(SoundType.WOOD))
                 .translucent()
+                .end()
                 .buildObject();
         }
 
@@ -250,6 +260,8 @@ public class MachineMeta extends MetaConsumer {
                 .transform(this::processor)
                 .end()
                 .block()
+                .material(Material.HEAVY_METAL)
+                .properties(MACHINE_PROPERTY)
                 .translucent()
                 .tint(i -> i == 2 ? v.color : 0xFFFFFFFF)
                 .end()

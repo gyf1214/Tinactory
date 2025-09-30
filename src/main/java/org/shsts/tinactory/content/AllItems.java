@@ -62,7 +62,7 @@ public final class AllItems {
 
         RUBBER_LOG = REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
             .material(Material.WOOD)
-            .properties(p -> p.sound(SoundType.WOOD))
+            .properties(p -> p.strength(2f).sound(SoundType.WOOD))
             .register();
 
         RUBBER_LEAVES = REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)

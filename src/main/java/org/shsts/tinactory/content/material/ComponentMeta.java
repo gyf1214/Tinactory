@@ -7,6 +7,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
@@ -22,6 +24,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllItems.COMPONENTS;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.AllRegistries.ITEMS;
+import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -73,6 +76,8 @@ public class ComponentMeta extends MetaConsumer {
             var id = "network/" + v.id + "/" + name;
 
             var block = REGISTRATE.block(id, CableBlock.cable(v, resistance, mat, bare))
+                .material(Material.HEAVY_METAL)
+                .properties($ -> $.strength(2f).sound(bare ? SoundType.METAL : SoundType.WOOL))
                 .transform(CableBlock.tint(mat.color, bare))
                 .translucent()
                 .register();
@@ -89,6 +94,8 @@ public class ComponentMeta extends MetaConsumer {
             var id = "network/" + v.id + "/" + name;
             var v1 = Voltage.fromRank(v.rank + voltageOffset);
             var block = REGISTRATE.block(id, SubnetBlock.factory(v, v1))
+                .material(Material.HEAVY_METAL)
+                .properties(MACHINE_PROPERTY)
                 .translucent()
                 .tint(i -> switch (i) {
                     case 0 -> v.color;

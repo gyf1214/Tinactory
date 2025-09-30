@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
@@ -29,6 +30,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -198,6 +200,10 @@ public class MachineSet {
         return $ -> $.blockEntity()
             .transform(Machine::factory)
             .end()
-            .translucent();
+            .block()
+            .material(Material.HEAVY_METAL)
+            .properties(MACHINE_PROPERTY)
+            .translucent()
+            .end();
     }
 }

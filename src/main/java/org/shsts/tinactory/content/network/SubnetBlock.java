@@ -32,7 +32,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
     private final Voltage subVoltage;
 
     public SubnetBlock(Properties properties, Voltage voltage, Voltage subVoltage) {
-        super(properties.strength(2f, 6f).requiresCorrectToolForDrops());
+        super(properties.requiresCorrectToolForDrops());
         this.voltage = voltage;
         this.subVoltage = subVoltage;
 
@@ -41,15 +41,6 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
 
     public static Function<Properties, SubnetBlock> factory(Voltage voltage, Voltage subVoltage) {
         return prop -> new SubnetBlock(prop, voltage, subVoltage);
-    }
-
-    public static Function<Properties, SubnetBlock> transformer(Voltage voltage) {
-        var subVoltage = Voltage.fromRank(voltage.rank - 1);
-        return prop -> new SubnetBlock(prop, voltage, subVoltage);
-    }
-
-    public static Function<Properties, SubnetBlock> buffer(Voltage voltage) {
-        return prop -> new SubnetBlock(prop, voltage, voltage);
     }
 
     @Override

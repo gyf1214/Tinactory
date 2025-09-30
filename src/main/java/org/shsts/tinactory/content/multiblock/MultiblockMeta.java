@@ -7,6 +7,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
@@ -222,13 +223,17 @@ public class MultiblockMeta extends MachineMeta {
 
             var appearance = new ResourceLocation(GsonHelper.getAsString(jo, "appearance"));
             var block = BlockEntityBuilder.builder("multiblock/" + id, PrimitiveBlock::new)
-                .translucent()
                 .blockEntity()
                 .child(this::multiblock)
                 .layout(layout)
                 .appearanceBlock(BLOCKS.getEntry(appearance))
                 .transform(this::buildSpec)
                 .build()
+                .end()
+                .block()
+                .material(Material.HEAVY_METAL)
+                .properties(MACHINE_PROPERTY)
+                .translucent()
                 .end()
                 .buildObject();
 
