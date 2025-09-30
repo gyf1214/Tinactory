@@ -137,7 +137,7 @@ object Technologies {
 
             KANTHAL = tech("kanthal") {
                 maxProgress(10)
-                displayItem(AllMultiblocks.KANTHAL_COIL_BLOCK)
+                displayItem(AllMultiblocks.COIL_BLOCKS.getValue("kanthal"))
             }
 
             SIFTING = tech("sifting") {
@@ -207,7 +207,7 @@ object Technologies {
 
             NICHROME = tech("nichrome") {
                 maxProgress(50)
-                displayItem(AllMultiblocks.NICHROME_COIL_BLOCK)
+                displayItem(AllMultiblocks.COIL_BLOCKS.getValue("nichrome"))
                 depends(KANTHAL)
             }
 

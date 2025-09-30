@@ -2,7 +2,6 @@ package org.shsts.tinactory.datagen.content.machine
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
@@ -11,25 +10,15 @@ import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE
 import org.shsts.tinactory.content.AllMultiblocks.BASIC_LITHOGRAPHY_LENS
 import org.shsts.tinactory.content.AllMultiblocks.CLEANROOM
-import org.shsts.tinactory.content.AllMultiblocks.CLEAN_STAINLESS_CASING
 import org.shsts.tinactory.content.AllMultiblocks.CLEAR_GLASS
 import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
-import org.shsts.tinactory.content.AllMultiblocks.CUPRONICKEL_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.FILTER_CASING
-import org.shsts.tinactory.content.AllMultiblocks.FROST_PROOF_CASING
 import org.shsts.tinactory.content.AllMultiblocks.GOOD_LITHOGRAPHY_LENS
 import org.shsts.tinactory.content.AllMultiblocks.GRATE_MACHINE_CASING
-import org.shsts.tinactory.content.AllMultiblocks.HEATPROOF_CASING
-import org.shsts.tinactory.content.AllMultiblocks.INERT_PTFE_CASING
-import org.shsts.tinactory.content.AllMultiblocks.KANTHAL_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.LAUNCH_SITE_BASE
-import org.shsts.tinactory.content.AllMultiblocks.NICHROME_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.PLASCRETE
 import org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
-import org.shsts.tinactory.content.AllMultiblocks.SOLID_STEEL_CASING
-import org.shsts.tinactory.content.AllMultiblocks.STABLE_TITANIUM_CASING
-import org.shsts.tinactory.content.AllMultiblocks.TUNGSTEN_COIL_BLOCK
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR
@@ -38,6 +27,7 @@ import org.shsts.tinactory.content.AllTags.COIL
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
 import org.shsts.tinactory.content.AllTags.machine
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.name
@@ -49,11 +39,11 @@ import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.BlockDataFactory
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
-import org.shsts.tinycorelib.api.registrate.entry.IEntry
 
 object Multiblocks {
     fun init() {
@@ -69,7 +59,7 @@ object Multiblocks {
                 tag(MINEABLE_WITH_WRENCH)
             }
 
-            for (entry in SOLID_CASINGS) {
+            for (entry in SOLID_CASINGS.values) {
                 val tex = "casings/solid/machine_casing_${name(entry.id(), -1)}"
                 block(entry) {
                     blockState(solidBlock(tex))
@@ -156,16 +146,16 @@ object Multiblocks {
 
     private fun componentRecipes() {
         assembler {
-            solid(HEATPROOF_CASING, Voltage.ULV, "invar", Technologies.STEEL)
-            solid(SOLID_STEEL_CASING, Voltage.LV, "steel", Technologies.STEEL)
-            solid(FROST_PROOF_CASING, Voltage.LV, "aluminium", Technologies.VACUUM_FREEZER)
-            solid(CLEAN_STAINLESS_CASING, Voltage.MV, "stainless_steel", Technologies.DISTILLATION)
-            solid(STABLE_TITANIUM_CASING, Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
+            solid("heatproof", Voltage.ULV, "invar", Technologies.STEEL)
+            solid("solid_steel", Voltage.LV, "steel", Technologies.STEEL)
+            solid("frost_proof", Voltage.LV, "aluminium", Technologies.VACUUM_FREEZER)
+            solid("clean_stainless_steel", Voltage.MV, "stainless_steel", Technologies.DISTILLATION)
+            solid("stable_titanium", Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
 
-            coil(CUPRONICKEL_COIL_BLOCK, Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
-            coil(KANTHAL_COIL_BLOCK, Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
-            coil(NICHROME_COIL_BLOCK, Voltage.MV, "nichrome", "stainless_steel", Technologies.NICHROME)
-            coil(TUNGSTEN_COIL_BLOCK, Voltage.HV, "tungsten", "platinum", Technologies.HYDROMETALLURGY)
+            coil("cupronickel", Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
+            coil("kanthal", Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
+            coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", Technologies.NICHROME)
+            coil("tungsten", Voltage.HV, "tungsten", "platinum", Technologies.HYDROMETALLURGY)
         }
 
         assembler {
@@ -219,8 +209,8 @@ object Multiblocks {
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.CLEANROOM)
             }
-            output(INERT_PTFE_CASING.get()) {
-                input(SOLID_STEEL_CASING.get())
+            solid("inert_ptfe") {
+                solid("solid_steel")
                 input("ptfe", amount = 1.5)
                 tech(Technologies.ADVANCED_CHEMISTRY)
             }
@@ -272,9 +262,10 @@ object Multiblocks {
         }
     }
 
-    private fun AssemblyRecipeFactory.solid(block: IEntry<out Block>,
+    private fun AssemblyRecipeFactory.solid(name: String,
         v: Voltage, mat: String, tech: ResourceLocation) {
-        output(block.get()) {
+        val block = SOLID_CASINGS.getValue(name).get()
+        output(block) {
             input(mat, "stick", 2)
             input(mat, "plate", 3)
             if (v != Voltage.ULV) {
@@ -286,10 +277,11 @@ object Multiblocks {
         }
     }
 
-    private fun AssemblyRecipeFactory.coil(block: IEntry<out Block>,
+    private fun AssemblyRecipeFactory.coil(name: String,
         v: Voltage, wire: String, foil: String, tech: ResourceLocation) {
         val amount = 8 * v.rank
-        output(block.get()) {
+        val block = COIL_BLOCKS.getValue(name).get()
+        output(block) {
             input(wire, "wire", amount)
             input(foil, "foil", amount)
             if (v.rank >= Voltage.MV.rank) {
@@ -354,7 +346,7 @@ object Multiblocks {
                 workTicks(MACHINE_TICKS)
             }
             multiblock("blast_furnace") {
-                input(HEATPROOF_CASING.get())
+                solid("heatproof")
                 machine("electric_furnace", 3)
                 circuit(3)
                 component("cable", 2)
@@ -369,7 +361,7 @@ object Multiblocks {
                 workTicks(MACHINE_TICKS)
             }
             multiblock("sifter") {
-                input(SOLID_STEEL_CASING.get())
+                solid("solid_steel")
                 circuit(3, Voltage.MV)
                 component("electric_piston", 4)
                 component("cable", 4)
@@ -396,7 +388,7 @@ object Multiblocks {
 
             componentVoltage = Voltage.MV
             multiblock("vacuum_freezer") {
-                input(FROST_PROOF_CASING.get())
+                solid("frost_proof")
                 circuit(3, Voltage.HV)
                 component("electric_pump", 4)
                 component("cable", 4)
@@ -404,7 +396,7 @@ object Multiblocks {
                 tech(Technologies.VACUUM_FREEZER)
             }
             multiblock("pyrolyse_oven") {
-                input(HEATPROOF_CASING.get())
+                solid("heatproof")
                 circuit(3)
                 component("electric_piston", 2)
                 component("electric_pump", 2)
@@ -416,7 +408,7 @@ object Multiblocks {
 
             componentVoltage = Voltage.HV
             multiblock("distillation_tower") {
-                input(CLEAN_STAINLESS_CASING.get())
+                solid("clean_stainless_steel")
                 circuit(4)
                 component("electric_pump", 2)
                 component("cable", 4)
@@ -425,7 +417,7 @@ object Multiblocks {
                 tech(Technologies.DISTILLATION)
             }
             multiblock("oil_cracking_unit") {
-                input(CLEAN_STAINLESS_CASING.get())
+                solid("clean_stainless_steel")
                 circuit(3)
                 component("electric_pump", 2)
                 component("electric_piston", 2)
@@ -443,7 +435,7 @@ object Multiblocks {
                 tech(Technologies.CLEANROOM)
             }
             multiblock("large_chemical_reactor") {
-                input(INERT_PTFE_CASING.get())
+                solid("inert_ptfe")
                 circuit(4)
                 component("electric_motor", 4)
                 input("stainless_steel", "rotor", 4)
@@ -461,7 +453,7 @@ object Multiblocks {
 
             componentVoltage = Voltage.HV
             multiblock("implosion_compressor") {
-                input(SOLID_STEEL_CASING.get())
+                solid("solid_steel")
                 circuit(3)
                 component("electric_piston", 4)
                 component("cable", 4)
@@ -469,7 +461,7 @@ object Multiblocks {
                 tech(Technologies.TNT)
             }
             multiblock("autoclave") {
-                input(CLEAN_STAINLESS_CASING.get())
+                solid("clean_stainless_steel")
                 circuit(3, Voltage.EV)
                 component("electric_motor", 2)
                 component("electric_pump", 2)
@@ -480,7 +472,7 @@ object Multiblocks {
 
             componentVoltage = Voltage.EV
             multiblock("lithography_machine") {
-                input(STABLE_TITANIUM_CASING.get())
+                solid("stable_titanium")
                 circuit(3, Voltage.IV)
                 component("emitter", 4, Voltage.HV)
                 component("conveyor_module", 4)
@@ -489,7 +481,7 @@ object Multiblocks {
                 tech(Technologies.LITHOGRAPHY)
             }
             multiblock("rocket_launch_site") {
-                input(SOLID_STEEL_CASING.get())
+                solid("solid_steel")
                 circuit(4)
                 component("robot_arm", 4)
                 component("conveyor_module", 4)
@@ -502,5 +494,13 @@ object Multiblocks {
 
     private fun AssemblyRecipeFactory.multiblock(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
         output(getMultiblock(name).block.get(), block = block)
+    }
+
+    private fun AssemblyRecipeFactory.solid(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
+        output(SOLID_CASINGS.getValue(name).get(), block = block)
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.solid(name: String) {
+        input(SOLID_CASINGS.getValue(name).get())
     }
 }

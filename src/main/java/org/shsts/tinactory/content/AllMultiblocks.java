@@ -5,8 +5,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
+import org.shsts.tinactory.content.material.MiscMeta;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.HalfBlock;
@@ -15,16 +15,13 @@ import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
@@ -39,20 +36,9 @@ public final class AllMultiblocks {
     public static final Map<String, MultiblockSet> MULTIBLOCK_SETS;
     public static final IEntry<FixedBlock> CLEANROOM;
 
-    // solid blocks
-    public static final Set<IEntry<Block>> SOLID_CASINGS;
-    public static final IEntry<Block> HEATPROOF_CASING;
-    public static final IEntry<Block> SOLID_STEEL_CASING;
-    public static final IEntry<Block> FROST_PROOF_CASING;
-    public static final IEntry<Block> CLEAN_STAINLESS_CASING;
-    public static final IEntry<Block> INERT_PTFE_CASING;
-    public static final IEntry<Block> STABLE_TITANIUM_CASING;
-    // coil blocks
+    public static final Map<String, IEntry<Block>> SOLID_CASINGS;
     public static final Map<String, IEntry<CoilBlock>> COIL_BLOCKS;
-    public static final IEntry<CoilBlock> CUPRONICKEL_COIL_BLOCK;
-    public static final IEntry<CoilBlock> KANTHAL_COIL_BLOCK;
-    public static final IEntry<CoilBlock> NICHROME_COIL_BLOCK;
-    public static final IEntry<CoilBlock> TUNGSTEN_COIL_BLOCK;
+
     // misc
     public static final IEntry<Block> GRATE_MACHINE_CASING;
     public static final IEntry<Block> AUTOFARM_BASE;
@@ -64,27 +50,10 @@ public final class AllMultiblocks {
     public static final IEntry<LensBlock> BASIC_LITHOGRAPHY_LENS;
     public static final IEntry<LensBlock> GOOD_LITHOGRAPHY_LENS;
 
-    private static final Transformer<BlockBehaviour.Properties> CASING_PROPERTY;
-
     static {
-        CASING_PROPERTY = $ -> $.strength(3f, 8f)
-            .sound(SoundType.METAL)
-            .requiresCorrectToolForDrops()
-            .isValidSpawn(AllItems::never);
-
-        SOLID_CASINGS = new HashSet<>();
-        HEATPROOF_CASING = solid("heatproof");
-        SOLID_STEEL_CASING = solid("solid_steel");
-        FROST_PROOF_CASING = solid("frost_proof");
-        CLEAN_STAINLESS_CASING = solid("clean_stainless_steel");
-        INERT_PTFE_CASING = solid("inert_ptfe");
-        STABLE_TITANIUM_CASING = solid("stable_titanium");
-
+        SOLID_CASINGS = new HashMap<>();
         COIL_BLOCKS = new HashMap<>();
-        CUPRONICKEL_COIL_BLOCK = coil("cupronickel", 1800);
-        KANTHAL_COIL_BLOCK = coil("kanthal", 2700);
-        NICHROME_COIL_BLOCK = coil("nichrome", 3600);
-        TUNGSTEN_COIL_BLOCK = coil("tungsten", 4500);
+        MULTIBLOCK_SETS = new HashMap<>();
 
         GRATE_MACHINE_CASING = misc("grate_machine_casing");
         AUTOFARM_BASE = misc("autofarm_base");
@@ -99,7 +68,7 @@ public final class AllMultiblocks {
 
         LAUNCH_SITE_BASE = REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
             .material(Material.HEAVY_METAL)
-            .properties(CASING_PROPERTY)
+            .properties(MiscMeta.CASING_PROPERTY)
             .register();
 
         var basicLens = List.of(
@@ -121,8 +90,6 @@ public final class AllMultiblocks {
                 props -> new LensBlock(props, goodLens))
             .transform(AllMultiblocks::glass)
             .register();
-
-        MULTIBLOCK_SETS = new HashMap<>();
 
         CLEANROOM = BlockEntityBuilder.builder("multiblock/cleanroom", FixedBlock::new)
             .blockEntity()
@@ -148,34 +115,16 @@ public final class AllMultiblocks {
             .buildObject();
     }
 
-    private static IEntry<Block> solid(String name) {
-        var ret = REGISTRATE.block("multiblock/solid/" + name, Block::new)
-            .material(Material.HEAVY_METAL)
-            .properties(CASING_PROPERTY)
-            .register();
-        SOLID_CASINGS.add(ret);
-        return ret;
-    }
-
-    private static IEntry<CoilBlock> coil(String name, int temperature) {
-        var ret = REGISTRATE.block("multiblock/coil/" + name, CoilBlock.factory(temperature))
-            .material(Material.HEAVY_METAL)
-            .properties(CASING_PROPERTY)
-            .register();
-        COIL_BLOCKS.put(name, ret);
-        return ret;
-    }
-
     private static IEntry<Block> misc(String name) {
         return REGISTRATE.block("multiblock/misc/" + name, Block::new)
             .material(Material.HEAVY_METAL)
-            .properties(CASING_PROPERTY)
+            .properties(MiscMeta.CASING_PROPERTY)
             .register();
     }
 
     private static <U extends Block, P> IBlockBuilder<U, P> glass(IBlockBuilder<U, P> builder) {
         return builder.material(Material.BARRIER)
-            .properties(CASING_PROPERTY)
+            .properties(MiscMeta.CASING_PROPERTY)
             .properties($ -> $.isViewBlocking(AllItems::never)
                 .noOcclusion()
                 .sound(SoundType.GLASS))

@@ -1,0 +1,23 @@
+{
+  "type": "solid",
+  "items": {
+    "heatproof": {
+      "materialColor": 27
+    },
+    "solid_steel": {
+      "materialColor": 21
+    },
+    "frost_proof": {
+      "materialColor": 25
+    },
+    "clean_stainless_steel": {
+      "materialColor": 17
+    },
+    "inert_ptfe": {
+      "materialColor": 29
+    },
+    "stable_titanium": {
+      "materialColor": 16
+    }
+  }
+}
