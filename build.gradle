@@ -115,10 +115,6 @@ repositories {
     maven {
         name = 'shsts'
         url = 'https://www.shsts.org/m2'
-        credentials {
-            username = shstsUser
-            password = shstsPassword
-        }
     }
 }
 
