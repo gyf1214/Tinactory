@@ -21,7 +21,6 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,16 +36,17 @@ import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
 public class MachineSet {
     public final Set<Voltage> voltages;
     protected final Map<Voltage, Layout> layoutSet;
-    protected final Map<Voltage, IEntry<? extends Block>> machines;
+    protected final Map<Voltage, ? extends IEntry<? extends Block>> machines;
 
     public MachineSet(Collection<Voltage> voltages, Map<Voltage, Layout> layoutSet,
-        Map<Voltage, IEntry<? extends Block>> machines) {
+        Map<Voltage, ? extends IEntry<? extends Block>> machines) {
         this.layoutSet = layoutSet;
         this.machines = machines;
         this.voltages = new HashSet<>(voltages);
     }
 
-    public MachineSet(Map<Voltage, Layout> layoutSet, Map<Voltage, IEntry<? extends Block>> machines) {
+    public MachineSet(Map<Voltage, Layout> layoutSet,
+        Map<Voltage, ? extends IEntry<? extends Block>> machines) {
         this(machines.keySet(), layoutSet, machines);
     }
 
@@ -66,40 +66,31 @@ public class MachineSet {
         return layoutSet.get(voltage);
     }
 
-    public Block icon() {
-        var voltage = voltages.stream()
-            .filter(v -> v.rank > Voltage.ULV.rank)
-            .min(Comparator.comparingInt(v -> v.rank))
-            .orElseThrow();
-        return machines.get(voltage).get();
-    }
-
-    public abstract static class BuilderBase<T extends MachineSet, P, S extends BuilderBase<T, P, S>>
-        extends SimpleBuilder<T, P, S> {
+    public static class Builder<P> extends SimpleBuilder<MachineSet, P, Builder<P>> {
         protected final IRegistrate registrate;
         protected final List<Voltage> voltages = new ArrayList<>();
         @Nullable
         protected Function<Voltage, BlockEntityBuilder<?, ?>> blockEntityBuilder = null;
         @Nullable
-        protected LayoutSetBuilder<S> layoutSetBuilder = null;
+        protected LayoutSetBuilder<Builder<P>> layoutSetBuilder = null;
         protected Map<Voltage, Layout> layoutSet = Layout.EMPTY_SET;
 
-        protected BuilderBase(IRegistrate registrate, P parent) {
+        public Builder(IRegistrate registrate, P parent) {
             super(parent);
             this.registrate = registrate;
         }
 
-        public S voltages(Voltage from) {
+        public Builder<P> voltages(Voltage from) {
             voltages.addAll(Voltage.between(from, Voltage.IV));
             return self();
         }
 
-        public S voltages(Voltage from, Voltage to) {
+        public Builder<P> voltages(Voltage from, Voltage to) {
             voltages.addAll(Voltage.between(from, to));
             return self();
         }
 
-        public LayoutSetBuilder<S> layoutSet() {
+        public LayoutSetBuilder<Builder<P>> layoutSet() {
             if (layoutSetBuilder == null) {
                 layoutSetBuilder = Layout.builder(self())
                     .onCreateObject($ -> layoutSet = $);
@@ -111,7 +102,7 @@ public class MachineSet {
             return layoutSet.get(voltage);
         }
 
-        public S machine(Function<Voltage, String> id,
+        public Builder<P> machine(Function<Voltage, String> id,
             Function<Voltage, SmartEntityBlock.Factory<?>> blockFactory) {
             assert blockEntityBuilder == null;
             blockEntityBuilder = v -> BlockEntityBuilder.builder(
@@ -119,14 +110,14 @@ public class MachineSet {
             return self();
         }
 
-        public S menu(IMenuType menu) {
+        public Builder<P> menu(IMenuType menu) {
             assert blockEntityBuilder != null;
             var old = blockEntityBuilder;
             blockEntityBuilder = v -> old.apply(v).menu(menu);
             return self();
         }
 
-        public <V> S machine(Transformer<IBlockEntityTypeBuilder<V>> trans) {
+        public <V> Builder<P> machine(Transformer<IBlockEntityTypeBuilder<V>> trans) {
             assert blockEntityBuilder != null;
             var old = blockEntityBuilder;
             blockEntityBuilder = v -> old.apply(v)
@@ -134,7 +125,7 @@ public class MachineSet {
             return self();
         }
 
-        public <V> S layoutMachine(
+        public <V> Builder<P> layoutMachine(
             Function<Layout, Transformer<IBlockEntityTypeBuilder<V>>> trans) {
             assert blockEntityBuilder != null;
             var old = blockEntityBuilder;
@@ -143,7 +134,7 @@ public class MachineSet {
             return self();
         }
 
-        public <U extends Block, V> S voltageBlock(
+        public <U extends Block, V> Builder<P> voltageBlock(
             Function<Voltage, Transformer<IBlockBuilder<U, V>>> trans) {
             assert blockEntityBuilder != null;
             var old = blockEntityBuilder;
@@ -152,7 +143,7 @@ public class MachineSet {
             return self();
         }
 
-        public S tintVoltage(int index) {
+        public Builder<P> tintVoltage(int index) {
             return voltageBlock(v -> $ -> $.tint(i -> i == index ? v.color : 0xFFFFFFFF));
         }
 
@@ -163,31 +154,20 @@ public class MachineSet {
                 .buildObject();
         }
 
-        protected abstract T createSet(Collection<Voltage> voltages,
+        protected MachineSet createSet(Collection<Voltage> voltages,
             Map<Voltage, Layout> layoutSet,
-            Map<Voltage, IEntry<? extends Block>> machines);
+            Map<Voltage, IEntry<? extends Block>> machines) {
+            return new MachineSet(voltages, layoutSet, machines);
+        }
 
         @Override
-        protected T createObject() {
+        protected MachineSet createObject() {
             if (voltages.isEmpty()) {
                 voltages(Voltage.LV);
             }
             var machines = new HashMap<Voltage, IEntry<? extends Block>>();
             voltages.forEach(v -> machines.put(v, createMachine(v)));
             return createSet(voltages, layoutSet, machines);
-        }
-    }
-
-    public static class Builder<P> extends BuilderBase<MachineSet, P, Builder<P>> {
-        private Builder(IRegistrate registrate, P parent) {
-            super(registrate, parent);
-        }
-
-        @Override
-        protected MachineSet createSet(Collection<Voltage> voltages,
-            Map<Voltage, Layout> layoutSet,
-            Map<Voltage, IEntry<? extends Block>> machines) {
-            return new MachineSet(voltages, layoutSet, machines);
         }
     }
 

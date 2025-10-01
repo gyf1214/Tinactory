@@ -22,6 +22,7 @@ import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.core.multiblock.client.MultiblockInterfaceRenderer;
@@ -33,7 +34,6 @@ import java.util.Map;
 
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
-import static org.shsts.tinactory.content.AllItems.COMPONENTS;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
 import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
@@ -59,7 +59,6 @@ public final class AllBlockEntities {
     public static final Map<String, MachineSet> MACHINE_SETS;
 
     static {
-
         MACHINE_SETS = new HashMap<>();
 
         var set = new SetFactory();
@@ -194,8 +193,7 @@ public final class AllBlockEntities {
             .end()
             .buildObject();
 
-        // TODO: make it a MachineSet without any layout
-        COMPONENTS.put("multiblock_interface", MULTIBLOCK_INTERFACE);
+        MACHINE_SETS.put("multiblock_interface", new MachineSet(Layout.EMPTY_SET, MULTIBLOCK_INTERFACE));
     }
 
     public static void init() {}

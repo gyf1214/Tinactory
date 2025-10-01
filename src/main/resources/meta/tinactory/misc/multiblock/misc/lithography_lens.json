@@ -1,0 +1,23 @@
+{
+  "type": "lens",
+  "items": {
+    "basic": {
+      "materials": [
+        "ruby",
+        "diamond",
+        "sapphire",
+        "emerald"
+      ]
+    },
+    "good": {
+      "materials": [
+        "ruby",
+        "diamond",
+        "sapphire",
+        "emerald",
+        "topaz",
+        "blue_topaz"
+      ]
+    }
+  }
+}

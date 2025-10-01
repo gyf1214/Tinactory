@@ -128,7 +128,7 @@ object MiscMachines {
                 component("cable", 4)
                 tech(Technologies.ALLOY_SMELTING)
             }
-            component("multiblock_interface") {
+            machine("multiblock_interface") {
                 component("machine_hull")
                 circuit(2)
                 component("cable", 2)

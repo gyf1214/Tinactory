@@ -289,7 +289,7 @@ object ProcessingMachines {
                 input(main, "plate", 4)
                 tech(Technologies.DIGITAL_STORAGE)
             }
-            component("multiblock_interface") {
+            machine("multiblock_interface") {
                 circuit(2)
                 component("conveyor_module")
                 component("electric_pump")

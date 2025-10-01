@@ -2,24 +2,19 @@ package org.shsts.tinactory.datagen.content.machine
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
 import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
 import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE
-import org.shsts.tinactory.content.AllMultiblocks.BASIC_LITHOGRAPHY_LENS
 import org.shsts.tinactory.content.AllMultiblocks.CLEANROOM
-import org.shsts.tinactory.content.AllMultiblocks.CLEAR_GLASS
 import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
-import org.shsts.tinactory.content.AllMultiblocks.FILTER_CASING
-import org.shsts.tinactory.content.AllMultiblocks.GOOD_LITHOGRAPHY_LENS
-import org.shsts.tinactory.content.AllMultiblocks.GRATE_MACHINE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.LAUNCH_SITE_BASE
-import org.shsts.tinactory.content.AllMultiblocks.PLASCRETE
-import org.shsts.tinactory.content.AllMultiblocks.PTFE_PIPE_CASING
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
+import org.shsts.tinactory.content.AllRegistries.BLOCKS
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR
 import org.shsts.tinactory.content.AllTags.CLEANROOM_WALL
@@ -44,6 +39,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
+import org.shsts.tinycorelib.datagen.api.builder.IBlockDataBuilder
 
 object Multiblocks {
     fun init() {
@@ -71,7 +67,7 @@ object Multiblocks {
             coil("nichrome")
             coil("tungsten", "rtm_alloy")
 
-            block(GRATE_MACHINE_CASING) {
+            misc("grate_machine_casing") {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
             }
 
@@ -85,18 +81,18 @@ object Multiblocks {
                 }
             }
 
-            block(CLEAR_GLASS) {
+            misc("clear_glass") {
                 blockState(solidBlock("casings/transparent/fusion_glass"))
                 tag(CLEANROOM_WALL)
                 tag(Tags.Blocks.GLASS)
             }
 
-            block(PLASCRETE) {
+            misc("plascrete") {
                 blockState(solidBlock("casings/cleanroom/plascrete"))
                 tag(CLEANROOM_WALL)
             }
 
-            block(FILTER_CASING) {
+            misc("filter_casing") {
                 blockState { ctx ->
                     val provider = ctx.provider()
                     provider.simpleBlock(ctx.`object`(), provider.models().cubeColumn(
@@ -106,7 +102,7 @@ object Multiblocks {
                 }
             }
 
-            block(PTFE_PIPE_CASING) {
+            misc("ptfe_pipe_casing") {
                 blockState(solidBlock("casings/pipe/machine_casing_pipe_polytetrafluoroethylene"))
             }
 
@@ -119,12 +115,12 @@ object Multiblocks {
                 }
             }
 
-            block(BASIC_LITHOGRAPHY_LENS) {
+            misc("lithography_lens/basic") {
                 blockState(solidBlock("casings/transparent/cleanroom_glass"))
                 tag(AllTags.LITHOGRAPHY_LENS)
             }
 
-            block(GOOD_LITHOGRAPHY_LENS) {
+            misc("lithography_lens/good") {
                 blockState(solidBlock("casings/transparent/laminated_glass"))
                 tag(AllTags.LITHOGRAPHY_LENS)
             }
@@ -142,6 +138,12 @@ object Multiblocks {
             blockState(solidBlock(tex))
             tag(COIL)
         }
+    }
+
+    private fun miscEntry(name: String) = BLOCKS.getEntry<Block>("multiblock/misc/$name")
+
+    private fun BlockDataFactory.misc(name: String, block: IBlockDataBuilder<Block, *>.() -> Unit) {
+        block(miscEntry(name), block)
     }
 
     private fun componentRecipes() {
@@ -163,7 +165,7 @@ object Multiblocks {
             defaults {
                 voltage(Voltage.LV)
             }
-            output(GRATE_MACHINE_CASING.get(), 2) {
+            misc("grate_machine_casing", 2) {
                 input("steel", "stick", 4)
                 component("electric_motor")
                 input("tin", "rotor")
@@ -189,18 +191,18 @@ object Multiblocks {
                 voltage(Voltage.MV)
                 workTicks(200)
             }
-            output(CLEAR_GLASS.get()) {
+            misc("clear_glass") {
                 input("steel", "stick", 2)
                 input("glass", "primary")
                 input("pe", amount = 3)
                 tech(Technologies.ORGANIC_CHEMISTRY)
             }
-            output(PLASCRETE.get()) {
+            misc("plascrete") {
                 input("steel", "stick", 2)
                 input("pe", "sheet", 3)
                 tech(Technologies.CLEANROOM)
             }
-            output(FILTER_CASING.get(), 2) {
+            misc("filter_casing", 2) {
                 input("steel", "stick", 4)
                 component("electric_motor")
                 input("bronze", "rotor")
@@ -214,7 +216,7 @@ object Multiblocks {
                 input("ptfe", amount = 1.5)
                 tech(Technologies.ADVANCED_CHEMISTRY)
             }
-            output(PTFE_PIPE_CASING.get()) {
+            misc("ptfe_pipe_casing") {
                 input("steel", "stick", 2)
                 input("ptfe", "pipe", 2)
                 input("ptfe", "sheet", 2)
@@ -235,7 +237,7 @@ object Multiblocks {
                 workTicks(140)
                 tech(Technologies.ROCKET_SCIENCE)
             }
-            output(BASIC_LITHOGRAPHY_LENS.get()) {
+            misc("lithography_lens/basic") {
                 input("titanium", "stick", 4)
                 component("robot_arm", 2, voltage = Voltage.EV)
                 input("ruby", "lens", 4)
@@ -249,8 +251,8 @@ object Multiblocks {
         }
 
         assembler {
-            output(GOOD_LITHOGRAPHY_LENS.get()) {
-                input(BASIC_LITHOGRAPHY_LENS.get())
+            misc("lithography_lens/good") {
+                misc("lithography_lens/basic")
                 component("robot_arm", 2, voltage = Voltage.IV)
                 input("topaz", "lens", 4)
                 input("blue_topaz", "lens", 4)
@@ -426,7 +428,7 @@ object Multiblocks {
                 tech(Technologies.OIL_CRACKING)
             }
             output(CLEANROOM.get()) {
-                input(PLASCRETE.get())
+                misc("plascrete")
                 circuit(3)
                 component("electric_motor", 2)
                 component("cable", 4)
@@ -477,7 +479,7 @@ object Multiblocks {
                 component("emitter", 4, Voltage.HV)
                 component("conveyor_module", 4)
                 component("cable", 4)
-                input(BASIC_LITHOGRAPHY_LENS.get())
+                misc("lithography_lens/basic")
                 tech(Technologies.LITHOGRAPHY)
             }
             multiblock("rocket_launch_site") {
@@ -502,5 +504,14 @@ object Multiblocks {
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.solid(name: String) {
         input(SOLID_CASINGS.getValue(name).get())
+    }
+
+    private fun AssemblyRecipeFactory.misc(name: String, amount: Int = 1,
+        block: AssemblyRecipeBuilder.() -> Unit) {
+        output(miscEntry(name).get(), amount, block = block)
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(name: String) {
+        input(miscEntry(name).get())
     }
 }

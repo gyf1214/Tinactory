@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.GlassBlock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -21,6 +22,10 @@ public class LensBlock extends GlassBlock {
     public LensBlock(Properties properties, Collection<Supplier<? extends Item>> lens) {
         super(properties);
         this.lensSupp = new ArrayList<>(lens);
+    }
+
+    public static Function<Properties, LensBlock> factory(Collection<Supplier<? extends Item>> lens) {
+        return properties -> new LensBlock(properties, lens);
     }
 
     public Collection<Item> getLens() {
