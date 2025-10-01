@@ -35,22 +35,19 @@ public final class AllMultiblocks {
     public static final Map<String, IEntry<Block>> SOLID_CASINGS;
     public static final Map<String, IEntry<CoilBlock>> COIL_BLOCKS;
 
-    // misc
-    public static final IEntry<Block> AUTOFARM_BASE;
-    public static final IEntry<HalfBlock> LAUNCH_SITE_BASE;
-
     static {
         SOLID_CASINGS = new HashMap<>();
         COIL_BLOCKS = new HashMap<>();
         MULTIBLOCK_SETS = new HashMap<>();
 
-        AUTOFARM_BASE = REGISTRATE.block("multiblock/misc/autofarm_base", Block::new)
+        // misc
+        REGISTRATE.block("multiblock/misc/autofarm_base", Block::new)
             .material(Material.HEAVY_METAL, MaterialColor.DIRT)
             .properties(MiscMeta.CASING_PROPERTY)
             .properties($ -> $.sound(SoundType.GRAVEL))
             .register();
 
-        LAUNCH_SITE_BASE = REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
+        REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
             .material(Material.HEAVY_METAL)
             .properties(MiscMeta.CASING_PROPERTY)
             .register();

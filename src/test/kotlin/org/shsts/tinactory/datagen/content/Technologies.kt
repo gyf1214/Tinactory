@@ -69,6 +69,8 @@ object Technologies {
     val AUTOCLAVE: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
     val ROCKET_T1: ResourceLocation
+    val TUNGSTEN_STEEL: ResourceLocation
+    val METAL_FORMER: ResourceLocation
 
     init {
         Factory().apply {
@@ -79,17 +81,17 @@ object Technologies {
 
             SOLDERING = tech("soldering") {
                 maxProgress(30)
-                displayItem("wrought_iron", "tool/screwdriver")
+                displayMaterial("wrought_iron", "tool/screwdriver")
             }
 
             STEEL = child("steel") {
                 maxProgress(30)
-                displayItem("steel", "ingot")
+                displayMaterial("steel", "ingot")
             }
 
             ELECTRIC_HEATING = tech("electric_heating") {
                 maxProgress(30)
-                displayItem("copper", "wire")
+                displayMaterial("copper", "wire")
             }
 
             BATTERY = tech("battery") {
@@ -162,7 +164,7 @@ object Technologies {
 
             ELECTROLYZING = tech("electrolyzing") {
                 maxProgress(40)
-                displayItem("gold", "wire")
+                displayMaterial("gold", "wire")
             }
 
             VACUUM_FREEZER = tech("vacuum_freezer") {
@@ -187,12 +189,12 @@ object Technologies {
 
             OIL_PROCESSING = tech("oil_processing") {
                 maxProgress(60)
-                displayItem("sulfur", "dust")
+                displayMaterial("sulfur", "dust")
             }
 
             ORGANIC_CHEMISTRY = child("organic_chemistry") {
                 maxProgress(50)
-                displayItem("pe", "sheet")
+                displayMaterial("pe", "sheet")
             }
 
             CPU = tech("cpu") {
@@ -220,7 +222,7 @@ object Technologies {
 
             HYDROMETALLURGY = tech("hydrometallurgy") {
                 maxProgress(80)
-                displayItem("aluminium_oxide", "dust")
+                displayMaterial("aluminium_oxide", "dust")
             }
 
             ARC_FURNACE = tech("arc_furnace") {
@@ -276,6 +278,19 @@ object Technologies {
                 displayItem(Items.FIREWORK_ROCKET)
                 noResearch()
             }
+
+            base = ADVANCED_CHEMISTRY
+
+            TUNGSTEN_STEEL = child("tungsten_steel") {
+                maxProgress(200)
+                displayMaterial("tungsten_steel", "ingot")
+                depends(HYDROMETALLURGY)
+            }
+
+            METAL_FORMER = tech("metal_former") {
+                maxProgress(200)
+                displayItem(getMultiblock("metal_former").block)
+            }
         }
     }
 
@@ -300,7 +315,7 @@ object Technologies {
                 register()
             }
 
-        fun TechBuilder<*>.displayItem(name: String, sub: String) {
+        fun TechBuilder<*>.displayMaterial(name: String, sub: String) {
             displayItem(getMaterial(name).loc(sub))
         }
     }

@@ -6,10 +6,8 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
-import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE
 import org.shsts.tinactory.content.AllMultiblocks.CLEANROOM
 import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
-import org.shsts.tinactory.content.AllMultiblocks.LAUNCH_SITE_BASE
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
 import org.shsts.tinactory.content.AllTags
@@ -71,7 +69,7 @@ object Multiblocks {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
             }
 
-            block(AUTOFARM_BASE) {
+            misc("autofarm_base") {
                 blockState { ctx ->
                     val provider = ctx.provider()
                     provider.simpleBlock(ctx.`object`(), provider.models().cubeTop(
@@ -106,7 +104,7 @@ object Multiblocks {
                 blockState(solidBlock("casings/pipe/machine_casing_pipe_polytetrafluoroethylene"))
             }
 
-            block(LAUNCH_SITE_BASE) {
+            misc("launch_site_base") {
                 blockState { ctx ->
                     val provider = ctx.provider()
                     val tex = gregtech("blocks/foam/reinforced_stone")
@@ -123,6 +121,16 @@ object Multiblocks {
             misc("lithography_lens/good") {
                 blockState(solidBlock("casings/transparent/laminated_glass"))
                 tag(AllTags.LITHOGRAPHY_LENS)
+            }
+
+            misc("metal_processing_chamber") {
+                blockState { ctx ->
+                    val provider = ctx.provider()
+                    provider.simpleBlock(ctx.`object`(), provider.models().cubeColumn(
+                        ctx.id(),
+                        gregtech("blocks/casings/gearbox/machine_casing_gearbox_tungstensteel"),
+                        gregtech("blocks/casings/solid/machine_casing_robust_tungstensteel")))
+                }
             }
         }
 
@@ -151,20 +159,22 @@ object Multiblocks {
             solid("frost_proof", Voltage.LV, "aluminium", Technologies.VACUUM_FREEZER)
             solid("clean_stainless_steel", Voltage.MV, "stainless_steel", Technologies.DISTILLATION)
             solid("stable_titanium", Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
+            solid("robust_tungstensteel", Voltage.EV, "tungsten_steel", Technologies.TUNGSTEN_STEEL)
 
             coil("cupronickel", Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
             coil("kanthal", Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
             coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", Technologies.NICHROME)
-            coil("tungsten", Voltage.HV, "tungsten", "platinum", Technologies.HYDROMETALLURGY)
+            coil("tungsten", Voltage.HV, "tungsten", "platinum", Technologies.TUNGSTEN_STEEL)
         }
 
         val itemFilter = getItem("component/item_filter")
 
         assembler {
-            componentVoltage = Voltage.LV
             defaults {
                 voltage(Voltage.LV)
             }
+
+            componentVoltage = Voltage.LV
             misc("grate_machine_casing", 2) {
                 input("steel", "stick", 4)
                 component("electric_motor")
@@ -174,7 +184,7 @@ object Multiblocks {
                 workTicks(140)
                 tech(Technologies.SIFTING)
             }
-            output(AUTOFARM_BASE.get()) {
+            misc("autofarm_base") {
                 input("steel", "stick", 2)
                 input(Blocks.COARSE_DIRT, 2)
                 input(Blocks.PODZOL, 2)
@@ -186,11 +196,12 @@ object Multiblocks {
         }
 
         assembler {
-            componentVoltage = Voltage.MV
             defaults {
                 voltage(Voltage.MV)
                 workTicks(200)
             }
+
+            componentVoltage = Voltage.MV
             misc("clear_glass") {
                 input("steel", "stick", 2)
                 input("glass", "primary")
@@ -225,21 +236,23 @@ object Multiblocks {
         }
 
         assembler {
-            componentVoltage = Voltage.HV
             defaults {
                 voltage(Voltage.HV)
             }
 
-            output(LAUNCH_SITE_BASE.get()) {
+            componentVoltage = Voltage.HV
+            misc("launch_site_base") {
                 input("aluminium", "stick", 2)
                 input(getItem("component/advanced_alloy"), 2)
                 input("soldering_alloy", amount = 1.5)
                 workTicks(140)
                 tech(Technologies.ROCKET_SCIENCE)
             }
+
+            componentVoltage = Voltage.EV
             misc("lithography_lens/basic") {
                 input("titanium", "stick", 4)
-                component("robot_arm", 2, voltage = Voltage.EV)
+                component("robot_arm", 2)
                 input("ruby", "lens", 4)
                 input("diamond", "lens", 4)
                 input("sapphire", "lens", 4)
@@ -251,14 +264,31 @@ object Multiblocks {
         }
 
         assembler {
+            defaults {
+                voltage(Voltage.EV)
+                workTicks(320)
+            }
+
+            componentVoltage = Voltage.EV
+            misc("metal_processing_chamber") {
+                solid("robust_tungstensteel")
+                circuit(2)
+                component("electric_motor", 8)
+                component("electric_piston", 4)
+                component("robot_arm", 2)
+                component("conveyor_module", 2)
+                component("cable", 16)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.METAL_FORMER)
+            }
+
+            componentVoltage = Voltage.IV
             misc("lithography_lens/good") {
                 misc("lithography_lens/basic")
-                component("robot_arm", 2, voltage = Voltage.IV)
+                component("robot_arm", 2)
                 input("topaz", "lens", 4)
                 input("blue_topaz", "lens", 4)
                 input("soldering_alloy", amount = 3)
-                workTicks(320)
-                voltage(Voltage.EV)
                 tech(Technologies.LITHOGRAPHY)
             }
         }
@@ -324,6 +354,7 @@ object Multiblocks {
             multiblock("lithography_machine", "stable_titanium", "blast_furnace")
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
             multiblock("multi_smelter", "heatproof", "blast_furnace")
+            multiblock("metal_former", "frost_proof", "blast_furnace")
         }
     }
 
@@ -374,7 +405,7 @@ object Multiblocks {
                 tech(Technologies.SIFTING)
             }
             multiblock("autofarm") {
-                input(AUTOFARM_BASE.get())
+                misc("autofarm_base")
                 circuit(4, Voltage.MV)
                 component("electric_pump", 4)
                 component("cable", 4)
@@ -492,6 +523,25 @@ object Multiblocks {
                 component("cable", 4)
                 input(getItem("component/advanced_alloy"), 4)
                 tech(Technologies.ROCKET_SCIENCE)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.EV)
+                workTicks(MACHINE_TICKS)
+            }
+
+            componentVoltage = Voltage.EV
+            multiblock("metal_former") {
+                solid("frost_proof")
+                circuit(3)
+                machine("bender")
+                machine("wiremill")
+                component("robot_arm", 4)
+                component("conveyor_module", 4)
+                component("cable", 4)
+                tech(Technologies.METAL_FORMER)
             }
         }
     }

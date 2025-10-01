@@ -18,6 +18,9 @@
     },
     "stable_titanium": {
       "materialColor": 16
+    },
+    "robust_tungstensteel": {
+      "materialColor": 25
     }
   }
 }

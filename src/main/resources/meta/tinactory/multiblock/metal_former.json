@@ -1,0 +1,59 @@
+{
+  "recipes": {
+    "tinactory:bender": {},
+    "tinactory:wiremill": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_bending",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/frost_proof",
+  "layers": [
+    [
+      "CCC",
+      "CCC",
+      "CCC",
+      "BBB"
+    ],
+    [
+      "CCC",
+      "CLC",
+      "CLC",
+      "B$B"
+    ],
+    [
+      "CCC",
+      "CCC",
+      "CCC",
+      "BBB"
+    ]
+  ],
+  "defines": {
+    "C": "tinactory:multiblock/solid/frost_proof",
+    "L": "tinactory:multiblock/misc/metal_processing_chamber",
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/frost_proof"
+    }
+  }
+}

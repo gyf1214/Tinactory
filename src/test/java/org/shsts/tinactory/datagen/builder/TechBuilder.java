@@ -44,7 +44,8 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
     @Nullable
     private ResourceLocation displayTexture = null;
     @Nullable
-    private Voltage researchVoltage;
+    private Voltage voltage = null;
+    private boolean noResearch = false;
 
     public TechBuilder(P parent, ResourceLocation loc) {
         super(parent);
@@ -92,12 +93,12 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
     }
 
     public TechBuilder<P> researchVoltage(Voltage val) {
-        researchVoltage = val;
+        voltage = val;
         return this;
     }
 
     public TechBuilder<P> noResearch() {
-        researchVoltage = null;
+        noResearch = true;
         return this;
     }
 
@@ -116,7 +117,8 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         assert maxProgress > 0;
         var jo = new JsonObject();
         jo.addProperty("max_progress", maxProgress);
-        var rank1 = researchVoltage != null ? RANK_PER_VOLTAGE * researchVoltage.rank : 0;
+        assert voltage != null;
+        var rank1 = RANK_PER_VOLTAGE * voltage.rank;
         jo.addProperty("rank", rank + rank1);
         var ja = new JsonArray();
         depends.forEach(d -> ja.add(d.toString()));
@@ -157,14 +159,15 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         dataGen.trackLang(description);
         dataGen.trackLang(details);
 
-        if (researchVoltage != null) {
-            var input = getComponent("research_equipment").get(researchVoltage).get();
+        if (!noResearch) {
+            assert voltage != null;
+            var input = getComponent("research_equipment").get(voltage).get();
             var type = REGISTRATE.<ResearchRecipe.Builder>getRecipeType("research_bench");
             type.recipe(DATA_GEN, loc)
                 .target(loc)
                 .input(new ProcessingIngredients.ItemIngredient(new ItemStack(input, 1)))
-                .voltage(researchVoltage.value)
-                .power((long) (0.25 * researchVoltage.value))
+                .voltage(voltage.value)
+                .power((long) (0.25 * voltage.value))
                 .workTicks(200)
                 .build();
         }
