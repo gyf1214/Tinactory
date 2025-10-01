@@ -8,7 +8,9 @@ import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
+import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.Circuits
+import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.gregtech
@@ -35,14 +37,14 @@ object Technologies {
     val ALLOY_SMELTING: ResourceLocation
     val SOLDERING: ResourceLocation
     val STEEL: ResourceLocation
-    val MOTOR: ResourceLocation
-    val PUMP_AND_PISTON: ResourceLocation
     val ELECTRIC_HEATING: ResourceLocation
-    val MATERIAL_CUTTING: ResourceLocation
-    val CONVEYOR_MODULE: ResourceLocation
     val BATTERY: ResourceLocation
+    val MOTOR: ResourceLocation
+    val MATERIAL_CUTTING: ResourceLocation
     val SENSOR_AND_EMITTER: ResourceLocation
+    val PUMP_AND_PISTON: ResourceLocation
     val HOT_WORKING: ResourceLocation
+    val CONVEYOR_MODULE: ResourceLocation
     val ROBOT_ARM: ResourceLocation
     val KANTHAL: ResourceLocation
     val SIFTING: ResourceLocation
@@ -57,16 +59,17 @@ object Technologies {
     val OIL_PROCESSING: ResourceLocation
     val ORGANIC_CHEMISTRY: ResourceLocation
     val CPU: ResourceLocation
-    val OIL_CRACKING: ResourceLocation
-    val CLEANROOM: ResourceLocation
     val NICHROME: ResourceLocation
-    val ARC_FURNACE: ResourceLocation
+    val OIL_CRACKING: ResourceLocation
     val HYDROMETALLURGY: ResourceLocation
+    val ARC_FURNACE: ResourceLocation
+    val CLEANROOM: ResourceLocation
     val ADVANCED_CHEMISTRY: ResourceLocation
     val TNT: ResourceLocation
-    val LITHOGRAPHY: ResourceLocation
-    val DIGITAL_STORAGE: ResourceLocation
+    val SURFACE_MOUNT_DEVICE: ResourceLocation
     val AUTOCLAVE: ResourceLocation
+    val DIGITAL_STORAGE: ResourceLocation
+    val LITHOGRAPHY: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
     val ROCKET_T1: ResourceLocation
     val TUNGSTEN_STEEL: ResourceLocation
@@ -248,6 +251,15 @@ object Technologies {
             }
 
             voltage = Voltage.HV
+
+            base = ORGANIC_CHEMISTRY
+
+            SURFACE_MOUNT_DEVICE = tech("surface_mount_device") {
+                maxProgress(120)
+                displayItem(getCircuitComponent("resistor").loc(CircuitComponentTier.SMD))
+                depends(CPU)
+            }
+
             base = CLEANROOM
 
             AUTOCLAVE = child("autoclave") {
@@ -258,6 +270,7 @@ object Technologies {
             DIGITAL_STORAGE = tech("digital_storage") {
                 maxProgress(240)
                 displayItem(ITEM_STORAGE_CELL[0])
+                depends(CPU)
             }
 
             base = ADVANCED_CHEMISTRY
@@ -265,12 +278,13 @@ object Technologies {
             LITHOGRAPHY = tech("lithography") {
                 maxProgress(160)
                 displayItem(getComponent("emitter").item(Voltage.HV))
+                depends(CPU)
             }
 
             ROCKET_SCIENCE = child("rocket_science") {
                 maxProgress(200)
                 displayItem(Items.FIREWORK_ROCKET)
-                depends(TNT)
+                depends(CPU, TNT)
             }
 
             ROCKET_T1 = tech("rocket_t1") {

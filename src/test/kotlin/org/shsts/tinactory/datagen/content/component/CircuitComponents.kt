@@ -242,14 +242,13 @@ object CircuitComponents {
                     tech(Technologies.SOLDERING)
                 }
                 component("resistor", 2) {
-                    input("coal", "dust", 1)
+                    input("coal", "dust")
                     input("copper", "wire_fine", 4)
                     input("rubber")
                     voltage(Voltage.ULV)
                 }
                 component("diode", 4) {
                     input("gallium_arsenide", "dust")
-                    input("glass", "primary")
                     input("copper", "wire_fine", 4)
                     input("rubber", amount = 2)
                     voltage(Voltage.LV)
@@ -282,9 +281,44 @@ object CircuitComponents {
                     input("tin", "wire_fine", 6)
                     input("rubber", amount = 2)
                 }
-                component("transistor", 8, suffix = "_from_pe") {
-                    input("silicon", "dust")
+                component("transistor", 8, suffix = "_from_wafer") {
+                    input(WAFER_RAW.item("silicon"))
                     input("tin", "wire_fine", 6)
+                    input("pe")
+                }
+            }
+        }
+
+        componentTier(CircuitComponentTier.SMD) {
+            assembler {
+                defaults {
+                    voltage(Voltage.HV)
+                    workTicks(COMPONENT_TICKS)
+                    tech(Technologies.SURFACE_MOUNT_DEVICE)
+                }
+                component("resistor", 16) {
+                    input("carbon", "dust")
+                    input("electrum", "wire_fine", 4)
+                    input("pe")
+                }
+                component("diode", 32) {
+                    input("gallium_arsenide", "dust")
+                    input("platinum", "wire_fine", 4)
+                    input("pe", amount = 2)
+                }
+                component("transistor", 16) {
+                    input("gallium", "foil")
+                    input("annealed_copper", "wire_fine", 4)
+                    input("pe")
+                }
+                component("capacitor", 12) {
+                    input("pvc", "foil", 2)
+                    input("aluminium", "foil")
+                    input("pe", amount = 0.75)
+                }
+                component("inductor", 16) {
+                    input("nickel_zinc_ferrite", "ring")
+                    input("annealed_copper", "wire_fine", 8)
                     input("pe")
                 }
             }
@@ -460,6 +494,29 @@ object CircuitComponents {
                     input("iron_chloride", amount = 0.25)
                     voltage(Voltage.MV)
                     workTicks(320)
+                    tech(Technologies.CPU)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.NANO) {
+            assembler {
+                output(board) {
+                    input(lastBoard, 3)
+                    input("silver", "wire_fine", 8)
+                    input("soldering_alloy", amount = 1.5)
+                    voltage(Voltage.MV)
+                    workTicks(CIRCUIT_TICKS)
+                    tech(Technologies.CPU)
+                }
+            }
+            chemicalReactor {
+                output(circuitBoard) {
+                    input(board)
+                    input("electrum", "foil", 12)
+                    input("iron_chloride", amount = 0.5)
+                    voltage(Voltage.MV)
+                    workTicks(480)
                     tech(Technologies.CPU)
                 }
             }
