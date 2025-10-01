@@ -2,7 +2,6 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Item
-import org.shsts.tinactory.content.AllItems.STICKY_RESIN
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.Circuits.BOULE
@@ -17,6 +16,7 @@ import org.shsts.tinactory.content.electric.Circuits.getCircuit
 import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.name
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
@@ -223,15 +223,16 @@ object CircuitComponents {
 
     private fun circuitComponents() {
         componentTier(CircuitComponentTier.NORMAL) {
+            val resin = getItem("rubber_tree/sticky_resin")
             vanilla {
                 shaped(getCircuitComponent("resistor").item(tier)) {
                     pattern(" R ")
                     pattern("WCW")
                     pattern(" R ")
-                    define('R', STICKY_RESIN.get())
+                    define('R', resin)
                     define('W', "copper", "wire")
                     define('C', "coal", "dust")
-                    unlockedBy("has_resin", STICKY_RESIN.get())
+                    unlockedBy("has_resin", resin)
                 }
             }
 
@@ -377,8 +378,7 @@ object CircuitComponents {
 
     private fun boards() {
         circuitTier(CircuitTier.ELECTRONIC) {
-            val resin = STICKY_RESIN.get()
-
+            val resin = getItem("rubber_tree/sticky_resin")
             vanilla {
                 shaped(board, 3) {
                     pattern("SSS")

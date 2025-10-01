@@ -17,6 +17,10 @@ object DataFactories {
         itemData { item(entry, block) }
     }
 
+    fun itemData(id: String, block: IItemDataBuilder<Item, *>.() -> Unit) {
+        itemData { item(id, block) }
+    }
+
     fun blockData(block: BlockDataFactory.() -> Unit) {
         BlockDataFactory().apply(block)
     }

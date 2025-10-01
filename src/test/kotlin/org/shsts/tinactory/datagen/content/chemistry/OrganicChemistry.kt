@@ -1,9 +1,8 @@
 package org.shsts.tinactory.datagen.content.chemistry
 
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllItems.FERTILIZER
-import org.shsts.tinactory.content.AllItems.GELLED_TOLUENE
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
@@ -73,7 +72,7 @@ object OrganicChemistry {
                 input("potassium_carbonate")
                 workTicks(64)
             }
-            output(FERTILIZER.get(), 2) {
+            output(getItem("misc/fertilizer"), 2) {
                 input(Items.BONE_MEAL)
                 input("ammonium_chloride")
                 input("potassium_nitrate")
@@ -236,8 +235,10 @@ object OrganicChemistry {
             }
         }
 
+        val toluene = getItem("misc/gelled_toluene")
+
         chemicalReactor {
-            output(GELLED_TOLUENE.get(), 12) {
+            output(toluene, 12) {
                 input("toluene", amount = 1.8)
                 input("nitric_acid", amount = 5)
                 input("sulfuric_acid", amount = 5)
@@ -250,7 +251,7 @@ object OrganicChemistry {
 
         assembler {
             output(Items.TNT, 2, suffix = "_from_toluene") {
-                input(GELLED_TOLUENE.get())
+                input(toluene)
                 input("pe", amount = 2)
                 voltage(Voltage.HV)
                 workTicks(100)

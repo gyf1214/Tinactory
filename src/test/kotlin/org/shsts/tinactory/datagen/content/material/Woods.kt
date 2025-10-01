@@ -4,11 +4,9 @@ import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
-import org.shsts.tinactory.content.AllItems.FERTILIZER
 import org.shsts.tinactory.content.AllItems.RUBBER_LEAVES
 import org.shsts.tinactory.content.AllItems.RUBBER_LOG
 import org.shsts.tinactory.content.AllItems.RUBBER_SAPLING
-import org.shsts.tinactory.content.AllItems.STICKY_RESIN
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.content.AllTags.TOOL_MORTAR
@@ -19,6 +17,7 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.datagen.content.Models
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
@@ -48,7 +47,7 @@ object Woods {
     }
 
     private fun farm(sapling: ItemLike, log: ItemLike, leaves: ItemLike, isRubber: Boolean) {
-        val stickResin = STICKY_RESIN.get()
+        val stickResin = getItem("rubber_tree/sticky_resin")
         autofarm {
             defaults {
                 output(log, 6)
@@ -72,7 +71,7 @@ object Woods {
         autofarm {
             input(sapling, suffix = "_with_fertilizer") {
                 input("water")
-                input(FERTILIZER.get(), 2, port = 2)
+                input(getItem("misc/fertilizer"), 2, port = 2)
                 output(log, 12)
                 if (isRubber) {
                     output(stickResin, 12)
@@ -164,6 +163,8 @@ object Woods {
     }
 
     private fun rubber() {
+        val resin = getItem("rubber_tree/sticky_resin")
+
         blockData {
             block(RUBBER_LOG) {
                 blockState { ctx ->
@@ -174,7 +175,7 @@ object Woods {
                 tag(listOf(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN))
                 itemTag(listOf(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN))
                 dropSelf()
-                dropOnState(STICKY_RESIN, RubberLogBlock.HAS_RUBBER, true)
+                dropOnState({ resin }, RubberLogBlock.HAS_RUBBER, true)
             }
             block(RUBBER_LEAVES) {
                 blockState(Models.cubeTint("wood/rubber/leaves_rubber"))
@@ -200,12 +201,12 @@ object Woods {
         toolCrafting {
             result("raw_rubber", "dust") {
                 pattern("#")
-                define('#', STICKY_RESIN.get())
+                define('#', resin)
                 toolTag(TOOL_MORTAR)
             }
         }
         extractor {
-            input(STICKY_RESIN.get()) {
+            input(resin) {
                 output("raw_rubber", "dust", 3)
                 voltage(Voltage.LV)
                 workTicks(160)

@@ -4,8 +4,8 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import net.minecraftforge.common.Tags
-import org.shsts.tinactory.content.AllItems.FERTILIZER
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autofarm
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
@@ -102,7 +102,7 @@ object Crops {
         autofarm {
             input(seed, suffix = "_with_fertilizer") {
                 input("water", amount = 0.5)
-                input(FERTILIZER.get(), port = 2)
+                input(getItem("misc/fertilizer"), port = 2)
                 output(crop, if (crop == seed) 6 else 2)
                 if (outputSeed) {
                     output(seed, 4)

@@ -2,18 +2,8 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
-import org.shsts.tinactory.content.AllItems.ADVANCED_BUZZSAW
-import org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER
-import org.shsts.tinactory.content.AllItems.ANNIHILATION_CORE
-import org.shsts.tinactory.content.AllItems.BASIC_BUZZSAW
 import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.FORMATION_CORE
-import org.shsts.tinactory.content.AllItems.GOOD_BUZZSAW
-import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
-import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.MIXED_METAL_INGOT
 import org.shsts.tinactory.content.AllItems.STORAGE_COMPONENT
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
@@ -25,7 +15,9 @@ import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ResearchRecipe
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
@@ -36,6 +28,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.rocket
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object MiscComponents {
@@ -47,29 +40,29 @@ object MiscComponents {
             defaults {
                 workTicks(240)
             }
-            output(BASIC_BUZZSAW.get()) {
+            misc("buzzsaw/basic") {
                 input("cobalt_brass", "gear")
                 voltage(Voltage.LV)
             }
-            output(GOOD_BUZZSAW.get()) {
+            misc("buzzsaw/good") {
                 input("vanadium_steel", "gear")
                 voltage(Voltage.MV)
             }
-            output(ADVANCED_BUZZSAW.get()) {
+            misc("buzzsaw/advanced") {
                 input("tungsten_carbide", "gear")
                 voltage(Voltage.HV)
             }
         }
 
         assembler {
-            output(ITEM_FILTER.get()) {
+            misc("item_filter") {
                 input("steel", "plate")
                 input("zinc", "foil", 8)
                 voltage(Voltage.LV)
                 workTicks(200)
                 tech(Technologies.SIFTING)
             }
-            output(GOOD_GRINDER.get()) {
+            misc("grinder/good") {
                 input("diamond", "gem_flawless")
                 input("steel", "plate", 8)
                 input("diamond", "dust", 4)
@@ -77,7 +70,7 @@ object MiscComponents {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.MATERIAL_CUTTING)
             }
-            output(ADVANCED_GRINDER.get()) {
+            misc("grinder/advanced") {
                 input("tungsten_carbide", "gear")
                 input("tungsten_steel", "plate", 8)
                 input("tungsten_carbide", "dust", 4)
@@ -85,8 +78,7 @@ object MiscComponents {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.MATERIAL_CUTTING)
             }
-
-            output(MIXED_METAL_INGOT.get()) {
+            misc("mixed_metal_ingot") {
                 input("aluminium", "plate")
                 input("stainless_steel", "plate")
                 input("chrome", "plate")
@@ -98,8 +90,8 @@ object MiscComponents {
         }
 
         implosionCompressor {
-            output(ADVANCED_ALLOY.get()) {
-                input(MIXED_METAL_INGOT.get())
+            misc("advanced_alloy") {
+                misc("mixed_metal_ingot")
                 input(Items.TNT, 12, port = 1)
                 voltage(Voltage.HV)
             }
@@ -108,6 +100,16 @@ object MiscComponents {
         researches()
         ae()
         rockets()
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<*>> RecipeFactory<B, RB>.misc(
+        id: String, amount: Int = 1, block: RB.() -> Unit) {
+        output(getItem("component/$id"), amount, block = block)
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
+        id: String, amount: Int = 1) {
+        input(getItem("component/$id"), amount)
     }
 
     private fun ulv() {
@@ -174,7 +176,7 @@ object MiscComponents {
 
         research(Voltage.HV) {
             input(getComponent("robot_arm").item(Voltage.HV))
-            input(ADVANCED_ALLOY.get())
+            input(getItem("component/advanced_alloy"))
         }
     }
 
@@ -189,13 +191,16 @@ object MiscComponents {
     }
 
     private fun ae() {
+        val annihilation = getItem("component/annihilation_core")
+        val formation = getItem("component/formation_core")
+
         assembler {
             defaults {
                 voltage(Voltage.HV)
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.DIGITAL_STORAGE)
             }
-            output(ANNIHILATION_CORE.get(), 2) {
+            output(annihilation, 2) {
                 circuit(1, Voltage.MV)
                 component("robot_arm", 1, Voltage.MV)
                 input("nether_quartz", "primary", 4)
@@ -203,7 +208,7 @@ object MiscComponents {
                 input("annealed_copper", "wire_fine", 8)
                 input("pvc")
             }
-            output(FORMATION_CORE.get(), 2) {
+            output(formation, 2) {
                 circuit(1, Voltage.MV)
                 component("conveyor_module", 1, Voltage.MV)
                 input("certus_quartz", "gem", 4)
@@ -221,15 +226,15 @@ object MiscComponents {
             for ((i, entry) in STORAGE_COMPONENT.withIndex()) {
                 output(ITEM_STORAGE_CELL.item(i)) {
                     input(entry.get())
-                    input(ANNIHILATION_CORE.get())
-                    input(FORMATION_CORE.get())
+                    input(annihilation)
+                    input(formation)
                     input("aluminium", "plate", 3)
                     input("soldering_alloy", amount = 3)
                 }
                 output(FLUID_STORAGE_CELL.item(i)) {
                     input(entry.get())
-                    input(ANNIHILATION_CORE.get())
-                    input(FORMATION_CORE.get())
+                    input(annihilation)
+                    input(formation)
                     input("stainless_steel", "plate", 3)
                     input("soldering_alloy", amount = 3)
                 }
@@ -242,7 +247,7 @@ object MiscComponents {
             rocket(Technologies.ROCKET_T1) {
                 input(AllTags.circuit(Voltage.EV))
                 input(getComponent("electric_pump").item(Voltage.HV), 4)
-                input(ADVANCED_ALLOY.get(), 16)
+                input(getItem("component/advanced_alloy"), 16)
                 input("cetane_boosted_diesel")
                 voltage(Voltage.HV)
             }

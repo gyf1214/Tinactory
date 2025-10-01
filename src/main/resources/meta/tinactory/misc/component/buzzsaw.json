@@ -1,0 +1,14 @@
+{
+  "type": "item",
+  "items": {
+    "basic": {
+      "tint": "0xFFB4B4A0"
+    },
+    "good": {
+      "tint": "0xFFC0C0C0"
+    },
+    "advanced": {
+      "tint": "0xFF330066"
+    }
+  }
+}

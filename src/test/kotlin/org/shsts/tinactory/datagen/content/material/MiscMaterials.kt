@@ -1,7 +1,6 @@
 package org.shsts.tinactory.datagen.content.material
 
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllItems.STICKY_RESIN
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags.FLUID_STORAGE_CELL
 import org.shsts.tinactory.content.AllTags.ITEM_STORAGE_CELL
@@ -33,7 +32,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 
 object MiscMaterials {
     fun init() {
-        itemData(STICKY_RESIN) { model(basicItem("metaitems/rubber_drop")) }
+        itemData("rubber_tree/sticky_resin") { model(basicItem("metaitems/rubber_drop")) }
 
         // blast ores
         blast()

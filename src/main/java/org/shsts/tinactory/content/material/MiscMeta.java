@@ -97,6 +97,14 @@ public class MiscMeta extends MetaConsumer {
             .register();
     }
 
+    private void item(String id, JsonObject jo) {
+        var builder = REGISTRATE.item(id);
+        if (jo.has("tint")) {
+            builder.tint(MaterialMeta.getColor(jo, "tint"));
+        }
+        builder.register();
+    }
+
     private void buildItem(String type, String name, String id, JsonObject jo) {
         switch (type) {
             case "casing" -> casing(id, jo);
@@ -104,6 +112,7 @@ public class MiscMeta extends MetaConsumer {
             case "coil" -> coil(name, id, jo);
             case "glass" -> glass(id);
             case "lens" -> lens(id, jo);
+            case "item" -> item(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }
     }

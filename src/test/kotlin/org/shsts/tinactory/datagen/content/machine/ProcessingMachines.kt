@@ -1,10 +1,9 @@
 package org.shsts.tinactory.datagen.content.machine
 
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllItems.ANNIHILATION_CORE
-import org.shsts.tinactory.content.AllItems.FORMATION_CORE
 import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
@@ -283,8 +282,8 @@ object ProcessingMachines {
             }
             machine("me_storage_interface") {
                 circuit(4)
-                input(ANNIHILATION_CORE.get())
-                input(FORMATION_CORE.get())
+                input(getItem("component/annihilation_core"))
+                input(getItem("component/formation_core"))
                 input("fluix", "dust", 4)
                 input(main, "plate", 4)
                 tech(Technologies.DIGITAL_STORAGE)

@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllItems.getComponent;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -68,6 +69,11 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
 
     public TechBuilder<P> displayItem(ResourceLocation loc) {
         displayItem = () -> loc;
+        return this;
+    }
+
+    public TechBuilder<P> displayItem(String id) {
+        displayItem = () -> modLoc(id);
         return this;
     }
 

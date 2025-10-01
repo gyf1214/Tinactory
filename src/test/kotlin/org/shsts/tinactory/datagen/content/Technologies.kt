@@ -3,7 +3,6 @@ package org.shsts.tinactory.datagen.content
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
-import org.shsts.tinactory.content.AllItems
 import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
@@ -105,7 +104,7 @@ object Technologies {
 
             MATERIAL_CUTTING = tech("material_cutting") {
                 maxProgress(35)
-                displayItem(AllItems.BASIC_BUZZSAW)
+                displayItem("component/buzzsaw/basic")
             }
 
             SENSOR_AND_EMITTER = tech("sensor_and_emitter") {
@@ -142,7 +141,7 @@ object Technologies {
 
             SIFTING = tech("sifting") {
                 maxProgress(10)
-                displayItem(AllItems.ITEM_FILTER)
+                displayItem("component/item_filter")
             }
 
             AUTOFARM = tech("autofarm") {

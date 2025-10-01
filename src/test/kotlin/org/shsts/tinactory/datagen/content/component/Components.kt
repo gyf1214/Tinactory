@@ -1,19 +1,10 @@
 package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Item
-import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
-import org.shsts.tinactory.content.AllItems.ADVANCED_GRINDER
-import org.shsts.tinactory.content.AllItems.ANNIHILATION_CORE
-import org.shsts.tinactory.content.AllItems.FERTILIZER
 import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.FORMATION_CORE
-import org.shsts.tinactory.content.AllItems.GELLED_TOLUENE
-import org.shsts.tinactory.content.AllItems.GOOD_GRINDER
-import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.MIXED_METAL_INGOT
 import org.shsts.tinactory.content.AllItems.STORAGE_COMPONENT
-import org.shsts.tinactory.content.AllItems.getComponentEntry
+import org.shsts.tinactory.content.AllItems.componentEntry
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
 import org.shsts.tinactory.content.electric.CircuitComponentTier
@@ -42,6 +33,7 @@ import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.ItemDataFactory
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
+import org.shsts.tinycorelib.datagen.api.builder.IItemDataBuilder
 
 object Components {
     private const val RESEARCH_TEX = "metaitems/glass_vial/"
@@ -56,7 +48,7 @@ object Components {
     }
 
     private fun components() {
-        for (entry in getComponentEntry<CableBlock>("cable").values) {
+        for (entry in componentEntry<CableBlock>("cable").values) {
             blockData(entry) {
                 blockState(Models::cableBlock)
                 itemModel(Models::cableItem)
@@ -74,49 +66,49 @@ object Components {
                 "sensor",
                 "emitter",
                 "field_generator")
-            for (entry in components.flatMap { getComponentEntry<Item>(it).values }) {
+            for (entry in components.flatMap { componentEntry<Item>(it).values }) {
                 item(entry) { model(Models::componentItem) }
             }
 
-            for ((v, entry) in getComponentEntry<BatteryItem>("battery")) {
+            for ((v, entry) in componentEntry<BatteryItem>("battery")) {
                 item(entry) {
                     model(Models::batteryItem)
                     tag(AllTags.battery(v))
                 }
             }
 
-            for ((v, entry) in getComponentEntry<Item>("machine_hull")) {
+            for ((v, entry) in componentEntry<Item>("machine_hull")) {
                 item(entry) { model(machineItem(v, IO_TEX)) }
             }
 
-            for (entry in getComponentEntry<Item>("research_equipment").values) {
+            for (entry in componentEntry<Item>("research_equipment").values) {
                 item(entry) { model(basicItem("${RESEARCH_TEX}base", "${RESEARCH_TEX}overlay")) }
             }
 
-            item(GOOD_GRINDER) { model(basicItem("$GRINDER_TEX.diamond")) }
-            item(ADVANCED_GRINDER) { model(basicItem("$GRINDER_TEX.tungsten")) }
+            component("grinder/good") { model(basicItem("$GRINDER_TEX.diamond")) }
+            component("grinder/advanced") { model(basicItem("$GRINDER_TEX.tungsten")) }
 
-            for (entry in getComponentEntry<Item>("buzzsaw").values) {
+            for (entry in componentEntry<Item>("buzzsaw").values) {
                 item(entry) { model(basicItem("tools/buzzsaw")) }
             }
 
-            for (entry in listOf(ITEM_FILTER, FERTILIZER, GELLED_TOLUENE)) {
-                item(entry) { model(Models::simpleItem) }
+            for (id in listOf("component/item_filter", "misc/fertilizer", "misc/gelled_toluene")) {
+                item(id) { model(Models::simpleItem) }
             }
 
-            item(MIXED_METAL_INGOT) {
+            component("mixed_metal_ingot") {
                 model(basicItem(ic2("items/resource/ingot/alloy")))
             }
 
-            item(ADVANCED_ALLOY) {
+            component("advanced_alloy") {
                 model(basicItem(ic2("items/crafting/alloy")))
             }
 
-            item(ANNIHILATION_CORE) {
+            component("annihilation_core") {
                 model(basicItem(ae2("items/material_annihilation_core")))
             }
 
-            item(FORMATION_CORE) {
+            component("formation_core") {
                 model(basicItem(ae2("items/material_formation_core")))
             }
 
@@ -135,6 +127,10 @@ object Components {
                 }
             }
         }
+    }
+
+    private fun ItemDataFactory.component(id: String, block: IItemDataBuilder<Item, *>.() -> Unit) {
+        item("component/$id", block)
     }
 
     private fun chips() {
@@ -222,7 +218,7 @@ object Components {
 
     private fun tools() {
         itemData {
-            for ((v, entry) in getComponentEntry<Item>("fluid_cell")) {
+            for ((v, entry) in componentEntry<Item>("fluid_cell")) {
                 val texKey = when (v) {
                     Voltage.ULV -> "metaitems/fluid_cell"
                     Voltage.IV -> "metaitems/large_fluid_cell.tungstensteel"

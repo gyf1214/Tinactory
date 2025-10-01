@@ -34,7 +34,7 @@ public class MaterialMeta extends MetaConsumer {
         return Integer.parseUnsignedInt(hex.substring(2).toLowerCase(), 16);
     }
 
-    private static int getColor(JsonObject jo, String member) {
+    public static int getColor(JsonObject jo, String member) {
         return getColor(GsonHelper.getAsString(jo, member));
     }
 

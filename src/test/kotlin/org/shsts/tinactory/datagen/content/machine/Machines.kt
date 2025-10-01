@@ -8,7 +8,7 @@ import org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
-import org.shsts.tinactory.content.AllItems.getComponentEntry
+import org.shsts.tinactory.content.AllItems.componentEntry
 import org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR
@@ -130,7 +130,7 @@ object Machines {
             }
 
             val subnets = listOf("transformer", "electric_buffer")
-                .flatMap { getComponentEntry<SubnetBlock>(it).values }
+                .flatMap { componentEntry<SubnetBlock>(it).values }
             for (entry in subnets) {
                 block(entry) {
                     machineModel {

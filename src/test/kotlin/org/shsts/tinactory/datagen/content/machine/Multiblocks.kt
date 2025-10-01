@@ -6,15 +6,12 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
-import org.shsts.tinactory.content.AllItems.ADVANCED_ALLOY
-import org.shsts.tinactory.content.AllItems.ITEM_FILTER
 import org.shsts.tinactory.content.AllMultiblocks.AUTOFARM_BASE
 import org.shsts.tinactory.content.AllMultiblocks.CLEANROOM
 import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
 import org.shsts.tinactory.content.AllMultiblocks.LAUNCH_SITE_BASE
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
-import org.shsts.tinactory.content.AllRegistries.BLOCKS
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR
 import org.shsts.tinactory.content.AllTags.CLEANROOM_WALL
@@ -28,6 +25,9 @@ import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.solidBlock
+import org.shsts.tinactory.datagen.content.RegistryHelper.blockEntry
+import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
@@ -140,10 +140,8 @@ object Multiblocks {
         }
     }
 
-    private fun miscEntry(name: String) = BLOCKS.getEntry<Block>("multiblock/misc/$name")
-
     private fun BlockDataFactory.misc(name: String, block: IBlockDataBuilder<Block, *>.() -> Unit) {
-        block(miscEntry(name), block)
+        block(blockEntry("multiblock/misc/$name"), block)
     }
 
     private fun componentRecipes() {
@@ -160,6 +158,8 @@ object Multiblocks {
             coil("tungsten", Voltage.HV, "tungsten", "platinum", Technologies.HYDROMETALLURGY)
         }
 
+        val itemFilter = getItem("component/item_filter")
+
         assembler {
             componentVoltage = Voltage.LV
             defaults {
@@ -169,7 +169,7 @@ object Multiblocks {
                 input("steel", "stick", 4)
                 component("electric_motor")
                 input("tin", "rotor")
-                input(ITEM_FILTER.get(), 6)
+                input(itemFilter, 6)
                 input("soldering_alloy", amount = 2)
                 workTicks(140)
                 tech(Technologies.SIFTING)
@@ -206,7 +206,7 @@ object Multiblocks {
                 input("steel", "stick", 4)
                 component("electric_motor")
                 input("bronze", "rotor")
-                input(ITEM_FILTER.get(), 3)
+                input(itemFilter, 3)
                 input("pe", "sheet", 3)
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.CLEANROOM)
@@ -232,7 +232,7 @@ object Multiblocks {
 
             output(LAUNCH_SITE_BASE.get()) {
                 input("aluminium", "stick", 2)
-                input(ADVANCED_ALLOY.get(), 2)
+                input(getItem("component/advanced_alloy"), 2)
                 input("soldering_alloy", amount = 1.5)
                 workTicks(140)
                 tech(Technologies.ROCKET_SCIENCE)
@@ -327,8 +327,8 @@ object Multiblocks {
         }
     }
 
-    private fun BlockDataFactory.multiblock(type: String, casing: String, overlay: String = type) {
-        val set = getMultiblock(type)
+    private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name) {
+        val set = getMultiblock(name)
         block(set.block) {
             machineModel {
                 casing("casings/solid/machine_casing_$casing")
@@ -341,6 +341,8 @@ object Multiblocks {
     }
 
     private fun machineRecipes() {
+        val itemFilter = getItem("component/item_filter")
+
         assembler {
             componentVoltage = Voltage.ULV
             defaults {
@@ -367,7 +369,7 @@ object Multiblocks {
                 circuit(3, Voltage.MV)
                 component("electric_piston", 4)
                 component("cable", 4)
-                input(ITEM_FILTER.get(), 4)
+                input(itemFilter, 4)
                 input("steel", "plate", 4)
                 tech(Technologies.SIFTING)
             }
@@ -432,7 +434,7 @@ object Multiblocks {
                 circuit(3)
                 component("electric_motor", 2)
                 component("cable", 4)
-                input(ITEM_FILTER.get(), 4)
+                input(itemFilter, 4)
                 input("pe", "sheet", 4)
                 tech(Technologies.CLEANROOM)
             }
@@ -488,7 +490,7 @@ object Multiblocks {
                 component("robot_arm", 4)
                 component("conveyor_module", 4)
                 component("cable", 4)
-                input(ADVANCED_ALLOY.get(), 4)
+                input(getItem("component/advanced_alloy"), 4)
                 tech(Technologies.ROCKET_SCIENCE)
             }
         }
@@ -508,10 +510,10 @@ object Multiblocks {
 
     private fun AssemblyRecipeFactory.misc(name: String, amount: Int = 1,
         block: AssemblyRecipeBuilder.() -> Unit) {
-        output(miscEntry(name).get(), amount, block = block)
+        output(getBlock("multiblock/misc/$name"), amount, block = block)
     }
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(name: String) {
-        input(miscEntry(name).get())
+        input(getBlock("multiblock/misc/$name"))
     }
 }
