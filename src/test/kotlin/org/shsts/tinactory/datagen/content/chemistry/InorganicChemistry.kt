@@ -377,9 +377,9 @@ object InorganicChemistry {
             }
             input("netherrack") {
                 input("sulfuric_acid", "dilute")
-                output("cobaltite", rate = 0.8)
-                output("manganese", rate = 0.5)
-                output("vanadium", rate = 0.3)
+                output("cobaltite", rate = 0.2)
+                output("manganese", rate = 0.1)
+                output("vanadium", rate = 0.05)
                 output("netherrack", "slurry")
                 workTicks(160)
             }
