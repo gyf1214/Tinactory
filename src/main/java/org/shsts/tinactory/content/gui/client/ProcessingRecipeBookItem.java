@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
@@ -24,6 +25,11 @@ public record ProcessingRecipeBookItem(ProcessingRecipe recipe) implements IReci
     @Override
     public ResourceLocation loc() {
         return recipe.loc();
+    }
+
+    @Override
+    public boolean isMarker() {
+        return recipe instanceof MarkerRecipe;
     }
 
     @Override

@@ -17,6 +17,8 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IRecipeBookItem extends ILoc {
+    boolean isMarker();
+
     void select(Layout layout, GhostRecipe ghostRecipe);
 
     Optional<List<Component>> buttonToolTip();

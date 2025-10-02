@@ -24,6 +24,7 @@ import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinactory.core.util.Tuple;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.DistLazy;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -139,11 +141,21 @@ public class MachineProcessor extends CapabilityProvider implements
         }
         var world = world();
         return () -> () -> {
-            var ret = new ArrayList<IRecipeBookItem>();
+            var ret = new ArrayList<Tuple<Integer, IRecipeBookItem>>();
+            var i = 0;
             for (var processor : processors) {
-                ret.addAll(processor.recipeBookItems(world, machine.get()).getValue());
+                var items = processor.recipeBookItems(world, machine.get()).getValue();
+                for (var item : items) {
+                    ret.add(new Tuple<>(i, item));
+                }
+                i++;
             }
-            return ret;
+
+            ret.sort(Comparator.comparing(Tuple<Integer, IRecipeBookItem>::first)
+                .thenComparing($ -> !$.second().isMarker())
+                .thenComparing($ -> $.second().loc(), ResourceLocation::compareNamespaced));
+
+            return ret.stream().map(Tuple::second).toList();
         };
     }
 

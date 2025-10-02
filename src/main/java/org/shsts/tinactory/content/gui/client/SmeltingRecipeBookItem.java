@@ -38,6 +38,11 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
     }
 
     @Override
+    public boolean isMarker() {
+        return false;
+    }
+
+    @Override
     public void select(Layout layout, GhostRecipe ghostRecipe) {
         var inputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == inputPort)
