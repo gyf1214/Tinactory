@@ -142,13 +142,13 @@ public class LanguageProcessor {
             fmt("%s", normalize(matcher, 1)));
         pattern("fluid[.]tinactory[.]material[.](.*)[.](.*)", matcher ->
             fmt("%s %s", normalize(matcher, 1), normalize(matcher, 2)));
+        pattern("tinactory[.]technology[.]ore[.](.*)[.](.*)[.]details", matcher ->
+            fmt("Allow analyzing Raw %s Ore from base stones.", normalize(matcher, 2)));
         pattern("tinactory[.]technology[.]ore[.](.*)[.]details", matcher ->
-            fmt("Allow analyzing Raw %s Ore from base stones.", normalize(matcher, 1)));
-        pattern("tinactory[.]technology[.]ore[.](.*)", matcher ->
-            fmt("%s Ore", normalize(matcher, 1)));
-        pattern("tinactory[.]technology[.]ore_base[.](.*)[.]details", matcher ->
             fmt("Unlock ores from %s.", normalize(matcher, 1)));
-        pattern("tinactory[.]technology[.]ore_base[.](.*)", matcher ->
+        pattern("tinactory[.]technology[.]ore[.](.*)[.](.*)", matcher ->
+            fmt("%s Ore", normalize(matcher, 2)));
+        pattern("tinactory[.]technology[.]ore[.](.*)", matcher ->
             fmt("%s Ores", normalize(matcher, 1)));
         pattern("tinactory[.]technology[.]([^.]*)", matcher ->
             fmt("%s", normalize(matcher, 1)));

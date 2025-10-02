@@ -40,6 +40,7 @@ object Veins {
 
     private fun deepslate() {
         vein("magnetite", 0.4) {
+            baseOre = true
             ore("magnetite", 1.0)
             ore("gold", 0.2)
             ore("magnetite", 0.2)
@@ -72,6 +73,7 @@ object Veins {
     private fun netherrack() {
         vein("gold", 0.2) {
             variant(OreVariant.NETHERRACK)
+            baseOre = true
             ore("gold", 0.5)
             ore("topaz", 0.3)
             ore("blue_topaz", 0.3)

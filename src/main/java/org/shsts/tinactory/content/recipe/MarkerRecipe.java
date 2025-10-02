@@ -42,6 +42,11 @@ public class MarkerRecipe extends ProcessingRecipe {
         return false;
     }
 
+    @Override
+    public boolean canCraft(IMachine machine) {
+        return super.canCraft(machine);
+    }
+
     public boolean matches(IRecipeType<?> type) {
         return baseType == type.get();
     }
