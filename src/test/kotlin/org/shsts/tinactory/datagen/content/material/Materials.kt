@@ -154,6 +154,7 @@ object Materials {
             machineProcess(Voltage.HV)
             smelt()
         }
+        material("mercury", DULL)
     }
 
     private fun firstDegrees() {
@@ -439,7 +440,7 @@ object Materials {
         }
         material("garnierite", METALLIC) {
             oreProcess {
-                byProducts("magnesium_chloride", "magnesium_chloride", "nickel")
+                byProducts("potassium_chloride", "nickel", "magnesium_chloride")
             }
             smelt("nickel")
         }
@@ -472,6 +473,10 @@ object Materials {
         material("cinnabar", SHINY) {
             oreProcess {
                 byProducts("rare_earth", "glowstone", "rare_earth")
+            }
+            centrifuge(Voltage.LV) {
+                component("mercury")
+                component("sulfur")
             }
         }
         material("ruby", RUBY) {
