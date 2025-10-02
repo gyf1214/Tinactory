@@ -1,10 +1,11 @@
 {
-  "color": "0xFF712400",
+  "color": "0xFF640C04",
   "items": [],
   "fluids": {
     "liquid": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/material_sets/fluid/liquid"
+      "texture": "gregtech:blocks/fluids/fluid.epichlorohydrin",
+      "textureColor": "0xFFFFFFFF"
     }
   },
   "aliases": {

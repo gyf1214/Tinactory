@@ -277,9 +277,10 @@ object OrganicChemistry {
                 input("methane", amount = 2)
                 input("chlorine", amount = 2)
                 input("water")
+                output("hydrogen_chloride", amount = 4)
                 workTicks(96)
             }
-            output("epoxy", amount = 1000 / 144) {
+            output("epoxy", amount = 1000.0 / 144.0) {
                 input("epichlorohydrin")
                 input("phenol", amount = 2)
                 input("acetone")

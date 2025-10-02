@@ -10,6 +10,7 @@ import org.shsts.tinactory.datagen.content.model.IconSet.DULL
 import org.shsts.tinactory.datagen.content.model.IconSet.FINE
 import org.shsts.tinactory.datagen.content.model.IconSet.GEM_HORIZONTAL
 import org.shsts.tinactory.datagen.content.model.IconSet.GEM_VERTICAL
+import org.shsts.tinactory.datagen.content.model.IconSet.LAPIS
 import org.shsts.tinactory.datagen.content.model.IconSet.LIGNITE
 import org.shsts.tinactory.datagen.content.model.IconSet.METALLIC
 import org.shsts.tinactory.datagen.content.model.IconSet.QUARTZ
@@ -140,7 +141,7 @@ object Materials {
         }
         material("molybdenum", SHINY) {
             machineProcess(Voltage.HV, 1.8)
-            blast(Voltage.HV, 2200, 1600) {
+            blast(Voltage.HV, 2800, 1600) {
                 component("nitrogen")
             }
         }
@@ -334,6 +335,7 @@ object Materials {
                 component("carbon")
             }
         }
+        material("molybdenum_trioxide", DULL)
     }
 
     private fun higherDegrees() {
@@ -412,7 +414,7 @@ object Materials {
         material("silicone_rubber", DULL) {
             machineProcess(Voltage.MV)
         }
-        material("epoxy", ROUGH) {
+        material("epoxy", DULL) {
             machineProcess(Voltage.MV)
         }
     }
@@ -494,19 +496,19 @@ object Materials {
         }
         material("magnetite", METALLIC) {
             oreProcess {
-                byProducts("gold", "vanadium", "copper")
+                byProducts("gold", "vanadium", "vanadium")
             }
             smelt("iron")
         }
         material("galena", DULL) {
             oreProcess {
-                byProducts("sulfur", "antimony", "silver")
+                byProducts("sulfur", "antimony", "gallium")
             }
             smelt("lead")
         }
         material("sphalerite", DULL) {
             oreProcess {
-                byProducts("sulfur", "silver", "gallium")
+                byProducts("sulfur", "antimony", "gallium")
             }
             smelt("zinc")
         }
@@ -569,24 +571,40 @@ object Materials {
         }
         material("nether_quartz", QUARTZ) {
             oreProcess {
+                amount = 2
                 siftPrimary = true
-                byProducts("certus_quartz", "silicon_dioxide")
+                byProducts("certus_quartz", "silicon_dioxide", "certus_quartz")
             }
             machineProcess(Voltage.MV)
         }
         material("certus_quartz", CERTUS) {
             oreProcess {
-                byProducts("nether_quartz", "silicon_dioxide")
+                byProducts("nether_quartz", "silicon_dioxide", "nether_quartz")
             }
             machineProcess(Voltage.MV)
             crystallize(Voltage.HV, 400, -0.5, 0.5, 5.0)
+        }
+        material("lapis", LAPIS) {
+            oreProcess {
+                amount = 6
+                siftPrimary = true
+                byProducts("lapis", "silicon_dioxide", "lapis")
+            }
+            machineProcess(Voltage.MV)
         }
         material("platinum_group_sludge", FINE)
         material("lava", DULL) {
             fluidOre(400, Items.NETHERRACK)
         }
         material("tungstate", DULL) {
-            oreProcess()
+            oreProcess {
+                byProducts("molybdate", "tin", "rare_earth")
+            }
+        }
+        material("molybdate", METALLIC) {
+            oreProcess {
+                byProducts("tungstate", "tin", "rare_earth")
+            }
         }
     }
 

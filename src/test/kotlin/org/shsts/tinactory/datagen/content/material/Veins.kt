@@ -77,15 +77,17 @@ object Veins {
             ore("blue_topaz", 0.3)
         }
         vein("quartz", 0.4) {
-            ore("nether_quartz", 0.6)
-            ore("certus_quartz", 0.6)
+            ore("nether_quartz", 0.5)
+            ore("certus_quartz", 0.5)
+            ore("lapis", 0.1)
         }
         vein("lava", 0.6) {
             ore("lava", 1.0)
             ore("lava", 0.2)
         }
-        vein("tungsten", 0.4) {
-            ore("tungstate", 1.0)
+        vein("tungsten", 0.3) {
+            ore("tungstate", 0.7)
+            ore("molybdate", 0.4)
         }
     }
 

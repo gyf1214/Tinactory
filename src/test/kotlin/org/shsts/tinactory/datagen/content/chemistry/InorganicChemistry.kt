@@ -377,9 +377,9 @@ object InorganicChemistry {
             }
             input("netherrack") {
                 input("sulfuric_acid", "dilute")
-                output("manganese", rate = 0.4)
-                output("vanadium", rate = 0.2)
-                output("molybdenum", rate = 0.2)
+                output("cobaltite", rate = 0.8)
+                output("manganese", rate = 0.5)
+                output("vanadium", rate = 0.3)
                 output("netherrack", "slurry")
                 workTicks(160)
             }
@@ -404,6 +404,13 @@ object InorganicChemistry {
                 input("tungstate")
                 input("hydrogen_chloride", amount = 2)
                 output("lithium_brine", amount = 4)
+                workTicks(400)
+            }
+            output("molybdenum_trioxide") {
+                input("molybdate")
+                input("hydrogen_chloride", amount = 2)
+                output("calcium_chloride")
+                output("water", amount = 2)
                 workTicks(400)
             }
         }
@@ -491,6 +498,16 @@ object InorganicChemistry {
                 workTicks(2560)
                 extra {
                     temperature(3600)
+                }
+            }
+            output("molybdenum", "ingot_hot", suffix = "_from_molybdenum_trioxide") {
+                input("molybdenum_trioxide", amount = 2)
+                input("carbon", amount = 3)
+                input("nitrogen", amount = 2)
+                output("carbon_dioxide", amount = 3)
+                workTicks(2560)
+                extra {
+                    temperature(2800)
                 }
             }
             output("platinum", "nugget", 2, suffix = "_from_sludge") {
