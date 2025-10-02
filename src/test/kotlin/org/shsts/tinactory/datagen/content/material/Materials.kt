@@ -409,6 +409,10 @@ object Materials {
                 component("tungsten")
             }
         }
+        material("pdms", DULL)
+        material("silicone_rubber", DULL) {
+            machineProcess(Voltage.MV)
+        }
     }
 
     private fun ores() {

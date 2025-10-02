@@ -155,6 +155,11 @@ object OrganicChemistry {
                 input("sulfur")
                 workTicks(160)
             }
+            output("silicone_rubber", "molten", amount = 9) {
+                input("pdms", amount = 9)
+                input("sulfur")
+                workTicks(160)
+            }
         }
     }
 
@@ -232,6 +237,13 @@ object OrganicChemistry {
                 input("propene", amount = 2.16)
                 input("titanium_tetrachloride", amount = 0.1)
                 workTicks(280)
+            }
+            output("pdms", amount = 7) {
+                input("silicon")
+                input("methane", amount = 2)
+                input("chlorine", amount = 2)
+                input("water")
+                workTicks(96)
             }
         }
 

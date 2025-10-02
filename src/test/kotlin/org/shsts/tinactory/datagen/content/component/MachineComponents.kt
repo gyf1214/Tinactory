@@ -40,6 +40,9 @@ object MachineComponents {
                 val cable = entry.get() as CableBlock
                 output(cable) {
                     input(cable.material, "wire", 4)
+                    if (v.rank >= Voltage.EV.rank) {
+                        input("silicone_rubber", "foil", 2)
+                    }
                     input("rubber", amount = 2)
                     if (v == Voltage.LV) {
                         voltage(Voltage.ULV)
