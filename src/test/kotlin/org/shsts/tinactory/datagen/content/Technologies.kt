@@ -69,6 +69,7 @@ object Technologies {
     val SURFACE_MOUNT_DEVICE: ResourceLocation
     val AUTOCLAVE: ResourceLocation
     val DIGITAL_STORAGE: ResourceLocation
+    val ADVANCED_POLYMER: ResourceLocation
     val LITHOGRAPHY: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
     val ROCKET_T1: ResourceLocation
@@ -274,6 +275,11 @@ object Technologies {
             }
 
             base = ADVANCED_CHEMISTRY
+
+            ADVANCED_POLYMER = tech("advanced_polymer") {
+                maxProgress(160)
+                displayMaterial("epoxy", "sheet")
+            }
 
             LITHOGRAPHY = tech("lithography") {
                 maxProgress(160)

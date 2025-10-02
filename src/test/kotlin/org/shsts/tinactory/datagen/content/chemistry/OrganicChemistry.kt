@@ -200,14 +200,6 @@ object OrganicChemistry {
                 output("hydrogen_chloride", amount = 12)
                 workTicks(320)
             }
-            output("styrene") {
-                input("benzene")
-                input("ethylene")
-                input("water", "gas")
-                output("hydrogen")
-                output("water")
-                workTicks(320)
-            }
             output("pe", amount = 30, suffix = "_from_lcr") {
                 input("ethylene", amount = 2.16)
                 input("oxygen", amount = 7.5)
@@ -225,6 +217,48 @@ object OrganicChemistry {
                 input("oxygen", amount = 7.5)
                 input("titanium_tetrachloride", amount = 0.1)
                 workTicks(512)
+            }
+        }
+
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.HV)
+                tech(Technologies.ADVANCED_POLYMER)
+            }
+            output("styrene") {
+                input("benzene")
+                input("ethylene")
+                input("water", "gas")
+                output("hydrogen")
+                output("water")
+                workTicks(320)
+            }
+            output("epichlorohydrin") {
+                input("propene")
+                input("chlorine", amount = 2)
+                input("sodium_hydroxide", amount = 3)
+                input("water")
+                output("salt_water", amount = 6)
+                workTicks(240)
+            }
+            output("chloro_benzene") {
+                input("benzene")
+                input("chlorine")
+                output("hydrogen_chloride")
+                workTicks(480)
+            }
+            output("phenol") {
+                input("chloro_benzene")
+                input("water")
+                output("hydrogen_chloride")
+                workTicks(128)
+            }
+            output("phenol", suffix = "_from_cumene") {
+                input("benzene")
+                input("propene")
+                input("oxygen")
+                output("acetone")
+                workTicks(256)
             }
             output("ps", amount = 30) {
                 input("styrene", amount = 2.16)
@@ -244,6 +278,15 @@ object OrganicChemistry {
                 input("chlorine", amount = 2)
                 input("water")
                 workTicks(96)
+            }
+            output("epoxy", amount = 1000 / 144) {
+                input("epichlorohydrin")
+                input("phenol", amount = 2)
+                input("acetone")
+                input("sodium_hydroxide")
+                output("salt_water", amount = 2)
+                output("water")
+                workTicks(160)
             }
         }
 

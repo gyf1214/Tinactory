@@ -1,0 +1,14 @@
+{
+  "color": "0xFF712400",
+  "items": [],
+  "fluids": {
+    "liquid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid"
+    }
+  },
+  "aliases": {
+    "fluid": "liquid"
+  },
+  "existings": {}
+}

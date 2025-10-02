@@ -154,7 +154,6 @@ object Materials {
             machineProcess(Voltage.HV)
             smelt()
         }
-        material("mercury", DULL)
     }
 
     private fun firstDegrees() {
@@ -411,6 +410,9 @@ object Materials {
         }
         material("pdms", DULL)
         material("silicone_rubber", DULL) {
+            machineProcess(Voltage.MV)
+        }
+        material("epoxy", ROUGH) {
             machineProcess(Voltage.MV)
         }
     }
