@@ -73,6 +73,7 @@ object Technologies {
     val LITHOGRAPHY: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
     val ROCKET_T1: ResourceLocation
+    val MULTI_SMELTER: ResourceLocation
     val TUNGSTEN_STEEL: ResourceLocation
     val METAL_FORMER: ResourceLocation
 
@@ -297,6 +298,13 @@ object Technologies {
                 maxProgress(250)
                 displayItem(Items.FIREWORK_ROCKET)
                 noResearch()
+            }
+
+            base = ARC_FURNACE
+
+            MULTI_SMELTER = tech("multi_smelter") {
+                maxProgress(200)
+                displayItem(getMultiblock("multi_smelter").block)
             }
 
             base = ADVANCED_CHEMISTRY

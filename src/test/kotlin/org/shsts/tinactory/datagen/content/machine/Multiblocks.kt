@@ -524,6 +524,16 @@ object Multiblocks {
                 input(getItem("component/advanced_alloy"), 4)
                 tech(Technologies.ROCKET_SCIENCE)
             }
+            multiblock("multi_smelter") {
+                solid("heatproof")
+                circuit(3)
+                machine("electric_furnace")
+                machine("alloy_smelter")
+                machine("arc_furnace")
+                component("conveyor_module", 4)
+                component("cable", 4)
+                tech(Technologies.MULTI_SMELTER)
+            }
         }
 
         assembler {
