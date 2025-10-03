@@ -78,7 +78,6 @@ public class MachineMeta extends MetaConsumer {
         protected String recipeTypeStr;
         protected String recipeTypeId;
         protected String machineType;
-        protected String menuType;
         @Nullable
         protected IRecipeType<?> recipeType;
         private IMenuType menu;
@@ -277,7 +276,6 @@ public class MachineMeta extends MetaConsumer {
 
         protected void parseTypes() {
             recipeTypeStr = GsonHelper.getAsString(jo, "recipe", "default");
-            menuType = GsonHelper.getAsString(jo, "menu", "default");
             machineType = GsonHelper.getAsString(jo, "machine", "default");
             if (jo.has("recipeTypeId")) {
                 recipeTypeId = GsonHelper.getAsString(jo, "recipeTypeId");

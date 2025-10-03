@@ -9,8 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -21,20 +21,19 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class MarkerRecipe extends ProcessingRecipe {
     private final RecipeType<?> baseType;
+    private final String prefix;
+    private final boolean requireMultiblock;
 
-    private MarkerRecipe(BuilderBase<?, ?> builder, RecipeType<?> baseType) {
+    private MarkerRecipe(Builder builder) {
         super(builder);
-        this.baseType = baseType;
+        this.baseType = builder.getBaseType();
+        this.prefix = builder.prefix;
+        this.requireMultiblock = builder.requireMultiblock;
     }
 
     @Override
     public Optional<String> getDescriptionId() {
         return Optional.of(getDescriptionId(loc));
-    }
-
-    @Override
-    protected boolean matchElectric(Optional<IElectricMachine> electric) {
-        return true;
     }
 
     @Override
@@ -44,21 +43,32 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     @Override
     public boolean canCraft(IMachine machine) {
-        return super.canCraft(machine);
+        return super.canCraft(machine) &&
+            (!requireMultiblock || machine instanceof MultiblockInterface);
     }
 
     public boolean matches(IRecipeType<?> type) {
         return baseType == type.get();
     }
 
-    // TODO
+    public boolean matches(RecipeType<?> type) {
+        return baseType == type;
+    }
+
     public boolean matches(ProcessingRecipe recipe) {
-        return true;
+        if (prefix.isEmpty()) {
+            return true;
+        } else {
+            var id = recipe.id();
+            return id.equals(prefix) || id.startsWith(prefix + "/");
+        }
     }
 
     public static class Builder extends BuilderBase<MarkerRecipe, Builder> {
         @Nullable
         private ResourceLocation baseType;
+        private String prefix = "";
+        private boolean requireMultiblock = false;
 
         public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
             super(parent, loc);
@@ -69,9 +79,21 @@ public class MarkerRecipe extends ProcessingRecipe {
             return this;
         }
 
-        public Builder baseType(IRecipeType<?> value) {
-            baseType = value.loc();
+        public Builder prefix(String value) {
+            prefix = value;
             return this;
+        }
+
+        public Builder requireMultiblock(boolean value) {
+            requireMultiblock = value;
+            return this;
+        }
+
+        public RecipeType<?> getBaseType() {
+            assert baseType != null;
+            var type = Registry.RECIPE_TYPE.get(baseType);
+            assert type != null;
+            return type;
         }
 
         @Override
@@ -79,10 +101,7 @@ public class MarkerRecipe extends ProcessingRecipe {
 
         @Override
         protected MarkerRecipe createObject() {
-            assert baseType != null;
-            var type = Registry.RECIPE_TYPE.get(baseType);
-            assert type != null;
-            return new MarkerRecipe(this, type);
+            return new MarkerRecipe(this);
         }
     }
 
@@ -90,13 +109,17 @@ public class MarkerRecipe extends ProcessingRecipe {
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(type, loc, jo)
-                .baseType(new ResourceLocation(GsonHelper.getAsString(jo, "base_type")));
+                .baseType(new ResourceLocation(GsonHelper.getAsString(jo, "base_type")))
+                .prefix(GsonHelper.getAsString(jo, "prefix", ""))
+                .requireMultiblock(GsonHelper.getAsBoolean(jo, "require_multiblock", false));
         }
 
         @Override
         public void toJson(JsonObject jo, MarkerRecipe recipe) {
             super.toJson(jo, recipe);
             jo.addProperty("base_type", recipe.baseType.toString());
+            jo.addProperty("prefix", recipe.prefix);
+            jo.addProperty("require_multiblock", recipe.requireMultiblock);
         }
     }
 
