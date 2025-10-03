@@ -8,6 +8,7 @@ import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
+import org.shsts.tinactory.datagen.content.builder.MarkerBuilder
 import org.shsts.tinactory.datagen.content.builder.MarkerFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.marker
 import org.shsts.tinactory.integration.jei.category.RecipeCategory
@@ -27,6 +28,16 @@ object Markers {
             baseMarker("arc_furnace")
             baseMarker("bender")
             baseMarker("wiremill")
+
+            wash("crushed")
+            wash("dust_impure")
+            wash("dust_pure")
+            oreProcess("macerator", "raw")
+            oreProcess("macerator", "crushed")
+            oreProcess("macerator", "crushed_purified")
+            oreProcess("macerator", "crushed_centrifuged")
+            oreProcess("centrifuge", "dust_pure")
+            oreProcess("thermal_centrifuge", "crushed_purified")
 
             extrude("stick")
             extrude("plate")
@@ -63,13 +74,28 @@ object Markers {
     }
 
     private fun MarkerFactory.extrude(sub: String) {
-        recipe("extruder/$sub") {
+        recipe("extruder/material/$sub") {
             baseType("extruder")
             prefix("material/$sub")
             input(AllTags.material("ingot"), port = 0)
             extra {
                 display(AllTags.material(sub))
             }
+        }
+    }
+
+    private fun MarkerFactory.oreProcess(type: String, sub: String, block: MarkerBuilder.() -> Unit = {}) {
+        recipe("$type/material/$sub") {
+            baseType(type)
+            prefix("material/$sub")
+            input(AllTags.material(sub), port = 0)
+            block()
+        }
+    }
+
+    private fun MarkerFactory.wash(sub: String) {
+        oreProcess("ore_washer", sub) {
+            input("water", port = 1)
         }
     }
 
