@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllMultiblocks.MULTIBLOCK_SETS;
-import static org.shsts.tinactory.content.AllRecipes.putRecipeType;
+import static org.shsts.tinactory.content.AllRecipes.putTypeInfo;
 import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
@@ -240,7 +240,7 @@ public class MultiblockMeta extends MachineMeta {
             var set = new MultiblockSet(recipeTypes, block);
             MULTIBLOCK_SETS.put(id, set);
             for (var recipeType : recipeTypes) {
-                putRecipeType(recipeType, layout, block);
+                putTypeInfo(recipeType, layout, block);
             }
         }
     }

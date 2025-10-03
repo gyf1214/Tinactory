@@ -144,6 +144,8 @@ public class LanguageProcessor {
             fmt("%s %s", normalize(matcher, 1), normalize(matcher, 2)));
         pattern("tinactory[.]recipe[.]marker[.]ore_analyzer[.](.*)", matcher ->
             fmt("Analyze %s", normalize(matcher, 1)));
+        pattern("tinactory[.]recipe[.]marker[.]extruder[.](.*)", matcher ->
+            fmt("Extrude %s", normalize(matcher, 1)));
         pattern("tinactory[.]recipe[.]marker[.](.*)", matcher ->
             fmt("Any %s recipes", normalize(matcher, 1)));
         pattern("tinactory[.]technology[.]ore[.](.*)[.](.*)[.]details", matcher ->

@@ -54,7 +54,7 @@ import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllBlockEntities.MACHINE_SETS;
-import static org.shsts.tinactory.content.AllRecipes.putRecipeType;
+import static org.shsts.tinactory.content.AllRecipes.putTypeInfo;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -309,7 +309,7 @@ public class MachineMeta extends MetaConsumer {
             }
 
             if (recipeType != null && !recipeTypeStr.equals("chemical_reactor") && icon != null) {
-                putRecipeType(recipeType, layoutSet.get(Voltage.MAX), icon);
+                putTypeInfo(recipeType, layoutSet.get(Voltage.MAX), icon);
             }
         }
     }

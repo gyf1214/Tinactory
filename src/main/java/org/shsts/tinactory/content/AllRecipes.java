@@ -6,7 +6,6 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -30,7 +29,7 @@ public final class AllRecipes {
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
 
-    public static final Map<ResourceLocation, RecipeTypeInfo> PROCESSING_TYPES = new HashMap<>();
+    public static final Map<String, RecipeTypeInfo> PROCESSING_TYPES = new HashMap<>();
 
     static {
         TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)
@@ -57,12 +56,16 @@ public final class AllRecipes {
             MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
     }
 
-    public static void putRecipeType(IRecipeType<?> recipeType, Layout layout,
+    public static void putTypeInfo(IRecipeType<?> recipeType, Layout layout,
         IEntry<? extends Block> icon) {
-        var loc = recipeType.loc();
-        if (!PROCESSING_TYPES.containsKey(loc)) {
-            PROCESSING_TYPES.put(loc, new RecipeTypeInfo(recipeType, layout, icon));
+        var id = recipeType.id();
+        if (!PROCESSING_TYPES.containsKey(id)) {
+            PROCESSING_TYPES.put(id, new RecipeTypeInfo(recipeType, layout, icon));
         }
+    }
+
+    public static RecipeTypeInfo getTypeInfo(String id) {
+        return PROCESSING_TYPES.get(id);
     }
 
     public static void init() {}
