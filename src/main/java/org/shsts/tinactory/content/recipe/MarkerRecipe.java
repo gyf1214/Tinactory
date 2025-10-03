@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -47,15 +48,15 @@ public class MarkerRecipe extends ProcessingRecipe {
             (!requireMultiblock || machine instanceof MultiblockInterface);
     }
 
-    public boolean matches(IRecipeType<?> type) {
+    public boolean matchesType(IRecipeType<?> type) {
         return baseType == type.get();
     }
 
-    public boolean matches(RecipeType<?> type) {
+    public boolean matchesType(RecipeType<?> type) {
         return baseType == type;
     }
 
-    public boolean matches(ProcessingRecipe recipe) {
+    public boolean matches(ILoc recipe) {
         if (prefix.isEmpty()) {
             return true;
         } else {

@@ -1,7 +1,7 @@
 package org.shsts.tinactory.datagen.content
 
+import net.minecraft.world.item.crafting.RecipeType
 import org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES
-import org.shsts.tinactory.content.AllTags.material
 import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
@@ -12,24 +12,17 @@ import org.shsts.tinactory.integration.jei.category.RecipeCategory
 object Markers {
     fun init() {
         marker {
-            crush("raw")
-            crush("crushed")
-            crush("crushed_purified")
-            crush("crushed_centrifuged")
-            wash("crushed")
-            wash("dust_impure")
-            wash("dust_pure")
-
-            recipe("centrifuge_dust_pure") {
-                baseType("centrifuge")
-                prefix("material/dust_pure")
-                input(material("dust_pure"), port = 0)
+            // base markers, i.e. marking all recipes in baseType for multi-use multiblocks
+            recipe("smelting") {
+                baseType(RecipeType.SMELTING)
+                extra {
+                    requireMultiblock(true)
+                }
             }
-            recipe("thermal_centrifuge_crushed_purified") {
-                baseType("thermal_centrifuge")
-                prefix("material/crushed_purified")
-                input(material("crushed_purified"), port = 0)
-            }
+            baseMarker("alloy_smelter")
+            baseMarker("arc_furnace")
+            baseMarker("bender")
+            baseMarker("wiremill")
 
             for (variant in OreVariant.entries) {
                 val name = variant.serializedName
@@ -45,20 +38,10 @@ object Markers {
         trackJEICategory()
     }
 
-    private fun MarkerFactory.crush(sub: String) {
-        recipe("crush_$sub") {
-            baseType("macerator")
-            prefix("material/$sub")
-            input(material(sub), port = 0)
-        }
-    }
-
-    private fun MarkerFactory.wash(sub: String) {
-        recipe("wash_$sub") {
-            baseType("ore_washer")
-            prefix("material/$sub")
-            input(material(sub), port = 0)
-            input("water", port = 1)
+    private fun MarkerFactory.baseMarker(id: String) {
+        recipe(id) {
+            baseType(id)
+            prefix()
         }
     }
 

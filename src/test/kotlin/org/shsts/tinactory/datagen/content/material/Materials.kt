@@ -216,7 +216,7 @@ object Materials {
             smelt()
             alloy(Voltage.LV) {
                 component("lead", 4)
-                component("antimony")
+                component("zinc")
             }
         }
         material("soldering_alloy", DULL) {

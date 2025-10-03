@@ -42,7 +42,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
             return false;
         }
         var recipe = marker.get();
-        return recipe.matches(recipeType) && recipe.canCraft(machine);
+        return recipe.matchesType(recipeType) && recipe.canCraft(machine);
     }
 
     private Optional<OreAnalyzerRecipe> newRecipe(List<OreAnalyzerRecipe> matches, Level world) {

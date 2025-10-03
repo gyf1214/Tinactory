@@ -13,6 +13,7 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.content.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -21,11 +22,14 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.content.AllRecipes.MARKER;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 import static org.shsts.tinactory.core.machine.RecipeProcessors.PROGRESS_PER_TICK;
 
@@ -86,14 +90,32 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public DistLazy<List<IRecipeBookItem>> recipeBookItems(Level world, IMachine machine) {
-        var recipes = world.getRecipeManager().getAllRecipesFor(RecipeType.SMELTING);
-        return () -> () -> recipes.stream()
-            .<IRecipeBookItem>map(recipe -> new SmeltingRecipeBookItem(recipe, inputPort, outputPort))
+        var recipeManager = CORE.recipeManager(world);
+        var markers = recipeManager.getAllRecipesFor(MARKER).stream()
+            .filter($ -> $.matchesType(RecipeType.SMELTING) && $.canCraft(machine))
             .toList();
+        var recipes = world.getRecipeManager().getAllRecipesFor(RecipeType.SMELTING);
+
+        return () -> () -> {
+            var ret = new ArrayList<IRecipeBookItem>();
+            for (var marker : markers) {
+                ret.add(new ProcessingRecipeBookItem(marker));
+            }
+            for (var recipe : recipes) {
+                ret.add(new SmeltingRecipeBookItem(recipe, inputPort, outputPort));
+            }
+            return ret;
+        };
     }
 
     @Override
     public boolean allowTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
+        var marker = CORE.recipeManager(world).byLoc(MARKER, loc);
+        if (marker.isPresent()) {
+            var recipe = marker.get();
+            return recipe.matchesType(RecipeType.SMELTING) && recipe.canCraft(machine);
+        }
+
         return world.getRecipeManager().byKey(loc)
             .filter(r -> r.getType() == RecipeType.SMELTING)
             .isPresent();
@@ -122,12 +144,27 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         if (container.isEmpty()) {
             return Optional.empty();
         }
-        var input = getInputWrapper(container.get());
-        return world.getRecipeManager().byKey(target)
-            .filter(recipe -> recipe instanceof SmeltingRecipe smeltingRecipe &&
-                smeltingRecipe.matches(input, world) &&
-                canOutput(smeltingRecipe, container.get()))
-            .map($ -> (SmeltingRecipe) $);
+        var container1 = container.get();
+        var input = getInputWrapper(container1);
+        var recipeManager = world.getRecipeManager();
+
+        var vanilla = recipeManager.byKey(target);
+        if (vanilla.isPresent() && vanilla.get() instanceof SmeltingRecipe smelting) {
+            return smelting.matches(input, world) && canOutput(smelting, container1) ?
+                Optional.of(smelting) : Optional.empty();
+        }
+
+        var marker = CORE.recipeManager(world).byLoc(MARKER, target);
+        if (marker.isPresent()) {
+            var recipe = marker.get();
+            if (recipe.matchesType(RecipeType.SMELTING) && recipe.canCraft(machine)) {
+                return recipeManager.getRecipesFor(RecipeType.SMELTING, input, world)
+                    .stream().filter($ -> recipe.matches($::getId) && canOutput($, container1))
+                    .findAny();
+            }
+        }
+
+        return Optional.empty();
     }
 
     private int getTemperature(IMachine machine) {

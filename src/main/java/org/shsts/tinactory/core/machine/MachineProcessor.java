@@ -151,9 +151,11 @@ public class MachineProcessor extends CapabilityProvider implements
                 i++;
             }
 
-            ret.sort(Comparator.comparing(Tuple<Integer, IRecipeBookItem>::first)
-                .thenComparing($ -> !$.second().isMarker())
-                .thenComparing($ -> $.second().loc(), ResourceLocation::compareNamespaced));
+            var comparator = Comparator
+                .<Tuple<Integer, IRecipeBookItem>, Boolean>comparing($ -> !$.second().isMarker())
+                .thenComparing(Tuple::first)
+                .thenComparing($ -> $.second().loc(), ResourceLocation::compareNamespaced);
+            ret.sort(comparator);
 
             return ret.stream().map(Tuple::second).toList();
         };
@@ -163,6 +165,8 @@ public class MachineProcessor extends CapabilityProvider implements
         var world = world();
         var machine = machine().orElseThrow();
 
+        // first clear the filter
+        doResetTargetRecipe();
         for (var processor : processors) {
             if (processor.allowTargetRecipe(world, loc, machine)) {
                 LOGGER.debug("{}: update target recipe = {}", blockEntity, loc);
@@ -170,12 +174,15 @@ public class MachineProcessor extends CapabilityProvider implements
                 return;
             }
         }
-        /* No processor can handle this target recipe */
-        resetTargetRecipe();
+        // no processor can handle this target recipe
     }
 
     private void resetTargetRecipe() {
         LOGGER.debug("{}: update target recipe = <null>", blockEntity);
+        doResetTargetRecipe();
+    }
+
+    private void doResetTargetRecipe() {
         container().ifPresent(container -> {
             var portSize = container.portSize();
             for (var i = 0; i < portSize; i++) {

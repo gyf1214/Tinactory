@@ -63,7 +63,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     protected Stream<MarkerRecipe> markers(IRecipeManager recipeManager, IMachine machine) {
         return recipeManager.getAllRecipesFor(MARKER).stream()
-            .filter($ -> $.matches(recipeType) && $.canCraft(machine));
+            .filter($ -> $.matchesType(recipeType) && $.canCraft(machine));
     }
 
     protected List<ProcessingRecipe> targetRecipes(Level world, IMachine machine) {
@@ -87,17 +87,19 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public boolean allowTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
         var recipeManager = CORE.recipeManager(world);
+
         var marker = recipeManager.byLoc(MARKER, loc);
         if (marker.isPresent()) {
             var recipe = marker.get();
-            return recipe.matches(recipeType) && recipe.canCraft(machine);
-        } else {
-            var processing = recipeManager.byLoc(recipeType, loc);
-            if (processing.isPresent()) {
-                var recipe = processing.get();
-                return recipe.canCraft(machine);
-            }
+            return recipe.matchesType(recipeType) && recipe.canCraft(machine);
         }
+
+        var processing = recipeManager.byLoc(recipeType, loc);
+        if (processing.isPresent()) {
+            var recipe = processing.get();
+            return recipe.canCraft(machine);
+        }
+
         return false;
     }
 
@@ -110,12 +112,17 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         if (recipe.isEmpty()) {
             return;
         }
+        var recipe1 = recipe.get();
+        // skip filter if targetRecipe is a marker without any input
+        if (recipe1 instanceof MarkerRecipe && recipe1.inputs.isEmpty()) {
+            return;
+        }
 
         machine.container().ifPresent(container -> {
             var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
             var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
 
-            for (var input : recipe.get().inputs) {
+            for (var input : recipe1.inputs) {
                 var idx = input.port();
                 var ingredient = input.ingredient();
                 if (!container.hasPort(idx)) {
@@ -157,16 +164,22 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public Optional<R> newRecipe(Level world, IMachine machine, ResourceLocation target) {
         var recipeManager = CORE.recipeManager(world);
-        var recipe = recipeManager.byLoc(recipeType, target);
-        if (recipe.isPresent() && recipe.get().matches(machine, world)) {
-            return recipe;
+
+        var processing = recipeManager.byLoc(recipeType, target);
+        if (processing.isPresent()) {
+            return processing.filter($ -> $.matches(machine, world));
         }
+
         var marker = recipeManager.byLoc(MARKER, target);
-        if (marker.isPresent() && marker.get().matches(recipeType)) {
-            return recipeManager.getRecipesFor(recipeType, machine, world)
-                .stream().filter(marker.get()::matches)
-                .findAny();
+        if (marker.isPresent()) {
+            var recipe = marker.get();
+            if (recipe.matchesType(recipeType) && recipe.canCraft(machine)) {
+                return recipeManager.getRecipesFor(recipeType, machine, world)
+                    .stream().filter(marker.get()::matches)
+                    .findAny();
+            }
         }
+
         return Optional.empty();
     }
 

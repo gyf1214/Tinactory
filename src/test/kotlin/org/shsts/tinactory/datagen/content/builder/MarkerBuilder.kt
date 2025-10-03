@@ -5,7 +5,7 @@ import net.minecraft.world.item.crafting.RecipeType
 import org.shsts.tinactory.content.recipe.MarkerRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 
-class MarkerBuilder(builder: MarkerRecipe.Builder, var baseType: String? = null) :
+class MarkerBuilder(builder: MarkerRecipe.Builder, private var baseType: String? = null) :
     ProcessingRecipeBuilder<MarkerRecipe.Builder>(builder) {
     init {
         requirePower = false
