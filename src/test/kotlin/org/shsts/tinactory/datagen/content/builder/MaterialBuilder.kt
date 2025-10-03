@@ -108,18 +108,18 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     private fun newItem(sub: String, tag: TagKey<Item>, entry: IEntry<out Item>) {
         itemData(entry) {
             tag(tag)
+
             if (sub.startsWith("tool/")) {
                 model { toolModel(it, sub) }
-            } else if (sub == "wire") {
-                model(Models::wireItem)
-            } else if (sub == "pipe") {
-                model(Models::pipeItem)
-            } else if (sub == "raw") {
-                model { basicItem(it, modLoc("items/material/raw")) }
-            } else if (sub == "seed") {
-                model { basicItem(it, ae2("items/crystal_seed_nether")) }
-            } else {
-                model { icon.itemModel(it, sub) }
+                return@itemData
+            }
+            when (sub) {
+                "wire" -> model(Models::wireItem)
+                "pipe" -> model(Models::pipeItem)
+                "raw" -> model { basicItem(it, modLoc("items/material/raw")) }
+                "raw_fluid" -> model { basicItem(it, modLoc("items/material/raw_fluid")) }
+                "seed" -> model { basicItem(it, ae2("items/crystal_seed_nether")) }
+                else -> model { icon.itemModel(it, sub) }
             }
         }
     }
@@ -793,7 +793,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     fun fluidOre(workTicks: Long, base: ItemLike, voltage: Voltage = Voltage.MV) {
         centrifuge {
-            input(material, "raw") {
+            input(material, "raw_fluid") {
                 output(base)
                 output(material, "fluid")
                 workTicks(workTicks)

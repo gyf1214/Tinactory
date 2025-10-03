@@ -2,7 +2,7 @@
   "color": "0xFFDCDCDC",
   "ore": "deepslate",
   "items": [
-    "raw"
+    "raw_fluid"
   ],
   "fluids": {
     "fluid": {
@@ -11,6 +11,8 @@
       "textureColor": "0xFFFFFFFF"
     }
   },
-  "aliases": {},
+  "aliases": {
+    "raw": "raw_fluid"
+  },
   "existings": {}
 }
