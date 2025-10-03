@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
 import static org.shsts.tinactory.content.AllTags.extend;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -187,6 +188,11 @@ public class MaterialSet {
             return color;
         }
 
+        private String newId(String sub) {
+            var prefix = sub.startsWith("tool/") ? "" : "material/";
+            return prefix + sub + "/" + name;
+        }
+
         private void put(String sub, ResourceLocation loc, Supplier<? extends Item> item) {
             if (items.containsKey(sub)) {
                 return;
@@ -206,16 +212,14 @@ public class MaterialSet {
 
         public Builder<P> existing(String sub, Item item) {
             assert !items.containsKey(sub);
-            var loc = item.getRegistryName();
-            assert loc != null;
+            var loc = modLoc(newId(sub));
             put(sub, loc, () -> item);
             return this;
         }
 
         public Builder<P> existing(String sub, Fluid fluid, int baseAmount) {
             assert !fluids.containsKey(sub);
-            var loc = fluid.getRegistryName();
-            assert loc != null;
+            var loc = modLoc(newId(sub));
             fluids.put(sub, new FluidEntry(loc, () -> fluid, baseAmount));
             return this;
         }
@@ -229,11 +233,6 @@ public class MaterialSet {
                 throw new IllegalArgumentException("Alias " + sub2 + " does not exist in " + name);
             }
             return this;
-        }
-
-        private String newId(String sub) {
-            var prefix = sub.startsWith("tool/") ? "" : "material/";
-            return prefix + sub + "/" + name;
         }
 
         public Builder<P> item(String sub, Function<Item.Properties, ? extends Item> factory) {

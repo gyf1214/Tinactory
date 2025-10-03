@@ -344,7 +344,7 @@ object Technologies {
             }
 
         fun TechBuilder<*>.displayMaterial(name: String, sub: String) {
-            displayItem(getMaterial(name).loc(sub))
+            displayItem(getMaterial(name).item(sub))
         }
     }
 

@@ -212,7 +212,7 @@ object MiscMaterials {
             result(Items.GRAVEL) {
                 pattern("#")
                 pattern("#")
-                define('#', "stone", "block")
+                define('#', "stone", "primary")
                 toolTag(TOOL_HAMMER)
             }
             // gravel -> flint
@@ -262,7 +262,7 @@ object MiscMaterials {
                 output("calcium_carbonate", "dust")
                 workTicks(128)
             }
-            input("stone", "block", 2) {
+            input("stone", "primary", 2) {
                 output(Items.GRAVEL)
                 output("calcium_carbonate", "dust")
                 workTicks(240)

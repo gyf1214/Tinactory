@@ -63,7 +63,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
                 TechBuilder.factory(handler, parent, loc)
             }.run {
                 maxProgress(30)
-                displayItem(ores[0].loc("raw"))
+                displayItem(ores[0].item("raw"))
                 depends(baseTech)
                 researchVoltage(variant1.voltage)
                 rank(rank + 1 + VEIN_TECH_RANK)

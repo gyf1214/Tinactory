@@ -11,10 +11,8 @@
       "displayColor": "0xFFC43C10"
     }
   },
-  "aliases": {
-    "primary": "block"
-  },
+  "aliases": {},
   "existings": {
-    "block": "minecraft:netherrack"
+    "primary": "minecraft:netherrack"
   }
 }

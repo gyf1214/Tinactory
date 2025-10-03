@@ -11,10 +11,8 @@
       "displayColor": "0xFF885542"
     }
   },
-  "aliases": {
-    "primary": "block"
-  },
+  "aliases": {},
   "existings": {
-    "block": "minecraft:obsidian"
+    "primary": "minecraft:obsidian"
   }
 }

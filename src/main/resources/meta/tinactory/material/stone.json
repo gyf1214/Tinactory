@@ -11,10 +11,8 @@
     "dust"
   ],
   "fluids": {},
-  "aliases": {
-    "primary": "block"
-  },
+  "aliases": {},
   "existings": {
-    "block": "minecraft:cobblestone"
+    "primary": "minecraft:cobblestone"
   }
 }

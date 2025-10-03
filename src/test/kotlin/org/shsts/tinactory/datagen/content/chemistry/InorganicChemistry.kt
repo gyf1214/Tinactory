@@ -273,7 +273,7 @@ object InorganicChemistry {
                 output("carbon_dioxide")
                 workTicks(160)
             }
-            output("obsidian", "block") {
+            output("obsidian", "primary") {
                 input("lava")
                 input("water")
                 output("water", "gas")

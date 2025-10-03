@@ -44,10 +44,10 @@ object MiscMachines {
                 pattern("WSW")
                 pattern("SCS")
                 pattern("WSW")
-                define('S', "stone", "block")
+                define('S', "stone", "primary")
                 define('W', Items.STICK)
                 define('C', Blocks.CRAFTING_TABLE)
-                unlockedBy("has_cobblestone", "stone", "block")
+                unlockedBy("has_cobblestone", "stone", "primary")
             }
             primitive("stone_generator") {
                 pattern("WLW")
