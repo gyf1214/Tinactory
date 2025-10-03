@@ -3,12 +3,22 @@ package org.shsts.tinactory.datagen.content.builder
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.crafting.RecipeType
 import org.shsts.tinactory.content.recipe.MarkerRecipe
+import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
+import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 
-class MarkerBuilder(builder: MarkerRecipe.Builder, private var baseType: String? = null) :
+class MarkerBuilder(builder: MarkerRecipe.Builder) :
     ProcessingRecipeBuilder<MarkerRecipe.Builder>(builder) {
+    private var baseType: String? = null
+
     init {
         requirePower = false
+        val loc = builder.loc
+        builder.onBuild {
+            dataGen {
+                trackLang(ProcessingRecipe.getDescriptionId(loc))
+            }
+        }
     }
 
     fun baseType(id: String) {

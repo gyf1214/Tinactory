@@ -26,7 +26,7 @@ object Markers {
 
             for (variant in OreVariant.entries) {
                 val name = variant.serializedName
-                recipe("analyze_$name") {
+                recipe("ore_analyzer/$name") {
                     baseType("ore_analyzer")
                     prefix(name)
                     input(variant.baseItem, port = 0)

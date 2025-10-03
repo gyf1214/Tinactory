@@ -115,7 +115,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         return loc;
     }
 
-    protected static String getDescriptionId(ResourceLocation loc) {
+    public static String getDescriptionId(ResourceLocation loc) {
         return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
     }
 
