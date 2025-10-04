@@ -50,6 +50,18 @@ object Markers {
             extrude("rotor")
             extrude("pipe")
 
+            solidifier("ingot")
+            solidifier("dust")
+            solidifier("sheet")
+            solidifier("nugget")
+            solidifier("ring")
+            solidifier("plate")
+            solidifier("stick")
+            solidifier("bolt")
+            solidifier("gear")
+            solidifier("rotor")
+            solidifier("pipe")
+
             for (variant in OreVariant.entries) {
                 val name = variant.serializedName
                 recipe("ore_analyzer/$name") {
@@ -80,6 +92,16 @@ object Markers {
             baseType("extruder")
             prefix("material/$sub")
             input(AllTags.material("ingot"), port = 0)
+            extra {
+                display(AllTags.material(sub))
+            }
+        }
+    }
+
+    private fun MarkerFactory.solidifier(sub: String) {
+        recipe("fluid_solidifier/material/$sub") {
+            baseType("fluid_solidifier")
+            prefix("material/$sub")
             extra {
                 display(AllTags.material(sub))
             }

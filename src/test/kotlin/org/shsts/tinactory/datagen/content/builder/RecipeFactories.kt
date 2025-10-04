@@ -199,16 +199,16 @@ object RecipeFactories {
     fun extractor(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("extractor") {
             defaultInputItem = 0
-            defaultOutputItem = 1
-            defaultOutputFluid = 2
+            defaultOutputItem = 2
+            defaultOutputFluid = 3
             amperage = 0.5
         }.block()
     }
 
     fun fluidSolidifier(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("fluid_solidifier") {
-            defaultInputFluid = 0
-            defaultOutputItem = 1
+            defaultInputFluid = 1
+            defaultOutputItem = 2
             amperage = 0.25
         }.block()
     }

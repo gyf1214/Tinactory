@@ -4,13 +4,13 @@
   "layout": {
     "slots": [
       {
-        "port": 0,
+        "port": 1,
         "type": "fluid_input",
         "x": 0,
         "y": 10
       },
       {
-        "port": 1,
+        "port": 2,
         "type": "item_output",
         "x": 54,
         "y": 10
