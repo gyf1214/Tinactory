@@ -11,8 +11,6 @@
       "textureColor": "0xFFFFFFFF"
     }
   },
-  "aliases": {
-    "raw": "raw_fluid"
-  },
+  "aliases": {},
   "existings": {}
 }

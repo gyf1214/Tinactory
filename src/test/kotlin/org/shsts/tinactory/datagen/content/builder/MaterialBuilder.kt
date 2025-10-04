@@ -156,7 +156,11 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             blockState { oreBlock(it, variant) }
             tag(BlockTags.MINEABLE_WITH_PICKAXE)
             tag(tierTag)
-            drop(material.entry("raw"))
+            if (material.hasItem("raw")) {
+                drop(material.entry("raw"))
+            } else {
+                drop(material.entry("raw_fluid"))
+            }
         }
     }
 
@@ -693,6 +697,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             macerator {
                 input(material, from) {
                     output(material, to, amount)
+                    if (from == "crushed_centrifuged") {
+                        output(byProduct(1), "dust", rate = 0.2)
+                    }
                     voltage(Voltage.LV)
                     workTicks((variant.destroyTime * 40).toLong())
                 }
@@ -705,8 +712,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     output(material, to)
                     if (from == "crushed") {
                         input("water")
-                        output(material.oreVariant().material, "dust", port = 3)
-                        output(byProduct(0), "dust", port = 4, rate = 0.3)
+                        output(material.oreVariant().material, "dust")
+                        output(byProduct(0), "dust", rate = 0.3)
                         workTicks(200)
                     } else {
                         input("water", amount = 0.1)
@@ -754,9 +761,14 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
 
             thermalCentrifuge {
+                input(material, "crushed") {
+                    output(material, "crushed_centrifuged")
+                    output(material.oreVariant().material, "dust")
+                    output(byProduct(2), "dust", rate = 0.3)
+                }
                 input(material, "crushed_purified") {
                     output(material, "crushed_centrifuged")
-                    output(byProduct(2), "dust", port = 2, rate = 0.4)
+                    output(byProduct(2), "dust", rate = 0.4)
                 }
             }
 

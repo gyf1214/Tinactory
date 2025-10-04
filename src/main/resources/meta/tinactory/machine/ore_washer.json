@@ -22,14 +22,14 @@
         "y": 10
       },
       {
-        "port": 3,
+        "port": 2,
         "type": "item_output",
         "x": 90,
         "y": 10,
         "voltages": "ulv-max"
       },
       {
-        "port": 4,
+        "port": 2,
         "type": "item_output",
         "x": 108,
         "y": 10,

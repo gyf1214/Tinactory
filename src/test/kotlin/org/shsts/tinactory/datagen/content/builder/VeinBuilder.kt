@@ -44,7 +44,11 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
             variant(mat.oreVariant())
         }
         chain {
-            output(mat, "raw", rate = rate)
+            if (mat.hasItem("raw")) {
+                output(mat, "raw", rate = rate)
+            } else {
+                output(mat, "raw_fluid", rate = rate)
+            }
         }
         ores.add(mat)
     }
@@ -63,7 +67,12 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
                 TechBuilder.factory(handler, parent, loc)
             }.run {
                 maxProgress(30)
-                displayItem(ores[0].item("raw"))
+                val mat = ores[0]
+                if (mat.hasItem("raw")) {
+                    displayItem(mat.item("raw"))
+                } else {
+                    displayItem(mat.item("raw_fluid"))
+                }
                 depends(baseTech)
                 researchVoltage(variant1.voltage)
                 rank(rank + 1 + VEIN_TECH_RANK)

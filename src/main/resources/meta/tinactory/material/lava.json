@@ -8,9 +8,7 @@
       "existing": "minecraft:lava"
     }
   },
-  "aliases": {
-    "raw": "raw_fluid"
-  },
+  "aliases": {},
   "existings": {
     "raw_fluid": "minecraft:magma_block"
   }

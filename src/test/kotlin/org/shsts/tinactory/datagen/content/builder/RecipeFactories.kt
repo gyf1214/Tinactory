@@ -115,7 +115,8 @@ object RecipeFactories {
 
     fun thermalCentrifuge(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("thermal_centrifuge") {
-            simpleDefaults()
+            defaultInputItem = 0
+            defaultOutputItem = 2
             amperage = 1.0
             voltage(Voltage.LV)
             workTicks(400)

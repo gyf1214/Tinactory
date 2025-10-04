@@ -57,10 +57,10 @@ public final class ProcessingResults {
 
         @Override
         public boolean insertPort(IPort port, Random random, boolean simulate) {
-            if (port == IPort.EMPTY) {
-                return true;
-            }
             if (portClazz.isInstance(port)) {
+                if (simulate && rate < 1d) {
+                    return true;
+                }
                 if (!simulate && random.nextDouble() > rate) {
                     return true;
                 }

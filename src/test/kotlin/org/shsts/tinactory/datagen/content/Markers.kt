@@ -36,7 +36,9 @@ object Markers {
             oreProcess("macerator", "crushed")
             oreProcess("macerator", "crushed_purified")
             oreProcess("macerator", "crushed_centrifuged")
+            oreProcess("centrifuge", "raw_fluid")
             oreProcess("centrifuge", "dust_pure")
+            oreProcess("thermal_centrifuge", "crushed")
             oreProcess("thermal_centrifuge", "crushed_purified")
 
             extrude("stick")
