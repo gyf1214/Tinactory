@@ -15,6 +15,7 @@ object InorganicChemistry {
     fun init() {
         mv()
         hv()
+        ev()
     }
 
     private fun mv() {
@@ -133,21 +134,34 @@ object InorganicChemistry {
                 voltage(Voltage.MV)
                 tech(Technologies.CHEMISTRY)
             }
+
             output("hydrogen_chloride") {
                 input("hydrogen", amount = 0.5)
                 input("chlorine", amount = 0.5)
                 workTicks(64)
+            }
+            output("hydrogen_chloride", amount = 2, suffix = "from_sulfuric") {
+                input("sulfuric_acid")
+                input("sodium_chloride", amount = 2)
+                output("sodium_sulfate")
+                workTicks(320)
+            }
+            output("hydrogen_fluoride") {
+                input("hydrogen", amount = 0.5)
+                input("fluorine", amount = 0.5)
+                workTicks(32)
             }
             output("carbon_dioxide") {
                 input("carbon")
                 input("oxygen")
                 workTicks(240)
             }
-            output("calcium_carbonate") {
-                input("sodium_carbonate")
-                input("calcium_chloride")
-                output("sodium_chloride", amount = 2)
-                workTicks(64)
+
+            // sodium
+            output("salt_water", amount = 2) {
+                input("sodium_hydroxide")
+                input("hydrogen_chloride")
+                workTicks(32)
             }
             output("salt_water", amount = 4, suffix = "_from_carbonate") {
                 input("sodium_carbonate")
@@ -162,50 +176,68 @@ object InorganicChemistry {
                 output("water")
                 workTicks(128)
             }
-            output("salt_water", amount = 2) {
-                input("sodium_hydroxide")
-                input("hydrogen_chloride")
-                workTicks(32)
+            output("sodium_hydroxide") {
+                input("sodium")
+                input("water")
+                output("hydrogen", amount = 0.5)
+                workTicks(64)
             }
-            output("calcium_hydroxide") {
-                input("calcium_carbonate")
-                input("water", "gas", 1)
-                output("carbon_dioxide")
-                workTicks(400)
-            }
-            output("calcium_chloride", suffix = "_from_carbonate") {
-                input("calcium_carbonate")
-                input("hydrogen_chloride", amount = 2)
-                output("water")
-                output("carbon_dioxide")
-                workTicks(160)
-            }
-            output("calcium_chloride") {
-                input("calcium_hydroxide")
-                input("hydrogen_chloride", amount = 2)
-                output("water", amount = 2)
-                workTicks(32)
-            }
-            output("sodium_hydroxide", amount = 2) {
+            output("sodium_hydroxide", amount = 2, suffix = "_from_carbonate") {
                 input("calcium_hydroxide")
                 input("sodium_carbonate")
                 output("calcium_carbonate")
                 workTicks(128)
             }
-            output("sulfuric_acid", "gas", 1) {
-                input("sulfur")
-                input("oxygen", amount = 1.5)
-                workTicks(480)
-            }
-            output("sulfuric_acid", amount = 1) {
-                input("sulfuric_acid", "gas", 1)
-                input("water", amount = 1)
+            output("sodium_sulfate") {
+                input("sodium_hydroxide", amount = 2)
+                input("sulfuric_acid", "dilute", 2)
+                output("water", amount = 3)
                 workTicks(64)
             }
+            output("sodium_sulfate", suffix = "_from_carbonate") {
+                input("sodium_carbonate")
+                input("sulfuric_acid", "dilute", 2)
+                output("water", amount = 2)
+                output("carbon_dioxide")
+                workTicks(160)
+            }
+
+            // potassium
+            output("potassium_chloride") {
+                input("potassium_hydroxide")
+                input("hydrogen_chloride")
+                output("water")
+                workTicks(32)
+            }
+            output("potassium_chloride", amount = 2, suffix = "_from_carbonate") {
+                input("potassium_carbonate")
+                input("hydrogen_chloride", amount = 2)
+                output("water")
+                output("carbon_dioxide")
+                workTicks(160)
+            }
             output("potassium_carbonate") {
+                input("potassium_hydroxide", amount = 2)
+                input("carbon_dioxide")
+                output("water")
+                workTicks(128)
+            }
+            output("potassium_carbonate", suffix = "_from_sodium") {
                 input("potassium_chloride", amount = 2)
                 input("sodium_carbonate")
                 output("sodium_chloride", amount = 2)
+                workTicks(128)
+            }
+            output("potassium_hydroxide") {
+                input("potassium")
+                input("water")
+                output("hydrogen", amount = 0.5)
+                workTicks(64)
+            }
+            output("potassium_hydroxide", amount = 2, suffix = "_from_carbonate") {
+                input("calcium_hydroxide")
+                input("potassium_carbonate")
+                output("calcium_carbonate")
                 workTicks(128)
             }
             output("potassium_nitrate", amount = 2) {
@@ -215,23 +247,76 @@ object InorganicChemistry {
                 output("carbon_dioxide")
                 workTicks(160)
             }
-            output("sodium_sulfate") {
-                input("sulfuric_acid")
-                input("sodium_chloride", amount = 2)
-                output("hydrogen_chloride", amount = 2)
+            output("potassium_bifluoride") {
+                input("potassium_hydroxide")
+                input("hydrogen_fluoride", amount = 2)
+                output("water")
+                workTicks(64)
+            }
+            output("potassium_bifluoride", amount = 2, suffix = "_from_carbonate") {
+                input("potassium_carbonate")
+                input("hydrogen_fluoride", amount = 4)
+                output("water")
+                output("carbon_dioxide")
                 workTicks(320)
             }
-            output("sodium_sulfate", suffix = "_from_carbonate") {
-                input("sodium_carbonate")
-                input("sulfuric_acid", "dilute", 2)
+
+            // calcium
+            output("calcium_chloride") {
+                input("calcium_hydroxide")
+                input("hydrogen_chloride", amount = 2)
                 output("water", amount = 2)
+                workTicks(64)
+            }
+            output("calcium_chloride", suffix = "_from_carbonate") {
+                input("calcium_carbonate")
+                input("hydrogen_chloride", amount = 2)
+                output("water")
                 output("carbon_dioxide")
                 workTicks(160)
             }
-            output("sodium_sulfate", suffix = "_from_hydroxide") {
-                input("sodium_hydroxide", amount = 2)
-                input("sulfuric_acid", "dilute", 2)
-                output("water", amount = 3)
+            output("calcium_carbonate") {
+                input("calcium_hydroxide")
+                input("carbon_dioxide")
+                output("water")
+                workTicks(128)
+            }
+            output("calcium_carbonate", suffix = "_from_sodium") {
+                input("calcium_chloride")
+                input("sodium_carbonate")
+                output("sodium_chloride", amount = 2)
+                workTicks(128)
+            }
+            output("calcium_hydroxide") {
+                input("calcium", amount = 2)
+                input("water", amount = 2)
+                output("hydrogen")
+                workTicks(128)
+            }
+            output("calcium_hydroxide", suffix = "_from_carbonate") {
+                input("calcium_carbonate")
+                input("water", "gas", 1)
+                output("carbon_dioxide")
+                workTicks(400)
+            }
+
+            // lithium
+            output("lithium_chloride", amount = 2) {
+                input("lithium_carbonate")
+                input("hydrogen_chloride", amount = 2)
+                output("water")
+                output("carbon_dioxide")
+                workTicks(160)
+            }
+
+            output("sulfuric_acid", "gas", 1) {
+                input("sulfur")
+                input("oxygen", amount = 1.5)
+                workTicks(480)
+            }
+            output("sulfuric_acid", amount = 1) {
+                input("sulfuric_acid", "gas", 1)
+                input("water", amount = 1)
                 workTicks(64)
             }
             output("sulfur", amount = 4) {
@@ -250,12 +335,14 @@ object InorganicChemistry {
                 output("carbon_dioxide", amount = 3)
                 workTicks(640)
             }
+
             output("iron_chloride") {
                 input("iron")
                 input("hydrogen_chloride", amount = 3)
                 output("hydrogen", amount = 1.5)
                 workTicks(160)
             }
+
             output("ammonium_chloride") {
                 input("ammonia")
                 input("hydrogen_chloride")
@@ -266,18 +353,12 @@ object InorganicChemistry {
                 output("hydrogen_chloride")
                 workTicks(320)
             }
-            output("lithium_chloride", amount = 2) {
-                input("lithium_carbonate")
-                input("hydrogen_chloride", amount = 2)
-                output("water")
-                output("carbon_dioxide")
-                workTicks(160)
-            }
+
             output("obsidian", "primary") {
                 input("lava")
                 input("water")
                 output("water", "gas")
-                workTicks(32)
+                workTicks(128)
             }
         }
     }
@@ -295,7 +376,7 @@ object InorganicChemistry {
             input("potassium_chloride") {
                 output("potassium")
                 output("chlorine", amount = 0.5)
-                workTicks(480)
+                workTicks(400)
             }
             input("magnesium_chloride") {
                 output("magnesium")
@@ -310,7 +391,7 @@ object InorganicChemistry {
             input("lithium_chloride") {
                 output("lithium")
                 output("chlorine", amount = 0.5)
-                workTicks(400)
+                workTicks(480)
             }
         }
 
@@ -516,6 +597,21 @@ object InorganicChemistry {
                 extra {
                     temperature(2300)
                 }
+            }
+        }
+    }
+
+    private fun ev() {
+        electrolyzer {
+            defaults {
+                voltage(Voltage.EV)
+            }
+            output("fluorine", amount = 1.5) {
+                input("potassium_bifluoride")
+                input("hydrogen_fluoride")
+                output("potassium")
+                output("hydrogen")
+                workTicks(800)
             }
         }
     }

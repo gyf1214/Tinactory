@@ -1,0 +1,13 @@
+{
+  "color": "0xFF6EA7DC",
+  "items": [],
+  "fluids": {
+    "fluid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/fluids/fluid.fluorine",
+      "textureColor": "0xFFFFFFFF"
+    }
+  },
+  "aliases": {},
+  "existings": {}
+}

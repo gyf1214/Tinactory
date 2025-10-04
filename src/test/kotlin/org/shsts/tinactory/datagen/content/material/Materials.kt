@@ -279,10 +279,12 @@ object Materials {
         material("potassium_carbonate", DULL)
         material("calcium_carbonate", DULL)
         material("lithium_carbonate", DULL)
+        material("sodium_hydroxide", DULL)
+        material("potassium_hydroxide", DULL)
+        material("calcium_hydroxide", DULL)
         material("sodium_sulfate", DULL)
         material("potassium_nitrate", FINE)
-        material("sodium_hydroxide", DULL)
-        material("calcium_hydroxide", DULL)
+        material("potassium_bifluoride", DULL)
         material("sulfuric_acid", DULL) {
             fluidMix(Voltage.MV, sub = "dilute") {
                 component("sulfuric_acid")
