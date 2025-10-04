@@ -175,7 +175,8 @@ object RecipeFactories {
 
     fun lathe(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("lathe") {
-            simpleDefaults()
+            defaultInputItem = 0
+            defaultOutputItem = 2
             amperage = 0.375
         }.block()
     }

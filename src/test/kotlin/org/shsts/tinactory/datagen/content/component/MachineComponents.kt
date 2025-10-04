@@ -206,11 +206,11 @@ object MachineComponents {
         component("battery", voltage = voltage) {
             if (voltage.rank > Voltage.LV.rank) {
                 input(AllTags.battery(Voltage.fromRank(voltage.rank - 1)), 2)
+                input("soldering_alloy", amount = wires)
             }
             component("cable", wires)
             input("battery_alloy", "plate", plates)
             input(mat, "dust", plates)
-            input("soldering_alloy", amount = wires)
         }
     }
 }

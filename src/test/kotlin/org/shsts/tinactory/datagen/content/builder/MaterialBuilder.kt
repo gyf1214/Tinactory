@@ -390,31 +390,31 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 process("magnetic", "stick", 40)
             }
             wiremill {
-                process("wire", "ingot", 48, 2)
-                process("wire_fine", "wire", 64, 4)
+                process("wire", "ingot", 48, amount = 2)
+                process("wire_fine", "wire", 64, amount = 4)
                 process("ring", "stick", 64)
             }
             bender {
                 process("plate", "ingot", 72)
-                process("foil", "plate", 40, 4)
-                process("foil", "sheet", 40, 4)
+                process("foil", "plate", 40, amount = 4)
+                process("foil", "sheet", 40, amount = 4)
             }
             lathe {
-                process("stick", "ingot", 64)
+                process("stick", "ingot", 64, amount = 2)
                 process("screw", "bolt", 16)
                 process("lens", "gem_exquisite", 600)
                 process("seed", "gem", 256)
             }
             mixer {
-                process("seed", "dust", 64, 2) {
+                process("seed", "dust", 64, amount = 2) {
                     input(material, "seed")
                 }
             }
             cutter {
-                process("bolt", "stick", 64, 4) {
+                process("bolt", "stick", 64, amount = 4) {
                     input("water", amount = 0.05)
                 }
-                process("gem", "gem_flawless", 480, 8) {
+                process("gem", "gem_flawless", 480, amount = 8) {
                     input("water", amount = 0.8)
                 }
             }
