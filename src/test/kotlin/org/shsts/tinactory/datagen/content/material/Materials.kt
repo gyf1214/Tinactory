@@ -80,7 +80,11 @@ object Materials {
         material("magnesium", METALLIC) {
             machineProcess(Voltage.LV)
         }
-        material("thorium", SHINY)
+        material("thorium", SHINY) {
+            oreProcess {
+                byProducts("lead", "rare_earth", "thorium")
+            }
+        }
         material("chrome", SHINY) {
             machineProcess(Voltage.MV, 1.5)
             blast(Voltage.MV, 2200, 1024) {
@@ -606,6 +610,11 @@ object Materials {
         material("molybdate", METALLIC) {
             oreProcess {
                 byProducts("tungstate", "tin", "rare_earth")
+            }
+        }
+        material("pitchblende", DULL) {
+            oreProcess {
+                byProducts("lead", "rare_earth", "thorium")
             }
         }
     }

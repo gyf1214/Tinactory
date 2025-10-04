@@ -91,6 +91,10 @@ object Veins {
             ore("tungstate", 0.7)
             ore("molybdate", 0.4)
         }
+        vein("pitchblende", 0.2) {
+            ore("pitchblende", 0.8)
+            ore("thorium", 0.3)
+        }
     }
 
     private var rank = 0
