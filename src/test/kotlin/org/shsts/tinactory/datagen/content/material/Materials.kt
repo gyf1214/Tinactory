@@ -438,7 +438,7 @@ object Materials {
         material("pyrite", ROUGH) {
             oreProcess {
                 primitive = true
-                byProducts("sulfur", "copper", "cadmium")
+                byProducts("sulfur", "lead", "cadmium")
             }
             smelt("iron")
         }
