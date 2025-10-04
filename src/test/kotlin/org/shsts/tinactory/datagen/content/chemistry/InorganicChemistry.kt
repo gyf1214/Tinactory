@@ -6,6 +6,7 @@ import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.electrolyzer
@@ -494,6 +495,24 @@ object InorganicChemistry {
                 output("water", amount = 2)
                 workTicks(400)
             }
+            output("uranium_hexafluoride") {
+                input("pitchblende")
+                input("hydrogen_fluoride", amount = 4)
+                input("fluorine")
+                output("water", amount = 2)
+                workTicks(320)
+                requireMultiblock()
+            }
+
+            for (name in listOf("enriched", "depleted")) {
+                output("${name}_uranium_fuel") {
+                    input("uranium_hexafluoride", name)
+                    input("hydrogen")
+                    input("water", amount = 2)
+                    output("hydrogen_fluoride", amount = 6)
+                    workTicks(400)
+                }
+            }
         }
 
         chemicalReactor {
@@ -599,6 +618,18 @@ object InorganicChemistry {
                 }
             }
         }
+
+        centrifuge {
+            defaults {
+                voltage(Voltage.HV)
+            }
+            input("uranium_hexafluoride") {
+                output("uranium_hexafluoride", amount = 0.9)
+                output("uranium_hexafluoride", "enriched", amount = 0.01)
+                output("uranium_hexafluoride", "depleted", amount = 0.09)
+                workTicks(200)
+            }
+        }
     }
 
     private fun ev() {
@@ -606,9 +637,9 @@ object InorganicChemistry {
             defaults {
                 voltage(Voltage.EV)
             }
-            output("fluorine", amount = 1.5) {
+            input("hydrogen_fluoride") {
                 input("potassium_bifluoride")
-                input("hydrogen_fluoride")
+                output("fluorine", amount = 1.5)
                 output("potassium")
                 output("hydrogen")
                 workTicks(800)

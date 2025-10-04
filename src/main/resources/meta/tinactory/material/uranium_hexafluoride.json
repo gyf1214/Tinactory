@@ -1,0 +1,26 @@
+{
+  "color": "0xFF42D126",
+  "items": [],
+  "fluids": {
+    "gas": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/dull/gas"
+    },
+    "enriched": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/dull/gas",
+      "textureColor": "0xFF4BF52A",
+      "displayColor": "0xFF4BF52A"
+    },
+    "depleted": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/dull/gas",
+      "textureColor": "0xFF74BA66",
+      "displayColor": "0xFF74BA66"
+    }
+  },
+  "aliases": {
+    "fluid": "gas"
+  },
+  "existings": {}
+}

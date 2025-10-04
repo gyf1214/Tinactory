@@ -342,6 +342,8 @@ object Materials {
             }
         }
         material("molybdenum_trioxide", DULL)
+        material("enriched_uranium_fuel", SHINY)
+        material("depleted_uranium_fuel", METALLIC)
     }
 
     private fun higherDegrees() {
@@ -380,9 +382,9 @@ object Materials {
         }
         material("cetane_boosted_diesel", DULL) {
             fluidMix(Voltage.HV) {
-                component("diesel", 8)
-                component("ethanol", 2)
-                component("nitric_acid", 2)
+                component("diesel", 4)
+                component("ethanol", 1)
+                component("nitric_acid", 1)
             }
         }
         material("vanadium_steel", METALLIC) {
