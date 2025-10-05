@@ -32,6 +32,7 @@ import static org.shsts.tinactory.TinactoryConfig.listConfig;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
@@ -49,8 +50,10 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private final int workerInterval;
     private final int workerStack;
     private final int workerFluidStack;
+    private final int[] nextValidSlot;
     private int tick = 0;
-    private int currentSlot = 0;
+    private int currentSlot;
+    private boolean noValidSlot = true;
 
     private final LazyOptional<IElectricMachine> electricCap;
 
@@ -62,6 +65,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         this.workerInterval = listConfig(CONFIG.logisticWorkerDelay, idx);
         this.workerStack = listConfig(CONFIG.logisticWorkerStack, idx);
         this.workerFluidStack = listConfig(CONFIG.logisticWorkerFluidStack, idx);
+        this.nextValidSlot = new int[workerSlots];
+        // initialize current slot to the last slot so in the first tick it will select the first valid slot
+        this.currentSlot = workerSlots - 1;
 
         var electric = new SimpleElectricConsumer(voltage, CONFIG.logisticWorkerAmperage.get());
         this.electricCap = LazyOptional.of(() -> electric);
@@ -100,6 +106,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     private void validateConfigs() {
+        noValidSlot = true;
+
         var world = blockEntity.getLevel();
         if (world == null || world.isClientSide) {
             return;
@@ -109,24 +117,49 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         if (network.isEmpty()) {
             return;
         }
+
         var logistic = network.get().getComponent(LOGISTIC_COMPONENT.get());
         var subnet = network.get().getSubnet(blockEntity.getBlockPos());
 
+        var firstValidSlot = -1;
+        var lastValidSlot = 0;
         var packet = SetMachineConfigPacket.builder();
-        var empty = true;
+        var needUpdate = false;
+
         for (var i = 0; i < workerSlots; i++) {
             var key = PREFIX + i;
-            var entry = getConfig(i);
-            if (entry.isEmpty()) {
-                continue;
+            var entry = getConfig(i).filter(LogisticWorkerConfig::isValid);
+            var valid = false;
+            if (entry.isPresent()) {
+                var entry1 = entry.get();
+                if (!validateConfig(logistic, subnet, entry1)) {
+                    entry1.setValid(false);
+                    packet.set(key, entry1.serializeNBT());
+                    needUpdate = true;
+                } else {
+                    valid = true;
+                }
             }
-            if (!validateConfig(logistic, subnet, entry.get())) {
-                entry.get().setValid(false);
-                packet.set(key, entry.get().serializeNBT());
-                empty = false;
+
+            if (valid) {
+                for (var j = lastValidSlot; j < i; j++) {
+                    nextValidSlot[j] = i;
+                }
+                if (firstValidSlot < 0) {
+                    firstValidSlot = i;
+                }
+                lastValidSlot = i;
             }
         }
-        if (!empty) {
+
+        if (firstValidSlot >= 0) {
+            for (var j = lastValidSlot; j < workerSlots; j++) {
+                nextValidSlot[j] = firstValidSlot;
+            }
+            noValidSlot = false;
+        }
+
+        if (needUpdate) {
             // skip event to skip validation
             machine.setConfig(packet.get(), false);
         }
@@ -166,38 +199,53 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     private void onTick(Level world, INetwork network) {
+        if (noValidSlot) {
+            return;
+        }
         if (tick < workerInterval) {
             tick++;
             return;
         }
-        getConfig(currentSlot).filter(LogisticWorkerConfig::isValid).ifPresent(entry -> {
-            var machine = MACHINE.get(blockEntity);
-            var logistic = network.getComponent(LOGISTIC_COMPONENT.get());
-            var subnet = network.getSubnet(blockEntity.getBlockPos());
 
-            if (validateConfig(logistic, subnet, entry)) {
-                var from = entry.from().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
-                var to = entry.to().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
-                if (from.type() == PortType.ITEM) {
-                    transmitItem(from.asItem(), to.asItem());
-                } else {
-                    transmitFluid(from.asFluid(), to.asFluid());
-                }
-                tick = 0;
+        currentSlot = nextValidSlot[currentSlot];
+
+        var entry = getConfig(currentSlot);
+        if (entry.isEmpty() || !entry.get().isValid()) {
+            // this should not happen, we should revalidate
+            LOGGER.warn("{}: unexpected invalid entry slot {}", this, currentSlot);
+            validateConfigs();
+            return;
+        }
+        var entry1 = entry.get();
+
+        var machine = MACHINE.get(blockEntity);
+        var logistic = network.getComponent(LOGISTIC_COMPONENT.get());
+        var subnet = network.getSubnet(blockEntity.getBlockPos());
+
+        if (validateConfig(logistic, subnet, entry1)) {
+            LOGGER.trace("{}: transmit entry slot {}", blockEntity, currentSlot);
+            var from = entry1.from().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
+            var to = entry1.to().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
+            if (from.type() == PortType.ITEM) {
+                transmitItem(from.asItem(), to.asItem());
             } else {
-                entry.setValid(false);
-                var packet = SetMachineConfigPacket.builder()
-                    .set(PREFIX + currentSlot, entry.serializeNBT())
-                    .get();
-                // try revalidate
-                machine.setConfig(packet);
+                transmitFluid(from.asFluid(), to.asFluid());
             }
-        });
-        currentSlot = (currentSlot + 1) % workerSlots;
+            tick = 0;
+        } else {
+            LOGGER.trace("{}: entry slot {} becomes invalid", blockEntity, currentSlot);
+            entry1.setValid(false);
+            var packet = SetMachineConfigPacket.builder()
+                .set(PREFIX + currentSlot, entry1.serializeNBT())
+                .get();
+            // try revalidate
+            machine.setConfig(packet);
+        }
     }
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(CONNECT.get(), $ -> validateConfigs());
         eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::validateConfigs);
     }

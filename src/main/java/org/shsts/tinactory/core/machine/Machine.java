@@ -234,7 +234,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public void onConnectToNetwork(INetwork network) {
-        LOGGER.debug("{}: connect to network {}", blockEntity, network);
+        LOGGER.trace("{}: connect to network {}", blockEntity, network);
         this.network = (Network) network;
 
         container().ifPresent(container -> {
@@ -309,7 +309,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        LOGGER.debug("{} deserializer machine NBT, tag={}", blockEntity, tag);
+        LOGGER.trace("{} deserializer machine NBT, tag={}", blockEntity, tag);
         config.deserializeNBT(tag.getCompound("config"));
         uuid = tag.getUUID("uuid");
     }
