@@ -5,6 +5,7 @@ import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe
 import org.shsts.tinactory.content.recipe.CleanRecipe
+import org.shsts.tinactory.content.recipe.GeneratorRecipe
 import org.shsts.tinactory.content.recipe.MarkerRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
@@ -247,23 +248,23 @@ object RecipeFactories {
         }
     }
 
-    fun steamTurbine(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("steam_turbine") {
+    fun steamTurbine(block: ProcessingRecipeFactoryBase<GeneratorRecipe.Builder>.() -> Unit) {
+        processing<GeneratorRecipe.Builder>("steam_turbine") {
             defaultInputFluid = 0
             defaultOutputFluid = 1
             amperage = 1.0
         }.block()
     }
 
-    fun gasTurbine(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("gas_turbine") {
+    fun gasTurbine(block: ProcessingRecipeFactoryBase<GeneratorRecipe.Builder>.() -> Unit) {
+        processing<GeneratorRecipe.Builder>("gas_turbine") {
             defaultInputFluid = 0
             amperage = 1.0
         }.block()
     }
 
-    fun combustionGenerator(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("combustion_generator") {
+    fun combustionGenerator(block: ProcessingRecipeFactoryBase<GeneratorRecipe.Builder>.() -> Unit) {
+        processing<GeneratorRecipe.Builder>("combustion_generator") {
             defaultInputFluid = 0
             amperage = 1.0
         }.block()

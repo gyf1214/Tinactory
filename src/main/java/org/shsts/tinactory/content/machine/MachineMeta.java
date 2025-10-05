@@ -161,7 +161,10 @@ public class MachineMeta extends MetaConsumer {
             recipeType = switch (recipeTypeStr) {
                 case "default" -> processingRecipe(ProcessingRecipe.Builder::new, ProcessingRecipe.class);
                 case "display_input" -> processingRecipe(DisplayInputRecipe::builder, DisplayInputRecipe.class);
-                case "generator" -> processingRecipe(GeneratorRecipe::builder, GeneratorRecipe.class);
+                case "generator" -> REGISTRATE.recipeType(recipeTypeId, GeneratorRecipe.Builder::new)
+                    .recipeClass(GeneratorRecipe.class)
+                    .serializer(GeneratorRecipe.SERIALIZER)
+                    .register();
                 case "distillation" -> processingRecipe(DistillationRecipe::builder, DistillationRecipe.class);
                 case "research" -> REGISTRATE.recipeType(recipeTypeId, ResearchRecipe.Builder::new)
                     .recipeClass(ResearchRecipe.class)

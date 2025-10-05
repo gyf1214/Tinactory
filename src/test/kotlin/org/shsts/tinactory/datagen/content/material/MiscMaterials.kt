@@ -24,6 +24,7 @@ import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.stoneGenerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
@@ -69,6 +70,32 @@ object MiscMaterials {
             output("water") {
                 input("water", "gas")
                 workTicks(32)
+            }
+            output(Items.ICE) {
+                input("water")
+                workTicks(64)
+            }
+            output(Items.PACKED_ICE) {
+                input(Items.ICE, 5)
+                workTicks(160)
+            }
+        }
+
+        vacuumFreezer {
+            output(Items.BLUE_ICE) {
+                input(Items.PACKED_ICE, 5)
+                voltage(Voltage.HV)
+                workTicks(160)
+            }
+        }
+
+        mixer {
+            output("coolant", amount = 10) {
+                input(Items.BLUE_ICE)
+                input("sodium")
+                input("potassium")
+                voltage(Voltage.HV)
+                workTicks(200)
             }
         }
 

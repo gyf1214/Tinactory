@@ -1,0 +1,22 @@
+{
+  "color": "0xFF25A4B6",
+  "items": [],
+  "fluids": {
+    "liquid": {
+      "baseAmount": 1000,
+      "texture": "ic2:blocks/fluid/coolant_still",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFF25A4B6"
+    },
+    "gas": {
+      "baseAmount": 1000,
+      "texture": "ic2:blocks/fluid/hot_coolant_still",
+      "textureColor": "0xFFFFFFFF",
+      "displayColor": "0xFFE14854"
+    }
+  },
+  "aliases": {
+    "fluid": "liquid"
+  },
+  "existings": {}
+}

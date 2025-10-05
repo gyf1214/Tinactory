@@ -249,7 +249,9 @@ object MiscMachines {
                 Items.LIGHT_WEIGHTED_PRESSURE_PLATE,
                 Items.HEAVY_WEIGHTED_PRESSURE_PLATE,
                 Items.STONE_BUTTON,
-                Items.POLISHED_BLACKSTONE_BUTTON)
+                Items.POLISHED_BLACKSTONE_BUTTON,
+                Items.PACKED_ICE,
+                Items.BLUE_ICE)
         }
     }
 
