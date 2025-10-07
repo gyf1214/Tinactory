@@ -105,8 +105,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
         var from1 = getPort(logistic, subnet, from.get());
         var to1 = getPort(logistic, subnet, to.get());
-        return from1.isPresent() && to1.isPresent() && from1.get().type() == to1.get().type()
-            && (entry.filterType() == PortType.NONE || entry.filterType() == from1.get().type());
+        return from1.isPresent() && to1.isPresent() && from1.get().type() == to1.get().type() &&
+            (entry.filterType() == PortType.NONE || entry.filterType() == from1.get().type());
     }
 
     private void validateConfigs() {
