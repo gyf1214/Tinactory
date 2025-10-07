@@ -57,6 +57,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private int tick = 0;
     private int currentSlot;
     private boolean noValidSlot = true;
+    private boolean needRevalidate = true;
 
     private final LazyOptional<IElectricMachine> electricCap;
 
@@ -110,6 +111,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     private void validateConfigs() {
+        needRevalidate = false;
         noValidSlot = true;
 
         var world = blockEntity.getLevel();
@@ -205,6 +207,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     private void onTick(Level world, INetwork network) {
+        if (needRevalidate) {
+            validateConfigs();
+        }
         if (noValidSlot) {
             return;
         }
@@ -219,7 +224,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         if (entry.isEmpty() || !entry.get().isValid()) {
             // this should not happen, we should revalidate
             LOGGER.warn("{}: unexpected invalid entry slot {}", this, currentSlot);
-            validateConfigs();
+            needRevalidate = true;
             return;
         }
         var entry1 = entry.get();
@@ -251,9 +256,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(CONNECT.get(), $ -> validateConfigs());
+        eventManager.subscribe(CONNECT.get(), $ -> needRevalidate = true);
         eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
-        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::validateConfigs);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), () -> needRevalidate = true);
     }
 
     private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
