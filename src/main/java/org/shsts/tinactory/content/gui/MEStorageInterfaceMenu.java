@@ -25,7 +25,6 @@ import static org.shsts.tinactory.content.AllMenus.ME_STORAGE_INTERFACE_SLOT;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -56,7 +55,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     }
 
     public MEStorageInterfaceMenu(Properties properties) {
-        super(properties, PANEL_HEIGHT + SPACING);
+        super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity);
         this.machineConfig = machine.config();
         this.storageInterface = getProvider(blockEntity, MEStorageInterface.ID, MEStorageInterface.class);
@@ -119,7 +118,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
                 var fluid3 = port.drain(fluid2, false);
                 var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
                 if (amount1 != amount) {
-                    LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
+                    LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
                 }
                 return new FluidClickResult(FluidClickAction.DRAIN,
                     handler.getContainer());

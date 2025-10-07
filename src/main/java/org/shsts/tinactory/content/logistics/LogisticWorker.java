@@ -6,10 +6,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
@@ -19,6 +21,7 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
@@ -102,7 +105,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
         var from1 = getPort(logistic, subnet, from.get());
         var to1 = getPort(logistic, subnet, to.get());
-        return from1.isPresent() && to1.isPresent() && from1.get().type() == to1.get().type();
+        return from1.isPresent() && to1.isPresent() && from1.get().type() == to1.get().type()
+            && (entry.filterType() == PortType.NONE || entry.filterType() == from1.get().type());
     }
 
     private void validateConfigs() {
@@ -165,8 +169,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private void transmitItem(IItemCollection from, IItemCollection to) {
-        var stack = from.extractItem(workerStack, true);
+    private void transmitItem(IItemCollection from, IItemCollection to, ItemStack filter) {
+        var stack = filter.isEmpty() ? from.extractItem(workerStack, true) :
+            from.extractItem(StackHelper.copyWithCount(filter, workerStack), true);
         if (stack.isEmpty()) {
             return;
         }
@@ -182,8 +187,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private void transmitFluid(IFluidCollection from, IFluidCollection to) {
-        var stack = from.drain(workerFluidStack, true);
+    private void transmitFluid(IFluidCollection from, IFluidCollection to, FluidStack filter) {
+        var stack = filter.isEmpty() ? from.drain(workerFluidStack, true) :
+            from.drain(StackHelper.copyWithAmount(filter, workerFluidStack), true);
         if (stack.isEmpty()) {
             return;
         }
@@ -227,9 +233,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             var from = entry1.from().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
             var to = entry1.to().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
             if (from.type() == PortType.ITEM) {
-                transmitItem(from.asItem(), to.asItem());
+                transmitItem(from.asItem(), to.asItem(), entry1.itemFilter());
             } else {
-                transmitFluid(from.asFluid(), to.asFluid());
+                transmitFluid(from.asFluid(), to.asFluid(), entry1.fluidFilter());
             }
             tick = 0;
         } else {

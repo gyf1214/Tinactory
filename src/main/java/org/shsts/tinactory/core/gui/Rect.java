@@ -25,6 +25,10 @@ public record Rect(int x, int y, int width, int height) {
         return new Rect(x + dx, y + dy, width, height);
     }
 
+    public Rect offsetLike(Rect other) {
+        return new Rect(x + other.x, y + other.y, other.width, other.height);
+    }
+
     public Rect resize(int newW, int newH) {
         return new Rect(x, y, newW, newH);
     }

@@ -80,7 +80,7 @@ public abstract class AbstractRecipeBook extends Panel {
             if (recipe == null) {
                 RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect.offset(2, 2).enlarge(-5, -5));
             } else {
-                recipe.renderButton(poseStack, mouseX, mouseY, partialTick, rect, z);
+                recipe.renderButton(poseStack, rect, z);
             }
         }
 

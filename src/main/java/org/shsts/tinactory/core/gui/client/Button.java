@@ -43,7 +43,7 @@ public abstract class Button extends MenuWidget {
     }
 
     @Override
-    protected boolean canClick(int button) {
+    protected boolean canClick(int button, double mouseX, double mouseY) {
         return button == 0;
     }
 

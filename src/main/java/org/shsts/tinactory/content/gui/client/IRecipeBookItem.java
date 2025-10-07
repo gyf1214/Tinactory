@@ -23,5 +23,5 @@ public interface IRecipeBookItem extends ILoc {
 
     Optional<List<Component>> buttonToolTip();
 
-    void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick, Rect rect, int z);
+    void renderButton(PoseStack poseStack, Rect rect, int z);
 }

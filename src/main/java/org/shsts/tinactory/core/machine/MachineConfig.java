@@ -38,7 +38,12 @@ public class MachineConfig implements IMachineConfig {
 
     @Override
     public void apply(ISetMachineConfigPacket packet) {
-        tag.merge(packet.getSets());
+        var sets = packet.getSets();
+        for (var k : sets.getAllKeys()) {
+            var v = sets.get(k);
+            assert v != null;
+            tag.put(k, v.copy());
+        }
         for (var key : packet.getResets()) {
             tag.remove(key);
         }

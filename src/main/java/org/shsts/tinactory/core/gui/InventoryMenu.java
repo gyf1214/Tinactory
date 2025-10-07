@@ -24,29 +24,35 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 @MethodsReturnNonnullByDefault
 public class InventoryMenu extends MenuBase {
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final int INVENTORY_HEIGHT = SLOT_SIZE * 4 + SPACING * 2;
 
     protected final int beginInvSlot;
     protected final int endInvSlot;
     protected final int endY;
 
-    public InventoryMenu(Properties properties, int beginY) {
+    public InventoryMenu(Properties properties, int beginX, int beginY) {
         super(properties);
         this.beginInvSlot = slots.size();
-        var barY = beginY + 3 * SLOT_SIZE + SPACING;
+        var beginY1 = beginY + SPACING + MARGIN_TOP;
+        var barY = beginY + 3 * SLOT_SIZE + SPACING * 2;
         var barY1 = barY + MARGIN_TOP;
         for (var j = 0; j < 9; j++) {
-            var x = MARGIN_X + j * SLOT_SIZE;
+            var x = MARGIN_X + beginX + j * SLOT_SIZE;
             addSlot(new Slot(inventory, j, x + 1, barY1 + 1));
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 9; j++) {
-                var x = MARGIN_X + j * SLOT_SIZE;
-                var y1 = beginY + i * SLOT_SIZE + MARGIN_TOP;
+                var x = MARGIN_X + beginX + j * SLOT_SIZE;
+                var y1 = beginY1 + i * SLOT_SIZE;
                 addSlot(new Slot(inventory, 9 + i * 9 + j, x + 1, y1 + 1));
             }
         }
         this.endInvSlot = slots.size();
         this.endY = barY + SLOT_SIZE;
+    }
+
+    public InventoryMenu(Properties properties, int beginY) {
+        this(properties, 0, beginY);
     }
 
     public int endY() {
@@ -103,16 +109,11 @@ public class InventoryMenu extends MenuBase {
         }
     }
 
-    protected enum FluidClickAction {
+    public enum FluidClickAction {
         NONE, FILL, DRAIN
     }
 
-    protected record FluidClickResult(FluidClickAction action, ItemStack stack) {
-        public FluidClickResult(FluidClickAction action, ItemStack stack) {
-            this.action = action;
-            this.stack = stack;
-        }
-
+    public record FluidClickResult(FluidClickAction action, ItemStack stack) {
         public FluidClickResult() {
             this(FluidClickAction.NONE, ItemStack.EMPTY);
         }

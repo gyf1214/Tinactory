@@ -9,7 +9,6 @@ import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
-import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -17,7 +16,7 @@ public class LayoutMenu extends InventoryMenu {
     protected final Layout layout;
 
     protected LayoutMenu(Properties properties, Layout layout, int extraHeight) {
-        super(properties, layout.rect.endY() + extraHeight + SPACING);
+        super(properties, layout.rect.endY() + extraHeight);
         this.layout = layout;
     }
 

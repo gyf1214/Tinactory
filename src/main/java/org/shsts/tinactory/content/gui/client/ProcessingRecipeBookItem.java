@@ -46,7 +46,7 @@ public record ProcessingRecipeBookItem(ProcessingRecipe recipe) implements IReci
     }
 
     @Override
-    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick, Rect rect, int z) {
+    public void renderButton(PoseStack poseStack, Rect rect, int z) {
         var x = rect.x() + 2;
         var y = rect.y() + 2;
         var output = recipe.getDisplay();

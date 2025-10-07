@@ -50,12 +50,13 @@ public abstract class ButtonPanel extends Panel {
 
         @Override
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            renderButton(poseStack, mouseX, mouseY, partialTick, rect, index, isHovering(mouseX, mouseY));
+            renderButton(poseStack, mouseX - rect.x(), mouseY - rect.y(), partialTick,
+                rect, index, isHovering(mouseX, mouseY));
         }
 
         @Override
-        protected boolean canClick(int button) {
-            return canClickButton(index, button);
+        protected boolean canClick(int button, double mouseX, double mouseY) {
+            return canClickButton(index, mouseX - rect.x(), mouseY - rect.y(), button);
         }
 
         @Override
@@ -144,10 +145,13 @@ public abstract class ButtonPanel extends Panel {
 
     protected abstract int getItemCount();
 
+    /**
+     * mouseX and mouseY are relative to the button rect
+     */
     protected abstract void renderButton(PoseStack poseStack, int mouseX, int mouseY,
         float partialTick, Rect rect, int index, boolean isHovering);
 
-    protected boolean canClickButton(int index, int button) {
+    protected boolean canClickButton(int index, double mouseX, double mouseY, int button) {
         return button == 0;
     }
 
@@ -155,8 +159,14 @@ public abstract class ButtonPanel extends Panel {
         ClientUtil.playSound(SoundEvents.UI_BUTTON_CLICK);
     }
 
+    /**
+     * mouseX and mouseY are relative to the button rect
+     */
     protected abstract void onSelect(int index, double mouseX, double mouseY, int button);
 
+    /**
+     * mouseX and mouseY are relative to the button rect
+     */
     protected abstract Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY);
 
     protected void setPage(int index) {

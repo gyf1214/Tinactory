@@ -72,7 +72,7 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         }
 
         @Override
-        protected boolean canClickButton(int index, int button) {
+        protected boolean canClickButton(int index, double mouseX, double mouseY, int button) {
             return button == 0 || button == 1;
         }
 

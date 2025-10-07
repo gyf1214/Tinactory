@@ -40,7 +40,7 @@ public class NetworkControllerMenu extends MenuBase {
         MARGIN_VERTICAL * 2 + SPACING + PANEL_BORDER * 2;
     public static final int RENAME_INVENTORY_WIDTH = SLOT_SIZE * 9;
     public static final int RENAME_INVENTORY_MARGIN = (WIDTH - RENAME_INVENTORY_WIDTH) / 2;
-    public static final int RENAME_INVENTORY_BAR_Y = HEIGHT - MARGIN_VERTICAL - SLOT_SIZE;
+    public static final int RENAME_INVENTORY_BAR_Y = HEIGHT - SLOT_SIZE;
     public static final int RENAME_INVENTORY_Y = RENAME_INVENTORY_BAR_Y - SLOT_SIZE * 3 - SPACING;
     public static final int RENAME_BASE_WIDTH = RENAME_INVENTORY_WIDTH - SLOT_SIZE * 4;
     public static final int RENAME_BASE_MARGIN = RENAME_INVENTORY_MARGIN + SLOT_SIZE * 2;

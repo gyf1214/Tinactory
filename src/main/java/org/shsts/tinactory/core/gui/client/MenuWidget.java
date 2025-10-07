@@ -61,12 +61,12 @@ public abstract class MenuWidget extends GuiComponent implements
         return Optional.empty();
     }
 
-    protected boolean canClick(int button) {
+    protected boolean canClick(int button, double mouseX, double mouseY) {
         return false;
     }
 
     protected boolean isClicking(double mouseX, double mouseY, int button) {
-        return active && rect.in(mouseX, mouseY) && canClick(button);
+        return active && rect.in(mouseX, mouseY) && canClick(button, mouseX, mouseY);
     }
 
     @Override

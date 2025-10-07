@@ -5,10 +5,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.content.gui.client.AbstractRecipeBook;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
+import org.shsts.tinactory.core.gui.InventoryMenu;
 import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
-import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +17,19 @@ import java.util.List;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticWorkerMenu extends MenuBase {
+public class LogisticWorkerMenu extends InventoryMenu {
+    public static final int BUTTON_SIZE = AbstractRecipeBook.BUTTON_SIZE;
+    public static final int CONFIG_WIDTH = BUTTON_SIZE * 4 + 2;
+    public static final int PORT_WIDTH = 42;
+    public static final int WIDTH = CONFIG_WIDTH + SLOT_SIZE * 9 + PORT_WIDTH + 2 * MARGIN_X;
+    private static final int PANEL_HEIGHT = 128;
+
     private class SyncScheduler implements ISyncSlotScheduler<LogisticWorkerSyncPacket> {
         @Override
         public boolean shouldSend() {
@@ -42,7 +51,7 @@ public class LogisticWorkerMenu extends MenuBase {
     private boolean needUpdate = true;
 
     public LogisticWorkerMenu(Properties properties) {
-        super(properties);
+        super(properties, MARGIN_X + CONFIG_WIDTH, PANEL_HEIGHT);
 
         this.machine = MACHINE.get(blockEntity);
         if (!world.isClientSide) {
