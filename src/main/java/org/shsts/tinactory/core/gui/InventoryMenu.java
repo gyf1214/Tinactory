@@ -65,6 +65,9 @@ public class InventoryMenu extends MenuBase {
         return quickMoveStack(slot) ? slot.getItem() : ItemStack.EMPTY;
     }
 
+    /**
+     * @return whether there's more quick move available, if so, this function will be called again.
+     */
     protected boolean quickMoveStack(Slot slot) {
         if (world.isClientSide) {
             return false;
@@ -190,7 +193,7 @@ public class InventoryMenu extends MenuBase {
             } else {
                 outputItem = combinedItem.get();
             }
-            if (button != 0) {
+            if (button == 1) {
                 break;
             }
         }

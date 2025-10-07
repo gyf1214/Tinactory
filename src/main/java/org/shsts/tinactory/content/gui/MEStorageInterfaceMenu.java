@@ -4,10 +4,12 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -23,6 +25,7 @@ import org.slf4j.Logger;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.ME_STORAGE_INTERFACE_SLOT;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
 import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
@@ -155,9 +158,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
 
     private void clickItemSlot(ItemStack carried, ItemStack item, IItemCollection port, int button) {
         if (!carried.isEmpty()) {
-            if (button == 0) {
-                setCarried(port.insertItem(carried, false));
-            } else {
+            if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);
                 carried.shrink(1);
                 var remaining = port.insertItem(carried1, false);
@@ -167,10 +168,12 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
                 } else {
                     setCarried(combined.get());
                 }
+            } else {
+                setCarried(port.insertItem(carried, false));
             }
         } else {
             var count = Math.min(item.getCount(), item.getMaxStackSize());
-            var count1 = button == 0 ? count : (count + 1) / 2;
+            var count1 = button == 1 ? (count + 1) / 2 : count;
             var item1 = StackHelper.copyWithCount(item, count1);
             var extracted = port.extractItem(item1, false);
             setCarried(extracted);
@@ -180,6 +183,12 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     private void onSlotClick(MEStorageInterfaceEventPacket packet) {
         var button = packet.button();
         var fluidPort = storageInterface.fluidPort();
+
+        if (packet.isItem() && packet.button() == QUICK_MOVE_BUTTON) {
+            quickMoveStack(packet.item());
+            return;
+        }
+
         boolean success;
         if (packet.isFluid()) {
             var fluid = packet.fluid();
@@ -196,5 +205,59 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
             var itemPort = storageInterface.itemPort();
             clickItemSlot(getCarried(), item, itemPort, button);
         }
+    }
+
+    private void quickMoveStack(ItemStack stack) {
+        var inv = new PlayerMainInvWrapper(inventory);
+        var target = storageInterface.itemPort();
+        var extracted = target.extractItem(stack, true);
+        var remaining = ItemHandlerHelper.insertItemStacked(inv, extracted, true);
+        var inserted = extracted.getCount() - remaining.getCount();
+        if (inserted <= 0) {
+            return;
+        }
+        var extracted1 = StackHelper.copyWithCount(extracted, inserted);
+        var extracted2 = target.extractItem(extracted1, false);
+        var remaining1 = ItemHandlerHelper.insertItemStacked(inv, extracted2, false);
+        if (!remaining1.isEmpty()) {
+            LOGGER.warn("{}: Failed to quick move inventory, extracted {}/{}", blockEntity,
+                extracted2.getCount() - remaining1.getCount(), extracted2.getCount());
+        }
+    }
+
+    /**
+     * This only handles quick move clicking on vanilla slots, i.e. inventory.
+     * <p>
+     * Only deals with item for now.
+     */
+    @Override
+    protected boolean quickMoveStack(Slot slot) {
+        if (world.isClientSide) {
+            return false;
+        }
+        if (!slot.hasItem()) {
+            return false;
+        }
+        var inv = new PlayerMainInvWrapper(inventory);
+        assert slot.index >= beginInvSlot && slot.index < endInvSlot;
+
+        var index = slot.getContainerSlot();
+        var stack = inv.getStackInSlot(index);
+        var target = storageInterface.itemPort();
+        if (!target.acceptInput(stack)) {
+            return false;
+        }
+        var remaining = target.insertItem(stack, true);
+        var inserted = stack.getCount() - remaining.getCount();
+        if (inserted <= 0) {
+            return false;
+        }
+        var stack1 = inv.extractItem(index, inserted, false);
+        var remaining1 = target.insertItem(stack1, false);
+        if (!remaining1.isEmpty()) {
+            LOGGER.warn("{}: Failed to quick move inventory, inserted {}/{}", blockEntity,
+                stack1.getCount() - remaining1.getCount(), stack1.getCount());
+        }
+        return false;
     }
 }

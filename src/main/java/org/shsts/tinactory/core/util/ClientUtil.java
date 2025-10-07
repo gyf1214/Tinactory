@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.util;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -106,5 +107,13 @@ public final class ClientUtil {
             tooltip.add(fluidAmount(stack).withStyle(ChatFormatting.GRAY));
         }
         return tooltip;
+    }
+
+    public static boolean keyDown(int key) {
+        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), key);
+    }
+
+    public static boolean shiftDown() {
+        return keyDown(InputConstants.KEY_LSHIFT) || keyDown(InputConstants.KEY_RSHIFT);
     }
 }

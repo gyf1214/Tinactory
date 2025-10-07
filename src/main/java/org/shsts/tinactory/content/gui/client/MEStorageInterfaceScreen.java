@@ -29,6 +29,7 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.AllMenus.ME_STORAGE_INTERFACE_SLOT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.PANEL_HEIGHT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.SLOT_SYNC;
+import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
 import static org.shsts.tinactory.content.machine.MEStorageInterface.CONNECT_PARENT_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
@@ -83,8 +84,9 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         protected void onSelect(int index, double mouseX, double mouseY, int button) {
             if (index < items.size()) {
                 var item = items.get(index);
+                var button1 = ClientUtil.shiftDown() ? QUICK_MOVE_BUTTON : button;
                 menu.triggerEvent(ME_STORAGE_INTERFACE_SLOT,
-                    () -> new MEStorageInterfaceEventPacket(item, button));
+                    () -> new MEStorageInterfaceEventPacket(item, button1));
             } else if (index - items.size() < fluids.size()) {
                 var fluid = fluids.get(index - items.size());
                 menu.triggerEvent(ME_STORAGE_INTERFACE_SLOT,

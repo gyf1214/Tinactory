@@ -12,6 +12,8 @@ import org.shsts.tinycorelib.api.network.IPacket;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEStorageInterfaceEventPacket implements IPacket {
+    public static final int QUICK_MOVE_BUTTON = -1;
+
     @Nullable
     private ItemStack item;
     @Nullable
