@@ -9,7 +9,6 @@ import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
-import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
@@ -29,9 +28,7 @@ public final class AllBlockEntities {
     static {
         MACHINE_SETS = new HashMap<>();
 
-        var set = new SetFactory();
-
-        NETWORK_CONTROLLER = set.blockEntity("network/controller", MachineBlock::simple)
+        NETWORK_CONTROLLER = BlockEntityBuilder.builder("network/controller", MachineBlock::simple)
             .menu(AllMenus.NETWORK_CONTROLLER)
             .blockEntity()
             .transform(NetworkController::factory)
@@ -43,8 +40,7 @@ public final class AllBlockEntities {
             .end()
             .buildObject();
 
-        WORKBENCH = set.blockEntity("primitive/workbench",
-                PrimitiveBlock::new)
+        WORKBENCH = BlockEntityBuilder.builder("primitive/workbench", PrimitiveBlock::new)
             .menu(AllMenus.WORKBENCH)
             .blockEntity()
             .transform(Workbench::factory)
@@ -57,18 +53,6 @@ public final class AllBlockEntities {
     }
 
     public static void init() {}
-
-    private static class SetFactory {
-        public <U extends SmartEntityBlock> BlockEntityBuilder<U, SetFactory> blockEntity(
-            String id, SmartEntityBlock.Factory<U> factory) {
-            return BlockEntityBuilder.builder(this, id, factory);
-        }
-
-        public MachineSet.Builder<SetFactory> machine(String id) {
-            return MachineSet.builder(this)
-                .onCreateObject($ -> MACHINE_SETS.put(id, $));
-        }
-    }
 
     public static MachineSet getMachine(String name) {
         return MACHINE_SETS.get(name);
