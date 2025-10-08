@@ -441,11 +441,11 @@ object CircuitComponents {
                 }
                 output(board) {
                     input(ItemTags.PLANKS)
-                    input(resin, 2)
+                    input("rubber", amount = 2)
                 }
                 output(circuitBoard) {
                     input(board)
-                    input("copper", "wire", 8)
+                    input("copper", "wire_fine", 8)
                     input("soldering_alloy", amount = 0.5)
                 }
             }
@@ -460,12 +460,12 @@ object CircuitComponents {
                 }
                 output(board) {
                     input(lastBoard, 2)
-                    input("red_alloy", "wire", 8)
+                    input("red_alloy", "wire_fine", 8)
                     input("soldering_alloy")
                 }
                 output(circuitBoard) {
                     input(board)
-                    input("silver", "wire", 8)
+                    input("silver", "wire_fine", 8)
                     input("soldering_alloy", amount = 0.5)
                 }
             }

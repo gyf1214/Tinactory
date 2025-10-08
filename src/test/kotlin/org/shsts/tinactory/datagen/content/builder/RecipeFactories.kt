@@ -120,7 +120,6 @@ object RecipeFactories {
             defaultOutputItem = 2
             amperage = 1.0
             voltage(Voltage.LV)
-            workTicks(400)
         }.block()
     }
 

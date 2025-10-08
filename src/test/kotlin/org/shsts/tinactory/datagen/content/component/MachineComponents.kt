@@ -195,12 +195,12 @@ object MachineComponents {
                 tech(Technologies.BATTERY)
             }
             battery(Voltage.LV, "cadmium")
-            battery(Voltage.MV, "sodium_hydroxide")
+            battery(Voltage.MV, "sulfuric_acid", "dilute")
             battery(Voltage.HV, "lithium")
         }
     }
 
-    private fun AssemblyRecipeFactory.battery(voltage: Voltage, mat: String) {
+    private fun AssemblyRecipeFactory.battery(voltage: Voltage, mat: String, sub: String = "dust") {
         val wires = voltage.rank - 1
         val plates = wires * wires
         component("battery", voltage = voltage) {
@@ -210,7 +210,7 @@ object MachineComponents {
             }
             component("cable", wires)
             input("battery_alloy", "plate", plates)
-            input(mat, "dust", plates)
+            input(mat, sub, plates)
         }
     }
 }

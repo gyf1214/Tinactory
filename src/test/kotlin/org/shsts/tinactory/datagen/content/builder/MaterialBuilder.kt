@@ -765,10 +765,12 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     output(material, "crushed_centrifuged")
                     output(material.oreVariant().material, "dust")
                     output(byProduct(2), "dust", rate = 0.3)
+                    workTicks(400)
                 }
                 input(material, "crushed_purified") {
                     output(material, "crushed_centrifuged")
                     output(byProduct(2), "dust", rate = 0.4)
+                    workTicks(300)
                 }
             }
 
