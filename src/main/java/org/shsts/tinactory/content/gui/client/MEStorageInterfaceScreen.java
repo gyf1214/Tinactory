@@ -30,7 +30,7 @@ import static org.shsts.tinactory.content.AllMenus.ME_STORAGE_INTERFACE_SLOT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.PANEL_HEIGHT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.SLOT_SYNC;
 import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
-import static org.shsts.tinactory.content.machine.MEStorageInterface.CONNECT_PARENT_KEY;
+import static org.shsts.tinactory.content.logistics.MEStorageInterface.CONNECT_PARENT_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;

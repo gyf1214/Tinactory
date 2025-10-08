@@ -16,7 +16,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
-import org.shsts.tinactory.content.machine.MEStorageInterface;
+import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.core.gui.InventoryMenu;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;

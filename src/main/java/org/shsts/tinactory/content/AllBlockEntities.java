@@ -8,12 +8,12 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
+import org.shsts.tinactory.content.logistics.MEDrive;
+import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.content.machine.ElectricTank;
-import org.shsts.tinactory.content.machine.MEDrive;
-import org.shsts.tinactory.content.machine.MEStorageInterface;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.material.ComponentBuilder;
@@ -47,8 +47,8 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
     public static final MachineSet LOGISTIC_WORKER;
-    public static final MachineSet ME_DRIVE;
     public static final MachineSet ME_STORAGE_INTERFACE;
+    public static final MachineSet ME_DRIVE;
     public static final Map<Voltage, IEntry<MachineBlock>> MULTIBLOCK_INTERFACE;
 
     public static final IEntry<MachineBlock> NETWORK_CONTROLLER;
@@ -148,6 +148,14 @@ public final class AllBlockEntities {
             .tintVoltage(2)
             .buildObject();
 
+        ME_STORAGE_INTERFACE = set.machine("me_storage_interface")
+            .machine(v -> "logistics/" + v.id + "/me_storage_interface", MachineBlock::factory)
+            .menu(AllMenus.ME_STORAGE_INTERFACE)
+            .voltages(Voltage.HV)
+            .machine(MEStorageInterface::factory)
+            .tintVoltage(2)
+            .buildObject();
+
         ME_DRIVE = set.machine("me_drive")
             .machine(v -> "logistics/" + v.id + "/me_drive", MachineBlock::factory)
             .menu(AllMenus.SIMPLE_MACHINE)
@@ -157,14 +165,6 @@ public final class AllBlockEntities {
             .port(ITEM_INPUT)
             .slots(0, 0, 3, 3)
             .build()
-            .tintVoltage(2)
-            .buildObject();
-
-        ME_STORAGE_INTERFACE = set.machine("me_storage_interface")
-            .machine(v -> "logistics/" + v.id + "/me_storage_interface", MachineBlock::factory)
-            .menu(AllMenus.ME_STORAGE_INTERFACE)
-            .voltages(Voltage.HV)
-            .machine(MEStorageInterface::factory)
             .tintVoltage(2)
             .buildObject();
 

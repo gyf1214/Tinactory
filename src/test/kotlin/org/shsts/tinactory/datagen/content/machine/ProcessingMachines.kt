@@ -231,19 +231,13 @@ object ProcessingMachines {
                 input(main, "gear", 2)
                 tech(Technologies.PUMP_AND_PISTON)
             }
-            machine("electric_chest") {
+            machine("multiblock_interface") {
                 circuit(2)
                 component("conveyor_module")
-                input(main, "plate", 2)
-                input(Items.CHEST)
-                tech(Technologies.CONVEYOR_MODULE)
-            }
-            machine("electric_tank") {
-                circuit(2)
                 component("electric_pump")
-                input(main, "plate", 2)
+                input(Items.CHEST)
                 input("glass", "primary")
-                tech(Technologies.PUMP_AND_PISTON)
+                tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             }
             machine("battery_box") {
                 circuit(2)
@@ -265,20 +259,26 @@ object ProcessingMachines {
                 component("cable", 2)
                 tech(Technologies.BATTERY)
             }
+            machine("electric_chest") {
+                circuit(2)
+                component("conveyor_module")
+                input(main, "plate", 2)
+                input(Items.CHEST)
+                tech(Technologies.CONVEYOR_MODULE)
+            }
+            machine("electric_tank") {
+                circuit(2)
+                component("electric_pump")
+                input(main, "plate", 2)
+                input("glass", "primary")
+                tech(Technologies.PUMP_AND_PISTON)
+            }
             machine("logistic_worker") {
                 circuit(4)
                 component("conveyor_module", 2)
                 component("electric_pump", 2)
                 input(main, "plate", 4)
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
-            }
-            machine("me_drive") {
-                circuit(4)
-                input(Items.CHEST)
-                input("certus_quartz", "gem", 4)
-                input("fluix", "dust", 4)
-                input(main, "plate", 4)
-                tech(Technologies.DIGITAL_STORAGE)
             }
             machine("me_storage_interface") {
                 circuit(4)
@@ -288,13 +288,13 @@ object ProcessingMachines {
                 input(main, "plate", 4)
                 tech(Technologies.DIGITAL_STORAGE)
             }
-            machine("multiblock_interface") {
-                circuit(2)
-                component("conveyor_module")
-                component("electric_pump")
+            machine("me_drive") {
+                circuit(4)
                 input(Items.CHEST)
-                input("glass", "primary")
-                tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
+                input("certus_quartz", "gem", 4)
+                input("fluix", "dust", 4)
+                input(main, "plate", 4)
+                tech(Technologies.DIGITAL_STORAGE)
             }
         }
     }
