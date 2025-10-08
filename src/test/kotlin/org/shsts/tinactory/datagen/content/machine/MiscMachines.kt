@@ -7,8 +7,6 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Blocks
-import org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER
-import org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
@@ -18,6 +16,8 @@ import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.AllTags.circuit
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
@@ -34,6 +34,7 @@ object MiscMachines {
     fun init() {
         primitives()
         ulvs()
+        ae()
         vanillas()
         misc()
     }
@@ -178,6 +179,33 @@ object MiscMachines {
         ulv(getComponent(name).item(Voltage.ULV), base)
     }
 
+    private fun ae() {
+        assembler {
+            componentVoltage = Voltage.HV
+            defaults {
+                autoCable = true
+                voltage(Voltage.HV)
+                workTicks(MACHINE_TICKS)
+            }
+
+            output(getItem("logistics/me_storage_interface")) {
+                circuit(4)
+                component("conveyor_module", 2)
+                component("electric_pump", 2)
+                input("stainless_steel", "plate", 4)
+                tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
+            }
+            output(getItem("logistics/me_drive")) {
+                circuit(4)
+                input(Items.CHEST)
+                input("certus_quartz", "gem", 4)
+                input("fluix", "dust", 4)
+                input("stainless_steel", "plate", 4)
+                tech(Technologies.DIGITAL_STORAGE)
+            }
+        }
+    }
+
     private fun vanillas() {
         toolCrafting {
             result(Items.HOPPER) {
@@ -257,7 +285,7 @@ object MiscMachines {
 
     private fun misc() {
         toolCrafting {
-            result(LOW_PRESSURE_BOILER.get()) {
+            result(getBlock("machine/boiler/low")) {
                 pattern("PPP")
                 pattern("PWP")
                 pattern("VFV")
@@ -271,7 +299,7 @@ object MiscMachines {
 
         assembler {
             componentVoltage = Voltage.MV
-            output(HIGH_PRESSURE_BOILER.get()) {
+            output(getBlock("machine/boiler/high")) {
                 component("machine_hull")
                 input(Blocks.FURNACE)
                 input("brass", "pipe", 2)

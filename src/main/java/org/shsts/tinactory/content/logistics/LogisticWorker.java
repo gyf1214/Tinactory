@@ -73,7 +73,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         // initialize current slot to the last slot so in the first tick it will select the first valid slot
         this.currentSlot = workerSlots - 1;
 
-        var electric = new SimpleElectricConsumer(voltage, CONFIG.logisticWorkerAmperage.get());
+        var electric = SimpleElectricConsumer.amperage(voltage, CONFIG.logisticWorkerAmperage.get());
         this.electricCap = LazyOptional.of(() -> electric);
     }
 

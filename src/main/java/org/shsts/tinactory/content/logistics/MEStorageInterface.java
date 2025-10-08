@@ -23,19 +23,18 @@ import org.shsts.tinactory.core.logistics.CombinedItemCollection;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
-import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -51,18 +50,17 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
     private IMachine machine;
     private IMachineConfig machineConfig;
 
-    public MEStorageInterface(BlockEntity blockEntity) {
+    public MEStorageInterface(BlockEntity blockEntity, double power) {
         this.blockEntity = blockEntity;
         this.combinedItem = new CombinedItemCollection();
         this.combinedFluid = new CombinedFluidCollection();
 
-        var electric = new SimpleElectricConsumer(getBlockVoltage(blockEntity),
-            CONFIG.meStorageInterfaceAmperage.get());
+        var electric = new SimpleElectricConsumer(power);
         this.electricCap = LazyOptional.of(() -> electric);
     }
 
-    public static <P> IBlockEntityTypeBuilder<P> factory(IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, MEStorageInterface::new);
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
+        return $ -> $.capability(ID, be -> new MEStorageInterface(be, power));
     }
 
     private void onUpdateLogistics(LogisticComponent logistics, BlockPos subnet) {

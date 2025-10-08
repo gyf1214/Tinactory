@@ -14,9 +14,18 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.content.AllItems;
+import org.shsts.tinactory.content.AllMenus;
+import org.shsts.tinactory.content.logistics.MEDrive;
+import org.shsts.tinactory.content.logistics.MEStorageInterface;
+import org.shsts.tinactory.content.logistics.StackProcessingContainer;
+import org.shsts.tinactory.content.machine.Boiler;
+import org.shsts.tinactory.content.machine.MachineMeta;
+import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
+import org.shsts.tinactory.content.network.MachineBlock;
+import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -39,14 +48,17 @@ public class MiscMeta extends MetaConsumer {
         .sound(SoundType.METAL)
         .requiresCorrectToolForDrops()
         .isValidSpawn(AllItems::never);
-    private static final JsonObject EMPTY = new JsonObject();
 
     public MiscMeta() {
         super("Misc");
     }
 
+    private static MaterialColor parseMaterialColor(JsonObject jo, String key) {
+        return MaterialColor.byId(GsonHelper.getAsInt(jo, key));
+    }
+
     private IEntry<Block> casing(String id, JsonObject jo) {
-        var materialColor = MaterialColor.byId(GsonHelper.getAsInt(jo, "materialColor"));
+        var materialColor = parseMaterialColor(jo, "materialColor");
         return REGISTRATE.block(id, Block::new)
             .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
@@ -60,7 +72,7 @@ public class MiscMeta extends MetaConsumer {
     private void coil(String name, String id, JsonObject jo) {
         var temperature = GsonHelper.getAsInt(jo, "temperature");
         // TODO: use string instead of integer
-        var materialColor = MaterialColor.byId(GsonHelper.getAsInt(jo, "materialColor"));
+        var materialColor = parseMaterialColor(jo, "materialColor");
         var block = REGISTRATE.block(id, CoilBlock.factory(temperature))
             .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
@@ -105,6 +117,43 @@ public class MiscMeta extends MetaConsumer {
         builder.register();
     }
 
+    private void meStorageInterface(String id, JsonObject jo) {
+        BlockEntityBuilder.builder(id, MachineBlock::simple)
+            .transform(MachineSet::baseMachine)
+            .menu(AllMenus.ME_STORAGE_INTERFACE)
+            .blockEntity()
+            .transform(MEStorageInterface.factory(GsonHelper.getAsDouble(jo, "power")))
+            .end()
+            .build();
+    }
+
+    private void meDrive(String id, JsonObject jo) {
+        var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
+        var layout = MachineMeta.parseLayout(jo1).buildLayout();
+        BlockEntityBuilder.builder(id, MachineBlock::simple)
+            .transform(MachineSet::baseMachine)
+            .menu(AllMenus.SIMPLE_MACHINE)
+            .blockEntity()
+            .transform(MEDrive.factory(layout, GsonHelper.getAsDouble(jo, "power")))
+            .end()
+            .build();
+    }
+
+    private void boiler(String id, JsonObject jo) {
+        var mat = getMaterial(GsonHelper.getAsString(jo, "material", "water"));
+        var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
+        var layout = MachineMeta.parseLayout(jo1).buildLayout();
+        var speed = GsonHelper.getAsDouble(jo, "burnSpeed");
+        BlockEntityBuilder.builder(id, MachineBlock::simple)
+            .transform(MachineSet::baseMachine)
+            .menu(AllMenus.BOILER)
+            .blockEntity()
+            .transform(Boiler.factory(speed, mat.fluid("liquid"), mat.fluid("gas")))
+            .transform(StackProcessingContainer.factory(layout))
+            .end()
+            .build();
+    }
+
     private void buildItem(String type, String name, String id, JsonObject jo) {
         switch (type) {
             case "casing" -> casing(id, jo);
@@ -113,6 +162,9 @@ public class MiscMeta extends MetaConsumer {
             case "glass" -> glass(id);
             case "lens" -> lens(id, jo);
             case "item" -> item(id, jo);
+            case "boiler" -> boiler(id, jo);
+            case "me_storage_interface" -> meStorageInterface(id, jo);
+            case "me_drive" -> meDrive(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }
     }
@@ -130,13 +182,24 @@ public class MiscMeta extends MetaConsumer {
             if (je.isJsonArray()) {
                 for (var entry : je.getAsJsonArray()) {
                     var name = GsonHelper.convertToString(entry, "items");
-                    buildItem(type, name, prefix + "/" + name, EMPTY);
+                    buildItem(type, name, prefix + "/" + name, jo);
                 }
             } else if (je.isJsonObject()) {
+                // add base settings
+                var jo2 = new JsonObject();
+                for (var entry : jo.entrySet()) {
+                    if (!entry.getKey().equals("type") && !entry.getKey().equals("items")) {
+                        jo2.add(entry.getKey(), entry.getValue().deepCopy());
+                    }
+                }
+
                 for (var entry : je.getAsJsonObject().entrySet()) {
                     var name = entry.getKey();
                     var jo1 = GsonHelper.convertToJsonObject(entry.getValue(), "items");
-                    buildItem(type, name, prefix + "/" + name, jo1);
+                    for (var entry1 : jo1.entrySet()) {
+                        jo2.add(entry1.getKey(), entry1.getValue().deepCopy());
+                    }
+                    buildItem(type, name, prefix + "/" + name, jo2);
                 }
             } else {
                 throw new JsonSyntaxException("Missing items, except JsonArray or JsonObject");

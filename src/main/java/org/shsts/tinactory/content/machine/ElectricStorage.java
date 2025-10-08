@@ -48,7 +48,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
         this.blockEntity = blockEntity;
         this.layout = layout;
 
-        var electric = new SimpleElectricConsumer(getBlockVoltage(blockEntity),
+        var electric = SimpleElectricConsumer.amperage(getBlockVoltage(blockEntity),
             CONFIG.electricStorageAmperage.get());
         this.electricCap = LazyOptional.of(() -> electric);
     }

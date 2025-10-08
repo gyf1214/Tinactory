@@ -1,0 +1,62 @@
+{
+  "type": "me_drive",
+  "power": 128,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 36
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 36
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 36
+      }
+    ]
+  }
+}

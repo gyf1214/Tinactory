@@ -8,10 +8,6 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
-import org.shsts.tinactory.content.logistics.MEDrive;
-import org.shsts.tinactory.content.logistics.MEStorageInterface;
-import org.shsts.tinactory.content.logistics.StackProcessingContainer;
-import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.ElectricChest;
 import org.shsts.tinactory.content.machine.ElectricTank;
 import org.shsts.tinactory.content.machine.MachineSet;
@@ -34,9 +30,7 @@ import java.util.Map;
 
 import static org.shsts.tinactory.api.logistics.SlotType.FLUID_INPUT;
 import static org.shsts.tinactory.api.logistics.SlotType.ITEM_INPUT;
-import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
-import static org.shsts.tinactory.content.machine.MachineSet.baseMachine;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
@@ -47,14 +41,10 @@ public final class AllBlockEntities {
     public static final MachineSet ELECTRIC_CHEST;
     public static final MachineSet ELECTRIC_TANK;
     public static final MachineSet LOGISTIC_WORKER;
-    public static final MachineSet ME_STORAGE_INTERFACE;
-    public static final MachineSet ME_DRIVE;
     public static final Map<Voltage, IEntry<MachineBlock>> MULTIBLOCK_INTERFACE;
 
     public static final IEntry<MachineBlock> NETWORK_CONTROLLER;
     public static final IEntry<PrimitiveBlock> WORKBENCH;
-    public static final IEntry<MachineBlock> LOW_PRESSURE_BOILER;
-    public static final IEntry<MachineBlock> HIGH_PRESSURE_BOILER;
 
     public static final Map<String, MachineSet> MACHINE_SETS;
 
@@ -62,9 +52,6 @@ public final class AllBlockEntities {
         MACHINE_SETS = new HashMap<>();
 
         var set = new SetFactory();
-
-        LOW_PRESSURE_BOILER = boiler("low", 5d);
-        HIGH_PRESSURE_BOILER = boiler("high", 17d);
 
         MULTIBLOCK_INTERFACE = ComponentBuilder
             .simple(v -> BlockEntityBuilder.builder("multiblock/" + v.id + "/interface",
@@ -148,28 +135,7 @@ public final class AllBlockEntities {
             .tintVoltage(2)
             .buildObject();
 
-        ME_STORAGE_INTERFACE = set.machine("me_storage_interface")
-            .machine(v -> "logistics/" + v.id + "/me_storage_interface", MachineBlock::factory)
-            .menu(AllMenus.ME_STORAGE_INTERFACE)
-            .voltages(Voltage.HV)
-            .machine(MEStorageInterface::factory)
-            .tintVoltage(2)
-            .buildObject();
-
-        ME_DRIVE = set.machine("me_drive")
-            .machine(v -> "logistics/" + v.id + "/me_drive", MachineBlock::factory)
-            .menu(AllMenus.SIMPLE_MACHINE)
-            .layoutMachine(MEDrive::factory)
-            .voltages(Voltage.HV)
-            .layoutSet()
-            .port(ITEM_INPUT)
-            .slots(0, 0, 3, 3)
-            .build()
-            .tintVoltage(2)
-            .buildObject();
-
-        NETWORK_CONTROLLER = set.blockEntity("network/controller",
-                MachineBlock.factory(Voltage.PRIMITIVE))
+        NETWORK_CONTROLLER = set.blockEntity("network/controller", MachineBlock::simple)
             .menu(AllMenus.NETWORK_CONTROLLER)
             .blockEntity()
             .transform(NetworkController::factory)
@@ -208,21 +174,6 @@ public final class AllBlockEntities {
             return MachineSet.builder(this)
                 .onCreateObject($ -> MACHINE_SETS.put(id, $));
         }
-    }
-
-    private static IEntry<MachineBlock> boiler(String name, double burnSpeed) {
-        var id = "machine/boiler/" + name;
-        var layout = AllLayouts.BOILER;
-        var water = getMaterial("water");
-        return BlockEntityBuilder.builder(id,
-                MachineBlock.factory(Voltage.PRIMITIVE))
-            .menu(AllMenus.BOILER)
-            .blockEntity()
-            .transform(Boiler.factory(burnSpeed, water.fluid("liquid"), water.fluid("gas")))
-            .transform(StackProcessingContainer.factory(layout))
-            .end()
-            .transform(baseMachine())
-            .buildObject();
     }
 
     public static MachineSet getMachine(String name) {

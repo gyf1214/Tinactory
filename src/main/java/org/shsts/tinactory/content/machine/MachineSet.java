@@ -150,7 +150,7 @@ public class MachineSet {
         protected IEntry<? extends Block> createMachine(Voltage voltage) {
             assert blockEntityBuilder != null;
             return blockEntityBuilder.apply(voltage)
-                .transform(baseMachine())
+                .transform(MachineSet::baseMachine)
                 .buildObject();
         }
 
@@ -175,9 +175,9 @@ public class MachineSet {
         return new Builder<>(REGISTRATE, parent);
     }
 
-    public static <U extends SmartEntityBlock,
-        P> Transformer<BlockEntityBuilder<U, P>> baseMachine() {
-        return $ -> $.blockEntity()
+    public static <U extends SmartEntityBlock, P> BlockEntityBuilder<U, P> baseMachine(
+        BlockEntityBuilder<U, P> builder) {
+        return builder.blockEntity()
             .transform(Machine::factory)
             .end()
             .block()

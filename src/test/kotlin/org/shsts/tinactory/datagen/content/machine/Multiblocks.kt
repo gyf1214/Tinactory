@@ -23,7 +23,6 @@ import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.solidBlock
-import org.shsts.tinactory.datagen.content.RegistryHelper.blockEntry
 import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
@@ -149,7 +148,7 @@ object Multiblocks {
     }
 
     private fun BlockDataFactory.misc(name: String, block: IBlockDataBuilder<Block, *>.() -> Unit) {
-        block(blockEntry("multiblock/misc/$name"), block)
+        block("multiblock/misc/$name", block)
     }
 
     private fun componentRecipes() {

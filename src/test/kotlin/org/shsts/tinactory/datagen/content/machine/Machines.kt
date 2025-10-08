@@ -3,8 +3,6 @@ package org.shsts.tinactory.datagen.content.machine
 import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.level.block.Block
-import org.shsts.tinactory.content.AllBlockEntities.HIGH_PRESSURE_BOILER
-import org.shsts.tinactory.content.AllBlockEntities.LOW_PRESSURE_BOILER
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
@@ -92,8 +90,6 @@ object Machines {
             overlay(Direction.NORTH, SCREEN_GLASS)
         }
         machine("logistic_worker", "cover/overlay_conveyor")
-        machine("me_drive", "overlay/automation/automation_superbuffer")
-        machine("me_storage_interface", "cover/overlay_storage")
     }
 
     private fun misc() {
@@ -103,6 +99,10 @@ object Machines {
             defaults {
                 tag(MINEABLE_WITH_WRENCH)
             }
+            block(WORKBENCH) {
+                blockState(cubeBlock("casings/crafting_table"))
+                tag(BlockTags.MINEABLE_WITH_AXE)
+            }
             block(NETWORK_CONTROLLER) {
                 machineModel {
                     casing("casings/computer/computer_casing")
@@ -110,21 +110,31 @@ object Machines {
                     ioTex(ME_BUS)
                 }
             }
-            block(WORKBENCH) {
-                blockState(cubeBlock("casings/crafting_table"))
-                tag(BlockTags.MINEABLE_WITH_AXE)
-            }
-            block(LOW_PRESSURE_BOILER) {
+            block("machine/boiler/low") {
                 machineModel {
                     casing(Voltage.ULV)
                     overlay(BOILER_TEX)
                     ioTex(ME_BUS)
                 }
             }
-            block(HIGH_PRESSURE_BOILER) {
+            block("machine/boiler/high") {
                 machineModel {
                     casing(Voltage.MV)
                     overlay(BOILER_TEX)
+                    ioTex(ME_BUS)
+                }
+            }
+            block("logistics/me_storage_interface") {
+                machineModel {
+                    casing(Voltage.HV)
+                    overlay("cover/overlay_storage")
+                    ioTex(ME_BUS)
+                }
+            }
+            block("logistics/me_drive") {
+                machineModel {
+                    casing(Voltage.HV)
+                    overlay("overlay/automation/automation_superbuffer")
                     ioTex(ME_BUS)
                 }
             }

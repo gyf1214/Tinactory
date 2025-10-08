@@ -71,6 +71,62 @@ public class MachineMeta extends MetaConsumer {
         super(name);
     }
 
+    private static void parseImage(JsonObject jo, int sh, BiConsumer<Rect, Texture> cons) {
+        var x = GsonHelper.getAsInt(jo, "x");
+        var y = GsonHelper.getAsInt(jo, "y");
+        var w = GsonHelper.getAsInt(jo, "width");
+        var h = GsonHelper.getAsInt(jo, "height");
+        var texLoc = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));
+        var tw = GsonHelper.getAsInt(jo, "textureWidth", w);
+        var th = GsonHelper.getAsInt(jo, "textureHeight", sh * h);
+        var tex = new Texture(texLoc, tw, th);
+        cons.accept(new Rect(x, y, w, h), tex);
+    }
+
+    public static LayoutSetBuilder<?> parseLayout(JsonObject jo) {
+        var builder = Layout.builder();
+
+        var ja1 = GsonHelper.getAsJsonArray(jo, "slots");
+        for (var je1 : ja1) {
+            var jo2 = GsonHelper.convertToJsonObject(je1, "slots");
+            var port = GsonHelper.getAsInt(jo2, "port");
+            var type = SlotType.fromName(GsonHelper.getAsString(jo2, "type"));
+            var x = GsonHelper.getAsInt(jo2, "x");
+            var y = GsonHelper.getAsInt(jo2, "y");
+            Collection<Voltage> voltages;
+            if (jo2.has("voltages")) {
+                voltages = Voltage.parseJson(jo2, "voltages");
+            } else if (jo2.has("levels")) {
+                var str = GsonHelper.getAsString(jo2, "levels");
+                if (str.contains("-")) {
+                    var fields = str.split("-");
+                    var low = Voltage.fromRank(Integer.parseInt(fields[0]));
+                    var high = fields.length > 1 ? Voltage.fromRank(Integer.parseInt(fields[1])) :
+                        Voltage.MAX;
+                    voltages = Voltage.between(low, high);
+                } else {
+                    voltages = List.of(Voltage.fromRank(Integer.parseInt(str)));
+                }
+            } else {
+                voltages = Arrays.asList(Voltage.values());
+            }
+            builder.slot(port, type, x, y, voltages);
+        }
+
+        var ja3 = GsonHelper.getAsJsonArray(jo, "images", new JsonArray());
+        for (var je3 : ja3) {
+            var jo3 = GsonHelper.convertToJsonObject(je3, "images");
+            parseImage(jo3, 1, builder::image);
+        }
+
+        if (jo.has("progressBar")) {
+            var jo4 = GsonHelper.getAsJsonObject(jo, "progressBar");
+            parseImage(jo4, 2, builder::progressBar);
+        }
+
+        return builder;
+    }
+
     protected static class Executor implements Runnable {
         protected final String id;
         protected final JsonObject jo;
@@ -88,64 +144,8 @@ public class MachineMeta extends MetaConsumer {
             this.jo = jo;
         }
 
-        private void parseImage(JsonObject jo, int sh, BiConsumer<Rect, Texture> cons) {
-            var x = GsonHelper.getAsInt(jo, "x");
-            var y = GsonHelper.getAsInt(jo, "y");
-            var w = GsonHelper.getAsInt(jo, "width");
-            var h = GsonHelper.getAsInt(jo, "height");
-            var texLoc = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));
-            var tw = GsonHelper.getAsInt(jo, "textureWidth", w);
-            var th = GsonHelper.getAsInt(jo, "textureHeight", sh * h);
-            var tex = new Texture(texLoc, tw, th);
-            cons.accept(new Rect(x, y, w, h), tex);
-        }
-
-        protected LayoutSetBuilder<?> parseLayout(JsonObject jo) {
-            var builder = Layout.builder();
-
-            var ja1 = GsonHelper.getAsJsonArray(jo, "slots");
-            for (var je1 : ja1) {
-                var jo2 = GsonHelper.convertToJsonObject(je1, "slots");
-                var port = GsonHelper.getAsInt(jo2, "port");
-                var type = SlotType.fromName(GsonHelper.getAsString(jo2, "type"));
-                var x = GsonHelper.getAsInt(jo2, "x");
-                var y = GsonHelper.getAsInt(jo2, "y");
-                Collection<Voltage> voltages;
-                if (jo2.has("voltages")) {
-                    voltages = Voltage.parseJson(jo2, "voltages");
-                } else if (jo2.has("levels")) {
-                    var str = GsonHelper.getAsString(jo2, "levels");
-                    if (str.contains("-")) {
-                        var fields = str.split("-");
-                        var low = Voltage.fromRank(Integer.parseInt(fields[0]));
-                        var high = fields.length > 1 ? Voltage.fromRank(Integer.parseInt(fields[1])) :
-                            Voltage.MAX;
-                        voltages = Voltage.between(low, high);
-                    } else {
-                        voltages = List.of(Voltage.fromRank(Integer.parseInt(str)));
-                    }
-                } else {
-                    voltages = Arrays.asList(Voltage.values());
-                }
-                builder.slot(port, type, x, y, voltages);
-            }
-
-            var ja3 = GsonHelper.getAsJsonArray(jo, "images", new JsonArray());
-            for (var je3 : ja3) {
-                var jo3 = GsonHelper.convertToJsonObject(je3, "images");
-                parseImage(jo3, 1, builder::image);
-            }
-
-            if (jo.has("progressBar")) {
-                var jo4 = GsonHelper.getAsJsonObject(jo, "progressBar");
-                parseImage(jo4, 2, builder::progressBar);
-            }
-
-            return builder;
-        }
-
         protected LayoutSetBuilder<?> parseLayout() {
-            return parseLayout(GsonHelper.getAsJsonObject(jo, "layout"));
+            return MachineMeta.parseLayout(GsonHelper.getAsJsonObject(jo, "layout"));
         }
 
         private IRecipeType<ProcessingRecipe.Builder> processingRecipe(

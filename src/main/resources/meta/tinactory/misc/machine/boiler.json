@@ -1,0 +1,33 @@
+{
+  "type": "boiler",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "fluid_output",
+        "x": 54,
+        "y": 19
+      }
+    ]
+  },
+  "items": {
+    "low": {
+      "burnSpeed": 5
+    },
+    "high": {
+      "burnSpeed": 17
+    }
+  }
+}

@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
@@ -48,7 +47,6 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
-import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -68,7 +66,7 @@ public class MEDrive extends CapabilityProvider
     private IMachine machine;
     private IMachineConfig machineConfig;
 
-    public MEDrive(BlockEntity blockEntity, Layout layout) {
+    public MEDrive(BlockEntity blockEntity, Layout layout, double power) {
         this.blockEntity = blockEntity;
         this.layout = layout;
         var size = layout.slots.size();
@@ -85,13 +83,12 @@ public class MEDrive extends CapabilityProvider
         this.combinedFluids = new CombinedFluidCollection();
         combinedFluids.onUpdate(blockEntity::setChanged);
 
-        var electric = new SimpleElectricConsumer(getBlockVoltage(blockEntity),
-            CONFIG.meDriveAmperage.get());
+        var electric = new SimpleElectricConsumer(power);
         this.electricCap = LazyOptional.of(() -> electric);
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
-        return $ -> $.capability(ID, be -> new MEDrive(be, layout));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double power) {
+        return $ -> $.capability(ID, be -> new MEDrive(be, layout, power));
     }
 
     private boolean allowItem(ItemStack stack) {

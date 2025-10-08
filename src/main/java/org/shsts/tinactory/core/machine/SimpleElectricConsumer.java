@@ -10,11 +10,19 @@ import org.shsts.tinactory.core.electric.Voltage;
 @MethodsReturnNonnullByDefault
 public class SimpleElectricConsumer implements IElectricMachine {
     private final long voltage;
-    private final double consumption;
+    private final double power;
 
-    public SimpleElectricConsumer(Voltage voltage, double amperage) {
-        this.voltage = voltage.value;
-        this.consumption = voltage.value * amperage;
+    public SimpleElectricConsumer(long voltage, double power) {
+        this.voltage = voltage;
+        this.power = power;
+    }
+
+    public SimpleElectricConsumer(double power) {
+        this(0, power);
+    }
+
+    public static SimpleElectricConsumer amperage(Voltage voltage, double amperage) {
+        return new SimpleElectricConsumer(voltage.value, voltage.value * amperage);
     }
 
     @Override
@@ -34,6 +42,6 @@ public class SimpleElectricConsumer implements IElectricMachine {
 
     @Override
     public double getPowerCons() {
-        return consumption;
+        return power;
     }
 }

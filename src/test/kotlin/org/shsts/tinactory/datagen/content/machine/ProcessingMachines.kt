@@ -3,7 +3,6 @@ package org.shsts.tinactory.datagen.content.machine
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
@@ -279,22 +278,6 @@ object ProcessingMachines {
                 component("electric_pump", 2)
                 input(main, "plate", 4)
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
-            }
-            machine("me_storage_interface") {
-                circuit(4)
-                input(getItem("component/annihilation_core"))
-                input(getItem("component/formation_core"))
-                input("fluix", "dust", 4)
-                input(main, "plate", 4)
-                tech(Technologies.DIGITAL_STORAGE)
-            }
-            machine("me_drive") {
-                circuit(4)
-                input(Items.CHEST)
-                input("certus_quartz", "gem", 4)
-                input("fluix", "dust", 4)
-                input(main, "plate", 4)
-                tech(Technologies.DIGITAL_STORAGE)
             }
         }
     }
