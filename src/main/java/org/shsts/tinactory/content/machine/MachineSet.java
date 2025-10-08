@@ -58,6 +58,10 @@ public class MachineSet {
         return machines.get(voltage);
     }
 
+    public Collection<? extends IEntry<? extends Block>> entries() {
+        return machines.values();
+    }
+
     public Block block(Voltage voltage) {
         return machines.get(voltage).get();
     }

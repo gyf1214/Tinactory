@@ -19,7 +19,6 @@ import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -44,13 +43,15 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     protected IMachine machine;
     protected IMachineConfig machineConfig;
 
-    public ElectricStorage(BlockEntity blockEntity, Layout layout) {
+    protected ElectricStorage(BlockEntity blockEntity, Layout layout, IElectricMachine electric) {
         this.blockEntity = blockEntity;
         this.layout = layout;
-
-        var electric = SimpleElectricConsumer.amperage(getBlockVoltage(blockEntity),
-            CONFIG.electricStorageAmperage.get());
         this.electricCap = LazyOptional.of(() -> electric);
+    }
+
+    protected ElectricStorage(BlockEntity blockEntity, Layout layout, double amperage) {
+        this(blockEntity, layout,
+            SimpleElectricConsumer.amperage(getBlockVoltage(blockEntity), amperage));
     }
 
     public boolean isUnlocked() {

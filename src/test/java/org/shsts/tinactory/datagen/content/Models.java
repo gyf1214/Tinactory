@@ -204,24 +204,22 @@ public final class Models {
         CableModel.pipe(ctx);
     }
 
-    public static Consumer<IEntryDataContext<Block,
-        MachineBlock, BlockStateProvider>> multiblockInterface(String ioTex) {
-        return ctx -> {
-            var models = ctx.provider().models();
-            var model = MachineModel.builder()
-                .overlay(ioTex).ioTex(ioTex)
-                .buildObject();
-            var fullModel = model.blockModel(ctx.id(), ctx.object(), false, models);
-            var ioModel = model.ioModel(ctx.id(), models)
-                .texture("particle", extend(model.getCasing(ctx.object()), "side"));
-            ctx.provider().getVariantBuilder(ctx.object())
-                .forAllStates(state -> {
-                    var dir = state.getValue(MachineBlock.IO_FACING);
-                    var baseModel = state.getValue(MultiblockInterfaceBlock.JOINED) ?
-                        ioModel : fullModel;
-                    return rotateModel(baseModel, dir);
-                });
-        };
+    public static <U extends Block> void multiblockInterface(
+        IEntryDataContext<Block, U, BlockStateProvider> ctx, String ioTex) {
+        var models = ctx.provider().models();
+        var model = MachineModel.builder()
+            .overlay(ioTex).ioTex(ioTex)
+            .buildObject();
+        var fullModel = model.blockModel(ctx.id(), ctx.object(), false, models);
+        var ioModel = model.ioModel(ctx.id(), models)
+            .texture("particle", extend(model.getCasing(ctx.object()), "side"));
+        ctx.provider().getVariantBuilder(ctx.object())
+            .forAllStates(state -> {
+                var dir = state.getValue(MachineBlock.IO_FACING);
+                var baseModel = state.getValue(MultiblockInterfaceBlock.JOINED) ?
+                    ioModel : fullModel;
+                return rotateModel(baseModel, dir);
+            });
     }
 
     public static <U extends Item> Consumer<IEntryDataContext<Item,

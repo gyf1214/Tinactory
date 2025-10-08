@@ -1,11 +1,13 @@
 package org.shsts.tinactory.content.logistics;
 
+import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,13 +27,12 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.TinactoryConfig.listConfig;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
@@ -61,25 +62,33 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private final LazyOptional<IElectricMachine> electricCap;
 
-    public LogisticWorker(BlockEntity blockEntity) {
+    public record Properties(int slots, int interval, int stack, int fluidStack, double amperage) {
+        public static Properties fromJson(JsonObject jo) {
+            return new Properties(
+                GsonHelper.getAsInt(jo, "slots"),
+                GsonHelper.getAsInt(jo, "interval"),
+                GsonHelper.getAsInt(jo, "stack"),
+                GsonHelper.getAsInt(jo, "fluidStack"),
+                GsonHelper.getAsDouble(jo, "amperage"));
+        }
+    }
+
+    public LogisticWorker(BlockEntity blockEntity, Properties properties) {
         this.blockEntity = blockEntity;
-        var voltage = getBlockVoltage(blockEntity);
-        var idx = voltage.rank - 1;
-        this.workerSlots = listConfig(CONFIG.logisticWorkerSize, idx);
-        this.workerInterval = listConfig(CONFIG.logisticWorkerDelay, idx);
-        this.workerStack = listConfig(CONFIG.logisticWorkerStack, idx);
-        this.workerFluidStack = listConfig(CONFIG.logisticWorkerFluidStack, idx);
+        this.workerSlots = properties.slots;
+        this.workerInterval = properties.interval;
+        this.workerStack = properties.stack;
+        this.workerFluidStack = properties.fluidStack;
         this.nextValidSlot = new int[workerSlots];
         // initialize current slot to the last slot so in the first tick it will select the first valid slot
         this.currentSlot = workerSlots - 1;
 
-        var electric = SimpleElectricConsumer.amperage(voltage, CONFIG.logisticWorkerAmperage.get());
+        var electric = SimpleElectricConsumer.amperage(getBlockVoltage(blockEntity), properties.amperage);
         this.electricCap = LazyOptional.of(() -> electric);
     }
 
-    public static <P> IBlockEntityTypeBuilder<P> factory(
-        IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, LogisticWorker::new);
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
+        return $ -> $.capability(ID, be -> new LogisticWorker(be, properties));
     }
 
     private Optional<LogisticWorkerConfig> getConfig(int index) {

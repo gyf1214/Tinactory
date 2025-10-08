@@ -79,8 +79,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         this.blockEntity = be;
     }
 
-    public static <P> IBlockEntityTypeBuilder<P> factory(
-        IBlockEntityTypeBuilder<P> builder) {
+    public static <P> IBlockEntityTypeBuilder<P> factory(IBlockEntityTypeBuilder<P> builder) {
         return builder.capability(ID, Machine::new);
     }
 

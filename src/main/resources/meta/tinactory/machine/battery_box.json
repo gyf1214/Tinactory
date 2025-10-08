@@ -1,0 +1,117 @@
+{
+  "recipe": "none",
+  "machine": "battery_box",
+  "voltages": "lv-hv",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 0,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 54,
+        "y": 0,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 18,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 54,
+        "y": 18,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 36,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 36,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 36,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 54,
+        "y": 36,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 54,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 54,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 54,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 54,
+        "y": 54,
+        "voltages": "hv-max"
+      }
+    ]
+  }
+}

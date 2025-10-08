@@ -15,7 +15,7 @@ public enum CircuitTier {
     NANO(Voltage.HV, CircuitComponentTier.SMD, "advanced_plastic", "advanced"),
     QUANTUM(Voltage.EV, CircuitComponentTier.SMD, "epoxy", "extreme"),
     CRYSTAL(Voltage.IV, CircuitComponentTier.ADVANCED, "advanced_epoxy", "elite"),
-    WETWARE(Voltage.LuV, CircuitComponentTier.ADVANCED, "wetware", "wetware");
+    WETWARE(Voltage.LUV, CircuitComponentTier.ADVANCED, "wetware", "wetware");
 
     public final int rank;
     public final Voltage baseVoltage;

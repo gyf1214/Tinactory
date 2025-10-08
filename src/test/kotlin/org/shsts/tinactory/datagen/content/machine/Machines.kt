@@ -89,7 +89,7 @@ object Machines {
             overlay(Direction.UP, "overlay/machine/overlay_qtank")
             overlay(Direction.NORTH, SCREEN_GLASS)
         }
-        machine("logistic_worker", "cover/overlay_conveyor")
+        machine("logistics/logistic_worker", "cover/overlay_conveyor")
     }
 
     private fun misc() {

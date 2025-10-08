@@ -35,8 +35,8 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     private final FluidStack[] filters;
     private final LazyOptional<IFluidStackHandler> fluidHandlerCap;
 
-    public ElectricTank(BlockEntity blockEntity, Layout layout) {
-        super(blockEntity, layout);
+    public ElectricTank(BlockEntity blockEntity, Layout layout, double amperage) {
+        super(blockEntity, layout, amperage);
         this.size = layout.slots.size();
         var capacity = CONFIG.tankSize.get();
         this.tanks = new WrapperFluidTank[size];
@@ -52,8 +52,8 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         this.fluidHandlerCap = LazyOptional.of(() -> port);
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
-        return $ -> $.capability(ID, be -> new ElectricTank(be, layout));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double amperage) {
+        return $ -> $.capability(ID, be -> new ElectricTank(be, layout, amperage));
     }
 
     private boolean allowFluidInTank(int slot, FluidStack stack) {

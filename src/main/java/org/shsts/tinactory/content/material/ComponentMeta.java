@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.material;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -18,7 +19,10 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllItems.COMPONENTS;
@@ -35,11 +39,61 @@ public class ComponentMeta extends MetaConsumer {
         super("Component");
     }
 
+    public record VoltageWithConfig(Voltage voltage, JsonObject jo) {}
+
+    public static Collection<VoltageWithConfig> parseVoltageConfig(JsonObject jo, String field) {
+        if (!jo.has(field)) {
+            throw new JsonSyntaxException("Missing field " + field);
+        }
+        var je = jo.get(field);
+        if (je.isJsonObject()) {
+            // add base settings
+            var jo2 = new JsonObject();
+            for (var entry : jo.entrySet()) {
+                if (!entry.getKey().equals(field)) {
+                    jo2.add(entry.getKey(), entry.getValue().deepCopy());
+                }
+            }
+
+            var ret = new ArrayList<VoltageWithConfig>();
+            for (var entry : je.getAsJsonObject().entrySet()) {
+                var v = Voltage.fromName(entry.getKey());
+                var jo1 = GsonHelper.convertToJsonObject(entry.getValue(), field);
+                for (var entry1 : jo1.entrySet()) {
+                    jo2.add(entry1.getKey(), entry1.getValue().deepCopy());
+                }
+                ret.add(new VoltageWithConfig(v, jo2));
+            }
+            return ret;
+        } else if (je.isJsonArray()) {
+            var ret = new ArrayList<VoltageWithConfig>();
+            for (var je1 : je.getAsJsonArray()) {
+                var v = Voltage.fromName(GsonHelper.convertToString(je1, field));
+                ret.add(new VoltageWithConfig(v, jo));
+            }
+            return ret;
+        } else if (je.isJsonPrimitive()) {
+            var str = GsonHelper.convertToString(je, field);
+            if (str.contains("-")) {
+                var fields = str.split("-");
+                return Voltage.between(Voltage.fromName(fields[0]), Voltage.fromName(fields[1]))
+                    .stream().map(v -> new VoltageWithConfig(v, jo))
+                    .toList();
+            } else {
+                return List.of(new VoltageWithConfig(Voltage.fromName(str), jo));
+            }
+        }
+        throw new JsonSyntaxException("Cannot parse voltages from field " + field);
+    }
+
+    public static Collection<Voltage> parseVoltage(JsonObject jo, String field) {
+        return parseVoltageConfig(jo, field).stream().map(VoltageWithConfig::voltage).toList();
+    }
+
     private void buildComponents(String name, JsonObject jo) {
         var tint = GsonHelper.getAsInt(jo, "voltageTint", -1);
         var components = new HashMap<Voltage, IEntry<Item>>();
-        var voltages = Voltage.parseJson(jo, "items");
-        for (var v : voltages) {
+        for (var v : parseVoltage(jo, "items")) {
             var id = "component/" + v.id + "/" + name;
             var builder = REGISTRATE.item(id);
             if (tint >= 0) {
@@ -88,9 +142,8 @@ public class ComponentMeta extends MetaConsumer {
 
     private void buildSubnets(String name, JsonObject jo) {
         var components = new HashMap<Voltage, IEntry<SubnetBlock>>();
-        var voltages = Voltage.parseJson(jo, "items");
         var voltageOffset = GsonHelper.getAsInt(jo, "voltageOffset");
-        for (var v : voltages) {
+        for (var v : parseVoltage(jo, "items")) {
             var id = "network/" + v.id + "/" + name;
             var v1 = Voltage.fromRank(v.rank + voltageOffset);
             var block = REGISTRATE.block(id, SubnetBlock.factory(v, v1))

@@ -5,7 +5,7 @@ import net.minecraft.tags.BlockTags
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
-import org.shsts.tinactory.content.AllBlockEntities.MULTIBLOCK_INTERFACE
+import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllMultiblocks.CLEANROOM
 import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
@@ -329,9 +329,11 @@ object Multiblocks {
             defaults {
                 tag(MINEABLE_WITH_WRENCH)
             }
-            for (entry in MULTIBLOCK_INTERFACE.values) {
+            for (entry in getMachine("multiblock/interface").entries()) {
                 block(entry) {
-                    blockState(multiblockInterface(IO_TEX))
+                    blockState { ctx ->
+                        multiblockInterface(ctx, IO_TEX)
+                    }
                 }
             }
             multiblock("blast_furnace", "heatproof")

@@ -230,7 +230,7 @@ object ProcessingMachines {
                 input(main, "gear", 2)
                 tech(Technologies.PUMP_AND_PISTON)
             }
-            machine("multiblock_interface") {
+            machine("multiblock/interface") {
                 circuit(2)
                 component("conveyor_module")
                 component("electric_pump")
@@ -272,7 +272,7 @@ object ProcessingMachines {
                 input("glass", "primary")
                 tech(Technologies.PUMP_AND_PISTON)
             }
-            machine("logistic_worker") {
+            machine("logistics/logistic_worker") {
                 circuit(4)
                 component("conveyor_module", 2)
                 component("electric_pump", 2)

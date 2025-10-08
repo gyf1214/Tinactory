@@ -1,0 +1,43 @@
+{
+  "recipe": "none",
+  "machine": "logistic_worker",
+  "amperage": 0.125,
+  "voltages": {
+    "ulv": {
+      "slots": 8,
+      "interval": 40,
+      "stack": 4,
+      "fluidStack": 1000
+    },
+    "lv": {
+      "slots": 16,
+      "interval": 20,
+      "stack": 16,
+      "fluidStack": 4000
+    },
+    "mv": {
+      "slots": 16,
+      "interval": 20,
+      "stack": 32,
+      "fluidStack": 8000
+    },
+    "hv": {
+      "slots": 24,
+      "interval": 10,
+      "stack": 32,
+      "fluidStack": 8000
+    },
+    "ev": {
+      "slots": 24,
+      "interval": 10,
+      "stack": 64,
+      "fluidStack": 16000
+    },
+    "iv": {
+      "slots": 32,
+      "interval": 5,
+      "stack": 64,
+      "fluidStack": 16000
+    }
+  }
+}

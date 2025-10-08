@@ -1,0 +1,118 @@
+{
+  "recipe": "none",
+  "machine": "electric_chest",
+  "voltages": "ulv-hv",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "none",
+        "x": 0,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 20,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 40,
+        "y": 0,
+        "voltages": "lv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 60,
+        "y": 0,
+        "voltages": "lv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 80,
+        "y": 0,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 100,
+        "y": 0,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 120,
+        "y": 0,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 140,
+        "y": 0,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 0,
+        "y": 48
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 20,
+        "y": 48
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 40,
+        "y": 48,
+        "voltages": "lv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 60,
+        "y": 48,
+        "voltages": "lv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 80,
+        "y": 48,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 100,
+        "y": 48,
+        "voltages": "mv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 120,
+        "y": 48,
+        "voltages": "hv-max"
+      },
+      {
+        "port": 0,
+        "type": "none",
+        "x": 140,
+        "y": 48,
+        "voltages": "hv-max"
+      }
+    ]
+  },
+  "amperage": 0.125
+}

@@ -53,8 +53,8 @@ public class MiscMeta extends MetaConsumer {
         super("Misc");
     }
 
-    private static MaterialColor parseMaterialColor(JsonObject jo, String key) {
-        return MaterialColor.byId(GsonHelper.getAsInt(jo, key));
+    private static MaterialColor parseMaterialColor(JsonObject jo, String field) {
+        return MaterialColor.byId(GsonHelper.getAsInt(jo, field));
     }
 
     private IEntry<Block> casing(String id, JsonObject jo) {

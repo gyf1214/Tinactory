@@ -6,7 +6,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -14,16 +13,10 @@ public final class TinactoryConfig {
     public final ConfigValue<Integer> fluidSlotSize;
     public final ConfigValue<Integer> chestSize;
     public final ConfigValue<Integer> tankSize;
-    public final ConfigValue<List<? extends Integer>> logisticWorkerSize;
-    public final ConfigValue<List<? extends Integer>> logisticWorkerDelay;
-    public final ConfigValue<List<? extends Integer>> logisticWorkerStack;
-    public final ConfigValue<List<? extends Integer>> logisticWorkerFluidStack;
     public final ConfigValue<Integer> bytesPerItem;
     public final ConfigValue<Integer> bytesPerItemType;
     public final ConfigValue<Integer> bytesPerFluid;
     public final ConfigValue<Integer> bytesPerFluidType;
-    public final ConfigValue<Double> logisticWorkerAmperage;
-    public final ConfigValue<Double> electricStorageAmperage;
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
     public final ConfigValue<Double> workFactorExponent;
@@ -46,16 +39,6 @@ public final class TinactoryConfig {
         tankSize = builder.comment("Size of the electric tank")
             .defineInRange("tank_size", 256000, 1, Integer.MAX_VALUE);
 
-        Predicate<Object> validator = i -> ((Number) i).doubleValue() > 0d;
-        logisticWorkerSize = builder.comment("Logistic Worker sizes")
-            .defineList("logistic_worker_size", List.of(8, 8, 16, 16, 32), validator);
-        logisticWorkerDelay = builder.comment("Logistic Worker delays")
-            .defineList("logistic_worker_delay", List.of(40, 40, 20, 20, 10), validator);
-        logisticWorkerStack = builder.comment("Logistic Worker item stacks per cycle")
-            .defineList("logistic_worker_stack", List.of(4, 16, 64, 64, 128), validator);
-        logisticWorkerFluidStack = builder.comment("Logistic Worker fluid stacks per cycle")
-            .defineList("logistic_worker_fluid_stack", List.of(1000, 4000, 16000, 16000, 32000), validator);
-
         bytesPerItem = builder.comment("Bytes used per item by digital storage")
             .defineInRange("bytes_per_item", 256, 1, Integer.MAX_VALUE);
         bytesPerItemType = builder.comment("Bytes used per item type by digital storage")
@@ -65,17 +48,14 @@ public final class TinactoryConfig {
         bytesPerFluidType = builder.comment("Bytes used per fluid type by digital storage")
             .defineInRange("bytes_per_fluid_type", 4096, 1, Integer.MAX_VALUE);
 
-        logisticWorkerAmperage = builder.comment("Amperage usage on Logistic Worker")
-            .defineInRange("logistic_worker_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
-        electricStorageAmperage = builder.comment("Amperage usage on Electric Storage")
-            .defineInRange("electric_storage_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
         builder.pop();
 
         builder.push("machine");
         primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
             .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
         machineResistanceFactor = builder.comment("Machine resistance factor")
-            .defineList("machine_resistance_factor", List.of(0.05d, 0.1d, 0.1d, 0.2d, 0.2d, 0.4d), validator);
+            .defineList("machine_resistance_factor", List.of(0.05d, 0.1d, 0.1d, 0.2d, 0.2d, 0.4d),
+                i -> ((Number) i).doubleValue() > 0d);
         workFactorExponent = builder.comment("Work factor exponent")
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
         blastFurnaceTempFactor = builder.comment("Temperature factor for blast furnace")

@@ -94,7 +94,7 @@ object MiscMachines {
             ulv("electric_furnace", Blocks.FURNACE)
             ulv("electric_chest", Blocks.CHEST)
             ulv("electric_tank", getMaterial("glass").tag("primary"))
-            ulv("logistic_worker", Blocks.HOPPER)
+            ulv("logistics/logistic_worker", Blocks.HOPPER)
             ulvComponent("electric_buffer", ulvCable)
 
             result(NETWORK_CONTROLLER.get()) {
@@ -129,7 +129,7 @@ object MiscMachines {
                 component("cable", 4)
                 tech(Technologies.ALLOY_SMELTING)
             }
-            machine("multiblock_interface") {
+            machine("multiblock/interface") {
                 component("machine_hull")
                 circuit(2)
                 component("cable", 2)

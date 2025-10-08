@@ -14,7 +14,11 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllMenus;
+import org.shsts.tinactory.content.electric.BatteryBox;
+import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
+import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
+import org.shsts.tinactory.content.material.ComponentMeta;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
@@ -31,12 +35,15 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.machine.RecipeProcessors;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
+import org.shsts.tinactory.core.multiblock.client.MultiblockInterfaceRenderer;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
+import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -95,7 +102,7 @@ public class MachineMeta extends MetaConsumer {
             var y = GsonHelper.getAsInt(jo2, "y");
             Collection<Voltage> voltages;
             if (jo2.has("voltages")) {
-                voltages = Voltage.parseJson(jo2, "voltages");
+                voltages = ComponentMeta.parseVoltage(jo2, "voltages");
             } else if (jo2.has("levels")) {
                 var str = GsonHelper.getAsString(jo2, "levels");
                 if (str.contains("-")) {
@@ -194,7 +201,7 @@ public class MachineMeta extends MetaConsumer {
                     .recipeClass(BlastFurnaceRecipe.class)
                     .serializer(BlastFurnaceRecipe.SERIALIZER)
                     .register();
-                case "electric_furnace" -> null;
+                case "electric_furnace", "none" -> null;
                 default -> throw new UnsupportedTypeException("recipe", recipeTypeStr);
             };
         }
@@ -252,25 +259,108 @@ public class MachineMeta extends MetaConsumer {
             return builder.transform(RecipeProcessors.machine(List.of(processor), autoRecipe));
         }
 
+        private String machineId(Voltage v) {
+            if (id.contains("/")) {
+                var name = LocHelper.name(id, -1);
+                var base = id.substring(0, id.length() - name.length());
+                return base + v.id + "/" + name;
+            } else {
+                return "machine/" + v.id + "/" + id;
+            }
+        }
+
+        private BlockEntityBuilder<MachineBlock, ?> baseMachine(Voltage v) {
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock.factory(v))
+                .transform(MachineSet::baseMachine)
+                .block()
+                .tint(i -> i == 2 ? v.color : 0xFFFFFFFF)
+                .end();
+        }
+
         private IEntry<MachineBlock> processing(Voltage v) {
-            var machineId = "machine/" + v.id + "/" + id;
-            var builder = BlockEntityBuilder.builder(machineId, MachineBlock.factory(v));
-            return builder.menu(menu)
+            return baseMachine(v)
+                .menu(menu)
                 .blockEntity()
-                .transform(Machine::factory)
                 .transform(StackProcessingContainer.factory(getLayout(v)))
                 .transform(this::processor)
-                .end()
-                .block()
-                .material(Material.HEAVY_METAL)
-                .properties(MACHINE_PROPERTY)
-                .translucent()
-                .tint(i -> i == 2 ? v.color : 0xFFFFFFFF)
                 .end()
                 .buildObject();
         }
 
-        private IEntry<? extends Block> buildMachine(Voltage v) {
+        private IEntry<MachineBlock> multiblockInterface(Voltage v) {
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock.multiblockInterface(v))
+                .menu(AllMenus.PROCESSING_MACHINE)
+                .blockEntity()
+                .transform(MultiblockInterface::factory)
+                .transform(FlexibleStackContainer::factory)
+                .renderer(() -> () -> MultiblockInterfaceRenderer::new)
+                .end()
+                .block()
+                .material(Material.HEAVY_METAL)
+                .properties(MACHINE_PROPERTY)
+                .tint(() -> () -> (state, $2, $3, i) ->
+                    MultiblockInterfaceBlock.tint(v, state, i))
+                .translucent()
+                .end()
+                .buildObject();
+        }
+
+        private IEntry<MachineBlock> batteryBox(Voltage v) {
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock.sided(v))
+                .transform(MachineSet::baseMachine)
+                .menu(AllMenus.SIMPLE_MACHINE)
+                .blockEntity()
+                .transform(BatteryBox.factory(getLayout(v)))
+                .end()
+                .block()
+                .tint(i -> i == 0 ? v.color : 0xFFFFFFFF)
+                .end()
+                .buildObject();
+        }
+
+        private IEntry<MachineBlock> electricChest(Voltage v, JsonObject jo) {
+            var amperage = GsonHelper.getAsDouble(jo, "amperage");
+            return baseMachine(v)
+                .menu(AllMenus.ELECTRIC_CHEST)
+                .blockEntity()
+                .transform(ElectricChest.factory(getLayout(v), amperage))
+                .end()
+                .buildObject();
+        }
+
+        private IEntry<MachineBlock> electricTank(Voltage v, JsonObject jo) {
+            var amperage = GsonHelper.getAsDouble(jo, "amperage");
+            return baseMachine(v)
+                .menu(AllMenus.ELECTRIC_TANK)
+                .blockEntity()
+                .transform(ElectricTank.factory(getLayout(v), amperage))
+                .end()
+                .buildObject();
+        }
+
+        private IEntry<MachineBlock> logisticWorker(Voltage v, JsonObject jo) {
+            var properties = LogisticWorker.Properties.fromJson(jo);
+            return baseMachine(v)
+                .menu(AllMenus.LOGISTIC_WORKER)
+                .blockEntity()
+                .transform(LogisticWorker.factory(properties))
+                .end()
+                .buildObject();
+        }
+
+        private IEntry<? extends Block> buildMachine(Voltage v, JsonObject jo) {
+            var basic = switch (machineType) {
+                case "multiblock_interface" -> multiblockInterface(v);
+                case "battery_box" -> batteryBox(v);
+                case "electric_chest" -> electricChest(v, jo);
+                case "electric_tank" -> electricTank(v, jo);
+                case "logistic_worker" -> logisticWorker(v, jo);
+                default -> null;
+            };
+            if (basic != null) {
+                return basic;
+            }
+
             if (v == Voltage.PRIMITIVE) {
                 return primitive();
             }
@@ -292,13 +382,14 @@ public class MachineMeta extends MetaConsumer {
             parseTypes();
 
             parseRecipeType();
-            layoutSet = parseLayout().buildObject();
+            layoutSet = jo.has("layout") ? parseLayout().buildObject() : Layout.EMPTY_SET;
             menu = getMenu();
 
             var machines = new HashMap<Voltage, IEntry<? extends Block>>();
             IEntry<? extends Block> icon = null;
-            for (var v : Voltage.parseJson(jo, "voltages")) {
-                var block = buildMachine(v);
+            for (var entry : ComponentMeta.parseVoltageConfig(jo, "voltages")) {
+                var v = entry.voltage();
+                var block = buildMachine(v, entry.jo());
                 if (v.rank > Voltage.ULV.rank && icon == null) {
                     icon = block;
                 }
