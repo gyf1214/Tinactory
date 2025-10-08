@@ -81,7 +81,8 @@ public class MultiblockInterface extends Machine {
     private void setJoined(Level world, boolean value) {
         getRealBlockState(world, blockEntity).ifPresent(state -> {
             var newState = state.setValue(MultiblockInterfaceBlock.JOINED, value);
-            world.setBlock(blockEntity.getBlockPos(), newState, 3);
+            // prevent updateShape on neighbor
+            world.setBlock(blockEntity.getBlockPos(), newState, 19);
         });
     }
 
@@ -195,7 +196,8 @@ public class MultiblockInterface extends Machine {
         if (multiblock == null) {
             return;
         }
-        world.setBlock(multiblock.blockEntity.getBlockPos(), state, 3);
+        // prevent updateShape on neighbor
+        world.setBlock(multiblock.blockEntity.getBlockPos(), state, 19);
     }
 
     @Override

@@ -185,7 +185,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     protected void setWorkBlock(Level world, BlockState state) {
-        world.setBlock(blockEntity.getBlockPos(), state, 3);
+        // prevent updateShape on neighbor
+        world.setBlock(blockEntity.getBlockPos(), state, 19);
     }
 
     protected void updateWorkBlock(Level world, boolean working) {

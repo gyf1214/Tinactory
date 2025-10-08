@@ -34,6 +34,7 @@ public class NetworkBase {
         CONNECTED,
         CONNECTING,
         CONFLICT,
+        INVALIDATING,
         DESTROYED
     }
 
@@ -133,9 +134,10 @@ public class NetworkBase {
     }
 
     public void invalidate() {
-        if (state == State.DESTROYED) {
+        if (state == State.DESTROYED || state == State.INVALIDATING) {
             return;
         }
+        state = State.INVALIDATING;
         onDisconnect();
         if (ref != null) {
             ref.invalidate();
@@ -145,9 +147,10 @@ public class NetworkBase {
     }
 
     public void destroy() {
-        if (state == State.DESTROYED) {
+        if (state == State.DESTROYED || state == State.INVALIDATING) {
             return;
         }
+        state = State.INVALIDATING;
         onDisconnect();
         if (ref != null) {
             ref.invalidate();

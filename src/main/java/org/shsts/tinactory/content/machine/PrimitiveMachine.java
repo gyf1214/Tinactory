@@ -65,7 +65,7 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
         var working = processor.getProgress() > 0d;
         var state = blockEntity.getBlockState();
         if (state.getValue(WORKING) != working) {
-            world.setBlock(blockEntity.getBlockPos(), state.setValue(WORKING, working), 3);
+            world.setBlockAndUpdate(blockEntity.getBlockPos(), state.setValue(WORKING, working));
         }
     }
 

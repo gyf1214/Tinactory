@@ -164,17 +164,27 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         return item.is(AllTags.TOOL_WIRE_CUTTER);
     }
 
-    private BlockState setConnected(Level world, BlockPos pos, BlockState state,
+    private BlockState setConnectedState(Level world, BlockPos pos, BlockState state,
         Direction dir, boolean connected) {
         var property = PROPERTY_BY_DIRECTION.get(dir);
         if (state.getValue(property) == connected) {
             return state;
         }
         var newState = state.setValue(property, connected);
+        NetworkManager.tryGet(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
+        return newState;
+    }
+
+    private void setConnected(Level world, BlockPos pos, BlockState state,
+        Direction dir, boolean connected) {
+        var property = PROPERTY_BY_DIRECTION.get(dir);
+        if (state.getValue(property) == connected) {
+            return;
+        }
+        var newState = state.setValue(property, connected);
         world.setBlockAndUpdate(pos, newState);
 
         NetworkManager.tryGet(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
-        return newState;
     }
 
     @Override
@@ -250,10 +260,10 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         var old = isConnected(world, pos, state, dir);
         if (!old && autoConnectWith(world, pos, state, dir, state1) &&
             IConnector.isConnectedInWorld(world, pos1, state1, dir1)) {
-            return setConnected(world, pos, state, dir, true);
+            return setConnectedState(world, pos, state, dir, true);
         } else if (old && (!allowConnectWith(world, pos, state, dir, state1) ||
             !IConnector.isConnectedInWorld(world, pos1, state1, dir1))) {
-            return setConnected(world, pos, state, dir, false);
+            return setConnectedState(world, pos, state, dir, false);
         }
         return state;
     }
