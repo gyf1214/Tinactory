@@ -48,8 +48,8 @@ import static org.shsts.tinactory.datagen.content.Models.yRotation;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineModel {
-    private static final String CASING_MODEL = "block/machine/casing";
-    private static final String IO_MODEL = "block/machine/io";
+    public static final String CASING_MODEL = "block/machine/casing";
+    public static final String IO_MODEL = "block/machine/io";
     public static final ResourceLocation PRIMITIVE_TEX = gregtech("blocks/casings/wood_wall");
     public static final String IO_TEX = "overlay/machine/overlay_energy_in_multi";
     public static final String IO_OUT_TEX = "overlay/machine/overlay_energy_out_multi";
@@ -86,7 +86,7 @@ public class MachineModel {
         throw new IllegalArgumentException();
     }
 
-    private <B extends ModelBuilder<B>> B applyCasing(B model, ResourceLocation tex,
+    public static <B extends ModelBuilder<B>> B applyCasing(B model, ResourceLocation tex,
         ExistingFileHelper existingHelper) {
         if (existingHelper.exists(tex, TEXTURE_TYPE)) {
             return model.texture("top", tex)

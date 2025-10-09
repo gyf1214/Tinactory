@@ -20,9 +20,12 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
+import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.core.util.LocHelper.name
+import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.solidBlock
+import org.shsts.tinactory.datagen.content.Models.turbineBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
@@ -130,6 +133,15 @@ object Multiblocks {
                         gregtech("blocks/casings/gearbox/machine_casing_gearbox_tungstensteel"),
                         gregtech("blocks/casings/solid/machine_casing_robust_tungstensteel")))
                 }
+            }
+
+            misc("turbine_blade") {
+                blockState { ctx ->
+                    turbineBlock(ctx, "casings/solid/machine_casing_stable_titanium",
+                        modLoc("blocks/multiblock/large_turbine/idle"),
+                        modLoc("blocks/multiblock/large_turbine/spin"))
+                }
+                itemModel(Models::turbineItem)
             }
         }
 

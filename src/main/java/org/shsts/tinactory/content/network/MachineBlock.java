@@ -91,9 +91,9 @@ public class MachineBlock extends SmartEntityBlock
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite())
-            .setValue(IO_FACING, ctx.getHorizontalDirection())
-            .setValue(WORKING, false);
+        return defaultBlockState()
+            .setValue(FACING, ctx.getHorizontalDirection().getOpposite())
+            .setValue(IO_FACING, ctx.getHorizontalDirection());
     }
 
     @Override

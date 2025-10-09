@@ -9,11 +9,13 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import org.shsts.tinactory.content.multiblock.TurbineBlock;
 import org.shsts.tinactory.content.network.CableBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
@@ -28,12 +30,15 @@ import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.content.multiblock.TurbineBlock.CENTER_BLADE;
 import static org.shsts.tinactory.core.util.LocHelper.extend;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.prepend;
+import static org.shsts.tinactory.datagen.content.model.MachineModel.CASING_MODEL;
+import static org.shsts.tinactory.datagen.content.model.MachineModel.applyCasing;
 import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
@@ -204,8 +209,8 @@ public final class Models {
         CableModel.pipe(ctx);
     }
 
-    public static <U extends Block> void multiblockInterface(
-        IEntryDataContext<Block, U, BlockStateProvider> ctx, String ioTex) {
+    public static void multiblockInterface(
+        IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx, String ioTex) {
         var models = ctx.provider().models();
         var model = MachineModel.builder()
             .overlay(ioTex).ioTex(ioTex)
@@ -220,6 +225,42 @@ public final class Models {
                     ioModel : fullModel;
                 return rotateModel(baseModel, dir);
             });
+    }
+
+    public static void turbineBlock(
+        IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx,
+        String casing, ResourceLocation idle, ResourceLocation spin) {
+        var prov = ctx.provider();
+        var models = prov.models();
+        var existingHelper = ctx.provider().models().existingFileHelper;
+        var blades = TurbineBlock.BLADES;
+        var idles = new BlockModelBuilder[blades];
+        var spins = new BlockModelBuilder[blades];
+        for (var i = 0; i < blades; i++) {
+            var id = ctx.id() + "_" + i;
+            var id1 = id + "_active";
+            var casingModel = modLoc(CASING_MODEL);
+            var casingTex = gregtech("blocks/" + casing);
+
+            idles[i] = applyCasing(models.withExistingParent(id, casingModel), casingTex, existingHelper)
+                .texture("front_overlay", extend(idle, Integer.toString(i)));
+            spins[i] = applyCasing(models.withExistingParent(id1, casingModel), casingTex, existingHelper)
+                .texture("front_overlay", extend(spin, Integer.toString(i)));
+        }
+
+        prov.getVariantBuilder(ctx.object())
+            .forAllStates(state -> {
+                var dir = state.getValue(TurbineBlock.FACING);
+                var i = state.getValue(TurbineBlock.BLADE);
+                var baseModel = state.getValue(TurbineBlock.WORKING) ? spins[i] : idles[i];
+                return rotateModel(baseModel, dir);
+            });
+    }
+
+    public static void turbineItem(IEntryDataContext<Item, BlockItem, ItemModelProvider> ctx) {
+        var id = ctx.id();
+        var blockModel = new ResourceLocation(ctx.modid(), "block/" + id + "_" + CENTER_BLADE);
+        ctx.provider().withExistingParent(id, blockModel);
     }
 
     public static <U extends Item> Consumer<IEntryDataContext<Item,

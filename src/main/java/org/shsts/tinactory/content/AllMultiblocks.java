@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.HalfBlock;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
+import org.shsts.tinactory.content.multiblock.TurbineBlock;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.multiblock.Multiblock;
@@ -49,6 +50,11 @@ public final class AllMultiblocks {
 
         REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
             .material(Material.HEAVY_METAL)
+            .properties(MiscMeta.CASING_PROPERTY)
+            .register();
+
+        REGISTRATE.block("multiblock/misc/turbine_blade", TurbineBlock::new)
+            .material(Material.HEAVY_METAL, MaterialColor.COLOR_MAGENTA)
             .properties(MiscMeta.CASING_PROPERTY)
             .register();
 

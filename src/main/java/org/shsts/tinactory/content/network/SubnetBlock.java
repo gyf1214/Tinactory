@@ -50,7 +50,8 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return defaultBlockState().setValue(IO_FACING, ctx.getHorizontalDirection().getOpposite());
+        return defaultBlockState()
+            .setValue(IO_FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     private void setIOFacing(Level world, BlockPos pos, BlockState state, Direction dir) {

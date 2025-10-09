@@ -38,7 +38,8 @@ public class SidedMachineBlock extends MachineBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return defaultBlockState().setValue(IO_FACING, ctx.getHorizontalDirection());
+        return defaultBlockState()
+            .setValue(IO_FACING, ctx.getHorizontalDirection());
     }
 
     @Override

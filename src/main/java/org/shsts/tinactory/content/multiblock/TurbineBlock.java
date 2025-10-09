@@ -1,6 +1,5 @@
-package org.shsts.tinactory.content.network;
+package org.shsts.tinactory.content.multiblock;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
@@ -9,39 +8,32 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import org.shsts.tinactory.content.AllItems;
-import org.shsts.tinactory.core.common.SmartEntityBlock;
-import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
-import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import org.shsts.tinactory.content.network.MachineBlock;
 
-import java.util.function.Supplier;
-
-import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
-
-/**
- * Entity block that has a face and do not connect to a network.
- */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class PrimitiveBlock extends SmartEntityBlock {
+public class TurbineBlock extends Block {
+    public static final int BLADES = 9;
+    public static final int CENTER_BLADE = 4;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty WORKING = MachineBlock.WORKING;
+    public static final IntegerProperty BLADE = IntegerProperty.create("blade", 0, BLADES - 1);
 
-    public PrimitiveBlock(Properties properties,
-        Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu) {
-        super(properties.isValidSpawn(AllItems::never), entityType, menu);
-    }
-
-    @Override
-    protected BlockState createDefaultBlockState() {
-        return super.createDefaultBlockState()
+    public TurbineBlock(Properties properties) {
+        super(properties);
+        var defaultState = stateDefinition.any()
             .setValue(FACING, Direction.NORTH)
-            .setValue(WORKING, false);
+            .setValue(WORKING, false)
+            .setValue(BLADE, CENTER_BLADE);
+        registerDefaultState(defaultState);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, WORKING);
+        builder.add(FACING, WORKING, BLADE);
     }
 
     @Override
