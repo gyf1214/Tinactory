@@ -185,20 +185,22 @@ public class MiscMeta extends MetaConsumer {
                     buildItem(type, name, prefix + "/" + name, jo);
                 }
             } else if (je.isJsonObject()) {
-                // add base settings
-                var jo2 = new JsonObject();
-                for (var entry : jo.entrySet()) {
-                    if (!entry.getKey().equals("type") && !entry.getKey().equals("items")) {
-                        jo2.add(entry.getKey(), entry.getValue().deepCopy());
-                    }
-                }
-
                 for (var entry : je.getAsJsonObject().entrySet()) {
+                    // add base settings
+                    var jo2 = new JsonObject();
+                    for (var entry1 : jo.entrySet()) {
+                        if (!entry1.getKey().equals("type") && !entry1.getKey().equals("items")) {
+                            jo2.add(entry1.getKey(), entry1.getValue().deepCopy());
+                        }
+                    }
+
+                    // add specific setting
                     var name = entry.getKey();
                     var jo1 = GsonHelper.convertToJsonObject(entry.getValue(), "items");
                     for (var entry1 : jo1.entrySet()) {
                         jo2.add(entry1.getKey(), entry1.getValue().deepCopy());
                     }
+
                     buildItem(type, name, prefix + "/" + name, jo2);
                 }
             } else {

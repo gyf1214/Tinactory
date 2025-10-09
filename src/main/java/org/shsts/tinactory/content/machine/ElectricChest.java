@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.content.logistics.ItemSlotHandler;
@@ -28,6 +27,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 
 @ParametersAreNonnullByDefault
@@ -161,7 +161,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (cap == ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
         }
         return super.getCapability(cap, side);

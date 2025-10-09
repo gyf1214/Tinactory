@@ -47,16 +47,17 @@ public class ComponentMeta extends MetaConsumer {
         }
         var je = jo.get(field);
         if (je.isJsonObject()) {
-            // add base settings
-            var jo2 = new JsonObject();
-            for (var entry : jo.entrySet()) {
-                if (!entry.getKey().equals(field)) {
-                    jo2.add(entry.getKey(), entry.getValue().deepCopy());
-                }
-            }
-
             var ret = new ArrayList<VoltageWithConfig>();
             for (var entry : je.getAsJsonObject().entrySet()) {
+                // add base settings
+                var jo2 = new JsonObject();
+                for (var entry1 : jo.entrySet()) {
+                    if (!entry1.getKey().equals(field)) {
+                        jo2.add(entry1.getKey(), entry1.getValue().deepCopy());
+                    }
+                }
+
+                // add specific setting
                 var v = Voltage.fromName(entry.getKey());
                 var jo1 = GsonHelper.convertToJsonObject(entry.getValue(), field);
                 for (var entry1 : jo1.entrySet()) {

@@ -210,7 +210,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
     private class MachineSelectPanel extends ButtonPanel {
         public MachineSelectPanel() {
-            super(LogisticWorkerScreen.this, BUTTON_SIZE, BUTTON_SIZE, 2);
+            super(LogisticWorkerScreen.this, BUTTON_SIZE, BUTTON_SIZE, 1);
         }
 
         @Override
