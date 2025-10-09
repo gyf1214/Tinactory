@@ -56,6 +56,7 @@ public final class AllMultiblocks {
         REGISTRATE.block("multiblock/misc/turbine_blade", TurbineBlock::new)
             .material(Material.HEAVY_METAL, MaterialColor.COLOR_MAGENTA)
             .properties(MiscMeta.CASING_PROPERTY)
+            .translucent()
             .register();
 
         var plascrete = BLOCKS.getEntry("multiblock/misc/plascrete");

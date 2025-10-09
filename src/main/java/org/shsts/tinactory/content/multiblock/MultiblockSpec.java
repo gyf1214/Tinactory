@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.Lazy;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
-import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
+import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
+public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
     public static final char IGNORED_CHAR = ' ';
     public static final char CENTER_CHAR = '$';
 
@@ -50,7 +50,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
     }
 
     private final List<Layer> layers;
-    private final Map<Character, BiConsumer<MultiblockCheckCtx, BlockPos>> checkers;
+    private final Map<Character, BiConsumer<IMultiblockCheckCtx, BlockPos>> checkers;
     private final Layer centerLayer;
     private final int centerLayerIdx;
     private final int centerW;
@@ -69,7 +69,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
         this.depth = builder.depth;
     }
 
-    private boolean getDirections(MultiblockCheckCtx ctx) {
+    private boolean getDirections(IMultiblockCheckCtx ctx) {
         var blockState = ctx.getBlock(ctx.getCenter());
         if (blockState.isEmpty()) {
             ctx.setFailed();
@@ -99,7 +99,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
         return true;
     }
 
-    private Optional<List<BlockPos>> checkLayer(MultiblockCheckCtx ctx, Layer layer, BlockPos base,
+    private Optional<List<BlockPos>> checkLayer(IMultiblockCheckCtx ctx, Layer layer, BlockPos base,
         int y, Direction dirW, Direction dirD) {
         var blocks = new ArrayList<BlockPos>();
         for (var d = 0; d < depth; d++) {
@@ -127,7 +127,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
         return Optional.of(blocks);
     }
 
-    private boolean checkLayer(MultiblockCheckCtx ctx, Layer layer, boolean reverse) {
+    private boolean checkLayer(IMultiblockCheckCtx ctx, Layer layer, boolean reverse) {
         var dirW = (Direction) ctx.getProperty("dirW");
         var dirD = (Direction) ctx.getProperty("dirD");
         var base = (BlockPos) ctx.getProperty("base");
@@ -155,7 +155,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
     }
 
     @Override
-    public void accept(MultiblockCheckCtx ctx) {
+    public void accept(IMultiblockCheckCtx ctx) {
         if (!getDirections(ctx)) {
             return;
         }
@@ -176,7 +176,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
         ctx.setProperty("height", h1 - h2);
     }
 
-    public static boolean checkInterface(MultiblockCheckCtx ctx, BlockPos pos) {
+    public static boolean checkInterface(IMultiblockCheckCtx ctx, BlockPos pos) {
         var be = ctx.getBlockEntity(pos);
         if (be.isEmpty()) {
             return false;
@@ -195,7 +195,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
 
     public static class Builder<P> extends SimpleBuilder<MultiblockSpec, P, Builder<P>> {
         private final List<Layer> layers = new ArrayList<>();
-        private final Map<Character, BiConsumer<MultiblockCheckCtx, BlockPos>> checkers = new HashMap<>();
+        private final Map<Character, BiConsumer<IMultiblockCheckCtx, BlockPos>> checkers = new HashMap<>();
         private int centerLayerIdx = -1;
         private int centerW;
         private int centerD;
@@ -221,7 +221,7 @@ public class MultiblockSpec implements Consumer<MultiblockCheckCtx> {
                 });
         }
 
-        public Builder<P> check(char ch, BiConsumer<MultiblockCheckCtx, BlockPos> checker) {
+        public Builder<P> check(char ch, BiConsumer<IMultiblockCheckCtx, BlockPos> checker) {
             checkers.put(ch, checker);
             return this;
         }

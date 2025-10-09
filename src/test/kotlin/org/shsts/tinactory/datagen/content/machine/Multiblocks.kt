@@ -16,6 +16,9 @@ import org.shsts.tinactory.content.AllTags.CLEANROOM_WALL
 import org.shsts.tinactory.content.AllTags.COIL
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
 import org.shsts.tinactory.content.AllTags.machine
+import org.shsts.tinactory.content.multiblock.TurbineBlock.CENTER_BLADE
+import org.shsts.tinactory.content.network.MachineBlock
+import org.shsts.tinactory.content.network.PrimitiveBlock
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.gregtech
@@ -368,6 +371,22 @@ object Multiblocks {
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
             multiblock("multi_smelter", "heatproof", "blast_furnace")
             multiblock("metal_former", "frost_proof", "blast_furnace")
+            block("multiblock/large_turbine") {
+                blockState { ctx ->
+                    val prov = ctx.provider()
+                    val models = prov.models()
+                    val id = ctx.id()
+                    val modelId = "block/multiblock/misc/turbine_blade_$CENTER_BLADE"
+                    val idle = models.withExistingParent(id, modLoc(modelId))
+                    val spin = models.withExistingParent("${id}_active", modLoc("${modelId}_active"))
+                    prov.getVariantBuilder(ctx.`object`())
+                        .forAllStates { state ->
+                            val dir = state.getValue(PrimitiveBlock.FACING)
+                            val model = if (state.getValue(MachineBlock.WORKING)) spin else idle
+                            Models.rotateModel(model, dir)
+                        }
+                }
+            }
         }
     }
 

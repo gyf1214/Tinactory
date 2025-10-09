@@ -1,0 +1,64 @@
+{
+  "recipes": {
+    "tinactory:steam_turbine": {},
+    "tinactory:gas_turbine": {},
+    "tinactory:combustion_generator": {}
+  },
+  "machine": "large_turbine",
+  "autoRecipe": true,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 54,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_gas_collector",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/stable_titanium",
+  "layers": [
+    [
+      "CCC",
+      "CCC",
+      "CCC",
+      "CCC",
+      "RRR"
+    ],
+    [
+      "CCC",
+      "CAC",
+      "CAC",
+      "CAC",
+      "R$R"
+    ],
+    [
+      "CCC",
+      "CCC",
+      "CCC",
+      "CCC",
+      "RRR"
+    ]
+  ],
+  "defines": {
+    "C": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "R": "tinactory:multiblock/misc/turbine_blade",
+    "A": "air"
+  }
+}

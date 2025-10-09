@@ -1,12 +1,16 @@
 package org.shsts.tinactory.core.multiblock;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
 
-public interface MultiblockCheckCtx {
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public interface IMultiblockCheckCtx {
     boolean isFailed();
 
     void setFailed(boolean val);

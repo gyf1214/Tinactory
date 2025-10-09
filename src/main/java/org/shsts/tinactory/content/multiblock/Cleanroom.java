@@ -21,8 +21,8 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockManager;
 
 import java.util.ArrayList;
@@ -162,7 +162,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         cleanness = tag.getDouble("cleanness");
     }
 
-    private static class Spec implements Consumer<MultiblockCheckCtx> {
+    private static class Spec implements Consumer<IMultiblockCheckCtx> {
         private final Supplier<Block> baseBlock;
         private final Supplier<Block> ceilingBlock;
         private final TagKey<Block> wallTag;
@@ -189,7 +189,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             assert maxSize > 0;
         }
 
-        private boolean getSizes(MultiblockCheckCtx ctx) {
+        private boolean getSizes(IMultiblockCheckCtx ctx) {
             var center = ctx.getCenter();
             var w = 1;
             var d = 1;
@@ -232,7 +232,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return true;
         }
 
-        private boolean checkGroundBlock(MultiblockCheckCtx ctx, BlockPos pos, BlockState block) {
+        private boolean checkGroundBlock(IMultiblockCheckCtx ctx, BlockPos pos, BlockState block) {
             if (MultiblockSpec.checkInterface(ctx, pos)) {
                 ctx.setProperty("interfaceSetByGround", true);
                 return !ctx.isFailed();
@@ -240,7 +240,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return block.is(baseBlock.get());
         }
 
-        private boolean checkGround(MultiblockCheckCtx ctx, int y) {
+        private boolean checkGround(IMultiblockCheckCtx ctx, int y) {
             if (y <= 1) {
                 return false;
             }
@@ -265,7 +265,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         }
 
         @SuppressWarnings("unchecked")
-        private boolean checkWallBlock(MultiblockCheckCtx ctx, BlockPos pos, BlockState block, Direction face) {
+        private boolean checkWallBlock(IMultiblockCheckCtx ctx, BlockPos pos, BlockState block, Direction face) {
             if (MultiblockSpec.checkInterface(ctx, pos)) {
                 return !ctx.isFailed();
             }
@@ -290,14 +290,14 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return block.is(wallTag);
         }
 
-        private boolean checkPillarBlock(MultiblockCheckCtx ctx, BlockPos pos, BlockState block) {
+        private boolean checkPillarBlock(IMultiblockCheckCtx ctx, BlockPos pos, BlockState block) {
             if (MultiblockSpec.checkInterface(ctx, pos)) {
                 return !ctx.isFailed();
             }
             return block.is(baseBlock.get());
         }
 
-        private boolean checkWall(MultiblockCheckCtx ctx, int y) {
+        private boolean checkWall(IMultiblockCheckCtx ctx, int y) {
             var center = ctx.getCenter().below(y);
             var w = (int) ctx.getProperty("w");
             var d = (int) ctx.getProperty("d");
@@ -342,7 +342,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return true;
         }
 
-        private boolean checkLayer(MultiblockCheckCtx ctx, int y) {
+        private boolean checkLayer(IMultiblockCheckCtx ctx, int y) {
             if (checkGround(ctx, y)) {
                 return false;
             } else {
@@ -362,7 +362,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return true;
         }
 
-        private void checkLayers(MultiblockCheckCtx ctx) {
+        private void checkLayers(IMultiblockCheckCtx ctx) {
             for (var y = 1; y < maxSize; y++) {
                 if (!checkLayer(ctx, y)) {
                     ctx.setProperty("h", y);
@@ -373,7 +373,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         }
 
         @Override
-        public void accept(MultiblockCheckCtx ctx) {
+        public void accept(IMultiblockCheckCtx ctx) {
             if (!getSizes(ctx)) {
                 ctx.setFailed();
                 return;
@@ -382,7 +382,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         }
     }
 
-    public static class SpecBuilder<P> extends SimpleBuilder<Consumer<MultiblockCheckCtx>, P, SpecBuilder<P>> {
+    public static class SpecBuilder<P> extends SimpleBuilder<Consumer<IMultiblockCheckCtx>, P, SpecBuilder<P>> {
         private Supplier<Block> baseBlock = null;
         private Supplier<Block> ceilingBlock = null;
         private TagKey<Block> wallTag = null;
@@ -437,7 +437,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         }
 
         @Override
-        protected Consumer<MultiblockCheckCtx> createObject() {
+        protected Consumer<IMultiblockCheckCtx> createObject() {
             return new Spec(this);
         }
     }

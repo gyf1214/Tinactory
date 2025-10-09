@@ -50,7 +50,7 @@ public class Multiblock extends MultiblockBase {
     private static final String ID = "multiblock";
 
     private Layout layout;
-    private final Consumer<MultiblockCheckCtx> checker;
+    private final Consumer<IMultiblockCheckCtx> checker;
     private final Supplier<BlockState> appearance;
 
     private boolean firstTick = false;
@@ -84,7 +84,7 @@ public class Multiblock extends MultiblockBase {
         }
     }
 
-    protected static class CheckContext implements MultiblockCheckCtx {
+    protected static class CheckContext implements IMultiblockCheckCtx {
         protected boolean failed = false;
         protected final Level world;
         protected final BlockPos center;
@@ -236,6 +236,11 @@ public class Multiblock extends MultiblockBase {
         invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 
+    public void setWorkBlock(Level world, BlockState state) {
+        // prevent updateShape on neighbor
+        world.setBlock(blockEntity.getBlockPos(), state, 19);
+    }
+
     private void onClientTick() {
         if (!firstTick) {
             updateMultiblockInterface();
@@ -282,7 +287,7 @@ public class Multiblock extends MultiblockBase {
         @Nullable
         private Layout layout = null;
         @Nullable
-        private Consumer<MultiblockCheckCtx> checker = null;
+        private Consumer<IMultiblockCheckCtx> checker = null;
 
         public Builder(IBlockEntityTypeBuilder<P> parent,
             BiFunction<BlockEntity, Builder<P>, Multiblock> factory) {
@@ -306,7 +311,7 @@ public class Multiblock extends MultiblockBase {
             return appearance(() -> val.get().defaultBlockState());
         }
 
-        public <S extends IBuilder<? extends Consumer<MultiblockCheckCtx>, Builder<P>, S>> S spec(
+        public <S extends IBuilder<? extends Consumer<IMultiblockCheckCtx>, Builder<P>, S>> S spec(
             Function<Builder<P>, S> child) {
             return child(child).onCreateObject($ -> this.checker = $);
         }

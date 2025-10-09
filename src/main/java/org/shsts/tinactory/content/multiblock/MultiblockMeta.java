@@ -58,6 +58,7 @@ public class MultiblockMeta extends MachineMeta {
                     var layouts = parseLayout().buildList(maxHeight - 2);
                     yield builder.child(Multiblock.builder((be, $) -> new DistillationTower(be, $, layouts)));
                 }
+                case "large_turbine" -> builder.child(Multiblock.builder(LargeTurbine::new));
                 default -> {
                     if (machineType.equals(recipeTypeStr)) {
                         yield builder.child(Multiblock.builder(Multiblock::new));

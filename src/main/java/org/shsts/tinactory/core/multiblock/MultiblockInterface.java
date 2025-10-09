@@ -196,8 +196,8 @@ public class MultiblockInterface extends Machine {
         if (multiblock == null) {
             return;
         }
-        // prevent updateShape on neighbor
-        world.setBlock(multiblock.blockEntity.getBlockPos(), state, 19);
+        LOGGER.debug("{}: set work block, state = {}", multiblock, state);
+        multiblock.setWorkBlock(world, state);
     }
 
     @Override
