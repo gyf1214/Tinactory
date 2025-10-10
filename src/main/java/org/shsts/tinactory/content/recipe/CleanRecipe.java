@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class CleanRecipe extends ProcessingRecipe {
         return Cleanroom.getCleanness(world, pos);
     }
 
-    private boolean checkCleanness(IMachine machine, Random random) {
+    private double getCleannessRate(IMachine machine) {
         var blockEntity = machine.blockEntity();
         var world = blockEntity.getLevel();
         assert world != null;
@@ -47,23 +48,22 @@ public class CleanRecipe extends ProcessingRecipe {
             world.dimension().location(), pos, cleanness);
 
         if (cleanness >= maxCleanness) {
-            LOGGER.debug("recipe rate=1");
-            return true;
+            return 1d;
         }
         if (cleanness <= minCleanness) {
-            LOGGER.debug("recipe rate=0");
-            return false;
+            return 0d;
         }
-        var rate = (cleanness - minCleanness) / (maxCleanness - minCleanness);
-        LOGGER.debug("recipe rate={}", rate);
-        return random.nextDouble() < rate;
+        return (cleanness - minCleanness) / (maxCleanness - minCleanness);
     }
 
     @Override
-    public void insertOutputs(IMachine machine, Random random) {
-        if (checkCleanness(machine, random)) {
-            super.insertOutputs(machine, random);
+    public void insertOutputs(IMachine machine, int parallel, Random random) {
+        var rate = getCleannessRate(machine);
+        if (rate <= 0d) {
+            return;
         }
+        var parallel1 = rate < 1d ? MathUtil.sampleBinomial(parallel, rate, random) : parallel;
+        super.insertOutputs(machine, parallel1, random);
     }
 
     public static class Builder extends BuilderBase<CleanRecipe, Builder> {

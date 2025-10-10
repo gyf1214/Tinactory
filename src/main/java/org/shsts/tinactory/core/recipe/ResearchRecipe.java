@@ -8,12 +8,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.ITechManager;
+import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -43,10 +46,29 @@ public class ResearchRecipe extends ProcessingRecipe {
         return team.filter(this::canResearch).isPresent();
     }
 
+    private boolean matchOutputs(ITechManager techManager, Optional<ITeamProfile> team, int parallel) {
+        if (parallel <= 1) {
+            return true;
+        }
+        return team.flatMap(team1 -> techManager
+                .techByKey(target)
+                .map(tech -> team1.getTechProgress(tech) + progress * parallel <= tech.getMaxProgress()))
+            .orElse(false);
+    }
+
     @Override
-    public void insertOutputs(IMachine machine, Random random) {
+    public boolean matches(IMachine machine, Level world, int parallel) {
+        var container = machine.container();
+        var manager = TechManager.get(world);
+        return canCraft(machine) && matchOutputs(manager, machine.owner(), parallel) && container
+            .filter($ -> matchInputs($, parallel))
+            .isPresent();
+    }
+
+    @Override
+    public void insertOutputs(IMachine machine, int parallel, Random random) {
         machine.owner()
-            .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress));
+            .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress * parallel));
     }
 
     public static class Builder extends ProcessingRecipe.BuilderBase<ResearchRecipe, Builder> {

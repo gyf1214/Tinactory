@@ -14,7 +14,9 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,18 +55,21 @@ public final class ProcessingResults {
             return portType;
         }
 
-        protected abstract boolean doInsertPort(T port, Random random, boolean simulate);
+        protected abstract boolean doInsertPort(T port, int parallel, Random random, boolean simulate);
 
         @Override
-        public boolean insertPort(IPort port, Random random, boolean simulate) {
+        public boolean insertPort(IPort port, int parallel, Random random, boolean simulate) {
             if (portClazz.isInstance(port)) {
-                if (simulate && rate < 1d) {
-                    return true;
+                var port1 = portClazz.cast(port);
+                if (rate < 1d) {
+                    if (simulate) {
+                        return true;
+                    }
+                    var parallel1 = MathUtil.sampleBinomial(parallel, rate, random);
+                    return parallel1 <= 0 || doInsertPort(port1, parallel1, random, false);
+                } else {
+                    return doInsertPort(port1, parallel, random, simulate);
                 }
-                if (!simulate && random.nextDouble() > rate) {
-                    return true;
-                }
-                return doInsertPort(portClazz.cast(port), random, simulate);
             }
             return false;
         }
@@ -81,8 +86,9 @@ public final class ProcessingResults {
         }
 
         @Override
-        protected boolean doInsertPort(IItemCollection port, Random random, boolean simulate) {
-            return port.insertItem(stack, simulate).isEmpty();
+        protected boolean doInsertPort(IItemCollection port, int parallel, Random random, boolean simulate) {
+            var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
+            return port.insertItem(stack1, simulate).isEmpty();
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -102,8 +108,9 @@ public final class ProcessingResults {
         }
 
         @Override
-        protected boolean doInsertPort(IFluidCollection port, Random random, boolean simulate) {
-            return port.acceptInput(stack) && port.fill(stack, simulate) == stack.getAmount();
+        protected boolean doInsertPort(IFluidCollection port, int parallel, Random random, boolean simulate) {
+            var stack1 = StackHelper.copyWithAmount(stack, stack.getAmount() * parallel);
+            return port.acceptInput(stack1) && port.fill(stack1, simulate) == stack1.getAmount();
         }
 
         private static final Codec<FluidResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(

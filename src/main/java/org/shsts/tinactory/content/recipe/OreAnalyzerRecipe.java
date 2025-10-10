@@ -25,19 +25,21 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
 
     /**
      * This is only called in primitive processor.
+     * <p>
+     * Ignore parallel.
      */
     @Override
-    public void insertOutputs(IContainer container, Random random) {
+    public void insertOutputs(IContainer container, int parallel, Random random) {
         if (random.nextDouble() <= rate) {
-            super.insertOutputs(container, random);
+            super.insertOutputs(container, parallel, random);
         }
     }
 
     /**
      * This is called in {@link OreAnalyzer}.
      */
-    public void doInsertOutputs(IContainer container, Random random) {
-        super.insertOutputs(container, random);
+    public void doInsertOutputs(IContainer container, int parallel, Random random) {
+        super.insertOutputs(container, parallel, random);
     }
 
     public static class Builder extends AssemblyRecipe.BuilderBase<OreAnalyzerRecipe, Builder> {

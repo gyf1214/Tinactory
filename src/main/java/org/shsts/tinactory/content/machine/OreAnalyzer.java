@@ -102,7 +102,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     @Override
     public void onWorkDone(OreAnalyzerRecipe recipe, IMachine machine, Random random) {
         if (!emptyRecipe) {
-            machine.container().ifPresent(container -> recipe.doInsertOutputs(container, random));
+            machine.container().ifPresent(container -> recipe.doInsertOutputs(container, 1, random));
         }
     }
 }

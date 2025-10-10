@@ -40,9 +40,12 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public boolean consumePort(IPort port, boolean simulate) {
-            return port instanceof IItemCollection itemCollection &&
-                itemCollection.extractItem(stack, simulate).getCount() >= stack.getCount();
+        public boolean consumePort(IPort port, int parallel, boolean simulate) {
+            if (!(port instanceof IItemCollection item)) {
+                return false;
+            }
+            var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
+            return item.extractItem(stack1, simulate).getCount() >= stack1.getCount();
         }
 
         private static final Codec<ItemIngredient> CODEC =
@@ -64,14 +67,14 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public boolean consumePort(IPort port, boolean simulate) {
-            if (!(port instanceof IItemCollection collection)) {
+        public boolean consumePort(IPort port, int parallel, boolean simulate) {
+            if (!(port instanceof IItemCollection item)) {
                 return false;
             }
             if (amount <= 0) {
-                return !simulate || StackHelper.hasItem(collection, ingredient);
+                return !simulate || StackHelper.hasItem(item, ingredient);
             } else {
-                return StackHelper.consumeItemCollection(collection, ingredient, amount, simulate);
+                return StackHelper.consumeItemCollection(item, ingredient, amount * parallel, simulate);
             }
         }
 
@@ -123,9 +126,12 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public boolean consumePort(IPort port, boolean simulate) {
-            return port instanceof IFluidCollection fluidCollection &&
-                fluidCollection.drain(fluid, simulate).getAmount() >= fluid.getAmount();
+        public boolean consumePort(IPort port, int parallel, boolean simulate) {
+            if (!(port instanceof IFluidCollection fluidCollection)) {
+                return false;
+            }
+            var fluid1 = StackHelper.copyWithAmount(fluid, fluid.getAmount() * parallel);
+            return fluidCollection.drain(fluid1, simulate).getAmount() >= fluid1.getAmount();
         }
 
         private static final Codec<FluidIngredient> CODEC =

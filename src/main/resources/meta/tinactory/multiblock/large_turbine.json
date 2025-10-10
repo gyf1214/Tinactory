@@ -1,8 +1,14 @@
 {
   "recipes": {
-    "tinactory:steam_turbine": {},
-    "tinactory:gas_turbine": {},
-    "tinactory:combustion_generator": {}
+    "tinactory:steam_turbine": {
+      "machine": "generator"
+    },
+    "tinactory:gas_turbine": {
+      "machine": "generator"
+    },
+    "tinactory:combustion_generator": {
+      "machine": "generator"
+    }
   },
   "machine": "large_turbine",
   "autoRecipe": true,

@@ -198,7 +198,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     @Override
     public void onWorkBegin(R recipe, IMachine machine) {
-        recipe.consumeInputs(machine.container().orElseThrow());
+        recipe.consumeInputs(machine.container().orElseThrow(), 1);
         calculateFactors(recipe, machine);
     }
 
@@ -214,7 +214,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     @Override
     public void onWorkDone(R recipe, IMachine machine, Random random) {
-        recipe.insertOutputs(machine, random);
+        recipe.insertOutputs(machine, 1, random);
     }
 
     @Override

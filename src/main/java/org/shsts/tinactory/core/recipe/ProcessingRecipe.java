@@ -55,21 +55,22 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         this.power = builder.power;
     }
 
-    protected boolean consumeInput(IContainer container, Input input, boolean simulate) {
+    protected boolean consumeInput(IContainer container, Input input, int parallel, boolean simulate) {
         return container.hasPort(input.port) &&
-            input.ingredient.consumePort(container.getPort(input.port, true), simulate);
+            input.ingredient.consumePort(container.getPort(input.port, true), parallel, simulate);
     }
 
-    protected boolean insertOutput(IContainer container, Output output, Random random, boolean simulate) {
-        return output.result.insertPort(container.getPort(output.port, true), random, simulate);
+    protected boolean insertOutput(IContainer container, Output output, int parallel,
+        Random random, boolean simulate) {
+        return output.result.insertPort(container.getPort(output.port, true), parallel, random, simulate);
     }
 
-    protected boolean matchInputs(IContainer container) {
-        return inputs.stream().allMatch(input -> consumeInput(container, input, true));
+    protected boolean matchInputs(IContainer container, int parallel) {
+        return inputs.stream().allMatch(input -> consumeInput(container, input, parallel, true));
     }
 
-    protected boolean matchOutputs(IContainer container, Random random) {
-        return outputs.stream().allMatch(output -> insertOutput(container, output, random, true));
+    protected boolean matchOutputs(IContainer container, int parallel, Random random) {
+        return outputs.stream().allMatch(output -> insertOutput(container, output, parallel, random, true));
     }
 
     protected boolean matchTeam(Optional<ITeamProfile> team) {
@@ -89,24 +90,29 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     @Override
     public boolean matches(IMachine machine, Level world) {
-        var container = machine.container();
-        return canCraft(machine) &&
-            container.filter($ -> matchInputs($) && matchOutputs($, world.random)).isPresent();
+        return matches(machine, world, 1);
     }
 
-    public void consumeInputs(IContainer container) {
+    public boolean matches(IMachine machine, Level world, int parallel) {
+        var container = machine.container();
+        return canCraft(machine) && container
+            .filter($ -> matchInputs($, parallel) && matchOutputs($, parallel, world.random))
+            .isPresent();
+    }
+
+    public void consumeInputs(IContainer container, int parallel) {
         for (var input : inputs) {
-            consumeInput(container, input, false);
+            consumeInput(container, input, parallel, false);
         }
     }
 
-    public void insertOutputs(IMachine machine, Random random) {
-        insertOutputs(machine.container().orElseThrow(), random);
+    public void insertOutputs(IMachine machine, int parallel, Random random) {
+        machine.container().ifPresent(container -> insertOutputs(container, parallel, random));
     }
 
-    public void insertOutputs(IContainer container, Random random) {
+    public void insertOutputs(IContainer container, int parallel, Random random) {
         for (var output : outputs) {
-            insertOutput(container, output, random, false);
+            insertOutput(container, output, parallel, random, false);
         }
     }
 

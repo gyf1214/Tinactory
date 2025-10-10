@@ -11,6 +11,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import org.shsts.tinactory.api.tech.IClientTechManager;
@@ -268,6 +269,10 @@ public class TechManager implements ITechManager {
     public static Client client() {
         assert client != null;
         return client;
+    }
+
+    public static TechManager get(Level world) {
+        return world.isClientSide ? client() : server();
     }
 
     public static Optional<ITeamProfile> localTeam() {

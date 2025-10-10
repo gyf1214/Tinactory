@@ -56,7 +56,7 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public boolean matches(IMachine machine, Level world) {
+    public boolean matches(IMachine machine, Level world, int parallel) {
         return false;
     }
 

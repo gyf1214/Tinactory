@@ -31,26 +31,26 @@ public class DistillationRecipe extends DisplayInputRecipe {
             .orElse(0);
     }
 
-    private boolean matchOutputs(IMachine machine, IContainer container, Random random) {
+    private boolean matchOutputs(IMachine machine, IContainer container, int parallel, Random random) {
         var slots = getSlots(machine);
         return outputs.stream().limit(slots)
-            .allMatch(output -> insertOutput(container, output, random, true));
+            .allMatch(output -> insertOutput(container, output, parallel, random, true));
     }
 
     @Override
-    public boolean matches(IMachine machine, Level world) {
+    public boolean matches(IMachine machine, Level world, int parallel) {
         var container = machine.container();
         return canCraft(machine) && container
-            .filter($ -> matchInputs($) && matchOutputs(machine, $, world.random))
+            .filter($ -> matchInputs($, parallel) && matchOutputs(machine, $, parallel, world.random))
             .isPresent();
     }
 
     @Override
-    public void insertOutputs(IMachine machine, Random random) {
+    public void insertOutputs(IMachine machine, int parallel, Random random) {
         var container = machine.container().orElseThrow();
         var slots = Math.min(outputs.size(), getSlots(machine));
         for (var i = 0; i < slots; i++) {
-            insertOutput(container, outputs.get(i), random, false);
+            insertOutput(container, outputs.get(i), parallel, random, false);
         }
     }
 

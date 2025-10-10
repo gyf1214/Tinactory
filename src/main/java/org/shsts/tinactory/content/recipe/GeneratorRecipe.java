@@ -27,7 +27,7 @@ public class GeneratorRecipe extends DisplayInputRecipe {
     }
 
     @Override
-    protected boolean matchOutputs(IContainer container, Random random) {
+    protected boolean matchOutputs(IContainer container, int parallel, Random random) {
         // no check output
         return true;
     }
