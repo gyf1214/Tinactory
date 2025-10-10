@@ -25,6 +25,7 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.IBuilder;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class Multiblock extends MultiblockBase {
     private Layout layout;
     private final Consumer<IMultiblockCheckCtx> checker;
     private final Supplier<BlockState> appearance;
+    private final IMenuType menu;
 
     private boolean firstTick = false;
     @Nullable
@@ -67,6 +69,7 @@ public class Multiblock extends MultiblockBase {
         this.layout = Objects.requireNonNull(builder.layout);
         this.checker = Objects.requireNonNull(builder.checker);
         this.appearance = Objects.requireNonNull(builder.appearance);
+        this.menu = Objects.requireNonNull(builder.menu);
     }
 
     public BlockState getAppearanceBlock() {
@@ -199,16 +202,20 @@ public class Multiblock extends MultiblockBase {
         return Optional.ofNullable(multiblockInterface);
     }
 
-    public Optional<IContainer> getContainer() {
+    public Optional<IContainer> container() {
         return getInterface().flatMap(MultiblockInterface::container);
     }
 
-    public IProcessor getProcessor() {
+    public IProcessor processor() {
         return AllCapabilities.PROCESSOR.get(blockEntity);
     }
 
-    public IElectricMachine getElectric() {
+    public IElectricMachine electric() {
         return AllCapabilities.ELECTRIC_MACHINE.get(blockEntity);
+    }
+
+    public IMenuType menu() {
+        return menu;
     }
 
     /**
@@ -280,7 +287,6 @@ public class Multiblock extends MultiblockBase {
 
     public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, Multiblock>,
         IBlockEntityTypeBuilder<P>, Builder<P>> {
-
         private final BiFunction<BlockEntity, Builder<P>, Multiblock> factory;
         @Nullable
         private Supplier<BlockState> appearance = null;
@@ -288,6 +294,8 @@ public class Multiblock extends MultiblockBase {
         private Layout layout = null;
         @Nullable
         private Consumer<IMultiblockCheckCtx> checker = null;
+        @Nullable
+        private IMenuType menu = null;
 
         public Builder(IBlockEntityTypeBuilder<P> parent,
             BiFunction<BlockEntity, Builder<P>, Multiblock> factory) {
@@ -309,6 +317,11 @@ public class Multiblock extends MultiblockBase {
 
         public Builder<P> appearanceBlock(Supplier<Block> val) {
             return appearance(() -> val.get().defaultBlockState());
+        }
+
+        public Builder<P> menu(IMenuType val) {
+            this.menu = val;
+            return this;
         }
 
         public <S extends IBuilder<? extends Consumer<IMultiblockCheckCtx>, Builder<P>, S>> S spec(

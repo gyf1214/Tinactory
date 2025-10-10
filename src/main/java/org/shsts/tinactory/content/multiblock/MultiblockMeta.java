@@ -8,6 +8,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Material;
+import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
@@ -49,7 +50,7 @@ public class MultiblockMeta extends MachineMeta {
             var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
             builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
 
-            return switch (machineType) {
+            var ret = switch (machineType) {
                 case "default" -> builder.child(Multiblock.builder(Multiblock::new));
                 case "coil", "blast_furnace" -> builder.child(Multiblock.builder(CoilMultiblock::new));
                 case "engraving" -> builder.child(Multiblock.builder(Lithography::new));
@@ -66,6 +67,11 @@ public class MultiblockMeta extends MachineMeta {
                         throw new UnsupportedTypeException("machine", machineType);
                     }
                 }
+            };
+
+            return switch (machineType) {
+                case "research" -> ret.menu(AllMenus.RESEARCH_BENCH);
+                default -> ret.menu(AllMenus.PROCESSING_MACHINE);
             };
         }
 

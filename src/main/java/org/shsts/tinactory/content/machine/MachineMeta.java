@@ -289,7 +289,6 @@ public class MachineMeta extends MetaConsumer {
 
         private IEntry<MachineBlock> multiblockInterface(Voltage v) {
             return BlockEntityBuilder.builder(machineId(v), MachineBlock.multiblockInterface(v))
-                .menu(AllMenus.PROCESSING_MACHINE)
                 .blockEntity()
                 .transform(MultiblockInterface::factory)
                 .transform(FlexibleStackContainer::factory)

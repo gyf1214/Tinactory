@@ -8,6 +8,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -18,6 +20,7 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
@@ -25,6 +28,7 @@ import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
@@ -97,8 +101,8 @@ public class MultiblockInterface extends Machine {
         }
         LOGGER.debug("{} set multiblock = {}", this, target);
         multiblock = target;
-        processor = target.getProcessor();
-        electricMachine = target.getElectric();
+        processor = target.processor();
+        electricMachine = target.electric();
         setLayout(target.getLayout());
         var world = blockEntity.getLevel();
         assert world != null;
@@ -173,6 +177,21 @@ public class MultiblockInterface extends Machine {
             updateMultiblock();
             firstTick = true;
         }
+    }
+
+    @Override
+    protected void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
+        super.onUse(arg, result);
+        if (result.get() != InteractionResult.PASS || multiblock == null) {
+            return;
+        }
+
+        var player = arg.player();
+        var world = player.level;
+        if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {
+            multiblock.menu().open(serverPlayer, blockEntity.getBlockPos());
+        }
+        result.set(InteractionResult.sidedSuccess(world.isClientSide));
     }
 
     @Override

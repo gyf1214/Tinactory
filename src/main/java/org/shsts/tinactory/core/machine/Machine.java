@@ -136,7 +136,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
     }
 
-    private void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
+    protected void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
         var player = arg.player();
         // TODO: unfortunately client does not know whether the player can interact with this machine,
         //       so on client we simply pass.

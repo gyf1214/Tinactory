@@ -104,9 +104,7 @@ public class SmartEntityBlock extends Block implements EntityBlock {
         }
         if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {
             menu.open(serverPlayer, pos);
-            return InteractionResult.CONSUME;
-        } else {
-            return InteractionResult.SUCCESS;
         }
+        return InteractionResult.sidedSuccess(world.isClientSide);
     }
 }
