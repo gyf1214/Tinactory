@@ -20,14 +20,19 @@ public class MachineConfig implements IMachineConfig {
     }
 
     @Override
-    public Optional<String> getString(String key) {
-        return tag.contains(key, Tag.TAG_STRING) ? Optional.of(tag.getString(key)) :
-            Optional.empty();
+    public Optional<Boolean> getBoolean(String key) {
+        return tag.contains(key, Tag.TAG_BYTE) ? Optional.of(tag.getBoolean(key)) : Optional.empty();
     }
 
     @Override
-    public Optional<Boolean> getBoolean(String key) {
-        return tag.contains(key, Tag.TAG_BYTE) ? Optional.of(tag.getBoolean(key)) : Optional.empty();
+    public Optional<Integer> getInt(String key) {
+        return tag.contains(key, Tag.TAG_INT) ? Optional.of(tag.getInt(key)) : Optional.empty();
+    }
+
+    @Override
+    public Optional<String> getString(String key) {
+        return tag.contains(key, Tag.TAG_STRING) ? Optional.of(tag.getString(key)) :
+            Optional.empty();
     }
 
     @Override

@@ -2,8 +2,10 @@ package org.shsts.tinactory.core.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
@@ -15,7 +17,7 @@ import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IRecipeProcessor<T> {
+public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
     Class<T> baseClass();
 
     Optional<T> byLoc(Level world, ResourceLocation loc);
@@ -40,7 +42,7 @@ public interface IRecipeProcessor<T> {
             .orElseGet(() -> newRecipe(world, machine));
     }
 
-    void onWorkBegin(T recipe, IMachine machine);
+    void onWorkBegin(T recipe, IMachine machine, int parallel);
 
     void onWorkContinue(T recipe, IMachine machine);
 

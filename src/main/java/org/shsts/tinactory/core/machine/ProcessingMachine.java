@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.machine;
 import com.google.common.collect.ArrayListMultimap;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -197,15 +198,13 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public void onWorkBegin(R recipe, IMachine machine) {
+    public void onWorkBegin(R recipe, IMachine machine, int parallel) {
         recipe.consumeInputs(machine.container().orElseThrow(), 1);
         calculateFactors(recipe, machine);
     }
 
     @Override
-    public void onWorkContinue(R recipe, IMachine machine) {
-        calculateFactors(recipe, machine);
-    }
+    public void onWorkContinue(R recipe, IMachine machine) {}
 
     @Override
     public long onWorkProgress(R recipe, double partial) {
@@ -235,5 +234,19 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public double powerCons(R recipe) {
         return energyFactor * recipe.power;
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        var tag = new CompoundTag();
+        tag.putDouble("workFactor", workFactor);
+        tag.putDouble("energyFactor", energyFactor);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        workFactor = tag.getDouble("workFactor");
+        energyFactor = tag.getDouble("energyFactor");
     }
 }

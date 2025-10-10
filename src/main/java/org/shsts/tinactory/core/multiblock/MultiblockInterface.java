@@ -41,6 +41,7 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 @MethodsReturnNonnullByDefault
 public class MultiblockInterface extends Machine {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final String PARALLEL_KEY = "parallel";
 
     public final Voltage voltage;
     private IFlexibleContainer container;
@@ -213,6 +214,14 @@ public class MultiblockInterface extends Machine {
     @Override
     public Optional<IElectricMachine> electric() {
         return Optional.ofNullable(electricMachine);
+    }
+
+    public int maxParallel() {
+        return 1;
+    }
+
+    public int parallel() {
+        return Math.min(maxParallel(), config.getInt(PARALLEL_KEY, 1));
     }
 
     @Override

@@ -62,10 +62,11 @@ public class MachineProcessor extends CapabilityProvider implements
      */
     @Nullable
     private ResourceLocation currentRecipeLoc = null;
+    private int processorIndex;
 
-    private record ProcessorRecipe<T>(IRecipeProcessor<T> processor, T recipe) {
-        public void onWorkBegin(IMachine machine) {
-            processor.onWorkBegin(recipe, machine);
+    private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, T recipe) {
+        public void onWorkBegin(IMachine machine, int parallel) {
+            processor.onWorkBegin(recipe, machine, parallel);
         }
 
         public void onWorkContinue(IMachine machine) {
@@ -128,6 +129,13 @@ public class MachineProcessor extends CapabilityProvider implements
 
     private Optional<IContainer> container() {
         return machine().flatMap(IMachine::container);
+    }
+
+    /**
+     * Return max parallel for the processor.
+     */
+    protected int parallel() {
+        return 1;
     }
 
     private Optional<ResourceLocation> targetRecipe() {
@@ -202,14 +210,14 @@ public class MachineProcessor extends CapabilityProvider implements
         targetRecipe().ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
     }
 
-    private <T> boolean newRecipe(IRecipeProcessor<T> processor, Level world,
+    private <T> boolean newRecipe(int index, IRecipeProcessor<T> processor, Level world,
         IMachine machine, Optional<ResourceLocation> target) {
         if (!autoRecipe && target.isEmpty()) {
             return false;
         }
         var recipe = processor.newRecipe(world, machine, target);
         if (recipe.isPresent()) {
-            currentRecipe = new ProcessorRecipe<>(processor, recipe.get());
+            currentRecipe = new ProcessorRecipe<>(index, processor, recipe.get());
             return true;
         }
         return false;
@@ -227,15 +235,16 @@ public class MachineProcessor extends CapabilityProvider implements
         }
 
         var target = targetRecipe();
-        for (var processor : processors) {
-            if (newRecipe(processor, world, machine.get(), target)) {
+        for (var i = 0; i < processors.size(); i++) {
+            var processor = processors.get(i);
+            if (newRecipe(i, processor, world, machine.get(), target)) {
                 break;
             }
         }
 
         workProgress = 0;
         if (currentRecipe != null) {
-            currentRecipe.onWorkBegin(machine.get());
+            currentRecipe.onWorkBegin(machine.get(), parallel());
         }
         needUpdate = false;
         blockEntity.setChanged();
@@ -306,24 +315,19 @@ public class MachineProcessor extends CapabilityProvider implements
         return currentRecipe == null ? 0 : currentRecipe.powerCons();
     }
 
-    private <T> boolean recoverRecipe(IRecipeProcessor<T> processor, Level world, ResourceLocation loc) {
-        var recipe = processor.byLoc(world, loc);
-        if (recipe.isPresent()) {
-            currentRecipe = new ProcessorRecipe<>(processor, recipe.get());
-            return true;
-        }
-        return false;
+    private <T> void recoverRecipe(int index, IRecipeProcessor<T> processor,
+        Level world, ResourceLocation loc) {
+        processor.byLoc(world, loc).ifPresent(recipe ->
+            currentRecipe = new ProcessorRecipe<>(index, processor, recipe));
     }
 
     private void onServerLoad(Level world) {
+        currentRecipe = null;
         if (currentRecipeLoc != null) {
-            for (var processor : processors) {
-                if (recoverRecipe(processor, world, currentRecipeLoc)) {
-                    break;
-                }
-            }
+            var processor = processors.get(processorIndex);
+            recoverRecipe(processorIndex, processor, world, currentRecipeLoc);
+            currentRecipeLoc = null;
         }
-        currentRecipeLoc = null;
 
         if (currentRecipe != null) {
             machine().ifPresent(currentRecipe::onWorkContinue);
@@ -370,10 +374,14 @@ public class MachineProcessor extends CapabilityProvider implements
         var tag = new CompoundTag();
         if (currentRecipe != null) {
             tag.putString("currentRecipe", currentRecipe.loc().toString());
+            tag.putInt("processorIndex", currentRecipe.index());
             tag.putLong("workProgress", workProgress);
+            tag.put("processorData", currentRecipe.processor().serializeNBT());
         } else if (currentRecipeLoc != null) {
             tag.putString("currentRecipe", currentRecipeLoc.toString());
+            tag.putInt("processorIndex", processorIndex);
             tag.putLong("workProgress", workProgress);
+            tag.put("processorData", processors.get(processorIndex).serializeNBT());
         }
         return tag;
     }
@@ -383,7 +391,11 @@ public class MachineProcessor extends CapabilityProvider implements
         currentRecipe = null;
         if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
             currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
+            processorIndex = tag.getInt("processorIndex");
             workProgress = tag.getLong("workProgress");
+            var data = tag.getCompound("processorData");
+            var processor = processors.get(processorIndex);
+            processor.deserializeNBT(data);
         } else {
             currentRecipeLoc = null;
         }

@@ -7,6 +7,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -19,8 +20,17 @@ public class MultiblockProcessor extends MachineProcessor {
         super(blockEntity, processors, autoRecipe);
     }
 
+    private Optional<MultiblockInterface> getInterface() {
+        return Multiblock.get(blockEntity).getInterface();
+    }
+
     @Override
     protected Optional<IMachine> machine() {
-        return Multiblock.get(blockEntity).getInterface().map($ -> $);
+        return getInterface().map($ -> $);
+    }
+
+    @Override
+    protected int parallel() {
+        return getInterface().map(MultiblockInterface::parallel).orElse(1);
     }
 }

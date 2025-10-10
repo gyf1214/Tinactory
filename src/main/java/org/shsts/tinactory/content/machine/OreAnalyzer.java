@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -104,5 +105,18 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
         if (!emptyRecipe) {
             machine.container().ifPresent(container -> recipe.doInsertOutputs(container, 1, random));
         }
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        var tag = super.serializeNBT();
+        tag.putBoolean("empty", emptyRecipe);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        super.deserializeNBT(tag);
+        emptyRecipe = tag.getBoolean("empty");
     }
 }

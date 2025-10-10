@@ -21,6 +21,12 @@ public interface IMachineConfig extends INBTSerializable<CompoundTag> {
         return getBoolean(key).orElse(defaultValue);
     }
 
+    Optional<Integer> getInt(String key);
+
+    default int getInt(String key, int defaultValue) {
+        return getInt(key).orElse(defaultValue);
+    }
+
     Optional<String> getString(String key);
 
     default Optional<ResourceLocation> getLoc(String key) {

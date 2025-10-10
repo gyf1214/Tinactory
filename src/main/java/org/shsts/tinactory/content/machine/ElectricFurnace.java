@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
@@ -193,7 +194,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public void onWorkBegin(SmeltingRecipe recipe, IMachine machine) {
+    public void onWorkBegin(SmeltingRecipe recipe, IMachine machine, int parallel) {
         var container = machine.container().orElseThrow();
         var ingredient = recipe.getIngredients().get(0);
         StackHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false);
@@ -201,9 +202,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public void onWorkContinue(SmeltingRecipe recipe, IMachine machine) {
-        calculateFactors(machine);
-    }
+    public void onWorkContinue(SmeltingRecipe recipe, IMachine machine) {}
 
     @Override
     public long onWorkProgress(SmeltingRecipe recipe, double partial) {
@@ -234,5 +233,19 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     @Override
     public double powerCons(SmeltingRecipe recipe) {
         return voltage * amperage * energyFactor;
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        var tag = new CompoundTag();
+        tag.putDouble("workFactor", workFactor);
+        tag.putDouble("energyFactor", energyFactor);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        workFactor = tag.getDouble("workFactor");
+        energyFactor = tag.getDouble("energyFactor");
     }
 }
