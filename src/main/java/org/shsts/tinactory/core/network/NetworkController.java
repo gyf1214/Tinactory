@@ -23,11 +23,11 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.AllEvents.BLOCK_USE;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_TICK;
-import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -94,9 +94,13 @@ public class NetworkController extends CapabilityProvider
         return network == null || network.team.hasPlayer(player);
     }
 
-    private void onServerUse(AllEvents.OnUseArg args,
-        IReturnEvent.Result<InteractionResult> result) {
-        if (!canPlayerInteract(args.player())) {
+    private void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
+        // TODO: unfortunately client does not know whether the player can interact with this machine,
+        //       so on client we simply pass.
+        if (arg.player().level.isClientSide) {
+            return;
+        }
+        if (!canPlayerInteract(arg.player())) {
             result.set(InteractionResult.FAIL);
         }
     }
@@ -107,7 +111,7 @@ public class NetworkController extends CapabilityProvider
         eventManager.subscribe(REMOVED_IN_WORLD.get(), $ -> onRemoved());
         eventManager.subscribe(REMOVED_BY_CHUNK.get(), $ -> onRemoved());
         eventManager.subscribe(SERVER_TICK.get(), $ -> onServerTick());
-        eventManager.subscribe(SERVER_USE.get(), this::onServerUse);
+        eventManager.subscribe(BLOCK_USE.get(), this::onUse);
     }
 
     @Override

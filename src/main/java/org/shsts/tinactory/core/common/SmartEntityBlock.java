@@ -26,8 +26,8 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.content.AllEvents.SERVER_PLACE;
-import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
+import static org.shsts.tinactory.content.AllEvents.BLOCK_PLACE;
+import static org.shsts.tinactory.content.AllEvents.BLOCK_USE;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -80,11 +80,8 @@ public class SmartEntityBlock extends Block implements EntityBlock {
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state,
         @Nullable LivingEntity placer, ItemStack stack) {
-        var be = getBlockEntity(world, pos);
-        if (be.isPresent() && !world.isClientSide) {
-            CapabilityProvider.invoke(be.get(), SERVER_PLACE,
-                new AllEvents.OnPlaceArg(placer, stack));
-        }
+        getBlockEntity(world, pos).ifPresent(be -> CapabilityProvider
+            .invoke(be, BLOCK_PLACE, new AllEvents.OnPlaceArg(world, placer, stack)));
     }
 
     @Override
@@ -96,12 +93,10 @@ public class SmartEntityBlock extends Block implements EntityBlock {
             return InteractionResult.PASS;
         }
 
-        if (!world.isClientSide) {
-            var args = new AllEvents.OnUseArg(player, hand, hitResult);
-            var result = CapabilityProvider.invokeReturn(be.get(), SERVER_USE, args);
-            if (result != InteractionResult.PASS) {
-                return result;
-            }
+        var args = new AllEvents.OnUseArg(player, hand, hitResult);
+        var result = CapabilityProvider.invokeReturn(be.get(), BLOCK_USE, args);
+        if (result != InteractionResult.PASS) {
+            return result;
         }
 
         if (menu == null) {

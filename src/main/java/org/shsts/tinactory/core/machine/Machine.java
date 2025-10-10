@@ -47,12 +47,12 @@ import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllEvents.BLOCK_PLACE;
+import static org.shsts.tinactory.content.AllEvents.BLOCK_USE;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.content.AllEvents.SERVER_PLACE;
-import static org.shsts.tinactory.content.AllEvents.SERVER_USE;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
@@ -125,15 +125,24 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         setConfig(SetMachineConfigPacket.builder().set("name", jo).get());
     }
 
-    private void onServerPlace(AllEvents.OnPlaceArg arg) {
+    private void onPlace(AllEvents.OnPlaceArg arg) {
+        // naming is server only as client gets notified when config is changed.
+        if (arg.world().isClientSide) {
+            return;
+        }
         var item = arg.stack();
         if (item.hasCustomHoverName()) {
             setName(item.getHoverName());
         }
     }
 
-    private void onServerUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
+    private void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
         var player = arg.player();
+        // TODO: unfortunately client does not know whether the player can interact with this machine,
+        //       so on client we simply pass.
+        if (player.level.isClientSide) {
+            return;
+        }
         if (!canPlayerInteract(player)) {
             result.set(InteractionResult.FAIL);
             return;
@@ -141,11 +150,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
         var item = player.getItemInHand(arg.hand());
         if (item.is(Items.NAME_TAG) && item.hasCustomHoverName()) {
-            if (!player.level.isClientSide) {
-                setName(item.getHoverName());
-                item.shrink(1);
-            }
-
+            setName(item.getHoverName());
+            item.shrink(1);
             result.set(InteractionResult.sidedSuccess(player.level.isClientSide));
             return;
         }
@@ -287,8 +293,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
         eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
-        eventManager.subscribe(SERVER_PLACE.get(), this::onServerPlace);
-        eventManager.subscribe(SERVER_USE.get(), this::onServerUse);
+        eventManager.subscribe(BLOCK_PLACE.get(), this::onPlace);
+        eventManager.subscribe(BLOCK_USE.get(), this::onUse);
     }
 
     @Override

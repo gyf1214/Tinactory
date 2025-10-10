@@ -34,10 +34,10 @@ public final class AllEvents {
 
     public record OnUseArg(Player player, InteractionHand hand, BlockHitResult hitResult) {}
 
-    public record OnPlaceArg(@Nullable LivingEntity placer, ItemStack stack) {}
+    public record OnPlaceArg(Level world, @Nullable LivingEntity placer, ItemStack stack) {}
 
-    public static final IEntry<IReturnEvent<OnUseArg, InteractionResult>> SERVER_USE;
-    public static final IEntry<IEvent<OnPlaceArg>> SERVER_PLACE;
+    public static final IEntry<IReturnEvent<OnUseArg, InteractionResult>> BLOCK_USE;
+    public static final IEntry<IEvent<OnPlaceArg>> BLOCK_PLACE;
     public static final IEntry<IEvent<Unit>> CONTAINER_CHANGE;
     public static final IEntry<IEvent<INetwork>> CONNECT;
     public static final IEntry<IEvent<INetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
@@ -53,8 +53,8 @@ public final class AllEvents {
         SERVER_TICK = EVENTS.getEntry(SERVER_TICK_LOC);
         CLIENT_TICK = EVENTS.getEntry(CLIENT_TICK_LOC);
 
-        SERVER_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
-        SERVER_PLACE = REGISTRATE.event("server_place");
+        BLOCK_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
+        BLOCK_PLACE = REGISTRATE.event("server_place");
         CONTAINER_CHANGE = REGISTRATE.event("logistics/container_change");
         CONNECT = REGISTRATE.event("network/connect");
         BUILD_SCHEDULING = REGISTRATE.event("network/build_scheduling");
