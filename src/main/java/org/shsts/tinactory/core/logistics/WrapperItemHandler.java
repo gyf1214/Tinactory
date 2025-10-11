@@ -8,8 +8,6 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.core.logistics.StackHelper.FALSE_FILTER;
@@ -17,9 +15,8 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WrapperItemHandler implements IItemHandlerModifiable, IPortNotifier {
+public class WrapperItemHandler extends PortNotifier implements IItemHandlerModifiable, IPortNotifier {
     private final IItemHandlerModifiable compose;
-    private final Set<Runnable> updateListeners = new HashSet<>();
     private final Predicate<ItemStack>[] filters;
     private final boolean[] allowOutputs;
 
@@ -51,22 +48,6 @@ public class WrapperItemHandler implements IItemHandlerModifiable, IPortNotifier
 
     public void setAllowOutput(int idx, boolean value) {
         allowOutputs[idx] = value;
-    }
-
-    @Override
-    public void onUpdate(Runnable listener) {
-        updateListeners.add(listener);
-    }
-
-    @Override
-    public void unregisterListener(Runnable listener) {
-        updateListeners.remove(listener);
-    }
-
-    private void invokeUpdate() {
-        for (var cb : updateListeners) {
-            cb.run();
-        }
     }
 
     @Override

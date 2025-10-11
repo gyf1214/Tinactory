@@ -9,22 +9,18 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import org.shsts.tinactory.api.logistics.IPortNotifier;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WrapperFluidTank implements IFluidTankModifiable, IPortNotifier,
+public class WrapperFluidTank extends PortNotifier implements IFluidTankModifiable,
     INBTSerializable<CompoundTag> {
     public static final WrapperFluidTank EMPTY = new WrapperFluidTank(0);
 
     private final IFluidTank tank;
-    private final Set<Runnable> updateListeners = new HashSet<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
     public Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
@@ -37,22 +33,6 @@ public class WrapperFluidTank implements IFluidTankModifiable, IPortNotifier,
         assert tank instanceof FluidTank ||
             (tank instanceof INBTSerializable<?> && tank instanceof IFluidTankModifiable);
         this.tank = tank;
-    }
-
-    @Override
-    public void onUpdate(Runnable listener) {
-        updateListeners.add(listener);
-    }
-
-    @Override
-    public void unregisterListener(Runnable listener) {
-        updateListeners.remove(listener);
-    }
-
-    private void invokeUpdate() {
-        for (var cb : updateListeners) {
-            cb.run();
-        }
     }
 
     public void resetFilter() {

@@ -1,0 +1,36 @@
+package org.shsts.tinactory.core.logistics;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class DigitalProvider implements IDigitalProvider {
+    private final int bytesLimit;
+    private int bytesRemaining;
+
+    public DigitalProvider(int bytesLimit) {
+        this.bytesLimit = bytesLimit;
+        this.bytesRemaining = bytesLimit;
+    }
+
+    @Override
+    public int bytesUsed() {
+        return bytesLimit - bytesRemaining;
+    }
+
+    @Override
+    public int consumeLimit(int bytes) {
+        return bytesRemaining / bytes;
+    }
+
+    @Override
+    public void consume(int bytes) {
+        bytesRemaining -= bytes;
+    }
+
+    @Override
+    public void reset() {
+        bytesRemaining = bytesLimit;
+    }
+}

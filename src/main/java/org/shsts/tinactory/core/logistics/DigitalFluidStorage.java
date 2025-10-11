@@ -1,15 +1,11 @@
 package org.shsts.tinactory.core.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IFluidFilter;
@@ -22,17 +18,18 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
 import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalFluidStorage extends DigitalStorage implements IFluidCollection, IFluidFilter {
+public class DigitalFluidStorage extends PortNotifier implements IFluidCollection,
+    IFluidFilter, INBTSerializable<CompoundTag> {
+    private final IDigitalProvider provider;
     private final Map<FluidStackWrapper, FluidStack> fluids = new HashMap<>();
     private Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
 
-    public DigitalFluidStorage(ItemStack stack, int bytesLimit) {
-        super(stack, bytesLimit);
+    public DigitalFluidStorage(IDigitalProvider provider) {
+        this.provider = provider;
     }
 
     @Override
@@ -40,11 +37,11 @@ public class DigitalFluidStorage extends DigitalStorage implements IFluidCollect
         if (stack.isEmpty()) {
             return true;
         }
-        if (!filter.test(stack) || bytesRemaining < CONFIG.bytesPerFluid.get()) {
+        if (!filter.test(stack) || !provider.canConsume(CONFIG.bytesPerFluid.get())) {
             return false;
         }
         if (!fluids.containsKey(new FluidStackWrapper(stack))) {
-            return bytesRemaining >= CONFIG.bytesPerFluid.get() + CONFIG.bytesPerFluidType.get();
+            return provider.canConsume(CONFIG.bytesPerFluid.get() + CONFIG.bytesPerFluidType.get());
         }
         return true;
     }
@@ -62,22 +59,22 @@ public class DigitalFluidStorage extends DigitalStorage implements IFluidCollect
         var key = new FluidStackWrapper(fluid);
         var bytesPerFluid = CONFIG.bytesPerFluid.get();
         if (!fluids.containsKey(key)) {
-            var newBytesRemaining = bytesRemaining - CONFIG.bytesPerFluidType.get();
-            var inserted = Math.min(fluid.getAmount(), newBytesRemaining / bytesPerFluid);
+            provider.consume(CONFIG.bytesPerFluidType.get());
+            var inserted = Math.min(fluid.getAmount(), provider.consumeLimit(bytesPerFluid));
             assert inserted > 0 && inserted <= fluid.getAmount();
             if (!simulate) {
                 var insertedStack = StackHelper.copyWithAmount(fluid, inserted);
                 fluids.put(new FluidStackWrapper(insertedStack), insertedStack);
-                bytesRemaining = newBytesRemaining - inserted * bytesPerFluid;
+                provider.consume(inserted * bytesPerFluid);
                 invokeUpdate();
             }
             return inserted;
         } else {
-            var inserted = Math.min(fluid.getAmount(), bytesRemaining / bytesPerFluid);
+            var inserted = Math.min(fluid.getAmount(), provider.consumeLimit(bytesPerFluid));
             assert inserted > 0 && inserted <= fluid.getAmount();
             if (!simulate) {
                 fluids.get(key).grow(inserted);
-                bytesRemaining -= inserted * bytesPerFluid;
+                provider.consume(inserted * bytesPerFluid);
                 invokeUpdate();
             }
             return inserted;
@@ -98,14 +95,14 @@ public class DigitalFluidStorage extends DigitalStorage implements IFluidCollect
         if (fluid.getAmount() >= stack.getAmount()) {
             if (!simulate) {
                 fluids.remove(key);
-                bytesRemaining += CONFIG.bytesPerFluidType.get() + bytesPerFluid * stack.getAmount();
+                provider.restore(CONFIG.bytesPerFluidType.get() + bytesPerFluid * stack.getAmount());
                 invokeUpdate();
             }
             return stack.copy();
         } else {
             if (!simulate) {
                 stack.shrink(fluid.getAmount());
-                bytesRemaining += bytesPerFluid * fluid.getAmount();
+                provider.restore(bytesPerFluid * fluid.getAmount());
                 invokeUpdate();
             }
             return fluid.copy();
@@ -122,14 +119,14 @@ public class DigitalFluidStorage extends DigitalStorage implements IFluidCollect
         if (limit >= stack.getAmount()) {
             if (!simulate) {
                 fluids.remove(new FluidStackWrapper(stack));
-                bytesRemaining += CONFIG.bytesPerFluidType.get() + bytesPerFluid * stack.getAmount();
+                provider.restore(CONFIG.bytesPerFluidType.get() + bytesPerFluid * stack.getAmount());
                 invokeUpdate();
             }
             return stack.copy();
         } else {
             if (!simulate) {
                 stack.shrink(limit);
-                bytesRemaining += bytesPerFluid * limit;
+                provider.restore(bytesPerFluid * limit);
                 invokeUpdate();
             }
             return StackHelper.copyWithAmount(stack, limit);
@@ -161,14 +158,6 @@ public class DigitalFluidStorage extends DigitalStorage implements IFluidCollect
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == FLUID_COLLECTION.get()) {
-            return myself();
-        }
-        return LazyOptional.empty();
-    }
-
-    @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
         var listTag = new ListTag();
@@ -183,13 +172,14 @@ public class DigitalFluidStorage extends DigitalStorage implements IFluidCollect
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
+        provider.reset();
         var listTag = tag.getList("Fluids", Tag.TAG_COMPOUND);
         var bytesPerFluid = CONFIG.bytesPerFluid.get();
         var bytesPerType = CONFIG.bytesPerFluidType.get();
         for (var fluidTag : listTag) {
             var stack = FluidStack.loadFluidStackFromNBT((CompoundTag) fluidTag);
             fluids.put(new FluidStackWrapper(stack), stack);
-            bytesRemaining -= bytesPerType + bytesPerFluid * stack.getAmount();
+            provider.consume(bytesPerType + bytesPerFluid * stack.getAmount());
         }
     }
 }

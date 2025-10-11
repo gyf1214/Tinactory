@@ -10,6 +10,7 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -31,6 +32,7 @@ public final class AllCapabilities {
 
     public static final ICapability<ILayoutProvider> LAYOUT_PROVIDER;
     public static final ICapability<IMachine> MACHINE;
+    public static final ICapability<IDigitalProvider> DIGITAL_PROVIDER;
 
     static {
         ITEM_HANDLER = REGISTRATE.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
@@ -46,6 +48,7 @@ public final class AllCapabilities {
 
         LAYOUT_PROVIDER = REGISTRATE.capability(ILayoutProvider.class, new CapabilityToken<>() {});
         MACHINE = REGISTRATE.capability(IMachine.class, new CapabilityToken<>() {});
+        DIGITAL_PROVIDER = REGISTRATE.capability(IDigitalProvider.class, new CapabilityToken<>() {});
     }
 
     public static void init() {}

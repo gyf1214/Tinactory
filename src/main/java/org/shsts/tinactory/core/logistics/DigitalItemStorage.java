@@ -1,15 +1,12 @@
 package org.shsts.tinactory.core.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IItemFilter;
 
@@ -21,17 +18,18 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
 import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalItemStorage extends DigitalStorage implements IItemCollection, IItemFilter {
+public class DigitalItemStorage extends PortNotifier implements IItemCollection,
+    IItemFilter, INBTSerializable<CompoundTag> {
+    private final IDigitalProvider provider;
     private final Map<ItemStackWrapper, ItemStack> items = new HashMap<>();
     private Predicate<ItemStack> filter = TRUE_FILTER;
 
-    public DigitalItemStorage(ItemStack stack, int bytesLimit) {
-        super(stack, bytesLimit);
+    public DigitalItemStorage(IDigitalProvider provider) {
+        this.provider = provider;
     }
 
     @Override
@@ -39,11 +37,11 @@ public class DigitalItemStorage extends DigitalStorage implements IItemCollectio
         if (stack.isEmpty()) {
             return true;
         }
-        if (!filter.test(stack) || bytesRemaining < CONFIG.bytesPerItem.get()) {
+        if (!filter.test(stack) || !provider.canConsume(CONFIG.bytesPerItem.get())) {
             return false;
         }
         if (!items.containsKey(new ItemStackWrapper(stack))) {
-            return bytesRemaining >= CONFIG.bytesPerItem.get() + CONFIG.bytesPerItemType.get();
+            return provider.canConsume(CONFIG.bytesPerItem.get() + CONFIG.bytesPerItemType.get());
         }
         return true;
     }
@@ -61,24 +59,24 @@ public class DigitalItemStorage extends DigitalStorage implements IItemCollectio
         var key = new ItemStackWrapper(stack);
         var bytesPerItem = CONFIG.bytesPerItem.get();
         if (!items.containsKey(key)) {
-            var newBytesRemaining = bytesRemaining - CONFIG.bytesPerItemType.get();
-            var inserted = Math.min(stack.getCount(), newBytesRemaining / bytesPerItem);
+            provider.consume(CONFIG.bytesPerItemType.get());
+            var inserted = Math.min(stack.getCount(), provider.consumeLimit(bytesPerItem));
             assert inserted > 0 && inserted <= stack.getCount();
             var remaining = StackHelper.copyWithCount(stack, stack.getCount() - inserted);
             if (!simulate) {
                 var insertedStack = StackHelper.copyWithCount(stack, inserted);
                 items.put(new ItemStackWrapper(insertedStack), insertedStack);
-                bytesRemaining = newBytesRemaining - inserted * bytesPerItem;
+                provider.consume(inserted * bytesPerItem);
                 invokeUpdate();
             }
             return remaining;
         } else {
-            var inserted = Math.min(stack.getCount(), bytesRemaining / bytesPerItem);
+            var inserted = Math.min(stack.getCount(), provider.consumeLimit(bytesPerItem));
             assert inserted > 0 && inserted <= stack.getCount();
             var remaining = StackHelper.copyWithCount(stack, stack.getCount() - inserted);
             if (!simulate) {
                 items.get(key).grow(inserted);
-                bytesRemaining -= inserted * bytesPerItem;
+                provider.consume(inserted * bytesPerItem);
                 invokeUpdate();
             }
             return remaining;
@@ -99,14 +97,14 @@ public class DigitalItemStorage extends DigitalStorage implements IItemCollectio
         if (item.getCount() >= stack.getCount()) {
             if (!simulate) {
                 items.remove(key);
-                bytesRemaining += CONFIG.bytesPerItemType.get() + bytesPerItem * stack.getCount();
+                provider.restore(CONFIG.bytesPerItemType.get() + bytesPerItem * stack.getCount());
                 invokeUpdate();
             }
             return stack.copy();
         } else {
             if (!simulate) {
                 stack.shrink(item.getCount());
-                bytesRemaining += bytesPerItem * item.getCount();
+                provider.restore(bytesPerItem * item.getCount());
                 invokeUpdate();
             }
             return item.copy();
@@ -123,14 +121,14 @@ public class DigitalItemStorage extends DigitalStorage implements IItemCollectio
         if (limit >= stack.getCount()) {
             if (!simulate) {
                 items.remove(new ItemStackWrapper(stack));
-                bytesRemaining += CONFIG.bytesPerItemType.get() + bytesPerItem * stack.getCount();
+                provider.restore(CONFIG.bytesPerItemType.get() + bytesPerItem * stack.getCount());
                 invokeUpdate();
             }
             return stack.copy();
         } else {
             if (!simulate) {
                 stack.shrink(limit);
-                bytesRemaining += bytesPerItem * limit;
+                provider.restore(bytesPerItem * limit);
                 invokeUpdate();
             }
             return StackHelper.copyWithCount(stack, limit);
@@ -162,15 +160,7 @@ public class DigitalItemStorage extends DigitalStorage implements IItemCollectio
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ITEM_COLLECTION.get()) {
-            return myself();
-        }
-        return LazyOptional.empty();
-    }
-
-    @Override
-    protected CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
         var listTag = new ListTag();
         for (var stack : items.values()) {
@@ -182,14 +172,15 @@ public class DigitalItemStorage extends DigitalStorage implements IItemCollectio
     }
 
     @Override
-    protected void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(CompoundTag tag) {
+        provider.reset();
         var listTag = tag.getList("Items", Tag.TAG_COMPOUND);
         var bytesPerItem = CONFIG.bytesPerItem.get();
         var bytesPerType = CONFIG.bytesPerItemType.get();
         for (var itemTag : listTag) {
             var stack = StackHelper.deserializeItemStack((CompoundTag) itemTag);
             items.put(new ItemStackWrapper(stack), stack);
-            bytesRemaining -= bytesPerType + bytesPerItem * stack.getCount();
+            provider.consume(bytesPerType + bytesPerItem * stack.getCount());
         }
     }
 }

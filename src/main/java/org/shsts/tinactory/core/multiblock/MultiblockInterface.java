@@ -48,7 +48,7 @@ public class MultiblockInterface extends Machine {
     private static final String PARALLEL_KEY = "parallel";
 
     public final Voltage voltage;
-    private IFlexibleContainer container;
+    protected IFlexibleContainer container;
     private boolean firstTick = false;
     @Nullable
     private BlockPos multiblockPos = null;
@@ -126,7 +126,7 @@ public class MultiblockInterface extends Machine {
         onMultiblockUpdate();
     }
 
-    private void onLoad() {
+    protected void onLoad() {
         container = (IFlexibleContainer) AllCapabilities.CONTAINER.get(blockEntity);
     }
 
@@ -249,10 +249,6 @@ public class MultiblockInterface extends Machine {
             return super.title();
         }
         return I18n.name(multiblock.blockEntity.getBlockState().getBlock());
-    }
-
-    public Optional<Layout> getLayout() {
-        return multiblock == null ? Optional.empty() : Optional.of(multiblock.getLayout());
     }
 
     public Optional<BlockState> getAppearanceBlock() {
