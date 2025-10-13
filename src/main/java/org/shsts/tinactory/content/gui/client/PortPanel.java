@@ -3,9 +3,10 @@ package org.shsts.tinactory.content.gui.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
@@ -17,11 +18,14 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.client.StretchImage;
+import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
+import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 
+import static org.shsts.tinactory.content.AllMenus.PORT_CLICK;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BUTTON_TOP_MARGIN;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_BORDER;
@@ -46,10 +50,14 @@ public class PortPanel extends Panel {
     private static final int OVERLAY_COLOR = 0x80FFAA00;
 
     private class ConfigLabel extends Label {
+        private final int port;
+        private final PortType type;
         private final List<Layout.SlotInfo> slots;
 
-        public ConfigLabel(MenuBase menu, Component line, List<Layout.SlotInfo> slots) {
-            super(menu, line);
+        public ConfigLabel(MenuBase menu, int port, PortType type, List<Layout.SlotInfo> slots) {
+            super(menu, portLabel(type, port));
+            this.port = port;
+            this.type = type;
             this.slots = slots;
             this.verticalAlign = Label.Alignment.MIDDLE;
             this.color = TEXT_COLOR;
@@ -66,6 +74,19 @@ public class PortPanel extends Panel {
             if (isHovering(mouseX, mouseY)) {
                 renderHoverOverlay(poseStack, slots);
             }
+        }
+
+        @Override
+        protected boolean canClick(int button, double mouseX, double mouseY) {
+            return (button == 0 || button == 1) && !menu.getCarried().isEmpty();
+        }
+
+        @Override
+        public void onMouseClicked(double mouseX, double mouseY, int button) {
+            if (type == PortType.FLUID) {
+                ClientUtil.playSound(SoundEvents.BUCKET_FILL);
+            }
+            menu.triggerEvent(PORT_CLICK, () -> new SlotEventPacket(port, button));
         }
     }
 
@@ -87,7 +108,7 @@ public class PortPanel extends Panel {
                 continue;
             }
 
-            var label = new ConfigLabel(menu, portLabel(type.portType, port), slots);
+            var label = new ConfigLabel(menu, port, type.portType, slots);
             label.verticalAlign = Label.Alignment.MIDDLE;
             label.color = 0xFFFFAA00;
 

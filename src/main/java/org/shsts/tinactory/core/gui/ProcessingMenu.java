@@ -12,6 +12,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
+import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 
 import java.util.Optional;
 
@@ -29,23 +30,41 @@ public class ProcessingMenu extends LayoutMenu {
 
     protected ProcessingMenu(Properties properties, int extraHeight) {
         super(properties, extraHeight);
-        addLayoutSlots(layout);
+        addSlots();
+    }
 
-        var fluids = MENU_FLUID_HANDLER.get(blockEntity);
+    /**
+     * Called during constructor.
+     */
+    protected void addFluidSlots(IFluidStackHandler fluids) {
         for (var slot : layout.slots) {
             if (slot.type().portType == PortType.FLUID) {
                 addSyncSlot(FLUID_SLOT + slot.index(),
                     () -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
             }
         }
+    }
 
+    /**
+     * Called during constructor.
+     */
+    protected void addProgressBar() {
         if (layout.progressBar != null) {
             addSyncSlot("progress", () -> new SyncPackets.Double(getProcessor(blockEntity)
                 .map(IProcessor::getProgress)
                 .orElse(0d)));
         }
+    }
 
+    /**
+     * Called during constructor.
+     */
+    protected void addSlots() {
+        addLayoutSlots(layout);
+        var fluids = MENU_FLUID_HANDLER.get(blockEntity);
+        addFluidSlots(fluids);
         onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
+        addProgressBar();
     }
 
     public Optional<Block> machineBlock() {

@@ -45,6 +45,7 @@ public final class AllMenus {
      * Used only in special item slots that is not implemented by the vanilla slot system.
      */
     public static final IMenuEvent<SlotEventPacket> ITEM_SLOT_CLICK;
+    public static final IMenuEvent<SlotEventPacket> PORT_CLICK;
     public static final IMenuEvent<ISetMachineConfigPacket> SET_MACHINE_CONFIG;
     public static final IMenuEvent<RenameEventPacket> RENAME;
     public static final IMenuEvent<MEStorageInterfaceEventPacket> ME_STORAGE_INTERFACE_SLOT;
@@ -73,14 +74,12 @@ public final class AllMenus {
             .registerMenuSyncPacket(MEStorageInterfaceSyncPacket.class,
                 MEStorageInterfaceSyncPacket::new);
 
-        FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class,
-            SlotEventPacket::new);
-        ITEM_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class,
-            SlotEventPacket::new);
+        FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
+        ITEM_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
+        PORT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
         SET_MACHINE_CONFIG = CHANNEL.registerMenuEventPacket(ISetMachineConfigPacket.class,
             SetMachineConfigPacket::new);
-        RENAME = CHANNEL.registerMenuEventPacket(RenameEventPacket.class,
-            RenameEventPacket::new);
+        RENAME = CHANNEL.registerMenuEventPacket(RenameEventPacket.class, RenameEventPacket::new);
         ME_STORAGE_INTERFACE_SLOT = CHANNEL.registerMenuEventPacket(MEStorageInterfaceEventPacket.class,
             MEStorageInterfaceEventPacket::new);
 

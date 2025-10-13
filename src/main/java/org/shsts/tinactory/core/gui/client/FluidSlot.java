@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
@@ -73,6 +74,7 @@ public class FluidSlot extends MenuWidget {
 
     @Override
     public void onMouseClicked(double mouseX, double mouseY, int button) {
+        ClientUtil.playSound(SoundEvents.BUCKET_FILL);
         menu.triggerEvent(FLUID_SLOT_CLICK, () -> new SlotEventPacket(tank, button));
     }
 
