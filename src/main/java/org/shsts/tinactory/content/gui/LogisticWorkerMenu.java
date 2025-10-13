@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.gui.client.AbstractRecipeBook;
+import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.gui.InventoryMenu;
@@ -24,7 +24,7 @@ import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LogisticWorkerMenu extends InventoryMenu {
-    public static final int BUTTON_SIZE = AbstractRecipeBook.BUTTON_SIZE;
+    public static final int BUTTON_SIZE = MachineRecipeBook.BUTTON_SIZE;
     public static final int CONFIG_WIDTH = BUTTON_SIZE * 4 + 2;
     public static final int PORT_WIDTH = 42;
     public static final int WIDTH = CONFIG_WIDTH + SLOT_SIZE * 9 + PORT_WIDTH + 2 * MARGIN_X;

@@ -35,7 +35,7 @@ import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_OFFSET;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_WIDTH;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.PANEL_BORDER;
-import static org.shsts.tinactory.content.gui.client.AbstractRecipeBook.BACKGROUND_TEX_RECT;
+import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
