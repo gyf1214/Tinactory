@@ -27,6 +27,7 @@ public class DigitalProvider implements IDigitalProvider {
     @Override
     public void consume(int bytes) {
         bytesRemaining -= bytes;
+        assert bytesRemaining >= 0 && bytesRemaining <= bytesLimit;
     }
 
     @Override

@@ -1,0 +1,23 @@
+{
+  "recipe": "none",
+  "machine": "digital_interface",
+  "dedicatedBytes": 20480,
+  "voltages": {
+    "ev": {
+      "maxParallel": 2,
+      "bytesLimit": 1048576
+    },
+    "iv": {
+      "maxParallel": 4,
+      "bytesLimit": 1048576
+    },
+    "luv": {
+      "maxParallel": 8,
+      "bytesLimit": 4194304
+    },
+    "zpm": {
+      "maxParallel": 16,
+      "bytesLimit": 4194304
+    }
+  }
+}

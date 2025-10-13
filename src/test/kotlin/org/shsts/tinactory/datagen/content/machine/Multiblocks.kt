@@ -42,6 +42,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
+import org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS
 import org.shsts.tinycorelib.datagen.api.builder.IBlockDataBuilder
 
 object Multiblocks {
@@ -348,6 +349,13 @@ object Multiblocks {
                 block(entry) {
                     blockState { ctx ->
                         multiblockInterface(ctx, IO_TEX)
+                    }
+                }
+            }
+            for (entry in getMachine("multiblock/digital_interface").entries()) {
+                block(entry) {
+                    blockState { ctx ->
+                        multiblockInterface(ctx, ME_BUS)
                     }
                 }
             }

@@ -19,6 +19,7 @@ import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.material.ComponentMeta;
+import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
@@ -287,11 +288,9 @@ public class MachineMeta extends MetaConsumer {
                 .buildObject();
         }
 
-        private IEntry<MachineBlock> multiblockInterface(Voltage v) {
+        private BlockEntityBuilder<MachineBlock, ?> baseInterface(Voltage v) {
             return BlockEntityBuilder.builder(machineId(v), MachineBlock.multiblockInterface(v))
                 .blockEntity()
-                .transform(MultiblockInterface::factory)
-                .transform(FlexibleStackContainer::factory)
                 .renderer(() -> () -> MultiblockInterfaceRenderer::new)
                 .end()
                 .block()
@@ -300,6 +299,26 @@ public class MachineMeta extends MetaConsumer {
                 .tint(() -> () -> (state, $2, $3, i) ->
                     MultiblockInterfaceBlock.tint(v, state, i))
                 .translucent()
+                .end();
+        }
+
+        private IEntry<MachineBlock> multiblockInterface(Voltage v) {
+            return baseInterface(v)
+                .blockEntity()
+                .transform(MultiblockInterface::factory)
+                .transform(FlexibleStackContainer::factory)
+                .end()
+                .buildObject();
+        }
+
+        private IEntry<MachineBlock> digitalInterface(Voltage v, JsonObject jo) {
+            var maxParallel = GsonHelper.getAsInt(jo, "maxParallel");
+            var bytesLimit = GsonHelper.getAsInt(jo, "bytesLimit");
+            var dedicatedBytes = GsonHelper.getAsInt(jo, "dedicatedBytes");
+
+            return baseInterface(v)
+                .blockEntity()
+                .transform(DigitalInterface.factory(maxParallel, bytesLimit, dedicatedBytes))
                 .end()
                 .buildObject();
         }
@@ -350,6 +369,7 @@ public class MachineMeta extends MetaConsumer {
         private IEntry<? extends Block> buildMachine(Voltage v, JsonObject jo) {
             var basic = switch (machineType) {
                 case "multiblock_interface" -> multiblockInterface(v);
+                case "digital_interface" -> digitalInterface(v, jo);
                 case "battery_box" -> batteryBox(v);
                 case "electric_chest" -> electricChest(v, jo);
                 case "electric_tank" -> electricTank(v, jo);

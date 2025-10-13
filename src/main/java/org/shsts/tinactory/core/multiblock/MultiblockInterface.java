@@ -21,9 +21,9 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
-import org.shsts.tinactory.content.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
@@ -240,7 +240,8 @@ public class MultiblockInterface extends Machine {
     }
 
     public int parallel() {
-        return Math.min(maxParallel(), config.getInt(PARALLEL_KEY, 1));
+        var maxParallel = maxParallel();
+        return Math.min(maxParallel, config.getInt(PARALLEL_KEY, maxParallel));
     }
 
     @Override

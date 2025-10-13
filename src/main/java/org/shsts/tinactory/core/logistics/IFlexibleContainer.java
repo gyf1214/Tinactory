@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.logistics;
+package org.shsts.tinactory.core.logistics;
 
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.core.gui.Layout;

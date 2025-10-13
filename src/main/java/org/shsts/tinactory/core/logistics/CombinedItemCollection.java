@@ -19,13 +19,16 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final List<IItemCollection> composes = new ArrayList<>();
+    public boolean allowInput = true;
+    public boolean allowOutput = true;
 
-    public void setComposes(Collection<IItemCollection> val) {
-        for (var compose : composes) {
-            if (compose instanceof IPortNotifier notifier) {
-                notifier.unregisterListener(combinedListener);
-            }
-        }
+    public CombinedItemCollection(Collection<IItemCollection> composes) {
+        setComposes(composes);
+    }
+
+    public CombinedItemCollection() {}
+
+    private void addComposes(Collection<IItemCollection> val) {
         composes.clear();
         composes.addAll(val);
         for (var compose : composes) {
@@ -33,21 +36,33 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
                 notifier.onUpdate(combinedListener);
             }
         }
+    }
+
+    public void setComposes(Collection<IItemCollection> val) {
+        for (var compose : composes) {
+            if (compose instanceof IPortNotifier notifier) {
+                notifier.unregisterListener(combinedListener);
+            }
+        }
+        addComposes(val);
         invokeUpdate();
     }
 
     @Override
     public boolean acceptInput(ItemStack stack) {
-        return composes.stream().anyMatch($ -> $.acceptInput(stack));
+        return allowInput && composes.stream().anyMatch($ -> $.acceptInput(stack));
     }
 
     @Override
     public boolean acceptOutput() {
-        return composes.stream().anyMatch(IPort::acceptOutput);
+        return allowOutput && composes.stream().anyMatch(IPort::acceptOutput);
     }
 
     @Override
     public ItemStack insertItem(ItemStack stack, boolean simulate) {
+        if (!allowInput) {
+            return stack;
+        }
         var stack1 = stack.copy();
         for (var compose : composes) {
             if (stack1.isEmpty()) {
@@ -60,6 +75,9 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
 
     @Override
     public ItemStack extractItem(ItemStack item, boolean simulate) {
+        if (!allowOutput) {
+            return ItemStack.EMPTY;
+        }
         var item1 = item.copy();
         var ret = ItemStack.EMPTY;
         for (var compose : composes) {
@@ -86,6 +104,9 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
 
     @Override
     public ItemStack extractItem(int limit, boolean simulate) {
+        if (!allowOutput) {
+            return ItemStack.EMPTY;
+        }
         return composes.isEmpty() ? ItemStack.EMPTY :
             composes.get(0).extractItem(limit, simulate);
     }

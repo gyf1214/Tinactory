@@ -19,6 +19,24 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final List<IFluidCollection> composes = new ArrayList<>();
+    public boolean allowInput;
+    public boolean allowOutput;
+
+    public CombinedFluidCollection(Collection<IFluidCollection> composes) {
+        addComposes(composes);
+    }
+
+    public CombinedFluidCollection() {}
+
+    private void addComposes(Collection<IFluidCollection> val) {
+        composes.clear();
+        composes.addAll(val);
+        for (var compose : composes) {
+            if (compose instanceof IPortNotifier notifier) {
+                notifier.onUpdate(combinedListener);
+            }
+        }
+    }
 
     public void setComposes(Collection<IFluidCollection> val) {
         for (var compose : composes) {
@@ -27,27 +45,25 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
             }
         }
         composes.clear();
-        composes.addAll(val);
-        for (var compose : composes) {
-            if (compose instanceof IPortNotifier notifier) {
-                notifier.onUpdate(combinedListener);
-            }
-        }
+        addComposes(val);
         invokeUpdate();
     }
 
     @Override
     public boolean acceptInput(FluidStack stack) {
-        return composes.stream().anyMatch($ -> $.acceptInput(stack));
+        return allowInput && composes.stream().anyMatch($ -> $.acceptInput(stack));
     }
 
     @Override
     public boolean acceptOutput() {
-        return composes.stream().anyMatch(IPort::acceptOutput);
+        return allowOutput && composes.stream().anyMatch(IPort::acceptOutput);
     }
 
     @Override
     public int fill(FluidStack fluid, boolean simulate) {
+        if (!allowInput) {
+            return 0;
+        }
         var stack = fluid.copy();
         for (var compose : composes) {
             if (stack.isEmpty()) {
@@ -61,6 +77,9 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
 
     @Override
     public FluidStack drain(FluidStack fluid, boolean simulate) {
+        if (!allowOutput) {
+            return FluidStack.EMPTY;
+        }
         var stack = fluid.copy();
         var ret = FluidStack.EMPTY;
         for (var compose : composes) {
@@ -87,6 +106,9 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
 
     @Override
     public FluidStack drain(int limit, boolean simulate) {
+        if (!allowOutput) {
+            return FluidStack.EMPTY;
+        }
         return composes.isEmpty() ? FluidStack.EMPTY :
             composes.get(0).drain(limit, simulate);
     }
