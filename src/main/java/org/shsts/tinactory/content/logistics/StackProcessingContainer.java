@@ -32,9 +32,9 @@ import java.util.List;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
-import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
@@ -191,7 +191,7 @@ public class StackProcessingContainer extends CapabilityProvider
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == LAYOUT_PROVIDER.get() || cap == CONTAINER.get()) {
             return myself();
-        } else if (cap == FLUID_STACK_HANDLER.get()) {
+        } else if (cap == MENU_FLUID_HANDLER.get()) {
             return fluidHandlerCap.cast();
         } else if (cap == ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();

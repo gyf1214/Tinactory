@@ -22,7 +22,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.Arrays;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -83,7 +83,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == FLUID_STACK_HANDLER.get()) {
+        if (cap == MENU_FLUID_HANDLER.get()) {
             return fluidHandlerCap.cast();
         }
         return super.getCapability(cap, side);

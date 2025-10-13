@@ -9,7 +9,7 @@ import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 
-import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 
@@ -25,7 +25,7 @@ public class ElectricTankMenu extends ElectricStorageMenu {
     public ElectricTankMenu(Properties properties) {
         super(properties);
         this.tank = getProvider(blockEntity, ElectricTank.ID, ElectricTank.class);
-        this.fluidHandler = FLUID_STACK_HANDLER.get(blockEntity);
+        this.fluidHandler = MENU_FLUID_HANDLER.get(blockEntity);
 
         for (var slot : layout.slots) {
             addSyncSlot(FLUID_SLOT + slot.index(), () ->

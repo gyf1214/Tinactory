@@ -1,12 +1,16 @@
 package org.shsts.tinactory.content.multiblock;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
@@ -25,6 +29,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 
 @ParametersAreNonnullByDefault
@@ -211,6 +216,14 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     @Override
     protected void onLoad() {
         container = this;
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == LAYOUT_PROVIDER.get()) {
+            return myself();
+        }
+        return super.getCapability(cap, side);
     }
 
     @Override

@@ -25,8 +25,8 @@ public final class AllCapabilities {
     public static final ICapability<IProcessor> PROCESSOR;
     public static final ICapability<IContainer> CONTAINER;
     public static final ICapability<IElectricMachine> ELECTRIC_MACHINE;
-    public static final ICapability<IFluidStackHandler> FLUID_STACK_HANDLER;
     public static final ICapability<IItemHandlerModifiable> MENU_ITEM_HANDLER;
+    public static final ICapability<IFluidStackHandler> MENU_FLUID_HANDLER;
     public static final ICapability<IItemCollection> ITEM_COLLECTION;
     public static final ICapability<IFluidCollection> FLUID_COLLECTION;
 
@@ -41,8 +41,8 @@ public final class AllCapabilities {
         PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
         CONTAINER = REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
         ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
-        FLUID_STACK_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
         MENU_ITEM_HANDLER = REGISTRATE.capability(IItemHandlerModifiable.class, new CapabilityToken<>() {});
+        MENU_FLUID_HANDLER = REGISTRATE.capability(IFluidStackHandler.class, new CapabilityToken<>() {});
         ITEM_COLLECTION = REGISTRATE.capability(IItemCollection.class, new CapabilityToken<>() {});
         FLUID_COLLECTION = REGISTRATE.capability(IFluidCollection.class, new CapabilityToken<>() {});
 

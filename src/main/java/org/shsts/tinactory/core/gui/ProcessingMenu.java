@@ -15,8 +15,8 @@ import org.shsts.tinactory.core.gui.sync.SyncPackets;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.FLUID_STACK_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.machine.Machine.getProcessor;
@@ -31,7 +31,7 @@ public class ProcessingMenu extends LayoutMenu {
         super(properties, extraHeight);
         addLayoutSlots(layout);
 
-        var fluids = FLUID_STACK_HANDLER.get(blockEntity);
+        var fluids = MENU_FLUID_HANDLER.get(blockEntity);
         for (var slot : layout.slots) {
             if (slot.type().portType == PortType.FLUID) {
                 addSyncSlot(FLUID_SLOT + slot.index(),
