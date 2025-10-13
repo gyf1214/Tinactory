@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
 import org.shsts.tinactory.core.logistics.DigitalItemStorage;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
+import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -28,7 +29,7 @@ import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalInterface extends MultiblockInterface implements IFlexibleContainer {
+public class DigitalInterface extends MultiblockInterface implements ILayoutProvider, IFlexibleContainer {
     private final int maxParallel;
     private final int bytesLimit;
     private final int dedicatedLimit;
@@ -141,7 +142,7 @@ public class DigitalInterface extends MultiblockInterface implements IFlexibleCo
     }
 
     private final List<Storage> storages = new ArrayList<>();
-    private int ports = 0;
+    private Layout layout = Layout.EMPTY;
 
     public DigitalInterface(BlockEntity be, int maxParallel, int bytesLimit, int dedicatedBytes) {
         super(be);
@@ -157,18 +158,23 @@ public class DigitalInterface extends MultiblockInterface implements IFlexibleCo
     }
 
     @Override
+    public Layout getLayout() {
+        return layout;
+    }
+
+    @Override
     public int maxParallel() {
         return maxParallel;
     }
 
     @Override
     public int portSize() {
-        return ports;
+        return layout.ports.size();
     }
 
     @Override
     public boolean hasPort(int port) {
-        return port >= 0 && port < ports && storages.get(port).type != SlotType.NONE;
+        return port >= 0 && port < layout.ports.size() && storages.get(port).type != SlotType.NONE;
     }
 
     @Override
@@ -183,24 +189,23 @@ public class DigitalInterface extends MultiblockInterface implements IFlexibleCo
 
     @Override
     public void setLayout(Layout layout) {
-        resetLayout();
         for (var i = storages.size(); i < layout.ports.size(); i++) {
             storages.add(new Storage());
         }
-        for (var i = 0; i < layout.ports.size(); i++) {
+        for (var i = 0; i < storages.size(); i++) {
             var storage = storages.get(i);
-            var port = layout.ports.get(i);
-            storage.setType(port.type());
+            var type = i < layout.ports.size() ? layout.ports.get(i).type() : SlotType.NONE;
+            storage.setType(type);
         }
-        ports = layout.ports.size();
+        this.layout = layout;
     }
 
     @Override
     public void resetLayout() {
-        ports = 0;
         for (var storage : storages) {
             storage.setType(SlotType.NONE);
         }
+        layout = Layout.EMPTY;
     }
 
     @Override

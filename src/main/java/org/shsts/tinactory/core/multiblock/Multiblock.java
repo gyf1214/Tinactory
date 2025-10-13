@@ -16,8 +16,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
+import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
@@ -53,7 +55,6 @@ public class Multiblock extends MultiblockBase {
     private Layout layout;
     private final Consumer<IMultiblockCheckCtx> checker;
     private final Supplier<BlockState> appearance;
-    private final IMenuType menu;
 
     private boolean firstTick = false;
     @Nullable
@@ -69,7 +70,6 @@ public class Multiblock extends MultiblockBase {
         this.layout = Objects.requireNonNull(builder.layout);
         this.checker = Objects.requireNonNull(builder.checker);
         this.appearance = Objects.requireNonNull(builder.appearance);
-        this.menu = Objects.requireNonNull(builder.menu);
     }
 
     public BlockState getAppearanceBlock() {
@@ -214,8 +214,8 @@ public class Multiblock extends MultiblockBase {
         return AllCapabilities.ELECTRIC_MACHINE.get(blockEntity);
     }
 
-    public IMenuType menu() {
-        return menu;
+    public IMenuType menu(IMachine machine) {
+        return AllMenus.PROCESSING_MACHINE;
     }
 
     /**
@@ -294,8 +294,6 @@ public class Multiblock extends MultiblockBase {
         private Layout layout = null;
         @Nullable
         private Consumer<IMultiblockCheckCtx> checker = null;
-        @Nullable
-        private IMenuType menu = null;
 
         public Builder(IBlockEntityTypeBuilder<P> parent,
             BiFunction<BlockEntity, Builder<P>, Multiblock> factory) {
@@ -317,11 +315,6 @@ public class Multiblock extends MultiblockBase {
 
         public Builder<P> appearanceBlock(Supplier<Block> val) {
             return appearance(() -> val.get().defaultBlockState());
-        }
-
-        public Builder<P> menu(IMenuType val) {
-            this.menu = val;
-            return this;
         }
 
         public <S extends IBuilder<? extends Consumer<IMultiblockCheckCtx>, Builder<P>, S>> S spec(

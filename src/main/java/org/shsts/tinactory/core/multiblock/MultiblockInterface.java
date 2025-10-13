@@ -189,7 +189,7 @@ public class MultiblockInterface extends Machine {
         var player = arg.player();
         var world = player.level;
         if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {
-            multiblock.menu().open(serverPlayer, blockEntity.getBlockPos());
+            multiblock.menu(this).open(serverPlayer, blockEntity.getBlockPos());
         }
         result.set(InteractionResult.sidedSuccess(world.isClientSide));
     }
