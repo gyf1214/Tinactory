@@ -201,6 +201,9 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public void onWorkBegin(R recipe, IMachine machine, int parallel, Consumer<ProcessingInfo> info) {
         recipe.consumeInputs(machine.container().orElseThrow(), 1, info);
+        for (var output : recipe.outputs) {
+            info.accept(new ProcessingInfo(output.port(), output.result()));
+        }
         calculateFactors(recipe, machine);
     }
 

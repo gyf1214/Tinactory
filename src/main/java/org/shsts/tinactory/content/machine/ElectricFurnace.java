@@ -22,6 +22,8 @@ import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
@@ -200,7 +202,9 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         int parallel, Consumer<ProcessingInfo> info) {
         var container = machine.container().orElseThrow();
         var ingredient = recipe.getIngredients().get(0);
-        StackHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false);
+        StackHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false)
+            .ifPresent($ -> info.accept(new ProcessingInfo(inputPort, new ProcessingIngredients.ItemIngredient($))));
+        info.accept(new ProcessingInfo(outputPort, new ProcessingResults.ItemResult(1, recipe.getResultItem())));
         calculateFactors(machine);
     }
 

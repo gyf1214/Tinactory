@@ -19,8 +19,8 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final List<IFluidCollection> composes = new ArrayList<>();
-    public boolean allowInput;
-    public boolean allowOutput;
+    public boolean allowInput = true;
+    public boolean allowOutput = true;
 
     public CombinedFluidCollection(Collection<IFluidCollection> composes) {
         addComposes(composes);
