@@ -10,12 +10,12 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class SyncPackets {
-    public static class Double implements IPacket {
+    public static class DoublePacket implements IPacket {
         private double data;
 
-        public Double() {}
+        public DoublePacket() {}
 
-        public Double(double data) {
+        public DoublePacket(double data) {
             this.data = data;
         }
 
@@ -34,7 +34,7 @@ public final class SyncPackets {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof Double that)) {
+            if (!(o instanceof DoublePacket that)) {
                 return false;
             }
             return that.data == data;
@@ -48,5 +48,9 @@ public final class SyncPackets {
         public double getData() {
             return data;
         }
+    }
+
+    public static DoublePacket doublePacket(double data) {
+        return new DoublePacket(data);
     }
 }

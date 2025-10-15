@@ -11,8 +11,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
-import org.shsts.tinactory.core.gui.sync.SyncPackets;
-import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 
 import java.util.Optional;
 
@@ -20,6 +18,7 @@ import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
 import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 import static org.shsts.tinactory.core.util.I18n.tr;
 
@@ -36,13 +35,15 @@ public class ProcessingMenu extends LayoutMenu {
     /**
      * Called during constructor.
      */
-    protected void addFluidSlots(IFluidStackHandler fluids) {
+    protected void addFluidSlots() {
+        var fluids = MENU_FLUID_HANDLER.get(blockEntity);
         for (var slot : layout.slots) {
             if (slot.type().portType == PortType.FLUID) {
                 addSyncSlot(FLUID_SLOT + slot.index(),
                     () -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
             }
         }
+        onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
     }
 
     /**
@@ -50,7 +51,7 @@ public class ProcessingMenu extends LayoutMenu {
      */
     protected void addProgressBar() {
         if (layout.progressBar != null) {
-            addSyncSlot("progress", () -> new SyncPackets.Double(getProcessor(blockEntity)
+            addSyncSlot("progress", () -> doublePacket(getProcessor(blockEntity)
                 .map(IProcessor::getProgress)
                 .orElse(0d)));
         }
@@ -59,11 +60,9 @@ public class ProcessingMenu extends LayoutMenu {
     /**
      * Called during constructor.
      */
-    protected void addSlots() {
+    private void addSlots() {
         addLayoutSlots(layout);
-        var fluids = MENU_FLUID_HANDLER.get(blockEntity);
-        addFluidSlots(fluids);
-        onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
+        addFluidSlots();
         addProgressBar();
     }
 

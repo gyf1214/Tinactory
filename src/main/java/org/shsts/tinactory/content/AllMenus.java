@@ -61,10 +61,12 @@ public final class AllMenus {
     public static final IMenuType PROCESSING_MACHINE;
     public static final IMenuType BOILER;
     public static final IMenuType RESEARCH_BENCH;
+    public static final IMenuType DIGITAL_INTERFACE;
+    public static final IMenuType RESEARCH_DIGITAL_INTERFACE;
 
     static {
         CHANNEL
-            .registerMenuSyncPacket(SyncPackets.Double.class, SyncPackets.Double::new)
+            .registerMenuSyncPacket(SyncPackets.DoublePacket.class, SyncPackets.DoublePacket::new)
             .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new)
             .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
             .registerMenuSyncPacket(NetworkControllerSyncPacket.class,
@@ -136,6 +138,17 @@ public final class AllMenus {
         RESEARCH_BENCH = REGISTRATE.menu("machine/research_bench", MachineMenu::machine)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> ResearchBenchScreen::new)
+            .register();
+
+        DIGITAL_INTERFACE = REGISTRATE.menu("multiblock/digital_interface", MachineMenu::digitalInterface)
+            .title(ProcessingMenu::getTitle)
+            .screen(() -> () -> MachineScreen::new)
+            .register();
+
+        RESEARCH_DIGITAL_INTERFACE = REGISTRATE.menu("multiblock/research_digital_interface",
+                MachineMenu::digitalInterface)
+            .title(ProcessingMenu::getTitle)
+            .screen(() -> () -> MachineScreen::new)
             .register();
     }
 

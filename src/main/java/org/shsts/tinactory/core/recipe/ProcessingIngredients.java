@@ -22,6 +22,7 @@ import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -40,12 +41,15 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public boolean consumePort(IPort port, int parallel, boolean simulate) {
-            if (!(port instanceof IItemCollection item)) {
-                return false;
+        public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
+            if (!(port instanceof IItemCollection collection)) {
+                return Optional.empty();
             }
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
-            return item.extractItem(stack1, simulate).getCount() >= stack1.getCount();
+            // it is assumed that the simulation is already done if simulate = false
+            var extracted = collection.extractItem(stack1, simulate);
+            return extracted.getCount() >= stack1.getCount() ?
+                Optional.of(new ItemIngredient(stack1)) : Optional.empty();
         }
 
         private static final Codec<ItemIngredient> CODEC =
@@ -67,14 +71,16 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public boolean consumePort(IPort port, int parallel, boolean simulate) {
+        public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
             if (!(port instanceof IItemCollection item)) {
-                return false;
+                return Optional.empty();
             }
             if (amount <= 0) {
-                return !simulate || StackHelper.hasItem(item, ingredient);
+                return StackHelper.hasItem(item, ingredient)
+                    .map($ -> new ItemIngredient(StackHelper.copyWithCount($, 1)));
             } else {
-                return StackHelper.consumeItemCollection(item, ingredient, amount * parallel, simulate);
+                return StackHelper.consumeItemCollection(item, ingredient, amount * parallel, simulate)
+                    .map(ItemIngredient::new);
             }
         }
 
@@ -126,12 +132,15 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public boolean consumePort(IPort port, int parallel, boolean simulate) {
-            if (!(port instanceof IFluidCollection fluidCollection)) {
-                return false;
+        public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
+            if (!(port instanceof IFluidCollection collection)) {
+                return Optional.empty();
             }
             var fluid1 = StackHelper.copyWithAmount(fluid, fluid.getAmount() * parallel);
-            return fluidCollection.drain(fluid1, simulate).getAmount() >= fluid1.getAmount();
+            // it is assumed that the simulation is already done if simulate = false
+            var extracted = collection.drain(fluid1, simulate);
+            return extracted.getAmount() >= fluid1.getAmount() ?
+                Optional.of(new FluidIngredient(extracted)) : Optional.empty();
         }
 
         private static final Codec<FluidIngredient> CODEC =

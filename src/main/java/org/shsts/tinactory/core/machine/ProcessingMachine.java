@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -198,8 +199,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public void onWorkBegin(R recipe, IMachine machine, int parallel) {
-        recipe.consumeInputs(machine.container().orElseThrow(), 1);
+    public void onWorkBegin(R recipe, IMachine machine, int parallel, Consumer<ProcessingInfo> info) {
+        recipe.consumeInputs(machine.container().orElseThrow(), 1, info);
         calculateFactors(recipe, machine);
     }
 

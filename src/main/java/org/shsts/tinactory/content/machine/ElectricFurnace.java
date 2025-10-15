@@ -21,12 +21,14 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
+import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
@@ -194,7 +196,8 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public void onWorkBegin(SmeltingRecipe recipe, IMachine machine, int parallel) {
+    public void onWorkBegin(SmeltingRecipe recipe, IMachine machine,
+        int parallel, Consumer<ProcessingInfo> info) {
         var container = machine.container().orElseThrow();
         var ingredient = recipe.getIngredients().get(0);
         StackHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false);

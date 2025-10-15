@@ -10,11 +10,17 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
 import java.io.Reader;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -41,6 +47,14 @@ public final class CodecHelper {
         return encoder.encodeStart(JsonOps.INSTANCE, sth).getOrThrow(false, $ -> {});
     }
 
+    public static <P> P parseTag(Decoder<P> decoder, Tag tag) {
+        return decoder.parse(NbtOps.INSTANCE, tag).getOrThrow(false, $ -> {});
+    }
+
+    public static <P> Tag encodeTag(Encoder<P> encoder, P sth) {
+        return encoder.encodeStart(NbtOps.INSTANCE, sth).getOrThrow(false, $ -> {});
+    }
+
     public static CompoundTag encodeBlockPos(BlockPos pos) {
         var tag = new CompoundTag();
         tag.putInt("x", pos.getX());
@@ -63,5 +77,15 @@ public final class CodecHelper {
     public static Component parseComponent(String json) {
         return Objects.requireNonNullElse(Component.Serializer.fromJsonLenient(json),
             TextComponent.EMPTY);
+    }
+
+    public static <T> ListTag encodeList(List<T> list, Function<T, Tag> encoder) {
+        var ret = new ListTag();
+        list.forEach($ -> ret.add(encoder.apply($)));
+        return ret;
+    }
+
+    public static <T> void parseList(ListTag tag, Function<Tag, T> decoder, Consumer<T> cons) {
+        tag.forEach($ -> cons.accept(decoder.apply($)));
     }
 }

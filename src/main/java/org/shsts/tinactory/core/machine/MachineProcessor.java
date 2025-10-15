@@ -1,5 +1,7 @@
 package org.shsts.tinactory.core.machine;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,6 +21,7 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
@@ -46,6 +49,8 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
+import static org.shsts.tinactory.core.util.CodecHelper.parseList;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -63,10 +68,13 @@ public class MachineProcessor extends CapabilityProvider implements
     @Nullable
     private ResourceLocation currentRecipeLoc = null;
     private int processorIndex;
+    private final List<ProcessingInfo> infoList = new ArrayList<>();
+    private final ListMultimap<Integer, IProcessingObject> infoMap = ArrayListMultimap.create();
 
     private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, T recipe) {
-        public void onWorkBegin(IMachine machine, int parallel) {
-            processor.onWorkBegin(recipe, machine, parallel);
+        public void onWorkBegin(IMachine machine, int parallel, List<ProcessingInfo> info) {
+            info.clear();
+            processor.onWorkBegin(recipe, machine, parallel, info::add);
         }
 
         public void onWorkContinue(IMachine machine) {
@@ -223,6 +231,19 @@ public class MachineProcessor extends CapabilityProvider implements
         return false;
     }
 
+    private void buildInfoMap() {
+        infoMap.clear();
+        for (var info : infoList) {
+            infoMap.put(info.port(), info.object());
+        }
+    }
+
+    public Optional<IProcessingObject> getInfo(int port, int index) {
+        var list = infoMap.get(port);
+        return index >= 0 && index < list.size() ? Optional.ofNullable(list.get(index)) :
+            Optional.empty();
+    }
+
     private void updateRecipe() {
         if (currentRecipe != null || !needUpdate) {
             return;
@@ -244,7 +265,8 @@ public class MachineProcessor extends CapabilityProvider implements
 
         workProgress = 0;
         if (currentRecipe != null) {
-            currentRecipe.onWorkBegin(machine.get(), parallel());
+            currentRecipe.onWorkBegin(machine.get(), parallel(), infoList);
+            buildInfoMap();
         }
         needUpdate = false;
         blockEntity.setChanged();
@@ -282,6 +304,8 @@ public class MachineProcessor extends CapabilityProvider implements
         if (workProgress >= currentRecipe.maxProcess()) {
             currentRecipe.onWorkDone(machine.get(), world().random);
             currentRecipe = null;
+            infoList.clear();
+            infoMap.clear();
             needUpdate = true;
         }
         blockEntity.setChanged();
@@ -377,11 +401,13 @@ public class MachineProcessor extends CapabilityProvider implements
             tag.putInt("processorIndex", currentRecipe.index());
             tag.putLong("workProgress", workProgress);
             tag.put("processorData", currentRecipe.processor().serializeNBT());
+            tag.put("processorInfo", encodeList(infoList, ProcessingInfo::serializeNBT));
         } else if (currentRecipeLoc != null) {
             tag.putString("currentRecipe", currentRecipeLoc.toString());
             tag.putInt("processorIndex", processorIndex);
             tag.putLong("workProgress", workProgress);
             tag.put("processorData", processors.get(processorIndex).serializeNBT());
+            tag.put("processorInfo", encodeList(infoList, ProcessingInfo::serializeNBT));
         }
         return tag;
     }
@@ -389,6 +415,7 @@ public class MachineProcessor extends CapabilityProvider implements
     @Override
     public void deserializeNBT(CompoundTag tag) {
         currentRecipe = null;
+        infoList.clear();
         if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
             currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
             processorIndex = tag.getInt("processorIndex");
@@ -396,8 +423,12 @@ public class MachineProcessor extends CapabilityProvider implements
             var data = tag.getCompound("processorData");
             var processor = processors.get(processorIndex);
             processor.deserializeNBT(data);
+            parseList(tag.getList("processorInfo", Tag.TAG_COMPOUND),
+                $ -> ProcessingInfo.fromNBT((CompoundTag) $), infoList::add);
+            buildInfoMap();
         } else {
             currentRecipeLoc = null;
+            infoMap.clear();
         }
     }
 }

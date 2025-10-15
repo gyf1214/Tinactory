@@ -14,6 +14,7 @@ import org.shsts.tinycorelib.api.core.DistLazy;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -42,7 +43,10 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
             .orElseGet(() -> newRecipe(world, machine));
     }
 
-    void onWorkBegin(T recipe, IMachine machine, int parallel);
+    /**
+     * Info is for returning actual ingredients.
+     */
+    void onWorkBegin(T recipe, IMachine machine, int parallel, Consumer<ProcessingInfo> info);
 
     void onWorkContinue(T recipe, IMachine machine);
 

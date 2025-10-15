@@ -54,7 +54,7 @@ public class EngravingRecipe extends CleanRecipe {
     private boolean matchInputs(IMachine machine, int parallel, IContainer container) {
         return getLithography(machine)
             .map($ -> inputs.stream().allMatch(input ->
-                input.port() == 1 || consumeInput(container, input, parallel, true)))
+                input.port() == 1 || canConsumeInput(container, input, parallel)))
             .orElseGet(() -> matchInputs(container, parallel));
     }
 

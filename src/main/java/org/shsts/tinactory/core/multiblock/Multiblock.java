@@ -20,6 +20,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllMenus;
+import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.content.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
@@ -215,7 +216,8 @@ public class Multiblock extends MultiblockBase {
     }
 
     public IMenuType menu(IMachine machine) {
-        return AllMenus.PROCESSING_MACHINE;
+        return machine instanceof DigitalInterface ? AllMenus.DIGITAL_INTERFACE :
+            AllMenus.PROCESSING_MACHINE;
     }
 
     /**

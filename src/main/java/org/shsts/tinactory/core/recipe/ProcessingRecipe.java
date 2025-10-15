@@ -19,6 +19,7 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
+import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
@@ -29,6 +30,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -55,9 +57,16 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         this.power = builder.power;
     }
 
-    protected boolean consumeInput(IContainer container, Input input, int parallel, boolean simulate) {
-        return container.hasPort(input.port) &&
-            input.ingredient.consumePort(container.getPort(input.port, true), parallel, simulate);
+    protected Optional<IProcessingIngredient> consumeInput(IContainer container, Input input,
+        int parallel, boolean simulate) {
+        if (!container.hasPort(input.port)) {
+            return Optional.empty();
+        }
+        return input.ingredient.consumePort(container.getPort(input.port, true), parallel, simulate);
+    }
+
+    protected boolean canConsumeInput(IContainer container, Input input, int parallel) {
+        return consumeInput(container, input, parallel, true).isPresent();
     }
 
     protected boolean insertOutput(IContainer container, Output output, int parallel,
@@ -66,7 +75,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     }
 
     protected boolean matchInputs(IContainer container, int parallel) {
-        return inputs.stream().allMatch(input -> consumeInput(container, input, parallel, true));
+        return inputs.stream().allMatch(input -> canConsumeInput(container, input, parallel));
     }
 
     protected boolean matchOutputs(IContainer container, int parallel, Random random) {
@@ -100,9 +109,10 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             .isPresent();
     }
 
-    public void consumeInputs(IContainer container, int parallel) {
+    public void consumeInputs(IContainer container, int parallel, Consumer<ProcessingInfo> cons) {
         for (var input : inputs) {
-            consumeInput(container, input, parallel, false);
+            consumeInput(container, input, parallel, false)
+                .ifPresent($ -> cons.accept(new ProcessingInfo(input.port, $)));
         }
     }
 

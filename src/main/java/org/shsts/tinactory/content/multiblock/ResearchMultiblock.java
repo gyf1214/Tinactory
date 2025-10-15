@@ -17,6 +17,7 @@ public class ResearchMultiblock extends Multiblock {
 
     @Override
     public IMenuType menu(IMachine machine) {
-        return AllMenus.RESEARCH_BENCH;
+        return machine instanceof DigitalInterface ? AllMenus.RESEARCH_DIGITAL_INTERFACE :
+            AllMenus.RESEARCH_BENCH;
     }
 }

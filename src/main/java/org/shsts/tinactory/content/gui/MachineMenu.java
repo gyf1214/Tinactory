@@ -7,13 +7,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.gui.sync.SyncPackets;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.machine.Boiler.getHeat;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
 import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 
 @ParametersAreNonnullByDefault
@@ -50,14 +50,12 @@ public class MachineMenu extends ProcessingMenu {
     public static class Boiler extends MachineMenu {
         public Boiler(Properties properties) {
             super(properties);
-            addSyncSlot("burn", () -> new SyncPackets.Double(
-                getProcessor(blockEntity)
-                    .map(IProcessor::getProgress)
-                    .orElse(0d)));
-            addSyncSlot("heat", () -> new SyncPackets.Double(
-                getProcessor(blockEntity)
-                    .map($ -> getHeat($) / 500d)
-                    .orElse(0d)));
+            addSyncSlot("burn", () -> doublePacket(getProcessor(blockEntity)
+                .map(IProcessor::getProgress)
+                .orElse(0d)));
+            addSyncSlot("heat", () -> doublePacket(getProcessor(blockEntity)
+                .map($ -> getHeat($) / 500d)
+                .orElse(0d)));
         }
     }
 
@@ -71,5 +69,9 @@ public class MachineMenu extends ProcessingMenu {
 
     public static ProcessingMenu boiler(Properties properties) {
         return new Boiler(properties);
+    }
+
+    public static ProcessingMenu digitalInterface(Properties properties) {
+        return new DigitalInterfaceMenu(properties);
     }
 }

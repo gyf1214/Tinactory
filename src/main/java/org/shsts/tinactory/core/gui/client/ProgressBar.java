@@ -38,8 +38,8 @@ public class ProgressBar extends MenuWidget {
 
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var progress = MathUtil.clamp(menu.getSyncPacket(syncName, SyncPackets.Double.class)
-            .map(SyncPackets.Double::getData).orElse(0d), 0d, 1d);
+        var progress = MathUtil.clamp(menu.getSyncPacket(syncName, SyncPackets.DoublePacket.class)
+            .map(SyncPackets.DoublePacket::getData).orElse(0d), 0d, 1d);
         var z = getBlitOffset();
         var h = rect.height();
 
