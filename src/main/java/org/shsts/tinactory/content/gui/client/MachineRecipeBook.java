@@ -189,6 +189,11 @@ public class MachineRecipeBook extends Panel {
         return bookPanel.isActive();
     }
 
+    @Override
+    public boolean mouseIn(double mouseX, double mouseY) {
+        return bookPanel.mouseIn(mouseX, mouseY);
+    }
+
     private void onTechChange() {
         refreshRecipes();
         buttonPanel.refresh();

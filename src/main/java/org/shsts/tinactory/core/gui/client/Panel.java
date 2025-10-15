@@ -17,6 +17,8 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Panel extends GuiComponent implements IWidgetConsumer {
+    private Rect rect;
+
     protected record Child(RectD anchor, Rect offset, GuiComponent child) {
         public void setRect(Rect parent) {
             var sx = parent.inX(anchor.x()) + offset.x();
@@ -109,6 +111,7 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
     }
 
     protected void setRect(Rect rect) {
+        this.rect = rect;
         for (var child : children) {
             child.setRect(rect);
         }
@@ -124,5 +127,9 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
             child.setActive(value);
         }
         refresh();
+    }
+
+    public boolean mouseIn(double mouseX, double mouseY) {
+        return rect.in(mouseX, mouseY);
     }
 }

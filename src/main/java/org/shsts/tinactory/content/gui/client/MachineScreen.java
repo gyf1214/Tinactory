@@ -25,8 +25,9 @@ import static org.shsts.tinactory.core.gui.Texture.PROGRESS_BURN;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineScreen extends ProcessingScreen {
+    private final PortPanel portPanel;
     @Nullable
-    protected final MachineRecipeBook recipeBook;
+    private final MachineRecipeBook recipeBook;
 
     protected MachineScreen(ProcessingMenu menu, Component title,
         @Nullable Function<MachineScreen, MachineRecipeBook> recipeBookFactory) {
@@ -35,7 +36,7 @@ public class MachineScreen extends ProcessingScreen {
         this.recipeBook = recipeBookFactory == null ? null : recipeBookFactory.apply(this);
 
         var buttonY = layout.rect.endY() + SPACING;
-        var portPanel = new PortPanel(this, layout);
+        this.portPanel = new PortPanel(this, layout);
         addPanel(PANEL_ANCHOR, PANEL_OFFSET, portPanel);
         portPanel.setActive(false);
 
@@ -48,7 +49,7 @@ public class MachineScreen extends ProcessingScreen {
         if (recipeBook != null) {
             addPanel(recipeBook);
             MachineRecipeBook.addButton(menu, this, recipeBook, RectD.ZERO, 0, buttonY, () -> {
-                if (recipeBook.isActive()) {
+                if (recipeBook.isBookActive()) {
                     portPanel.setActive(false);
                 }
             });
@@ -65,6 +66,15 @@ public class MachineScreen extends ProcessingScreen {
         if (recipeBook != null) {
             recipeBook.remove();
         }
+    }
+
+    @Override
+    protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeft, int guiTop, int button) {
+        if (!super.hasClickedOutside(mouseX, mouseY, guiLeft, guiTop, button)) {
+            return false;
+        }
+        return (!portPanel.isActive() || !portPanel.mouseIn(mouseX, mouseY)) &&
+            (recipeBook == null || !recipeBook.isBookActive() || !recipeBook.mouseIn(mouseX, mouseY));
     }
 
     public static class Boiler extends MachineScreen {
