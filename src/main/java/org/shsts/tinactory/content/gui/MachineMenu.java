@@ -1,14 +1,26 @@
 package org.shsts.tinactory.content.gui;
 
+import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.shsts.tinactory.api.logistics.IFluidCollection;
+import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
+import org.shsts.tinactory.core.logistics.StackHelper;
+import org.slf4j.Logger;
+
+import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllMenus.PORT_CLICK;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.machine.Boiler.getHeat;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -19,20 +31,101 @@ import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineMenu extends ProcessingMenu {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    private final IMachine machine;
+
     public MachineMenu(Properties properties) {
         super(properties, SLOT_SIZE + SPACING);
-        onEventPacket(SET_MACHINE_CONFIG, p -> MACHINE.get(blockEntity).setConfig(p));
+        this.machine = MACHINE.get(blockEntity);
+        onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
+        onEventPacket(PORT_CLICK, p -> onPortClick(p.getIndex(), p.getButton()));
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return super.stillValid(player) && canPlayerInteract(blockEntity, player);
+        return super.stillValid(player) && machine.canPlayerInteract(player);
     }
 
-    public static boolean canPlayerInteract(BlockEntity blockEntity, Player player) {
-        return MACHINE.tryGet(blockEntity)
-            .filter($ -> $.canPlayerInteract(player))
-            .isPresent();
+    private ItemStack clickItemPort(ItemStack carried, IItemCollection collection, int button) {
+        if (carried.isEmpty()) {
+            var extracted = collection.extractItem(64, true);
+            // need to make sure the extracted does not exceed stack size.
+            var limit = Math.min(extracted.getCount(), extracted.getMaxStackSize());
+            var limit1 = button == 1 ? limit / 2 : limit;
+            var extracted1 = extracted.getCount() > limit1 ?
+                StackHelper.copyWithCount(extracted, limit1) : extracted;
+            return collection.extractItem(extracted1, false);
+        } else {
+            if (button == 1) {
+                var carried1 = StackHelper.copyWithCount(carried, 1);
+                var remaining = collection.insertItem(carried1, false);
+                if (remaining.isEmpty()) {
+                    carried.shrink(1);
+                }
+                return carried;
+            } else {
+                return collection.insertItem(carried, false);
+            }
+        }
+    }
+
+    private FluidClickResult doClickFluidPort(ItemStack carried, IFluidCollection collection,
+        boolean mayDrain, boolean mayFill) {
+        var cap = StackHelper.getFluidHandlerFromItem(carried);
+        if (cap.isEmpty()) {
+            return new FluidClickResult();
+        }
+        var handler = cap.get();
+        if (mayFill) {
+            var fluid1 = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
+            if (!fluid1.isEmpty()) {
+                int amount = collection.fill(fluid1, true);
+                if (amount > 0) {
+                    var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
+                    var fluid3 = handler.drain(fluid2, IFluidHandler.FluidAction.EXECUTE);
+                    var amount1 = collection.fill(fluid3, false);
+                    if (amount1 != amount) {
+                        LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
+                    }
+                    return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
+                }
+            }
+        }
+        if (mayDrain) {
+            for (var i = 0; i < handler.getTanks(); i++) {
+                var fluid1 = StackHelper.copyWithAmount(handler.getFluidInTank(i), Integer.MAX_VALUE);
+                var fluid2 = collection.drain(fluid1, true);
+                int amount = handler.fill(fluid2, IFluidHandler.FluidAction.SIMULATE);
+                if (amount > 0) {
+                    var fluid3 = StackHelper.copyWithAmount(fluid2, amount);
+                    var fluid4 = collection.drain(fluid3, false);
+                    var amount1 = handler.fill(fluid4, IFluidHandler.FluidAction.EXECUTE);
+                    if (amount1 != amount) {
+                        LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
+                    }
+                    return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer());
+                }
+            }
+        }
+        return new FluidClickResult();
+    }
+
+    private Optional<IPort> getPort(int port) {
+        return machine.container().flatMap($ -> $.hasPort(port) ?
+            Optional.of($.getPort(port, false)) : Optional.empty());
+    }
+
+    private void onPortClick(int port, int button) {
+        getPort(port).ifPresent(port1 -> {
+            if (port1.type() == PortType.ITEM) {
+                var carried1 = clickItemPort(getCarried(), port1.asItem(), button);
+                setCarried(carried1);
+            } else if (port1.type() == PortType.FLUID) {
+                clickFluidSlot((carried, mayDrain, mayFill) ->
+                    doClickFluidPort(carried, port1.asFluid(), mayDrain, mayFill), button);
+            }
+        });
     }
 
     public static class Simple extends LayoutMenu {
@@ -43,7 +136,9 @@ public class MachineMenu extends ProcessingMenu {
 
         @Override
         public boolean stillValid(Player player) {
-            return super.stillValid(player) && canPlayerInteract(blockEntity, player);
+            return super.stillValid(player) && MACHINE.tryGet(blockEntity)
+                .filter($ -> $.canPlayerInteract(player))
+                .isPresent();
         }
     }
 

@@ -29,6 +29,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 
@@ -38,6 +39,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     private final int maxParallel;
     private final int bytesLimit;
     private final int dedicatedLimit;
+    private final int amountByteLimit;
 
     private int sharedBytes;
 
@@ -63,10 +65,12 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
         public void setType(SlotType val) {
             type = val;
-            var allowInput = type.direction == PortDirection.INPUT;
+            var isInput = type.direction == PortDirection.INPUT;
             // always allow output as we don't have a menu to extract items.
-            externalItem.allowInput = allowInput;
-            externalFluid.allowInput = allowInput;
+            externalItem.allowInput = isInput;
+            externalFluid.allowInput = isInput;
+            internalItem.maxCount = isInput ? amountByteLimit / CONFIG.bytesPerItem.get() : Integer.MAX_VALUE;
+            internalFluid.maxAmount = isInput ? amountByteLimit / CONFIG.bytesPerFluid.get() : Integer.MAX_VALUE;
         }
 
         public IPort port(boolean internal) {
@@ -149,17 +153,19 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     private final List<Storage> storages = new ArrayList<>();
     private Layout layout = Layout.EMPTY;
 
-    public DigitalInterface(BlockEntity be, int maxParallel, int bytesLimit, int dedicatedBytes) {
+    public record Properties(int maxParallel, int bytesLimit, int dedicatedBytes, int amountByteLimit) {}
+
+    public DigitalInterface(BlockEntity be, Properties properties) {
         super(be);
-        this.maxParallel = maxParallel;
-        this.bytesLimit = bytesLimit;
-        this.dedicatedLimit = dedicatedBytes;
+        this.maxParallel = properties.maxParallel();
+        this.bytesLimit = properties.bytesLimit();
+        this.dedicatedLimit = properties.dedicatedBytes();
         this.sharedBytes = bytesLimit;
+        this.amountByteLimit = properties.amountByteLimit();
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
-        int maxParallel, int bytesLimit, int dedicatedLimit) {
-        return $ -> $.capability(ID, be -> new DigitalInterface(be, maxParallel, bytesLimit, dedicatedLimit));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
+        return $ -> $.capability(ID, be -> new DigitalInterface(be, properties));
     }
 
     @Override

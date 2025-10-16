@@ -5,19 +5,23 @@
   "voltages": {
     "ev": {
       "maxParallel": 2,
-      "bytesLimit": 262144
+      "bytesLimit": 262144,
+      "amountByteLimit": 32768
     },
     "iv": {
       "maxParallel": 4,
-      "bytesLimit": 262144
+      "bytesLimit": 262144,
+      "amountByteLimit": 32768
     },
     "luv": {
       "maxParallel": 8,
-      "bytesLimit": 1048576
+      "bytesLimit": 1048576,
+      "amountByteLimit": 131072
     },
     "zpm": {
       "maxParallel": 16,
-      "bytesLimit": 1048576
+      "bytesLimit": 1048576,
+      "amountByteLimit": 131072
     }
   }
 }

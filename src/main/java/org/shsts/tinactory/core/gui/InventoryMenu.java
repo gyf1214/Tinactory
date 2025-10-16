@@ -159,7 +159,7 @@ public class InventoryMenu extends MenuBase {
                 var fluid3 = tank.drain(fluid2, IFluidHandler.FluidAction.EXECUTE);
                 var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
                 if (amount1 != amount) {
-                    LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
+                    LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
                 }
                 return new FluidClickResult(FluidClickAction.DRAIN,
                     handler.getContainer());

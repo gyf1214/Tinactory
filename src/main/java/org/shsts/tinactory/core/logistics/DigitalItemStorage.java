@@ -25,6 +25,7 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 public class DigitalItemStorage extends PortNotifier implements IItemCollection,
     IItemFilter, INBTSerializable<CompoundTag> {
     private final IDigitalProvider provider;
+    public int maxCount = Integer.MAX_VALUE;
     private final Map<ItemStackWrapper, ItemStack> items = new HashMap<>();
     private Predicate<ItemStack> filter = TRUE_FILTER;
 
@@ -37,13 +38,15 @@ public class DigitalItemStorage extends PortNotifier implements IItemCollection,
         if (stack.isEmpty()) {
             return true;
         }
-        if (!filter.test(stack) || !provider.canConsume(CONFIG.bytesPerItem.get())) {
+        if (!filter.test(stack)) {
             return false;
         }
-        if (!items.containsKey(new ItemStackWrapper(stack))) {
+        var key = new ItemStackWrapper(stack);
+        if (items.containsKey(key)) {
+            return items.get(key).getCount() < maxCount && provider.canConsume(CONFIG.bytesPerItem.get());
+        } else {
             return provider.canConsume(CONFIG.bytesPerItem.get() + CONFIG.bytesPerItemType.get());
         }
-        return true;
     }
 
     @Override
@@ -60,7 +63,8 @@ public class DigitalItemStorage extends PortNotifier implements IItemCollection,
         var bytesPerItem = CONFIG.bytesPerItem.get();
         if (!items.containsKey(key)) {
             provider.consume(CONFIG.bytesPerItemType.get());
-            var inserted = Math.min(stack.getCount(), provider.consumeLimit(bytesPerItem));
+            var limit = Math.min(provider.consumeLimit(bytesPerItem), maxCount);
+            var inserted = Math.min(stack.getCount(), limit);
             assert inserted > 0 && inserted <= stack.getCount();
             var remaining = StackHelper.copyWithCount(stack, stack.getCount() - inserted);
             if (!simulate) {
@@ -71,11 +75,13 @@ public class DigitalItemStorage extends PortNotifier implements IItemCollection,
             }
             return remaining;
         } else {
-            var inserted = Math.min(stack.getCount(), provider.consumeLimit(bytesPerItem));
+            var existing = items.get(key);
+            var limit = Math.min(provider.consumeLimit(bytesPerItem), maxCount - existing.getCount());
+            var inserted = Math.min(stack.getCount(), limit);
             assert inserted > 0 && inserted <= stack.getCount();
             var remaining = StackHelper.copyWithCount(stack, stack.getCount() - inserted);
             if (!simulate) {
-                items.get(key).grow(inserted);
+                existing.grow(inserted);
                 provider.consume(inserted * bytesPerItem);
                 invokeUpdate();
             }

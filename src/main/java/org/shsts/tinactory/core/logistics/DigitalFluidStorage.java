@@ -25,6 +25,7 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 public class DigitalFluidStorage extends PortNotifier implements IFluidCollection,
     IFluidFilter, INBTSerializable<CompoundTag> {
     private final IDigitalProvider provider;
+    public int maxAmount = Integer.MAX_VALUE;
     private final Map<FluidStackWrapper, FluidStack> fluids = new HashMap<>();
     private Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
 
@@ -37,13 +38,15 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidCollectio
         if (stack.isEmpty()) {
             return true;
         }
-        if (!filter.test(stack) || !provider.canConsume(CONFIG.bytesPerFluid.get())) {
+        if (!filter.test(stack)) {
             return false;
         }
-        if (!fluids.containsKey(new FluidStackWrapper(stack))) {
+        var key = new FluidStackWrapper(stack);
+        if (fluids.containsKey(key)) {
+            return fluids.get(key).getAmount() < maxAmount && provider.canConsume(CONFIG.bytesPerFluid.get());
+        } else {
             return provider.canConsume(CONFIG.bytesPerFluid.get() + CONFIG.bytesPerFluidType.get());
         }
-        return true;
     }
 
     @Override
@@ -60,7 +63,8 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidCollectio
         var bytesPerFluid = CONFIG.bytesPerFluid.get();
         if (!fluids.containsKey(key)) {
             provider.consume(CONFIG.bytesPerFluidType.get());
-            var inserted = Math.min(fluid.getAmount(), provider.consumeLimit(bytesPerFluid));
+            var limit = Math.min(provider.consumeLimit(bytesPerFluid), maxAmount);
+            var inserted = Math.min(fluid.getAmount(), limit);
             assert inserted > 0 && inserted <= fluid.getAmount();
             if (!simulate) {
                 var insertedStack = StackHelper.copyWithAmount(fluid, inserted);
@@ -70,10 +74,12 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidCollectio
             }
             return inserted;
         } else {
-            var inserted = Math.min(fluid.getAmount(), provider.consumeLimit(bytesPerFluid));
+            var existing = fluids.get(key);
+            var limit = Math.min(provider.consumeLimit(bytesPerFluid), maxAmount - existing.getAmount());
+            var inserted = Math.min(fluid.getAmount(), limit);
             assert inserted > 0 && inserted <= fluid.getAmount();
             if (!simulate) {
-                fluids.get(key).grow(inserted);
+                existing.grow(inserted);
                 provider.consume(inserted * bytesPerFluid);
                 invokeUpdate();
             }

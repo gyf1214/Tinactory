@@ -312,13 +312,15 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IEntry<MachineBlock> digitalInterface(Voltage v, JsonObject jo) {
-            var maxParallel = GsonHelper.getAsInt(jo, "maxParallel");
-            var bytesLimit = GsonHelper.getAsInt(jo, "bytesLimit");
-            var dedicatedBytes = GsonHelper.getAsInt(jo, "dedicatedBytes");
+            var properties = new DigitalInterface.Properties(
+                GsonHelper.getAsInt(jo, "maxParallel"),
+                GsonHelper.getAsInt(jo, "bytesLimit"),
+                GsonHelper.getAsInt(jo, "dedicatedBytes"),
+                GsonHelper.getAsInt(jo, "amountByteLimit"));
 
             return baseInterface(v)
                 .blockEntity()
-                .transform(DigitalInterface.factory(maxParallel, bytesLimit, dedicatedBytes))
+                .transform(DigitalInterface.factory(properties))
                 .end()
                 .buildObject();
         }
