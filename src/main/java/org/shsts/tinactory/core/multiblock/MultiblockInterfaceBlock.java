@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.multiblock;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,6 +36,12 @@ public class MultiblockInterfaceBlock extends SidedMachineBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(JOINED);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState()
+            .setValue(IO_FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     @SuppressWarnings("deprecation")

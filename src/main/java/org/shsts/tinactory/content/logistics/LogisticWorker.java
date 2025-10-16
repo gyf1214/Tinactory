@@ -1,13 +1,11 @@
 package org.shsts.tinactory.content.logistics;
 
-import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -62,16 +60,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private final LazyOptional<IElectricMachine> electricCap;
 
-    public record Properties(int slots, int interval, int stack, int fluidStack, double amperage) {
-        public static Properties fromJson(JsonObject jo) {
-            return new Properties(
-                GsonHelper.getAsInt(jo, "slots"),
-                GsonHelper.getAsInt(jo, "interval"),
-                GsonHelper.getAsInt(jo, "stack"),
-                GsonHelper.getAsInt(jo, "fluidStack"),
-                GsonHelper.getAsDouble(jo, "amperage"));
-        }
-    }
+    public record Properties(int slots, int interval, int stack, int fluidStack, double power) {}
 
     public LogisticWorker(BlockEntity blockEntity, Properties properties) {
         this.blockEntity = blockEntity;
@@ -83,7 +72,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         // initialize current slot to the last slot so in the first tick it will select the first valid slot
         this.currentSlot = workerSlots - 1;
 
-        var electric = SimpleElectricConsumer.amperage(getBlockVoltage(blockEntity), properties.amperage);
+        var voltage = getBlockVoltage(blockEntity);
+        var electric = new SimpleElectricConsumer(voltage.value, properties.power);
         this.electricCap = LazyOptional.of(() -> electric);
     }
 

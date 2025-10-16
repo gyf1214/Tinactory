@@ -49,9 +49,9 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
         this.electricCap = LazyOptional.of(() -> electric);
     }
 
-    protected ElectricStorage(BlockEntity blockEntity, Layout layout, double amperage) {
-        this(blockEntity, layout,
-            SimpleElectricConsumer.amperage(getBlockVoltage(blockEntity), amperage));
+    protected ElectricStorage(BlockEntity blockEntity, Layout layout, double power) {
+        this(blockEntity, layout, new SimpleElectricConsumer(
+            getBlockVoltage(blockEntity).value, power));
     }
 
     public boolean isUnlocked() {

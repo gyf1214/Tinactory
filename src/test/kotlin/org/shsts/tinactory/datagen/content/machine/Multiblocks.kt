@@ -14,6 +14,7 @@ import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR
 import org.shsts.tinactory.content.AllTags.CLEANROOM_WALL
 import org.shsts.tinactory.content.AllTags.COIL
+import org.shsts.tinactory.content.AllTags.ELECTRIC_FURNACE
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
 import org.shsts.tinactory.content.AllTags.machine
 import org.shsts.tinactory.content.multiblock.TurbineBlock.CENTER_BLADE
@@ -31,6 +32,7 @@ import org.shsts.tinactory.datagen.content.Models.solidBlock
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemEntry
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
@@ -378,21 +380,29 @@ object Multiblocks {
             multiblock("lithography_machine", "stable_titanium", "blast_furnace")
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
             multiblock("multi_smelter", "heatproof", "blast_furnace")
+            dataGen {
+                tag(itemEntry("multiblock/multi_smelter"), ELECTRIC_FURNACE)
+            }
             multiblock("metal_former", "frost_proof", "blast_furnace")
-            block("multiblock/large_turbine") {
-                blockState { ctx ->
-                    val prov = ctx.provider()
-                    val models = prov.models()
-                    val id = ctx.id()
-                    val modelId = "block/multiblock/misc/turbine_blade_$CENTER_BLADE"
-                    val idle = models.withExistingParent(id, modLoc(modelId))
-                    val spin = models.withExistingParent("${id}_active", modLoc("${modelId}_active"))
-                    prov.getVariantBuilder(ctx.`object`())
-                        .forAllStates { state ->
-                            val dir = state.getValue(PrimitiveBlock.FACING)
-                            val model = if (state.getValue(MachineBlock.WORKING)) spin else idle
-                            Models.rotateModel(model, dir)
-                        }
+            getMultiblock("large_turbine").apply {
+                block(block) {
+                    blockState { ctx ->
+                        val prov = ctx.provider()
+                        val models = prov.models()
+                        val id = ctx.id()
+                        val modelId = "block/multiblock/misc/turbine_blade_$CENTER_BLADE"
+                        val idle = models.withExistingParent(id, modLoc(modelId))
+                        val spin = models.withExistingParent("${id}_active", modLoc("${modelId}_active"))
+                        prov.getVariantBuilder(ctx.`object`())
+                            .forAllStates { state ->
+                                val dir = state.getValue(PrimitiveBlock.FACING)
+                                val model = if (state.getValue(MachineBlock.WORKING)) spin else idle
+                                Models.rotateModel(model, dir)
+                            }
+                    }
+                    for (type in types) {
+                        itemTag(machine(type))
+                    }
                 }
             }
         }

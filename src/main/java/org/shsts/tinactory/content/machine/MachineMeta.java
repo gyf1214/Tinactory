@@ -338,28 +338,39 @@ public class MachineMeta extends MetaConsumer {
                 .buildObject();
         }
 
+        private double getPower(Voltage v, JsonObject jo) {
+            if (jo.has("amperage")) {
+                return v.value * GsonHelper.getAsDouble(jo, "amperage");
+            } else {
+                return GsonHelper.getAsDouble(jo, "power");
+            }
+        }
+
         private IEntry<MachineBlock> electricChest(Voltage v, JsonObject jo) {
-            var amperage = GsonHelper.getAsDouble(jo, "amperage");
             return baseMachine(v)
                 .menu(AllMenus.ELECTRIC_CHEST)
                 .blockEntity()
-                .transform(ElectricChest.factory(getLayout(v), amperage))
+                .transform(ElectricChest.factory(getLayout(v), getPower(v, jo)))
                 .end()
                 .buildObject();
         }
 
         private IEntry<MachineBlock> electricTank(Voltage v, JsonObject jo) {
-            var amperage = GsonHelper.getAsDouble(jo, "amperage");
             return baseMachine(v)
                 .menu(AllMenus.ELECTRIC_TANK)
                 .blockEntity()
-                .transform(ElectricTank.factory(getLayout(v), amperage))
+                .transform(ElectricTank.factory(getLayout(v), getPower(v, jo)))
                 .end()
                 .buildObject();
         }
 
         private IEntry<MachineBlock> logisticWorker(Voltage v, JsonObject jo) {
-            var properties = LogisticWorker.Properties.fromJson(jo);
+            var properties = new LogisticWorker.Properties(
+                GsonHelper.getAsInt(jo, "slots"),
+                GsonHelper.getAsInt(jo, "interval"),
+                GsonHelper.getAsInt(jo, "stack"),
+                GsonHelper.getAsInt(jo, "fluidStack"),
+                getPower(v, jo));
             return baseMachine(v)
                 .menu(AllMenus.LOGISTIC_WORKER)
                 .blockEntity()

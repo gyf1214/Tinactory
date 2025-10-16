@@ -157,11 +157,11 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
     public DigitalInterface(BlockEntity be, Properties properties) {
         super(be);
-        this.maxParallel = properties.maxParallel();
-        this.bytesLimit = properties.bytesLimit();
-        this.dedicatedLimit = properties.dedicatedBytes();
+        this.maxParallel = properties.maxParallel;
+        this.bytesLimit = properties.bytesLimit;
+        this.dedicatedLimit = properties.dedicatedBytes;
         this.sharedBytes = bytesLimit;
-        this.amountByteLimit = properties.amountByteLimit();
+        this.amountByteLimit = properties.amountByteLimit;
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {

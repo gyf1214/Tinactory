@@ -86,8 +86,8 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         }
     }
 
-    public ElectricChest(BlockEntity blockEntity, Layout layout, double amperage) {
-        super(blockEntity, layout, amperage);
+    public ElectricChest(BlockEntity blockEntity, Layout layout, double power) {
+        super(blockEntity, layout, power);
         this.size = layout.slots.size() / 2;
         this.capacity = CONFIG.chestSize.get();
         this.filters = new ItemStack[size];
@@ -105,8 +105,8 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         this.itemHandlerCap = LazyOptional.of(() -> externalHandler);
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double amperage) {
-        return $ -> $.capability(ID, be -> new ElectricChest(be, layout, amperage));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double power) {
+        return $ -> $.capability(ID, be -> new ElectricChest(be, layout, power));
     }
 
     public ItemStack getStackInSlot(int slot) {

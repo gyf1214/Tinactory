@@ -148,7 +148,7 @@ public final class AllMenus {
         RESEARCH_DIGITAL_INTERFACE = REGISTRATE.menu("multiblock/research_digital_interface",
                 MachineMenu::digitalInterface)
             .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> MachineScreen::new)
+            .screen(() -> () -> ResearchBenchScreen::new)
             .register();
     }
 

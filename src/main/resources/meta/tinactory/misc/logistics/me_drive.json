@@ -1,6 +1,6 @@
 {
   "type": "me_drive",
-  "power": 128,
+  "power": 32,
   "layout": {
     "slots": [
       {

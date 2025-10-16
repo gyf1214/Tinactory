@@ -1,7 +1,7 @@
 {
   "recipe": "none",
   "machine": "logistic_worker",
-  "amperage": 0.125,
+  "power": 2,
   "voltages": {
     "ulv": {
       "slots": 8,
