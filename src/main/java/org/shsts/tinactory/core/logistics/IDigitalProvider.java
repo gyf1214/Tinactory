@@ -8,10 +8,14 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 public interface IDigitalProvider {
     int bytesUsed();
 
-    int consumeLimit(int bytes);
+    int consumeLimit(int offset, int bytes);
+
+    default int consumeLimit(int bytes) {
+        return consumeLimit(0, bytes);
+    }
 
     default boolean canConsume(int bytes) {
-        return consumeLimit(bytes) > 0;
+        return consumeLimit(0, bytes) > 0;
     }
 
     void consume(int bytes);

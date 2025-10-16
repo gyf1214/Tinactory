@@ -20,8 +20,8 @@ public class DigitalProvider implements IDigitalProvider {
     }
 
     @Override
-    public int consumeLimit(int bytes) {
-        return bytesRemaining / bytes;
+    public int consumeLimit(int offset, int bytes) {
+        return Math.max(0, (bytesRemaining - offset) / bytes);
     }
 
     @Override

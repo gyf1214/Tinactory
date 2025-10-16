@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.multiblock;
 
+import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -25,6 +26,7 @@ import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,8 @@ import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DigitalInterface extends MultiblockInterface implements ILayoutProvider, IFlexibleContainer {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private final int maxParallel;
     private final int bytesLimit;
     private final int dedicatedLimit;
@@ -92,11 +96,11 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         }
 
         @Override
-        public int consumeLimit(int bytes) {
+        public int consumeLimit(int offset, int bytes) {
             if (bytesUsed < dedicatedLimit) {
-                return (sharedBytes + dedicatedLimit - bytesUsed) / bytes;
+                return Math.max(0, (sharedBytes + dedicatedLimit - bytesUsed - offset) / bytes);
             } else {
-                return sharedBytes / bytes;
+                return Math.max(0, (sharedBytes - offset) / bytes);
             }
         }
 
@@ -112,6 +116,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             }
             assert sharedBytes >= 0;
             bytesUsed += bytes;
+            LOGGER.debug("consume {}, bytesUsed={}", bytes, bytesUsed);
         }
 
         @Override
@@ -126,6 +131,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             }
             bytesUsed -= bytes;
             assert bytesUsed >= 0;
+            LOGGER.debug("restore {}, bytesUsed={}", bytes, bytesUsed);
         }
 
         /**

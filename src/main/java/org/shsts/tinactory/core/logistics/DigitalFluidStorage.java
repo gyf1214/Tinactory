@@ -62,14 +62,14 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidCollectio
         var key = new FluidStackWrapper(fluid);
         var bytesPerFluid = CONFIG.bytesPerFluid.get();
         if (!fluids.containsKey(key)) {
-            provider.consume(CONFIG.bytesPerFluidType.get());
-            var limit = Math.min(provider.consumeLimit(bytesPerFluid), maxAmount);
+            var bytesPerType = CONFIG.bytesPerFluidType.get();
+            var limit = Math.min(provider.consumeLimit(bytesPerType, bytesPerFluid), maxAmount);
             var inserted = Math.min(fluid.getAmount(), limit);
             assert inserted > 0 && inserted <= fluid.getAmount();
             if (!simulate) {
                 var insertedStack = StackHelper.copyWithAmount(fluid, inserted);
                 fluids.put(new FluidStackWrapper(insertedStack), insertedStack);
-                provider.consume(inserted * bytesPerFluid);
+                provider.consume(bytesPerType + inserted * bytesPerFluid);
                 invokeUpdate();
             }
             return inserted;

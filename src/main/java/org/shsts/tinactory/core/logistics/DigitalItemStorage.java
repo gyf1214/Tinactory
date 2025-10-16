@@ -62,15 +62,15 @@ public class DigitalItemStorage extends PortNotifier implements IItemCollection,
         var key = new ItemStackWrapper(stack);
         var bytesPerItem = CONFIG.bytesPerItem.get();
         if (!items.containsKey(key)) {
-            provider.consume(CONFIG.bytesPerItemType.get());
-            var limit = Math.min(provider.consumeLimit(bytesPerItem), maxCount);
+            var bytesPerType = CONFIG.bytesPerItemType.get();
+            var limit = Math.min(provider.consumeLimit(bytesPerType, bytesPerItem), maxCount);
             var inserted = Math.min(stack.getCount(), limit);
             assert inserted > 0 && inserted <= stack.getCount();
             var remaining = StackHelper.copyWithCount(stack, stack.getCount() - inserted);
             if (!simulate) {
                 var insertedStack = StackHelper.copyWithCount(stack, inserted);
                 items.put(new ItemStackWrapper(insertedStack), insertedStack);
-                provider.consume(inserted * bytesPerItem);
+                provider.consume(bytesPerType + inserted * bytesPerItem);
                 invokeUpdate();
             }
             return remaining;
