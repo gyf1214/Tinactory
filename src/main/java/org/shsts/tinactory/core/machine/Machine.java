@@ -90,9 +90,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Optional<ITeamProfile> owner() {
-        var world = blockEntity.getLevel();
-        assert world != null;
-        if (world.isClientSide) {
+        if (world().isClientSide) {
             return TechManager.localTeam();
         }
         if (network == null) {
@@ -180,9 +178,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Optional<BlockState> workBlock() {
-        var world = blockEntity.getLevel();
-        assert world != null;
-        return workBlock(world);
+        return workBlock(world());
     }
 
     protected Optional<BlockState> workBlock(Level world) {
@@ -260,9 +256,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     public void onDisconnectFromNetwork() {
         network = null;
         LOGGER.trace("{}: disconnect from network", blockEntity);
-        var world = blockEntity.getLevel();
-        assert world != null;
-        updateWorkBlock(world, false);
+        updateWorkBlock(world(), false);
     }
 
     private void onPreWork(Level world, INetwork network) {

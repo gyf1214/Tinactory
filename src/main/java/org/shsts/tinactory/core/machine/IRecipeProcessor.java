@@ -46,7 +46,7 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
     /**
      * Info is for returning actual ingredients.
      */
-    void onWorkBegin(T recipe, IMachine machine, int parallel, Consumer<ProcessingInfo> info);
+    void onWorkBegin(T recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> info);
 
     void onWorkContinue(T recipe, IMachine machine);
 

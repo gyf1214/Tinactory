@@ -199,7 +199,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public void onWorkBegin(SmeltingRecipe recipe, IMachine machine,
-        int parallel, Consumer<ProcessingInfo> info) {
+        int maxParallel, Consumer<ProcessingInfo> info) {
         var container = machine.container().orElseThrow();
         var ingredient = recipe.getIngredients().get(0);
         StackHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false)

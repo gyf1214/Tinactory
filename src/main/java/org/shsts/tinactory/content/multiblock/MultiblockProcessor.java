@@ -30,7 +30,7 @@ public class MultiblockProcessor extends MachineProcessor {
     }
 
     @Override
-    protected int parallel() {
+    protected int maxParallel() {
         return getInterface().map(MultiblockInterface::parallel).orElse(1);
     }
 }

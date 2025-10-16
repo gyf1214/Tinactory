@@ -72,9 +72,9 @@ public class MachineProcessor extends CapabilityProvider implements
     private final ListMultimap<Integer, IProcessingObject> infoMap = ArrayListMultimap.create();
 
     private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, T recipe) {
-        public void onWorkBegin(IMachine machine, int parallel, List<ProcessingInfo> info) {
+        public void onWorkBegin(IMachine machine, int maxParallel, List<ProcessingInfo> info) {
             info.clear();
-            processor.onWorkBegin(recipe, machine, parallel, info::add);
+            processor.onWorkBegin(recipe, machine, maxParallel, info::add);
         }
 
         public void onWorkContinue(IMachine machine) {
@@ -142,7 +142,7 @@ public class MachineProcessor extends CapabilityProvider implements
     /**
      * Return max parallel for the processor.
      */
-    protected int parallel() {
+    protected int maxParallel() {
         return 1;
     }
 
@@ -265,7 +265,7 @@ public class MachineProcessor extends CapabilityProvider implements
 
         workProgress = 0;
         if (currentRecipe != null) {
-            currentRecipe.onWorkBegin(machine.get(), parallel(), infoList);
+            currentRecipe.onWorkBegin(machine.get(), maxParallel(), infoList);
             buildInfoMap();
         }
         needUpdate = false;

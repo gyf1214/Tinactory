@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
@@ -18,6 +19,7 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
@@ -33,13 +35,13 @@ import java.util.stream.Stream;
 
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
-import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 import static org.shsts.tinactory.core.machine.RecipeProcessors.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipeProcessor<R> {
     protected final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
+
     protected double workFactor = 1d;
     protected double energyFactor = 1d;
 
@@ -185,9 +187,41 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         return Optional.empty();
     }
 
-    protected void calculateFactors(R recipe, IMachine machine) {
-        var baseVoltage = recipe.voltage == 0 ? Voltage.ULV.value : recipe.voltage;
-        var voltage = getBlockVoltage(machine.blockEntity()).value;
+    protected int calculateParallel(R recipe, Level world, IMachine machine, int maxParallel) {
+        var l = 1;
+        var r = maxParallel + 1;
+        while (r - l > 1) {
+            var m = (l + r) / 2;
+            if (recipe.matches(machine, world, m)) {
+                l = m;
+            } else {
+                r = m;
+            }
+        }
+        return l;
+    }
+
+    protected void addOutputInfo(R recipe, int parallel, Consumer<ProcessingInfo> info) {
+        for (var output : recipe.outputs) {
+            var result = output.result();
+            if (result instanceof ProcessingResults.ItemResult item) {
+                var stack1 = StackHelper.copyWithCount(item.stack, parallel * item.stack.getCount());
+                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.ItemResult(1, stack1)));
+            } else if (result instanceof ProcessingResults.FluidResult fluid) {
+                var stack1 = StackHelper.copyWithAmount(fluid.stack, parallel * fluid.stack.getAmount());
+                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.FluidResult(1, stack1)));
+            }
+        }
+    }
+
+    protected static long machineVoltage(IMachine machine) {
+        return machine.electric().map(IElectricMachine::getVoltage).orElse(0L);
+    }
+
+    protected void calculateFactors(R recipe, IMachine machine, int parallel) {
+        // parallel will limit overclock
+        var baseVoltage = parallel * Math.max(recipe.voltage, Voltage.ULV.value);
+        var voltage = machineVoltage(machine);
         var voltageFactor = 1L;
         var overclock = 1L;
         while (baseVoltage * voltageFactor * 4 <= voltage) {
@@ -195,16 +229,15 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             voltageFactor *= 4;
         }
         workFactor = overclock;
-        energyFactor = voltageFactor;
+        energyFactor = voltageFactor * parallel;
     }
 
     @Override
-    public void onWorkBegin(R recipe, IMachine machine, int parallel, Consumer<ProcessingInfo> info) {
-        recipe.consumeInputs(machine.container().orElseThrow(), 1, info);
-        for (var output : recipe.outputs) {
-            info.accept(new ProcessingInfo(output.port(), output.result()));
-        }
-        calculateFactors(recipe, machine);
+    public void onWorkBegin(R recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> info) {
+        var parallel = calculateParallel(recipe, machine.world(), machine, maxParallel);
+        recipe.consumeInputs(machine.container().orElseThrow(), parallel, info);
+        addOutputInfo(recipe, parallel, info);
+        calculateFactors(recipe, machine, parallel);
     }
 
     @Override

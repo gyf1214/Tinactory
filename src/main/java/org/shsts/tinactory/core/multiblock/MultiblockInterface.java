@@ -104,9 +104,7 @@ public class MultiblockInterface extends Machine {
         processor = target.processor();
         electricMachine = target.electric();
         setLayout(target.getLayout());
-        var world = blockEntity.getLevel();
-        assert world != null;
-        setJoined(world, true);
+        setJoined(world(), true);
         onMultiblockUpdate();
     }
 
@@ -115,8 +113,7 @@ public class MultiblockInterface extends Machine {
             return;
         }
         LOGGER.debug("{} reset multiblock", this);
-        var world = blockEntity.getLevel();
-        assert world != null;
+        var world = world();
         updateWorkBlock(world, false);
         setJoined(world, false);
         multiblock = null;
@@ -150,8 +147,8 @@ public class MultiblockInterface extends Machine {
     }
 
     private void updateMultiblock() {
-        var world = blockEntity.getLevel();
-        assert world != null && world.isClientSide;
+        var world = world();
+        assert world.isClientSide;
 
         LOGGER.debug("update multiblock current={}, pos={}, firstTick={}",
             multiblock, multiblockPos, firstTick);

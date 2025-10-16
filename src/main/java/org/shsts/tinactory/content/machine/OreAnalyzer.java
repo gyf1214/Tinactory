@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
+import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -14,6 +15,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
@@ -98,6 +100,13 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
             .stream().filter(marker.get()::matches)
             .toList();
         return newRecipe(matches, world);
+    }
+
+    @Override
+    protected void addOutputInfo(OreAnalyzerRecipe recipe, int parallel, Consumer<ProcessingInfo> info) {
+        if (!emptyRecipe) {
+            super.addOutputInfo(recipe, parallel, info);
+        }
     }
 
     @Override

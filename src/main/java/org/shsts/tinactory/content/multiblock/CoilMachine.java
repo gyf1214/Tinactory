@@ -24,8 +24,8 @@ public abstract class CoilMachine<R extends ProcessingRecipe> extends Processing
     protected abstract int getRecipeTemperature(R recipe);
 
     @Override
-    protected void calculateFactors(R recipe, IMachine machine) {
-        super.calculateFactors(recipe, machine);
+    protected void calculateFactors(R recipe, IMachine machine, int parallel) {
+        super.calculateFactors(recipe, machine, parallel);
         var temp = getTemperature(machine);
         var factor = Math.max(1d, (temp - getRecipeTemperature(recipe)) /
             CONFIG.blastFurnaceTempFactor.get());

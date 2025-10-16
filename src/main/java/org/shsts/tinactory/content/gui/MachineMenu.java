@@ -5,7 +5,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -70,6 +72,22 @@ public class MachineMenu extends ProcessingMenu {
         }
     }
 
+    private boolean tryDrain(IFluidHandlerItem handler, IFluidCollection collection, FluidStack fluid) {
+        var fluid1 = fluid.isEmpty() ? collection.drain(Integer.MAX_VALUE, true) :
+            collection.drain(StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE), true);
+        int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
+        if (amount > 0) {
+            var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
+            var fluid3 = collection.drain(fluid2, false);
+            var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
+            if (amount1 != amount) {
+                LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
+            }
+            return true;
+        }
+        return false;
+    }
+
     private FluidClickResult doClickFluidPort(ItemStack carried, IFluidCollection collection,
         boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
@@ -94,18 +112,13 @@ public class MachineMenu extends ProcessingMenu {
         }
         if (mayDrain) {
             for (var i = 0; i < handler.getTanks(); i++) {
-                var fluid1 = StackHelper.copyWithAmount(handler.getFluidInTank(i), Integer.MAX_VALUE);
-                var fluid2 = collection.drain(fluid1, true);
-                int amount = handler.fill(fluid2, IFluidHandler.FluidAction.SIMULATE);
-                if (amount > 0) {
-                    var fluid3 = StackHelper.copyWithAmount(fluid2, amount);
-                    var fluid4 = collection.drain(fluid3, false);
-                    var amount1 = handler.fill(fluid4, IFluidHandler.FluidAction.EXECUTE);
-                    if (amount1 != amount) {
-                        LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
-                    }
+                var fluid1 = handler.getFluidInTank(i);
+                if (!fluid1.isEmpty() && tryDrain(handler, collection, fluid1)) {
                     return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer());
                 }
+            }
+            if (tryDrain(handler, collection, FluidStack.EMPTY)) {
+                return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer());
             }
         }
         return new FluidClickResult();
