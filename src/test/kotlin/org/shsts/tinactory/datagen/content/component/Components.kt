@@ -1,9 +1,7 @@
 package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.world.item.Item
-import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.STORAGE_COMPONENT
+import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.content.AllItems.componentEntry
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
@@ -112,17 +110,17 @@ object Components {
                 model(basicItem(ae2("items/material_formation_core")))
             }
 
-            for ((i, entry) in STORAGE_COMPONENT.withIndex()) {
-                val k = 1 shl (2 * i)
-                item(entry) {
-                    model(basicItem(ae2("items/material_cell${k}k_part")))
+            for (entry in STORAGE_CELLS) {
+                val k = name(entry.component.id(), -1).replace('m', 'k')
+                item(entry.component) {
+                    model(basicItem(ae2("items/material_cell${k}_part")))
                 }
-                item(ITEM_STORAGE_CELL[i]) {
-                    model(basicItem(ae2("items/storage_cell_${k}k")))
+                item(entry.item) {
+                    model(basicItem(ae2("items/storage_cell_${k}")))
                     tag(AllTags.ITEM_STORAGE_CELL)
                 }
-                item(FLUID_STORAGE_CELL[i]) {
-                    model(basicItem(ae2("items/fluid_storage_cell_${k}k")))
+                item(entry.fluid) {
+                    model(basicItem(ae2("items/fluid_storage_cell_${k}")))
                     tag(AllTags.FLUID_STORAGE_CELL)
                 }
             }

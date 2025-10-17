@@ -16,6 +16,8 @@ import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.logistics.MEDrive;
+import org.shsts.tinactory.content.logistics.MEStorageCell;
+import org.shsts.tinactory.content.logistics.MEStorageCellSet;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.content.AllItems.STORAGE_CELLS;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS;
@@ -139,6 +142,21 @@ public class MiscMeta extends MetaConsumer {
             .build();
     }
 
+    private void meStorageCell(String name, String id, JsonObject jo) {
+        var parent = LocHelper.name(id, -2);
+        var prefix = id.substring(0, id.length() - parent.length() - name.length() - 1);
+        var componentPrefix = GsonHelper.getAsString(jo, "componentPrefix");
+        var bytes = GsonHelper.getAsInt(jo, "bytes");
+
+        var component = REGISTRATE.item(componentPrefix + "/" + name).register();
+        var item = REGISTRATE.item(prefix + "item_" + parent + "/" + name,
+            MEStorageCell.itemCell(bytes)).register();
+        var fluid = REGISTRATE.item(prefix + "fluid_" + parent + "/" + name,
+            MEStorageCell.fluidCell(bytes)).register();
+
+        STORAGE_CELLS.add(new MEStorageCellSet(component, item, fluid));
+    }
+
     private void boiler(String id, JsonObject jo) {
         var mat = getMaterial(GsonHelper.getAsString(jo, "material", "water"));
         var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
@@ -162,9 +180,10 @@ public class MiscMeta extends MetaConsumer {
             case "glass" -> glass(id);
             case "lens" -> lens(id, jo);
             case "item" -> item(id, jo);
-            case "boiler" -> boiler(id, jo);
             case "me_storage_interface" -> meStorageInterface(id, jo);
             case "me_drive" -> meDrive(id, jo);
+            case "me_storage_cell" -> meStorageCell(name, id, jo);
+            case "boiler" -> boiler(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }
     }

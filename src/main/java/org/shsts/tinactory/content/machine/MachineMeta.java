@@ -297,8 +297,6 @@ public class MachineMeta extends MetaConsumer {
                 .block()
                 .material(Material.HEAVY_METAL)
                 .properties(MACHINE_PROPERTY)
-                .tint(() -> () -> (state, $2, $3, i) ->
-                    MultiblockInterfaceBlock.tint(v, state, i))
                 .translucent()
                 .end();
         }
@@ -308,6 +306,10 @@ public class MachineMeta extends MetaConsumer {
                 .blockEntity()
                 .transform(MultiblockInterface::factory)
                 .transform(FlexibleStackContainer::factory)
+                .end()
+                .block()
+                .tint(() -> () -> (state, $2, $3, i) ->
+                    MultiblockInterfaceBlock.tint(v, state, i))
                 .end()
                 .buildObject();
         }

@@ -2,9 +2,7 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllItems.FLUID_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
-import org.shsts.tinactory.content.AllItems.STORAGE_COMPONENT
+import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags
@@ -216,23 +214,26 @@ object MiscComponents {
                 input("annealed_copper", "wire_fine", 8)
                 input("pvc")
             }
-            output(STORAGE_COMPONENT.item(0)) {
+
+            output(STORAGE_CELLS[0].component.get()) {
                 circuit(1, Voltage.LV)
                 input(CHIP.item("ram"), 4)
                 input("certus_quartz", "gem", 4)
                 input("annealed_copper", "wire_fine", 16)
                 input("pvc")
             }
-            for ((i, entry) in STORAGE_COMPONENT.withIndex()) {
-                output(ITEM_STORAGE_CELL.item(i)) {
-                    input(entry.get())
+
+            for (entry in STORAGE_CELLS) {
+                val component = entry.component.get()
+                output(entry.item.get()) {
+                    input(component)
                     input(annihilation)
                     input(formation)
                     input("aluminium", "plate", 3)
                     input("soldering_alloy", amount = 3)
                 }
-                output(FLUID_STORAGE_CELL.item(i)) {
-                    input(entry.get())
+                output(entry.fluid.get()) {
+                    input(component)
                     input(annihilation)
                     input(formation)
                     input("stainless_steel", "plate", 3)

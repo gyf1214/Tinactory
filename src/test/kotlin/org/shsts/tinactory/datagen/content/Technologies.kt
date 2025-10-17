@@ -3,7 +3,7 @@ package org.shsts.tinactory.datagen.content
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
-import org.shsts.tinactory.content.AllItems.ITEM_STORAGE_CELL
+import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllMultiblocks
@@ -271,7 +271,7 @@ object Technologies {
 
             DIGITAL_STORAGE = tech("digital_storage") {
                 maxProgress(240)
-                displayItem(ITEM_STORAGE_CELL[0])
+                displayItem(STORAGE_CELLS[0].item)
                 depends(CPU)
             }
 

@@ -1,0 +1,18 @@
+{
+  "type": "me_storage_cell",
+  "componentPrefix": "component/storage_component",
+  "items": {
+    "1m": {
+      "bytes": 1048576
+    },
+    "4m": {
+      "bytes": 4194304
+    },
+    "16m": {
+      "bytes": 16777216
+    },
+    "64m": {
+      "bytes": 67108864
+    }
+  }
+}
