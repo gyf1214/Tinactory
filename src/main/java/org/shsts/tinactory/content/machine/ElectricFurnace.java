@@ -4,12 +4,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.RecipeWrapper;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
@@ -19,7 +18,6 @@ import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
-import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
@@ -67,15 +65,26 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         return container.getPort(outputPort, true).asItem();
     }
 
-    private RecipeWrapper getInputWrapper(IContainer container) {
-        return new RecipeWrapper((IItemHandlerModifiable)
-            ((ItemHandlerCollection) getInputPort(container)).itemHandler);
+    /**
+     * TODO: need to use {@link SmeltingRecipe#assemble} to cope with subclass.
+     */
+    private ItemStack getResult(SmeltingRecipe recipe) {
+        return recipe.getResultItem();
     }
 
-    private boolean canOutput(SmeltingRecipe recipe, IContainer container) {
-        var result = recipe.assemble(getInputWrapper(container));
-        var outputPort = getOutputPort(container);
-        return outputPort.insertItem(result, true).isEmpty();
+    private boolean matchesInput(SmeltingRecipe recipe, IItemCollection port) {
+        var ingredient = recipe.getIngredients().get(0);
+        return StackHelper.consumeItemCollection(port, ingredient, 1, true).isPresent();
+    }
+
+    private boolean matchesOutput(SmeltingRecipe recipe, IItemCollection port) {
+        var result = getResult(recipe);
+        return port.insertItem(result, true).isEmpty();
+    }
+
+    private boolean matches(SmeltingRecipe recipe, IContainer container) {
+        return matchesInput(recipe, getInputPort(container)) &&
+            matchesOutput(recipe, getOutputPort(container));
     }
 
     @Override
@@ -138,11 +147,15 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             .asItemFilter().setFilters(smeltingRecipe.getIngredients()));
     }
 
+    /**
+     * Unfortunately we cannot use {@link net.minecraft.world.item.crafting.RecipeManager#getRecipeFor}.
+     */
     @Override
     public Optional<SmeltingRecipe> newRecipe(Level world, IMachine machine) {
         return machine.container().flatMap(container -> world.getRecipeManager()
-            .getRecipeFor(RecipeType.SMELTING, getInputWrapper(container), world)
-            .filter(recipe -> canOutput(recipe, container)));
+            .getAllRecipesFor(RecipeType.SMELTING).stream()
+            .filter($ -> matches($, container))
+            .findFirst());
     }
 
     @Override
@@ -152,22 +165,20 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             return Optional.empty();
         }
         var container1 = container.get();
-        var input = getInputWrapper(container1);
         var recipeManager = world.getRecipeManager();
 
         var vanilla = recipeManager.byKey(target);
         if (vanilla.isPresent() && vanilla.get() instanceof SmeltingRecipe smelting) {
-            return smelting.matches(input, world) && canOutput(smelting, container1) ?
-                Optional.of(smelting) : Optional.empty();
+            return matches(smelting, container1) ? Optional.of(smelting) : Optional.empty();
         }
 
         var marker = CORE.recipeManager(world).byLoc(MARKER, target);
         if (marker.isPresent()) {
             var recipe = marker.get();
             if (recipe.matchesType(RecipeType.SMELTING) && recipe.canCraft(machine)) {
-                return recipeManager.getRecipesFor(RecipeType.SMELTING, input, world)
-                    .stream().filter($ -> recipe.matches($::getId) && canOutput($, container1))
-                    .findAny();
+                return recipeManager.getAllRecipesFor(RecipeType.SMELTING).stream()
+                    .filter($ -> matches($, container1))
+                    .findFirst();
             }
         }
 
@@ -221,7 +232,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         StackHelper.consumeItemCollection(port, ingredient, parallel, false)
             .ifPresent($ -> info.accept(new ProcessingInfo(inputPort, new ProcessingIngredients.ItemIngredient($))));
 
-        var result = recipe.getResultItem();
+        var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
         info.accept(new ProcessingInfo(outputPort, new ProcessingResults.ItemResult(1, result1)));
 
@@ -238,8 +249,10 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public void onWorkDone(SmeltingRecipe recipe, IMachine machine, Random random) {
-        var container = machine.container().orElseThrow();
-        getOutputPort(container).insertItem(recipe.assemble(getInputWrapper(container)), false);
+        var port = getOutputPort(machine.container().orElseThrow());
+        var result = getResult(recipe);
+        var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
+        port.insertItem(result1, false);
     }
 
     @Override
