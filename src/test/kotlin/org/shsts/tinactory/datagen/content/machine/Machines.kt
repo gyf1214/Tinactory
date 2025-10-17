@@ -81,12 +81,12 @@ object Machines {
     }
 
     private fun logistics() {
-        machine("electric_chest") {
+        machine("logistics/electric_chest") {
             overlay(Direction.UP, "overlay/machine/overlay_qchest")
             overlay(Direction.NORTH, SCREEN_GLASS)
             ioTex(ME_BUS)
         }
-        machine("electric_tank") {
+        machine("logistics/electric_tank") {
             overlay(Direction.UP, "overlay/machine/overlay_qtank")
             overlay(Direction.NORTH, SCREEN_GLASS)
             ioTex(ME_BUS)
@@ -179,7 +179,10 @@ object Machines {
         blockData {
             for (v in set.voltages.filter { it != Voltage.PRIMITIVE }) {
                 block(set.entry(v)) {
-                    machineModel(block)
+                    machineModel {
+                        casing(v)
+                        block()
+                    }
                     tag(MINEABLE_WITH_WRENCH)
                     tag?.let { itemTag(it) }
                 }

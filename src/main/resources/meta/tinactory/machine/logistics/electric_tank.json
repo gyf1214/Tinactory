@@ -1,12 +1,17 @@
 {
   "recipe": "none",
   "machine": "electric_tank",
-  "voltages": [
-    "ulv",
-    "mv",
-    "ev"
-  ],
-  "power": 1,
+  "voltages": {
+    "ulv": {
+      "power": 1
+    },
+    "mv": {
+      "power": 2
+    },
+    "ev": {
+      "power": 4
+    }
+  },
   "layout": {
     "slots": [
       {

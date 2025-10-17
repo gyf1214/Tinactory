@@ -122,6 +122,8 @@ public class LanguageProcessor {
             fmt("Primitive %s", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]multiblock[.](.*)[.]interface", matcher ->
             fmt("%s Multiblock Interface", capitalize(matcher, 1)));
+        pattern("block[.]tinactory[.]multiblock[.](.*)[.]digital_interface", matcher ->
+            fmt("%s Digital Interface", capitalize(matcher, 1)));
         pattern("block[.]tinactory[.]multiblock[.]coil[.](.*)", matcher ->
             fmt("%s Furnace Coil", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]multiblock[.]solid[.](.*)", matcher ->
@@ -132,8 +134,14 @@ public class LanguageProcessor {
             fmt("%s", normalize(matcher, 1)));
         pattern("block[.]tinactory[.]multiblock[.](.*)", matcher ->
             fmt("%s", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]logistics[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
+        pattern("block[.]tinactory[.]logistics[.]ulv[.](.*)", matcher ->
+            fmt("Basic %s", normalize(matcher, 1)));
+        pattern("block[.]tinactory[.]logistics[.]mv[.](.*)", matcher ->
+            fmt("Good %s", normalize(matcher, 1)));
+        pattern("block[.]tinactory[.]logistics[.]ev[.](.*)", matcher ->
+            fmt("Advanced %s", normalize(matcher, 1)));
+        pattern("block[.]tinactory[.]logistics[.](.*)", matcher ->
+            fmt("%s", normalize(matcher, 1)));
         pattern("fluid[.]tinactory[.]material[.]gas[.](.*)", matcher ->
             fmt("%s", normalize(matcher, 1)));
         pattern("fluid[.]tinactory[.]material[.]liquid[.](.*)", matcher ->

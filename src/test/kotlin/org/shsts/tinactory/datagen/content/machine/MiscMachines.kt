@@ -93,8 +93,8 @@ object MiscMachines {
             ulv("research_bench", Blocks.CRAFTING_TABLE)
             ulv("assembler", WORKBENCH.get())
             ulv("electric_furnace", Blocks.FURNACE)
-            ulv("electric_chest", Blocks.CHEST)
-            ulv("electric_tank", getMaterial("glass").tag("primary"))
+            ulv("logistics/electric_chest", Blocks.CHEST)
+            ulv("logistics/electric_tank", getMaterial("glass").tag("primary"))
             ulv("logistics/logistic_worker", Blocks.HOPPER)
             ulvComponent("electric_buffer", ulvCable)
 
@@ -156,6 +156,8 @@ object MiscMachines {
                 input(ulvCircuit, 2)
                 input(ulvCable, 2)
                 input(base, 2)
+                voltage(Voltage.ULV)
+                workTicks(MACHINE_TICKS)
                 tech(Technologies.SOLDERING)
             }
         }
@@ -176,6 +178,8 @@ object MiscMachines {
                 input(ulvCircuit, 2)
                 input(ulvCable, 2)
                 input(base, 2)
+                voltage(Voltage.ULV)
+                workTicks(MACHINE_TICKS)
                 tech(Technologies.SOLDERING)
             }
         }

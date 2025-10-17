@@ -1,21 +1,23 @@
 {
   "recipe": "none",
   "machine": "logistic_worker",
-  "power": 2,
   "voltages": {
     "ulv": {
+      "power": 2,
       "slots": 8,
       "interval": 40,
       "stack": 16,
       "fluidStack": 4000
     },
     "mv": {
+      "power": 8,
       "slots": 16,
       "interval": 20,
       "stack": 32,
       "fluidStack": 8000
     },
     "ev": {
+      "power": 32,
       "slots": 24,
       "interval": 10,
       "stack": 64,

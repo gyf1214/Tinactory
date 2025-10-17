@@ -258,14 +258,14 @@ object ProcessingMachines {
                 component("cable", 2)
                 tech(Technologies.BATTERY)
             }
-            machine("electric_chest") {
+            machine("logistics/electric_chest") {
                 circuit(2)
                 component("conveyor_module")
                 input(main, "plate", 2)
                 input(Items.CHEST)
                 tech(Technologies.CONVEYOR_MODULE)
             }
-            machine("electric_tank") {
+            machine("logistics/electric_tank") {
                 circuit(2)
                 component("electric_pump")
                 input(main, "plate", 2)
