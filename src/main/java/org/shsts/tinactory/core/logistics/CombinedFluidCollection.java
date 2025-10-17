@@ -10,6 +10,7 @@ import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,8 +23,8 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
-    public CombinedFluidCollection(Collection<IFluidCollection> composes) {
-        addComposes(composes);
+    public CombinedFluidCollection(IFluidCollection... composes) {
+        addComposes(Arrays.asList(composes));
     }
 
     public CombinedFluidCollection() {}

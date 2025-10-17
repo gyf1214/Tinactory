@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -127,7 +128,7 @@ public class MachineMenu extends ProcessingMenu {
 
     private Optional<IPort> getPort(int port) {
         return machine.container().flatMap($ -> $.hasPort(port) ?
-            Optional.of($.getPort(port, false)) : Optional.empty());
+            Optional.of($.getPort(port, ContainerAccess.MENU)) : Optional.empty());
     }
 
     private void onPortClick(int port, int button) {

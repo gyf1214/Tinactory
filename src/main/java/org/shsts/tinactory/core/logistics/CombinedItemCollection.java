@@ -10,6 +10,7 @@ import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,8 +23,8 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
-    public CombinedItemCollection(Collection<IItemCollection> composes) {
-        setComposes(composes);
+    public CombinedItemCollection(IItemCollection... composes) {
+        addComposes(Arrays.asList(composes));
     }
 
     public CombinedItemCollection() {}

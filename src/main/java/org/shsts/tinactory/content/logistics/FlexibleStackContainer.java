@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
@@ -50,7 +51,7 @@ public class FlexibleStackContainer extends CapabilityProvider
     private final WrapperFluidTank[] internalFluids;
     private final WrapperFluidTank[] externalFluids;
     private final CombinedFluidTank combinedFluids;
-    private final List<PortInfo> ports = new ArrayList<>();
+    private final List<ContainerPort> ports = new ArrayList<>();
     private final LazyOptional<?> itemHandlerCap;
     private final LazyOptional<?> menuItemHandlerCap;
     private final LazyOptional<?> fluidHandlerCap;
@@ -62,9 +63,10 @@ public class FlexibleStackContainer extends CapabilityProvider
 
         this.internalItems = new WrapperItemHandler(maxItemSlots);
         this.menuItems = new WrapperItemHandler(internalItems);
-        this.externalItems = new WrapperItemHandler(menuItems);
+        this.externalItems = new WrapperItemHandler(internalItems);
         for (var i = 0; i < maxItemSlots; i++) {
             menuItems.disallowInput(i);
+            externalItems.disallowInput(i);
         }
         internalItems.onUpdate(this::onUpdate);
 
@@ -75,7 +77,7 @@ public class FlexibleStackContainer extends CapabilityProvider
             internalFluids[i] = new WrapperFluidTank(fluidSize);
             internalFluids[i].onUpdate(this::onUpdate);
             externalFluids[i] = new WrapperFluidTank(internalFluids[i]);
-            externalFluids[i].allowInput = false;
+            externalFluids[i].disallowInput();
         }
 
         this.combinedFluids = new CombinedFluidTank(externalFluids);
@@ -90,11 +92,9 @@ public class FlexibleStackContainer extends CapabilityProvider
         return builder.capability(ID, be -> new FlexibleStackContainer(be, 16, 8));
     }
 
-    private record PortInfo(SlotType type, IPort port, IPort internal) {}
-
-    private PortInfo createItemPort(SlotType type, List<Layout.SlotInfo> slots) {
+    private ContainerPort createItemPort(SlotType type, List<Layout.SlotInfo> slots) {
         if (slots.isEmpty()) {
-            return new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
+            return ContainerPort.EMPTY;
         }
 
         var minSlot = slots.get(0).index();
@@ -103,24 +103,30 @@ public class FlexibleStackContainer extends CapabilityProvider
         if (type == SlotType.ITEM_INPUT) {
             for (var i = minSlot; i < maxSlot; i++) {
                 menuItems.resetFilter(i);
+                externalItems.resetFilter(i);
                 externalItems.setAllowOutput(i, false);
             }
         }
 
         var allowOutput = type.direction != PortDirection.INPUT;
         var internalPort = new ItemHandlerCollection(internalItems, minSlot, maxSlot);
+        var menuPort = new ItemHandlerCollection(menuItems, minSlot, maxSlot);
         var externalPort = new ItemHandlerCollection(externalItems, minSlot, maxSlot, allowOutput);
-        return new PortInfo(type, externalPort, internalPort);
+        return new ContainerPort(type, internalPort, menuPort, externalPort);
     }
 
-    private PortInfo createFluidPort(SlotType type, List<Layout.SlotInfo> slots) {
+    private ContainerPort createFluidPort(SlotType type, List<Layout.SlotInfo> slots) {
+        if (slots.isEmpty()) {
+            return ContainerPort.EMPTY;
+        }
+
         var externalTanks = new WrapperFluidTank[slots.size()];
         var internalTanks = new WrapperFluidTank[slots.size()];
         var k = 0;
         for (var slot : slots) {
             var i = slot.index();
             if (type == SlotType.FLUID_INPUT) {
-                externalFluids[i].allowInput = true;
+                externalFluids[i].resetFilter();
             }
             externalTanks[k] = externalFluids[i];
             internalTanks[k] = internalFluids[i];
@@ -129,8 +135,9 @@ public class FlexibleStackContainer extends CapabilityProvider
 
         var allowOutput = type.direction != PortDirection.INPUT;
         var internalPort = new CombinedFluidTank(internalTanks);
+        var menuPort = new CombinedFluidTank(externalTanks);
         var externalPort = new CombinedFluidTank(allowOutput, externalTanks);
-        return new PortInfo(type, externalPort, internalPort);
+        return new ContainerPort(type, internalPort, menuPort, externalPort);
     }
 
     @Override
@@ -146,13 +153,13 @@ public class FlexibleStackContainer extends CapabilityProvider
             var type = layout.ports.get(k).type();
             var slots = layout.portSlots.get(k);
 
-            var portInfo = switch (type.portType) {
+            var containerPort = switch (type.portType) {
                 case ITEM -> createItemPort(type, slots);
                 case FLUID -> createFluidPort(type, slots);
-                default -> new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
+                default -> ContainerPort.EMPTY;
             };
 
-            ports.add(portInfo);
+            ports.add(containerPort);
         }
         this.layout = layout;
     }
@@ -162,11 +169,11 @@ public class FlexibleStackContainer extends CapabilityProvider
         layout = Layout.EMPTY;
         for (var i = 0; i < menuItems.getSlots(); i++) {
             menuItems.disallowInput(i);
+            externalItems.disallowInput(i);
             externalItems.setAllowOutput(i, true);
         }
-        for (var fluid : externalFluids) {
-            fluid.allowInput = false;
-            fluid.resetFilter();
+        for (var externalFluid : externalFluids) {
+            externalFluid.disallowInput();
         }
         ports.clear();
     }
@@ -183,18 +190,17 @@ public class FlexibleStackContainer extends CapabilityProvider
 
     @Override
     public boolean hasPort(int port) {
-        return port >= 0 && port < ports.size() && ports.get(port).type != SlotType.NONE;
+        return port >= 0 && port < ports.size() && ports.get(port).type() != SlotType.NONE;
     }
 
     @Override
     public PortDirection portDirection(int port) {
-        return ports.get(port).type.direction;
+        return ports.get(port).type().direction;
     }
 
     @Override
-    public IPort getPort(int port, boolean internal) {
-        var info = ports.get(port);
-        return internal ? info.internal : info.port;
+    public IPort getPort(int port, ContainerAccess access) {
+        return ports.get(port).get(access);
     }
 
     @Override

@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -45,15 +46,11 @@ public class StackProcessingContainer extends CapabilityProvider
     implements IContainer, ILayoutProvider, IEventSubscriber, INBTSerializable<CompoundTag> {
     public static final String ID = "logistics/stack_container";
 
-    private record PortInfo(SlotType type, IPort externalPort, IPort internalPort) {
-        public static final PortInfo EMPTY = new PortInfo(SlotType.NONE, IPort.EMPTY, IPort.EMPTY);
-    }
-
     private final BlockEntity blockEntity;
     private final Layout layout;
     private final WrapperItemHandler internalItems;
     private final CombinedFluidTank combinedFluids;
-    private final List<PortInfo> ports;
+    private final List<ContainerPort> ports;
 
     private final LazyOptional<?> itemHandlerCap;
     private final LazyOptional<?> menuItemHandlerCap;
@@ -76,7 +73,7 @@ public class StackProcessingContainer extends CapabilityProvider
 
         this.internalItems = new WrapperItemHandler(itemSlots);
         var menuItems = new WrapperItemHandler(internalItems);
-        var externalItems = new WrapperItemHandler(menuItems);
+        var externalItems = new WrapperItemHandler(internalItems);
         var allFluids = new WrapperFluidTank[fluidSlots];
         internalItems.onUpdate(this::onUpdate);
 
@@ -86,7 +83,7 @@ public class StackProcessingContainer extends CapabilityProvider
         for (var port : portInfo) {
             var type = port.type();
             if (port.slots() <= 0 || type == SlotType.NONE) {
-                ports.add(PortInfo.EMPTY);
+                ports.add(ContainerPort.EMPTY);
                 continue;
             }
 
@@ -97,14 +94,16 @@ public class StackProcessingContainer extends CapabilityProvider
                     if (type.direction == PortDirection.INPUT) {
                         externalItems.setAllowOutput(i, false);
                     } else {
+                        externalItems.disallowInput(i);
                         menuItems.disallowInput(i);
                     }
                 }
 
                 var allowOutput = type.direction != PortDirection.INPUT;
                 var internalPort = new ItemHandlerCollection(internalItems, itemIdx, endIdx);
+                var menuPort = new ItemHandlerCollection(menuItems, itemIdx, endIdx);
                 var externalPort = new ItemHandlerCollection(externalItems, itemIdx, endIdx, allowOutput);
-                ports.add(new PortInfo(type, externalPort, internalPort));
+                ports.add(new ContainerPort(type, internalPort, menuPort, externalPort));
 
                 itemIdx = endIdx;
             } else {
@@ -120,7 +119,7 @@ public class StackProcessingContainer extends CapabilityProvider
                         externalFluids[i] = internalFluids[i];
                     } else {
                         externalFluids[i] = new WrapperFluidTank(internalFluids[i]);
-                        externalFluids[i].allowInput = false;
+                        externalFluids[i].disallowInput();
                     }
 
                     allFluids[fluidIdx + i] = externalFluids[i];
@@ -128,8 +127,9 @@ public class StackProcessingContainer extends CapabilityProvider
 
                 var allowOutput = type.direction != PortDirection.INPUT;
                 var internalPort = new CombinedFluidTank(internalFluids);
+                var menuPort = new CombinedFluidTank(externalFluids);
                 var externalPort = new CombinedFluidTank(allowOutput, externalFluids);
-                ports.add(new PortInfo(type, externalPort, internalPort));
+                ports.add(new ContainerPort(type, internalPort, menuPort, externalPort));
 
                 fluidIdx += slots;
             }
@@ -159,21 +159,20 @@ public class StackProcessingContainer extends CapabilityProvider
     @Override
     public boolean hasPort(int port) {
         return port >= 0 && port < ports.size() &&
-            ports.get(port).type != SlotType.NONE;
+            ports.get(port).type() != SlotType.NONE;
     }
 
     @Override
     public PortDirection portDirection(int port) {
-        return ports.get(port).type.direction;
+        return ports.get(port).type().direction;
     }
 
     @Override
-    public IPort getPort(int port, boolean internal) {
+    public IPort getPort(int port, ContainerAccess access) {
         if (!hasPort(port)) {
             return IPort.EMPTY;
         }
-        var portInfo = ports.get(port);
-        return internal ? portInfo.internalPort : portInfo.externalPort;
+        return ports.get(port).get(access);
     }
 
     @Override

@@ -12,9 +12,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.content.logistics.ContainerPort;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidCollection;
 import org.shsts.tinactory.core.logistics.CombinedItemCollection;
@@ -48,18 +50,26 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     private int sharedBytes;
 
     private class Storage implements IDigitalProvider, INBTSerializable<CompoundTag> {
-        public final DigitalItemStorage internalItem;
-        public final DigitalFluidStorage internalFluid;
-        public final CombinedItemCollection externalItem;
-        public final CombinedFluidCollection externalFluid;
+        private final DigitalItemStorage internalItem;
+        private final CombinedItemCollection menuItem;
+        private final CombinedItemCollection externalItem;
+        private final ContainerPort itemPort;
+        private final CombinedFluidCollection menuFluid;
+        private final DigitalFluidStorage internalFluid;
+        private final CombinedFluidCollection externalFluid;
+        private final ContainerPort fluidPort;
         public SlotType type;
         private int bytesUsed;
 
         private Storage() {
             this.internalItem = new DigitalItemStorage(this);
+            this.menuItem = new CombinedItemCollection(internalItem);
+            this.externalItem = new CombinedItemCollection(internalItem);
+            this.itemPort = new ContainerPort(SlotType.NONE, internalItem, menuItem, externalItem);
             this.internalFluid = new DigitalFluidStorage(this);
-            this.externalItem = new CombinedItemCollection(List.of(internalItem));
-            this.externalFluid = new CombinedFluidCollection(List.of(internalFluid));
+            this.menuFluid = new CombinedFluidCollection(internalFluid);
+            this.externalFluid = new CombinedFluidCollection(internalFluid);
+            this.fluidPort = new ContainerPort(SlotType.NONE, internalFluid, menuFluid, externalFluid);
             this.type = SlotType.NONE;
             this.bytesUsed = 0;
 
@@ -69,18 +79,31 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
         public void setType(SlotType val) {
             type = val;
-            var isInput = type.direction == PortDirection.INPUT;
-            // always allow output as we don't have a menu to extract items.
-            externalItem.allowInput = isInput;
-            externalFluid.allowInput = isInput;
-            internalItem.maxCount = isInput ? amountByteLimit / CONFIG.bytesPerItem.get() : Integer.MAX_VALUE;
-            internalFluid.maxAmount = isInput ? amountByteLimit / CONFIG.bytesPerFluid.get() : Integer.MAX_VALUE;
+            if (type.direction == PortDirection.INPUT) {
+                internalItem.maxCount = amountByteLimit / CONFIG.bytesPerItem.get();
+                menuItem.allowInput = true;
+                externalItem.allowInput = true;
+                externalItem.allowOutput = false;
+                internalFluid.maxAmount = amountByteLimit / CONFIG.bytesPerFluid.get();
+                menuFluid.allowInput = true;
+                externalFluid.allowInput = true;
+                externalFluid.allowOutput = false;
+            } else {
+                internalItem.maxCount = Integer.MAX_VALUE;
+                menuItem.allowInput = false;
+                externalItem.allowInput = false;
+                externalItem.allowOutput = true;
+                internalFluid.maxAmount = Integer.MAX_VALUE;
+                menuFluid.allowInput = false;
+                externalFluid.allowInput = false;
+                externalFluid.allowOutput = true;
+            }
         }
 
-        public IPort port(boolean internal) {
+        public IPort port(ContainerAccess access) {
             return switch (type.portType) {
-                case ITEM -> internal ? internalItem : externalItem;
-                case FLUID -> internal ? internalFluid : externalFluid;
+                case ITEM -> itemPort.get(access);
+                case FLUID -> fluidPort.get(access);
                 case NONE -> IPort.EMPTY;
             };
         }
@@ -200,8 +223,8 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
-    public IPort getPort(int port, boolean internal) {
-        return storages.get(port).port(internal);
+    public IPort getPort(int port, ContainerAccess access) {
+        return storages.get(port).port(access);
     }
 
     @Override

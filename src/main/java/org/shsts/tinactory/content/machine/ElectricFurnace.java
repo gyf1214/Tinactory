@@ -10,6 +10,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -58,11 +59,11 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     private IItemCollection getInputPort(IContainer container) {
-        return container.getPort(inputPort, true).asItem();
+        return container.getPort(inputPort, ContainerAccess.INTERNAL).asItem();
     }
 
     private IItemCollection getOutputPort(IContainer container) {
-        return container.getPort(outputPort, true).asItem();
+        return container.getPort(outputPort, ContainerAccess.INTERNAL).asItem();
     }
 
     /**

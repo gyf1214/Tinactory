@@ -12,6 +12,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
@@ -62,7 +63,8 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         if (!container.hasPort(input.port)) {
             return Optional.empty();
         }
-        return input.ingredient.consumePort(container.getPort(input.port, true), parallel, simulate);
+        var port = container.getPort(input.port, ContainerAccess.INTERNAL);
+        return input.ingredient.consumePort(port, parallel, simulate);
     }
 
     protected boolean canConsumeInput(IContainer container, Input input, int parallel) {
@@ -71,7 +73,8 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     protected boolean insertOutput(IContainer container, Output output, int parallel,
         Random random, boolean simulate) {
-        return output.result.insertPort(container.getPort(output.port, true), parallel, random, simulate);
+        var port = container.getPort(output.port, ContainerAccess.INTERNAL);
+        return output.result.insertPort(port, parallel, random, simulate);
     }
 
     protected boolean matchInputs(IContainer container, int parallel) {

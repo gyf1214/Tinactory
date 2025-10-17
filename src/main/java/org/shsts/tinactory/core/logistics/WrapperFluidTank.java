@@ -12,6 +12,7 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 import java.util.function.Predicate;
 
+import static org.shsts.tinactory.core.logistics.StackHelper.FALSE_FLUID_FILTER;
 import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
@@ -21,7 +22,6 @@ public class WrapperFluidTank extends PortNotifier implements IFluidTankModifiab
     public static final WrapperFluidTank EMPTY = new WrapperFluidTank(0);
 
     private final IFluidTank tank;
-    public boolean allowInput = true;
     public boolean allowOutput = true;
     public Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
 
@@ -33,6 +33,14 @@ public class WrapperFluidTank extends PortNotifier implements IFluidTankModifiab
         assert tank instanceof FluidTank ||
             (tank instanceof INBTSerializable<?> && tank instanceof IFluidTankModifiable);
         this.tank = tank;
+    }
+
+    public void setFilter(Predicate<FluidStack> val) {
+        filter = val;
+    }
+
+    public void disallowInput() {
+        filter = FALSE_FLUID_FILTER;
     }
 
     public void resetFilter() {
@@ -56,7 +64,7 @@ public class WrapperFluidTank extends PortNotifier implements IFluidTankModifiab
 
     @Override
     public boolean isFluidValid(FluidStack fluid) {
-        return allowInput && filter.test(fluid) && tank.isFluidValid(fluid);
+        return filter.test(fluid) && tank.isFluidValid(fluid);
     }
 
     @Override

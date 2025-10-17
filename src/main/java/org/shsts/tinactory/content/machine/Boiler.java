@@ -12,6 +12,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -73,9 +74,9 @@ public class Boiler extends CapabilityProvider implements
 
     private void onLoad() {
         var container = AllCapabilities.CONTAINER.get(blockEntity);
-        fuelPort = container.getPort(0, true).asItem();
-        waterPort = container.getPort(1, true).asFluid();
-        outputPort = container.getPort(2, true).asFluid();
+        fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
+        waterPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
+        outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluid();
 
         fuelPort.asItemFilter().setFilters(List.of(item -> ForgeHooks.getBurnTime(item, null) > 0));
         waterPort.asFluidFilter().setFilters(List.of(fluid -> fluid.getFluid() == water));

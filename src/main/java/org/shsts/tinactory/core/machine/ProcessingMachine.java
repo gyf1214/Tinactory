@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBookItem;
@@ -146,14 +147,14 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             }
 
             for (var idx : itemFilters.keys().elementSet()) {
-                var port = container.getPort(idx, true);
+                var port = container.getPort(idx, ContainerAccess.INTERNAL);
                 if (port.type() == PortType.ITEM) {
                     port.asItemFilter().setFilters(itemFilters.get(idx));
                 }
             }
 
             for (var idx : fluidFilters.keys().elementSet()) {
-                var port = container.getPort(idx, true);
+                var port = container.getPort(idx, ContainerAccess.INTERNAL);
                 if (port.type() == PortType.FLUID) {
                     port.asFluidFilter().setFilters(fluidFilters.get(idx));
                 }

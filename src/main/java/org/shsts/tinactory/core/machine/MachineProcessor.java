@@ -17,6 +17,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -205,7 +206,7 @@ public class MachineProcessor extends CapabilityProvider implements
                 if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
                     continue;
                 }
-                var port = container.getPort(i, true);
+                var port = container.getPort(i, ContainerAccess.INTERNAL);
                 switch (port.type()) {
                     case ITEM -> port.asItemFilter().resetFilters();
                     case FLUID -> port.asFluidFilter().resetFilters();

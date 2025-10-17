@@ -35,6 +35,7 @@ public final class StackHelper {
     public static final Predicate<ItemStack> TRUE_FILTER = $ -> true;
     public static final Predicate<ItemStack> FALSE_FILTER = $ -> false;
     public static final Predicate<FluidStack> TRUE_FLUID_FILTER = $ -> true;
+    public static final Predicate<FluidStack> FALSE_FLUID_FILTER = $ -> false;
 
     public static CompoundTag serializeItemStack(ItemStack stack) {
         var tag = new CompoundTag();

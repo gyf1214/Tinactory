@@ -18,6 +18,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
@@ -245,7 +246,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
                 if (!container.hasPort(i)) {
                     continue;
                 }
-                logistics.registerPort(this, i, container.getPort(i, false), false, false);
+                logistics.registerPort(this, i, container.getPort(i, ContainerAccess.EXTERNAL), false, false);
             }
         });
 
