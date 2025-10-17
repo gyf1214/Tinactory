@@ -84,12 +84,33 @@ object Machines {
         machine("electric_chest") {
             overlay(Direction.UP, "overlay/machine/overlay_qchest")
             overlay(Direction.NORTH, SCREEN_GLASS)
+            ioTex(ME_BUS)
         }
         machine("electric_tank") {
             overlay(Direction.UP, "overlay/machine/overlay_qtank")
             overlay(Direction.NORTH, SCREEN_GLASS)
+            ioTex(ME_BUS)
         }
-        machine("logistics/logistic_worker", "cover/overlay_conveyor")
+        machine("logistics/logistic_worker") {
+            overlay("cover/overlay_conveyor")
+            ioTex(ME_BUS)
+        }
+        blockData {
+            block("logistics/me_storage_interface") {
+                machineModel {
+                    casing(Voltage.HV)
+                    overlay("cover/overlay_storage")
+                    ioTex(ME_BUS)
+                }
+            }
+            block("logistics/me_drive") {
+                machineModel {
+                    casing(Voltage.HV)
+                    overlay("overlay/automation/automation_superbuffer")
+                    ioTex(ME_BUS)
+                }
+            }
+        }
     }
 
     private fun misc() {
@@ -121,20 +142,6 @@ object Machines {
                 machineModel {
                     casing(Voltage.MV)
                     overlay(BOILER_TEX)
-                    ioTex(ME_BUS)
-                }
-            }
-            block("logistics/me_storage_interface") {
-                machineModel {
-                    casing(Voltage.HV)
-                    overlay("cover/overlay_storage")
-                    ioTex(ME_BUS)
-                }
-            }
-            block("logistics/me_drive") {
-                machineModel {
-                    casing(Voltage.HV)
-                    overlay("overlay/automation/automation_superbuffer")
                     ioTex(ME_BUS)
                 }
             }

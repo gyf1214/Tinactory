@@ -132,8 +132,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     protected Map<Voltage, Layout> createObject() {
         var ret = new HashMap<Voltage, Layout>();
         for (var voltage : Voltage.values()) {
-            var slots = getSlots(voltage);
-            ret.put(voltage, new Layout(slots, images, progressBar));
+            ret.put(voltage, buildLayout(voltage));
         }
         return ret;
     }
@@ -147,8 +146,12 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return ret;
     }
 
-    public Layout buildLayout() {
-        var slots = getSlots(Voltage.MAX);
+    public Layout buildLayout(Voltage voltage) {
+        var slots = getSlots(voltage);
         return new Layout(slots, images, progressBar);
+    }
+
+    public Layout buildLayout() {
+        return buildLayout(Voltage.MAX);
     }
 }

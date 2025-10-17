@@ -30,6 +30,7 @@ import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 object MiscMachines {
     private val ulvCable: Item by lazy { getComponent("cable").item(Voltage.ULV) }
     private val ulvHull: Item by lazy { getComponent("machine_hull").item(Voltage.ULV) }
+    private val ulvCircuit: TagKey<Item> by lazy { circuit(Voltage.ULV) }
 
     fun init() {
         primitives()
@@ -103,7 +104,7 @@ object MiscMachines {
                 pattern("WVW")
                 define('W', ulvCable)
                 define('H', ulvHull)
-                define('V', circuit(Voltage.ULV))
+                define('V', ulvCircuit)
                 toolTag(TOOL_WRENCH)
             }
             result(getMachine("steam_turbine").block(Voltage.ULV)) {
@@ -112,7 +113,7 @@ object MiscMachines {
                 define('R', "iron", "rotor")
                 define('W', ulvCable)
                 define('H', ulvHull)
-                define('V', circuit(Voltage.ULV))
+                define('V', ulvCircuit)
                 toolTag(TOOL_WRENCH)
             }
         }
@@ -146,8 +147,17 @@ object MiscMachines {
             define('B', base.asItem())
             define('W', ulvCable)
             define('H', ulvHull)
-            define('V', circuit(Voltage.ULV))
+            define('V', ulvCircuit)
             toolTag(TOOL_WRENCH)
+        }
+        assembler {
+            output(item) {
+                input(ulvHull)
+                input(ulvCircuit, 2)
+                input(ulvCable, 2)
+                input(base, 2)
+                tech(Technologies.SOLDERING)
+            }
         }
     }
 
@@ -157,8 +167,17 @@ object MiscMachines {
             define('B', base)
             define('W', ulvCable)
             define('H', ulvHull)
-            define('V', circuit(Voltage.ULV))
+            define('V', ulvCircuit)
             toolTag(TOOL_WRENCH)
+        }
+        assembler {
+            output(item) {
+                input(ulvHull)
+                input(ulvCircuit, 2)
+                input(ulvCable, 2)
+                input(base, 2)
+                tech(Technologies.SOLDERING)
+            }
         }
     }
 
@@ -291,7 +310,7 @@ object MiscMachines {
                 pattern("VFV")
                 define('P', "iron", "plate")
                 define('W', ulvCable)
-                define('V', circuit(Voltage.ULV))
+                define('V', ulvCircuit)
                 define('F', Blocks.FURNACE.asItem())
                 toolTag(TOOL_WRENCH)
             }

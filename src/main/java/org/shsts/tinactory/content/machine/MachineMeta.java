@@ -346,7 +346,8 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IEntry<MachineBlock> electricChest(Voltage v, JsonObject jo) {
-            return baseMachine(v)
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock::simple)
+                .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_CHEST)
                 .blockEntity()
                 .transform(ElectricChest.factory(getLayout(v), getPower(v, jo)))
@@ -355,7 +356,8 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IEntry<MachineBlock> electricTank(Voltage v, JsonObject jo) {
-            return baseMachine(v)
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock::simple)
+                .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_TANK)
                 .blockEntity()
                 .transform(ElectricTank.factory(getLayout(v), getPower(v, jo)))
@@ -370,7 +372,9 @@ public class MachineMeta extends MetaConsumer {
                 GsonHelper.getAsInt(jo, "stack"),
                 GsonHelper.getAsInt(jo, "fluidStack"),
                 getPower(v, jo));
-            return baseMachine(v)
+
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock::simple)
+                .transform(MachineSet::baseMachine)
                 .menu(AllMenus.LOGISTIC_WORKER)
                 .blockEntity()
                 .transform(LogisticWorker.factory(properties))

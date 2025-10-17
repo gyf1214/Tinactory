@@ -1,7 +1,11 @@
 {
   "recipe": "none",
   "machine": "electric_tank",
-  "voltages": "ulv-hv",
+  "voltages": [
+    "ulv",
+    "mv",
+    "ev"
+  ],
   "power": 1,
   "layout": {
     "slots": [
@@ -22,42 +26,42 @@
         "type": "fluid_input",
         "x": 40,
         "y": 10,
-        "voltages": "lv-max"
+        "voltages": "mv-max"
       },
       {
         "port": 0,
         "type": "fluid_input",
         "x": 60,
         "y": 10,
-        "voltages": "lv-max"
+        "voltages": "mv-max"
       },
       {
         "port": 0,
         "type": "fluid_input",
         "x": 80,
         "y": 10,
-        "voltages": "mv-max"
+        "voltages": "ev-max"
       },
       {
         "port": 0,
         "type": "fluid_input",
         "x": 100,
         "y": 10,
-        "voltages": "mv-max"
+        "voltages": "ev-max"
       },
       {
         "port": 0,
         "type": "fluid_input",
         "x": 120,
         "y": 10,
-        "voltages": "hv-max"
+        "voltages": "ev-max"
       },
       {
         "port": 0,
         "type": "fluid_input",
         "x": 140,
         "y": 10,
-        "voltages": "hv-max"
+        "voltages": "ev-max"
       }
     ]
   }
