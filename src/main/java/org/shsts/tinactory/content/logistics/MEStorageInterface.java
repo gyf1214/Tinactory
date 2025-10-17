@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -15,7 +14,6 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.logistics.CombinedFluidCollection;
@@ -33,14 +31,12 @@ import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEStorageInterface extends CapabilityProvider implements IEventSubscriber {
     public static final String ID = "machine/me_storage_interface";
-    public static final String CONNECT_PARENT_KEY = "connectParent";
 
     private final BlockEntity blockEntity;
     private final CombinedItemCollection combinedItem;
@@ -48,7 +44,6 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
     private final LazyOptional<IElectricMachine> electricCap;
 
     private IMachine machine;
-    private IMachineConfig machineConfig;
 
     public MEStorageInterface(BlockEntity blockEntity, double power) {
         this.blockEntity = blockEntity;
@@ -63,10 +58,10 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
         return $ -> $.capability(ID, be -> new MEStorageInterface(be, power));
     }
 
-    private void onUpdateLogistics(LogisticComponent logistics, BlockPos subnet) {
+    private void onUpdateLogistics(LogisticComponent logistics) {
         var items = new ArrayList<IItemCollection>();
         var fluids = new ArrayList<IFluidCollection>();
-        var ports = logistics.getStoragePorts(subnet);
+        var ports = logistics.getStoragePorts();
         for (var port : ports) {
             if (port.type() == PortType.ITEM) {
                 items.add(port.asItem());
@@ -80,43 +75,13 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
 
     private void onLoad() {
         machine = MACHINE.get(blockEntity);
-        machineConfig = machine.config();
-    }
-
-    private void registerPorts(LogisticComponent logistics, INetwork network, BlockPos subnet) {
-        logistics.unregisterPort(machine, 0);
-        logistics.unregisterPort(machine, 1);
-        var connectParent = machineConfig.getBoolean(CONNECT_PARENT_KEY, false);
-        var parent = network.getSubnet(subnet);
-        if (parent.equals(subnet) || !connectParent) {
-            logistics.registerPortInSubnets(machine, 0, combinedItem, false,
-                subnet, false);
-            logistics.registerPortInSubnets(machine, 1, combinedFluid, false,
-                subnet, false);
-        } else {
-            logistics.registerPortInSubnets(machine, 0, combinedItem, false,
-                subnet, false, parent, true);
-            logistics.registerPortInSubnets(machine, 1, combinedFluid, false,
-                subnet, false, parent, true);
-        }
-    }
-
-    private void registerPorts() {
-        var world = blockEntity.getLevel();
-        if (world != null && !world.isClientSide) {
-            machine.network().ifPresent(network -> {
-                var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-                var subnet = network.getSubnet(blockEntity.getBlockPos());
-                registerPorts(logistics, network, subnet);
-            });
-        }
     }
 
     private void onConnect(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        var subnet = network.getSubnet(blockEntity.getBlockPos());
-        logistics.onUpdatePorts(() -> onUpdateLogistics(logistics, subnet));
-        registerPorts(logistics, network, subnet);
+        logistics.registerPort(machine, 0, combinedItem, false, false);
+        logistics.registerPort(machine, 1, combinedFluid, false, false);
+        logistics.onUpdatePorts(() -> onUpdateLogistics(logistics));
     }
 
     public void onUpdate(Runnable listener) {
@@ -157,6 +122,5 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CONNECT.get(), this::onConnect);
-        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::registerPorts);
     }
 }

@@ -30,9 +30,7 @@ import static org.shsts.tinactory.content.AllMenus.ME_STORAGE_INTERFACE_SLOT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.PANEL_HEIGHT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.SLOT_SYNC;
 import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
-import static org.shsts.tinactory.content.logistics.MEStorageInterface.CONNECT_PARENT_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 
 @OnlyIn(Dist.CLIENT)
@@ -117,14 +115,8 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         super(menu, title);
         this.contentHeight = menu.endY();
 
-        var config = menu.machineConfig();
         this.panel = new StoragePanel();
         addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, PANEL_HEIGHT), panel);
-        var buttonSize = ALLOW_ARROW_BUTTON.width();
-        addWidget(RectD.corners(1d, 0d, 1d, 0d),
-            new Rect(-buttonSize, PANEL_HEIGHT - buttonSize, buttonSize, buttonSize),
-            new MachineConfigButton(menu, config, CONNECT_PARENT_KEY, false,
-                ALLOW_ARROW_BUTTON, 0, 20, "disconnectParent", "connectParent"));
         menu.onSyncPacket(SLOT_SYNC, this::onSync);
     }
 
