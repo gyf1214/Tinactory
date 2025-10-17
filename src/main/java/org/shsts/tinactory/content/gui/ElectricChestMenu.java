@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import org.shsts.tinactory.content.machine.ElectricChest;
+import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;

@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
-import org.shsts.tinactory.content.machine.ElectricChest;
+import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.Panel;

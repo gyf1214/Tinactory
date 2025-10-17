@@ -13,6 +13,7 @@ import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.ElectricChestScreen;
 import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
+import org.shsts.tinactory.content.gui.client.MEDriveScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageInterfaceScreen;
 import org.shsts.tinactory.content.gui.client.MachineScreen;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
@@ -56,6 +57,7 @@ public final class AllMenus {
     public static final IMenuType ELECTRIC_CHEST;
     public static final IMenuType ELECTRIC_TANK;
     public static final IMenuType LOGISTIC_WORKER;
+    public static final IMenuType ME_DRIVE;
     public static final IMenuType ME_STORAGE_INTERFACE;
     public static final IMenuType PRIMITIVE_MACHINE;
     public static final IMenuType PROCESSING_MACHINE;
@@ -113,6 +115,11 @@ public final class AllMenus {
         LOGISTIC_WORKER = REGISTRATE.menu("logistics/logistic_worker", LogisticWorkerMenu::new)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> LogisticWorkerScreen::new)
+            .register();
+
+        ME_DRIVE = REGISTRATE.menu("logistics/me_drive", MachineMenu::simpleWithConfig)
+            .title(ProcessingMenu::getTitle)
+            .screen(() -> () -> MEDriveScreen::new)
             .register();
 
         ME_STORAGE_INTERFACE = REGISTRATE.menu("logistics/me_storage_interface", MEStorageInterfaceMenu::new)

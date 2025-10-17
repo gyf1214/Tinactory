@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.content.machine.ElectricTank;
+import org.shsts.tinactory.content.logistics.ElectricTank;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;

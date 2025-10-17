@@ -132,7 +132,7 @@ public class MiscMeta extends MetaConsumer {
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
         BlockEntityBuilder.builder(id, MachineBlock::simple)
             .transform(MachineSet::baseMachine)
-            .menu(AllMenus.SIMPLE_MACHINE)
+            .menu(AllMenus.ME_DRIVE)
             .blockEntity()
             .transform(MEDrive.factory(layout, GsonHelper.getAsDouble(jo, "power")))
             .end()

@@ -19,7 +19,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.ElectricStorage;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidCollection;
@@ -53,10 +52,8 @@ import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 @MethodsReturnNonnullByDefault
 public class MEDrive extends CapabilityProvider
     implements IEventSubscriber, ILayoutProvider, INBTSerializable<CompoundTag> {
-    /**
-     * TODO: make it configurable.
-     */
     public static final String STORAGE_KEY = ElectricStorage.STORAGE_KEY;
+    public static final boolean STORAGE_DEFAULT = true;
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "machine/me_drive";
@@ -103,7 +100,7 @@ public class MEDrive extends CapabilityProvider
 
     private void registerPort(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        var isStorage = machineConfig.getBoolean(STORAGE_KEY, true);
+        var isStorage = machineConfig.getBoolean(STORAGE_KEY, STORAGE_DEFAULT);
         logistics.unregisterPort(machine, 0);
         logistics.unregisterPort(machine, 1);
         logistics.registerPort(machine, 0, combinedItems, false, isStorage);

@@ -14,6 +14,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -142,9 +143,10 @@ public class MachineMenu extends ProcessingMenu {
     }
 
     public static class Simple extends LayoutMenu {
-        private Simple(Properties properties) {
-            super(properties, 0);
+        private Simple(Properties properties, int extraHeight) {
+            super(properties, extraHeight);
             addLayoutSlots(layout);
+            onEventPacket(SET_MACHINE_CONFIG, this::setMachineConfig);
         }
 
         @Override
@@ -152,6 +154,10 @@ public class MachineMenu extends ProcessingMenu {
             return super.stillValid(player) && MACHINE.tryGet(blockEntity)
                 .filter($ -> $.canPlayerInteract(player))
                 .isPresent();
+        }
+
+        private void setMachineConfig(ISetMachineConfigPacket packet) {
+            MACHINE.tryGet(blockEntity).ifPresent($ -> $.setConfig(packet));
         }
     }
 
@@ -168,7 +174,11 @@ public class MachineMenu extends ProcessingMenu {
     }
 
     public static LayoutMenu simple(Properties properties) {
-        return new Simple(properties);
+        return new Simple(properties, 0);
+    }
+
+    public static LayoutMenu simpleWithConfig(Properties properties) {
+        return new Simple(properties, SLOT_SIZE + SPACING);
     }
 
     public static ProcessingMenu machine(Properties properties) {

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -33,8 +33,11 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 @MethodsReturnNonnullByDefault
 public abstract class ElectricStorage extends CapabilityProvider implements ILayoutProvider, IEventSubscriber {
     public static final String UNLOCK_KEY = "unlockChest";
+    public static final boolean UNLOCK_DEFAULT = false;
     public static final String STORAGE_KEY = "storage";
+    public static final boolean STORAGE_DEFAULT = false;
     public static final String GLOBAL_KEY = "global";
+    public static final boolean GLOBAL_DEFAULT = false;
 
     protected final BlockEntity blockEntity;
     private final Layout layout;
@@ -55,15 +58,15 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     }
 
     public boolean isUnlocked() {
-        return machineConfig.getBoolean(UNLOCK_KEY, false);
+        return machineConfig.getBoolean(UNLOCK_KEY, UNLOCK_DEFAULT);
     }
 
     protected void registerPort(INetwork network, IPort port) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.unregisterPort(machine, 0);
         logistics.registerPort(machine, 0, port,
-            machineConfig.getBoolean(GLOBAL_KEY, false),
-            machineConfig.getBoolean(STORAGE_KEY, true));
+            machineConfig.getBoolean(GLOBAL_KEY, GLOBAL_DEFAULT),
+            machineConfig.getBoolean(STORAGE_KEY, STORAGE_DEFAULT));
     }
 
     protected void onSlotChange() {

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

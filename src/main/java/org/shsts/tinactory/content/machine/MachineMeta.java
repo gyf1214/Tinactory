@@ -15,6 +15,8 @@ import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.electric.BatteryBox;
+import org.shsts.tinactory.content.logistics.ElectricChest;
+import org.shsts.tinactory.content.logistics.ElectricTank;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;

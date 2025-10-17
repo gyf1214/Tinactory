@@ -29,7 +29,7 @@ import java.util.function.Function;
 
 import static org.shsts.tinactory.content.AllCapabilities.DIGITAL_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
-import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -95,7 +95,7 @@ public class MEStorageCell extends CapabilityItem {
 
         @Override
         public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-            if (cap == ITEM_HANDLER.get()) {
+            if (cap == ITEM_COLLECTION.get()) {
                 return itemCap.cast();
             } else if (cap == DIGITAL_PROVIDER.get()) {
                 return providerCap.cast();
@@ -116,6 +116,8 @@ public class MEStorageCell extends CapabilityItem {
             this.storage = new DigitalFluidStorage(provider);
             this.fluidCap = LazyOptional.of(() -> storage);
             this.providerCap = LazyOptional.of(() -> provider);
+
+            storage.onUpdate(this::syncTag);
         }
 
         @Override
@@ -143,9 +145,9 @@ public class MEStorageCell extends CapabilityItem {
     public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
         var stack = event.getObject();
         if (isFluid) {
-            event.addCapability(ID, new ItemCapability(stack, bytesLimit));
-        } else {
             event.addCapability(ID, new FluidCapability(stack, bytesLimit));
+        } else {
+            event.addCapability(ID, new ItemCapability(stack, bytesLimit));
         }
     }
 }
