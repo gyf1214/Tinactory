@@ -9,8 +9,6 @@ import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import static org.shsts.tinactory.core.machine.RecipeProcessors.PROGRESS_PER_TICK;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Generator extends ProcessingMachine<ProcessingRecipe> {

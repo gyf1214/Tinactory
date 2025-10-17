@@ -12,10 +12,10 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -35,13 +35,15 @@ import java.util.stream.Stream;
 
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
-import static org.shsts.tinactory.core.machine.RecipeProcessors.PROGRESS_PER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipeProcessor<R> {
+    public static final long PROGRESS_PER_TICK = 256;
+
     protected final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
 
+    protected int parallel = 1;
     protected double workFactor = 1d;
     protected double energyFactor = 1d;
 
@@ -214,7 +216,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         }
     }
 
-    protected static long machineVoltage(IMachine machine) {
+    public static long machineVoltage(IMachine machine) {
         return machine.electric().map(IElectricMachine::getVoltage).orElse(0L);
     }
 
@@ -229,12 +231,12 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             voltageFactor *= 4;
         }
         workFactor = overclock;
-        energyFactor = voltageFactor * parallel;
+        energyFactor = parallel * voltageFactor;
     }
 
     @Override
     public void onWorkBegin(R recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> info) {
-        var parallel = calculateParallel(recipe, machine.world(), machine, maxParallel);
+        parallel = calculateParallel(recipe, machine.world(), machine, maxParallel);
         recipe.consumeInputs(machine.container().orElseThrow(), parallel, info);
         addOutputInfo(recipe, parallel, info);
         calculateFactors(recipe, machine, parallel);
@@ -250,7 +252,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     @Override
     public void onWorkDone(R recipe, IMachine machine, Random random) {
-        recipe.insertOutputs(machine, 1, random);
+        recipe.insertOutputs(machine, parallel, random);
     }
 
     @Override
@@ -276,6 +278,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
+        tag.putInt("parallel", parallel);
         tag.putDouble("workFactor", workFactor);
         tag.putDouble("energyFactor", energyFactor);
         return tag;
@@ -283,6 +286,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
+        parallel = tag.getInt("parallel");
         workFactor = tag.getDouble("workFactor");
         energyFactor = tag.getDouble("energyFactor");
     }

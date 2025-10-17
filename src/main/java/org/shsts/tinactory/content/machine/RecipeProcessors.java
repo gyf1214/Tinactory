@@ -1,16 +1,17 @@
-package org.shsts.tinactory.core.machine;
+package org.shsts.tinactory.content.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import org.shsts.tinactory.content.electric.Generator;
-import org.shsts.tinactory.content.machine.ElectricFurnace;
-import org.shsts.tinactory.content.machine.OreAnalyzer;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.CoilMachine;
 import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
+import org.shsts.tinactory.core.machine.IRecipeProcessor;
+import org.shsts.tinactory.core.machine.MachineProcessor;
+import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
@@ -24,7 +25,6 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 public final class RecipeProcessors {
     private static final String ID = "machine/recipe_processor";
-    public static final long PROGRESS_PER_TICK = 256;
 
     public static <R extends ProcessingRecipe> Supplier<IRecipeProcessor<R>> processing(
         IRecipeType<? extends IRecipeBuilderBase<R>> recipeType) {

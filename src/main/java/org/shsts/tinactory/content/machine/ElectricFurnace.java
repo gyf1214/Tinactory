@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
@@ -13,11 +14,11 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
@@ -35,25 +36,26 @@ import java.util.function.Consumer;
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllRecipes.MARKER;
-import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
-import static org.shsts.tinactory.core.machine.RecipeProcessors.PROGRESS_PER_TICK;
+import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
+import static org.shsts.tinactory.core.machine.ProcessingMachine.machineVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
+    private static final Voltage BASE_VOLTAGE = Voltage.ULV;
+
     private final int inputPort;
     private final int outputPort;
-    private final double amperage;
+    private final double basePower;
     private final int baseTemperature;
-    private long voltage = 0L;
+    private int parallel = 1;
     private double workFactor = 1d;
     private double energyFactor = 1d;
 
-    public ElectricFurnace(int inputPort, int outputPort,
-        double amperage, int baseTemperature) {
+    public ElectricFurnace(int inputPort, int outputPort, double amperage, int baseTemperature) {
         this.inputPort = inputPort;
         this.outputPort = outputPort;
-        this.amperage = amperage;
+        this.basePower = BASE_VOLTAGE.value * amperage;
         this.baseTemperature = baseTemperature;
     }
 
@@ -176,9 +178,23 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         return CoilMultiblock.getTemperature(machine).orElse(0);
     }
 
-    private void calculateFactors(IMachine machine) {
-        var baseVoltage = Voltage.ULV.value;
-        voltage = getBlockVoltage(machine.blockEntity()).value;
+    private int calculateParallel(IItemCollection port, Ingredient ingredient, int maxParallel) {
+        var l = 1;
+        var r = maxParallel + 1;
+        while (r - l > 1) {
+            var m = (l + r) / 2;
+            if (StackHelper.consumeItemCollection(port, ingredient, m, true).isPresent()) {
+                l = m;
+            } else {
+                r = m;
+            }
+        }
+        return l;
+    }
+
+    private void calculateFactors(IMachine machine, int parallel) {
+        var baseVoltage = parallel * BASE_VOLTAGE.value;
+        var voltage = machineVoltage(machine);
         var voltageFactor = 1L;
         var overclock = 1L;
         while (baseVoltage * voltageFactor * 4 <= voltage) {
@@ -186,26 +202,30 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             voltageFactor *= 4;
         }
         workFactor = overclock;
+        energyFactor = parallel * voltageFactor;
 
         var temp = getTemperature(machine);
         if (temp > 0 && baseTemperature > 0) {
-            var factor = Math.max(1d, (temp - baseTemperature) /
-                CONFIG.blastFurnaceTempFactor.get());
-            energyFactor = 1 / factor;
-        } else {
-            energyFactor = 1;
+            var factor = Math.max(1d, (temp - baseTemperature) / CONFIG.blastFurnaceTempFactor.get());
+            energyFactor /= factor;
         }
     }
 
     @Override
     public void onWorkBegin(SmeltingRecipe recipe, IMachine machine,
         int maxParallel, Consumer<ProcessingInfo> info) {
-        var container = machine.container().orElseThrow();
+        var port = getInputPort(machine.container().orElseThrow());
         var ingredient = recipe.getIngredients().get(0);
-        StackHelper.consumeItemCollection(getInputPort(container), ingredient, 1, false)
+
+        parallel = calculateParallel(port, ingredient, maxParallel);
+        StackHelper.consumeItemCollection(port, ingredient, parallel, false)
             .ifPresent($ -> info.accept(new ProcessingInfo(inputPort, new ProcessingIngredients.ItemIngredient($))));
-        info.accept(new ProcessingInfo(outputPort, new ProcessingResults.ItemResult(1, recipe.getResultItem())));
-        calculateFactors(machine);
+
+        var result = recipe.getResultItem();
+        var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
+        info.accept(new ProcessingInfo(outputPort, new ProcessingResults.ItemResult(1, result1)));
+
+        calculateFactors(machine, parallel);
     }
 
     @Override
@@ -239,12 +259,13 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public double powerCons(SmeltingRecipe recipe) {
-        return voltage * amperage * energyFactor;
+        return basePower * energyFactor;
     }
 
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
+        tag.putInt("parallel", parallel);
         tag.putDouble("workFactor", workFactor);
         tag.putDouble("energyFactor", energyFactor);
         return tag;
@@ -252,6 +273,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
+        parallel = tag.getInt("parallel");
         workFactor = tag.getDouble("workFactor");
         energyFactor = tag.getDouble("energyFactor");
     }
