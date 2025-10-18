@@ -67,7 +67,10 @@ public class MultiblockMeta extends MachineMeta {
                 case "default" -> builder.child(Multiblock.builder(Multiblock::new));
                 case "research" -> builder.child(Multiblock.builder(ResearchMultiblock::new));
                 case "coil", "blast_furnace" -> builder.child(Multiblock.builder(CoilMultiblock::new));
-                case "engraving" -> builder.child(Multiblock.builder(Lithography::new));
+                case "engraving" -> {
+                    var factor = GsonHelper.getAsDouble(jo, "cleannessFactor");
+                    yield builder.child(Multiblock.builder((be, $) -> new Lithography(be, $, factor)));
+                }
                 case "distillation" -> {
                     var maxHeight = GsonHelper.getAsInt(jo, "maxHeight");
                     var layouts = parseLayout().buildList(maxHeight - 2);

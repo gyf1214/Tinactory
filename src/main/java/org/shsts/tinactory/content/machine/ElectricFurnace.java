@@ -218,7 +218,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
         var temp = getTemperature(machine);
         if (temp > 0 && baseTemperature > 0) {
-            var factor = Math.max(1d, (temp - baseTemperature) / CONFIG.blastFurnaceTempFactor.get());
+            var factor = Math.max(1d, (temp - baseTemperature) / CONFIG.coilTemperatureFactor.get());
             energyFactor /= factor;
         }
     }

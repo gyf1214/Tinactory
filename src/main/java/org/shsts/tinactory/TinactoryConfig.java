@@ -11,8 +11,6 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public final class TinactoryConfig {
     public final ConfigValue<Integer> fluidSlotSize;
-    public final ConfigValue<Integer> chestSize;
-    public final ConfigValue<Integer> tankSize;
     public final ConfigValue<Integer> bytesPerItem;
     public final ConfigValue<Integer> bytesPerItemType;
     public final ConfigValue<Integer> bytesPerFluid;
@@ -20,8 +18,7 @@ public final class TinactoryConfig {
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
     public final ConfigValue<Double> workFactorExponent;
-    public final ConfigValue<Double> blastFurnaceTempFactor;
-    public final ConfigValue<Double> lithographyCleannessFactor;
+    public final ConfigValue<Double> coilTemperatureFactor;
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
     public final ConfigValue<Integer> multiblockCheckCycle;
@@ -30,10 +27,6 @@ public final class TinactoryConfig {
         builder.push("logistics");
         fluidSlotSize = builder.comment("Default size of a fluid slot.")
             .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
-        chestSize = builder.comment("Size of the electric chest")
-            .defineInRange("chest_size", 1024, 1, Integer.MAX_VALUE);
-        tankSize = builder.comment("Size of the electric tank")
-            .defineInRange("tank_size", 256000, 1, Integer.MAX_VALUE);
 
         bytesPerItem = builder.comment("Bytes used per item by digital storage")
             .defineInRange("bytes_per_item", 256, 1, Integer.MAX_VALUE);
@@ -54,10 +47,8 @@ public final class TinactoryConfig {
                 i -> ((Number) i).doubleValue() > 0d);
         workFactorExponent = builder.comment("Work factor exponent")
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
-        blastFurnaceTempFactor = builder.comment("Temperature factor for blast furnace")
-            .defineInRange("blast_furnace_temp_factor", 1000d, 0d, Double.POSITIVE_INFINITY);
-        lithographyCleannessFactor = builder.comment("Cleanness factor in lithography")
-            .defineInRange("lithography_cleanness_factory", 2d, 0d, Double.POSITIVE_INFINITY);
+        coilTemperatureFactor = builder.comment("Temperature energy factor for coil machines")
+            .defineInRange("coil_temperature_factor", 1000d, 0d, Double.POSITIVE_INFINITY);
         builder.pop();
 
         builder.push("network");

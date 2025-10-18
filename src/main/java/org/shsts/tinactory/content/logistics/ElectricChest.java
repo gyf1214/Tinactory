@@ -25,7 +25,6 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 
@@ -34,7 +33,7 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 public class ElectricChest extends ElectricStorage implements INBTSerializable<CompoundTag> {
     public static final String ID = "machine/chest";
 
-    public final int capacity;
+    public final int slotSize;
     private final int size;
     private final WrapperItemHandler internalItems;
     private final IItemCollection externalPort;
@@ -85,13 +84,13 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         }
     }
 
-    public ElectricChest(BlockEntity blockEntity, Layout layout, double power) {
+    public ElectricChest(BlockEntity blockEntity, Layout layout, int slotSize, double power) {
         super(blockEntity, layout, power);
         this.size = layout.slots.size() / 2;
-        this.capacity = CONFIG.chestSize.get();
+        this.slotSize = slotSize;
         this.filters = new ItemStack[size];
 
-        var inner = new ItemSlotHandler(size, capacity);
+        var inner = new ItemSlotHandler(size, slotSize);
         this.internalItems = new WrapperItemHandler(inner);
         internalItems.onUpdate(this::onSlotChange);
         for (var i = 0; i < size; i++) {
@@ -104,8 +103,9 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         this.itemHandlerCap = LazyOptional.of(() -> externalHandler);
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double power) {
-        return $ -> $.capability(ID, be -> new ElectricChest(be, layout, power));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
+        Layout layout, int slotSize, double power) {
+        return $ -> $.capability(ID, be -> new ElectricChest(be, layout, slotSize, power));
     }
 
     public ItemStack getStackInSlot(int slot) {

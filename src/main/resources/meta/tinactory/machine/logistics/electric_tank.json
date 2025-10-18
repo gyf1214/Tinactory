@@ -1,6 +1,7 @@
 {
   "recipe": "none",
   "machine": "electric_tank",
+  "slotSize": 256000,
   "voltages": {
     "ulv": {
       "power": 1

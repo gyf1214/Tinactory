@@ -13,17 +13,19 @@ import org.shsts.tinactory.core.multiblock.Multiblock;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Lithography extends Multiblock {
+    private final double cleannessFactor;
+
     @Nullable
     private LensBlock lensBlock = null;
 
-    public Lithography(BlockEntity blockEntity, Builder<?> builder) {
+    public Lithography(BlockEntity blockEntity, Builder<?> builder, double cleannessFactor) {
         super(blockEntity, builder);
+        this.cleannessFactor = cleannessFactor;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class Lithography extends Multiblock {
     }
 
     public double getCleannessFactor() {
-        return CONFIG.lithographyCleannessFactor.get();
+        return cleannessFactor;
     }
 
     @Override

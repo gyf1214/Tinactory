@@ -21,7 +21,6 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Arrays;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 
 @ParametersAreNonnullByDefault
@@ -35,14 +34,13 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     private final FluidStack[] filters;
     private final LazyOptional<IFluidStackHandler> fluidHandlerCap;
 
-    public ElectricTank(BlockEntity blockEntity, Layout layout, double power) {
+    public ElectricTank(BlockEntity blockEntity, Layout layout, int slotSize, double power) {
         super(blockEntity, layout, power);
         this.size = layout.slots.size();
-        var capacity = CONFIG.tankSize.get();
         this.tanks = new WrapperFluidTank[size];
         for (var i = 0; i < size; i++) {
             var slot = i;
-            tanks[i] = new WrapperFluidTank(capacity);
+            tanks[i] = new WrapperFluidTank(slotSize);
             tanks[i].onUpdate(this::onSlotChange);
             tanks[i].filter = stack -> allowFluidInTank(slot, stack);
         }
@@ -52,8 +50,9 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         this.fluidHandlerCap = LazyOptional.of(() -> port);
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double power) {
-        return $ -> $.capability(ID, be -> new ElectricTank(be, layout, power));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
+        Layout layout, int slotSize, double power) {
+        return $ -> $.capability(ID, be -> new ElectricTank(be, layout, slotSize, power));
     }
 
     private boolean allowFluidInTank(int slot, FluidStack stack) {

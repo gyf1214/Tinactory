@@ -28,7 +28,7 @@ public abstract class CoilMachine<R extends ProcessingRecipe> extends Processing
         super.calculateFactors(recipe, machine, parallel);
         var temp = getTemperature(machine);
         var factor = Math.max(1d, (temp - getRecipeTemperature(recipe)) /
-            CONFIG.blastFurnaceTempFactor.get());
+            CONFIG.coilTemperatureFactor.get());
         energyFactor /= factor;
     }
 }

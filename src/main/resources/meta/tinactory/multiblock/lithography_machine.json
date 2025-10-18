@@ -2,6 +2,7 @@
   "recipe": "tinactory:laser_engraver",
   "machine": "engraving",
   "autoRecipe": false,
+  "cleannessFactor": 2,
   "layout": {
     "slots": [
       {
