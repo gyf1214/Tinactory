@@ -7,6 +7,9 @@
     "annihilation_core",
     "formation_core",
     "grinder/good",
-    "grinder/advanced"
+    "grinder/advanced",
+    "carbon_fiber",
+    "carbon_mesh",
+    "carbon_plate"
   ]
 }

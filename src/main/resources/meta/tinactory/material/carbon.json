@@ -1,7 +1,8 @@
 {
   "color": "0xFF141414",
   "items": [
-    "dust"
+    "dust",
+    "ingot"
   ],
   "fluids": {
     "molten": {

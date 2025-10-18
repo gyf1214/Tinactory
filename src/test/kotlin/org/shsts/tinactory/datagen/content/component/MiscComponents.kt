@@ -26,6 +26,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.rocket
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
@@ -85,13 +86,38 @@ object MiscComponents {
                 workTicks(200)
                 tech(Technologies.TNT)
             }
+            misc("carbon_mesh") {
+                misc("carbon_fiber", 4)
+                input("epoxy", amount = 2)
+                voltage(Voltage.HV)
+                workTicks(256)
+                tech(Technologies.CARBON_FIBER)
+            }
+        }
+
+        wiremill {
+            misc("carbon_fiber") {
+                input("carbon", "ingot", 4)
+                workTicks(192)
+                voltage(Voltage.HV)
+            }
         }
 
         implosionCompressor {
+            defaults {
+                voltage(Voltage.HV)
+            }
             misc("advanced_alloy") {
                 misc("mixed_metal_ingot")
                 input(Items.TNT, 12, port = 1)
-                voltage(Voltage.HV)
+            }
+            output("carbon", "ingot") {
+                input("carbon", "dust", 4)
+                input(Items.TNT, 2, port = 1)
+            }
+            misc("carbon_plate") {
+                misc("carbon_mesh")
+                input(Items.TNT, 12, port = 1)
             }
         }
 
@@ -173,8 +199,14 @@ object MiscComponents {
         }
 
         research(Voltage.HV) {
-            input(getComponent("robot_arm").item(Voltage.HV))
+            input(getComponent("conveyor_module").item(Voltage.HV))
             input(getItem("component/advanced_alloy"))
+            input("pvc", "molten", 2)
+        }
+
+        research(Voltage.EV) {
+            input(getComponent("robot_arm").item(Voltage.EV))
+            input(getItem("component/carbon_plate"))
         }
     }
 

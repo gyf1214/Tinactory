@@ -110,6 +110,18 @@ object Components {
                 model(basicItem(ae2("items/material_formation_core")))
             }
 
+            component("carbon_fiber") {
+                model(basicItem("metaitems/carbon.fibres"))
+            }
+
+            component("carbon_mesh") {
+                model(basicItem("metaitems/carbon.mesh"))
+            }
+
+            component("carbon_plate") {
+                model(basicItem("metaitems/carbon.plate"))
+            }
+
             for (entry in STORAGE_CELLS) {
                 val k = name(entry.component.id(), -1).replace('m', 'k')
                 item(entry.component) {

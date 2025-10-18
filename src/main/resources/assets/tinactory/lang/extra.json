@@ -150,5 +150,6 @@
   "tinactory.technology.metal_former.details": "A precision machine that bends, presses, and shapes metals into complex parts. It enables mass production of durable components for advanced engineering.",
   "tinactory.technology.multi_smelter.details": "An industrial furnace capable of processing multiple ores simultaneously. Its efficiency saves time, energy, and space in large-scale metallurgical operations.",
   "tinactory.technology.advanced_polymer.details": "High-strength synthetic materials designed for extreme durability and flexibility. They’re essential for advanced construction, protective gear, and high-performance machinery.",
+  "tinactory.technology.carbon_fiber.details": "An ultra-light yet incredibly strong composite made from tightly bound carbon strands. It’s ideal for aerospace structures, advanced vehicles, and high-efficiency machinery where strength-to-weight ratio is critical.",
   "generator.tinactory.void": "Void"
 }

@@ -34,6 +34,7 @@ object Technologies {
         }
     }
 
+    // ULV
     val ALLOY_SMELTING: ResourceLocation
     val SOLDERING: ResourceLocation
     val STEEL: ResourceLocation
@@ -46,6 +47,8 @@ object Technologies {
     val HOT_WORKING: ResourceLocation
     val CONVEYOR_MODULE: ResourceLocation
     val ROBOT_ARM: ResourceLocation
+
+    // LV
     val KANTHAL: ResourceLocation
     val SIFTING: ResourceLocation
     val AUTOFARM: ResourceLocation
@@ -59,6 +62,8 @@ object Technologies {
     val OIL_PROCESSING: ResourceLocation
     val ORGANIC_CHEMISTRY: ResourceLocation
     val CPU: ResourceLocation
+
+    // MV
     val NICHROME: ResourceLocation
     val OIL_CRACKING: ResourceLocation
     val HYDROMETALLURGY: ResourceLocation
@@ -66,11 +71,14 @@ object Technologies {
     val CLEANROOM: ResourceLocation
     val ADVANCED_CHEMISTRY: ResourceLocation
     val TNT: ResourceLocation
+
+    // HV
     val SURFACE_MOUNT_DEVICE: ResourceLocation
     val AUTOCLAVE: ResourceLocation
     val DIGITAL_STORAGE: ResourceLocation
-    val ADVANCED_POLYMER: ResourceLocation
     val LITHOGRAPHY: ResourceLocation
+    val ADVANCED_POLYMER: ResourceLocation
+    val CARBON_FIBER: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
     val ROCKET_T1: ResourceLocation
     val MULTI_SMELTER: ResourceLocation
@@ -277,16 +285,24 @@ object Technologies {
 
             base = ADVANCED_CHEMISTRY
 
-            ADVANCED_POLYMER = tech("advanced_polymer") {
-                maxProgress(160)
-                displayMaterial("epoxy", "sheet")
-            }
-
             LITHOGRAPHY = tech("lithography") {
                 maxProgress(160)
                 displayItem(getComponent("emitter").item(Voltage.HV))
                 depends(CPU)
             }
+
+            ADVANCED_POLYMER = child("advanced_polymer") {
+                maxProgress(160)
+                displayMaterial("epoxy", "sheet")
+            }
+
+            CARBON_FIBER = tech("carbon_fiber") {
+                maxProgress(200)
+                displayItem("component/carbon_plate")
+                depends(TNT)
+            }
+
+            base = ADVANCED_CHEMISTRY
 
             ROCKET_SCIENCE = child("rocket_science") {
                 maxProgress(200)
