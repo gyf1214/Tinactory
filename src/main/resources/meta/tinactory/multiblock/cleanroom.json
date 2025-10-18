@@ -1,0 +1,28 @@
+{
+  "machine": "cleanroom",
+  "amperage": 0.125,
+  "baseClean": 5e-5,
+  "baseDecay": 1e-4,
+  "openDecay": 0.01,
+  "layout": {
+    "slots": [],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_turbine_rotor_speed",
+      "x": 0,
+      "y": 9,
+      "width": 62,
+      "height": 7
+    }
+  },
+  "appearance": "tinactory:multiblock/misc/plascrete",
+  "spec": {
+    "base": "tinactory:multiblock/misc/plascrete",
+    "ceiling": "tinactory:multiblock/misc/filter_casing",
+    "wall": "tinactory:multiblock/cleanroom_wall",
+    "connector": "tinactory:multiblock/cleanroom_connector",
+    "door": "tinactory:multiblock/cleanroom_door",
+    "maxSize": 7,
+    "maxConnectors": 1,
+    "maxDoors": 2
+  }
+}

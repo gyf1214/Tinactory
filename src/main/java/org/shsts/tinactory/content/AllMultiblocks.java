@@ -7,31 +7,21 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.content.material.MiscMeta;
-import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.HalfBlock;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.content.multiblock.TurbineBlock;
-import org.shsts.tinactory.content.network.FixedBlock;
-import org.shsts.tinactory.core.builder.BlockEntityBuilder;
-import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
-import static org.shsts.tinactory.content.AllTags.CLEANROOM_CONNECTOR;
-import static org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR;
-import static org.shsts.tinactory.content.AllTags.CLEANROOM_WALL;
-import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMultiblocks {
     public static final Map<String, MultiblockSet> MULTIBLOCK_SETS;
-    public static final IEntry<FixedBlock> CLEANROOM;
 
     public static final Map<String, IEntry<Block>> SOLID_CASINGS;
     public static final Map<String, IEntry<CoilBlock>> COIL_BLOCKS;
@@ -58,31 +48,6 @@ public final class AllMultiblocks {
             .properties(MiscMeta.CASING_PROPERTY)
             .translucent()
             .register();
-
-        var plascrete = BLOCKS.getEntry("multiblock/misc/plascrete");
-        var cleanroomCeiling = BLOCKS.getEntry("multiblock/misc/filter_casing");
-        CLEANROOM = BlockEntityBuilder.builder("multiblock/cleanroom", FixedBlock::new)
-            .blockEntity()
-            .child(Multiblock.builder(Cleanroom::new))
-            .appearanceBlock(plascrete)
-            .spec(Cleanroom::spec)
-            .baseBlock(plascrete)
-            .ceilingBlock(cleanroomCeiling)
-            .wallTag(CLEANROOM_WALL)
-            .connectorTag(CLEANROOM_CONNECTOR)
-            .doorTag(CLEANROOM_DOOR)
-            .maxSize(7)
-            .maxConnector(1)
-            .maxDoor(2)
-            .build()
-            .build()
-            .end()
-            .block()
-            .material(Material.HEAVY_METAL)
-            .properties(MACHINE_PROPERTY)
-            .translucent()
-            .end()
-            .buildObject();
     }
 
     public static MultiblockSet getMultiblock(String name) {

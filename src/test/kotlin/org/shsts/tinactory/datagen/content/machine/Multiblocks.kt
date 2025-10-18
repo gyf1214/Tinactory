@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
-import org.shsts.tinactory.content.AllMultiblocks.CLEANROOM
 import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
 import org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS
 import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
@@ -366,7 +365,7 @@ object Multiblocks {
             multiblock("autofarm", "solid_steel", "blast_furnace")
             multiblock("vacuum_freezer", "frost_proof")
             multiblock("distillation_tower", "clean_stainless_steel")
-            block(CLEANROOM) {
+            block("multiblock/cleanroom") {
                 machineModel {
                     casing("casings/cleanroom/plascrete")
                     overlay("multiblock/cleanroom")
@@ -510,7 +509,7 @@ object Multiblocks {
                 input("stainless_steel", "pipe", 4)
                 tech(Technologies.OIL_CRACKING)
             }
-            output(CLEANROOM.get()) {
+            multiblock("cleanroom") {
                 misc("plascrete")
                 circuit(3)
                 component("electric_motor", 2)

@@ -6,12 +6,15 @@ import com.google.gson.JsonSyntaxException;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.RecipeProcessors;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
+import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
@@ -19,6 +22,7 @@ import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -35,6 +39,16 @@ import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 public class MultiblockMeta extends MachineMeta {
     public MultiblockMeta() {
         super("Multiblock");
+    }
+
+    private static IEntry<Block> getBlock(JsonObject jo, String member) {
+        var loc = new ResourceLocation(GsonHelper.getAsString(jo, member));
+        return BLOCKS.getEntry(loc);
+    }
+
+    private static TagKey<Block> getBlockTag(JsonObject jo, String member) {
+        var loc = new ResourceLocation(GsonHelper.getAsString(jo, member));
+        return AllTags.block(loc);
     }
 
     private static class Executor extends MachineMeta.Executor {
@@ -135,21 +149,21 @@ public class MultiblockMeta extends MachineMeta {
             var type = GsonHelper.getAsString(jo, "type");
             switch (type) {
                 case "block_or_interface" -> {
-                    var block = BLOCKS.getEntry(new ResourceLocation(GsonHelper.getAsString(jo, "block")));
+                    var block = getBlock(jo, "block");
                     return $ -> $.blockOrInterface(ch, block);
                 }
                 case "tag" -> {
-                    var tag = AllTags.block(new ResourceLocation(GsonHelper.getAsString(jo, "tag")));
+                    var tag = getBlockTag(jo, "tag");
                     return $ -> $.tag(ch, tag);
                 }
                 case "tag_with_same_block" -> {
-                    var tag = AllTags.block(new ResourceLocation(GsonHelper.getAsString(jo, "tag")));
+                    var tag = getBlockTag(jo, "tag");
                     var key = GsonHelper.getAsString(jo, "key");
                     return $ -> $.tagWithSameBlock(ch, key, tag);
                 }
                 case "tag_or_block" -> {
-                    var block = BLOCKS.getEntry(new ResourceLocation(GsonHelper.getAsString(jo, "block")));
-                    var tag = AllTags.block(new ResourceLocation(GsonHelper.getAsString(jo, "tag")));
+                    var block = getBlock(jo, "block");
+                    var tag = getBlockTag(jo, "tag");
                     return $ -> $.checkBlock(ch, blockState -> blockState.is(block.get()) || blockState.is(tag));
                 }
             }
@@ -202,9 +216,46 @@ public class MultiblockMeta extends MachineMeta {
             }
         }
 
-        @Override
-        public void run() {
-            parseTypes();
+        private IEntry<? extends Block> buildCleanroom() {
+            var properties = new Cleanroom.Properties(
+                GsonHelper.getAsDouble(jo, "amperage"),
+                GsonHelper.getAsDouble(jo, "baseClean"),
+                GsonHelper.getAsDouble(jo, "baseDecay"),
+                GsonHelper.getAsDouble(jo, "openDecay"));
+
+            var jo1 = GsonHelper.getAsJsonObject(jo, "spec");
+
+            var layout = parseLayout().buildLayout();
+
+            return BlockEntityBuilder.builder("multiblock/" + id, FixedBlock::new)
+                .blockEntity()
+                .child(Multiblock.builder((be, $) -> new Cleanroom(be, $, properties)))
+                .layout(layout)
+                .appearanceBlock(getBlock(jo, "appearance"))
+                .spec(Cleanroom::spec)
+                .baseBlock(getBlock(jo1, "base"))
+                .ceilingBlock(getBlock(jo1, "ceiling"))
+                .wallTag(getBlockTag(jo1, "wall"))
+                .connectorTag(getBlockTag(jo1, "connector"))
+                .doorTag(getBlockTag(jo1, "door"))
+                .maxSize(GsonHelper.getAsInt(jo1, "maxSize"))
+                .maxConnectors(GsonHelper.getAsInt(jo1, "maxConnectors"))
+                .maxDoors(GsonHelper.getAsInt(jo1, "maxDoors"))
+                .build()
+                .build()
+                .end()
+                .block()
+                .material(Material.HEAVY_METAL)
+                .properties(MACHINE_PROPERTY)
+                .translucent()
+                .end()
+                .buildObject();
+        }
+
+        private IEntry<? extends Block> buildBlock() {
+            if (machineType.equals("cleanroom")) {
+                return buildCleanroom();
+            }
 
             if (jo.has("recipes")) {
                 var jo1 = GsonHelper.getAsJsonObject(jo, "recipes");
@@ -223,12 +274,11 @@ public class MultiblockMeta extends MachineMeta {
 
             var layout = jo.has("layout") ? parseLayout().buildLayout() : Layout.EMPTY;
 
-            var appearance = new ResourceLocation(GsonHelper.getAsString(jo, "appearance"));
             var block = BlockEntityBuilder.builder("multiblock/" + id, PrimitiveBlock::new)
                 .blockEntity()
                 .child(this::multiblock)
                 .layout(layout)
-                .appearanceBlock(BLOCKS.getEntry(appearance))
+                .appearanceBlock(getBlock(jo, "appearance"))
                 .transform(this::buildSpec)
                 .build()
                 .end()
@@ -239,11 +289,21 @@ public class MultiblockMeta extends MachineMeta {
                 .end()
                 .buildObject();
 
-            var set = new MultiblockSet(recipeTypes, block);
-            MULTIBLOCK_SETS.put(id, set);
             for (var recipeType : recipeTypes) {
                 putTypeInfo(recipeType, layout, block);
             }
+
+            return block;
+        }
+
+        @Override
+        public void run() {
+            parseTypes();
+
+            var block = buildBlock();
+
+            var set = new MultiblockSet(recipeTypes, block);
+            MULTIBLOCK_SETS.put(id, set);
         }
     }
 

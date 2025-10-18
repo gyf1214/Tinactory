@@ -239,7 +239,7 @@ object Technologies {
 
             CLEANROOM = tech("cleanroom") {
                 maxProgress(160)
-                displayItem(AllMultiblocks.CLEANROOM)
+                displayItem("multiblock/cleanroom")
             }
 
             ADVANCED_CHEMISTRY = tech("advanced_chemistry") {

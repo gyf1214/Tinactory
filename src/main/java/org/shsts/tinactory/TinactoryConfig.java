@@ -21,10 +21,6 @@ public final class TinactoryConfig {
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
     public final ConfigValue<Double> workFactorExponent;
     public final ConfigValue<Double> blastFurnaceTempFactor;
-    public final ConfigValue<Double> cleanroomAmperage;
-    public final ConfigValue<Double> cleanroomBaseClean;
-    public final ConfigValue<Double> cleanroomBaseDecay;
-    public final ConfigValue<Double> cleanroomOpenDecay;
     public final ConfigValue<Double> lithographyCleannessFactor;
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
@@ -60,14 +56,6 @@ public final class TinactoryConfig {
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
         blastFurnaceTempFactor = builder.comment("Temperature factor for blast furnace")
             .defineInRange("blast_furnace_temp_factor", 1000d, 0d, Double.POSITIVE_INFINITY);
-        cleanroomAmperage = builder.comment("Cleanroom amperage usage")
-            .defineInRange("cleanroom_amperage", 0.125d, 0d, Double.POSITIVE_INFINITY);
-        cleanroomBaseClean = builder.comment("Cleanroom base clean speed in ULV")
-            .defineInRange("cleanroom_base_clean", 5e-5d, 0d, 1d);
-        cleanroomBaseDecay = builder.comment("Cleanroom base decay")
-            .defineInRange("cleanroom_base_decay", 1e-4d, 0d, 1d);
-        cleanroomOpenDecay = builder.comment("Cleanroom decay when open")
-            .defineInRange("cleanroom_open_decay", 0.01d, 0d, 1d);
         lithographyCleannessFactor = builder.comment("Cleanness factor in lithography")
             .defineInRange("lithography_cleanness_factory", 2d, 0d, Double.POSITIVE_INFINITY);
         builder.pop();

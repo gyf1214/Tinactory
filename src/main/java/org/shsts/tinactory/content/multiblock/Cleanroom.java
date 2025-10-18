@@ -18,7 +18,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllLayouts;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
@@ -31,7 +30,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 
@@ -39,6 +37,10 @@ import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 @MethodsReturnNonnullByDefault
 public class Cleanroom extends Multiblock implements IProcessor, IElectricMachine,
     INBTSerializable<CompoundTag> {
+    public record Properties(double amperage, double baseClean, double baseDecay, double openDecay) {}
+
+    private final Properties properties;
+
     private record DoorState(BlockPos pos, Direction facing) {}
 
     private double cleanness = 0d;
@@ -46,8 +48,9 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     private int size;
     private List<DoorState> doors;
 
-    public Cleanroom(BlockEntity blockEntity, Builder<?> builder) {
-        super(blockEntity, builder.layout(AllLayouts.CLEANROOM));
+    public Cleanroom(BlockEntity blockEntity, Builder<?> builder, Properties properties) {
+        super(blockEntity, builder);
+        this.properties = properties;
     }
 
     @Override
@@ -86,7 +89,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     public double getPowerCons() {
-        return CONFIG.cleanroomAmperage.get() * getVoltage() * Math.sqrt(size);
+        return properties.amperage * getVoltage() * Math.sqrt(size);
     }
 
     @Override
@@ -99,7 +102,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return;
         }
         var workFactor = partial * Math.sqrt((double) voltage / (double) Voltage.ULV.value);
-        var clean = workFactor * CONFIG.cleanroomBaseClean.get();
+        var clean = workFactor * properties.baseClean;
 
         cleanness = Math.min(1d, cleanness + clean - cleanness * clean);
     }
@@ -133,8 +136,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     @Override
     protected void onServerTick() {
         super.onServerTick();
-        var decay = isOpen() ? CONFIG.cleanroomOpenDecay.get() :
-            CONFIG.cleanroomBaseDecay.get();
+        var decay = isOpen() ? properties.openDecay : properties.baseDecay;
         cleanness = cleanness * (1d - decay);
 
         blockEntity.setChanged();
@@ -170,9 +172,9 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         private final TagKey<Block> doorTag;
         @Nullable
         private final TagKey<Block> connectorTag;
-        private final int maxDoor;
-        private final int maxConnector;
         private final int maxSize;
+        private final int maxDoors;
+        private final int maxConnectors;
 
         public Spec(SpecBuilder<?> builder) {
             this.baseBlock = Objects.requireNonNull(builder.baseBlock);
@@ -180,13 +182,13 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             this.wallTag = Objects.requireNonNull(builder.wallTag);
             this.doorTag = builder.doorTag;
             this.connectorTag = builder.connectorTag;
-            this.maxDoor = builder.maxDoor;
-            this.maxConnector = builder.maxConnector;
             this.maxSize = builder.maxSize;
+            this.maxDoors = builder.maxDoors;
+            this.maxConnectors = builder.maxConnectors;
 
-            assert maxDoor <= 0 || doorTag != null;
-            assert maxConnector <= 0 || connectorTag != null;
             assert maxSize > 0;
+            assert maxDoors <= 0 || doorTag != null;
+            assert maxConnectors <= 0 || connectorTag != null;
         }
 
         private boolean getSizes(IMultiblockCheckCtx ctx) {
@@ -271,7 +273,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             }
             if (doorTag != null && block.is(doorTag)) {
                 var doors = (List<DoorState>) ctx.getProperty("doors");
-                if (doors.size() < maxDoor) {
+                if (doors.size() < maxDoors) {
                     doors.add(new DoorState(pos, face));
                     return true;
                 } else {
@@ -280,7 +282,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             }
             if (connectorTag != null && block.is(connectorTag)) {
                 var connectors = (int) ctx.getProperty("connectors");
-                if (connectors < maxConnector) {
+                if (connectors < maxConnectors) {
                     ctx.setProperty("connectors", connectors + 1);
                     return true;
                 } else {
@@ -388,9 +390,9 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         private TagKey<Block> wallTag = null;
         private TagKey<Block> doorTag = null;
         private TagKey<Block> connectorTag = null;
-        private int maxDoor = 0;
-        private int maxConnector = 0;
         private int maxSize = 0;
+        private int maxDoors = 0;
+        private int maxConnectors = 0;
 
         private SpecBuilder(P parent) {
             super(parent);
@@ -421,18 +423,18 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             return this;
         }
 
-        public SpecBuilder<P> maxDoor(int val) {
-            this.maxDoor = val;
-            return this;
-        }
-
-        public SpecBuilder<P> maxConnector(int val) {
-            this.maxConnector = val;
-            return this;
-        }
-
         public SpecBuilder<P> maxSize(int val) {
             this.maxSize = val;
+            return this;
+        }
+
+        public SpecBuilder<P> maxDoors(int val) {
+            this.maxDoors = val;
+            return this;
+        }
+
+        public SpecBuilder<P> maxConnectors(int val) {
+            this.maxConnectors = val;
             return this;
         }
 
