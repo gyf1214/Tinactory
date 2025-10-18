@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
-import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
+import static org.shsts.tinactory.core.gui.Texture.FLUID_SLOT_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -79,7 +79,7 @@ public class FluidSlot extends MenuWidget {
     }
 
     protected void renderBackground(PoseStack poseStack) {
-        RenderUtil.blit(poseStack, SLOT_BACKGROUND, getBlitOffset(), rect.offset(-1, -1).enlarge(2, 2));
+        RenderUtil.blit(poseStack, FLUID_SLOT_BG, getBlitOffset(), rect.offset(-1, -1).enlarge(2, 2));
     }
 
     protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {

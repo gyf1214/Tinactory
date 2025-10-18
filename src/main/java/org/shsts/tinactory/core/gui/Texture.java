@@ -18,6 +18,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
 
     public static final Texture SLOT_BACKGROUND = new Texture(
         gregtech("gui/base/slot"), SLOT_SIZE, SLOT_SIZE);
+    public static final Texture FLUID_SLOT_BG = new Texture(
+        gregtech("gui/base/fluid_slot"), SLOT_SIZE, SLOT_SIZE);
     public static final Texture SWITCH_BUTTON = new Texture(
         gregtech("gui/widget/toggle_button_background"), 18, 36);
     public static final Texture GREGTECH_LOGO = new Texture(
@@ -25,12 +27,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
     public static final Texture VANILLA_WIDGETS = new Texture(
         mcLoc("gui/widgets"), 256, 256);
 
-    public static final Texture PROGRESS_ARROW = new Texture(
-        gregtech("gui/progress_bar/progress_bar_" + "arrow"), 20, 40);
     public static final Texture PROGRESS_BURN = new Texture(
         gregtech("gui/progress_bar/progress_bar_boiler_fuel_steel"), 18, 36);
-    public static final Texture PROGRESS_CLEANROOM = new Texture(
-        gregtech("gui/progress_bar/progress_bar_turbine_rotor_speed"), 62, 14);
 
     public static final Texture HEAT_EMPTY = new Texture(
         gregtech("gui/progress_bar/progress_bar_boiler_empty_steel"), 10, 54);
