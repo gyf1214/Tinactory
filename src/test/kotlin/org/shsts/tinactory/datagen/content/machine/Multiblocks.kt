@@ -2,8 +2,8 @@ package org.shsts.tinactory.datagen.content.machine
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
@@ -202,8 +202,8 @@ object Multiblocks {
             }
             misc("autofarm_base") {
                 input("steel", "stick", 2)
-                input(Blocks.COARSE_DIRT, 2)
-                input(Blocks.PODZOL, 2)
+                input(Items.COARSE_DIRT, 2)
+                input(Items.PODZOL, 2)
                 input("steel", "plate", 3)
                 input("soldering_alloy", amount = 2)
                 workTicks(200)

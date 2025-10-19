@@ -170,10 +170,16 @@ object MiscComponents {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.SOLDERING)
             }
+            component("machine_hull") {
+                input("iron", "plate", 8)
+                component("cable")
+            }
+            component("cable") {
+                input("iron", "wire", 4)
+            }
             component("fluid_cell") {
                 input("iron", "plate", 4)
                 input("glass", "primary")
-                input("soldering_alloy")
             }
             output(Items.NAME_TAG) {
                 input("iron", "plate")

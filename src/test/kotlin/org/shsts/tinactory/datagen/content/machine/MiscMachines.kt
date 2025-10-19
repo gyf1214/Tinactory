@@ -6,7 +6,6 @@ import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
-import net.minecraft.world.level.block.Blocks
 import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
@@ -22,8 +21,8 @@ import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
-import org.shsts.tinactory.datagen.content.builder.ToolRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.VanillaRecipeFactory
+import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 
@@ -48,7 +47,7 @@ object MiscMachines {
                 pattern("WSW")
                 define('S', "stone", "primary")
                 define('W', Items.STICK)
-                define('C', Blocks.CRAFTING_TABLE)
+                define('C', Items.CRAFTING_TABLE)
                 unlockedBy("has_cobblestone", "stone", "primary")
             }
             primitive("stone_generator") {
@@ -86,18 +85,18 @@ object MiscMachines {
     }
 
     private fun ulvs() {
-        toolCrafting {
-            ulv("stone_generator")
-            ulv("ore_analyzer")
-            ulv("ore_washer")
-            ulv("research_bench", Blocks.CRAFTING_TABLE)
-            ulv("assembler", WORKBENCH.get())
-            ulv("electric_furnace", Blocks.FURNACE)
-            ulv("logistics/electric_chest", Blocks.CHEST)
-            ulv("logistics/electric_tank", getMaterial("glass").tag("primary"))
-            ulv("logistics/logistic_worker", Blocks.HOPPER)
-            ulvComponent("electric_buffer", ulvCable)
+        ulv("stone_generator")
+        ulv("ore_analyzer")
+        ulv("ore_washer")
+        ulv("research_bench", Items.CRAFTING_TABLE)
+        ulv("assembler", WORKBENCH.get())
+        ulv("electric_furnace", Items.FURNACE)
+        ulv("logistics/electric_chest", Items.CHEST)
+        ulv("logistics/electric_tank", getMaterial("glass").tag("primary"))
+        ulv("logistics/logistic_worker", Items.HOPPER)
+        ulvComponent("electric_buffer", ulvCable)
 
+        toolCrafting {
             result(NETWORK_CONTROLLER.get()) {
                 pattern("VWV")
                 pattern("VHV")
@@ -124,6 +123,19 @@ object MiscMachines {
                 voltage(Voltage.ULV)
                 workTicks(MACHINE_TICKS)
             }
+            output(NETWORK_CONTROLLER.get()) {
+                component("machine_hull")
+                circuit(4)
+                component("cable", 2)
+                input("iron", "plate", 4)
+            }
+            machine("steam_turbine") {
+                component("machine_hull")
+                circuit(2)
+                component("cable", 2)
+                input("iron", "rotor", 2)
+                input("copper", "pipe", 2)
+            }
             machine("alloy_smelter") {
                 machine("electric_furnace")
                 circuit(2)
@@ -134,21 +146,23 @@ object MiscMachines {
                 component("machine_hull")
                 circuit(2)
                 component("cable", 2)
-                input(Blocks.CHEST)
+                input(Items.CHEST)
                 input("glass", "primary")
                 tech(Technologies.STEEL)
             }
         }
     }
 
-    private fun ToolRecipeFactory.ulv(item: ItemLike, base: ItemLike) {
-        result(item) {
-            pattern("BBB").pattern("VHV").pattern("WVW")
-            define('B', base.asItem())
-            define('W', ulvCable)
-            define('H', ulvHull)
-            define('V', ulvCircuit)
-            toolTag(TOOL_WRENCH)
+    private fun ulv(item: ItemLike, base: ItemLike) {
+        toolCrafting {
+            result(item) {
+                pattern("BBB").pattern("VHV").pattern("WVW")
+                define('B', base.asItem())
+                define('W', ulvCable)
+                define('H', ulvHull)
+                define('V', ulvCircuit)
+                toolTag(TOOL_WRENCH)
+            }
         }
         assembler {
             output(item) {
@@ -163,14 +177,16 @@ object MiscMachines {
         }
     }
 
-    private fun ToolRecipeFactory.ulv(item: ItemLike, base: TagKey<Item>) {
-        result(item) {
-            pattern("BBB").pattern("VHV").pattern("WVW")
-            define('B', base)
-            define('W', ulvCable)
-            define('H', ulvHull)
-            define('V', ulvCircuit)
-            toolTag(TOOL_WRENCH)
+    private fun ulv(item: ItemLike, base: TagKey<Item>) {
+        toolCrafting {
+            result(item) {
+                pattern("BBB").pattern("VHV").pattern("WVW")
+                define('B', base)
+                define('W', ulvCable)
+                define('H', ulvHull)
+                define('V', ulvCircuit)
+                toolTag(TOOL_WRENCH)
+            }
         }
         assembler {
             output(item) {
@@ -185,20 +201,20 @@ object MiscMachines {
         }
     }
 
-    private fun ToolRecipeFactory.ulv(name: String, base: ItemLike) {
+    private fun ulv(name: String, base: ItemLike) {
         ulv(getMachine(name).block(Voltage.ULV), base)
     }
 
-    private fun ToolRecipeFactory.ulv(name: String, base: TagKey<Item>) {
+    private fun ulv(name: String, base: TagKey<Item>) {
         ulv(getMachine(name).block(Voltage.ULV), base)
     }
 
-    private fun ToolRecipeFactory.ulv(name: String) {
+    private fun ulv(name: String) {
         val set = getMachine(name)
         ulv(set.block(Voltage.ULV), set.block(Voltage.PRIMITIVE))
     }
 
-    private fun ToolRecipeFactory.ulvComponent(name: String, base: ItemLike) {
+    private fun ulvComponent(name: String, base: ItemLike) {
         ulv(getComponent(name).item(Voltage.ULV), base)
     }
 
@@ -244,6 +260,23 @@ object MiscMachines {
                 pattern(" P ")
                 define('P', "iron", "plate")
                 toolTag(TOOL_HAMMER)
+            }
+        }
+
+        assembler {
+            output(Items.HOPPER) {
+                input(Items.CHEST)
+                input("iron", "plate", 4)
+                voltage(Voltage.ULV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.SOLDERING)
+            }
+            output(Items.BUCKET) {
+                input("iron", "plate", 2)
+                input("iron", "stick")
+                voltage(Voltage.ULV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.SOLDERING)
             }
         }
 
@@ -315,16 +348,27 @@ object MiscMachines {
                 define('P', "iron", "plate")
                 define('W', ulvCable)
                 define('V', ulvCircuit)
-                define('F', Blocks.FURNACE.asItem())
+                define('F', Items.FURNACE)
                 toolTag(TOOL_WRENCH)
             }
         }
 
         assembler {
+            componentVoltage = Voltage.ULV
+            output(getBlock("machine/boiler/low")) {
+                component("machine_hull")
+                circuit(2)
+                input(Items.FURNACE)
+                component("cable", 2)
+                voltage(Voltage.ULV)
+                workTicks(MACHINE_TICKS)
+                tech(Technologies.SOLDERING)
+            }
+
             componentVoltage = Voltage.MV
             output(getBlock("machine/boiler/high")) {
                 component("machine_hull")
-                input(Blocks.FURNACE)
+                input(Items.FURNACE)
                 input("brass", "pipe", 2)
                 input("iron", "plate", 4)
                 voltage(Voltage.LV)
