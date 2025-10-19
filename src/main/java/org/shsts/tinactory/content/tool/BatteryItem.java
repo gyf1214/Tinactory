@@ -39,14 +39,14 @@ public class BatteryItem extends Item {
     @Override
     public void initializeClient(Consumer<IItemRenderProperties> consumer) {
         ItemProperties.register(this, ITEM_PROPERTY, (stack, $1, $2, $3) ->
-            (float) getPowerLevel(stack) / capacity);
+            (float) getPower(stack) / capacity);
     }
 
-    public long getPowerLevel(ItemStack stack) {
+    public long getPower(ItemStack stack) {
         if (stack.getTag() == null) {
             return 0L;
         }
-        return stack.getTag().getLong("power");
+        return MathUtil.clamp(stack.getTag().getLong("power"), 0, capacity);
     }
 
     public void setPowerLevel(ItemStack stack, long value) {
@@ -55,7 +55,7 @@ public class BatteryItem extends Item {
     }
 
     public void charge(ItemStack stack, long delta) {
-        var value = MathUtil.clamp(getPowerLevel(stack) + delta, 0L, capacity);
+        var value = MathUtil.clamp(getPower(stack) + delta, 0L, capacity);
         setPowerLevel(stack, value);
     }
 
@@ -66,7 +66,7 @@ public class BatteryItem extends Item {
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return (int) Math.round(13f * (double) getPowerLevel(stack) / (double) capacity);
+        return (int) Math.round(13f * (double) getPower(stack) / (double) capacity);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class BatteryItem extends Item {
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltips,
         TooltipFlag isAdvanced) {
         var line = tr("tinactory.tooltip.battery",
-            NUMBER_FORMAT.format(getPowerLevel(stack)),
+            NUMBER_FORMAT.format(getPower(stack)),
             NUMBER_FORMAT.format(capacity),
             voltage.displayName());
         tooltips.add(line.withStyle(ChatFormatting.GRAY));

@@ -61,7 +61,9 @@ public class MultiblockMeta extends MachineMeta {
 
         private <P> Multiblock.Builder<P> multiblock(IBlockEntityTypeBuilder<P> builder) {
             var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
-            builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
+            if (!machineType.equals("power_substation")) {
+                builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
+            }
 
             return switch (machineType) {
                 case "default" -> builder.child(Multiblock.builder(Multiblock::new));
@@ -77,6 +79,7 @@ public class MultiblockMeta extends MachineMeta {
                     yield builder.child(Multiblock.builder((be, $) -> new DistillationTower(be, $, layouts)));
                 }
                 case "large_turbine" -> builder.child(Multiblock.builder(LargeTurbine::new));
+                case "power_substation" -> builder.child(Multiblock.builder(PowerSubstation::new));
                 default -> {
                     if (machineType.equals(recipeTypeStr)) {
                         yield builder.child(Multiblock.builder(Multiblock::new));

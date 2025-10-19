@@ -90,8 +90,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
                 continue;
             }
             var cap = Math.min(voltage.value, sign > 0 ?
-                battery.capacity - battery.getPowerLevel(stack) :
-                battery.getPowerLevel(stack));
+                battery.capacity - battery.getPower(stack) :
+                battery.getPower(stack));
             battery.charge(stack, (long) Math.floor(cap * factor));
         }
     }
@@ -117,7 +117,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
             if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
-                ret += Math.min(voltage.value, battery.getPowerLevel(stack));
+                ret += Math.min(voltage.value, battery.getPower(stack));
             }
         }
         return ret;
@@ -129,7 +129,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
             if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
-                ret += Math.min(voltage.value, battery.capacity - battery.getPowerLevel(stack));
+                ret += Math.min(voltage.value, battery.capacity - battery.getPower(stack));
             }
         }
         return ret;

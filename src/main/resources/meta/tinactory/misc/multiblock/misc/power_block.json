@@ -1,0 +1,21 @@
+{
+  "type": "power",
+  "materialColor": 32,
+  "items": {
+    "hv": {
+      "capacity": 3072000
+    },
+    "ev": {
+      "capacity": 12288000
+    },
+    "iv": {
+      "capacity": 49152000
+    },
+    "luv": {
+      "capacity": 196608000
+    },
+    "zpm": {
+      "capacity": 786432000
+    }
+  }
+}

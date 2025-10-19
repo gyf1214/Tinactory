@@ -11,11 +11,14 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.util.MathUtil;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -34,7 +37,7 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
         super.doCheckMultiblock(ctx);
         if (ctx.hasProperty("height") && ctx.hasProperty("power") &&
             ctx.getProperty("power") instanceof PowerBlock block) {
-            var height = (int) ctx.getProperty("height");
+            var height = (int) ctx.getProperty("height") - 2;
             output = block.voltage * 3 * height;
             capacity = block.capacity * 9 * height;
         } else {
@@ -42,15 +45,32 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
         }
     }
 
+    private long getPower() {
+        return MathUtil.clamp(power, 0, capacity);
+    }
+
     @Override
     public void onPreWork() {}
 
     @Override
-    public void onWorkTick(double partial) {}
+    public void onWorkTick(double partial) {
+        var factor = (double) getInterface()
+            .flatMap(IMachine::network)
+            .map($ -> $.getComponent(ELECTRIC_COMPONENT.get()).getBufferFactor())
+            .orElse(0d);
+        var sign = MathUtil.compare(factor);
+        if (sign == 0) {
+            return;
+        }
+
+        var cap = sign > 0 ? getPowerCons() : getPowerGen();
+        power = MathUtil.clamp(power + (long) Math.floor(cap * factor), 0, capacity);
+        blockEntity.setChanged();
+    }
 
     @Override
     public double getProgress() {
-        return (double) power / (double) capacity;
+        return (double) getPower() / (double) capacity;
     }
 
     @Override
@@ -65,12 +85,12 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
 
     @Override
     public double getPowerGen() {
-        return Math.min(power, output);
+        return Math.min(getPower(), output);
     }
 
     @Override
     public double getPowerCons() {
-        return Math.min(capacity - power, output);
+        return Math.min(capacity - getPower(), output);
     }
 
     @Override

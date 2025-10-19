@@ -21,6 +21,9 @@
     },
     "robust_tungstensteel": {
       "materialColor": 25
+    },
+    "insulated_battery": {
+      "materialColor": 14
     }
   }
 }

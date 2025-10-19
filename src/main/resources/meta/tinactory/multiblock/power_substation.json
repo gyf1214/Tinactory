@@ -1,0 +1,53 @@
+{
+  "recipes": {},
+  "machine": "power_substation",
+  "layout": {
+    "slots": [],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_multi_energy_yellow",
+      "x": 0,
+      "y": 9,
+      "width": 190,
+      "height": 7
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/insulated_battery",
+  "layers": [
+    [
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BB$BB"
+    ],
+    {
+      "rows": [
+        "CCCCC",
+        "CPPPC",
+        "CPPPC",
+        "CPPPC",
+        "CCCCC"
+      ],
+      "height": "2-14"
+    },
+    [
+      "CCCCC",
+      "CCCCC",
+      "CCCCC",
+      "CCCCC",
+      "CCCCC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/insulated_battery"
+    },
+    "C": "tinactory:multiblock/solid/insulated_battery",
+    "P": {
+      "type": "tag_with_same_block",
+      "key": "power",
+      "tag": "tinactory:multiblock/power"
+    }
+  }
+}

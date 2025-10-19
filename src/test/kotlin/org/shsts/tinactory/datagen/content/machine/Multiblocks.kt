@@ -22,10 +22,12 @@ import org.shsts.tinactory.content.network.PrimitiveBlock
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.gregtech
+import org.shsts.tinactory.core.util.LocHelper.ic2
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models
+import org.shsts.tinactory.datagen.content.Models.cubeColumn
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.solidBlock
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
@@ -63,7 +65,20 @@ object Multiblocks {
             for (entry in SOLID_CASINGS.values) {
                 val tex = "casings/solid/machine_casing_${name(entry.id(), -1)}"
                 block(entry) {
-                    blockState(solidBlock(tex))
+                    blockState { ctx ->
+                        val existingHelper = ctx.provider().models().existingFileHelper
+                        if (existingHelper.exists(gregtech("blocks/$tex"), Models.TEXTURE_TYPE)) {
+                            solidBlock(ctx, tex)
+                        }
+                    }
+                }
+            }
+
+            block("multiblock/solid/insulated_battery") {
+                blockState { ctx ->
+                    val model = ctx.provider().models()
+                        .cubeAll(ctx.id(), ic2("blocks/wiring/storage/mfe_bottomtop"))
+                    ctx.provider().simpleBlock(ctx.`object`(), model)
                 }
             }
 
@@ -98,13 +113,7 @@ object Multiblocks {
             }
 
             misc("filter_casing") {
-                blockState { ctx ->
-                    val provider = ctx.provider()
-                    provider.simpleBlock(ctx.`object`(), provider.models().cubeColumn(
-                        ctx.id(),
-                        gregtech("blocks/casings/cleanroom/plascrete"),
-                        gregtech("blocks/casings/cleanroom/filter_casing")))
-                }
+                blockState(cubeColumn("casings/cleanroom/plascrete", "casings/cleanroom/filter_casing"))
             }
 
             misc("ptfe_pipe_casing") {
@@ -131,13 +140,8 @@ object Multiblocks {
             }
 
             misc("metal_processing_chamber") {
-                blockState { ctx ->
-                    val provider = ctx.provider()
-                    provider.simpleBlock(ctx.`object`(), provider.models().cubeColumn(
-                        ctx.id(),
-                        gregtech("blocks/casings/gearbox/machine_casing_gearbox_tungstensteel"),
-                        gregtech("blocks/casings/solid/machine_casing_robust_tungstensteel")))
-                }
+                blockState(cubeColumn("casings/gearbox/machine_casing_gearbox_tungstensteel",
+                    "casings/solid/machine_casing_robust_tungstensteel"))
             }
 
             misc("turbine_blade") {
@@ -147,6 +151,14 @@ object Multiblocks {
                         modLoc("blocks/multiblock/large_turbine/spin"))
                 }
                 itemModel(Models::turbineItem)
+            }
+
+            for (v in Voltage.between(Voltage.HV, Voltage.ZPM)) {
+                val texName = if (v == Voltage.HV) "empty_tier_i" else "lapotronic_${v.id}"
+                misc("power_block/${v.id}") {
+                    blockState(cubeColumn("casings/battery/$texName"))
+                    tag(AllTags.POWER)
+                }
             }
         }
 
@@ -402,6 +414,12 @@ object Multiblocks {
                     for (type in types) {
                         itemTag(machine(type))
                     }
+                }
+            }
+            block("multiblock/power_substation") {
+                machineModel {
+                    casing(ic2("blocks/wiring/storage/mfe_bottomtop"))
+                    overlay("multiblock/blast_furnace")
                 }
             }
         }

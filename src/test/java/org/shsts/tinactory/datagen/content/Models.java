@@ -167,6 +167,22 @@ public final class Models {
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<Block,
+        U, BlockStateProvider>> cubeColumn(String side, String end) {
+        return ctx -> {
+            var provider = ctx.provider();
+            provider.simpleBlock(ctx.object(), provider.models().cubeColumn(
+                ctx.id(),
+                gregtech("blocks/" + side),
+                gregtech("blocks/" + end)));
+        };
+    }
+
+    public static <U extends Block> Consumer<IEntryDataContext<Block,
+        U, BlockStateProvider>> cubeColumn(String tex) {
+        return cubeColumn(tex + "/side", tex + "/top");
+    }
+
+    public static <U extends Block> Consumer<IEntryDataContext<Block,
         U, BlockStateProvider>> cubeTint(String tex) {
         return ctx -> {
             var model = ctx.provider().models()
@@ -176,13 +192,16 @@ public final class Models {
         };
     }
 
+    public static <U extends Block> void solidBlock(IEntryDataContext<Block,
+        U, BlockStateProvider> ctx, String tex) {
+        var model = ctx.provider().models()
+            .cubeAll(ctx.id(), gregtech("blocks/" + tex));
+        ctx.provider().simpleBlock(ctx.object(), model);
+    }
+
     public static <U extends Block> Consumer<IEntryDataContext<Block,
         U, BlockStateProvider>> solidBlock(String tex) {
-        return ctx -> {
-            var model = ctx.provider().models()
-                .cubeAll(ctx.id(), gregtech("blocks/" + tex));
-            ctx.provider().simpleBlock(ctx.object(), model);
-        };
+        return ctx -> solidBlock(ctx, tex);
     }
 
     public static void cableBlock(IEntryDataContext<Block,

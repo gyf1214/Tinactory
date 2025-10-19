@@ -26,9 +26,11 @@ import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
+import org.shsts.tinactory.content.multiblock.PowerBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.MetaConsumer;
+import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
@@ -57,6 +59,7 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private static MaterialColor parseMaterialColor(JsonObject jo, String field) {
+        // TODO: use string instead of integer
         return MaterialColor.byId(GsonHelper.getAsInt(jo, field));
     }
 
@@ -74,7 +77,6 @@ public class MiscMeta extends MetaConsumer {
 
     private void coil(String name, String id, JsonObject jo) {
         var temperature = GsonHelper.getAsInt(jo, "temperature");
-        // TODO: use string instead of integer
         var materialColor = parseMaterialColor(jo, "materialColor");
         var block = REGISTRATE.block(id, CoilBlock.factory(temperature))
             .material(Material.HEAVY_METAL, materialColor)
@@ -109,6 +111,16 @@ public class MiscMeta extends MetaConsumer {
 
         REGISTRATE.block(id, LensBlock.factory(lens))
             .transform(MiscMeta::glass)
+            .register();
+    }
+
+    private void power(String name, String id, JsonObject jo) {
+        var voltage = Voltage.fromName(GsonHelper.getAsString(jo, "voltage", name));
+        var capacity = GsonHelper.getAsLong(jo, "capacity");
+        var materialColor = parseMaterialColor(jo, "materialColor");
+        REGISTRATE.block(id, PowerBlock.factory(voltage, capacity))
+            .material(Material.HEAVY_METAL, materialColor)
+            .properties(CASING_PROPERTY)
             .register();
     }
 
@@ -179,6 +191,7 @@ public class MiscMeta extends MetaConsumer {
             case "coil" -> coil(name, id, jo);
             case "glass" -> glass(id);
             case "lens" -> lens(id, jo);
+            case "power" -> power(name, id, jo);
             case "item" -> item(id, jo);
             case "me_storage_interface" -> meStorageInterface(id, jo);
             case "me_drive" -> meDrive(id, jo);
