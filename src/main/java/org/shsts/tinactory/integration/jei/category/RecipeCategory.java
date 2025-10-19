@@ -22,9 +22,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
 import org.shsts.tinactory.integration.jei.DrawableHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
@@ -64,7 +66,13 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
         IGuiHelper helper, int xOffset) {
         builder.add(helper.createBlankDrawable(WIDTH, layout.rect.height()));
         for (var slot : layout.slots) {
-            builder.add(helper.getSlotDrawable(), xOffset + slot.x(), slot.y());
+            var type = slot.type().portType;
+            if (type == PortType.FLUID) {
+                builder.add(DrawableHelper.createStatic(helper, Texture.FLUID_SLOT_BG),
+                    xOffset + slot.x(), slot.y());
+            } else {
+                builder.add(helper.getSlotDrawable(), xOffset + slot.x(), slot.y());
+            }
         }
         for (var image : layout.images) {
             var rect = image.rect();

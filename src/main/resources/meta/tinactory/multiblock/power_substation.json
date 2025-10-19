@@ -4,10 +4,10 @@
   "layout": {
     "slots": [],
     "progressBar": {
-      "texture": "gregtech:gui/progress_bar/progress_bar_multi_energy_yellow",
+      "texture": "tinactory:gui/progress_bar_energy",
       "x": 0,
       "y": 9,
-      "width": 190,
+      "width": 62,
       "height": 7
     }
   },

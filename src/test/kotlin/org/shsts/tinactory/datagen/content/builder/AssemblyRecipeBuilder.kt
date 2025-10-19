@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.getComponent
 import org.shsts.tinactory.content.AllTags
+import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.datagen.content.component.item
@@ -39,6 +40,19 @@ class AssemblyRecipeBuilder(builder: AssemblyRecipe.Builder) :
     fun circuit(amount: Int, voltage: Voltage = this.componentVoltage!!,
         port: Int = defaultInputItem!!) {
         input(AllTags.circuit(voltage), amount, port)
+    }
+
+    fun pic(amount: Int) {
+        val v = componentVoltage!!
+        if (v.rank < Voltage.HV.rank) {
+            return
+        } else if (v.rank < Voltage.IV.rank) {
+            input(CHIP.item("low_pic"), amount)
+        } else if (v.rank < Voltage.ZPM.rank) {
+            input(CHIP.item("pic"), amount)
+        } else {
+            input(CHIP.item("high_pic"), amount)
+        }
     }
 
     override fun build() {

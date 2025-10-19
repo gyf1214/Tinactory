@@ -104,23 +104,19 @@ object MachineComponents {
             quartz = "fluix")
     }
 
-    private fun component(voltage: Voltage, main: String, motor: String,
+    private fun component(v: Voltage, main: String, motor: String,
         pipe: String, rotor: String, magnetic: String,
         sensor: String, quartz: String) {
         assembler {
-            componentVoltage = voltage
+            componentVoltage = v
             defaults {
-                if (voltage.rank > Voltage.LV.rank) {
-                    voltage(Voltage.LV)
-                } else {
-                    voltage(Voltage.ULV)
-                }
+                voltage(Voltage.fromRank(v.rank - 1))
                 workTicks(COMPONENT_TICKS)
             }
             component("electric_motor") {
                 input(magnetic, "magnetic")
                 input(main, "stick", 2)
-                input(motor, "wire", 2 * voltage.rank)
+                input(motor, "wire", 2 * v.rank)
                 component("cable", 2)
                 tech(Technologies.MOTOR)
             }
@@ -172,15 +168,15 @@ object MachineComponents {
             component("machine_hull") {
                 input(main, "plate", 8)
                 component("cable", 2)
-                if (voltage.rank >= Voltage.HV.rank) {
+                if (v.rank >= Voltage.HV.rank) {
                     input("pe", amount = 2)
                 }
                 tech(Technologies.SOLDERING)
             }
             component("fluid_cell") {
-                input(main, "plate", voltage.rank * 2)
-                input(rotor, "ring", voltage.rank)
-                input("soldering_alloy", amount = voltage.rank)
+                input(main, "plate", v.rank * 2)
+                input(rotor, "ring", v.rank)
+                input("soldering_alloy", amount = v.rank)
                 voltage(Voltage.LV)
                 tech(Technologies.SOLDERING)
             }

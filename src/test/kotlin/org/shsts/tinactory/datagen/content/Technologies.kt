@@ -84,6 +84,7 @@ object Technologies {
     val MULTI_SMELTER: ResourceLocation
     val TUNGSTEN_STEEL: ResourceLocation
     val METAL_FORMER: ResourceLocation
+    val POWER_SUBSTATION: ResourceLocation
 
     init {
         Factory().apply {
@@ -324,6 +325,11 @@ object Technologies {
             }
 
             base = ADVANCED_CHEMISTRY
+
+            POWER_SUBSTATION = tech("power_substation") {
+                maxProgress(240)
+                displayItem(getMultiblock("power_substation").block)
+            }
 
             TUNGSTEN_STEEL = child("tungsten_steel") {
                 maxProgress(200)

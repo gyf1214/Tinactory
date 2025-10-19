@@ -425,6 +425,13 @@ object Materials {
         material("epoxy", DULL) {
             machineProcess(Voltage.MV)
         }
+        material("battery_powder", SHINY) {
+            mix(Voltage.HV) {
+                component("cadmium", 4)
+                component("sulfuric_acid", 8, sub = "dilute")
+                component("lithium", 9)
+            }
+        }
     }
 
     private fun ores() {

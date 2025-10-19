@@ -309,6 +309,13 @@ object Multiblocks {
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.METAL_FORMER)
             }
+            solid("insulated_battery") {
+                solid("frost_proof")
+                input("battery_alloy", "plate", 3)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.POWER_SUBSTATION)
+                workTicks(140)
+            }
 
             componentVoltage = Voltage.IV
             misc("lithography_lens/good") {
@@ -320,12 +327,46 @@ object Multiblocks {
                 tech(Technologies.LITHOGRAPHY)
             }
         }
+
+        assembler {
+            defaults {
+                input("aluminium", "stick", 2)
+                input("battery_alloy", "plate", 3)
+                pic(2)
+                component("cable", 4)
+                input("soldering_alloy", amount = 1.5)
+                workTicks(200)
+                tech(Technologies.POWER_SUBSTATION)
+            }
+
+            componentVoltage = Voltage.HV
+            misc("power_block/hv") {
+                input("battery_powder", "dust", 10)
+                voltage(Voltage.HV)
+            }
+        }
+    }
+
+    private fun AssemblyRecipeFactory.solid(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
+        output(SOLID_CASINGS.getValue(name).get(), block = block)
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.solid(name: String) {
+        input(SOLID_CASINGS.getValue(name).get())
+    }
+
+    private fun AssemblyRecipeFactory.misc(name: String, amount: Int = 1,
+        block: AssemblyRecipeBuilder.() -> Unit) {
+        output(getBlock("multiblock/misc/$name"), amount, block = block)
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(name: String) {
+        input(getBlock("multiblock/misc/$name"))
     }
 
     private fun AssemblyRecipeFactory.solid(name: String,
         v: Voltage, mat: String, tech: ResourceLocation) {
-        val block = SOLID_CASINGS.getValue(name).get()
-        output(block) {
+        solid(name) {
             input(mat, "stick", 2)
             input(mat, "plate", 3)
             if (v != Voltage.ULV) {
@@ -419,7 +460,7 @@ object Multiblocks {
             block("multiblock/power_substation") {
                 machineModel {
                     casing(ic2("blocks/wiring/storage/mfe_bottomtop"))
-                    overlay("multiblock/blast_furnace")
+                    overlay("multiblock/power_substation")
                 }
             }
         }
@@ -620,27 +661,18 @@ object Multiblocks {
                 component("cable", 4)
                 tech(Technologies.METAL_FORMER)
             }
+            multiblock("power_substation") {
+                solid("insulated_battery")
+                circuit(3)
+                pic(6)
+                component("electric_pump", 2)
+                component("cable", 16)
+                tech(Technologies.POWER_SUBSTATION)
+            }
         }
     }
 
     private fun AssemblyRecipeFactory.multiblock(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
         output(getMultiblock(name).block.get(), block = block)
-    }
-
-    private fun AssemblyRecipeFactory.solid(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
-        output(SOLID_CASINGS.getValue(name).get(), block = block)
-    }
-
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.solid(name: String) {
-        input(SOLID_CASINGS.getValue(name).get())
-    }
-
-    private fun AssemblyRecipeFactory.misc(name: String, amount: Int = 1,
-        block: AssemblyRecipeBuilder.() -> Unit) {
-        output(getBlock("multiblock/misc/$name"), amount, block = block)
-    }
-
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(name: String) {
-        input(getBlock("multiblock/misc/$name"))
     }
 }

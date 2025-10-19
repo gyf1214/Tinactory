@@ -42,6 +42,12 @@
       {
         "port": 1,
         "type": "fluid_input",
+        "x": 0,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
         "x": 18,
         "y": 37
       },

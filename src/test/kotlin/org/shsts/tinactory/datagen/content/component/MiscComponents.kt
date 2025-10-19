@@ -253,16 +253,35 @@ object MiscComponents {
                 input("pvc")
             }
 
-            output(STORAGE_CELLS[0].component.get()) {
-                circuit(1, Voltage.LV)
-                input(CHIP.item("ram"), 4)
-                input("certus_quartz", "gem", 4)
-                input("annealed_copper", "wire_fine", 16)
-                input("pvc")
-            }
-
-            for (entry in STORAGE_CELLS) {
+            for ((i, entry) in STORAGE_CELLS.withIndex()) {
                 val component = entry.component.get()
+                output(component) {
+                    circuit(1, Voltage.fromRank(i + 2))
+                    if (i > 0) {
+                        input(STORAGE_CELLS[i - 1].component.get(), 3)
+                    }
+                    when (i) {
+                        0 -> input(CHIP.item("ram"), 4)
+                        1 -> input(CHIP.item("nor"), 4)
+                        2 -> input(CHIP.item("nor"), 8)
+                        3 -> input(CHIP.item("nand"), 4)
+                    }
+                    if (i < 2) {
+                        input("certus_quartz", "gem", 4)
+                    } else {
+                        input("fluix", "gem", 4)
+                    }
+                    val wireMat = when (i) {
+                        0 -> "annealed_copper"
+                        1 -> "platinum"
+                        // TODO
+                        2 -> "platinum"
+                        3 -> "platinum"
+                        else -> throw IllegalStateException()
+                    }
+                    input(wireMat, "wire_fine", 16)
+                    input("pvc")
+                }
                 output(entry.item.get()) {
                     input(component)
                     input(annihilation)

@@ -43,7 +43,7 @@ public class MaterialMeta extends MetaConsumer {
         for (var item : items) {
             var sub = GsonHelper.convertToString(item, "items");
             // TODO: more flexible
-            if (sub.equals("primary") && burnTime > 0) {
+            if (sub.equals("gem") && burnTime > 0) {
                 builder.item(sub, properties -> new Item(properties) {
                     @Override
                     public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {

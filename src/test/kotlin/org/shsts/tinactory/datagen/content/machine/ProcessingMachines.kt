@@ -1,12 +1,11 @@
 package org.shsts.tinactory.datagen.content.machine
 
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.electric.Circuits.CHIP
+import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
-import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 
 object ProcessingMachines {
@@ -232,29 +231,39 @@ object ProcessingMachines {
             }
             machine("multiblock/interface") {
                 circuit(2)
+                pic(2)
                 component("conveyor_module")
                 component("electric_pump")
                 input(Items.CHEST)
                 input("glass", "primary")
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             }
+            machine("multiblock/digital_interface") {
+                circuit(4)
+                pic(4)
+                input(getItem("component/annihilation_core"))
+                input(getItem("component/formation_core"))
+                input(STORAGE_CELLS[(v.rank - 5) / 2].component.get(), 2)
+                component("cable", 4)
+                tech(Technologies.DIGITAL_STORAGE)
+            }
             machine("battery_box") {
                 circuit(2)
-                pic()
+                pic(2)
                 component("cable", 4)
                 input(Items.CHEST)
                 tech(Technologies.BATTERY)
             }
             component("transformer") {
                 circuit(4)
-                pic()
+                pic(2)
                 component("cable")
                 component("cable", 4, voltage = lastVoltage)
                 tech(Technologies.BATTERY)
             }
             component("electric_buffer") {
                 circuit(4)
-                pic()
+                pic(2)
                 component("cable", 2)
                 tech(Technologies.BATTERY)
             }
@@ -279,19 +288,6 @@ object ProcessingMachines {
                 input(main, "plate", 4)
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             }
-        }
-    }
-
-    private fun AssemblyRecipeBuilder.pic() {
-        val v = componentVoltage!!
-        if (v.rank < Voltage.HV.rank) {
-            return
-        } else if (v.rank < Voltage.IV.rank) {
-            input(CHIP.item("low_pic"), 2)
-        } else if (v.rank < Voltage.ZPM.rank) {
-            input(CHIP.item("pic"), 2)
-        } else {
-            input(CHIP.item("high_pic"), 2)
         }
     }
 }
