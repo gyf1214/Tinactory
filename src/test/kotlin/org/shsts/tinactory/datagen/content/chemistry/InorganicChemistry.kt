@@ -590,7 +590,7 @@ object InorganicChemistry {
                     temperature(1300)
                 }
             }
-            output("tungsten", "ingot_hot", suffix = "_from_tungsten_trioxide") {
+            output("tungsten", "ingot_hot", 2, suffix = "_from_tungsten_trioxide") {
                 input("tungsten_trioxide", amount = 2)
                 input("carbon", amount = 3)
                 input("nitrogen", amount = 2)
@@ -600,7 +600,7 @@ object InorganicChemistry {
                     temperature(3600)
                 }
             }
-            output("molybdenum", "ingot_hot", suffix = "_from_molybdenum_trioxide") {
+            output("molybdenum", "ingot_hot", 2, suffix = "_from_molybdenum_trioxide") {
                 input("molybdenum_trioxide", amount = 2)
                 input("carbon", amount = 3)
                 input("nitrogen", amount = 2)

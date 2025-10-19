@@ -279,7 +279,7 @@ object Woods {
                 workTicks(1280)
             }
             output("charcoal", amount = 16, suffix = "_with_nitrogen") {
-                input("nitrogen", amount = 4)
+                input("nitrogen", amount = 1)
                 workTicks(320)
             }
         }

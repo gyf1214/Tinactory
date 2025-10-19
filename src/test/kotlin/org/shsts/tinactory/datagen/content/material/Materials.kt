@@ -200,7 +200,7 @@ object Materials {
         }
         material("steel", METALLIC) {
             toolProcess(1.5)
-            blast(Voltage.ULV, 1000, 800)
+            blast(Voltage.ULV, 1000, 320)
             blast(Voltage.ULV, 1000, 1000, "iron")
             blast(Voltage.MV, 1000, 96, "wrought_iron") {
                 component("oxygen")

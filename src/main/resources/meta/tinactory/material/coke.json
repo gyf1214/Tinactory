@@ -1,5 +1,6 @@
 {
   "color": "0xFF666666",
+  "burnTime": 3200,
   "items": [
     "dust",
     "gem"
