@@ -144,9 +144,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == PROCESSOR.get()) {
-            return myself();
-        } else if (cap == ELECTRIC_MACHINE.get()) {
+        if (cap == PROCESSOR.get() || cap == ELECTRIC_MACHINE.get()) {
             return myself();
         }
         return LazyOptional.empty();
