@@ -24,9 +24,14 @@ public class LanguageProcessor {
 
     private record Processor(Pattern pattern, Function<Matcher, String> func) {}
 
+    private final String splitter;
     private final Map<String, String> words = new HashMap<>();
     private final List<Processor> processors = new ArrayList<>();
     private final Map<String, String> extras = new HashMap<>();
+
+    public LanguageProcessor(String splitter) {
+        this.splitter = splitter;
+    }
 
     public void word(String key, String val) {
         words.put(key, val);
@@ -50,7 +55,7 @@ public class LanguageProcessor {
         }
         return Arrays.stream(key.split("_"))
             .map(this::normalize)
-            .collect(Collectors.joining(" "));
+            .collect(Collectors.joining(splitter));
     }
 
     public void pattern(String pattern, String val) {
