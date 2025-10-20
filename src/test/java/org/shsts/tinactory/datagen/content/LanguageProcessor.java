@@ -1,14 +1,14 @@
 package org.shsts.tinactory.datagen.content;
 
-import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.common.data.LanguageProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -24,154 +24,57 @@ public class LanguageProcessor {
 
     private record Processor(Pattern pattern, Function<Matcher, String> func) {}
 
-    private final Set<String> abbreviates = new HashSet<>();
+    private final Map<String, String> words = new HashMap<>();
     private final List<Processor> processors = new ArrayList<>();
+    private final Map<String, String> extras = new HashMap<>();
 
-    private void pattern(String pattern, Function<Matcher, String> func) {
-        processors.add(new Processor(Pattern.compile("^" + pattern + "$"), func));
+    public void word(String key, String val) {
+        words.put(key, val);
     }
 
-    private void abbreviate(String... vals) {
-        Arrays.stream(vals).map(String::toLowerCase).forEach(abbreviates::add);
+    public void extra(String key, String val) {
+        extras.put(key, val);
+    }
+
+    private String normalize(String str) {
+        if (words.containsKey(str)) {
+            return words.get(str);
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
     private String normalize(Matcher matcher, int group) {
-        return Arrays.stream(matcher.group(group).split("_"))
-            .map(str -> {
-                if (abbreviates.contains(str.toLowerCase())) {
-                    return str.toUpperCase();
-                } else {
-                    return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
-                }
-            }).collect(Collectors.joining(" "));
+        var key = matcher.group(group);
+        if (words.containsKey(key)) {
+            return words.get(key);
+        }
+        return Arrays.stream(key.split("_"))
+            .map(this::normalize)
+            .collect(Collectors.joining(" "));
     }
 
-    private String capitalize(Matcher matcher, int group) {
-        return matcher.group(group).toUpperCase();
-    }
+    public void pattern(String pattern, String val) {
+        var pattern1 = Pattern.compile("^" + pattern + "$");
 
-    private String fmt(String a, Object... args) {
-        return a.formatted(args);
-    }
+        var groupPat = Pattern.compile("\\$[0-9]+");
+        var groupMatcher = groupPat.matcher(val);
+        var groups = new ArrayList<Function<Matcher, String>>();
 
-    public LanguageProcessor() {
-        abbreviate("cpu", "ram", "nand", "nor", "soc", "pic");
-        abbreviate("ptfe", "me");
+        var sb = new StringBuilder();
+        var lastPos = 0;
+        while (groupMatcher.find()) {
+            sb.append(val, lastPos, groupMatcher.start());
+            sb.append("%s");
+            lastPos = groupMatcher.end();
 
-        pattern("item[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
-        pattern("item[.]tinactory[.]component[.]storage_component[.](.*)", matcher ->
-            fmt("%s ME Storage Component", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]component[.](.*)[.](basic|good|advanced)", matcher ->
-            fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]component[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
-        pattern("item[.]tinactory[.]component[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]material[.]dust_impure[.](.*)", matcher ->
-            fmt("Impure Pile of %s", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]material[.]dust_pure[.](.*)", matcher ->
-            fmt("Purified Pile of %s", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]material[.]dust_tiny[.](.*)", matcher ->
-            fmt("Tiny Pile of %s Dust", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]material[.]crushed_(.*)[.](.*)", matcher ->
-            fmt("%s %s Ore", normalize(matcher, 1), normalize(matcher, 2)));
-        pattern("item[.]tinactory[.]material[.]crushed[.](.*)", matcher ->
-            fmt("Crushed %s Ore", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]material[.]raw(_fluid)?[.](.*)", matcher ->
-            fmt("Raw %s Ore", normalize(matcher, 2)));
-        pattern("item[.]tinactory[.]material[.]magnetic[.](.*)", matcher ->
-            fmt("Magnetic %s Stick", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]material[.]gem[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]material[.]gem_(.*)[.](.*)", matcher ->
-            fmt("%s %s", normalize(matcher, 1), normalize(matcher, 2)));
-        pattern("item[.]tinactory[.]material[.]ingot_hot[.](.*)", matcher ->
-            fmt("Hot %s Ingot", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]material[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]tool[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
-        pattern("item[.]tinactory[.](circuit_)?board[.](.*)", matcher ->
-            fmt("%s Circuit Board", normalize(matcher, 2)));
-        pattern("item[.]tinactory[.]circuit_component[.](.*).smd", matcher ->
-            fmt("SMD %s", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]circuit_component[.](.*).advanced_smd", matcher ->
-            fmt("Advanced SMD %s", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]circuit_component[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]boule[.](.*)", matcher ->
-            fmt("%s-doped Monocrystalline Silicon Boule", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]wafer_raw[.](.*)", matcher ->
-            fmt("%s-doped Wafer", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]misc[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]wafer[.](.*)", matcher ->
-            fmt("%s Wafer", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]chip[.](.*)", matcher ->
-            fmt("%s Chip", normalize(matcher, 1)));
-        pattern("item[.]tinactory[.]logistics[.](.*_storage_cell)[.](.*)", matcher ->
-            fmt("%s ME %s", capitalize(matcher, 2), normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]material[.]ore[.](.*)", matcher ->
-            fmt("%s Ore", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]network[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
-        pattern("block[.]tinactory[.]machine[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", capitalize(matcher, 1), normalize(matcher, 2)));
-        pattern("block[.]tinactory[.]primitive[.](.*)", matcher ->
-            fmt("Primitive %s", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]multiblock[.](.*)[.]interface", matcher ->
-            fmt("%s Multiblock Interface", capitalize(matcher, 1)));
-        pattern("block[.]tinactory[.]multiblock[.](.*)[.]digital_interface", matcher ->
-            fmt("%s Digital Interface", capitalize(matcher, 1)));
-        pattern("block[.]tinactory[.]multiblock[.]coil[.](.*)", matcher ->
-            fmt("%s Furnace Coil", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]multiblock[.]solid[.](.*)", matcher ->
-            fmt("%s Machine Casing", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]multiblock[.]misc[.]power_block[.](.*)", matcher ->
-            fmt("%s Power Block", capitalize(matcher, 1)));
-        pattern("block[.]tinactory[.]multiblock[.]misc[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", normalize(matcher, 2), normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]multiblock[.]misc[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]multiblock[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]logistics[.]ulv[.](.*)", matcher ->
-            fmt("Basic %s", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]logistics[.]mv[.](.*)", matcher ->
-            fmt("Good %s", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]logistics[.]ev[.](.*)", matcher ->
-            fmt("Advanced %s", normalize(matcher, 1)));
-        pattern("block[.]tinactory[.]logistics[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("fluid[.]tinactory[.]material[.]gas[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("fluid[.]tinactory[.]material[.]liquid[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("fluid[.]tinactory[.]material[.]fluid[.](.*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("fluid[.]tinactory[.]material[.](.*)[.](.*)", matcher ->
-            fmt("%s %s", normalize(matcher, 1), normalize(matcher, 2)));
-        pattern("tinactory[.]recipe[.]marker[.]ore_analyzer[.](.*)", matcher ->
-            fmt("Analyze %ss", normalize(matcher, 1)));
-        pattern("tinactory[.]recipe[.]marker[.]extruder[.]material[.](.*)", matcher ->
-            fmt("Extrude %ss", normalize(matcher, 1)));
-        pattern("tinactory[.]recipe[.]marker[.]fluid_solidifier[.]material[.](.*)", matcher ->
-            fmt("Solidify %ss", normalize(matcher, 1)));
-        pattern("tinactory[.]recipe[.]marker[.](.*)", matcher ->
-            fmt("Any %s recipes", normalize(matcher, 1)));
-        pattern("tinactory[.]technology[.]ore[.](.*)[.](.*)[.]details", matcher ->
-            fmt("Allow analyzing Raw %s Ore from base stones.", normalize(matcher, 2)));
-        pattern("tinactory[.]technology[.]ore[.](.*)[.]details", matcher ->
-            fmt("Unlock ores from %s.", normalize(matcher, 1)));
-        pattern("tinactory[.]technology[.]ore[.](.*)[.](.*)", matcher ->
-            fmt("%s Ore", normalize(matcher, 2)));
-        pattern("tinactory[.]technology[.]ore[.](.*)", matcher ->
-            fmt("%s Ores", normalize(matcher, 1)));
-        pattern("tinactory[.]technology[.]([^.]*)", matcher ->
-            fmt("%s", normalize(matcher, 1)));
-        pattern("tinactory[.]jei[.]category[.](.*)", matcher ->
-            normalize(matcher, 1));
+            var index = Integer.parseInt(groupMatcher.group().substring(1));
+            groups.add(matcher -> normalize(matcher, index));
+        }
+        sb.append(val, lastPos, val.length());
+        var fmt = sb.toString();
+
+        processors.add(new Processor(pattern1, matcher -> fmt.formatted(
+            groups.stream().map($ -> $.apply(matcher)).toArray())));
     }
 
     private Optional<String> process(String key) {
@@ -184,10 +87,9 @@ public class LanguageProcessor {
         return Optional.empty();
     }
 
-    public void process(Set<String> keys, JsonObject extra,
-        LanguageProvider prov, Consumer<String> onProcess) {
+    public void process(Set<String> keys, LanguageProvider prov, Consumer<String> onProcess) {
         for (var key : keys) {
-            if (extra.has(key)) {
+            if (extras.containsKey(key)) {
                 onProcess.accept(key);
                 continue;
             }
@@ -197,8 +99,8 @@ public class LanguageProcessor {
             }
             prov.add(key, value.orElse(MISSING_TR));
         }
-        for (var entry : extra.entrySet()) {
-            prov.add(entry.getKey(), entry.getValue().getAsString());
+        for (var entry : extras.entrySet()) {
+            prov.add(entry.getKey(), entry.getValue());
         }
     }
 }
