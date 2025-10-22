@@ -9,7 +9,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
@@ -27,25 +26,6 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
 
     public OreAnalyzer(IRecipeType<OreAnalyzerRecipe.Builder> recipeType) {
         super(recipeType);
-    }
-
-    @Override
-    protected List<ProcessingRecipe> targetRecipes(Level world, IMachine machine) {
-        var recipeManager = CORE.recipeManager(world);
-        return markers(recipeManager, machine)
-            .map($ -> (ProcessingRecipe) $)
-            .toList();
-    }
-
-    @Override
-    public boolean allowTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
-        var recipeManager = CORE.recipeManager(world);
-        var marker = recipeManager.byLoc(MARKER, loc);
-        if (marker.isEmpty()) {
-            return false;
-        }
-        var recipe = marker.get();
-        return recipe.matchesType(recipeType) && recipe.canCraft(machine);
     }
 
     private Optional<OreAnalyzerRecipe> newRecipe(List<OreAnalyzerRecipe> matches, Level world) {
@@ -93,13 +73,21 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     public Optional<OreAnalyzerRecipe> newRecipe(Level world, IMachine machine, ResourceLocation target) {
         var recipeManager = CORE.recipeManager(world);
         var marker = recipeManager.byLoc(MARKER, target);
-        if (marker.isEmpty()) {
-            return Optional.empty();
+        if (marker.isPresent()) {
+            var matches = recipeManager.getRecipesFor(recipeType, machine, world)
+                .stream().filter(marker.get()::matches)
+                .toList();
+            return newRecipe(matches, world);
         }
-        var matches = recipeManager.getRecipesFor(recipeType, machine, world)
-            .stream().filter(marker.get()::matches)
-            .toList();
-        return newRecipe(matches, world);
+
+        var recipe = recipeManager.byLoc(recipeType, target);
+        if (recipe.isPresent() && recipe.get().matches(machine, world)) {
+            var random = world.random;
+            emptyRecipe = random.nextDouble() > recipe.get().rate;
+            return recipe;
+        }
+
+        return Optional.empty();
     }
 
     @Override
