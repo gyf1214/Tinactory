@@ -58,7 +58,7 @@ public class LogisticWorkerMenu extends InventoryMenu {
             var network = machine.network().orElseThrow();
             this.logistic = network.getComponent(LOGISTIC_COMPONENT.get());
             this.subnet = network.getSubnet(blockEntity.getBlockPos());
-            logistic.onUpdatePorts(onUpdatePorts);
+            logistic.onUpdate(onUpdatePorts);
         } else {
             this.logistic = null;
             this.subnet = null;

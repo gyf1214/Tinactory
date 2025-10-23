@@ -2,11 +2,9 @@ package org.shsts.tinactory.core.network;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.shsts.tinactory.api.network.IScheduling;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -17,13 +15,9 @@ public class Scheduling extends ForgeRegistryEntry<IScheduling> implements ISche
     private final List<Supplier<IScheduling>> befores;
     private final List<Supplier<IScheduling>> afters;
 
-    private static <T> List<Supplier<T>> toLazy(Collection<Supplier<T>> suppliers) {
-        return suppliers.stream().<Supplier<T>>map(Lazy::of).toList();
-    }
-
     public Scheduling(List<Supplier<IScheduling>> befores, List<Supplier<IScheduling>> afters) {
-        this.befores = toLazy(befores);
-        this.afters = toLazy(afters);
+        this.befores = befores;
+        this.afters = afters;
     }
 
     @Override

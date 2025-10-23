@@ -5,13 +5,11 @@ import com.google.common.collect.SetMultimap;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.NetworkComponent;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -22,11 +20,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LogisticComponent extends NetworkComponent {
+public class LogisticComponent extends NotifierComponent {
     public record PortKey(UUID machineId, int portIndex) {}
 
     public record PortInfo(IMachine machine, int portIndex, IPort port, BlockPos subnet, int priority) {}
@@ -35,15 +31,9 @@ public class LogisticComponent extends NetworkComponent {
     private final SetMultimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
     private final Set<PortKey> storagePorts = new HashSet<>();
     private final Set<PortKey> globalPorts = new HashSet<>();
-    private final Set<Runnable> callbacks = new HashSet<>();
-    private boolean isConnecting = false;
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
-    }
-
-    private BlockPos getMachineSubnet(IMachine machine) {
-        return network.getSubnet(machine.blockEntity().getBlockPos());
     }
 
     private PortKey createPort(IMachine machine, int index, IPort port, BlockPos subnet, int priority) {
@@ -114,47 +104,15 @@ public class LogisticComponent extends NetworkComponent {
         }
     }
 
-    private void invokeUpdate() {
-        if (isConnecting) {
-            return;
-        }
-        for (var cb : callbacks) {
-            cb.run();
-        }
-    }
-
-    public void onUpdatePorts(Runnable cb) {
-        callbacks.add(cb);
-    }
-
-    public void unregisterCallback(Runnable cb) {
-        callbacks.remove(cb);
-    }
-
-    @Override
-    public void onConnect() {
-        isConnecting = true;
-    }
-
-    @Override
-    public void onPostConnect() {
-        isConnecting = false;
-        invokeUpdate();
-    }
-
     @Override
     public void onDisconnect() {
+        super.onDisconnect();
         ports.clear();
         subnetPorts.clear();
         globalPorts.clear();
         storagePorts.clear();
-        callbacks.clear();
     }
-
-    private void onTick(Level world, INetwork network) {}
 
     @Override
-    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
-        builder.add(LOGISTICS_SCHEDULING.get(), this::onTick);
-    }
+    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {}
 }

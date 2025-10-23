@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryManager;
 import org.shsts.tinactory.api.network.IScheduling;
 
 import java.util.ArrayDeque;
@@ -25,7 +24,7 @@ public final class SchedulingManager {
     @Nullable
     private static List<IScheduling> sortedSchedulings = null;
 
-    public static void onBake(IForgeRegistry<IScheduling> registry, RegistryManager stage) {
+    public static void onBake(IForgeRegistry<IScheduling> registry) {
         var nodes = new HashMap<IScheduling, SortInfo>();
         for (var scheduling : registry) {
             nodes.put(scheduling, new SortInfo());

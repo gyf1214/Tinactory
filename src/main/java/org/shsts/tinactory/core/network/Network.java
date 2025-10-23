@@ -15,7 +15,6 @@ import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.tech.TeamProfile;
-import org.shsts.tinactory.core.util.BiKeyHashMap;
 import org.slf4j.Logger;
 
 import java.util.Collection;
@@ -32,8 +31,8 @@ public class Network extends NetworkBase implements INetwork {
     private final Map<IComponentType<?>, INetworkComponent> components = new HashMap<>();
     private final Multimap<BlockPos, IMachine> subnetMachines = ArrayListMultimap.create();
     private final Map<BlockPos, BlockPos> blockSubnets = new HashMap<>();
-    private final BiKeyHashMap<IScheduling, IComponentType<?>,
-        INetworkComponent.Ticker> componentSchedulings = new BiKeyHashMap<>();
+    private final Multimap<IScheduling, INetworkComponent.Ticker> componentSchedulings =
+        ArrayListMultimap.create();
     private final Multimap<IScheduling, INetworkComponent.Ticker> machineSchedulings =
         ArrayListMultimap.create();
 
@@ -51,8 +50,7 @@ public class Network extends NetworkBase implements INetwork {
         assert !components.containsKey(type);
         var component = type.create(this);
         components.put(type, component);
-        component.buildSchedulings(((scheduling, ticker) ->
-            componentSchedulings.put(scheduling, type, ticker)));
+        component.buildSchedulings(componentSchedulings::put);
     }
 
     protected void attachComponents() {
@@ -128,8 +126,8 @@ public class Network extends NetworkBase implements INetwork {
     protected void doTick() {
         super.doTick();
         for (var scheduling : SchedulingManager.getSortedSchedulings()) {
-            for (var entry : componentSchedulings.getPrimary(scheduling)) {
-                entry.getValue().tick(world, this);
+            for (var entry : componentSchedulings.get(scheduling)) {
+                entry.tick(world, this);
             }
             for (var ticker : machineSchedulings.get(scheduling)) {
                 ticker.tick(world, this);

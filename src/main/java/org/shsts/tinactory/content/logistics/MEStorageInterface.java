@@ -81,7 +81,7 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.registerPort(machine, 0, combinedItem, false);
         logistics.registerPort(machine, 1, combinedFluid, false);
-        logistics.onUpdatePorts(() -> onUpdateLogistics(logistics));
+        logistics.onUpdate(() -> onUpdateLogistics(logistics));
     }
 
     public void onUpdate(Runnable listener) {

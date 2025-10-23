@@ -133,6 +133,11 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
     public void setConfig(ISetMachineConfigPacket packet, boolean invokeUpdate) {}
 
     @Override
+    public boolean isStopped() {
+        return false;
+    }
+
+    @Override
     public Component title() {
         return I18n.name(blockEntity.getBlockState().getBlock());
     }

@@ -57,7 +57,9 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.content.AllNetworks.POST_WORK_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.PRE_WORK_SCHEDULING;
+import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.content.AllNetworks.WORK_SCHEDULING;
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
@@ -75,6 +77,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     private UUID uuid = UUID.randomUUID();
     protected final MachineConfig config = new MachineConfig();
+    private boolean stopSignal = false;
 
     protected Machine(BlockEntity be) {
         this.blockEntity = be;
@@ -117,6 +120,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         if (invokeEvent) {
             invoke(blockEntity, SET_MACHINE_CONFIG);
         }
+    }
+
+    @Override
+    public boolean isStopped() {
+        return stopSignal;
     }
 
     private void setName(Component name) {
@@ -250,6 +258,19 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
             }
         });
 
+        var signal = network.getComponent(SIGNAL_COMPONENT.get());
+        signal.registerRead(this, "progress", () -> processor().map($ -> {
+            var progress = $.getProgress();
+            if (progress >= 1d) {
+                return 15;
+            } else if (progress <= 0d) {
+                return 0;
+            } else {
+                return 1 + (int) Math.floor(progress * 15);
+            }
+        }).orElse(0));
+        signal.registerWrite(this, "stop", $ -> stopSignal = $ > 0);
+
         invoke(blockEntity, CONNECT, network);
     }
 
@@ -277,10 +298,15 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         });
     }
 
+    private void onPostWork(Level world, INetwork network) {
+        stopSignal = false;
+    }
+
     @Override
     public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
         builder.add(PRE_WORK_SCHEDULING.get(), this::onPreWork);
         builder.add(WORK_SCHEDULING.get(), this::onWork);
+        builder.add(POST_WORK_SCHEDULING.get(), this::onPostWork);
         invoke(blockEntity, BUILD_SCHEDULING, builder);
     }
 

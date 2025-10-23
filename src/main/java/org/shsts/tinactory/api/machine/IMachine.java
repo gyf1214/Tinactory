@@ -40,6 +40,8 @@ public interface IMachine {
         setConfig(packet, true);
     }
 
+    boolean isStopped();
+
     Component title();
 
     ItemStack icon();

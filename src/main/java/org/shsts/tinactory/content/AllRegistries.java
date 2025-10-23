@@ -38,7 +38,7 @@ public final class AllRegistries {
 
     static {
         SCHEDULINGS = REGISTRATE.registry("scheduling", IScheduling.class)
-            .onBake(SchedulingManager::onBake)
+            .onBake((registry, stage) -> SchedulingManager.onBake(registry))
             .register();
         COMPONENT_TYPES = REGISTRATE.<IComponentType<?>>genericRegistry("component_type", IComponentType.class)
             .onBake((registry, stage) -> ComponentType.onBake(registry))

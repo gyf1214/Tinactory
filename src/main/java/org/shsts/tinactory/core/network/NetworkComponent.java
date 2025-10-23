@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 
@@ -20,6 +21,10 @@ public abstract class NetworkComponent implements INetworkComponent {
     public NetworkComponent(ComponentType<?> type, INetwork network) {
         this.type = type;
         this.network = network;
+    }
+
+    protected BlockPos getMachineSubnet(IMachine machine) {
+        return network.getSubnet(machine.blockEntity().getBlockPos());
     }
 
     @Override

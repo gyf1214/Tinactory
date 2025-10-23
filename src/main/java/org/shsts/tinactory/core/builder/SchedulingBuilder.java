@@ -18,8 +18,8 @@ import static org.shsts.tinactory.content.AllRegistries.SCHEDULINGS;
 public class SchedulingBuilder<P> extends Builder<IScheduling, P, SchedulingBuilder<P>> {
     private final IRegistrate registrate;
     private final String id;
-    private final List<Supplier<Supplier<IScheduling>>> befores = new ArrayList<>();
-    private final List<Supplier<Supplier<IScheduling>>> afters = new ArrayList<>();
+    private final List<Supplier<IScheduling>> befores = new ArrayList<>();
+    private final List<Supplier<IScheduling>> afters = new ArrayList<>();
 
     public SchedulingBuilder(IRegistrate registrate, P parent, String id) {
         super(parent);
@@ -29,20 +29,19 @@ public class SchedulingBuilder<P> extends Builder<IScheduling, P, SchedulingBuil
         onBuild(this::register);
     }
 
-    public final SchedulingBuilder<P> before(Supplier<Supplier<IScheduling>> before) {
+    public final SchedulingBuilder<P> before(Supplier<IScheduling> before) {
         this.befores.add(before);
         return self();
     }
 
-    public final SchedulingBuilder<P> after(Supplier<Supplier<IScheduling>> after) {
+    public final SchedulingBuilder<P> after(Supplier<IScheduling> after) {
         this.afters.add(after);
         return self();
     }
 
     @Override
     protected IScheduling createObject() {
-        return new Scheduling(befores.stream().map(Supplier::get).toList(),
-            afters.stream().map(Supplier::get).toList());
+        return new Scheduling(befores, afters);
     }
 
     public IEntry<IScheduling> register() {
