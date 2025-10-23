@@ -19,8 +19,10 @@ import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactoryBase
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.rocket
@@ -226,6 +228,19 @@ object MiscComponents {
         }
     }
 
+    private fun ProcessingRecipeFactory.storageComponent(i: Int,
+        block: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
+        output(STORAGE_CELLS[i].component.get()) {
+            input("pvc", "sheet")
+            input(AllTags.circuit(Voltage.fromRank(i + 2)))
+            if (i > 0) {
+                input(STORAGE_CELLS[i - 1].component.get(), 3)
+            }
+            block()
+            input("soldering_alloy", amount = 2)
+        }
+    }
+
     private fun ae() {
         val annihilation = getItem("component/annihilation_core")
         val formation = getItem("component/formation_core")
@@ -253,35 +268,8 @@ object MiscComponents {
                 input("pvc")
             }
 
-            for ((i, entry) in STORAGE_CELLS.withIndex()) {
+            for (entry in STORAGE_CELLS) {
                 val component = entry.component.get()
-                output(component) {
-                    circuit(1, Voltage.fromRank(i + 2))
-                    if (i > 0) {
-                        input(STORAGE_CELLS[i - 1].component.get(), 3)
-                    }
-                    when (i) {
-                        0 -> input(CHIP.item("ram"), 4)
-                        1 -> input(CHIP.item("nor"), 4)
-                        2 -> input(CHIP.item("nor"), 8)
-                        3 -> input(CHIP.item("nand"), 4)
-                    }
-                    if (i < 2) {
-                        input("certus_quartz", "gem", 4)
-                    } else {
-                        input("fluix", "gem", 4)
-                    }
-                    val wireMat = when (i) {
-                        0 -> "annealed_copper"
-                        1 -> "platinum"
-                        // TODO
-                        2 -> "platinum"
-                        3 -> "platinum"
-                        else -> throw IllegalStateException()
-                    }
-                    input(wireMat, "wire_fine", 16)
-                    input("pvc")
-                }
                 output(entry.item.get()) {
                     input(component)
                     input(annihilation)
@@ -296,6 +284,38 @@ object MiscComponents {
                     input("stainless_steel", "plate", 3)
                     input("soldering_alloy", amount = 3)
                 }
+            }
+        }
+
+        circuitAssembler {
+            defaults {
+                workTicks(200)
+            }
+            storageComponent(0) {
+                input(CHIP.item("ram"), 4)
+                input("certus_quartz", "gem", 4)
+                input("annealed_copper", "wire_fine", 16)
+                voltage(Voltage.HV)
+            }
+            storageComponent(1) {
+                input(CHIP.item("nor"), 4)
+                input("certus_quartz", "gem", 4)
+                input("platinum", "wire_fine", 16)
+                voltage(Voltage.HV)
+            }
+            storageComponent(2) {
+                input(CHIP.item("nor"), 16)
+                input("fluix", "gem", 4)
+                // TODO
+                input("platinum", "wire_fine", 16)
+                voltage(Voltage.EV)
+            }
+            storageComponent(3) {
+                input(CHIP.item("nand"), 4)
+                input("fluix", "gem", 4)
+                // TODO
+                input("platinum", "wire_fine", 16)
+                voltage(Voltage.EV)
             }
         }
     }

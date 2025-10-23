@@ -33,6 +33,10 @@ object MachineComponents {
         }
 
         assembler {
+            defaults {
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.HOT_WORKING)
+            }
             for ((v, entry) in items) {
                 if (v == Voltage.ULV) {
                     continue
@@ -44,13 +48,7 @@ object MachineComponents {
                         input("silicone_rubber", "foil", 2)
                     }
                     input("rubber", amount = 2)
-                    if (v == Voltage.LV) {
-                        voltage(Voltage.ULV)
-                    } else {
-                        voltage(Voltage.LV)
-                    }
-                    workTicks(COMPONENT_TICKS)
-                    tech(Technologies.HOT_WORKING)
+                    voltage(Voltage.fromRank(v.rank - 1))
                 }
             }
         }
@@ -186,7 +184,6 @@ object MachineComponents {
     private fun batteries() {
         assembler {
             defaults {
-                voltage(Voltage.LV)
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.BATTERY)
             }
@@ -196,17 +193,18 @@ object MachineComponents {
         }
     }
 
-    private fun AssemblyRecipeFactory.battery(voltage: Voltage, mat: String, sub: String = "dust") {
-        val wires = voltage.rank - 1
+    private fun AssemblyRecipeFactory.battery(v: Voltage, mat: String, sub: String = "dust") {
+        val wires = v.rank - 1
         val plates = wires * wires
-        component("battery", voltage = voltage) {
-            if (voltage.rank > Voltage.LV.rank) {
-                input(AllTags.battery(Voltage.fromRank(voltage.rank - 1)), 2)
+        component("battery", voltage = v) {
+            if (v.rank > Voltage.LV.rank) {
+                input(AllTags.battery(Voltage.fromRank(v.rank - 1)), 2)
                 input("soldering_alloy", amount = wires)
             }
             component("cable", wires)
             input("battery_alloy", "plate", plates)
             input(mat, sub, plates)
+            voltage(v)
         }
     }
 }
