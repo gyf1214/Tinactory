@@ -315,7 +315,7 @@ public class MachineProcessor extends CapabilityProvider implements
     @Override
     public double getProgress() {
         if (currentRecipe == null) {
-            return 0;
+            return workProgress > 0 ? 1d : 0d;
         }
         return (double) workProgress / (double) currentRecipe.maxProcess();
     }

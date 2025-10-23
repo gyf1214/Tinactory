@@ -139,7 +139,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             }
             assert sharedBytes >= 0;
             bytesUsed += bytes;
-            LOGGER.debug("consume {}, bytesUsed={}", bytes, bytesUsed);
+            LOGGER.trace("consume {}, bytesUsed={}", bytes, bytesUsed);
         }
 
         @Override
@@ -154,7 +154,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             }
             bytesUsed -= bytes;
             assert bytesUsed >= 0;
-            LOGGER.debug("restore {}, bytesUsed={}", bytes, bytesUsed);
+            LOGGER.trace("restore {}, bytesUsed={}", bytes, bytesUsed);
         }
 
         /**
