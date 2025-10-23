@@ -16,11 +16,14 @@ import static org.shsts.tinactory.content.logistics.ElectricStorage.STORAGE_DEFA
 import static org.shsts.tinactory.content.logistics.ElectricStorage.STORAGE_KEY;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.UNLOCK_DEFAULT;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.UNLOCK_KEY;
+import static org.shsts.tinactory.content.logistics.ElectricStorage.VOID_DEFAULT;
+import static org.shsts.tinactory.content.logistics.ElectricStorage.VOID_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.GLOBAL_PORT_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.LOCK_BUTTON;
+import static org.shsts.tinactory.core.gui.Texture.VOID_BUTTON;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -35,6 +38,9 @@ public class ElectricStorageScreen<M extends ElectricStorageMenu> extends Layout
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
         addWidget(anchor, offset, new MachineConfigButton(menu, config, UNLOCK_KEY, UNLOCK_DEFAULT,
             LOCK_BUTTON, 18, 0, "chestLock", "chestUnlock"));
+        offset = offset.offset(-SLOT_SIZE - SPACING, 0);
+        addWidget(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY, VOID_DEFAULT,
+            VOID_BUTTON, 18, 0, "chestNotVoid", "chestVoid"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
         addWidget(anchor, offset.enlarge(2, 2).offset(-1, -1),
             new MachineConfigButton(menu, config, STORAGE_KEY, STORAGE_DEFAULT,

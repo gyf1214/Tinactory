@@ -44,6 +44,9 @@ public class ElectricChestMenu extends ElectricStorageMenu {
 
         @Override
         public int getMaxStackSize() {
+            if (chest.isVoid()) {
+                return 64;
+            }
             var capacity = chest.slotSize - chest.getStackInSlot(slot).getCount();
             return Math.min(capacity, 64);
         }

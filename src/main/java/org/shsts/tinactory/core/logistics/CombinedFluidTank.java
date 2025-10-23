@@ -195,9 +195,9 @@ public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter,
     public void setFilters(List<? extends Predicate<FluidStack>> filters) {
         for (var i = 0; i < tanks.length; i++) {
             if (i < filters.size()) {
-                tanks[i].filter = filters.get(i);
+                tanks[i].setFilter(filters.get(i));
             } else {
-                tanks[i].filter = $ -> false;
+                tanks[i].disallowInput();
             }
         }
     }

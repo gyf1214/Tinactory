@@ -38,6 +38,8 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     public static final boolean STORAGE_DEFAULT = false;
     public static final String GLOBAL_KEY = "global";
     public static final boolean GLOBAL_DEFAULT = false;
+    public static final String VOID_KEY = "void";
+    public static final boolean VOID_DEFAULT = false;
 
     protected final BlockEntity blockEntity;
     private final Layout layout;
@@ -59,6 +61,10 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
 
     public boolean isUnlocked() {
         return machineConfig.getBoolean(UNLOCK_KEY, UNLOCK_DEFAULT);
+    }
+
+    public boolean isVoid() {
+        return machineConfig.getBoolean(VOID_KEY, VOID_DEFAULT);
     }
 
     protected void registerPort(INetwork network, IPort port) {

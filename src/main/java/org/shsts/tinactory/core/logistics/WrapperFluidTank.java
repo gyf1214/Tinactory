@@ -23,7 +23,7 @@ public class WrapperFluidTank extends PortNotifier implements IFluidTankModifiab
 
     private final IFluidTank tank;
     public boolean allowOutput = true;
-    public Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
+    private Predicate<FluidStack> filter = TRUE_FLUID_FILTER;
 
     public WrapperFluidTank(int capacity) {
         this(new FluidTank(capacity));

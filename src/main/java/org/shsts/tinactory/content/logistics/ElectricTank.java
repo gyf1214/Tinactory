@@ -12,6 +12,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
@@ -34,15 +35,36 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     private final FluidStack[] filters;
     private final LazyOptional<IFluidStackHandler> fluidHandlerCap;
 
+    private class VoidableFluidTank extends WrapperFluidTank {
+        public VoidableFluidTank(int capacity) {
+            super(capacity);
+        }
+
+        @Override
+        public int getCapacity() {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public int fill(FluidStack fluid, IFluidHandler.FluidAction action) {
+            if (!isFluidValid(fluid)) {
+                return 0;
+            }
+            var amount = fluid.getAmount();
+            var ret = super.fill(fluid, action);
+            return isVoid() ? amount : ret;
+        }
+    }
+
     public ElectricTank(BlockEntity blockEntity, Layout layout, int slotSize, double power) {
         super(blockEntity, layout, power);
         this.size = layout.slots.size();
         this.tanks = new WrapperFluidTank[size];
         for (var i = 0; i < size; i++) {
             var slot = i;
-            tanks[i] = new WrapperFluidTank(slotSize);
+            tanks[i] = new VoidableFluidTank(slotSize);
             tanks[i].onUpdate(this::onSlotChange);
-            tanks[i].filter = stack -> allowFluidInTank(slot, stack);
+            tanks[i].setFilter(stack -> allowFluidInTank(slot, stack));
         }
         this.port = new CombinedFluidTank(tanks);
         this.filters = new FluidStack[size];

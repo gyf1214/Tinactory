@@ -50,6 +50,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
         gregtech("gui/widget/button_allow_import_export"), 20, 40);
     public static final Texture GLOBAL_PORT_BUTTON = new Texture(
         gregtech("gui/widget/button_distinct_buses"), 18, 36);
+    public static final Texture VOID_BUTTON = new Texture(
+        modLoc("gui/void_button"), 18, 36);
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = new ResourceLocation(loc.getNamespace(), "textures/" + loc.getPath() + ".png");

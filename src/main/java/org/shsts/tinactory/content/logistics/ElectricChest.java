@@ -13,6 +13,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
@@ -39,6 +40,21 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     private final IItemCollection externalPort;
     private final ItemStack[] filters;
     private final LazyOptional<?> itemHandlerCap;
+
+    private class VoidableItemHandler extends WrapperItemHandler {
+        public VoidableItemHandler(IItemHandlerModifiable compose) {
+            super(compose);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (!isItemValid(slot, stack)) {
+                return stack;
+            }
+            var ret = super.insertItem(slot, stack, simulate);
+            return isVoid() ? ItemStack.EMPTY : ret;
+        }
+    }
 
     private class ExternalItemHandler implements IItemHandler {
         @Override
@@ -91,7 +107,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         this.filters = new ItemStack[size];
 
         var inner = new ItemSlotHandler(size, slotSize);
-        this.internalItems = new WrapperItemHandler(inner);
+        this.internalItems = new VoidableItemHandler(inner);
         internalItems.onUpdate(this::onSlotChange);
         for (var i = 0; i < size; i++) {
             var slot = i;

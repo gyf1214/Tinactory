@@ -120,6 +120,8 @@
     "tinactory.tooltip.openPortPanel": "Show ports",
     "tinactory.tooltip.chestLock": "Empty slot locked",
     "tinactory.tooltip.chestUnlock": "Empty slot unlocked",
+    "tinactory.tooltip.chestVoid": "Automatically void excess items",
+    "tinactory.tooltip.chestNotVoid": "Do not void items",
     "tinactory.tooltip.chestStorage": "Used as a storage port",
     "tinactory.tooltip.chestNotStorage": "Not used as a storage port",
     "tinactory.tooltip.chestLocal": "Accessible from local subnet",
