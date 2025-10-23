@@ -61,6 +61,12 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
         }
 
         @Override
+        public ISetMachineConfigPacket.Builder set(String key, int val) {
+            sets.putInt(key, val);
+            return this;
+        }
+
+        @Override
         public ISetMachineConfigPacket.Builder set(String key, String value) {
             sets.putString(key, value);
             return this;

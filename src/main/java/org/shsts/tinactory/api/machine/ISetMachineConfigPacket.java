@@ -21,6 +21,8 @@ public interface ISetMachineConfigPacket extends IPacket {
 
         Builder set(String key, boolean val);
 
+        Builder set(String key, int val);
+
         Builder set(String key, String value);
 
         default Builder set(String key, ResourceLocation val) {

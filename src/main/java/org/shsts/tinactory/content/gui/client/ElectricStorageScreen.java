@@ -12,15 +12,14 @@ import org.shsts.tinactory.core.gui.client.LayoutScreen;
 
 import static org.shsts.tinactory.content.logistics.ElectricStorage.GLOBAL_DEFAULT;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.GLOBAL_KEY;
-import static org.shsts.tinactory.content.logistics.ElectricStorage.STORAGE_DEFAULT;
-import static org.shsts.tinactory.content.logistics.ElectricStorage.STORAGE_KEY;
+import static org.shsts.tinactory.content.logistics.ElectricStorage.PRIORITY_DEFAULT;
+import static org.shsts.tinactory.content.logistics.ElectricStorage.PRIORITY_KEY;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.UNLOCK_DEFAULT;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.UNLOCK_KEY;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.VOID_DEFAULT;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.VOID_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.GLOBAL_PORT_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.LOCK_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.VOID_BUTTON;
@@ -42,9 +41,7 @@ public class ElectricStorageScreen<M extends ElectricStorageMenu> extends Layout
         addWidget(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY, VOID_DEFAULT,
             VOID_BUTTON, 18, 0, "chestNotVoid", "chestVoid"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
-        addWidget(anchor, offset.enlarge(2, 2).offset(-1, -1),
-            new MachineConfigButton(menu, config, STORAGE_KEY, STORAGE_DEFAULT,
-                ALLOW_ARROW_BUTTON, 0, 20, "chestNotStorage", "chestStorage"));
+        addWidget(anchor, offset, new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
         addWidget(anchor, offset, new MachineConfigButton(menu, config, GLOBAL_KEY, GLOBAL_DEFAULT,
             GLOBAL_PORT_BUTTON, 0, 18, "chestLocal", "chestGlobal"));

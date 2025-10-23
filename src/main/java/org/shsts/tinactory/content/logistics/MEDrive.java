@@ -52,8 +52,8 @@ import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
 @MethodsReturnNonnullByDefault
 public class MEDrive extends CapabilityProvider
     implements IEventSubscriber, ILayoutProvider, INBTSerializable<CompoundTag> {
-    public static final String STORAGE_KEY = ElectricStorage.STORAGE_KEY;
-    public static final boolean STORAGE_DEFAULT = true;
+    public static final String PRIORITY_KEY = ElectricStorage.PRIORITY_KEY;
+    public static final int PRIORITY_DEFAULT = 2;
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "machine/me_drive";
@@ -100,11 +100,11 @@ public class MEDrive extends CapabilityProvider
 
     private void registerPort(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        var isStorage = machineConfig.getBoolean(STORAGE_KEY, STORAGE_DEFAULT);
+        var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
         logistics.unregisterPort(machine, 0);
         logistics.unregisterPort(machine, 1);
-        logistics.registerPort(machine, 0, combinedItems, false, isStorage);
-        logistics.registerPort(machine, 1, combinedFluids, false, isStorage);
+        logistics.registerStoragePort(machine, 0, combinedItems, false, priority);
+        logistics.registerStoragePort(machine, 1, combinedFluids, false, priority);
     }
 
     private void onUpdateStorage() {

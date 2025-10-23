@@ -11,10 +11,10 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.LayoutScreen;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.logistics.MEDrive.STORAGE_DEFAULT;
-import static org.shsts.tinactory.content.logistics.MEDrive.STORAGE_KEY;
+import static org.shsts.tinactory.content.logistics.MEDrive.PRIORITY_DEFAULT;
+import static org.shsts.tinactory.content.logistics.MEDrive.PRIORITY_KEY;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -25,8 +25,7 @@ public class MEDriveScreen extends LayoutScreen<LayoutMenu> {
 
         var config = MACHINE.get(menu.blockEntity()).config();
         var buttonY = menu.layout().rect.endY() + SPACING;
-        addWidget(RectD.corners(1d, 0d, 1d, 0d), new Rect(-19, buttonY - 1, 20, 20),
-            new MachineConfigButton(menu, config, STORAGE_KEY, STORAGE_DEFAULT,
-                ALLOW_ARROW_BUTTON, 0, 20, "chestNotStorage", "chestStorage"));
+        addWidget(RectD.corners(1d, 0d, 1d, 0d), new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE),
+            new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
     }
 }

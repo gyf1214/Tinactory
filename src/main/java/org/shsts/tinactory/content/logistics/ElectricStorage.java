@@ -34,8 +34,8 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 public abstract class ElectricStorage extends CapabilityProvider implements ILayoutProvider, IEventSubscriber {
     public static final String UNLOCK_KEY = "unlockChest";
     public static final boolean UNLOCK_DEFAULT = false;
-    public static final String STORAGE_KEY = "storage";
-    public static final boolean STORAGE_DEFAULT = false;
+    public static final String PRIORITY_KEY = "priority";
+    public static final int PRIORITY_DEFAULT = -1;
     public static final String GLOBAL_KEY = "global";
     public static final boolean GLOBAL_DEFAULT = false;
     public static final String VOID_KEY = "void";
@@ -70,9 +70,9 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     protected void registerPort(INetwork network, IPort port) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.unregisterPort(machine, 0);
-        logistics.registerPort(machine, 0, port,
+        logistics.registerStoragePort(machine, 0, port,
             machineConfig.getBoolean(GLOBAL_KEY, GLOBAL_DEFAULT),
-            machineConfig.getBoolean(STORAGE_KEY, STORAGE_DEFAULT));
+            machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT));
     }
 
     protected void onSlotChange() {

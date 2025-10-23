@@ -96,6 +96,9 @@ object Machines {
             ioTex(ME_BUS)
         }
         blockData {
+            defaults {
+                tag(MINEABLE_WITH_WRENCH)
+            }
             block("logistics/me_storage_interface") {
                 machineModel {
                     casing(Voltage.HV)

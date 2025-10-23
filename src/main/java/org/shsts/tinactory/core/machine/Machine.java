@@ -246,7 +246,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
                 if (!container.hasPort(i)) {
                     continue;
                 }
-                logistics.registerPort(this, i, container.getPort(i, ContainerAccess.EXTERNAL), false, false);
+                logistics.registerPort(this, i, container.getPort(i, ContainerAccess.EXTERNAL), false);
             }
         });
 

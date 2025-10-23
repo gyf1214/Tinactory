@@ -14,6 +14,7 @@ import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.NetworkComponent;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,7 +29,7 @@ import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 public class LogisticComponent extends NetworkComponent {
     public record PortKey(UUID machineId, int portIndex) {}
 
-    public record PortInfo(IMachine machine, int portIndex, IPort port, BlockPos subnet) {}
+    public record PortInfo(IMachine machine, int portIndex, IPort port, BlockPos subnet, int priority) {}
 
     private final Map<PortKey, PortInfo> ports = new HashMap<>();
     private final SetMultimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
@@ -45,20 +46,20 @@ public class LogisticComponent extends NetworkComponent {
         return network.getSubnet(machine.blockEntity().getBlockPos());
     }
 
-    private PortKey createPort(IMachine machine, int index, IPort port, BlockPos subnet) {
+    private PortKey createPort(IMachine machine, int index, IPort port, BlockPos subnet, int priority) {
         var key = new PortKey(machine.uuid(), index);
         assert !ports.containsKey(key);
-        ports.put(key, new PortInfo(machine, index, port, subnet));
+        ports.put(key, new PortInfo(machine, index, port, subnet, priority));
         return key;
     }
 
     private void registerPortInSubnet(IMachine machine, int index, IPort port,
-        BlockPos subnet, boolean isGlobal, boolean isStorage) {
-        var key = createPort(machine, index, port, subnet);
+        BlockPos subnet, boolean isGlobal, int priority) {
+        var key = createPort(machine, index, port, subnet, priority);
         if (isGlobal) {
             globalPorts.add(key);
         }
-        if (isStorage) {
+        if (priority >= 0) {
             storagePorts.add(key);
         }
         subnetPorts.put(subnet, key);
@@ -66,9 +67,15 @@ public class LogisticComponent extends NetworkComponent {
     }
 
     public void registerPort(IMachine machine, int index, IPort port,
-        boolean isGlobal, boolean isStorage) {
+        boolean isGlobal) {
         registerPortInSubnet(machine, index, port, getMachineSubnet(machine),
-            isGlobal, isStorage);
+            isGlobal, -1);
+    }
+
+    public void registerStoragePort(IMachine machine, int index, IPort port,
+        boolean isGlobal, int priority) {
+        registerPortInSubnet(machine, index, port, getMachineSubnet(machine),
+            isGlobal, priority);
     }
 
     public void unregisterPort(IMachine machine, int index) {
@@ -92,7 +99,9 @@ public class LogisticComponent extends NetworkComponent {
 
     public Collection<IPort> getStoragePorts() {
         return storagePorts.stream()
-            .map(key -> ports.get(key).port())
+            .map(ports::get)
+            .sorted(Comparator.comparing(PortInfo::priority).reversed())
+            .map(PortInfo::port)
             .toList();
     }
 
@@ -136,8 +145,9 @@ public class LogisticComponent extends NetworkComponent {
     @Override
     public void onDisconnect() {
         ports.clear();
-        globalPorts.clear();
         subnetPorts.clear();
+        globalPorts.clear();
+        storagePorts.clear();
         callbacks.clear();
     }
 
