@@ -185,7 +185,7 @@ public class MiscMeta extends MetaConsumer {
             .build();
     }
 
-    private void signalController(String id, JsonObject jo) {
+    private void meSignalController(String id, JsonObject jo) {
         BlockEntityBuilder.builder(id, MachineBlock::signal)
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.SIGNAL_CONTROLLER)
@@ -207,8 +207,8 @@ public class MiscMeta extends MetaConsumer {
             case "me_storage_interface" -> meStorageInterface(id, jo);
             case "me_drive" -> meDrive(id, jo);
             case "me_storage_cell" -> meStorageCell(name, id, jo);
+            case "me_signal_controller" -> meSignalController(id, jo);
             case "boiler" -> boiler(id, jo);
-            case "signal_controller" -> signalController(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }
     }

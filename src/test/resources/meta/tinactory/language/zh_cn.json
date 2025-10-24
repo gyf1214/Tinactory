@@ -29,6 +29,8 @@
     "drive": "驱动器",
     "storage": "存储",
     "interface": "接口",
+    "signal": "信号",
+    "controller": "控制器",
     "digital": "数字",
     "alloy_smelter": "合金炉",
     "arc_furnace": "电弧炉",
@@ -427,7 +429,6 @@
   "extras": {
     "block.tinactory.machine.boiler.high": "高压蒸汽锅炉",
     "block.tinactory.machine.boiler.low": "小型蒸汽锅炉",
-    "block.tinactory.machine.signal_controller": "信号控制器",
     "block.tinactory.network.controller": "网络控制器",
     "block.tinactory.primitive.workbench": "工作台",
     "block.tinactory.multiblock.sifter": "大型筛选漏斗",
