@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -62,5 +63,12 @@ public class SignalMachineBlock extends MachineBlock {
     public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos,
         @Nullable Direction dir) {
         return state.getValue(FACING).getOpposite() == dir;
+    }
+
+    public static void updateSignal(Level world, BlockEntity blockEntity) {
+        var pos = blockEntity.getBlockPos();
+        var state = blockEntity.getBlockState();
+        var dir = state.getValue(FACING);
+        world.neighborChanged(pos.relative(dir), state.getBlock(), pos);
     }
 }

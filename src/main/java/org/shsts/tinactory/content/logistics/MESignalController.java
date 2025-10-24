@@ -11,6 +11,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.content.network.SignalMachineBlock;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.logistics.ISignalMachine;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
@@ -35,7 +36,7 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 @MethodsReturnNonnullByDefault
 public class MESignalController extends CapabilityProvider implements IEventSubscriber, ISignalMachine {
     public static final String SIGNAL_CONFIG_KEY = "signal";
-    private static final String ID = "machine/me_signal_controller";
+    private static final String ID = "logistics/me_signal_controller";
 
     private final BlockEntity blockEntity;
     private int signal = 0;
@@ -95,10 +96,7 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
         signal = config != null && !isWrite ?
             component.read(config.machine(), config.key()) : 0;
         if (signal != oldSignal) {
-            var pos = blockEntity.getBlockPos();
-            var state = blockEntity.getBlockState();
-            var dir = state.getValue(FACING);
-            world.neighborChanged(pos.relative(dir), state.getBlock(), pos);
+            SignalMachineBlock.updateSignal(world, blockEntity);
         }
     }
 

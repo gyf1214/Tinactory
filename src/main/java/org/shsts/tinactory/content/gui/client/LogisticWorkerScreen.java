@@ -173,7 +173,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                             return stack.isEmpty() ? Optional.empty() :
                                 Optional.of(StackHelper.copyWithAmount(stack, 1));
                         });
-                    fluid.ifPresentOrElse(config::setFilter, () -> config.setFilter(carried));
+                    fluid.ifPresentOrElse(config::setFilter, () ->
+                        config.setFilter(StackHelper.copyWithCount(carried, 1)));
                 }
 
                 var packet = SetMachineConfigPacket.builder()

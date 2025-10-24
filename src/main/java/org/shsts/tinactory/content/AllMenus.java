@@ -7,6 +7,7 @@ import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MESignalControllerMenu;
+import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
 import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
@@ -16,6 +17,7 @@ import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.MEDriveScreen;
 import org.shsts.tinactory.content.gui.client.MESignalControllerScreen;
+import org.shsts.tinactory.content.gui.client.MEStorageDetectorScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageInterfaceScreen;
 import org.shsts.tinactory.content.gui.client.MachineScreen;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
@@ -63,6 +65,7 @@ public final class AllMenus {
     public static final IMenuType ME_DRIVE;
     public static final IMenuType ME_STORAGE_INTERFACE;
     public static final IMenuType ME_SIGNAL_CONTROLLER;
+    public static final IMenuType ME_STORAGE_DETECTOR;
     public static final IMenuType PRIMITIVE_MACHINE;
     public static final IMenuType PROCESSING_MACHINE;
     public static final IMenuType BOILER;
@@ -136,6 +139,11 @@ public final class AllMenus {
         ME_SIGNAL_CONTROLLER = REGISTRATE.menu("logistics/me_signal_controller", MESignalControllerMenu::new)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> MESignalControllerScreen::new)
+            .register();
+
+        ME_STORAGE_DETECTOR = REGISTRATE.menu("logistics/me_storage_detector", MEStorageDetectorMenu::new)
+            .title(ProcessingMenu::getTitle)
+            .screen(() -> () -> MEStorageDetectorScreen::new)
             .register();
 
         PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive", ProcessingMenu::primitive)

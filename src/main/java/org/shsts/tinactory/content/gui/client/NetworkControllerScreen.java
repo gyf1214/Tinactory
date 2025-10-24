@@ -38,13 +38,13 @@ import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_WIDTH;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_Y;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.WIDTH;
+import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Texture.CRAFTING_ARROW;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
-import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 import static org.shsts.tinactory.core.util.ClientUtil.INTEGER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 
@@ -87,7 +87,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         this.welcomeEdit = Widgets.editBox();
         var welcomeButton = Widgets.simpleButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
         welcomePanel.addWidget(welcomeLabel);
-        welcomePanel.addWidget(new Rect(0, -1, 64, EDIT_BOX_LINE_HEIGHT), welcomeEdit);
+        welcomePanel.addWidget(new Rect(0, -1, 64, EDIT_HEIGHT), welcomeEdit);
         welcomePanel.addWidget(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
             welcomeButton);
 
@@ -103,8 +103,8 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         renameEdit.setResponder(name -> menu.triggerEvent(RENAME, () -> new RenameEventPacket(name)));
         renamePanel.addWidget(rect.enlarge(0, FONT_HEIGHT), new Label(menu, tr("rename")));
         renamePanel.addWidget(rect.offset(0, FONT_HEIGHT + MARGIN_VERTICAL)
-            .enlarge(0, EDIT_BOX_LINE_HEIGHT), renameEdit);
-        renamePanel.addWidget(rect.offset(34, FONT_HEIGHT + EDIT_BOX_LINE_HEIGHT + MARGIN_VERTICAL * 2 + 1)
+            .enlarge(0, EDIT_HEIGHT), renameEdit);
+        renamePanel.addWidget(rect.offset(34, FONT_HEIGHT + EDIT_HEIGHT + MARGIN_VERTICAL * 2 + 1)
                 .enlarge(-RENAME_BASE_WIDTH + CRAFTING_ARROW.width(), CRAFTING_ARROW.height()),
             new StaticWidget(menu, CRAFTING_ARROW));
         menu.onRefreshName(renameEdit::setValue);

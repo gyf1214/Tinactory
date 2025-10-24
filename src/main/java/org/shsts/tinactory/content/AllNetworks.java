@@ -39,16 +39,16 @@ public final class AllNetworks {
             .after(PRE_WORK_SCHEDULING)
             .before(WORK_SCHEDULING)
             .register();
-        SIGNAL_READ_SCHEDULING = scheduling("machine/signal_read")
+        SIGNAL_READ_SCHEDULING = scheduling("signal/read")
             .after(POST_WORK_SCHEDULING)
             .register();
-        SIGNAL_WRITE_SCHEDULING = scheduling("machine/signal_write")
+        SIGNAL_WRITE_SCHEDULING = scheduling("signal/write")
             .before(LOGISTICS_SCHEDULING)
             .register();
 
         ELECTRIC_COMPONENT = componentType("electric", ElectricComponent.class, ElectricComponent::new);
         LOGISTIC_COMPONENT = componentType("logistics", LogisticComponent.class, LogisticComponent::new);
-        SIGNAL_COMPONENT = componentType("machine/signal", SignalComponent.class, SignalComponent::new);
+        SIGNAL_COMPONENT = componentType("signal", SignalComponent.class, SignalComponent::new);
     }
 
     public static void init() {}

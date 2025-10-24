@@ -21,7 +21,6 @@ import static org.shsts.tinactory.core.gui.Texture.VANILLA_WIDGETS;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Widgets {
-    public static final int EDIT_BOX_LINE_HEIGHT = 14;
     public static final int BUTTON_HEIGHT = 20;
 
     public static Button simpleButton(MenuBase menu, Component label,

@@ -62,7 +62,7 @@ public class MEDrive extends CapabilityProvider
     public static final String AMOUNT_SIGNAL = ElectricStorage.AMOUNT_SIGNAL;
 
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String ID = "machine/me_drive";
+    private static final String ID = "logistics/me_drive";
 
     private final BlockEntity blockEntity;
     private final Layout layout;

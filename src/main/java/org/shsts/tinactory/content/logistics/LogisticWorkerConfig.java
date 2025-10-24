@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -98,9 +99,7 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         if (!itemFilter.isEmpty()) {
             tag.put("itemFilter", itemFilter.serializeNBT());
         } else if (!fluidFilter.isEmpty()) {
-            var tag1 = new CompoundTag();
-            fluidFilter.writeToNBT(tag1);
-            tag.put("fluidFilter", tag1);
+            tag.put("fluidFilter", StackHelper.serializeFluidStack(fluidFilter));
         }
         return tag;
     }

@@ -120,6 +120,13 @@ object Machines {
                     ioTex(ME_BUS)
                 }
             }
+            block("logistics/me_storage_detector") {
+                machineModel {
+                    casing(Voltage.LV)
+                    overlay("cover/overlay_energy_detector")
+                    ioTex(ME_BUS)
+                }
+            }
         }
     }
 

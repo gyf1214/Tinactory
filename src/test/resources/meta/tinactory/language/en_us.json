@@ -158,7 +158,7 @@
     "tinactory.gui.fluidAmount": "%s mB",
     "tinactory.gui.emptyFluid": "Empty",
     "tinactory.gui.workbench.title": "Workbench",
-    "tinactory.gui.signal.progress": "Progress",
+    "tinactory.gui.signal.progress": "Work",
     "tinactory.gui.signal.stop": "Stop",
     "tinactory.gui.signal.amount": "Amount",
     "tinactory.gui.signalController.readSignal": "Read Signal",

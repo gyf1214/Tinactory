@@ -19,6 +19,7 @@ import org.shsts.tinactory.content.logistics.MEDrive;
 import org.shsts.tinactory.content.logistics.MESignalController;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.logistics.MEStorageCellSet;
+import org.shsts.tinactory.content.logistics.MEStorageDetector;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
@@ -195,6 +196,16 @@ public class MiscMeta extends MetaConsumer {
             .build();
     }
 
+    private void meStorageDetector(String id, JsonObject jo) {
+        BlockEntityBuilder.builder(id, MachineBlock::signal)
+            .transform(MachineSet::baseMachine)
+            .menu(AllMenus.ME_STORAGE_DETECTOR)
+            .blockEntity()
+            .transform(MEStorageDetector.factory(GsonHelper.getAsDouble(jo, "power")))
+            .end()
+            .build();
+    }
+
     private void buildItem(String type, String name, String id, JsonObject jo) {
         switch (type) {
             case "casing" -> casing(id, jo);
@@ -208,6 +219,7 @@ public class MiscMeta extends MetaConsumer {
             case "me_drive" -> meDrive(id, jo);
             case "me_storage_cell" -> meStorageCell(name, id, jo);
             case "me_signal_controller" -> meSignalController(id, jo);
+            case "me_storage_detector" -> meStorageDetector(id, jo);
             case "boiler" -> boiler(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }

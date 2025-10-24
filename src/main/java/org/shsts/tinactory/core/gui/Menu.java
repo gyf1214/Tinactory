@@ -14,6 +14,7 @@ public final class Menu {
     public static final int SPACING = 3;
     public static final int SLOT_SIZE = 18;
     public static final int FONT_HEIGHT = 9;
+    public static final int EDIT_HEIGHT = 14;
     public static final int PANEL_WIDTH = SLOT_SIZE * 9;
     public static final int PANEL_HEIGHT = 128;
     public static final int BUTTON_SIZE = SLOT_SIZE + 3;

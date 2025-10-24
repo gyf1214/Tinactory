@@ -88,6 +88,7 @@ public final class RenderUtil {
         bufferbuilder.end();
         BufferUploader.end(bufferbuilder);
         RenderSystem.disableBlend();
+        setGLColor(WHITE);
     }
 
     public static void blitAtlas(PoseStack poseStack, ResourceLocation atlas, TextureAtlasSprite sprite,
@@ -118,6 +119,7 @@ public final class RenderUtil {
         bufferbuilder.end();
         BufferUploader.end(bufferbuilder);
         RenderSystem.disableBlend();
+        setGLColor(WHITE);
     }
 
     public static int mixColor(int color1, int color2) {

@@ -19,6 +19,7 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.AllMenus.RENAME;
+import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
@@ -27,7 +28,6 @@ import static org.shsts.tinactory.core.gui.Menu.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
-import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -45,9 +45,9 @@ public class NetworkControllerMenu extends MenuBase {
     public static final int RENAME_BASE_WIDTH = RENAME_INVENTORY_WIDTH - SLOT_SIZE * 4;
     public static final int RENAME_BASE_MARGIN = RENAME_INVENTORY_MARGIN + SLOT_SIZE * 2;
     public static final int RENAME_BASE_Y = (RENAME_INVENTORY_Y - SLOT_SIZE -
-        EDIT_BOX_LINE_HEIGHT - FONT_HEIGHT - MARGIN_VERTICAL * 2) / 2;
+        EDIT_HEIGHT - FONT_HEIGHT - MARGIN_VERTICAL * 2) / 2;
     public static final int RENAME_SLOT_Y = RENAME_BASE_Y + FONT_HEIGHT +
-        EDIT_BOX_LINE_HEIGHT + MARGIN_VERTICAL * 2;
+        EDIT_HEIGHT + MARGIN_VERTICAL * 2;
 
     private String name = "";
     private boolean renameActive = false;

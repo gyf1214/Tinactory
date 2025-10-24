@@ -37,6 +37,9 @@ public final class StackHelper {
     public static final Predicate<FluidStack> TRUE_FLUID_FILTER = $ -> true;
     public static final Predicate<FluidStack> FALSE_FLUID_FILTER = $ -> false;
 
+    /**
+     * Use this if the itemStack can have more than 255 items.
+     */
     public static CompoundTag serializeItemStack(ItemStack stack) {
         var tag = new CompoundTag();
         stack.save(tag);
@@ -44,12 +47,21 @@ public final class StackHelper {
         return tag;
     }
 
+    /**
+     * Use this if the itemStack can have more than 255 items.
+     */
     public static ItemStack deserializeItemStack(CompoundTag tag) {
         var stack = ItemStack.of(tag);
         if (tag.contains("CountInt", Tag.TAG_INT)) {
             stack.setCount(tag.getInt("CountInt"));
         }
         return stack;
+    }
+
+    public static CompoundTag serializeFluidStack(FluidStack stack) {
+        var tag = new CompoundTag();
+        stack.writeToNBT(tag);
+        return tag;
     }
 
     public static CompoundTag serializeItemHandler(IItemHandler itemHandler) {

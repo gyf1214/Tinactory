@@ -16,6 +16,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -90,10 +91,12 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     public void setFilter(int index, FluidStack stack) {
         filters[index] = stack.copy();
+        onSlotChange();
     }
 
     public void resetFilter(int index) {
         filters[index] = null;
+        onSlotChange();
     }
 
     public FluidStack getFilter(int index) {
@@ -133,8 +136,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         var tag1 = new ListTag();
         for (var i = 0; i < size; i++) {
             if (filters[i] != null) {
-                var tag2 = new CompoundTag();
-                filters[i].writeToNBT(tag2);
+                var tag2 = StackHelper.serializeFluidStack(filters[i]);
                 tag2.putInt("Slot", i);
                 tag1.add(tag2);
             }

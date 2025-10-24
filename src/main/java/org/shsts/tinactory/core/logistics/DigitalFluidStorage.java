@@ -168,9 +168,7 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidCollectio
         var tag = new CompoundTag();
         var listTag = new ListTag();
         for (var stack : fluids.values()) {
-            var fluidTag = new CompoundTag();
-            stack.writeToNBT(fluidTag);
-            listTag.add(fluidTag);
+            listTag.add(StackHelper.serializeFluidStack(stack));
         }
         tag.put("Fluids", listTag);
         return tag;

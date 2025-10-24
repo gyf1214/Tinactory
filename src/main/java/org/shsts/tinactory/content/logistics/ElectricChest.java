@@ -147,12 +147,12 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     public void setFilter(int slot, ItemStack stack) {
         filters[slot] = StackHelper.copyWithCount(stack, 1);
-        blockEntity.setChanged();
+        onSlotChange();
     }
 
     public void resetFilter(int slot) {
         filters[slot] = null;
-        blockEntity.setChanged();
+        onSlotChange();
     }
 
     public boolean allowStackInSlot(int slot, ItemStack stack) {
