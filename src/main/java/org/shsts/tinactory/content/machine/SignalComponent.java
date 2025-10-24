@@ -28,8 +28,9 @@ public class SignalComponent extends NotifierComponent {
     private final Map<UUID, Map<String, IntSupplier>> readSignals = new HashMap<>();
     private final Map<UUID, Map<String, IntConsumer>> writeSignals = new HashMap<>();
     private final SetMultimap<BlockPos, UUID> subnetMachines = HashMultimap.create();
+    private final Map<UUID, IMachine> machines = new HashMap<>();
 
-    public record SignalInfo(UUID machine, String key, boolean isWrite) {}
+    public record SignalInfo(IMachine machine, String key, boolean isWrite) {}
 
     public SignalComponent(ComponentType<?> type, INetwork network) {
         super(type, network);
@@ -39,6 +40,7 @@ public class SignalComponent extends NotifierComponent {
         var uuid = machine.uuid();
         readSignals.computeIfAbsent(uuid, $ -> new HashMap<>()).put(key, reader);
         subnetMachines.put(getMachineSubnet(machine), uuid);
+        machines.put(uuid, machine);
         invokeUpdate();
     }
 
@@ -46,6 +48,7 @@ public class SignalComponent extends NotifierComponent {
         var uuid = machine.uuid();
         writeSignals.computeIfAbsent(uuid, $ -> new HashMap<>()).put(key, writer);
         subnetMachines.put(getMachineSubnet(machine), uuid);
+        machines.put(uuid, machine);
         invokeUpdate();
     }
 
@@ -59,14 +62,15 @@ public class SignalComponent extends NotifierComponent {
 
     public Collection<SignalInfo> getSubnetSignals(BlockPos subnet) {
         var ret = new ArrayList<SignalInfo>();
-        for (var machine : subnetMachines.get(subnet)) {
-            if (readSignals.containsKey(machine)) {
-                for (var key : readSignals.get(machine).keySet()) {
+        for (var uuid : subnetMachines.get(subnet)) {
+            var machine = machines.get(uuid);
+            if (readSignals.containsKey(uuid)) {
+                for (var key : readSignals.get(uuid).keySet()) {
                     ret.add(new SignalInfo(machine, key, false));
                 }
             }
-            if (writeSignals.containsKey(machine)) {
-                for (var key : writeSignals.get(machine).keySet()) {
+            if (writeSignals.containsKey(uuid)) {
+                for (var key : writeSignals.get(uuid).keySet()) {
                     ret.add(new SignalInfo(machine, key, true));
                 }
             }

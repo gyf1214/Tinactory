@@ -31,6 +31,7 @@ import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BUTTON_TO
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.core.gui.Menu.PORT_TEXT_COLOR;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
@@ -46,7 +47,6 @@ public class PortPanel extends Panel {
         new Rect(PANEL_BORDER + SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
             -(PANEL_BORDER + SPACING) * 2 - SLOT_SIZE, SLOT_SIZE);
 
-    public static final int TEXT_COLOR = 0xFFFFAA00;
     private static final int OVERLAY_COLOR = 0x80FFAA00;
 
     private class ConfigLabel extends Label {
@@ -60,7 +60,7 @@ public class PortPanel extends Panel {
             this.type = type;
             this.slots = slots;
             this.verticalAlign = Label.Alignment.MIDDLE;
-            this.color = TEXT_COLOR;
+            this.color = PORT_TEXT_COLOR;
         }
 
         @Override

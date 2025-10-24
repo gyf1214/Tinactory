@@ -9,6 +9,7 @@ import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
+import org.shsts.tinactory.content.gui.SignalControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.ElectricChestScreen;
 import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
@@ -19,6 +20,7 @@ import org.shsts.tinactory.content.gui.client.MachineScreen;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
+import org.shsts.tinactory.content.gui.client.SignalControllerScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
@@ -26,6 +28,7 @@ import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.content.gui.sync.SignalControllerSyncPacket;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.LayoutScreen;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
@@ -65,6 +68,7 @@ public final class AllMenus {
     public static final IMenuType RESEARCH_BENCH;
     public static final IMenuType DIGITAL_INTERFACE;
     public static final IMenuType RESEARCH_DIGITAL_INTERFACE;
+    public static final IMenuType SIGNAL_CONTROLLER;
 
     static {
         CHANNEL
@@ -76,7 +80,9 @@ public final class AllMenus {
             .registerMenuSyncPacket(LogisticWorkerSyncPacket.class,
                 LogisticWorkerSyncPacket::new)
             .registerMenuSyncPacket(MEStorageInterfaceSyncPacket.class,
-                MEStorageInterfaceSyncPacket::new);
+                MEStorageInterfaceSyncPacket::new)
+            .registerMenuSyncPacket(SignalControllerSyncPacket.class,
+                SignalControllerSyncPacket::new);
 
         FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
         ITEM_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
@@ -156,6 +162,11 @@ public final class AllMenus {
                 MachineMenu::digitalInterface)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> ResearchBenchScreen::new)
+            .register();
+
+        SIGNAL_CONTROLLER = REGISTRATE.menu("machine/signal_controller", SignalControllerMenu::new)
+            .title(ProcessingMenu::getTitle)
+            .screen(() -> () -> SignalControllerScreen::new)
             .register();
     }
 

@@ -52,8 +52,10 @@ public record Texture(ResourceLocation loc, int width, int height) {
         gregtech("gui/widget/button_distinct_buses"), 18, 36);
     public static final Texture VOID_BUTTON = new Texture(
         modLoc("gui/void_button"), 18, 36);
-    public static final Texture PRIORITY_BUTTON = new Texture(
-        modLoc("gui/priority_button_overlay"), 108, 18);
+    public static final Texture PRIORITY_OVERLAY = new Texture(
+        modLoc("gui/priority_overlay"), 108, 18);
+    public static final Texture INPUT_OUTPUT_OVERLAY = new Texture(
+        modLoc("gui/input_output_overlay"), 18, 36);
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = new ResourceLocation(loc.getNamespace(), "textures/" + loc.getPath() + ".png");

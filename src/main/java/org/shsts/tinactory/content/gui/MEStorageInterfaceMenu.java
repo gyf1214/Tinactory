@@ -14,12 +14,12 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.core.gui.InventoryMenu;
 import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
 import org.slf4j.Logger;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -40,22 +40,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     private final IMachine machine;
     private final IMachineConfig machineConfig;
     private final MEStorageInterface storageInterface;
-    private boolean needUpdate = true;
-    private final Runnable updateListener = () -> needUpdate = true;
-
-    private class SyncScheduler implements ISyncSlotScheduler<MEStorageInterfaceSyncPacket> {
-        @Override
-        public boolean shouldSend() {
-            return needUpdate;
-        }
-
-        @Override
-        public MEStorageInterfaceSyncPacket createPacket() {
-            needUpdate = false;
-            return new MEStorageInterfaceSyncPacket(
-                storageInterface.getAllItems(), storageInterface.getAllFluids());
-        }
-    }
+    private final Runnable updateListener;
 
     public MEStorageInterfaceMenu(Properties properties) {
         super(properties, PANEL_HEIGHT);
@@ -63,7 +48,11 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         this.machineConfig = machine.config();
         this.storageInterface = getProvider(blockEntity, MEStorageInterface.ID, MEStorageInterface.class);
 
-        addSyncSlot(SLOT_SYNC, new SyncScheduler());
+        var scheduler = new ActiveScheduler<>(() -> new MEStorageInterfaceSyncPacket(
+            storageInterface.getAllItems(), storageInterface.getAllFluids()));
+        this.updateListener = scheduler::invokeUpdate;
+
+        addSyncSlot(SLOT_SYNC, scheduler);
         if (!world.isClientSide) {
             storageInterface.onUpdate(updateListener);
         }

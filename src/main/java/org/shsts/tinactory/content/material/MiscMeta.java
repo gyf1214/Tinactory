@@ -23,6 +23,7 @@ import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.MachineSet;
+import org.shsts.tinactory.content.machine.SignalController;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
@@ -184,6 +185,16 @@ public class MiscMeta extends MetaConsumer {
             .build();
     }
 
+    private void signalController(String id, JsonObject jo) {
+        BlockEntityBuilder.builder(id, MachineBlock::signal)
+            .transform(MachineSet::baseMachine)
+            .menu(AllMenus.SIGNAL_CONTROLLER)
+            .blockEntity()
+            .transform(SignalController.factory(GsonHelper.getAsDouble(jo, "power")))
+            .end()
+            .build();
+    }
+
     private void buildItem(String type, String name, String id, JsonObject jo) {
         switch (type) {
             case "casing" -> casing(id, jo);
@@ -197,6 +208,7 @@ public class MiscMeta extends MetaConsumer {
             case "me_drive" -> meDrive(id, jo);
             case "me_storage_cell" -> meStorageCell(name, id, jo);
             case "boiler" -> boiler(id, jo);
+            case "signal_controller" -> signalController(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }
     }

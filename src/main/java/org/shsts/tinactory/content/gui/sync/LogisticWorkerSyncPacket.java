@@ -17,7 +17,8 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LogisticWorkerSyncPacket implements IPacket {
-    public record PortInfo(UUID machineId, int portIndex, Component machineName, ItemStack icon, Component portName) {
+    public record PortInfo(UUID machineId, int portIndex, Component machineName,
+        ItemStack icon, Component portName) {
         public static void serialize(FriendlyByteBuf buf, PortInfo info) {
             buf.writeUUID(info.machineId);
             buf.writeVarInt(info.portIndex);

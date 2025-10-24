@@ -19,7 +19,6 @@ import net.minecraftforge.fluids.FluidStack;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 @MethodsReturnNonnullByDefault
@@ -101,12 +100,9 @@ public final class ClientUtil {
     }
 
     public static List<Component> fluidTooltip(FluidStack stack, boolean showAmount) {
-        var tooltip = new ArrayList<Component>();
-        tooltip.add(fluidName(stack));
-        if (showAmount) {
-            tooltip.add(fluidAmount(stack).withStyle(ChatFormatting.GRAY));
-        }
-        return tooltip;
+        var line1 = fluidName(stack);
+        return showAmount ? List.of(line1, fluidAmount(stack)
+            .withStyle(ChatFormatting.GRAY)) : List.of(line1);
     }
 
     public static boolean keyDown(int key) {

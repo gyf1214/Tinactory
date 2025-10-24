@@ -15,11 +15,15 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.core.Transformer;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.SIGNAL_MACHINE;
 import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
+import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.content.AllNetworks.SIGNAL_READ_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.SIGNAL_WRITE_SCHEDULING;
@@ -29,7 +33,8 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SignalController extends CapabilityProvider implements IEventSubscriber, ISignalMachine {
-    private static final String CONFIG_KEY = "signal";
+    public static final String SIGNAL_CONFIG_KEY = "signal";
+    private static final String ID = "machine/signal_controller";
 
     private final BlockEntity blockEntity;
     private int signal = 0;
@@ -48,6 +53,10 @@ public class SignalController extends CapabilityProvider implements IEventSubscr
         this.electricCap = LazyOptional.of(() -> electric);
     }
 
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
+        return $ -> $.capability(ID, be -> new SignalController(be, power));
+    }
+
     @Override
     public int getSignal() {
         return signal;
@@ -56,7 +65,7 @@ public class SignalController extends CapabilityProvider implements IEventSubscr
     private void validateConfig(SignalComponent component) {
         needRevalidate = false;
         var config1 = MACHINE.get(blockEntity).config()
-            .getCompound(CONFIG_KEY)
+            .getCompound(SIGNAL_CONFIG_KEY)
             .map(SignalConfig::fromTag);
 
         if (config1.isEmpty()) {
@@ -81,10 +90,15 @@ public class SignalController extends CapabilityProvider implements IEventSubscr
         if (needRevalidate) {
             validateConfig(component);
         }
-        if (config == null || isWrite) {
-            return;
+        var oldSignal = signal;
+        signal = config != null && !isWrite ?
+            component.read(config.machine(), config.key()) : 0;
+        if (signal != oldSignal) {
+            var pos = blockEntity.getBlockPos();
+            var state = blockEntity.getBlockState();
+            var dir = state.getValue(FACING);
+            world.neighborChanged(pos.relative(dir), state.getBlock(), pos);
         }
-        signal = component.read(config.machine(), config.key());
     }
 
     private void writeSignal(Level world, INetwork network) {
@@ -114,7 +128,9 @@ public class SignalController extends CapabilityProvider implements IEventSubscr
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(CONNECT.get(), $ -> needRevalidate = true);
         eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), () -> needRevalidate = true);
     }
 
     @Override

@@ -49,7 +49,7 @@ public class StoragePriorityButton extends Button {
         var z = getBlitOffset();
         RenderUtil.blit(poseStack, Texture.SWITCH_BUTTON, z, rect);
         var x = (getValue() + 1) * SLOT_SIZE;
-        RenderUtil.blit(poseStack, Texture.PRIORITY_BUTTON, z, rect, x, 0);
+        RenderUtil.blit(poseStack, Texture.PRIORITY_OVERLAY, z, rect, x, 0);
     }
 
     @Override

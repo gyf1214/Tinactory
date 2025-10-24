@@ -61,6 +61,6 @@ public class SignalMachineBlock extends MachineBlock {
     @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos,
         @Nullable Direction dir) {
-        return state.getValue(FACING) == dir;
+        return state.getValue(FACING).getOpposite() == dir;
     }
 }

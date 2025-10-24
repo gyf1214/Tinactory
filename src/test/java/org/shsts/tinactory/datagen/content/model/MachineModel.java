@@ -14,11 +14,14 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
+import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.client.model.generators.MultiPartBlockStateBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
+import org.shsts.tinactory.content.network.SignalMachineBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -181,6 +184,24 @@ public class MachineModel {
             });
     }
 
+    private void ioState(MultiPartBlockStateBuilder multipart, ModelFile io) {
+        for (var dir : Direction.values()) {
+            var builder = multipart.part().modelFile(io);
+            if (dir.getAxis() == Direction.Axis.Y) {
+                builder.rotationX(xRotation(dir))
+                    .rotationY(yRotation(dir)).addModel()
+                    .condition(MachineBlock.IO_FACING, dir);
+            } else {
+                var otherDir = Arrays.stream(Direction.values())
+                    .filter(d -> d.getAxis() != Direction.Axis.Y && d != dir)
+                    .toArray(Direction[]::new);
+                builder.rotationY(yRotation(dir)).addModel()
+                    .condition(MachineBlock.FACING, otherDir)
+                    .condition(MachineBlock.IO_FACING, dir);
+            }
+        }
+    }
+
     private void machine(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
         var prov = ctx.provider().models();
         var base = blockModel(ctx.id(), ctx.object(), false, prov);
@@ -203,21 +224,7 @@ public class MachineModel {
             }
         }
 
-        for (var dir : Direction.values()) {
-            var builder = multipart.part().modelFile(io);
-            if (dir.getAxis() == Direction.Axis.Y) {
-                builder.rotationX(xRotation(dir))
-                    .rotationY(yRotation(dir)).addModel()
-                    .condition(MachineBlock.IO_FACING, dir);
-            } else {
-                var otherDir = Arrays.stream(Direction.values())
-                    .filter(d -> d.getAxis() != Direction.Axis.Y && d != dir)
-                    .toArray(Direction[]::new);
-                builder.rotationY(yRotation(dir)).addModel()
-                    .condition(MachineBlock.FACING, otherDir)
-                    .condition(MachineBlock.IO_FACING, dir);
-            }
-        }
+        ioState(multipart, io);
     }
 
     private void fixed(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
@@ -231,6 +238,24 @@ public class MachineModel {
                 .build());
     }
 
+    private void signal(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+        var prov = ctx.provider().models();
+        var base = blockModel(ctx.id(), ctx.object(), false, prov);
+        var io = ioModel(ctx.id(), prov);
+        var multipart = ctx.provider().getMultipartBuilder(ctx.object());
+
+        for (var dir : Direction.values()) {
+            if (dir.getAxis() != Direction.Axis.Y) {
+                multipart.part().modelFile(base)
+                    .rotationY(yRotation(dir)).addModel()
+                    .condition(MachineBlock.FACING, dir)
+                    .end();
+            }
+        }
+
+        ioState(multipart, io);
+    }
+
     public <U extends Block> Consumer<IEntryDataContext<Block, U, BlockStateProvider>> blockState() {
         return ctx -> {
             if (ctx.object() instanceof PrimitiveBlock) {
@@ -238,6 +263,8 @@ public class MachineModel {
             } else if (ctx.object() instanceof SidedMachineBlock ||
                 ctx.object() instanceof SubnetBlock) {
                 sided(ctx);
+            } else if (ctx.object() instanceof SignalMachineBlock) {
+                signal(ctx);
             } else if (ctx.object() instanceof MachineBlock) {
                 machine(ctx);
             } else if (ctx.object() instanceof FixedBlock) {
