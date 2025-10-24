@@ -6,8 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
-import org.shsts.tinactory.content.gui.sync.SignalControllerSyncPacket;
-import org.shsts.tinactory.content.machine.SignalComponent;
+import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
+import org.shsts.tinactory.content.logistics.SignalComponent;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SignalControllerMenu extends MenuBase {
+public class MESignalControllerMenu extends MenuBase {
     public static final String SIGNAL_SYNC = "signals";
 
     public final IMachine machine;
@@ -27,11 +27,11 @@ public class SignalControllerMenu extends MenuBase {
     private final BlockPos subnet;
     private final Runnable onUpdatePorts;
 
-    public SignalControllerMenu(Properties properties) {
+    public MESignalControllerMenu(Properties properties) {
         super(properties);
 
         var scheduler = new ActiveScheduler<>(() ->
-            new SignalControllerSyncPacket(getVisibleSignals()));
+            new MESignalControllerSyncPacket(getVisibleSignals()));
         this.onUpdatePorts = scheduler::invokeUpdate;
 
         this.machine = MACHINE.get(blockEntity);
@@ -62,11 +62,11 @@ public class SignalControllerMenu extends MenuBase {
         }
     }
 
-    private List<SignalControllerSyncPacket.SignalInfo> getVisibleSignals() {
-        var ret = new ArrayList<SignalControllerSyncPacket.SignalInfo>();
+    private List<MESignalControllerSyncPacket.SignalInfo> getVisibleSignals() {
+        var ret = new ArrayList<MESignalControllerSyncPacket.SignalInfo>();
         for (var info : signals.getSubnetSignals(subnet)) {
             var machine = info.machine();
-            ret.add(new SignalControllerSyncPacket.SignalInfo(machine.uuid(),
+            ret.add(new MESignalControllerSyncPacket.SignalInfo(machine.uuid(),
                 machine.title(), machine.icon(), info.key(), info.isWrite()));
         }
         return ret;

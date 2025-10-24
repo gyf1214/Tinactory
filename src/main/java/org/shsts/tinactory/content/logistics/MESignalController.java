@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -12,6 +12,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.core.logistics.ISignalMachine;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
@@ -32,9 +33,9 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SignalController extends CapabilityProvider implements IEventSubscriber, ISignalMachine {
+public class MESignalController extends CapabilityProvider implements IEventSubscriber, ISignalMachine {
     public static final String SIGNAL_CONFIG_KEY = "signal";
-    private static final String ID = "machine/signal_controller";
+    private static final String ID = "machine/me_signal_controller";
 
     private final BlockEntity blockEntity;
     private int signal = 0;
@@ -45,7 +46,7 @@ public class SignalController extends CapabilityProvider implements IEventSubscr
 
     private final LazyOptional<IElectricMachine> electricCap;
 
-    public SignalController(BlockEntity blockEntity, double power) {
+    public MESignalController(BlockEntity blockEntity, double power) {
         this.blockEntity = blockEntity;
 
         var voltage = getBlockVoltage(blockEntity);
@@ -54,7 +55,7 @@ public class SignalController extends CapabilityProvider implements IEventSubscr
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new SignalController(be, power));
+        return $ -> $.capability(ID, be -> new MESignalController(be, power));
     }
 
     @Override

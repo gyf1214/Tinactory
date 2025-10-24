@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SignalControllerSyncPacket implements IPacket {
+public class MESignalControllerSyncPacket implements IPacket {
     public record SignalInfo(UUID machineId, Component machineName, ItemStack icon,
         String key, boolean isWrite) {
         private static void serialize(FriendlyByteBuf buf, SignalInfo info) {
@@ -36,11 +36,11 @@ public class SignalControllerSyncPacket implements IPacket {
 
     private final List<SignalInfo> visibleSignals;
 
-    public SignalControllerSyncPacket() {
+    public MESignalControllerSyncPacket() {
         this.visibleSignals = new ArrayList<>();
     }
 
-    public SignalControllerSyncPacket(List<SignalInfo> visibleSignals) {
+    public MESignalControllerSyncPacket(List<SignalInfo> visibleSignals) {
         this.visibleSignals = visibleSignals;
     }
 

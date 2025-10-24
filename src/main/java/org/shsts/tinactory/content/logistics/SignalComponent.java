@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.logistics;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -8,7 +8,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.content.logistics.NotifierComponent;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.slf4j.Logger;
 

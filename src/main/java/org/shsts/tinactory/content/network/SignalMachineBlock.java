@@ -10,8 +10,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import org.shsts.tinactory.content.machine.ISignalMachine;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.logistics.ISignalMachine;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 

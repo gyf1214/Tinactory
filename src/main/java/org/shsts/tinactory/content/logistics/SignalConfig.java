@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.machine;
+package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

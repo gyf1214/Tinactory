@@ -11,10 +11,10 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
-import org.shsts.tinactory.content.gui.SignalControllerMenu;
+import org.shsts.tinactory.content.gui.MESignalControllerMenu;
+import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.gui.sync.SignalControllerSyncPacket;
-import org.shsts.tinactory.content.machine.SignalConfig;
+import org.shsts.tinactory.content.logistics.SignalConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
@@ -29,8 +29,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.gui.SignalControllerMenu.SIGNAL_SYNC;
-import static org.shsts.tinactory.content.machine.SignalController.SIGNAL_CONFIG_KEY;
+import static org.shsts.tinactory.content.gui.MESignalControllerMenu.SIGNAL_SYNC;
+import static org.shsts.tinactory.content.logistics.MESignalController.SIGNAL_CONFIG_KEY;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.PANEL_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.PANEL_WIDTH;
@@ -44,18 +44,18 @@ import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
+public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu> {
     private static final int SIGNAL_WIDTH = 64;
     private static final int WIDTH = PANEL_WIDTH + SIGNAL_WIDTH + MARGIN_X;
     private static final int HEIGHT = PANEL_HEIGHT;
 
     private final IMachineConfig machineConfig;
-    private final ListMultimap<UUID, SignalControllerSyncPacket.SignalInfo> machineSignals =
+    private final ListMultimap<UUID, MESignalControllerSyncPacket.SignalInfo> machineSignals =
         ArrayListMultimap.create();
 
     private class SignalSelectPanel extends ButtonPanel {
         public SignalSelectPanel() {
-            super(SignalControllerScreen.this, SIGNAL_WIDTH, PORT_HEIGHT, 0);
+            super(MESignalControllerScreen.this, SIGNAL_WIDTH, PORT_HEIGHT, 0);
         }
 
         @Override
@@ -65,7 +65,7 @@ public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
                 .orElse(0);
         }
 
-        private boolean isSelected(SignalControllerSyncPacket.SignalInfo info) {
+        private boolean isSelected(MESignalControllerSyncPacket.SignalInfo info) {
             return getConfig()
                 .filter($ -> $.machine().equals(info.machineId()) &&
                     $.key().equals(info.key()))
@@ -76,7 +76,7 @@ public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
             return I18n.tr("tinactory.gui.signal." + key);
         }
 
-        private Optional<SignalControllerSyncPacket.SignalInfo> getInfo(int index) {
+        private Optional<MESignalControllerSyncPacket.SignalInfo> getInfo(int index) {
             return machinePanel.getSelected()
                 .flatMap(selected -> {
                     if (!machineSignals.containsKey(selected)) {
@@ -138,7 +138,7 @@ public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
         return I18n.tr("tinactory.gui.signalController." + key);
     }
 
-    public SignalControllerScreen(SignalControllerMenu menu, Component title) {
+    public MESignalControllerScreen(MESignalControllerMenu menu, Component title) {
         super(menu, title);
         this.contentWidth = WIDTH;
         this.contentHeight = HEIGHT;
@@ -162,7 +162,7 @@ public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
         menu.onSyncPacket(SIGNAL_SYNC, this::refreshVisibleSignals);
     }
 
-    private void refreshVisibleSignals(SignalControllerSyncPacket p) {
+    private void refreshVisibleSignals(MESignalControllerSyncPacket p) {
         machineSignals.clear();
         machinePanel.clearList();
 
@@ -175,7 +175,7 @@ public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
 
         for (var machine : machineSignals.keySet()) {
             var l = machineSignals.get(machine);
-            l.sort(Comparator.comparing(SignalControllerSyncPacket.SignalInfo::key));
+            l.sort(Comparator.comparing(MESignalControllerSyncPacket.SignalInfo::key));
         }
 
         machinePanel.refresh();

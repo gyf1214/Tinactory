@@ -16,6 +16,7 @@ import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.content.AllItems;
 import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.logistics.MEDrive;
+import org.shsts.tinactory.content.logistics.MESignalController;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.logistics.MEStorageCellSet;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
@@ -23,7 +24,6 @@ import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.MachineSet;
-import org.shsts.tinactory.content.machine.SignalController;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
@@ -188,9 +188,9 @@ public class MiscMeta extends MetaConsumer {
     private void meSignalController(String id, JsonObject jo) {
         BlockEntityBuilder.builder(id, MachineBlock::signal)
             .transform(MachineSet::baseMachine)
-            .menu(AllMenus.SIGNAL_CONTROLLER)
+            .menu(AllMenus.ME_SIGNAL_CONTROLLER)
             .blockEntity()
-            .transform(SignalController.factory(GsonHelper.getAsDouble(jo, "power")))
+            .transform(MESignalController.factory(GsonHelper.getAsDouble(jo, "power")))
             .end()
             .build();
     }

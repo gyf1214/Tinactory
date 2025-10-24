@@ -6,29 +6,29 @@ import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
+import org.shsts.tinactory.content.gui.MESignalControllerMenu;
 import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
-import org.shsts.tinactory.content.gui.SignalControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.ElectricChestScreen;
 import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.MEDriveScreen;
+import org.shsts.tinactory.content.gui.client.MESignalControllerScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageInterfaceScreen;
 import org.shsts.tinactory.content.gui.client.MachineScreen;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
-import org.shsts.tinactory.content.gui.client.SignalControllerScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
+import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.content.gui.sync.SignalControllerSyncPacket;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.LayoutScreen;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
@@ -62,13 +62,13 @@ public final class AllMenus {
     public static final IMenuType LOGISTIC_WORKER;
     public static final IMenuType ME_DRIVE;
     public static final IMenuType ME_STORAGE_INTERFACE;
+    public static final IMenuType ME_SIGNAL_CONTROLLER;
     public static final IMenuType PRIMITIVE_MACHINE;
     public static final IMenuType PROCESSING_MACHINE;
     public static final IMenuType BOILER;
     public static final IMenuType RESEARCH_BENCH;
     public static final IMenuType DIGITAL_INTERFACE;
     public static final IMenuType RESEARCH_DIGITAL_INTERFACE;
-    public static final IMenuType SIGNAL_CONTROLLER;
 
     static {
         CHANNEL
@@ -81,8 +81,8 @@ public final class AllMenus {
                 LogisticWorkerSyncPacket::new)
             .registerMenuSyncPacket(MEStorageInterfaceSyncPacket.class,
                 MEStorageInterfaceSyncPacket::new)
-            .registerMenuSyncPacket(SignalControllerSyncPacket.class,
-                SignalControllerSyncPacket::new);
+            .registerMenuSyncPacket(MESignalControllerSyncPacket.class,
+                MESignalControllerSyncPacket::new);
 
         FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
         ITEM_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
@@ -133,6 +133,11 @@ public final class AllMenus {
             .screen(() -> () -> MEStorageInterfaceScreen::new)
             .register();
 
+        ME_SIGNAL_CONTROLLER = REGISTRATE.menu("logistics/me_signal_controller", MESignalControllerMenu::new)
+            .title(ProcessingMenu::getTitle)
+            .screen(() -> () -> MESignalControllerScreen::new)
+            .register();
+
         PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive", ProcessingMenu::primitive)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> ProcessingScreen::new)
@@ -162,11 +167,6 @@ public final class AllMenus {
                 MachineMenu::digitalInterface)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> ResearchBenchScreen::new)
-            .register();
-
-        SIGNAL_CONTROLLER = REGISTRATE.menu("machine/signal_controller", SignalControllerMenu::new)
-            .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> SignalControllerScreen::new)
             .register();
     }
 
