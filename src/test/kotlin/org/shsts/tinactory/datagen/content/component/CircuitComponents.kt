@@ -474,7 +474,6 @@ object CircuitComponents {
         circuitTier(CircuitTier.CPU) {
             chemicalReactor {
                 defaults {
-                    input("copper", "foil", 4)
                     input("sulfuric_acid", "dilute", 0.25)
                     voltage(Voltage.MV)
                     workTicks(240)
@@ -482,9 +481,11 @@ object CircuitComponents {
                 }
                 output(board) {
                     input("pe", "sheet")
+                    input("copper", "foil", 4)
                 }
                 output(board, 2, suffix = "_from_pvc") {
                     input("pvc", "sheet")
+                    input("copper", "foil", 4)
                 }
             }
             chemicalReactor {
