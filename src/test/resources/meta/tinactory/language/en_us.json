@@ -160,7 +160,7 @@
     "tinactory.gui.workbench.title": "Workbench",
     "tinactory.gui.signal.progress": "Progress",
     "tinactory.gui.signal.stop": "Stop",
-    "tinactory.gui.signal.Amount": "Amount",
+    "tinactory.gui.signal.amount": "Amount",
     "tinactory.gui.signalController.readSignal": "Read Signal",
     "tinactory.gui.signalController.writeSignal": "Write Signal",
     "tinactory.jei.processing.total": "Total: %s EU",
