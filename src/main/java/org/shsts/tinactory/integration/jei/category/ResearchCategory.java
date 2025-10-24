@@ -15,9 +15,9 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Collections;
 
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
@@ -31,7 +31,7 @@ public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
 
     @Override
     protected int extraHeight() {
-        return super.extraHeight() + BUTTON_SIZE + FONT_HEIGHT + SPACING * 2;
+        return super.extraHeight() + TECH_SIZE + FONT_HEIGHT + SPACING * 2;
     }
 
     @Override

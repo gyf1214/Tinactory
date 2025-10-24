@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.gui.InventoryMenu;
@@ -17,6 +16,7 @@ import java.util.List;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
@@ -24,7 +24,6 @@ import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LogisticWorkerMenu extends InventoryMenu {
-    public static final int BUTTON_SIZE = MachineRecipeBook.BUTTON_SIZE;
     public static final int CONFIG_WIDTH = BUTTON_SIZE * 4 + 2;
     public static final int PORT_WIDTH = 42;
     public static final int WIDTH = CONFIG_WIDTH + SLOT_SIZE * 9 + PORT_WIDTH + 2 * MARGIN_X;

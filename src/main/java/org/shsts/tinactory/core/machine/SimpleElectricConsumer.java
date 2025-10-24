@@ -16,10 +16,6 @@ public class SimpleElectricConsumer implements IElectricMachine {
         this.power = power;
     }
 
-    public SimpleElectricConsumer(double power) {
-        this(0, power);
-    }
-
     @Override
     public long getVoltage() {
         return voltage;

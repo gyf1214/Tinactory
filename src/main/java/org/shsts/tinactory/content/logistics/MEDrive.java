@@ -47,6 +47,7 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -86,7 +87,8 @@ public class MEDrive extends CapabilityProvider
         this.combinedFluids = new CombinedFluidCollection();
         combinedFluids.onUpdate(blockEntity::setChanged);
 
-        var electric = new SimpleElectricConsumer(power);
+        var voltage = getBlockVoltage(blockEntity);
+        var electric = new SimpleElectricConsumer(voltage.value, power);
         this.electricCap = LazyOptional.of(() -> electric);
     }
 

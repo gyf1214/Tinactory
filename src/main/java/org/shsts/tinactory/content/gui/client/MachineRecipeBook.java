@@ -36,10 +36,10 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
-import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.DISABLE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
@@ -49,7 +49,6 @@ import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineRecipeBook extends Panel {
-    public static final int BUTTON_SIZE = SLOT_SIZE + 3;
     private static final int BUTTON_PER_LINE = 4;
     public static final int BUTTON_TOP_MARGIN = BUTTON_SIZE / 2;
     public static final int PANEL_BORDER = 8;

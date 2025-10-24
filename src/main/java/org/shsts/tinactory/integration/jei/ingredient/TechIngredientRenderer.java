@@ -14,12 +14,12 @@ import org.shsts.tinactory.core.util.I18n;
 
 import java.util.List;
 
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechIngredientRenderer implements IIngredientRenderer<TechWrapper> {
-    private static final Rect RECT = new Rect(0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    private static final Rect RECT = new Rect(0, 0, TECH_SIZE, TECH_SIZE);
 
     private TechIngredientRenderer() {}
 
@@ -40,12 +40,12 @@ public class TechIngredientRenderer implements IIngredientRenderer<TechWrapper> 
 
     @Override
     public int getWidth() {
-        return BUTTON_SIZE;
+        return TECH_SIZE;
     }
 
     @Override
     public int getHeight() {
-        return BUTTON_SIZE;
+        return TECH_SIZE;
     }
 
     public static final TechIngredientRenderer INSTANCE = new TechIngredientRenderer();

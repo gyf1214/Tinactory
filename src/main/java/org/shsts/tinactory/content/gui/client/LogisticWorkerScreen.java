@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.mojang.blaze3d.vertex.PoseStack;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -30,7 +29,6 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -40,18 +38,15 @@ import java.util.UUID;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.BUTTON_SIZE;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.CONFIG_WIDTH;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.PORT_WIDTH;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.PANEL_BORDER;
-import static org.shsts.tinactory.content.gui.client.TechPanel.BUTTON_PANEL_BG;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.InventoryMenu.INVENTORY_HEIGHT;
+import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
-import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
@@ -60,12 +55,8 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
-    private record MachineInfo(UUID id, Component name, ItemStack icon) {}
-
     private final int workerSlots;
     private final IMachineConfig machineConfig;
-    private final Map<UUID, MachineInfo> machines = new HashMap<>();
-    private final List<MachineInfo> machineList = new ArrayList<>();
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
         new HashMap<>();
     private final ArrayListMultimap<UUID, LogisticWorkerSyncPacket.PortInfo> machinePorts =
@@ -73,8 +64,6 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
     private int selectedConfig = -1;
     private boolean selectedFrom;
-    @Nullable
-    private UUID selectedMachine = null;
 
     private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
 
@@ -97,8 +86,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         private Optional<ItemStack> getIcon(LogisticComponent.PortKey key) {
-            return machines.containsKey(key.machineId()) ?
-                Optional.of(machines.get(key.machineId()).icon()) : Optional.empty();
+            return Optional.ofNullable(ports.get(key))
+                .map(LogisticWorkerSyncPacket.PortInfo::icon);
         }
 
         @Override
@@ -156,11 +145,11 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             if (FROM_RECT.in(mouseX, mouseY)) {
                 selectedConfig = index;
                 selectedFrom = true;
-                config.from().ifPresent(p -> selectMachine(p.machineId()));
+                config.from().ifPresent(p -> machinePanel.select(p.machineId()));
             } else if (TO_RECT.in(mouseX, mouseY)) {
                 selectedConfig = index;
                 selectedFrom = false;
-                config.to().ifPresent(p -> selectMachine(p.machineId()));
+                config.to().ifPresent(p -> machinePanel.select(p.machineId()));
             } else if (VALID_RECT.in(mouseX, mouseY)) {
                 config.setValid(!config.isValid());
                 var packet = SetMachineConfigPacket.builder()
@@ -208,36 +197,6 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
     }
 
-    private class MachineSelectPanel extends ButtonPanel {
-        public MachineSelectPanel() {
-            super(LogisticWorkerScreen.this, BUTTON_SIZE, BUTTON_SIZE, 1);
-        }
-
-        @Override
-        protected int getItemCount() {
-            return machineList.size();
-        }
-
-        @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
-            float partialTick, Rect rect, int index, boolean isHovering) {
-            var machine = machineList.get(index);
-            RenderUtil.blit(poseStack, RECIPE_BUTTON, getBlitOffset(), rect,
-                machine.id.equals(selectedMachine) ? 21 : 0, 0);
-            RenderUtil.renderItem(machine.icon, rect.x() + 2, rect.y() + 2);
-        }
-
-        @Override
-        protected void onSelect(int index, double mouseX, double mouseY, int button) {
-            selectMachine(machineList.get(index).id);
-        }
-
-        @Override
-        protected Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY) {
-            return Optional.of(List.of(machineList.get(index).name));
-        }
-    }
-
     private class PortSelectPanel extends ButtonPanel {
         private static final int X_OFFSET = SPACING;
         private static final int Y_OFFSET = (BUTTON_SIZE + 2 - FONT_HEIGHT) / 2 + 1;
@@ -248,7 +207,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected int getItemCount() {
-            return selectedMachine == null ? 0 : machinePorts.get(selectedMachine).size();
+            return machinePanel.getSelected()
+                .map($ -> machinePorts.get($).size())
+                .orElse(0);
         }
 
         private boolean isSelected(LogisticWorkerSyncPacket.PortInfo port) {
@@ -264,10 +225,11 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         @Override
         protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
-            if (selectedMachine == null) {
+            var selected = machinePanel.getSelected();
+            if (selected.isEmpty()) {
                 return;
             }
-            var ports = machinePorts.get(selectedMachine);
+            var ports = machinePorts.get(selected.get());
             if (index >= ports.size()) {
                 return;
             }
@@ -283,10 +245,11 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected void onSelect(int index, double mouseX, double mouseY, int button) {
-            if (selectedConfig == -1 || selectedMachine == null) {
+            var selectedMachine = machinePanel.getSelected();
+            if (selectedConfig == -1 || selectedMachine.isEmpty()) {
                 return;
             }
-            var port = machinePorts.get(selectedMachine).get(index);
+            var port = machinePorts.get(selectedMachine.get()).get(index);
 
             var config = getConfig(selectedConfig);
             if (selectedFrom) {
@@ -305,8 +268,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
     }
 
-    private final MachineSelectPanel machineSelectPanel;
-    private final PortSelectPanel portSelectPanel;
+    private final MachineSelectPanel machinePanel;
+    private final PortSelectPanel portPanel;
 
     private static Component tr(String key) {
         return I18n.tr("tinactory.gui.logisticWorker." + key);
@@ -322,15 +285,20 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
 
         var configPanel = new ConfigPanel();
-        this.machineSelectPanel = new MachineSelectPanel();
-        this.portSelectPanel = new PortSelectPanel();
+        this.machinePanel = new MachineSelectPanel(this) {
+            @Override
+            public void select(UUID machine) {
+                super.select(machine);
+                portPanel.refresh();
+            }
+        };
+        this.portPanel = new PortSelectPanel();
 
         var offset1 = Rect.corners(0, TOP_MARGIN, CONFIG_WIDTH, 0);
         var offset2 = Rect.corners(MARGIN_X + CONFIG_WIDTH + 1, TOP_MARGIN + 1,
             -MARGIN_X - PORT_WIDTH - 1, -1 - INVENTORY_HEIGHT);
         var offset3 = Rect.corners(-PORT_WIDTH, TOP_MARGIN, 0, 0);
         var anchor1 = RectD.corners(0d, 0d, 0d, 1d);
-        var anchor2 = RectD.corners(0d, 0d, 1d, 1d);
         var anchor3 = RectD.corners(1d, 0d, 1d, 1d);
 
         addWidget(new Label(menu, tr("configLabel")));
@@ -338,27 +306,21 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         addWidget(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
             new Label(menu, tr("portLabel")));
 
-        var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
-        addWidget(anchor2, offset2.offset(-2, -2).enlarge(4, 4), bg);
-
         addPanel(anchor1, offset1, configPanel);
-        addPanel(anchor2, offset2, machineSelectPanel);
-        addPanel(anchor3, offset3, portSelectPanel);
+        addPanel(offset2, machinePanel);
+        addPanel(anchor3, offset3, portPanel);
 
         menu.onSyncPacket("info", this::refreshVisiblePorts);
     }
 
     private void refreshVisiblePorts(LogisticWorkerSyncPacket p) {
         machinePorts.clear();
-        machines.clear();
-        machineList.clear();
+        machinePanel.clearList();
         ports.clear();
 
         for (var port : p.ports()) {
             if (!machinePorts.containsKey(port.machineId())) {
-                var info = new MachineInfo(port.machineId(), port.machineName(), port.icon());
-                machineList.add(info);
-                machines.put(port.machineId(), info);
+                machinePanel.add(port.machineId(), port.machineName(), port.icon());
             }
             ports.put(port.getKey(), port);
             machinePorts.put(port.machineId(), port);
@@ -369,17 +331,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             l.sort(Comparator.comparingInt(LogisticWorkerSyncPacket.PortInfo::portIndex));
         }
 
-        if (!machines.containsKey(selectedMachine)) {
-            selectedMachine = null;
-        }
-
-        machineSelectPanel.refresh();
-        portSelectPanel.refresh();
-    }
-
-    private void selectMachine(UUID id) {
-        selectedMachine = machines.containsKey(id) ? id : null;
-        portSelectPanel.refresh();
+        machinePanel.refresh();
+        portPanel.refresh();
     }
 
     private LogisticWorkerConfig getConfig(int slot) {

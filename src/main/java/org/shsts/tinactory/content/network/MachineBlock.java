@@ -71,6 +71,11 @@ public class MachineBlock extends SmartEntityBlock
             new MultiblockInterfaceBlock(properties, entityType, menu, voltage);
     }
 
+    public static Factory<MachineBlock> signal(Voltage voltage) {
+        return (properties, entityType, menu) ->
+            new SignalMachineBlock(properties, entityType, menu, voltage);
+    }
+
     public static Voltage getBlockVoltage(BlockEntity be) {
         return be.getBlockState().getBlock() instanceof MachineBlock machineBlock ?
             machineBlock.voltage : Voltage.PRIMITIVE;

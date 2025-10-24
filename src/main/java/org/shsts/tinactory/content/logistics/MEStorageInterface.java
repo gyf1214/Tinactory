@@ -32,6 +32,7 @@ import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -50,7 +51,8 @@ public class MEStorageInterface extends CapabilityProvider implements IEventSubs
         this.combinedItem = new CombinedItemCollection();
         this.combinedFluid = new CombinedFluidCollection();
 
-        var electric = new SimpleElectricConsumer(power);
+        var voltage = getBlockVoltage(blockEntity);
+        var electric = new SimpleElectricConsumer(voltage.value, power);
         this.electricCap = LazyOptional.of(() -> electric);
     }
 

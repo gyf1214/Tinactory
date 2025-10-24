@@ -31,15 +31,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_OFFSET;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_WIDTH;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.PANEL_BORDER;
-import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
+import static org.shsts.tinactory.core.gui.Menu.BUTTON_PANEL_BG;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
+import static org.shsts.tinactory.core.gui.Menu.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 
@@ -52,7 +52,6 @@ public class TechPanel extends Panel {
     private static final int INVALID_COLOR = 0xFFFFAAAA;
     private static final int PROGRESS_COLOR = 0xFF00AA00;
 
-    public static final Rect BUTTON_PANEL_BG = BACKGROUND_TEX_RECT.offset(6, 6).enlarge(-12, -12);
     private static final int PROGRESS_HEIGHT = 5;
 
     private final ITechManager techManager;
@@ -102,7 +101,7 @@ public class TechPanel extends Panel {
 
     private class TechButtonPanel extends ButtonPanel {
         public TechButtonPanel() {
-            super(TechPanel.this.screen, BUTTON_SIZE, BUTTON_SIZE, 0);
+            super(TechPanel.this.screen, TECH_SIZE, TECH_SIZE, 0);
         }
 
         private ITechnology getTech(int index) {
@@ -143,9 +142,9 @@ public class TechPanel extends Panel {
 
             var i = 0;
             for (var depend : depends) {
-                var x = rect.endX() - (i + 1) * BUTTON_SIZE;
+                var x = rect.endX() - (i + 1) * TECH_SIZE;
                 var y = rect.y();
-                renderTechButton(poseStack, z, new Rect(x, y, BUTTON_SIZE, BUTTON_SIZE), depend, true);
+                renderTechButton(poseStack, z, new Rect(x, y, TECH_SIZE, TECH_SIZE), depend, true);
                 i++;
             }
         }
@@ -155,7 +154,7 @@ public class TechPanel extends Panel {
                 return Optional.empty();
             }
             var depends = selectedTech.getDepends();
-            var index = (int) Math.floor((rect.endX() - mouseX) / BUTTON_SIZE);
+            var index = (int) Math.floor((rect.endX() - mouseX) / TECH_SIZE);
 
             return index >= 0 && index < depends.size() ? Optional.of(depends.get(index)) : Optional.empty();
         }
@@ -211,13 +210,13 @@ public class TechPanel extends Panel {
         var label1 = new Label(menu, tr("currentTechLabel"));
         label1.verticalAlign = Label.Alignment.MIDDLE;
         this.currentTechButton = new TechButton(true);
-        addWidget(new Rect(0, 0, LEFT_WIDTH - BUTTON_SIZE - 2, BUTTON_SIZE), label1);
-        addWidget(new Rect(LEFT_WIDTH - BUTTON_SIZE - 2, 0, BUTTON_SIZE, BUTTON_SIZE), currentTechButton);
+        addWidget(new Rect(0, 0, LEFT_WIDTH - TECH_SIZE - 2, TECH_SIZE), label1);
+        addWidget(new Rect(LEFT_WIDTH - TECH_SIZE - 2, 0, TECH_SIZE, TECH_SIZE), currentTechButton);
 
         this.availableTechPanel = new TechButtonPanel();
         var label2 = new Label(menu, tr("availableTechLabel"));
         var anchor1 = RectD.corners(0d, 0d, 0d, 1d);
-        var top = BUTTON_SIZE + MARGIN_VERTICAL * 2;
+        var top = TECH_SIZE + MARGIN_VERTICAL * 2;
         var offset1 = Rect.corners(-1, top + FONT_HEIGHT + SPACING, LEFT_WIDTH - 1, 0);
         var offset2 = offset1.offset(PANEL_BORDER, PANEL_BORDER).enlarge(-PANEL_BORDER * 2, -PANEL_BORDER * 2);
         var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
@@ -237,8 +236,8 @@ public class TechPanel extends Panel {
         y -= Widgets.BUTTON_HEIGHT + MARGIN_VERTICAL;
         var offset6 = Rect.corners(0, y - PROGRESS_HEIGHT, 0, y);
         y -= PROGRESS_HEIGHT + MARGIN_VERTICAL;
-        var offset5 = Rect.corners(0, y - BUTTON_SIZE, 0, y);
-        y -= BUTTON_SIZE + MARGIN_VERTICAL;
+        var offset5 = Rect.corners(0, y - TECH_SIZE, 0, y);
+        y -= TECH_SIZE + MARGIN_VERTICAL;
         var offset4 = Rect.corners(0, FONT_HEIGHT + SPACING, 0, y);
         var offset3 = Rect.corners(0, 0, 0, FONT_HEIGHT);
         selectedTechPanel.addWidget(RectD.corners(0d, 0d, 1d, 0d), offset3, selectedTechLabel);

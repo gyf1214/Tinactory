@@ -35,10 +35,10 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllTags.machine;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
 
 @ParametersAreNonnullByDefault
@@ -75,11 +75,11 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
 
     protected int drawRequiredTechText(PoseStack stack, boolean empty, int y) {
         if (!empty) {
-            y += (BUTTON_SIZE - FONT_HEIGHT) / 2 + 1;
+            y += (TECH_SIZE - FONT_HEIGHT) / 2 + 1;
             drawTextLine(stack, tr("requiredTech"), y);
-            y += (BUTTON_SIZE + FONT_HEIGHT) / 2 + SPACING;
+            y += (TECH_SIZE + FONT_HEIGHT) / 2 + SPACING;
         } else {
-            y += BUTTON_SIZE + SPACING;
+            y += TECH_SIZE + SPACING;
         }
         return y;
     }
@@ -156,7 +156,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         var y = layout.rect.endY() + SLOT_SIZE / 2;
         for (var tech : techs) {
             addTechIngredient(builder, RecipeIngredientRole.OUTPUT, x, y, tech);
-            x += BUTTON_SIZE;
+            x += TECH_SIZE;
         }
     }
 }

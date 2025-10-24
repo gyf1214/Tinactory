@@ -23,20 +23,20 @@ import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.core.gui.Menu.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 import static org.shsts.tinactory.core.gui.client.Widgets.EDIT_BOX_LINE_HEIGHT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class NetworkControllerMenu extends MenuBase {
-    public static final int BUTTON_SIZE = 24;
-    public static final int PANEL_BORDER = 2;
-    public static final int LEFT_WIDTH = PANEL_BORDER * 2 + BUTTON_SIZE * 5;
-    public static final int RIGHT_WIDTH = LEFT_WIDTH + BUTTON_SIZE * 2;
+    public static final int LEFT_WIDTH = PANEL_BORDER * 2 + TECH_SIZE * 5;
+    public static final int RIGHT_WIDTH = LEFT_WIDTH + TECH_SIZE * 2;
     public static final int LEFT_OFFSET = LEFT_WIDTH + MARGIN_X * 2;
     public static final int WIDTH = LEFT_OFFSET + RIGHT_WIDTH;
-    public static final int HEIGHT = BUTTON_SIZE * 6 + FONT_HEIGHT +
+    public static final int HEIGHT = TECH_SIZE * 6 + FONT_HEIGHT +
         MARGIN_VERTICAL * 2 + SPACING + PANEL_BORDER * 2;
     public static final int RENAME_INVENTORY_WIDTH = SLOT_SIZE * 9;
     public static final int RENAME_INVENTORY_MARGIN = (WIDTH - RENAME_INVENTORY_WIDTH) / 2;

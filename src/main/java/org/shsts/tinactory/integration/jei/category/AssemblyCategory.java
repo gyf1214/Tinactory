@@ -10,8 +10,8 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -24,7 +24,7 @@ public class AssemblyCategory<R extends AssemblyRecipe> extends ProcessingCatego
 
     @Override
     protected int extraHeight() {
-        return super.extraHeight() + BUTTON_SIZE + SPACING;
+        return super.extraHeight() + TECH_SIZE + SPACING;
     }
 
     @Override
