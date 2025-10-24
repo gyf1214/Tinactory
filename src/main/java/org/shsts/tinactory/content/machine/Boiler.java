@@ -16,8 +16,10 @@ import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -26,7 +28,9 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 
@@ -54,6 +58,7 @@ public class Boiler extends CapabilityProvider implements
     private long maxBurn = 0L;
     private long currentBurn = 0L;
     private double leftSteam = 0d;
+    private boolean stopped = false;
 
     private Boiler(BlockEntity blockEntity, double burnSpeed, Fluid water, Fluid steam) {
         this.blockEntity = blockEntity;
@@ -83,14 +88,8 @@ public class Boiler extends CapabilityProvider implements
     }
 
     @Override
-    public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
-    }
-
-    @Override
     public void onPreWork() {
-        if (maxBurn > 0) {
+        if (maxBurn > 0 || stopped) {
             return;
         }
         var item = fuelPort.extractItem(1, false);
@@ -135,12 +134,24 @@ public class Boiler extends CapabilityProvider implements
         } else {
             heat = heat1;
         }
+        stopped = false;
         blockEntity.setChanged();
     }
 
     @Override
     public double getProgress() {
         return maxBurn <= 0 ? 0d : 1d - ((double) currentBurn / (double) maxBurn);
+    }
+
+    private void onConnect(INetwork network) {
+        Machine.registerStopSignal(network, MACHINE.get(blockEntity), $ -> stopped = $);
+    }
+
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
+        eventManager.subscribe(CONNECT.get(), this::onConnect);
     }
 
     @Override

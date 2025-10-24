@@ -18,11 +18,14 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockManager;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,7 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -47,6 +51,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     private int w, d, h;
     private int size;
     private List<DoorState> doors;
+    private boolean stopped = false;
 
     public Cleanroom(BlockEntity blockEntity, Builder<?> builder, Properties properties) {
         super(blockEntity, builder);
@@ -89,7 +94,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     public double getPowerCons() {
-        return properties.amperage * getVoltage() * Math.sqrt(size);
+        return stopped ? 0 : properties.amperage * getVoltage() * Math.sqrt(size);
     }
 
     @Override
@@ -97,6 +102,10 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     public void onWorkTick(double partial) {
+        if (stopped) {
+            stopped = false;
+            return;
+        }
         var voltage = getVoltage();
         if (voltage <= 0) {
             return;
@@ -140,6 +149,18 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         cleanness = cleanness * (1d - decay);
 
         blockEntity.setChanged();
+    }
+
+    private void onConnect(INetwork network) {
+        if (multiblockInterface != null) {
+            Machine.registerStopSignal(network, multiblockInterface, $ -> stopped = $);
+        }
+    }
+
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        super.subscribeEvents(eventManager);
+        eventManager.subscribe(CONNECT.get(), this::onConnect);
     }
 
     @Override

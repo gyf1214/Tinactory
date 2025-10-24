@@ -427,6 +427,7 @@
   "extras": {
     "block.tinactory.machine.boiler.high": "高压蒸汽锅炉",
     "block.tinactory.machine.boiler.low": "小型蒸汽锅炉",
+    "block.tinactory.machine.signal_controller": "信号控制器",
     "block.tinactory.network.controller": "网络控制器",
     "block.tinactory.primitive.workbench": "工作台",
     "block.tinactory.multiblock.sifter": "大型筛选漏斗",
@@ -506,6 +507,10 @@
     "tinactory.gui.fluidAmount": "%s mB",
     "tinactory.gui.emptyFluid": "空",
     "tinactory.gui.workbench.title": "工作台",
+    "tinactory.gui.signal.progress": "进度",
+    "tinactory.gui.signal.stop": "停机",
+    "tinactory.gui.signalController.readSignal": "读信号",
+    "tinactory.gui.signalController.writeSignal": "写信号",
     "tinactory.jei.processing.total": "总计：%s EU",
     "tinactory.jei.processing.power": "功率： %s EU/t (%s)",
     "tinactory.jei.processing.duration": "持续时间：%s 秒",

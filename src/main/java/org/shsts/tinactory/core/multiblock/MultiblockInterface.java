@@ -19,6 +19,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
+import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -36,6 +37,7 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.CLIENT_TICK;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
@@ -133,6 +135,12 @@ public class MultiblockInterface extends Machine {
         }
     }
 
+    private void onConnect(INetwork network) {
+        if (multiblock != null) {
+            invoke(multiblock.blockEntity, CONNECT, network);
+        }
+    }
+
     @Override
     public void setConfig(ISetMachineConfigPacket packet, boolean invokeEvent) {
         super.setConfig(packet, invokeEvent);
@@ -198,6 +206,7 @@ public class MultiblockInterface extends Machine {
         eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_TICK.get(), $ -> onClientTick());
         eventManager.subscribe(CONTAINER_CHANGE.get(), this::onContainerChange);
+        eventManager.subscribe(CONNECT.get(), this::onConnect);
     }
 
     @Override
@@ -213,7 +222,7 @@ public class MultiblockInterface extends Machine {
         if (multiblock == null) {
             return;
         }
-        LOGGER.debug("{}: set work block, state = {}", multiblock, state);
+        LOGGER.trace("{}: set work block, state = {}", multiblock, state);
         multiblock.setWorkBlock(world, state);
     }
 

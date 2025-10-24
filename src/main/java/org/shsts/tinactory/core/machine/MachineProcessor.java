@@ -22,6 +22,7 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.AllCapabilities;
@@ -44,6 +45,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
@@ -62,6 +64,7 @@ public class MachineProcessor extends CapabilityProvider implements
     protected final BlockEntity blockEntity;
     private final List<IRecipeProcessor<?>> processors;
     private final boolean autoRecipe;
+    private boolean stopped = false;
 
     /**
      * This is only used during deserializeNBT when world is not available.
@@ -249,6 +252,14 @@ public class MachineProcessor extends CapabilityProvider implements
         if (currentRecipe != null || !needUpdate) {
             return;
         }
+
+        if (stopped) {
+            if (workProgress > 0) {
+                workProgress = 0;
+            }
+            return;
+        }
+
         var world = world();
         assert currentRecipeLoc == null;
         var machine = machine();
@@ -309,6 +320,7 @@ public class MachineProcessor extends CapabilityProvider implements
             infoMap.clear();
             needUpdate = true;
         }
+        stopped = false;
         blockEntity.setChanged();
     }
 
@@ -363,6 +375,10 @@ public class MachineProcessor extends CapabilityProvider implements
         TechManager.server().onProgressChange(onTechChange);
     }
 
+    private void onConnect(INetwork network) {
+        machine().ifPresent(machine -> Machine.registerStopSignal(network, machine, $ -> stopped = $));
+    }
+
     private void onRemoved(Level world) {
         if (!world.isClientSide) {
             TechManager.server().removeProgressChangeListener(onTechChange);
@@ -380,6 +396,7 @@ public class MachineProcessor extends CapabilityProvider implements
         eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
         eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
         eventManager.subscribe(CONTAINER_CHANGE.get(), this::setUpdateRecipe);
+        eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }
 

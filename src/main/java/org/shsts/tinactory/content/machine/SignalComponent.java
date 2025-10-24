@@ -52,14 +52,6 @@ public class SignalComponent extends NotifierComponent {
         invokeUpdate();
     }
 
-    public void unregisterMachine(IMachine machine) {
-        var uuid = machine.uuid();
-        readSignals.remove(uuid);
-        writeSignals.remove(uuid);
-        subnetMachines.remove(getMachineSubnet(machine), uuid);
-        invokeUpdate();
-    }
-
     public Collection<SignalInfo> getSubnetSignals(BlockPos subnet) {
         var ret = new ArrayList<SignalInfo>();
         for (var uuid : subnetMachines.get(subnet)) {

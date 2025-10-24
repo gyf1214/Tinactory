@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
@@ -57,7 +58,6 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
-import static org.shsts.tinactory.content.AllNetworks.POST_WORK_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.PRE_WORK_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.content.AllNetworks.WORK_SCHEDULING;
@@ -69,6 +69,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
     protected static final String ID = "network/machine";
+    public static final String STOP_SIGNAL = "stop";
 
     protected final BlockEntity blockEntity;
 
@@ -77,7 +78,6 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     private UUID uuid = UUID.randomUUID();
     protected final MachineConfig config = new MachineConfig();
-    private boolean stopSignal = false;
 
     protected Machine(BlockEntity be) {
         this.blockEntity = be;
@@ -120,11 +120,6 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         if (invokeEvent) {
             invoke(blockEntity, SET_MACHINE_CONFIG);
         }
-    }
-
-    @Override
-    public boolean isStopped() {
-        return stopSignal;
     }
 
     private void setName(Component name) {
@@ -259,8 +254,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         });
 
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
-        signal.registerRead(this, "progress", () -> processor().map($ -> {
-            var progress = $.getProgress();
+        processor().ifPresent(processor -> signal.registerRead(this, "progress", () -> {
+            var progress = processor.getProgress();
             if (progress >= 1d) {
                 return 15;
             } else if (progress <= 0d) {
@@ -268,8 +263,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
             } else {
                 return 1 + (int) Math.floor(progress * 15);
             }
-        }).orElse(0));
-        signal.registerWrite(this, "stop", $ -> stopSignal = $ > 0);
+        }));
 
         invoke(blockEntity, CONNECT, network);
     }
@@ -298,15 +292,10 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         });
     }
 
-    private void onPostWork(Level world, INetwork network) {
-        stopSignal = false;
-    }
-
     @Override
     public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
         builder.add(PRE_WORK_SCHEDULING.get(), this::onPreWork);
         builder.add(WORK_SCHEDULING.get(), this::onWork);
-        builder.add(POST_WORK_SCHEDULING.get(), this::onPostWork);
         invoke(blockEntity, BUILD_SCHEDULING, builder);
     }
 
@@ -356,5 +345,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         var machine = MACHINE.tryGet(be);
         return machine.map(IMachine::processor)
             .orElseGet(() -> PROCESSOR.tryGet(be));
+    }
+
+    public static void registerStopSignal(INetwork network, IMachine machine,
+        Consumer<Boolean> setter) {
+        var signal = network.getComponent(SIGNAL_COMPONENT.get());
+        signal.registerWrite(machine, STOP_SIGNAL, val -> setter.accept(val > 0));
     }
 }

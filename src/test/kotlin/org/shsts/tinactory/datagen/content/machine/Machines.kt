@@ -116,7 +116,7 @@ object Machines {
             block("machine/signal_controller") {
                 machineModel {
                     casing(Voltage.LV)
-                    overlay("cover/over_controller")
+                    overlay("cover/overlay_controller")
                     ioTex(ME_BUS)
                 }
             }

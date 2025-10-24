@@ -38,8 +38,6 @@ import static org.shsts.tinactory.core.gui.Menu.PORT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.PORT_PADDING_ICON;
 import static org.shsts.tinactory.core.gui.Menu.PORT_PADDING_TEXT;
 import static org.shsts.tinactory.core.gui.Menu.PORT_TEXT_COLOR;
-import static org.shsts.tinactory.core.gui.Menu.PORT_WIDTH;
-import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.INPUT_OUTPUT_OVERLAY;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 
@@ -47,7 +45,8 @@ import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
-    private static final int WIDTH = PANEL_WIDTH + PORT_WIDTH + MARGIN_X;
+    private static final int SIGNAL_WIDTH = 64;
+    private static final int WIDTH = PANEL_WIDTH + SIGNAL_WIDTH + MARGIN_X;
     private static final int HEIGHT = PANEL_HEIGHT;
 
     private final IMachineConfig machineConfig;
@@ -56,7 +55,7 @@ public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
 
     private class SignalSelectPanel extends ButtonPanel {
         public SignalSelectPanel() {
-            super(SignalControllerScreen.this, PORT_WIDTH, PORT_HEIGHT, 0);
+            super(SignalControllerScreen.this, SIGNAL_WIDTH, PORT_HEIGHT, 0);
         }
 
         @Override
@@ -101,13 +100,12 @@ public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
 
                 var iconW = INPUT_OUTPUT_OVERLAY.width();
                 var iconH = INPUT_OUTPUT_OVERLAY.height() / 2;
-                var icon = new Rect(0, info.isWrite() ? iconH : 0, iconW, iconH);
+                var icon = new Rect(0, info.isWrite() ? 0 : iconH, iconW, iconH);
                 RenderUtil.blit(poseStack, INPUT_OUTPUT_OVERLAY, z,
-                    rect.offset(SPACING, PORT_PADDING_ICON).resize(iconW, iconH), icon);
+                    rect.offset(0, PORT_PADDING_ICON).resize(iconW, iconH), icon);
 
-                var textX = SPACING * 2 + iconW;
                 RenderUtil.renderText(poseStack, signalName(info.key()),
-                    rect.x() + textX, rect.y() + PORT_PADDING_TEXT,
+                    rect.x() + iconW, rect.y() + PORT_PADDING_TEXT + 1,
                     PORT_TEXT_COLOR);
             });
         }
@@ -155,8 +153,8 @@ public class SignalControllerScreen extends MenuScreen<SignalControllerMenu> {
         };
         this.signalPanel = new SignalSelectPanel();
 
-        var offset1 = Rect.corners(1, 1, -PORT_WIDTH - MARGIN_X - 1, -1);
-        var offset2 = Rect.corners(-PORT_WIDTH, 0, 0, 0);
+        var offset1 = Rect.corners(1, 1, -SIGNAL_WIDTH - MARGIN_X - 1, -1);
+        var offset2 = Rect.corners(-SIGNAL_WIDTH, 0, 0, 0);
 
         addPanel(offset1, machinePanel);
         addPanel(RectD.corners(1d, 0d, 1d, 1d), offset2, signalPanel);
