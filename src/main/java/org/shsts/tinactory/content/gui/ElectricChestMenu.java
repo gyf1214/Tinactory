@@ -47,7 +47,7 @@ public class ElectricChestMenu extends ElectricStorageMenu {
             if (chest.isVoid()) {
                 return 64;
             }
-            var capacity = chest.slotSize - chest.getStackInSlot(slot).getCount();
+            var capacity = chest.capacity - chest.getStackInSlot(slot).getCount();
             return Math.min(capacity, 64);
         }
 

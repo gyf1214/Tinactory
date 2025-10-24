@@ -254,16 +254,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         });
 
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
-        processor().ifPresent(processor -> signal.registerRead(this, "progress", () -> {
-            var progress = processor.getProgress();
-            if (progress >= 1d) {
-                return 15;
-            } else if (progress <= 0d) {
-                return 0;
-            } else {
-                return 1 + (int) Math.floor(progress * 15);
-            }
-        }));
+        processor().ifPresent(processor -> signal.registerRead(this, "progress", () ->
+            MathUtil.toSignal(processor.getProgress())));
 
         invoke(blockEntity, CONNECT, network);
     }

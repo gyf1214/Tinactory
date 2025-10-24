@@ -19,6 +19,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -34,7 +35,7 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 public class ElectricChest extends ElectricStorage implements INBTSerializable<CompoundTag> {
     public static final String ID = "machine/chest";
 
-    public final int slotSize;
+    public final int capacity;
     private final int size;
     private final WrapperItemHandler internalItems;
     private final IItemCollection externalPort;
@@ -100,13 +101,13 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         }
     }
 
-    public ElectricChest(BlockEntity blockEntity, Layout layout, int slotSize, double power) {
+    public ElectricChest(BlockEntity blockEntity, Layout layout, int capacity, double power) {
         super(blockEntity, layout, power);
         this.size = layout.slots.size() / 2;
-        this.slotSize = slotSize;
+        this.capacity = capacity;
         this.filters = new ItemStack[size];
 
-        var inner = new ItemSlotHandler(size, slotSize);
+        var inner = new ItemSlotHandler(size, capacity);
         this.internalItems = new VoidableItemHandler(inner);
         internalItems.onUpdate(this::onSlotChange);
         for (var i = 0; i < size; i++) {
@@ -165,6 +166,19 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     @Override
     protected void onMachineConfig() {
         machine.network().ifPresent(network -> registerPort(network, externalPort));
+    }
+
+    @Override
+    protected int updateSignal() {
+        var totalCapacity = 0;
+        var totalCount = 0;
+        for (var i = 0; i < size; i++) {
+            if (filters[i] != null) {
+                totalCapacity += capacity;
+                totalCount += internalItems.getStackInSlot(i).getCount();
+            }
+        }
+        return totalCapacity == 0 ? 0 : MathUtil.toSignal((double) totalCount / totalCapacity);
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
@@ -29,6 +30,7 @@ import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 public class ElectricTank extends ElectricStorage implements INBTSerializable<CompoundTag> {
     public static final String ID = "machine/tank";
 
+    private final int capacity;
     private final int size;
     private final WrapperFluidTank[] tanks;
     private final CombinedFluidTank port;
@@ -56,13 +58,14 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         }
     }
 
-    public ElectricTank(BlockEntity blockEntity, Layout layout, int slotSize, double power) {
+    public ElectricTank(BlockEntity blockEntity, Layout layout, int capacity, double power) {
         super(blockEntity, layout, power);
+        this.capacity = capacity;
         this.size = layout.slots.size();
         this.tanks = new WrapperFluidTank[size];
         for (var i = 0; i < size; i++) {
             var slot = i;
-            tanks[i] = new VoidableFluidTank(slotSize);
+            tanks[i] = new VoidableFluidTank(capacity);
             tanks[i].onUpdate(this::onSlotChange);
             tanks[i].setFilter(stack -> allowFluidInTank(slot, stack));
         }
@@ -100,6 +103,19 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     @Override
     protected void onMachineConfig() {
         machine.network().ifPresent(network -> registerPort(network, port));
+    }
+
+    @Override
+    protected int updateSignal() {
+        var totalCapacity = 0;
+        var totalAmount = 0;
+        for (var i = 0; i < size; i++) {
+            if (filters[i] != null) {
+                totalCapacity += capacity;
+                totalAmount += tanks[i].getFluidAmount();
+            }
+        }
+        return totalCapacity == 0 ? 0 : MathUtil.toSignal((double) totalAmount / totalCapacity);
     }
 
     @Override

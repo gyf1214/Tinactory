@@ -6,6 +6,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IDigitalProvider {
+    int capacity();
+
     int bytesUsed();
 
     int consumeLimit(int offset, int bytes);

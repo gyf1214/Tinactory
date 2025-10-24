@@ -15,6 +15,11 @@ public class DigitalProvider implements IDigitalProvider {
     }
 
     @Override
+    public int capacity() {
+        return bytesLimit;
+    }
+
+    @Override
     public int bytesUsed() {
         return bytesLimit - bytesRemaining;
     }

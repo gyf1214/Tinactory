@@ -509,6 +509,7 @@
     "tinactory.gui.workbench.title": "工作台",
     "tinactory.gui.signal.progress": "进度",
     "tinactory.gui.signal.stop": "停机",
+    "tinactory.gui.signal.Amount": "数量",
     "tinactory.gui.signalController.readSignal": "读信号",
     "tinactory.gui.signalController.writeSignal": "写信号",
     "tinactory.jei.processing.total": "总计：%s EU",

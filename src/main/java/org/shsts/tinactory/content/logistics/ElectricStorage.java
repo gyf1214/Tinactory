@@ -27,6 +27,7 @@ import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
@@ -40,6 +41,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     public static final boolean GLOBAL_DEFAULT = false;
     public static final String VOID_KEY = "void";
     public static final boolean VOID_DEFAULT = false;
+    public static final String AMOUNT_SIGNAL = "amount";
 
     protected final BlockEntity blockEntity;
     private final Layout layout;
@@ -47,6 +49,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
 
     protected IMachine machine;
     protected IMachineConfig machineConfig;
+    private int amountSignal = 0;
 
     protected ElectricStorage(BlockEntity blockEntity, Layout layout, IElectricMachine electric) {
         this.blockEntity = blockEntity;
@@ -77,6 +80,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
 
     protected void onSlotChange() {
         blockEntity.setChanged();
+        amountSignal = updateSignal();
     }
 
     private void onLoad() {
@@ -85,6 +89,16 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     }
 
     protected abstract void onMachineConfig();
+
+    protected abstract int updateSignal();
+
+    private void onConnect(INetwork network) {
+        onMachineConfig();
+
+        var signal = network.getComponent(SIGNAL_COMPONENT.get());
+        signal.registerRead(machine, AMOUNT_SIGNAL, () -> amountSignal);
+        amountSignal = updateSignal();
+    }
 
     @Override
     public Layout getLayout() {
@@ -95,7 +109,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CONNECT.get(), $ -> onMachineConfig());
+        eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }
 

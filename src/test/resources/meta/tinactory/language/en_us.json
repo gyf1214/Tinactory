@@ -78,7 +78,8 @@
     "tinactory[.]technology[.]ore[.](.*)[.](.*)": "$2 Ore",
     "tinactory[.]technology[.]ore[.](.*)": "$1 Ores",
     "tinactory[.]technology[.]([^.]*)": "$1",
-    "tinactory[.]jei[.]category[.](.*)": "$1"
+    "tinactory[.]jei[.]category[.](.*)": "$1",
+    "tinactory[.]gui[.]signal[.](.*)": "$1"
   },
   "extras": {
     "block.tinactory.machine.boiler.high": "High Pressure Steam Boiler",
@@ -159,8 +160,6 @@
     "tinactory.gui.fluidAmount": "%s mB",
     "tinactory.gui.emptyFluid": "Empty",
     "tinactory.gui.workbench.title": "Workbench",
-    "tinactory.gui.signal.progress": "Progress",
-    "tinactory.gui.signal.stop": "Stop",
     "tinactory.gui.signalController.readSignal": "Read Signal",
     "tinactory.gui.signalController.writeSignal": "Write Signal",
     "tinactory.jei.processing.total": "Total: %s EU",

@@ -113,6 +113,14 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             blockEntity.setChanged();
         }
 
+        /**
+         * This is not used.
+         */
+        @Override
+        public int capacity() {
+            return bytesLimit;
+        }
+
         @Override
         public int bytesUsed() {
             return bytesUsed;

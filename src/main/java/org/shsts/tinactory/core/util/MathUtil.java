@@ -118,4 +118,14 @@ public final class MathUtil {
         // nothing we can do to get a good approximation, just sample directly
         return directBinomial(n, p, random);
     }
+
+    public static int toSignal(double x) {
+        if (x >= 1d) {
+            return 15;
+        } else if (x <= 0d) {
+            return 0;
+        } else {
+            return 1 + (int) Math.floor(x * 14);
+        }
+    }
 }

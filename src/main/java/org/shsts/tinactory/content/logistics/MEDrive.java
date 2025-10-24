@@ -27,6 +27,7 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -34,7 +35,9 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
+import static org.shsts.tinactory.content.AllCapabilities.DIGITAL_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
@@ -47,6 +50,7 @@ import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
@@ -55,6 +59,7 @@ public class MEDrive extends CapabilityProvider
     implements IEventSubscriber, ILayoutProvider, INBTSerializable<CompoundTag> {
     public static final String PRIORITY_KEY = ElectricStorage.PRIORITY_KEY;
     public static final int PRIORITY_DEFAULT = 2;
+    public static final String AMOUNT_SIGNAL = ElectricStorage.AMOUNT_SIGNAL;
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "machine/me_drive";
@@ -69,6 +74,7 @@ public class MEDrive extends CapabilityProvider
 
     private IMachine machine;
     private IMachineConfig machineConfig;
+    private int amountSignal = 0;
 
     public MEDrive(BlockEntity blockEntity, Layout layout, double power) {
         this.blockEntity = blockEntity;
@@ -79,13 +85,13 @@ public class MEDrive extends CapabilityProvider
             storages.setFilter(i, this::allowItem);
         }
         this.itemHandlerCap = LazyOptional.of(() -> storages);
-        storages.onUpdate(this::onUpdateStorage);
+        storages.onUpdate(this::onStorageChange);
 
         this.combinedItems = new CombinedItemCollection();
-        combinedItems.onUpdate(blockEntity::setChanged);
+        combinedItems.onUpdate(this::onContainerChange);
 
         this.combinedFluids = new CombinedFluidCollection();
-        combinedFluids.onUpdate(blockEntity::setChanged);
+        combinedFluids.onUpdate(this::onContainerChange);
 
         var voltage = getBlockVoltage(blockEntity);
         var electric = new SimpleElectricConsumer(voltage.value, power);
@@ -100,6 +106,24 @@ public class MEDrive extends CapabilityProvider
         return stack.is(AllTags.STORAGE_CELL);
     }
 
+    private int updateSignal() {
+        var totalBytes = 0;
+        var totalCapacity = 0;
+        for (var i = 0; i < storages.getSlots(); i++) {
+            var storage = storages.getStackInSlot(i);
+            if (storage.isEmpty()) {
+                continue;
+            }
+            var cap = storage.getCapability(DIGITAL_PROVIDER.get());
+            if (cap.isPresent()) {
+                var cap1 = cap.orElseThrow(NoSuchElementException::new);
+                totalBytes += cap1.bytesUsed();
+                totalCapacity += cap1.capacity();
+            }
+        }
+        return totalCapacity == 0 ? 0 : MathUtil.toSignal((double) totalBytes / totalCapacity);
+    }
+
     private void registerPort(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
@@ -109,7 +133,20 @@ public class MEDrive extends CapabilityProvider
         logistics.registerStoragePort(machine, 1, combinedFluids, false, priority);
     }
 
-    private void onUpdateStorage() {
+    private void onConnect(INetwork network) {
+        registerPort(network);
+
+        var signal = network.getComponent(SIGNAL_COMPONENT.get());
+        signal.registerRead(machine, AMOUNT_SIGNAL, () -> amountSignal);
+        amountSignal = updateSignal();
+    }
+
+    private void onContainerChange() {
+        amountSignal = updateSignal();
+        blockEntity.setChanged();
+    }
+
+    private void onStorageChange() {
         var world = blockEntity.getLevel();
         if (world != null && world.isClientSide) {
             return;
@@ -128,7 +165,7 @@ public class MEDrive extends CapabilityProvider
         }
         combinedItems.setComposes(items);
         combinedFluids.setComposes(fluids);
-        blockEntity.setChanged();
+        onContainerChange();
     }
 
     private void onMachineConfig() {
@@ -161,7 +198,7 @@ public class MEDrive extends CapabilityProvider
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CONNECT.get(), this::registerPort);
+        eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
         eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
             StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), storages));
