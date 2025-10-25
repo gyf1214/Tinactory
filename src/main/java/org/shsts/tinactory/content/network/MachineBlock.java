@@ -58,7 +58,7 @@ public class MachineBlock extends SmartEntityBlock
 
     public static MachineBlock simple(Properties properties,
         Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu) {
-        return new MachineBlock(properties, entityType, menu, Voltage.PRIMITIVE);
+        return new StaticMachineBlock(properties, entityType, menu, Voltage.PRIMITIVE);
     }
 
     public static Factory<MachineBlock> sided(Voltage voltage) {

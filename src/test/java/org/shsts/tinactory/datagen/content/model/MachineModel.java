@@ -21,7 +21,7 @@ import org.shsts.tinactory.content.network.FixedBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
-import org.shsts.tinactory.content.network.SignalMachineBlock;
+import org.shsts.tinactory.content.network.StaticMachineBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -238,7 +238,7 @@ public class MachineModel {
                 .build());
     }
 
-    private void signal(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+    private void staticMachine(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
         var prov = ctx.provider().models();
         var base = blockModel(ctx.id(), ctx.object(), false, prov);
         var io = ioModel(ctx.id(), prov);
@@ -263,8 +263,8 @@ public class MachineModel {
             } else if (ctx.object() instanceof SidedMachineBlock ||
                 ctx.object() instanceof SubnetBlock) {
                 sided(ctx);
-            } else if (ctx.object() instanceof SignalMachineBlock) {
-                signal(ctx);
+            } else if (ctx.object() instanceof StaticMachineBlock) {
+                staticMachine(ctx);
             } else if (ctx.object() instanceof MachineBlock) {
                 machine(ctx);
             } else if (ctx.object() instanceof FixedBlock) {
