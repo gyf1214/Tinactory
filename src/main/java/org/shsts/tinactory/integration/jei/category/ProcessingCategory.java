@@ -24,9 +24,9 @@ import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.jei.ComposeDrawable;
+import org.shsts.tinactory.integration.jei.ingredient.RecipeMarker;
+import org.shsts.tinactory.integration.jei.ingredient.TechIngredient;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredientRenderer;
-import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
-import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -144,11 +144,18 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         }
     }
 
+    @Override
+    protected void extraLayout(R recipe, IRecipeLayoutBuilder builder) {
+        // register as OUTPUT so you can use the shortcut R to see it.
+        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
+            .addIngredient(RecipeMarker.TYPE, new RecipeMarker(recipe.loc()));
+    }
+
     protected void addTechIngredient(IRecipeLayoutBuilder builder, RecipeIngredientRole role,
         int x, int y, ResourceLocation loc) {
         builder.addSlot(role, x + 1 + xOffset, y + 1)
-            .addIngredient(TechIngredientType.INSTANCE, new TechWrapper(loc))
-            .setCustomRenderer(TechIngredientType.INSTANCE, TechIngredientRenderer.INSTANCE);
+            .addIngredient(TechIngredient.TYPE, new TechIngredient(loc))
+            .setCustomRenderer(TechIngredient.TYPE, TechIngredientRenderer.INSTANCE);
     }
 
     protected void addRequiredTech(IRecipeLayoutBuilder builder, Collection<ResourceLocation> techs) {

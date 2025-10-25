@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -71,7 +72,7 @@ public class MachineRecipeBook extends Panel {
         }
 
         @Nullable
-        private IRecipeBookItem getRecipe(int index) {
+        public IRecipeBookItem getRecipe(int index) {
             return index >= 1 && index < recipes.size() + 1 ? recipes.get(index - 1) : null;
         }
 
@@ -211,5 +212,13 @@ public class MachineRecipeBook extends Panel {
             }
         };
         parent.addWidget(anchor, new Rect(x, y, 20, 18), button);
+    }
+
+    public static Optional<IRecipeBookItem> getHoveredRecipe(Widget widget) {
+        if (!(widget instanceof ButtonPanel.ItemButton button) ||
+            !(button.getParent() instanceof RecipeButtonPanel buttonPanel)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(buttonPanel.getRecipe(button.getIndex()));
     }
 }

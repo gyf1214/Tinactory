@@ -34,6 +34,7 @@ public class AssemblyCategory<R extends AssemblyRecipe> extends ProcessingCatego
 
     @Override
     protected void extraLayout(R recipe, IRecipeLayoutBuilder builder) {
+        super.extraLayout(recipe, builder);
         addRequiredTech(builder, recipe.requiredTech);
     }
 }

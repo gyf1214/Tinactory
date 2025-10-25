@@ -12,7 +12,11 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
+import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
+import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.integration.jei.ingredient.RecipeMarker;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -24,9 +28,18 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingHandler extends MenuScreenHandler<ProcessingScreen> {
+    private Object getRecipeBookIngredient(IRecipeBookItem item) {
+        if (item instanceof SmeltingRecipeBookItem smelting) {
+            return smelting.recipe().getResultItem();
+        }
+        return new RecipeMarker(item.loc());
+    }
+
     @Override
     protected @Nullable Object getIngredientHovered(Widget hovered, double mouseX, double mouseY) {
-        return null;
+        return MachineRecipeBook.getHoveredRecipe(hovered)
+            .map(this::getRecipeBookIngredient)
+            .orElse(null);
     }
 
     @Override

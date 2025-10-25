@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.Widget;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.TechPanel;
-import org.shsts.tinactory.integration.jei.ingredient.TechWrapper;
+import org.shsts.tinactory.integration.jei.ingredient.TechIngredient;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -16,7 +16,7 @@ public class NetworkControllerHandler extends MenuScreenHandler<NetworkControlle
         double mouseX, double mouseY) {
         if (TechPanel.isHoveringTech(hovered)) {
             return TechPanel.getHoveredTech(hovered, mouseX)
-                .map(tech -> new TechWrapper(tech.getLoc()))
+                .map(tech -> new TechIngredient(tech.getLoc()))
                 .orElse(null);
         }
         return null;

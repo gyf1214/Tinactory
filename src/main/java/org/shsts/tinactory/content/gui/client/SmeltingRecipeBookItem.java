@@ -33,6 +33,10 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
         this.outputPort = outputPort;
     }
 
+    public SmeltingRecipe recipe() {
+        return recipe;
+    }
+
     @Override
     public ResourceLocation loc() {
         return recipe.getId();

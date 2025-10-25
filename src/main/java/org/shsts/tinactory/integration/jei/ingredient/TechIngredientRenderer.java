@@ -18,13 +18,13 @@ import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TechIngredientRenderer implements IIngredientRenderer<TechWrapper> {
+public class TechIngredientRenderer implements IIngredientRenderer<TechIngredient> {
     private static final Rect RECT = new Rect(0, 0, TECH_SIZE, TECH_SIZE);
 
     private TechIngredientRenderer() {}
 
     @Override
-    public void render(PoseStack poseStack, TechWrapper ingredient) {
+    public void render(PoseStack poseStack, TechIngredient ingredient) {
         var tech = TechManager.client().techByKey(ingredient.loc());
         if (tech.isEmpty()) {
             return;
@@ -34,7 +34,7 @@ public class TechIngredientRenderer implements IIngredientRenderer<TechWrapper> 
     }
 
     @Override
-    public List<Component> getTooltip(TechWrapper ingredient, TooltipFlag tooltipFlag) {
+    public List<Component> getTooltip(TechIngredient ingredient, TooltipFlag tooltipFlag) {
         return List.of(I18n.tr(ITechnology.getDescriptionId(ingredient.loc())));
     }
 

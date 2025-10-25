@@ -39,11 +39,11 @@ import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
 import org.shsts.tinactory.integration.jei.gui.NetworkControllerHandler;
 import org.shsts.tinactory.integration.jei.gui.ProcessingHandler;
-import org.shsts.tinactory.integration.jei.gui.ResearchBenchHandler;
+import org.shsts.tinactory.integration.jei.gui.ResearchHandler;
 import org.shsts.tinactory.integration.jei.gui.WorkbenchHandler;
 import org.shsts.tinactory.integration.jei.ingredient.IngredientRenderers;
-import org.shsts.tinactory.integration.jei.ingredient.TechIngredientHelper;
-import org.shsts.tinactory.integration.jei.ingredient.TechIngredientType;
+import org.shsts.tinactory.integration.jei.ingredient.RecipeMarker;
+import org.shsts.tinactory.integration.jei.ingredient.TechIngredient;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -111,8 +111,10 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
-        registration.register(TechIngredientType.INSTANCE, Collections.emptyList(),
-            new TechIngredientHelper(), IngredientRenderers.empty());
+        registration.register(TechIngredient.TYPE, Collections.emptyList(),
+            TechIngredient.HELPER, IngredientRenderers.empty());
+        registration.register(RecipeMarker.TYPE, Collections.emptyList(),
+            RecipeMarker.HELPER, IngredientRenderers.empty());
     }
 
     @Override
@@ -145,7 +147,7 @@ public class JEI implements IModPlugin {
         registration.addGenericGuiContainerHandler(MenuScreen.class, MenuScreenHandler.fluid());
         registration.addGuiContainerHandler(NetworkControllerScreen.class, new NetworkControllerHandler());
         registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler());
-        registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchBenchHandler());
+        registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchHandler());
         WorkbenchHandler.addWorkbenchClickArea(registration, toolCategory);
     }
 

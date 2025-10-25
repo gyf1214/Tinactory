@@ -49,6 +49,7 @@ public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
 
     @Override
     protected void extraLayout(ResearchRecipe recipe, IRecipeLayoutBuilder builder) {
+        super.extraLayout(recipe, builder);
         var rect = layout.images.get(0).rect();
         addTechIngredient(builder, RecipeIngredientRole.OUTPUT, rect.x(), rect.y(), recipe.target);
         var requiredTech = TechManager.client().techByKey(recipe.target)
