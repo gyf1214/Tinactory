@@ -22,6 +22,8 @@ import static org.shsts.tinactory.core.gui.Texture.VANILLA_WIDGETS;
 @MethodsReturnNonnullByDefault
 public final class Widgets {
     public static final int BUTTON_HEIGHT = 20;
+    public static final Rect BUTTON_PANEL_TEX = new Rect(1, 1, 147, 166);
+    public static final Rect BUTTON_PANEL_BG = BUTTON_PANEL_TEX.offset(6, 6).enlarge(-12, -12);
 
     public static Button simpleButton(MenuBase menu, Component label,
         @Nullable Component tooltip, Runnable onPress) {

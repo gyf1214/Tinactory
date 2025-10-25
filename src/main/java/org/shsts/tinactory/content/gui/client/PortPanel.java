@@ -26,7 +26,6 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllMenus.PORT_CLICK;
-import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BUTTON_TOP_MARGIN;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
@@ -38,6 +37,7 @@ import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 import static org.shsts.tinactory.core.gui.Texture.GREGTECH_LOGO;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
+import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_TEX;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -97,7 +97,7 @@ public class PortPanel extends Panel {
         var menu = screen.menu();
         this.xOffset = layout.getXOffset();
 
-        var background = new StretchImage(menu, RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);
+        var background = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
         addWidget(RectD.FULL, Rect.ZERO, background);
 
         var i = 0;

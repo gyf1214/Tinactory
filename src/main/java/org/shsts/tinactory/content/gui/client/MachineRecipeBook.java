@@ -44,6 +44,7 @@ import static org.shsts.tinactory.core.gui.Texture.DISABLE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
+import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_TEX;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -56,9 +57,8 @@ public class MachineRecipeBook extends Panel {
     public static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
     public static final Rect PANEL_OFFSET = Rect.corners(-MARGIN_X - PANEL_WIDTH,
         -MARGIN_TOP, -MARGIN_X, MARGIN_VERTICAL);
-    public static final Rect BACKGROUND_TEX_RECT = new Rect(1, 1, 147, 166);
-    private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER, PANEL_BORDER + BUTTON_TOP_MARGIN,
-        -PANEL_BORDER, -PANEL_BORDER);
+    private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER,
+        PANEL_BORDER + BUTTON_TOP_MARGIN, -PANEL_BORDER, -PANEL_BORDER);
 
     private class RecipeButtonPanel extends ButtonPanel {
         public RecipeButtonPanel() {
@@ -137,7 +137,7 @@ public class MachineRecipeBook extends Panel {
         this.ghostRecipe = new GhostRecipe(menu);
 
         buttonPanel = new RecipeButtonPanel();
-        var panelBg = new StretchImage(menu, RECIPE_BOOK_BG, BACKGROUND_TEX_RECT, PANEL_BORDER);
+        var panelBg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
         bookPanel.addWidget(RectD.FULL, Rect.ZERO, panelBg);
         bookPanel.addPanel(BUTTON_PANEL_OFFSET, buttonPanel);
         bookPanel.setActive(false);

@@ -5,8 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 
-import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BACKGROUND_TEX_RECT;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Menu {
@@ -30,7 +28,6 @@ public final class Menu {
     public static final int MARGIN_VERTICAL = 3 + SPACING;
     public static final int MARGIN_TOP = MARGIN_VERTICAL + FONT_HEIGHT + SPACING;
     public static final Container EMPTY_CONTAINER = new SimpleContainer(0);
-    public static final Rect BUTTON_PANEL_BG = BACKGROUND_TEX_RECT.offset(6, 6).enlarge(-12, -12);
 
     private Menu() {}
 }

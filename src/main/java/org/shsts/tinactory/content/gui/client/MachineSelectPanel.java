@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.shsts.tinactory.core.gui.Menu.BUTTON_PANEL_BG;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
+import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault

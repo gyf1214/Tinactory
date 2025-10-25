@@ -34,7 +34,6 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_OFFSET;
 import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_WIDTH;
 import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
-import static org.shsts.tinactory.core.gui.Menu.BUTTON_PANEL_BG;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.PANEL_BORDER;
@@ -42,6 +41,8 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
+import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
+import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -232,8 +233,8 @@ public class TechPanel extends Panel {
         this.startResearchButton = Widgets.simpleButton(menu, tr("startResearchButton"),
             null, this::startResearch);
         var y = 0;
-        var offset7 = Rect.corners(0, y - Widgets.BUTTON_HEIGHT, 0, y);
-        y -= Widgets.BUTTON_HEIGHT + MARGIN_VERTICAL;
+        var offset7 = Rect.corners(0, y - BUTTON_HEIGHT, 0, y);
+        y -= BUTTON_HEIGHT + MARGIN_VERTICAL;
         var offset6 = Rect.corners(0, y - PROGRESS_HEIGHT, 0, y);
         y -= PROGRESS_HEIGHT + MARGIN_VERTICAL;
         var offset5 = Rect.corners(0, y - TECH_SIZE, 0, y);
