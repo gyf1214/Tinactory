@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -19,6 +20,7 @@ import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.core.util.ClientUtil;
 
 import java.util.Optional;
 
@@ -79,6 +81,8 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
+            ClientUtil.playSound(SoundEvents.UI_BUTTON_CLICK);
+
             var carried = menu.getCarried();
             var packet = SetMachineConfigPacket.builder();
 

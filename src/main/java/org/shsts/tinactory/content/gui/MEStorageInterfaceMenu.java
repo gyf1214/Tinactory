@@ -28,6 +28,7 @@ import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
 import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -35,7 +36,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static final String SLOT_SYNC = "slots";
-    public static final int PANEL_HEIGHT = 6 * SLOT_SIZE + 21;
+    public static final int PANEL_HEIGHT = 6 * SLOT_SIZE + SPACING;
 
     private final IMachine machine;
     private final IMachineConfig machineConfig;

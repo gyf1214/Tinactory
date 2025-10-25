@@ -27,6 +27,7 @@ import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -85,8 +86,12 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     @Override
     public DistLazy<List<IRecipeBookItem>> recipeBookItems(Level world, IMachine machine) {
-        var locs = targetRecipes(world, machine);
-        return () -> () -> locs.stream()
+        var loc = targetRecipes(world, machine);
+        var comparator = Comparator.<ProcessingRecipe>comparingLong($ -> $.voltage)
+            .thenComparing(ProcessingRecipe::loc, ResourceLocation::compareNamespaced);
+        loc.sort(comparator);
+
+        return () -> () -> loc.stream()
             .<IRecipeBookItem>map(ProcessingRecipeBookItem::new)
             .toList();
     }

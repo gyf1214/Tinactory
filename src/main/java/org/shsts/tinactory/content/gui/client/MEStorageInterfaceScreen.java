@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -86,6 +87,7 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
                 menu.triggerEvent(ME_STORAGE_INTERFACE_SLOT,
                     () -> new MEStorageInterfaceEventPacket(item, button1));
             } else if (index - items.size() < fluids.size()) {
+                ClientUtil.playSound(SoundEvents.BUCKET_FILL);
                 var fluid = fluids.get(index - items.size());
                 menu.triggerEvent(ME_STORAGE_INTERFACE_SLOT,
                     () -> new MEStorageInterfaceEventPacket(fluid, button));

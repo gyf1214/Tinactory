@@ -78,7 +78,7 @@ object Woods {
                 }
                 output(sapling, 4)
                 output(leaves, 32)
-                voltage(Voltage.MV)
+                voltage(Voltage.LV)
                 workTicks(300)
             }
         }
