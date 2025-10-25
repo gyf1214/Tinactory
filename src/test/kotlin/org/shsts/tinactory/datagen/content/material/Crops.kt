@@ -6,10 +6,13 @@ import net.minecraft.world.level.ItemLike
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autofarm
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
+import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object Crops {
     fun init() {
@@ -76,6 +79,20 @@ object Crops {
                 output("biomass", amount = 0.1)
                 voltage(Voltage.LV)
                 workTicks(96)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.ULV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.SOLDERING)
+            }
+            output(Items.HAY_BLOCK) {
+                input(Items.WHEAT, 9)
+            }
+            output(Items.WHEAT, 9) {
+                input(Items.HAY_BLOCK)
             }
         }
     }

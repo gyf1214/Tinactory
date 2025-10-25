@@ -261,22 +261,133 @@ object MiscMachines {
                 define('P', "iron", "plate")
                 toolTag(TOOL_HAMMER)
             }
+            result(Items.LEVER) {
+                pattern("P")
+                pattern("S")
+                pattern("R")
+                define('P', "iron", "plate")
+                define('S', Items.STICK)
+                define('R', "redstone", "dust")
+                toolTag(TOOL_WRENCH)
+            }
         }
 
         assembler {
-            output(Items.HOPPER) {
-                input(Items.CHEST)
-                input("iron", "plate", 4)
+            defaults {
                 voltage(Voltage.ULV)
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.SOLDERING)
             }
+            output(Items.HOPPER) {
+                input(Items.CHEST)
+                input("iron", "plate", 4)
+            }
             output(Items.BUCKET) {
                 input("iron", "plate", 2)
                 input("iron", "stick")
-                voltage(Voltage.ULV)
+            }
+            output(Items.TORCH, 3) {
+                input(Items.STICK)
+                input("sulfur", "dust")
+                workTicks(64)
+            }
+            output(Items.REDSTONE_TORCH) {
+                input(Items.STICK)
+                input("redstone", "dust")
+                workTicks(64)
+            }
+            output(Items.LEVER) {
+                input("iron", "plate")
+                input(Items.STICK)
+                input("redstone", "dust")
+            }
+            output(Items.TRIPWIRE_HOOK, 2) {
+                input("iron", "plate", 2)
+                input(Items.STICK, 2)
+                input(Items.REDSTONE_TORCH)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.LV)
                 workTicks(COMPONENT_TICKS)
-                tech(Technologies.SOLDERING)
+                tech(Technologies.INTEGRATED_CIRCUIT)
+            }
+
+            componentVoltage = Voltage.ULV
+            output(Items.REPEATER) {
+                circuit(1)
+                input("redstone", "dust")
+                input("iron", "plate", 2)
+            }
+            output(Items.COMPARATOR) {
+                circuit(1)
+                input(Items.REDSTONE_TORCH, 4)
+                input("iron", "plate", 2)
+            }
+            output(Items.REDSTONE_LAMP) {
+                circuit(1)
+                input("glowstone", "dust", 2)
+                input("redstone", "dust", 2)
+                input("iron", "plate", 2)
+            }
+            output(Items.REDSTONE_BLOCK) {
+                circuit(1)
+                input("redstone", "dust", 4)
+                input("iron", "plate", 2)
+            }
+            output(Items.TRAPPED_CHEST) {
+                circuit(1)
+                input(Items.CHEST)
+                input(Items.REDSTONE_TORCH)
+            }
+
+            componentVoltage = Voltage.LV
+            output(Items.OBSERVER) {
+                component("sensor")
+                input("redstone", "dust", 2)
+                input("iron", "plate", 2)
+            }
+            output(Items.DAYLIGHT_DETECTOR) {
+                component("sensor")
+                input("redstone", "dust", 2)
+                input("glass", "primary", 2)
+            }
+            output(Items.TARGET) {
+                component("sensor")
+                input("redstone", "dust", 2)
+                input(Items.WHEAT, 9)
+            }
+            output(Items.PISTON) {
+                component("electric_piston")
+                input("redstone", "dust", 2)
+                input("iron", "plate", 2)
+            }
+            output(Items.STICKY_PISTON) {
+                component("electric_piston")
+                input("redstone", "dust", 2)
+                input("rubber", amount = 2)
+            }
+            output(Items.DROPPER) {
+                component("electric_pump")
+                input("redstone", "dust", 2)
+                input("iron", "plate", 2)
+            }
+            output(Items.DISPENSER) {
+                component("conveyor_module")
+                input("redstone", "dust", 2)
+                input("iron", "plate", 2)
+            }
+            output(Items.NOTE_BLOCK) {
+                component("emitter")
+                input("redstone", "dust", 2)
+                input("iron", "plate", 2)
+            }
+            output(Items.JUKEBOX) {
+                component("emitter")
+                input("diamond", "gem")
+                input("steel", "plate", 2)
             }
         }
 
@@ -292,9 +403,6 @@ object MiscMachines {
                 Items.ENCHANTING_TABLE,
                 Items.ANVIL,
                 Items.SMITHING_TABLE,
-                Items.TARGET,
-                Items.NOTE_BLOCK,
-                Items.JUKEBOX,
                 Items.CAULDRON,
                 Items.RESPAWN_ANCHOR,
                 Items.GLOWSTONE,
@@ -306,6 +414,9 @@ object MiscMachines {
                 Items.COMPASS,
                 Items.CROSSBOW,
                 Items.CLOCK,
+                Items.TARGET,
+                Items.NOTE_BLOCK,
+                Items.JUKEBOX,
                 Items.PISTON,
                 Items.STICKY_PISTON,
                 Items.DISPENSER,
@@ -313,12 +424,11 @@ object MiscMachines {
                 Items.DAYLIGHT_DETECTOR,
                 Items.TRIPWIRE_HOOK,
                 Items.TRAPPED_CHEST,
-                Items.HOPPER,
-                Items.REDSTONE_TORCH,
                 Items.REPEATER,
                 Items.COMPARATOR,
                 Items.REDSTONE_LAMP,
                 Items.OBSERVER,
+                Items.HOPPER,
                 Items.MINECART,
                 Items.CHEST_MINECART,
                 Items.TNT_MINECART,
@@ -328,6 +438,7 @@ object MiscMachines {
                 Items.POWERED_RAIL,
                 Items.DETECTOR_RAIL,
                 Items.ACTIVATOR_RAIL,
+                Items.LEVER,
                 Items.STONE_PRESSURE_PLATE,
                 Items.POLISHED_BLACKSTONE_PRESSURE_PLATE,
                 Items.LIGHT_WEIGHTED_PRESSURE_PLATE,
