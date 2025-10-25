@@ -220,8 +220,35 @@ object MiscMachines {
 
     private fun ae() {
         assembler {
+            componentVoltage = Voltage.LV
+            defaults {
+                component("machine_hull")
+                autoCable = true
+                voltage(Voltage.LV)
+                workTicks(MACHINE_TICKS)
+            }
+
+            output(getItem("logistics/me_signal_controller")) {
+                circuit(2)
+                component("sensor")
+                component("emitter")
+                input(Items.REDSTONE_TORCH)
+                input("iron", "plate", 4)
+                tech(Technologies.INTEGRATED_CIRCUIT)
+            }
+            output(getItem("logistics/me_storage_detector")) {
+                circuit(2)
+                component("sensor", 2)
+                input(Items.CHEST)
+                input("glass", "primary")
+                input("iron", "plate", 4)
+                tech(Technologies.INTEGRATED_CIRCUIT)
+            }
+        }
+        assembler {
             componentVoltage = Voltage.HV
             defaults {
+                component("machine_hull")
                 autoCable = true
                 voltage(Voltage.HV)
                 workTicks(MACHINE_TICKS)
