@@ -15,7 +15,9 @@ public abstract class NotifierComponent extends NetworkComponent {
     private final Set<Runnable> callbacks = new HashSet<>();
     private boolean isConnecting = false;
 
-    public NotifierComponent(ComponentType<?> type, INetwork network) {super(type, network);}
+    public NotifierComponent(ComponentType<?> type, INetwork network) {
+        super(type, network);
+    }
 
     protected void invokeUpdate() {
         if (isConnecting) {
