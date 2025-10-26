@@ -437,6 +437,12 @@ object Materials {
                 component("lithium", 9)
             }
         }
+        material("rocket_fuel", DULL) {
+            fluidMix(Voltage.HV) {
+                component("lpg")
+                component("oxygen", sub = "liquid")
+            }
+        }
     }
 
     private fun ores() {

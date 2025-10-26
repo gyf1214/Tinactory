@@ -58,7 +58,7 @@ object MiscMaterials {
                 200, suffix = "_from_iron")
         }
 
-        // freeze water and air
+        // MV freezer
         vacuumFreezer {
             defaults {
                 voltage(Voltage.MV)
@@ -81,11 +81,18 @@ object MiscMaterials {
             }
         }
 
+        // HV freezer
         vacuumFreezer {
+            defaults {
+                voltage(Voltage.HV)
+            }
             output(Items.BLUE_ICE) {
                 input(Items.PACKED_ICE, 5)
-                voltage(Voltage.HV)
                 workTicks(160)
+            }
+            output("oxygen", "liquid") {
+                input("oxygen")
+                workTicks(200)
             }
         }
 
@@ -233,20 +240,20 @@ object MiscMaterials {
             output(Items.COBBLED_DEEPSLATE) {
                 voltage(Voltage.LV)
             }
-        }
-        stoneGenerator {
-            defaults {
+            output("air") {
                 voltage(Voltage.MV)
             }
-            output("air")
-            output("sea_water")
-        }
-        stoneGenerator {
-            defaults {
+            output("sea_water") {
+                voltage(Voltage.MV)
+            }
+            output(Items.NETHERRACK) {
                 voltage(Voltage.HV)
                 tech(Technologies.ROCKET_T1)
             }
-            output(Items.NETHERRACK)
+            output(Items.END_STONE) {
+                voltage(Voltage.EV)
+                tech(Technologies.ROCKET_T2)
+            }
         }
     }
 

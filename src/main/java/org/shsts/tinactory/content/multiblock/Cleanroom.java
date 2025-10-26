@@ -200,6 +200,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         @Nullable
         private final TagKey<Block> connectorTag;
         private final int maxSize;
+        private final int maxHeight;
         private final int maxDoors;
         private final int maxConnectors;
 
@@ -212,8 +213,9 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
             this.maxSize = builder.maxSize;
             this.maxDoors = builder.maxDoors;
             this.maxConnectors = builder.maxConnectors;
+            this.maxHeight = builder.maxHeight;
 
-            assert maxSize > 0;
+            assert maxSize > 1 && maxHeight > 1;
             assert maxDoors <= 0 || doorTag != null;
             assert maxConnectors <= 0 || connectorTag != null;
         }
@@ -392,7 +394,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         }
 
         private void checkLayers(IMultiblockCheckCtx ctx) {
-            for (var y = 1; y < maxSize; y++) {
+            for (var y = 1; y < maxHeight; y++) {
                 if (!checkLayer(ctx, y)) {
                     ctx.setProperty("h", y);
                     return;
@@ -418,6 +420,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         private TagKey<Block> doorTag = null;
         private TagKey<Block> connectorTag = null;
         private int maxSize = 0;
+        private int maxHeight = 0;
         private int maxDoors = 0;
         private int maxConnectors = 0;
 
@@ -452,6 +455,11 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
         public SpecBuilder<P> maxSize(int val) {
             this.maxSize = val;
+            return this;
+        }
+
+        public SpecBuilder<P> maxHeight(int val) {
+            this.maxHeight = val;
             return this;
         }
 

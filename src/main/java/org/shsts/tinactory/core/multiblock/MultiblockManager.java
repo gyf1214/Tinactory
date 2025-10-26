@@ -49,6 +49,9 @@ public final class MultiblockManager {
         posMap.get(pos).ifPresent(MultiblockBase::markPreInvalid);
     }
 
+    /*
+     * TODO: Optimize ME
+     */
     public void registerCleanroom(MultiblockBase multiblock, BlockPos center, int w, int d, int h) {
         LOGGER.debug("register new cleanroom {}, size={}x{}x{}", multiblock, 2 * w - 1, h - 1, 2 * d - 1);
         for (var x = -w + 1; x <= w - 1; x++) {

@@ -82,9 +82,12 @@ object Technologies {
     val ROCKET_SCIENCE: ResourceLocation
     val ROCKET_T1: ResourceLocation
     val MULTI_SMELTER: ResourceLocation
+    val POWER_SUBSTATION: ResourceLocation
+
+    // EV
     val TUNGSTEN_STEEL: ResourceLocation
     val METAL_FORMER: ResourceLocation
-    val POWER_SUBSTATION: ResourceLocation
+    val ROCKET_T2: ResourceLocation
 
     init {
         Factory().apply {
@@ -331,15 +334,24 @@ object Technologies {
                 displayItem(getMultiblock("power_substation").block)
             }
 
+            voltage = Voltage.EV
+
             TUNGSTEN_STEEL = child("tungsten_steel") {
-                maxProgress(200)
+                maxProgress(120)
                 displayMaterial("tungsten_steel", "ingot")
                 depends(HYDROMETALLURGY)
             }
 
             METAL_FORMER = tech("metal_former") {
-                maxProgress(200)
+                maxProgress(120)
                 displayItem(getMultiblock("metal_former").block)
+            }
+
+            ROCKET_T2 = tech("rocket_t2") {
+                maxProgress(350)
+                displayItem(Items.FIREWORK_ROCKET)
+                depends(ROCKET_T1, DIGITAL_STORAGE, CARBON_FIBER)
+                noResearch()
             }
         }
     }

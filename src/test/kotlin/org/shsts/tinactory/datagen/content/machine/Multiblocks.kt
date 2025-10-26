@@ -192,7 +192,7 @@ object Multiblocks {
             coil("cupronickel", Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
             coil("kanthal", Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
             coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", Technologies.NICHROME)
-            coil("tungsten", Voltage.HV, "tungsten", "platinum", Technologies.TUNGSTEN_STEEL)
+            coil("tungsten", Voltage.HV, "tungsten", "annealed_copper", Technologies.TUNGSTEN_STEEL)
         }
 
         val itemFilter = getItem("component/item_filter")

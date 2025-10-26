@@ -22,6 +22,7 @@
     "connector": "tinactory:multiblock/cleanroom_connector",
     "door": "tinactory:multiblock/cleanroom_door",
     "maxSize": 7,
+    "maxHeight": 31,
     "maxConnectors": 1,
     "maxDoors": 2
   }

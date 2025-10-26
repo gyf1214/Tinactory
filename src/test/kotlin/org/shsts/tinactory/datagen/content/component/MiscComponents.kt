@@ -205,7 +205,6 @@ object MiscComponents {
         research(Voltage.HV) {
             input(getComponent("conveyor_module").item(Voltage.HV))
             input(getItem("component/advanced_alloy"))
-            input("pvc", "molten", 2)
         }
 
         research(Voltage.EV) {
@@ -324,6 +323,16 @@ object MiscComponents {
                 input(getItem("component/advanced_alloy"), 16)
                 input("cetane_boosted_diesel")
                 voltage(Voltage.HV)
+            }
+            rocket(Technologies.ROCKET_T2) {
+                input(AllTags.circuit(Voltage.IV))
+                input(STORAGE_CELLS[1].component.get())
+                input(getComponent("electric_pump").item(Voltage.IV), 4)
+                input(getItem("component/advanced_alloy"), 8)
+                input(getItem("component/carbon_plate"), 16)
+                input("soldering_alloy", amount = 4)
+                input("rocket_fuel")
+                voltage(Voltage.EV)
             }
         }
     }

@@ -110,6 +110,9 @@ object MachineComponents {
             defaults {
                 voltage(Voltage.fromRank(v.rank - 1))
                 workTicks(COMPONENT_TICKS)
+                if (v.rank >= Voltage.IV.rank) {
+                    tech(Technologies.TUNGSTEN_STEEL)
+                }
             }
             component("electric_motor") {
                 input(magnetic, "magnetic")
