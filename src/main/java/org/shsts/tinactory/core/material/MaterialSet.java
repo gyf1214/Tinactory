@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
@@ -292,10 +293,16 @@ public class MaterialSet {
                 return item(category, p -> new ToolItem(p, durability));
             }
 
+            public ToolBuilder usable(String category, Supplier<SoundEvent> sound) {
+                assert tier != null;
+                var tag = AllTags.modBlock("mineable/" + category);
+                return item(category, p -> new UsableToolItem(p, durability, tier, tag, sound));
+            }
+
             public ToolBuilder usable(String category) {
                 assert tier != null;
                 var tag = AllTags.modBlock("mineable/" + category);
-                return item(category, p -> new UsableToolItem(p, durability, tier, tag));
+                return item(category, p -> new UsableToolItem(p, durability, tier, tag, null));
             }
 
             @Override

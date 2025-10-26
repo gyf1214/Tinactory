@@ -3,6 +3,7 @@ package org.shsts.tinactory.content;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -35,6 +36,7 @@ public final class AllRegistries {
     public static final IEntryHandler<Fluid> FLUIDS;
     public static final IEntryHandler<Feature<?>> FEATURES;
     public static final IEntryHandler<ForgeWorldPreset> WORLD_TYPES;
+    public static final IEntryHandler<SoundEvent> SOUND_EVENTS;
 
     static {
         SCHEDULINGS = REGISTRATE.registry("scheduling", IScheduling.class)
@@ -50,6 +52,7 @@ public final class AllRegistries {
         FLUIDS = REGISTRATE.getHandler(ForgeRegistries.FLUIDS);
         FEATURES = REGISTRATE.getHandler(ForgeRegistries.FEATURES);
         WORLD_TYPES = REGISTRATE.getHandler(ForgeRegistries.Keys.WORLD_TYPES, ForgeWorldPreset.class);
+        SOUND_EVENTS = REGISTRATE.getHandler(ForgeRegistries.SOUND_EVENTS);
     }
 
     public static void init() {}

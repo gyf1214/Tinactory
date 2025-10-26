@@ -8,6 +8,7 @@ import org.shsts.tinactory.content.material.ComponentMeta;
 import org.shsts.tinactory.content.material.MaterialMeta;
 import org.shsts.tinactory.content.material.MiscMeta;
 import org.shsts.tinactory.content.multiblock.MultiblockMeta;
+import org.shsts.tinactory.content.sound.SoundMeta;
 import org.shsts.tinycorelib.api.meta.IMetaConsumer;
 
 import java.util.function.Supplier;
@@ -24,6 +25,7 @@ public class AllMeta {
         execute("machine", MachineMeta::new);
         execute("multiblock", MultiblockMeta::new);
         execute("misc", MiscMeta::new);
+        execute("sound", SoundMeta::new);
     }
 
     private static void execute(String folder, Supplier<? extends IMetaConsumer> supplier) {

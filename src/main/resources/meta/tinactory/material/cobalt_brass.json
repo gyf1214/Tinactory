@@ -10,10 +10,14 @@
       "saw",
       "screwdriver"
     ],
-    "usables": [
-      "wire_cutter",
-      "wrench"
-    ]
+    "usables": {
+      "wire_cutter": {
+        "sound": "tinactory:use.wirecutter"
+      },
+      "wrench": {
+        "sound": "tinactory:use.wrench"
+      }
+    }
   },
   "items": [
     "dust",

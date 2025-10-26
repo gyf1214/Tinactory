@@ -19,6 +19,7 @@ import org.shsts.tinycorelib.api.meta.MetaLoadingException;
 
 import static org.shsts.tinactory.content.AllRegistries.FLUIDS;
 import static org.shsts.tinactory.content.AllRegistries.ITEMS;
+import static org.shsts.tinactory.content.AllRegistries.SOUND_EVENTS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -105,16 +106,23 @@ public class MaterialMeta extends MetaConsumer {
 
         var toolBuilder = builder.tool(durability, tier);
         var ja1 = GsonHelper.getAsJsonArray(jo, "items");
-        var ja2 = GsonHelper.getAsJsonArray(jo, "usables");
+        var jo1 = GsonHelper.getAsJsonObject(jo, "usables");
 
         for (var entry : ja1) {
             var category = GsonHelper.convertToString(entry, "items");
             toolBuilder.item(category);
         }
 
-        for (var entry : ja2) {
-            var category = GsonHelper.convertToString(entry, "usables");
-            toolBuilder.usable(category);
+        for (var entry : jo1.entrySet()) {
+            var category = entry.getKey();
+            var jo2 = GsonHelper.convertToJsonObject(entry.getValue(), "usables");
+
+            if (jo2.has("sound")) {
+                var sound = SOUND_EVENTS.getEntry(new ResourceLocation(GsonHelper.getAsString(jo2, "sound")));
+                toolBuilder.usable(category, sound);
+            } else {
+                toolBuilder.usable(category);
+            }
         }
         toolBuilder.build();
     }
