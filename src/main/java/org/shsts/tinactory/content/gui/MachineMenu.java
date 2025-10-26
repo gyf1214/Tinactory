@@ -174,11 +174,7 @@ public class MachineMenu extends ProcessingMenu {
         }
     }
 
-    public static LayoutMenu simple(Properties properties) {
-        return new Simple(properties, 0);
-    }
-
-    public static LayoutMenu simpleWithConfig(Properties properties) {
+    public static LayoutMenu simpleConfig(Properties properties) {
         return new Simple(properties, SLOT_SIZE + SPACING);
     }
 

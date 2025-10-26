@@ -469,6 +469,8 @@
     "tinactory.tooltip.openRecipeBook": "打开配方书",
     "tinactory.tooltip.unselectRecipe": "清除配方",
     "tinactory.tooltip.openPortPanel": "显示端口",
+    "tinactory.tooltip.batteryMode": "储电模式",
+    "tinactory.tooltip.dischargeMode": "放电模式",
     "tinactory.tooltip.chestLock": "空槽锁定",
     "tinactory.tooltip.chestUnlock": "空槽解锁",
     "tinactory.tooltip.chestVoid": "自动销毁多余物品",

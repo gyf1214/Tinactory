@@ -12,6 +12,7 @@ import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
+import org.shsts.tinactory.content.gui.client.BatteryBoxScreen;
 import org.shsts.tinactory.content.gui.client.ElectricChestScreen;
 import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
@@ -32,7 +33,6 @@ import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.gui.client.LayoutScreen;
 import org.shsts.tinactory.core.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
@@ -58,7 +58,7 @@ public final class AllMenus {
 
     public static final IMenuType WORKBENCH;
     public static final IMenuType NETWORK_CONTROLLER;
-    public static final IMenuType SIMPLE_MACHINE;
+    public static final IMenuType BATTERY_BOX;
     public static final IMenuType ELECTRIC_CHEST;
     public static final IMenuType ELECTRIC_TANK;
     public static final IMenuType LOGISTIC_WORKER;
@@ -96,9 +96,9 @@ public final class AllMenus {
         ME_STORAGE_INTERFACE_SLOT = CHANNEL.registerMenuEventPacket(MEStorageInterfaceEventPacket.class,
             MEStorageInterfaceEventPacket::new);
 
-        SIMPLE_MACHINE = REGISTRATE.menu("machine/simple", MachineMenu::simple)
+        BATTERY_BOX = REGISTRATE.menu("machine/battery_box", MachineMenu::simpleConfig)
             .title(ProcessingMenu::getTitle)
-            .screen(() -> () -> LayoutScreen.Simple::new)
+            .screen(() -> () -> BatteryBoxScreen::new)
             .register();
 
         WORKBENCH = REGISTRATE.menu("primitive/workbench", WorkbenchMenu::new)
@@ -126,7 +126,7 @@ public final class AllMenus {
             .screen(() -> () -> LogisticWorkerScreen::new)
             .register();
 
-        ME_DRIVE = REGISTRATE.menu("logistics/me_drive", MachineMenu::simpleWithConfig)
+        ME_DRIVE = REGISTRATE.menu("logistics/me_drive", MachineMenu::simpleConfig)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> MEDriveScreen::new)
             .register();

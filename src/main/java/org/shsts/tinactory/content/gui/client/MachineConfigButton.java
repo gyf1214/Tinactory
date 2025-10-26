@@ -16,7 +16,7 @@ class MachineConfigButton extends SwitchButton {
         IMachineConfig config, String configKey, boolean defaultValue,
         Texture texture, int disableTexY, int enableTexY,
         String disableLang, String enableLang) {
-        super(menu, texture, enableTexY, disableTexY, enableLang, disableLang);
+        super(menu, texture, disableTexY, enableTexY, disableLang, enableLang);
         this.config = config;
         this.configKey = configKey;
         this.defaultValue = defaultValue;

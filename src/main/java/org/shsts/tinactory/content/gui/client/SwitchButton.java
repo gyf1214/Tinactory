@@ -26,8 +26,8 @@ public abstract class SwitchButton extends Button {
     protected final String enableLang;
     protected final String disableLang;
 
-    public SwitchButton(MenuBase menu, Texture texture, int enableTexY, int disableTexY,
-        String enableLang, String disableLang) {
+    public SwitchButton(MenuBase menu, Texture texture, int disableTexY, int enableTexY,
+        String disableLang, String enableLang) {
         super(menu);
         this.texture = texture;
         this.enableTexY = enableTexY;

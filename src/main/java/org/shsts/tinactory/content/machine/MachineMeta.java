@@ -331,7 +331,7 @@ public class MachineMeta extends MetaConsumer {
         private IEntry<MachineBlock> batteryBox(Voltage v) {
             return BlockEntityBuilder.builder(machineId(v), MachineBlock.sided(v))
                 .transform(MachineSet::baseMachine)
-                .menu(AllMenus.SIMPLE_MACHINE)
+                .menu(AllMenus.BATTERY_BOX)
                 .blockEntity()
                 .transform(BatteryBox.factory(getLayout(v)))
                 .end()

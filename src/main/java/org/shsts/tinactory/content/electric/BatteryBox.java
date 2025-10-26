@@ -42,10 +42,12 @@ import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 @MethodsReturnNonnullByDefault
 public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     IProcessor, IElectricMachine, ILayoutProvider, INBTSerializable<CompoundTag> {
+    public static final String DISCHARGE_KEY = "discharge";
+    public static final boolean DISCHARGE_DEFAULT = false;
     private static final String ID = "battery_box";
 
-    private final Layout layout;
     private final BlockEntity blockEntity;
+    private final Layout layout;
     private final Voltage voltage;
     private IMachine machine;
     private final WrapperItemHandler items;
@@ -72,14 +74,23 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
             batteryItem.voltage == voltage;
     }
 
+    private boolean isDischarge() {
+        return machine.config().getBoolean(DISCHARGE_KEY, DISCHARGE_DEFAULT);
+    }
+
     @Override
     public void onPreWork() {}
 
     @Override
     public void onWorkTick(double partial) {
-        var factor = machine.network().orElseThrow()
-            .getComponent(ELECTRIC_COMPONENT.get())
-            .getBufferFactor();
+        double factor;
+        if (isDischarge()) {
+            factor = -1;
+        } else {
+            factor = machine.network().orElseThrow()
+                .getComponent(ELECTRIC_COMPONENT.get())
+                .getBufferFactor();
+        }
         var sign = MathUtil.compare(factor);
         if (sign == 0) {
             return;
@@ -108,7 +119,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public ElectricMachineType getMachineType() {
-        return ElectricMachineType.BUFFER;
+        return isDischarge() ? ElectricMachineType.GENERATOR : ElectricMachineType.BUFFER;
     }
 
     @Override
@@ -125,6 +136,9 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public double getPowerCons() {
+        if (isDischarge()) {
+            return 0;
+        }
         var ret = 0d;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
