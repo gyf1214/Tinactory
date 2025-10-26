@@ -113,10 +113,6 @@ object MiscComponents {
                 misc("mixed_metal_ingot")
                 input(Items.TNT, 12, port = 1)
             }
-            output("carbon", "ingot") {
-                input("carbon", "dust", 4)
-                input(Items.TNT, 2, port = 1)
-            }
             misc("carbon_plate") {
                 misc("carbon_mesh")
                 input(Items.TNT, 12, port = 1)

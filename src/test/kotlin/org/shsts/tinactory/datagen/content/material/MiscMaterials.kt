@@ -99,6 +99,23 @@ object MiscMaterials {
             }
         }
 
+        mixer {
+            output("blaze", "seed") {
+                input("glowstone")
+                input("lava", amount = 0.5)
+                voltage(Voltage.HV)
+                workTicks(64)
+            }
+        }
+
+        macerator {
+            output("blaze", "dust", 3) {
+                input("blaze", "gem")
+                voltage(Voltage.HV)
+                workTicks(128)
+            }
+        }
+
         generateStone()
         stone()
         tags()

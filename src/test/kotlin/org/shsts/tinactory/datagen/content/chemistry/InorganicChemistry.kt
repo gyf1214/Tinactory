@@ -474,13 +474,11 @@ object InorganicChemistry {
                 workTicks(320)
             }
             input("obsidian", "slurry") {
-                input("hydrogen_chloride", amount = 4)
-                input("sodium_hydroxide", amount = 2)
-                output("magnesium_chloride", amount = 2)
-                output("sodium_sulfate")
+                input("hydrogen_chloride", amount = 2)
+                output("magnesium_chloride")
                 output("silicon_dioxide")
-                output("water", amount = 3)
-                workTicks(320)
+                output("water")
+                workTicks(160)
             }
             output("tungsten_trioxide") {
                 input("tungstate")
@@ -582,10 +580,10 @@ object InorganicChemistry {
                 }
             }
             output("obsidian", "slurry") {
-                input("obsidian", amount = 2)
-                input("sulfuric_acid")
+                input("obsidian")
+                input("mercury", amount = 0.5)
                 output("platinum_group_sludge", rate = 0.1)
-                workTicks(400)
+                workTicks(200)
                 extra {
                     temperature(1300)
                 }

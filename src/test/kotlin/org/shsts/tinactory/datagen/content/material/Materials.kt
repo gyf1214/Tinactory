@@ -121,10 +121,14 @@ object Materials {
         }
         material("carbon", DULL) {
             machineProcess(Voltage.HV)
+            implosion(4)
         }
         material("manganese", DULL)
         material("arsenic", DULL)
-        material("silicon", METALLIC)
+        material("silicon", METALLIC) {
+            machineProcess(Voltage.HV)
+            implosion(4)
+        }
         material("beryllium", METALLIC) {
             machineProcess(Voltage.LV, 0.6)
             smelt()
@@ -406,7 +410,8 @@ object Materials {
                 component("nether_quartz")
                 component("redstone")
             }
-            crystallize(Voltage.HV, 600, -0.1, 1.0, 10.0)
+            crystallize("salt_water", Voltage.HV, 600, -0.1, 1.0, 10.0)
+            seeding(Voltage.MV, 1.25)
         }
         material("tungsten_steel", METALLIC) {
             machineProcess(Voltage.HV, 2.0)
@@ -597,7 +602,8 @@ object Materials {
                 byProducts("nether_quartz", "silicon_dioxide", "nether_quartz")
             }
             machineProcess(Voltage.MV)
-            crystallize(Voltage.HV, 400, -0.5, 0.5, 5.0)
+            crystallize("salt_water", Voltage.HV, 400, -0.5, 0.5, 5.0)
+            seeding(Voltage.MV)
         }
         material("lapis", LAPIS) {
             oreProcess {
@@ -641,6 +647,13 @@ object Materials {
         }
         material("obsidian", DULL) {
             machineProcess(Voltage.HV, 4.0)
+        }
+        material("end_stone", DULL) {
+            machineProcess(Voltage.MV)
+        }
+        material("blaze", FINE) {
+            machineProcess(Voltage.HV)
+            crystallize("lava", Voltage.HV, 1000, 0.0, 0.5)
         }
         material("raw_rubber", DULL)
         material("rubber", SHINY) {

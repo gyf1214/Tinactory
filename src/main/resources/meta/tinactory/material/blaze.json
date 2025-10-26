@@ -1,0 +1,12 @@
+{
+  "color": "0xFFFFC800",
+  "items": [
+    "seed"
+  ],
+  "fluids": {},
+  "aliases": {},
+  "existings": {
+    "gem": "minecraft:blaze_rod",
+    "dust": "minecraft:blaze_powder"
+  }
+}

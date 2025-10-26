@@ -347,6 +347,15 @@ object CircuitComponents {
                     temperature(2100)
                 }
             }
+            output(BOULE.item("glowstone")) {
+                input("silicon", amount = 64)
+                input("glowstone")
+                voltage(Voltage.HV)
+                workTicks(9600)
+                extra {
+                    temperature(3000)
+                }
+            }
         }
 
         cutter {
@@ -519,6 +528,55 @@ object CircuitComponents {
                     voltage(Voltage.MV)
                     workTicks(480)
                     tech(Technologies.CPU)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.QUANTUM) {
+            chemicalReactor {
+                defaults {
+                    voltage(Voltage.HV)
+                    // TODO
+                    tech()
+                }
+                output(board) {
+                    input("epoxy", "sheet")
+                    input("annealed_copper", "foil", 8)
+                    input("sulfuric_acid", "dilute", 0.5)
+                    workTicks(320)
+                }
+                output(circuitBoard) {
+                    input(board)
+                    input("annealed_copper", "foil", 16)
+                    input("iron_chloride", amount = 0.75)
+                    workTicks(480)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.CRYSTAL) {
+            assembler {
+                defaults {
+                }
+                output(board) {
+                    input(lastBoard, 4)
+                    input("platinum", "wire_fine", 16)
+                    input("soldering_alloy", amount = 2)
+                    voltage(Voltage.EV)
+                    workTicks(CIRCUIT_TICKS)
+                    // TODO
+                    tech()
+                }
+            }
+            chemicalReactor {
+                output(circuitBoard) {
+                    input(board)
+                    input("platinum", "foil", 16)
+                    input("iron_chloride")
+                    voltage(Voltage.EV)
+                    workTicks(480)
+                    // TODO
+                    tech()
                 }
             }
         }

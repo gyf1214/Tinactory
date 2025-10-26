@@ -1,0 +1,11 @@
+{
+  "color": "0xFFD9DE9E",
+  "items": [
+    "dust"
+  ],
+  "fluids": {},
+  "aliases": {},
+  "existings": {
+    "primary": "minecraft:end_stone"
+  }
+}

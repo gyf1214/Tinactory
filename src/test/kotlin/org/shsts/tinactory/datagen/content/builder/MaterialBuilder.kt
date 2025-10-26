@@ -5,6 +5,7 @@ import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Block
 import net.minecraftforge.client.model.generators.ItemModelProvider
@@ -45,6 +46,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extruder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fluidSolidifier
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
@@ -403,12 +405,6 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 process("stick", "ingot", 64, amount = 2)
                 process("screw", "bolt", 16)
                 process("lens", "gem_exquisite", 600)
-                process("seed", "gem", 256)
-            }
-            mixer {
-                process("seed", "dust", 64, amount = 2) {
-                    input(material, "seed")
-                }
             }
             cutter {
                 process("bolt", "stick", 64, amount = 4) {
@@ -642,8 +638,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         blast(voltage, temperature, workTicks, getMaterial(from), block)
     }
 
-    fun crystallize(voltage: Voltage, workTicks: Long,
-        baseCleanness: Double, normalCleanness: Double, idealCleanness: Double) {
+    fun crystallize(mat2: String, voltage: Voltage, workTicks: Long,
+        baseCleanness: Double, normalCleanness: Double, idealCleanness: Double? = null) {
         autoclave {
             defaults {
                 voltage(voltage)
@@ -651,15 +647,47 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
             output(material, "gem") {
                 input(material, "seed")
+                input(mat2)
                 extra {
                     requireCleanness(baseCleanness, normalCleanness)
                 }
             }
-            output(material, "gem", suffix = "_from_dust") {
-                input(material, "dust")
-                extra {
-                    requireCleanness(baseCleanness, idealCleanness)
+            if (idealCleanness != null) {
+                output(material, "gem", suffix = "_from_dust") {
+                    input(material, "dust")
+                    input(mat2)
+                    extra {
+                        requireCleanness(baseCleanness, idealCleanness)
+                    }
                 }
+            }
+        }
+    }
+
+    fun seeding(voltage: Voltage, factor: Double = 1.0) {
+        lathe {
+            output(material, "seed") {
+                input(material, "gem")
+                voltage(voltage)
+                workTicks(round(256 * factor).toLong())
+            }
+        }
+        mixer {
+            output(material, "seed", 2) {
+                input(material, "seed")
+                input(material, "dust")
+                voltage(voltage)
+                workTicks(round(64 * factor).toLong())
+            }
+        }
+    }
+
+    fun implosion(amount: Int, voltage: Voltage = Voltage.HV) {
+        implosionCompressor {
+            output(material, "ingot") {
+                input(material, "dust", amount)
+                input(Items.TNT, amount / 4, port = 1)
+                voltage(voltage)
             }
         }
     }

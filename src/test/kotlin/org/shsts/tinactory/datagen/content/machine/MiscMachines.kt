@@ -425,7 +425,8 @@ object MiscMachines {
         }
 
         vanilla {
-            nullRecipe(Items.BLAST_FURNACE,
+            nullRecipe(
+                Items.BLAST_FURNACE,
                 Items.SMOKER,
                 Items.STONECUTTER,
                 Items.FLETCHING_TABLE,
@@ -437,6 +438,7 @@ object MiscMachines {
                 Items.ANVIL,
                 Items.SMITHING_TABLE,
                 Items.CAULDRON,
+                Items.BREWING_STAND,
                 Items.RESPAWN_ANCHOR,
                 Items.GLOWSTONE,
                 Items.BUCKET,
@@ -479,7 +481,11 @@ object MiscMachines {
                 Items.STONE_BUTTON,
                 Items.POLISHED_BLACKSTONE_BUTTON,
                 Items.PACKED_ICE,
-                Items.BLUE_ICE)
+                Items.BLUE_ICE,
+                Items.BLAZE_POWDER,
+                Items.ENDER_EYE,
+                Items.END_CRYSTAL,
+                Items.ENDER_CHEST)
         }
     }
 
