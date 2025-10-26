@@ -31,7 +31,8 @@ public class LanguageMeta extends MetaConsumer {
     @Override
     protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
         var locale = LocHelper.name(loc.getPath(), -1);
-        var processor = new LanguageProcessor(GsonHelper.getAsString(jo, "splitter", " "));
+        var splitter = GsonHelper.getAsString(jo, "splitter", " ");
+        var processor = new LanguageProcessor(locale, splitter);
 
         parse(jo, "words", processor::word);
         parse(jo, "patterns", processor::pattern);

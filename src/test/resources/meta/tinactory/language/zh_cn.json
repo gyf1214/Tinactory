@@ -197,6 +197,7 @@
     "benzene": "苯",
     "beryllium": "铍",
     "biomass": "生物质",
+    "blaze": "烈焰",
     "blue_topaz": "蓝色托帕石",
     "brass": "黄铜",
     "bronze": "青铜",
@@ -316,6 +317,7 @@
     "red_alloy": "红色合金",
     "redstone": "红石",
     "refinery_gas": "炼油气",
+    "rocket_fuel": "火箭燃料",
     "rubber": "橡胶",
     "ruby": "红宝石",
     "rutile": "金红石",
@@ -617,7 +619,7 @@
     "tinactory.technology.oil_cracking.details": "将重质原油分解成更轻、更有用的燃料和化学品。这一过程将解锁塑料、合成材料和高效能源生产。",
     "tinactory.technology.rocket_science": "火箭科学",
     "tinactory.technology.rocket_science.details": "开辟了使用先进推进和制导系统的太空探索之路。掌握它对于制造火箭和卫星至关重要。",
-    "tinactory.technology.rocket_t1": "一级火箭",
+    "tinactory.technology.rocket_t1": "一阶火箭",
     "tinactory.technology.rocket_t1.details": "一种能够到达低轨道或附近行星的基本航天器。它标志着迈向星际工业和殖民的第一步。",
     "tinactory.technology.tnt": "TNT",
     "tinactory.technology.tnt.details": "一种用于采矿、爆破和战争的威力强大的炸药。其破坏力使其成为一种宝贵的工具，同时也是一种危险的武器。",
@@ -635,6 +637,8 @@
     "tinactory.technology.carbon_fiber.details": "由紧密结合的碳纤维制成的超轻但强度极高的复合材料，是航空航天结构、先进车辆和高效机械的理想选择，这些领域对强度重量比至关重要。",
     "tinactory.technology.power_substation": "能源站",
     "tinactory.technology.power_substation.details": "将发电机的电力输送到工厂和城市的关键枢纽。它可以稳定电压，防止过载，并确保整个网络的可靠能量流动。",
+    "tinactory.technology.rocket_t2": "二阶火箭",
+    "tinactory.technology.rocket_t2.details": "一艘强大的宇宙飞船，配备强大的星际旅行和更重的有效载荷。它能够将探索范围扩展到邻近轨道之外，实现资源运输和在遥远星球建立殖民地。",
     "generator.tinactory.void": "虚空"
   }
 }

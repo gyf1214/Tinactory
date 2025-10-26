@@ -21,16 +21,19 @@ import java.util.stream.Collectors;
 @MethodsReturnNonnullByDefault
 public class LanguageProcessor {
     private static final String MISSING_TR = "<MISSING TRANSLATE>";
+    private static final String MISSING_WORD = "<MISSING WORD>";
 
     private record Processor(Pattern pattern, Function<Matcher, String> func) {}
 
     private final String splitter;
+    private final boolean isEnglish;
     private final Map<String, String> words = new HashMap<>();
     private final List<Processor> processors = new ArrayList<>();
     private final Map<String, String> extras = new HashMap<>();
 
-    public LanguageProcessor(String splitter) {
+    public LanguageProcessor(String locale, String splitter) {
         this.splitter = splitter;
+        this.isEnglish = locale.equals("en_us");
     }
 
     public void word(String key, String val) {
@@ -44,6 +47,9 @@ public class LanguageProcessor {
     private String normalize(String str) {
         if (words.containsKey(str)) {
             return words.get(str);
+        }
+        if (!isEnglish) {
+            return MISSING_WORD;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }

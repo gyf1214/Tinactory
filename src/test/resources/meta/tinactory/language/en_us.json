@@ -241,6 +241,8 @@
     "tinactory.technology.advanced_polymer.details": "High-strength synthetic materials designed for extreme durability and flexibility. They’re essential for advanced construction, protective gear, and high-performance machinery.",
     "tinactory.technology.carbon_fiber.details": "An ultra-light yet incredibly strong composite made from tightly bound carbon strands. It’s ideal for aerospace structures, advanced vehicles, and high-efficiency machinery where strength-to-weight ratio is critical.",
     "tinactory.technology.power_substation.details": "A critical hub that distributes electricity from generators to factories and cities. It stabilizes voltage, prevents overloads, and ensures reliable energy flow across your entire network.",
+    "tinactory.technology.rocket_t2": "Tier 2 Rocket",
+    "tinactory.technology.rocket_t2.details": "A powerful spacecraft equipped for interplanetary travel and heavier payloads. It expands exploration beyond nearby orbits, enabling resource transport and colony establishment on distant worlds.",
     "generator.tinactory.void": "Void"
   }
 }
