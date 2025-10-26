@@ -305,6 +305,12 @@ object MiscMachines {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.SOLDERING)
             }
+            output(Items.FURNACE) {
+                input("stone", "primary", 8)
+            }
+            output(Items.CHEST) {
+                input(ItemTags.PLANKS)
+            }
             output(Items.HOPPER) {
                 input(Items.CHEST)
                 input("iron", "plate", 4)
