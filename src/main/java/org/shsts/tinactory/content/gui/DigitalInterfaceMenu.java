@@ -72,7 +72,7 @@ public class DigitalInterfaceMenu extends MachineMenu {
     }
 
     private void addFluidSlot(int slot, int port, int index) {
-        addSyncSlot(FLUID_SLOT + slot, () -> new FluidSyncPacket(getInfoFluid(port, index)));
+        addSyncSlot(FLUID_SYNC + slot, () -> new FluidSyncPacket(getInfoFluid(port, index)));
     }
 
     @Override

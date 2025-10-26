@@ -10,7 +10,6 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -19,8 +18,8 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.gui.ElectricTankMenu.FILTER_SLOT;
-import static org.shsts.tinactory.content.gui.ElectricTankMenu.FLUID_SLOT;
+import static org.shsts.tinactory.content.gui.ElectricTankMenu.FILTER_SYNC;
+import static org.shsts.tinactory.core.gui.LayoutMenu.FLUID_SYNC;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @OnlyIn(Dist.CLIENT)
@@ -31,8 +30,8 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
         private final String filterName;
 
         public TankSlot(MenuBase menu, int index) {
-            super(menu, index, FLUID_SLOT + index);
-            this.filterName = FILTER_SLOT + index;
+            super(menu, index, FLUID_SYNC + index);
+            this.filterName = FILTER_SYNC + index;
         }
 
         private FluidStack getFilterFluid() {
@@ -69,12 +68,9 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
     public ElectricTankScreen(ElectricTankMenu menu, Component title) {
         super(menu, title);
 
-        var layoutPanel = new Panel(this);
-        var layout = menu.layout();
         for (var slot : layout.slots) {
             var rect = new Rect(slot.x() + 1, slot.y() + 1, SLOT_SIZE - 2, SLOT_SIZE - 2);
             layoutPanel.addWidget(rect, new TankSlot(menu, slot.index()));
         }
-        addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
     }
 }

@@ -17,6 +17,8 @@ public class BatteryBoxScreen extends LayoutScreen<LayoutMenu> {
     public BatteryBoxScreen(LayoutMenu menu, Component title) {
         super(menu, title);
 
+        addProgressBar();
+
         var config = MACHINE.get(menu.blockEntity()).config();
         var buttonY = menu.layout().rect.endY() + SPACING;
         var button = new MachineConfigButton(menu, config, DISCHARGE_KEY, DISCHARGE_DEFAULT,

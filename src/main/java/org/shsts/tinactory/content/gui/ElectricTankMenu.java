@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.logistics.ElectricTank;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.logistics.IFluidStackHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -16,9 +15,7 @@ import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricTankMenu extends ElectricStorageMenu {
-    public static final String FLUID_SLOT = ProcessingMenu.FLUID_SLOT;
-    public static final String FILTER_SLOT = "filterSlot_";
-
+    public static final String FILTER_SYNC = "filterSlot_";
     private final ElectricTank tank;
     private final IFluidStackHandler fluidHandler;
 
@@ -28,9 +25,9 @@ public class ElectricTankMenu extends ElectricStorageMenu {
         this.fluidHandler = MENU_FLUID_HANDLER.get(blockEntity);
 
         for (var slot : layout.slots) {
-            addSyncSlot(FLUID_SLOT + slot.index(), () ->
+            addSyncSlot(FLUID_SYNC + slot.index(), () ->
                 new FluidSyncPacket(fluidHandler.getFluidInTank(slot.index())));
-            addSyncSlot(FILTER_SLOT + slot.index(), () ->
+            addSyncSlot(FILTER_SYNC + slot.index(), () ->
                 new FluidSyncPacket(tank.getFilter(slot.index())));
         }
 

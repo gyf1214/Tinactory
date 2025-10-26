@@ -11,7 +11,6 @@ import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
-import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -87,8 +86,6 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
         super(menu, title);
 
         this.chest = menu.chest();
-        var layoutPanel = new Panel(this);
-        var layout = menu.layout();
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {
             var slot = layout.slots.get(i);
@@ -97,6 +94,5 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
             var y = (slot.y() + slot1.y()) / 2 + 1;
             layoutPanel.addWidget(new Rect(x, y, SLOT_SIZE - 2, SLOT_SIZE - 2), new ItemSlot(i));
         }
-        addPanel(new Rect(layout.getXOffset(), 0, 0, 0), layoutPanel);
     }
 }

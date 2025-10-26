@@ -147,6 +147,7 @@ public class MachineMenu extends ProcessingMenu {
         private Simple(Properties properties, int extraHeight) {
             super(properties, extraHeight);
             addLayoutSlots(layout);
+            addProgressBar();
             onEventPacket(SET_MACHINE_CONFIG, this::setMachineConfig);
         }
 

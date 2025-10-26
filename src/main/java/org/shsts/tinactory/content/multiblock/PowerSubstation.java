@@ -13,12 +13,16 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
+import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_DEFAULT;
+import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -50,14 +54,31 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
     }
 
     @Override
+    public IMenuType menu(IMachine machine) {
+        return AllMenus.BATTERY_BOX;
+    }
+
+    private boolean isDischarge() {
+        if (multiblockInterface == null) {
+            return false;
+        }
+        return multiblockInterface.config().getBoolean(DISCHARGE_KEY, DISCHARGE_DEFAULT);
+    }
+
+    @Override
     public void onPreWork() {}
 
     @Override
     public void onWorkTick(double partial) {
-        var factor = (double) getInterface()
-            .flatMap(IMachine::network)
-            .map($ -> $.getComponent(ELECTRIC_COMPONENT.get()).getBufferFactor())
-            .orElse(0d);
+        double factor;
+        if (isDischarge()) {
+            factor = -1;
+        } else {
+            factor = getInterface()
+                .flatMap(IMachine::network)
+                .map($ -> $.getComponent(ELECTRIC_COMPONENT.get()).getBufferFactor())
+                .orElse(0d);
+        }
         var sign = MathUtil.compare(factor);
         if (sign == 0) {
             return;
@@ -80,7 +101,7 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
 
     @Override
     public ElectricMachineType getMachineType() {
-        return ElectricMachineType.BUFFER;
+        return isDischarge() ? ElectricMachineType.GENERATOR : ElectricMachineType.BUFFER;
     }
 
     @Override
@@ -90,7 +111,7 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
 
     @Override
     public double getPowerCons() {
-        return Math.min(capacity - getPower(), output);
+        return isDischarge() ? 0 : Math.min(capacity - getPower(), output);
     }
 
     @Override

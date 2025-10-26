@@ -105,11 +105,22 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
                 battery.getPower(stack));
             battery.charge(stack, (long) Math.floor(cap * factor));
         }
+        blockEntity.setChanged();
     }
 
     @Override
     public double getProgress() {
-        return 0d;
+        var totalPower = 0L;
+        var totalCapacity = 0L;
+        for (var i = 0; i < items.getSlots(); i++) {
+            var stack = items.getStackInSlot(i);
+            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+                continue;
+            }
+            totalPower += battery.getPower(stack);
+            totalCapacity += battery.capacity;
+        }
+        return totalCapacity == 0 ? 0 : (double) totalPower / totalCapacity;
     }
 
     @Override

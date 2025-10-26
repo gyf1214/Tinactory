@@ -9,52 +9,19 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
-import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
-import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 import static org.shsts.tinactory.core.util.I18n.tr;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingMenu extends LayoutMenu {
-    public static final String FLUID_SLOT = "fluidSlot_";
-
     protected ProcessingMenu(Properties properties, int extraHeight) {
         super(properties, extraHeight);
         addSlots();
-    }
-
-    /**
-     * Called during constructor.
-     */
-    protected void addFluidSlots() {
-        var fluids = MENU_FLUID_HANDLER.get(blockEntity);
-        for (var slot : layout.slots) {
-            if (slot.type().portType == PortType.FLUID) {
-                addSyncSlot(FLUID_SLOT + slot.index(),
-                    () -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
-            }
-        }
-        onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
-    }
-
-    /**
-     * Called during constructor.
-     */
-    protected void addProgressBar() {
-        if (layout.progressBar != null) {
-            addSyncSlot("progress", () -> doublePacket(getProcessor(blockEntity)
-                .map(IProcessor::getProgress)
-                .orElse(0d)));
-        }
     }
 
     /**

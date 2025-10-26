@@ -68,8 +68,9 @@ import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 public class Machine extends UpdatableCapabilityProvider implements IMachine,
     IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    protected static final String ID = "network/machine";
+    public static final String PROGRESS_SIGNAL = "progress";
     public static final String STOP_SIGNAL = "stop";
+    protected static final String ID = "network/machine";
 
     protected final BlockEntity blockEntity;
 
@@ -254,7 +255,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         });
 
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
-        processor().ifPresent(processor -> signal.registerRead(this, "progress", () ->
+        processor().ifPresent(processor -> signal.registerRead(this, PROGRESS_SIGNAL, () ->
             MathUtil.toSignal(processor.getProgress())));
 
         invoke(blockEntity, CONNECT, network);
