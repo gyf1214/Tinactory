@@ -140,6 +140,7 @@
     "sensor": "传感器",
     "item_filter": "物品过滤器",
     "mixed_metal_ingot": "混合金属锭",
+    "quantum_eye": "量子之眼",
     "fluid_storage_cell": "流体存储单元",
     "item_storage_cell": "物品存储单元",
     "centrifuged": "离心",
@@ -232,6 +233,8 @@
     "diesel": "柴油",
     "electrum": "琥珀金",
     "emerald": "祖母绿",
+    "ender_eye": "末影之眼",
+    "ender_pearl": "末影珍珠",
     "enriched_uranium_fuel": "浓缩铀燃料",
     "epichlorohydrin": "环氧氯丙烷",
     "epoxy": "环氧树脂",
@@ -311,6 +314,7 @@
     "propane": "丙烷",
     "propene": "丙烯",
     "pyrite": "黄铁",
+    "radon": "氡",
     "rare_earth": "稀土",
     "raw_rubber": "生橡胶",
     "raw_styrene_butadiene_rubber": "生丁苯橡胶",
@@ -639,6 +643,8 @@
     "tinactory.technology.power_substation.details": "将发电机的电力输送到工厂和城市的关键枢纽。它可以稳定电压，防止过载，并确保整个网络的可靠能量流动。",
     "tinactory.technology.rocket_t2": "二阶火箭",
     "tinactory.technology.rocket_t2.details": "一艘强大的宇宙飞船，配备强大的星际旅行和更重的有效载荷。它能够将探索范围扩展到邻近轨道之外，实现资源运输和在遥远星球建立殖民地。",
+    "tinactory.technology.ender_chemistry": "末影化学",
+    "tinactory.technology.ender_chemistry.details": "利用末影维度的神秘能量，以不可思议的方式操控物质。其不稳定的反应颠覆了传统科学，揭开了已知宇宙之外的物质和现象。",
     "generator.tinactory.void": "虚空"
   }
 }

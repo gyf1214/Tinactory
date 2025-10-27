@@ -350,6 +350,7 @@ object CircuitComponents {
             output(BOULE.item("glowstone")) {
                 input("silicon", amount = 64)
                 input("glowstone")
+                input("nitrogen", amount = 6)
                 voltage(Voltage.HV)
                 workTicks(9600)
                 extra {

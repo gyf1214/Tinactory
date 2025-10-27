@@ -122,6 +122,10 @@ object Components {
                 model(basicItem("metaitems/carbon.plate"))
             }
 
+            component("quantum_eye") {
+                model(basicItem("metaitems/quantumeye"))
+            }
+
             for (entry in STORAGE_CELLS) {
                 val k = name(entry.component.id(), -1).replace('m', 'k')
                 item(entry.component) {

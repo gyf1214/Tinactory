@@ -88,6 +88,7 @@ object Technologies {
     val TUNGSTEN_STEEL: ResourceLocation
     val METAL_FORMER: ResourceLocation
     val ROCKET_T2: ResourceLocation
+    val ENDER_CHEMISTRY: ResourceLocation
 
     init {
         Factory().apply {
@@ -347,11 +348,16 @@ object Technologies {
                 displayItem(getMultiblock("metal_former").block)
             }
 
-            ROCKET_T2 = tech("rocket_t2") {
+            ROCKET_T2 = child("rocket_t2") {
                 maxProgress(350)
                 displayItem(Items.FIREWORK_ROCKET)
                 depends(ROCKET_T1, DIGITAL_STORAGE, CARBON_FIBER)
                 noResearch()
+            }
+
+            ENDER_CHEMISTRY = child("ender_chemistry") {
+                maxProgress(160)
+                displayItem(Items.ENDER_EYE)
             }
         }
     }

@@ -1,0 +1,14 @@
+{
+  "color": "0xFF6CDCC8",
+  "items": [
+    "dust",
+    "seed"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "gem"
+  },
+  "existings": {
+    "gem": "minecraft:ender_pearl"
+  }
+}

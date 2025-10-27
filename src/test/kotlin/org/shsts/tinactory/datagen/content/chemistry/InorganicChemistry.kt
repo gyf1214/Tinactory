@@ -581,7 +581,7 @@ object InorganicChemistry {
             }
             output("obsidian", "slurry") {
                 input("obsidian")
-                input("mercury", amount = 0.5)
+                input("mercury")
                 output("platinum_group_sludge", rate = 0.1)
                 workTicks(200)
                 extra {
@@ -610,9 +610,18 @@ object InorganicChemistry {
             }
             output("platinum", "nugget", 2, suffix = "_from_sludge") {
                 input("platinum_group_sludge")
+                input("nitrogen")
                 workTicks(640)
                 extra {
                     temperature(2300)
+                }
+            }
+            output("blaze", "seed") {
+                input("glowstone")
+                input("lava")
+                workTicks(720)
+                extra {
+                    temperature(3100)
                 }
             }
         }
@@ -641,6 +650,39 @@ object InorganicChemistry {
                 output("potassium")
                 output("hydrogen")
                 workTicks(800)
+            }
+        }
+
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.EV)
+                tech(Technologies.ENDER_CHEMISTRY)
+            }
+            output("ender_eye", "seed") {
+                input("ender_pearl", "gem")
+                input("blaze", "dust")
+                workTicks(120)
+            }
+            output("ender_eye") {
+                input("ender_pearl")
+                input("radon", amount = 0.75)
+                workTicks(240)
+            }
+        }
+
+        blastFurnace {
+            defaults {
+                voltage(Voltage.EV)
+            }
+            output("end_stone", "slurry") {
+                input("end_stone")
+                input("mercury")
+                output("platinum_group_sludge", rate = 0.2)
+                output("ender_pearl", "seed", rate = 0.1)
+                workTicks(100)
+                extra {
+                    temperature(2100)
+                }
             }
         }
     }

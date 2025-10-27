@@ -107,11 +107,18 @@ object MiscMaterials {
         }
 
         mixer {
+            defaults {
+                workTicks(64)
+            }
             output("blaze", "seed") {
                 input("glowstone")
-                input("lava", amount = 0.5)
+                input("blaze")
                 voltage(Voltage.HV)
-                workTicks(64)
+            }
+            output("ender_pearl", "seed", 3) {
+                input("ender_pearl")
+                input("end_stone", amount = 2)
+                voltage(Voltage.EV)
             }
         }
 

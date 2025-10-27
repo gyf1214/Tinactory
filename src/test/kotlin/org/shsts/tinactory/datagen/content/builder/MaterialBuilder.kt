@@ -299,7 +299,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 }
                 macerate("primary")
                 macerateTiny("nugget", 1)
-                macerate("magnetic")
+                macerateTiny("magnetic", 4)
                 macerateTiny("wire", 4)
                 macerateTiny("wire_fine", 1)
                 macerateTiny("ring", 2)
@@ -639,7 +639,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     fun crystallize(mat2: String, voltage: Voltage, workTicks: Long,
-        baseCleanness: Double, normalCleanness: Double, idealCleanness: Double? = null) {
+        baseCleanness: Double, normalCleanness: Double, idealCleanness: Double? = null,
+        amount: Number = 1) {
         autoclave {
             defaults {
                 voltage(voltage)
@@ -647,7 +648,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
             output(material, "gem") {
                 input(material, "seed")
-                input(mat2)
+                input(mat2, amount = amount)
                 extra {
                     requireCleanness(baseCleanness, normalCleanness)
                 }
@@ -655,7 +656,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             if (idealCleanness != null) {
                 output(material, "gem", suffix = "_from_dust") {
                     input(material, "dust")
-                    input(mat2)
+                    input(mat2, amount = amount)
                     extra {
                         requireCleanness(baseCleanness, idealCleanness)
                     }

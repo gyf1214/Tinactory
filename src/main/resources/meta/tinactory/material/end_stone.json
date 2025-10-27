@@ -3,7 +3,14 @@
   "items": [
     "dust"
   ],
-  "fluids": {},
+  "fluids": {
+    "slurry": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "textureColor": "0xFFE0C27F",
+      "displayColor": "0xFFE0C27F"
+    }
+  },
   "aliases": {},
   "existings": {
     "primary": "minecraft:end_stone"

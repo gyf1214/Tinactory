@@ -22,6 +22,7 @@ import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactoryBase
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
@@ -116,6 +117,18 @@ object MiscComponents {
             misc("carbon_plate") {
                 misc("carbon_mesh")
                 input(Items.TNT, 12, port = 1)
+            }
+        }
+
+        autoclave {
+            misc("quantum_eye") {
+                input("ender_eye", "gem")
+                input("radon")
+                voltage(Voltage.EV)
+                workTicks(1600)
+                extra {
+                    requireCleanness(0.5, 2.0)
+                }
             }
         }
 

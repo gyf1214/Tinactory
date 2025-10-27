@@ -648,6 +648,13 @@ object Materials {
         material("flint", DULL) {
             toolProcess()
         }
+        material("glass", SHINY)
+        material("raw_rubber", DULL)
+        material("rubber", SHINY) {
+            toolProcess()
+        }
+        material("glowstone", SHINY)
+        material("rare_earth", ROUGH)
         material("netherrack", ROUGH) {
             machineProcess(Voltage.LV, 0.5)
         }
@@ -661,12 +668,18 @@ object Materials {
             machineProcess(Voltage.HV)
             crystallize("lava", Voltage.HV, 1000, 0.0, 0.5)
         }
-        material("raw_rubber", DULL)
-        material("rubber", SHINY) {
-            toolProcess()
+        material("ender_pearl", FINE) {
+            machineProcess(Voltage.HV)
+            crystallize("argon", Voltage.EV, 400, 0.5, 1.0, amount = 0.1)
         }
-        material("glowstone", SHINY)
-        material("rare_earth", ROUGH)
-        material("glass", SHINY)
+        material("ender_eye", SHINY) {
+            machineProcess(Voltage.EV)
+            crystallize("argon", Voltage.EV, 1200, 0.5, 1.5)
+            centrifuge(Voltage.EV) {
+                amount(1)
+                component("end_stone")
+                component("radon")
+            }
+        }
     }
 }

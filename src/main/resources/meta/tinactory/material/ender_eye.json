@@ -1,0 +1,14 @@
+{
+  "color": "0xFF66FF66",
+  "items": [
+    "dust",
+    "seed"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "gem"
+  },
+  "existings": {
+    "gem": "minecraft:ender_eye"
+  }
+}
