@@ -91,7 +91,6 @@ object MachineComponents {
             sensor = "molybdenum",
             quartz = "fluix")
 
-        // TODO
         component(Voltage.IV,
             main = "tungsten_steel",
             motor = "annealed_copper",
@@ -99,7 +98,7 @@ object MachineComponents {
             rotor = "titanium",
             magnetic = "neodymium",
             sensor = "platinum",
-            quartz = "fluix")
+            quartz = "ender_eye")
     }
 
     private fun component(v: Voltage, main: String, motor: String,

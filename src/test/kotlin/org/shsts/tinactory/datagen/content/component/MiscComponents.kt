@@ -96,6 +96,18 @@ object MiscComponents {
                 workTicks(256)
                 tech(Technologies.CARBON_FIBER)
             }
+            componentVoltage = Voltage.IV
+            output(Items.END_CRYSTAL) {
+                input("ender_pearl")
+                circuit(1)
+                component("cable", 2)
+                input("platinum", "stick", 2)
+                input("tungsten_steel", "plate", 3)
+                input(Items.GLASS, 4)
+                input("soldering_alloy")
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.ENDER_CHEMISTRY)
+            }
         }
 
         wiremill {
@@ -224,6 +236,11 @@ object MiscComponents {
             input(getComponent("robot_arm").item(Voltage.EV))
             input(getItem("component/carbon_plate"))
         }
+
+        research(Voltage.IV) {
+            input(Items.END_CRYSTAL)
+            // TODO
+        }
     }
 
     private fun research(voltage: Voltage, block: AssemblyRecipeBuilder.() -> Unit) {
@@ -339,7 +356,7 @@ object MiscComponents {
             }
             rocket(Technologies.ROCKET_T2) {
                 input(AllTags.circuit(Voltage.IV))
-                input(STORAGE_CELLS[1].component.get())
+                input(STORAGE_CELLS[0].component.get(), 2)
                 input(getComponent("electric_pump").item(Voltage.IV), 4)
                 input(getItem("component/advanced_alloy"), 8)
                 input(getItem("component/carbon_plate"), 16)
