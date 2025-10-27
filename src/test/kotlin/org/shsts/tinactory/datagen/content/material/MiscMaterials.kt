@@ -145,13 +145,13 @@ object MiscMaterials {
                 }
             }
             input("chalcopyrite", amount = 2) {
-                input("oxygen", amount = 9)
+                input("oxygen", amount = 6)
                 output("iron", "ingot", 3)
                 output("copper", "ingot", 3)
                 output("sulfuric_acid", "gas", 6)
             }
             input("pyrite", amount = 2) {
-                input("oxygen", amount = 4.5)
+                input("oxygen", amount = 3)
                 output("iron", "ingot", 3)
                 output("sulfuric_acid", "gas", 3)
             }
@@ -179,13 +179,13 @@ object MiscMaterials {
                 output("carbon_dioxide", amount = 3)
             }
             input("galena", amount = 2) {
-                input("oxygen", amount = 4.5)
+                input("oxygen", amount = 3)
                 output("lead", "ingot", 3)
                 output("antimony", "ingot", 1)
                 output("sulfuric_acid", "gas", 3)
             }
             input("sphalerite", amount = 2) {
-                input("oxygen", amount = 4.5)
+                input("oxygen", amount = 3)
                 output("zinc", "ingot", 3)
                 output("silver", "ingot", 1)
                 output("sulfuric_acid", "gas", 3)

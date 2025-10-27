@@ -310,15 +310,27 @@ object InorganicChemistry {
                 workTicks(160)
             }
 
-            output("sulfuric_acid", "gas", 1) {
+            // sulfur
+            output("sulfuric_acid", "gas") {
                 input("sulfur")
-                input("oxygen", amount = 1.5)
+                input("oxygen")
                 workTicks(480)
             }
-            output("sulfuric_acid", amount = 1) {
-                input("sulfuric_acid", "gas", 1)
-                input("water", amount = 1)
+            output("sulfuric_acid") {
+                input("sulfuric_acid", "gas")
+                input("water")
+                input("oxygen", amount = 0.5)
                 workTicks(64)
+            }
+            output("sulfuric_acid", suffix = "_from_hydrogen_sulfide") {
+                input("hydrogen_sulfide")
+                input("oxygen", amount = 2)
+                workTicks(160)
+            }
+            output("hydrogen_sulfide") {
+                input("sulfur")
+                input("hydrogen")
+                workTicks(200)
             }
             output("sulfur", amount = 4) {
                 input("sodium_sulfate")
@@ -523,12 +535,6 @@ object InorganicChemistry {
                 input("hydrogen", amount = 1.5)
                 input("iron", "dust_tiny", 1)
                 workTicks(512)
-            }
-            output("sulfuric_acid", suffix = "_from_hydrogen_sulfide") {
-                input("hydrogen_sulfide")
-                input("oxygen", amount = 2)
-                requireMultiblock()
-                workTicks(160)
             }
             output("sulfuric_acid", suffix = "_from_sulfur") {
                 input("sulfur")

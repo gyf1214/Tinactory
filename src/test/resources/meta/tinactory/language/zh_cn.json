@@ -470,7 +470,7 @@
     "item.tinactory.misc.gelled_toluene": "甲苯凝胶",
     "fluid.tinactory.material.gas.water": "蒸汽",
     "fluid.tinactory.material.liquid.air": "液态空气",
-    "fluid.tinactory.material.gas.sulfuric_acid": "三氧化硫",
+    "fluid.tinactory.material.gas.sulfuric_acid": "二氧化硫",
     "fluid.tinactory.material.fluid.lpg": "液化石油气",
     "tinactory.tooltip.openRecipeBook": "打开配方书",
     "tinactory.tooltip.unselectRecipe": "清除配方",
