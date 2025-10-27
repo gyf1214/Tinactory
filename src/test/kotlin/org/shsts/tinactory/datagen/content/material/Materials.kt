@@ -163,6 +163,7 @@ object Materials {
             machineProcess(Voltage.HV)
             smelt()
         }
+        material("niobium", METALLIC)
     }
 
     private fun firstDegrees() {
@@ -348,6 +349,16 @@ object Materials {
         material("molybdenum_trioxide", DULL)
         material("enriched_uranium_fuel", SHINY)
         material("depleted_uranium_fuel", METALLIC)
+        material("niobium_titanium", DULL) {
+            machineProcess(Voltage.HV, 1.2)
+            blast(Voltage.HV, 3700, 1280) {
+                component("nitrogen")
+            }
+            mix(Voltage.HV) {
+                component("niobium")
+                component("titanium")
+            }
+        }
     }
 
     private fun higherDegrees() {

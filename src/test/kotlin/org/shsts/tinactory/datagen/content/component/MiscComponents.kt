@@ -96,15 +96,17 @@ object MiscComponents {
                 workTicks(256)
                 tech(Technologies.CARBON_FIBER)
             }
+
             componentVoltage = Voltage.IV
             output(Items.END_CRYSTAL) {
-                input("ender_pearl")
+                input("ender_pearl", "gem")
                 circuit(1)
                 component("cable", 2)
                 input("platinum", "stick", 2)
                 input("tungsten_steel", "plate", 3)
                 input(Items.GLASS, 4)
                 input("soldering_alloy")
+                voltage(Voltage.EV)
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.ENDER_CHEMISTRY)
             }

@@ -1,0 +1,18 @@
+{
+  "color": "0xFF1D1D29",
+  "items": [
+    "dust",
+    "dust_tiny",
+    "foil",
+    "ingot",
+    "ingot_hot",
+    "plate",
+    "wire",
+    "wire_fine"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "ingot"
+  },
+  "existings": {}
+}

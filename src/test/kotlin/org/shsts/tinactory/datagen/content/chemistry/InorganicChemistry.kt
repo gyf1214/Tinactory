@@ -582,6 +582,7 @@ object InorganicChemistry {
             output("obsidian", "slurry") {
                 input("obsidian")
                 input("mercury")
+                output("niobium", rate = 0.3)
                 output("platinum_group_sludge", rate = 0.1)
                 workTicks(200)
                 extra {
