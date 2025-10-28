@@ -98,6 +98,9 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
     @Override
     public boolean allowConnectWith(Level world, BlockPos pos, BlockState state,
         Direction dir, BlockState state1) {
+        if (!(state1.getBlock() instanceof CableBlock)) {
+            return false;
+        }
         var myDir = state.getValue(IO_FACING);
         if (dir == myDir) {
             return IElectricBlock.canVoltagesConnect(voltage.value, state1);

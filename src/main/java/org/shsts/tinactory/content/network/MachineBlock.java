@@ -144,6 +144,7 @@ public class MachineBlock extends SmartEntityBlock
     public boolean allowConnectWith(Level world, BlockPos pos, BlockState state,
         Direction dir, BlockState state1) {
         return dir == state.getValue(IO_FACING) &&
+            state1.getBlock() instanceof CableBlock &&
             IElectricBlock.canVoltagesConnect(voltage.value, state1);
     }
 
