@@ -37,6 +37,13 @@ object ProcessingMachines {
             electric = "electrum",
             pipe = "pvc",
             rotor = "stainless_steel")
+
+        machine(Voltage.IV,
+            main = "tungsten_steel",
+            heat = "niobium_titanium",
+            electric = "platinum",
+            pipe = "ptfe",
+            rotor = "titanium")
     }
 
     private fun machine(v: Voltage, main: String,
