@@ -489,7 +489,7 @@ object InorganicChemistry {
                 input("hydrogen_chloride", amount = 2)
                 output("magnesium_chloride")
                 output("silicon_dioxide")
-                output("water")
+                output("mercury", amount = 0.8)
                 workTicks(160)
             }
             output("tungsten_trioxide") {
