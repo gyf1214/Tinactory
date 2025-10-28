@@ -85,6 +85,7 @@ object Technologies {
     val POWER_SUBSTATION: ResourceLocation
 
     // EV
+    val NUCLEAR_PHYSICS: ResourceLocation
     val TUNGSTEN_STEEL: ResourceLocation
     val METAL_FORMER: ResourceLocation
     val ROCKET_T2: ResourceLocation
@@ -337,6 +338,11 @@ object Technologies {
             }
 
             voltage = Voltage.EV
+
+            NUCLEAR_PHYSICS = child("nuclear_physics") {
+                maxProgress(120)
+                displayItem(getComponent("field_generator").item(Voltage.EV))
+            }
 
             TUNGSTEN_STEEL = child("tungsten_steel") {
                 maxProgress(120)

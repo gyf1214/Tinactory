@@ -16,6 +16,7 @@ object MachineComponents {
         cables()
         components()
         batteries()
+        superconductors()
     }
 
     private fun cables() {
@@ -165,6 +166,13 @@ object MachineComponents {
                 input(main, "stick", 2)
                 tech(Technologies.ROBOT_ARM)
             }
+            component("field_generator") {
+                input(quartz, "gem")
+                circuit(2)
+                input(v.id + "_superconductor", "wire", amount = 16)
+                input(main, "plate", 4)
+                tech(Technologies.NUCLEAR_PHYSICS)
+            }
             component("machine_hull") {
                 input(main, "plate", 8)
                 component("cable", 2)
@@ -206,6 +214,27 @@ object MachineComponents {
             component("cable", wires)
             input("battery_alloy", "plate", plates)
             input(mat, sub, plates)
+            voltage(v)
+        }
+    }
+
+    private fun superconductors() {
+        assembler {
+            defaults {
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.NUCLEAR_PHYSICS)
+            }
+            superconductor(Voltage.EV, "niobium_titanium", "ptfe", "coolant")
+        }
+    }
+
+    private fun AssemblyRecipeFactory.superconductor(v: Voltage, mat: String,
+        pipe: String, coolant: String) {
+        output(v.id + "_superconductor", "wire") {
+            input(mat, "wire")
+            component("electric_pump", voltage = v)
+            input(pipe, "pipe")
+            input(coolant)
             voltage(v)
         }
     }

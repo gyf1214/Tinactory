@@ -362,7 +362,7 @@ object Materials {
         material("depleted_uranium_fuel", METALLIC)
         material("niobium_titanium", DULL) {
             machineProcess(Voltage.HV, 1.2)
-            blast(Voltage.HV, 3700, 1280) {
+            blast(Voltage.HV, 3500, 1280) {
                 component("nitrogen")
             }
             mix(Voltage.HV) {
@@ -485,6 +485,8 @@ object Materials {
                 component("nitric_acid")
             }
         }
+        material("ev_superconductor", SHINY)
+        material("iv_superconductor", SHINY)
     }
 
     private fun ores() {
