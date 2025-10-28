@@ -240,8 +240,8 @@ object MiscComponents {
         }
 
         research(Voltage.IV) {
+            input(STORAGE_CELLS[1].component.get())
             input(Items.END_CRYSTAL)
-            // TODO
         }
     }
 

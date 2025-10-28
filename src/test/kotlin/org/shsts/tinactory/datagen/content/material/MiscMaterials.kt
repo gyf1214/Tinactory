@@ -106,30 +106,6 @@ object MiscMaterials {
             }
         }
 
-        mixer {
-            defaults {
-                workTicks(64)
-            }
-            output("blaze", "seed") {
-                input("glowstone")
-                input("blaze")
-                voltage(Voltage.HV)
-            }
-            output("ender_pearl", "seed", 3) {
-                input("ender_pearl")
-                input("end_stone", amount = 2)
-                voltage(Voltage.EV)
-            }
-        }
-
-        macerator {
-            output("blaze", "dust", 3) {
-                input("blaze", "gem")
-                voltage(Voltage.HV)
-                workTicks(128)
-            }
-        }
-
         generateStone()
         stone()
         tags()

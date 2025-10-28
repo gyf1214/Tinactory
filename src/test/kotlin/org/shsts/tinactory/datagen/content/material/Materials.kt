@@ -164,6 +164,17 @@ object Materials {
             smelt()
         }
         material("niobium", METALLIC)
+        material("palladium", SHINY) {
+            machineProcess(Voltage.HV)
+        }
+        material("rhodium", BRIGHT) {
+            machineProcess(Voltage.HV, 1.5)
+        }
+        material("ruthenium", BRIGHT)
+        material("iridium", METALLIC) {
+            machineProcess(Voltage.HV, 2.0)
+        }
+        material("osmium", METALLIC)
     }
 
     private fun firstDegrees() {
@@ -359,6 +370,8 @@ object Materials {
                 component("titanium")
             }
         }
+        material("rhodium_metallic", ROUGH)
+        material("rarest_metallic", SHINY)
     }
 
     private fun higherDegrees() {
@@ -630,7 +643,7 @@ object Materials {
             }
             machineProcess(Voltage.MV)
         }
-        material("platinum_group_sludge", FINE)
+        material("platinum_metallic", METALLIC)
         material("lava", DULL) {
             fluidOre(400, Items.NETHERRACK)
         }

@@ -10,6 +10,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.electrolyzer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 
 object InorganicChemistry {
@@ -17,6 +18,7 @@ object InorganicChemistry {
         mv()
         hv()
         ev()
+        ender()
     }
 
     private fun mv() {
@@ -589,7 +591,7 @@ object InorganicChemistry {
                 input("obsidian")
                 input("mercury")
                 output("niobium", rate = 0.3)
-                output("platinum_group_sludge", rate = 0.1)
+                output("platinum_metallic", rate = 0.1)
                 workTicks(200)
                 extra {
                     temperature(1300)
@@ -616,7 +618,7 @@ object InorganicChemistry {
                 }
             }
             output("platinum", "nugget", 2, suffix = "_from_sludge") {
-                input("platinum_group_sludge")
+                input("platinum_metallic")
                 input("nitrogen")
                 workTicks(640)
                 extra {
@@ -659,6 +661,25 @@ object InorganicChemistry {
                 workTicks(800)
             }
         }
+    }
+
+    // ender processing
+    private fun ender() {
+        blastFurnace {
+            defaults {
+                voltage(Voltage.EV)
+            }
+            output("end_stone", "slurry") {
+                input("end_stone")
+                input("mercury")
+                output("platinum_metallic", rate = 0.2)
+                output("ender_pearl", "seed", rate = 0.1)
+                workTicks(100)
+                extra {
+                    temperature(2100)
+                }
+            }
+        }
 
         chemicalReactor {
             defaults {
@@ -677,19 +698,27 @@ object InorganicChemistry {
             }
         }
 
-        blastFurnace {
+        mixer {
             defaults {
+                workTicks(64)
+            }
+            output("blaze", "seed") {
+                input("glowstone")
+                input("blaze")
+                voltage(Voltage.HV)
+            }
+            output("ender_pearl", "seed", 3) {
+                input("ender_pearl")
+                input("end_stone", amount = 2)
                 voltage(Voltage.EV)
             }
-            output("end_stone", "slurry") {
-                input("end_stone")
-                input("mercury")
-                output("platinum_group_sludge", rate = 0.2)
-                output("ender_pearl", "seed", rate = 0.1)
-                workTicks(100)
-                extra {
-                    temperature(2100)
-                }
+        }
+
+        macerator {
+            output("blaze", "dust", 3) {
+                input("blaze", "gem")
+                voltage(Voltage.HV)
+                workTicks(128)
             }
         }
     }
