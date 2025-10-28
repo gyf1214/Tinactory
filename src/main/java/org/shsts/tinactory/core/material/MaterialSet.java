@@ -35,14 +35,14 @@ public class MaterialSet {
     public final int color;
 
     private record ItemEntry(ResourceLocation loc, TagKey<Item> tag,
-        Supplier<? extends Item> item, boolean isAlias) {
+        Supplier<? extends Item> item, boolean isAlias, boolean isExisting) {
         public ItemEntry(ResourceLocation loc, TagKey<Item> tag,
-            Supplier<? extends Item> item) {
-            this(loc, tag, item, false);
+            Supplier<? extends Item> item, boolean isExisting) {
+            this(loc, tag, item, false, isExisting);
         }
 
         public ItemEntry alias() {
-            return new ItemEntry(loc, tag, item, true);
+            return new ItemEntry(loc, tag, item, true, false);
         }
 
         public Item getItem() {
@@ -97,6 +97,10 @@ public class MaterialSet {
 
     public boolean isAlias(String sub) {
         return items.containsKey(sub) && items.get(sub).isAlias;
+    }
+
+    public boolean isExisting(String sub) {
+        return items.containsKey(sub) && items.get(sub).isExisting;
     }
 
     public boolean hasItem(String sub) {
@@ -194,12 +198,12 @@ public class MaterialSet {
             return prefix + sub + "/" + name;
         }
 
-        private void put(String sub, ResourceLocation loc, Supplier<? extends Item> item) {
+        private void put(String sub, ResourceLocation loc, Supplier<? extends Item> item, boolean isExisting) {
             if (items.containsKey(sub)) {
                 return;
             }
             var tag = newTag(sub);
-            var entry = new ItemEntry(loc, tag, item);
+            var entry = new ItemEntry(loc, tag, item, isExisting);
             items.put(sub, entry);
         }
 
@@ -208,20 +212,20 @@ public class MaterialSet {
                 return;
             }
             var entry = item.get();
-            put(sub, entry.loc(), entry);
+            put(sub, entry.loc(), entry, false);
         }
 
-        public Builder<P> existing(String sub, Item item) {
+        public Builder<P> existing(String sub, Supplier<Item> item) {
             assert !items.containsKey(sub);
             var loc = modLoc(newId(sub));
-            put(sub, loc, () -> item);
+            put(sub, loc, item, true);
             return this;
         }
 
-        public Builder<P> existing(String sub, Fluid fluid, int baseAmount) {
+        public Builder<P> existing(String sub, Supplier<Fluid> fluid, int baseAmount) {
             assert !fluids.containsKey(sub);
             var loc = modLoc(newId(sub));
-            fluids.put(sub, new FluidEntry(loc, () -> fluid, baseAmount));
+            fluids.put(sub, new FluidEntry(loc, fluid, baseAmount));
             return this;
         }
 

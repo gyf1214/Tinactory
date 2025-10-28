@@ -9,6 +9,7 @@
     "primary": "gem"
   },
   "existings": {
-    "gem": "minecraft:ender_eye"
+    "gem": "minecraft:ender_eye",
+    "lens": "tinactory:component/quantum_eye"
   }
 }

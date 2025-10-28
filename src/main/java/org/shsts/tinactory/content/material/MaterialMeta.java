@@ -59,7 +59,7 @@ public class MaterialMeta extends MetaConsumer {
         var existings = GsonHelper.getAsJsonObject(jo, "existings");
         for (var entry : existings.entrySet()) {
             var loc = new ResourceLocation(GsonHelper.convertToString(entry.getValue(), "existings"));
-            var item = ITEMS.getEntry(loc).get();
+            var item = ITEMS.getEntry(loc);
             builder.existing(entry.getKey(), item);
         }
     }
@@ -68,7 +68,7 @@ public class MaterialMeta extends MetaConsumer {
         var baseAmount = GsonHelper.getAsInt(jo, "baseAmount");
         if (jo.has("existing")) {
             var loc = new ResourceLocation(GsonHelper.getAsString(jo, "existing"));
-            var fluid = FLUIDS.getEntry(loc).get();
+            var fluid = FLUIDS.getEntry(loc);
             builder.existing(sub, fluid, baseAmount);
         } else {
             var tex = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));

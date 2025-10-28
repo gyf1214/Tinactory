@@ -331,14 +331,13 @@ object MiscComponents {
                 voltage(Voltage.HV)
             }
             storageComponent(2) {
-                input(CHIP.item("nor"), 16)
+                input(CHIP.item("nand"), 4)
                 input("fluix", "gem", 4)
-                // TODO
-                input("platinum", "wire_fine", 16)
+                input("niobium_titanium", "wire_fine", 16)
                 voltage(Voltage.EV)
             }
             storageComponent(3) {
-                input(CHIP.item("nand"), 4)
+                input(CHIP.item("nand"), 16)
                 input("fluix", "gem", 4)
                 // TODO
                 input("platinum", "wire_fine", 16)

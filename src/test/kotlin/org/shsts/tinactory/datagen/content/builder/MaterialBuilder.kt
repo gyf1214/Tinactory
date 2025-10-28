@@ -142,12 +142,12 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         val entry = material.entry(sub)
-        if (entry is IEntry<out Item>) {
-            // build item data for new item
-            newItem(sub, tag, entry)
-        } else {
+        if (material.isExisting(sub)) {
             // simple add tag for existing item
             dataGen { tag(entry, tag) }
+        } else {
+            // build item data for new item
+            newItem(sub, tag, entry as IEntry<out Item>)
         }
     }
 

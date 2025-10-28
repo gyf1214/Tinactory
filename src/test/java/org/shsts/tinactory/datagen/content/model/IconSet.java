@@ -75,7 +75,7 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
             var sub1 = sub.equals("sheet") ? "plate" : sub;
             var baseSub = sub1.equals("magnetic") ? "stick" : sub1;
             var base = getTex(ITEM_LOC, helper, baseSub).orElseThrow(() -> new IllegalArgumentException(
-                "No icon %s for icon set %s".formatted(baseSub, subfolder)));
+                "No icon %s for icon set %s, item=%s".formatted(baseSub, subfolder, ctx.id())));
             var overlay = getTex(ITEM_LOC, helper, sub1 + "_overlay");
 
             var model = ctx.provider().withExistingParent(ctx.id(), "item/generated")

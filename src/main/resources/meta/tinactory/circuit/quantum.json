@@ -1,0 +1,11 @@
+{
+  "type": "circuit",
+  "tier": "quantum",
+  "baseLevel": "normal",
+  "items": [
+    "quantum_processor",
+    "quantum_assembly",
+    "quantum_computer",
+    "quantum_mainframe"
+  ]
+}
