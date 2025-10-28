@@ -12,13 +12,74 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.electrolyzer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
 
 object InorganicChemistry {
     fun init() {
+        blastOre()
         mv()
         hv()
         ev()
         ender()
+        platinum()
+    }
+
+    private fun blastOre() {
+        blastFurnace {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(400)
+                extra {
+                    temperature(2000)
+                }
+            }
+            input("chalcopyrite", amount = 2) {
+                input("oxygen", amount = 6)
+                output("iron", "ingot", 3)
+                output("copper", "ingot", 3)
+                output("sulfuric_acid", "gas", 6)
+            }
+            input("pyrite", amount = 2) {
+                input("oxygen", amount = 3)
+                output("iron", "ingot", 3)
+                output("sulfuric_acid", "gas", 3)
+            }
+            input("limonite", amount = 8) {
+                input("carbon", amount = 9)
+                output("iron", "ingot", 12)
+                output("carbon_dioxide", amount = 9)
+                workTicks(1600)
+            }
+            input("banded_iron", amount = 8) {
+                input("carbon", amount = 9)
+                output("iron", "ingot", 12)
+                output("carbon_dioxide", amount = 9)
+                workTicks(1600)
+            }
+            input("garnierite", amount = 4) {
+                input("carbon", amount = 3)
+                output("nickel", "ingot", 6)
+                output("carbon_dioxide", amount = 3)
+                workTicks(800)
+            }
+            input("cassiterite", amount = 2) {
+                input("carbon", amount = 3)
+                output("tin", "ingot", 3)
+                output("carbon_dioxide", amount = 3)
+            }
+            input("galena", amount = 2) {
+                input("oxygen", amount = 3)
+                output("lead", "ingot", 3)
+                output("antimony", "ingot", 1)
+                output("sulfuric_acid", "gas", 3)
+            }
+            input("sphalerite", amount = 2) {
+                input("oxygen", amount = 3)
+                output("zinc", "ingot", 3)
+                output("silver", "ingot", 1)
+                output("sulfuric_acid", "gas", 3)
+            }
+        }
     }
 
     private fun mv() {
@@ -351,13 +412,19 @@ object InorganicChemistry {
                 workTicks(640)
             }
 
-            output("iron_chloride") {
-                input("iron")
-                input("hydrogen_chloride", amount = 3)
-                output("hydrogen", amount = 1.5)
+            // nitric
+            output("nitric_acid") {
+                input("nitric_acid", "gas")
+                input("water", amount = 0.5)
+                input("oxygen", amount = 0.25)
                 workTicks(160)
             }
-
+            output("nitric_acid", suffix = "_from_ammonium") {
+                input("ammonia")
+                input("oxygen", amount = 2)
+                output("water")
+                workTicks(320)
+            }
             output("ammonium_chloride") {
                 input("ammonia")
                 input("hydrogen_chloride")
@@ -367,6 +434,13 @@ object InorganicChemistry {
                 input("ammonium_chloride")
                 output("hydrogen_chloride")
                 workTicks(320)
+            }
+
+            output("iron_chloride") {
+                input("iron")
+                input("hydrogen_chloride", amount = 3)
+                output("hydrogen", amount = 1.5)
+                workTicks(160)
             }
 
             output("obsidian", "primary") {
@@ -552,13 +626,6 @@ object InorganicChemistry {
                 output("ammonium_chloride")
                 workTicks(160)
             }
-            output("nitric_acid") {
-                input("ammonia")
-                input("oxygen", amount = 2)
-                output("water")
-                requireMultiblock()
-                workTicks(256)
-            }
             output("lithium_carbonate") {
                 input("lithium_brine", amount = 4)
                 input("sodium_carbonate")
@@ -592,7 +659,7 @@ object InorganicChemistry {
                 input("mercury")
                 output("niobium", rate = 0.3)
                 output("platinum_metallic", rate = 0.1)
-                workTicks(200)
+                workTicks(400)
                 extra {
                     temperature(1300)
                 }
@@ -623,14 +690,6 @@ object InorganicChemistry {
                 workTicks(640)
                 extra {
                     temperature(2300)
-                }
-            }
-            output("blaze", "seed") {
-                input("glowstone")
-                input("lava")
-                workTicks(720)
-                extra {
-                    temperature(3100)
                 }
             }
         }
@@ -666,15 +725,22 @@ object InorganicChemistry {
     // ender processing
     private fun ender() {
         blastFurnace {
-            defaults {
-                voltage(Voltage.EV)
+            output("blaze", "seed") {
+                input("glowstone")
+                input("lava")
+                voltage(Voltage.HV)
+                workTicks(720)
+                extra {
+                    temperature(3100)
+                }
             }
             output("end_stone", "slurry") {
                 input("end_stone")
                 input("mercury")
                 output("platinum_metallic", rate = 0.2)
                 output("ender_pearl", "seed", rate = 0.1)
-                workTicks(100)
+                voltage(Voltage.EV)
+                workTicks(256)
                 extra {
                     temperature(2100)
                 }
@@ -719,6 +785,114 @@ object InorganicChemistry {
                 input("blaze", "gem")
                 voltage(Voltage.HV)
                 workTicks(128)
+            }
+        }
+    }
+
+    private fun platinum() {
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.HV)
+                tech(Technologies.PLATINUM_GROUP_METAL)
+            }
+            input("platinum_metallic", amount = 2) {
+                input("aqua_regia", amount = 14)
+                output("platinum_palladium_leachate")
+                output("rhodium_metallic")
+                output("nitric_acid", "gas", 3)
+                workTicks(320)
+            }
+            input("platinum_palladium_leachate", amount = 2) {
+                input("ammonium_chloride", amount = 6)
+                output("chloroplatinate", amount = 2)
+                output("palladium_rich_ammonia")
+                output("raw_platinum")
+                output("hydrogen_chloride", amount = 6)
+                workTicks(128)
+            }
+            output("platinum") {
+                input("chloroplatinate")
+                input("calcium", amount = 2)
+                output("ammonia", amount = 2)
+                output("calcium_chloride", amount = 2)
+                workTicks(256)
+            }
+            output("palladium") {
+                input("palladium_rich_ammonia")
+                input("sodium", amount = 4)
+                input("sodium_hydroxide", amount = 4)
+                output("ammonia", amount = 2)
+                output("salt_water", amount = 16)
+                workTicks(196)
+            }
+        }
+
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.EV)
+                tech(Technologies.PLATINUM_GROUP_METAL)
+            }
+            input("raw_rhodium", amount = 5) {
+                input("hydrogen_chloride", amount = 12)
+                output("rhodium_chloride", amount = 3)
+                output("raw_ruthenium", amount = 2)
+                output("sulfuric_acid", "gas", 5)
+                output("salt_water", amount = 5)
+                workTicks(196)
+            }
+            input("rhodium_chloride", amount = 2) {
+                input("calcium", amount = 3)
+                output("rhodium", amount = 2)
+                output("calcium_chloride", amount = 3)
+                workTicks(384)
+            }
+            input("rarest_metallic", amount = 2) {
+                input("mercury", amount = 3)
+                output("raw_iridium")
+                output("osmium_solution", amount = 3)
+                workTicks(480)
+            }
+        }
+
+        blastFurnace {
+            defaults {
+                voltage(Voltage.EV)
+            }
+            input("rhodium_metallic", amount = 16) {
+                input("sodium_sulfate")
+                input("sulfuric_acid", amount = 3)
+                output("raw_rhodium", amount = 4)
+                output("rarest_metallic")
+                workTicks(800)
+                extra {
+                    temperature(3500)
+                }
+            }
+            input("raw_ruthenium", amount = 16) {
+                input("carbon", amount = 3)
+                output("ruthenium", amount = 16)
+                workTicks(2000)
+                extra {
+                    temperature(2000)
+                }
+            }
+        }
+
+        sifter {
+            input("raw_platinum", "dust") {
+                output("platinum_metallic", "dust", rate = 0.95)
+                voltage(Voltage.HV)
+                workTicks(160)
+            }
+        }
+
+        distillation {
+            input("osmium_solution", amount = 12) {
+                output("osmium")
+                output("rarest_metallic", amount = 3)
+                output("mercury", amount = 8)
+                voltage(Voltage.IV)
+                workTicks(2400)
             }
         }
     }

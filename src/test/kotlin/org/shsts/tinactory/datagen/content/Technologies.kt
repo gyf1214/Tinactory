@@ -89,6 +89,7 @@ object Technologies {
     val METAL_FORMER: ResourceLocation
     val ROCKET_T2: ResourceLocation
     val ENDER_CHEMISTRY: ResourceLocation
+    val PLATINUM_GROUP_METAL: ResourceLocation
 
     init {
         Factory().apply {
@@ -355,9 +356,14 @@ object Technologies {
                 noResearch()
             }
 
-            ENDER_CHEMISTRY = child("ender_chemistry") {
+            ENDER_CHEMISTRY = tech("ender_chemistry") {
                 maxProgress(160)
                 displayItem(Items.ENDER_EYE)
+            }
+
+            PLATINUM_GROUP_METAL = tech("platinum_group_metal") {
+                maxProgress(160)
+                displayMaterial("platinum_metallic", "dust")
             }
         }
     }

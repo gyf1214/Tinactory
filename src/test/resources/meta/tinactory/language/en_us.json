@@ -114,6 +114,7 @@
     "fluid.tinactory.material.gas.water": "Steam",
     "fluid.tinactory.material.liquid.air": "Liquid Air",
     "fluid.tinactory.material.gas.sulfuric_acid": "Sulfur Dioxide",
+    "fluid.tinactory.material.gas.nitric_acid": "Nitrogen Dioxide",
     "fluid.tinactory.material.fluid.lpg": "LPG",
     "tinactory.tooltip.openRecipeBook": "Open recipe book",
     "tinactory.tooltip.unselectRecipe": "Clear recipe",
@@ -244,6 +245,7 @@
     "tinactory.technology.rocket_t2": "Tier 2 Rocket",
     "tinactory.technology.rocket_t2.details": "A powerful spacecraft equipped for interplanetary travel and heavier payloads. It expands exploration beyond nearby orbits, enabling resource transport and colony establishment on distant worlds.",
     "tinactory.technology.ender_chemistry.details": "Harnesses the mysterious energies of the Ender dimension to manipulate matter in impossible ways. Its unstable reactions defy conventional science, unlocking materials and phenomena beyond the known universe.",
+    "tinactory.technology.platinum_group_metal.details": "A collection of rare, lustrous elements prized for their exceptional catalytic and conductive properties. They are vital for high-end electronics, advanced catalysts, and cutting-edge energy systems.",
     "generator.tinactory.void": "Void"
   }
 }

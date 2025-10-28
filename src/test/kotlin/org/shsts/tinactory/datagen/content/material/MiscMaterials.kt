@@ -21,7 +21,6 @@ import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
@@ -34,9 +33,6 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 object MiscMaterials {
     fun init() {
         itemData("rubber_tree/sticky_resin") { model(basicItem("metaitems/rubber_drop")) }
-
-        // blast ores
-        blast()
 
         // disable vanilla recipes
         disableVanilla("iron")
@@ -109,64 +105,6 @@ object MiscMaterials {
         generateStone()
         stone()
         tags()
-    }
-
-    private fun blast() {
-        blastFurnace {
-            defaults {
-                voltage(Voltage.LV)
-                workTicks(400)
-                extra {
-                    temperature(2000)
-                }
-            }
-            input("chalcopyrite", amount = 2) {
-                input("oxygen", amount = 6)
-                output("iron", "ingot", 3)
-                output("copper", "ingot", 3)
-                output("sulfuric_acid", "gas", 6)
-            }
-            input("pyrite", amount = 2) {
-                input("oxygen", amount = 3)
-                output("iron", "ingot", 3)
-                output("sulfuric_acid", "gas", 3)
-            }
-            input("limonite", amount = 8) {
-                input("carbon", amount = 9)
-                output("iron", "ingot", 12)
-                output("carbon_dioxide", amount = 9)
-                workTicks(1600)
-            }
-            input("banded_iron", amount = 8) {
-                input("carbon", amount = 9)
-                output("iron", "ingot", 12)
-                output("carbon_dioxide", amount = 9)
-                workTicks(1600)
-            }
-            input("garnierite", amount = 4) {
-                input("carbon", amount = 3)
-                output("nickel", "ingot", 6)
-                output("carbon_dioxide", amount = 3)
-                workTicks(800)
-            }
-            input("cassiterite", amount = 2) {
-                input("carbon", amount = 3)
-                output("tin", "ingot", 3)
-                output("carbon_dioxide", amount = 3)
-            }
-            input("galena", amount = 2) {
-                input("oxygen", amount = 3)
-                output("lead", "ingot", 3)
-                output("antimony", "ingot", 1)
-                output("sulfuric_acid", "gas", 3)
-            }
-            input("sphalerite", amount = 2) {
-                input("oxygen", amount = 3)
-                output("zinc", "ingot", 3)
-                output("silver", "ingot", 1)
-                output("sulfuric_acid", "gas", 3)
-            }
-        }
     }
 
     private val VANILLA_METHODS = listOf("smelting", "blasting")

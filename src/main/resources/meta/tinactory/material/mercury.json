@@ -3,7 +3,7 @@
   "items": [],
   "fluids": {
     "molten": {
-      "baseAmount": 144,
+      "baseAmount": 1000,
       "texture": "gregtech:blocks/material_sets/dull/liquid"
     }
   },

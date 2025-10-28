@@ -372,6 +372,18 @@ object Materials {
         }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
+        material("chloroplatinate", DULL)
+        material("raw_platinum", METALLIC)
+        material("raw_rhodium", DULL)
+        material("rhodium_chloride", SHINY)
+        material("raw_ruthenium", SHINY)
+        material("raw_iridium", ROUGH) {
+            centrifuge(Voltage.IV) {
+                amount(1)
+                component("iridium")
+                component("mercury", 0.5)
+            }
+        }
     }
 
     private fun higherDegrees() {
@@ -465,6 +477,12 @@ object Materials {
             fluidMix(Voltage.HV) {
                 component("lpg")
                 component("oxygen", sub = "liquid")
+            }
+        }
+        material("aqua_regia", DULL) {
+            fluidMix(Voltage.HV) {
+                component("hydrogen_chloride", 3)
+                component("nitric_acid")
             }
         }
     }
