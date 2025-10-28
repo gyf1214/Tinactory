@@ -251,6 +251,7 @@
     "tinactory.technology.rocket_t2.details": "A powerful spacecraft equipped for interplanetary travel and heavier payloads. It expands exploration beyond nearby orbits, enabling resource transport and colony establishment on distant worlds.",
     "tinactory.technology.ender_chemistry.details": "Harnesses the mysterious energies of the Ender dimension to manipulate matter in impossible ways. Its unstable reactions defy conventional science, unlocking materials and phenomena beyond the known universe.",
     "tinactory.technology.platinum_group_metal.details": "A collection of rare, lustrous elements prized for their exceptional catalytic and conductive properties. They are vital for high-end electronics, advanced catalysts, and cutting-edge energy systems.",
+    "tinactory.technology.nuclear_physics.details": "Explores the forces binding atomic nuclei, unlocking immense power from the heart of matter itself. This knowledge paves the way for nuclear energy, advanced reactors, and devastating weaponry.",
     "generator.tinactory.void": "Void"
   }
 }
