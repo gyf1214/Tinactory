@@ -26,7 +26,7 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.PORT_CLICK;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.machine.Boiler.getHeat;
+import static org.shsts.tinactory.content.machine.BoilerProcessor.getHeat;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;

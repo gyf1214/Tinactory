@@ -22,7 +22,7 @@ import org.shsts.tinactory.content.logistics.MEStorageCellSet;
 import org.shsts.tinactory.content.logistics.MEStorageDetector;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
-import org.shsts.tinactory.content.machine.Boiler;
+import org.shsts.tinactory.content.machine.BoilerProcessor;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
@@ -180,7 +180,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.BOILER)
             .blockEntity()
-            .transform(Boiler.factory(speed, mat.fluid("liquid"), mat.fluid("gas")))
+            .transform(BoilerProcessor.factory(speed, mat.fluid("liquid"), mat.fluid("gas")))
             .transform(StackProcessingContainer.factory(layout))
             .end()
             .build();

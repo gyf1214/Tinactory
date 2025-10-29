@@ -36,7 +36,7 @@ import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TI
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Boiler extends CapabilityProvider implements
+public class BoilerProcessor extends CapabilityProvider implements
     IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final String ID = "machine/boiler";
     private static final double BASE_HEAT = 20d;
@@ -57,10 +57,9 @@ public class Boiler extends CapabilityProvider implements
     private double heat = BASE_HEAT;
     private long maxBurn = 0L;
     private long currentBurn = 0L;
-    private double leftSteam = 0d;
     private boolean stopped = false;
 
-    private Boiler(BlockEntity blockEntity, double burnSpeed, Fluid water, Fluid steam) {
+    private BoilerProcessor(BlockEntity blockEntity, double burnSpeed, Fluid water, Fluid steam) {
         this.blockEntity = blockEntity;
         this.burnSpeed = burnSpeed;
         this.water = water;
@@ -70,11 +69,11 @@ public class Boiler extends CapabilityProvider implements
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
         double burnSpeed, Supplier<? extends Fluid> water,
         Supplier<? extends Fluid> steam) {
-        return $ -> $.capability(ID, be -> new Boiler(be, burnSpeed, water.get(), steam.get()));
+        return $ -> $.capability(ID, be -> new BoilerProcessor(be, burnSpeed, water.get(), steam.get()));
     }
 
     public static double getHeat(IProcessor processor) {
-        return ((Boiler) processor).heat;
+        return ((BoilerProcessor) processor).heat;
     }
 
     private void onLoad() {
@@ -118,22 +117,16 @@ public class Boiler extends CapabilityProvider implements
         }
         if (heat > BURN_HEAT) {
             var absorb = (heat - BURN_HEAT) * BASE_ABSORB;
-            var leftSteam1 = leftSteam + absorb * BURN_EFFICIENCY;
-            var amount = (int) Math.floor(leftSteam1);
+            var amount = (int) Math.floor(absorb * BURN_EFFICIENCY);
             var drained = waterPort.drain(new FluidStack(water, amount), true);
             var amount1 = drained.getAmount();
             if (!drained.isEmpty()) {
                 waterPort.drain(drained, false);
                 outputPort.fill(new FluidStack(steam, amount1), false);
-                leftSteam1 -= amount1;
             }
-
-            var rebate = Math.floor(leftSteam1);
-            leftSteam = leftSteam1 - rebate;
-            heat = heat1 - absorb + rebate / BURN_EFFICIENCY;
-        } else {
-            heat = heat1;
+            heat1 -= amount1 / BURN_EFFICIENCY;
         }
+        heat = heat1;
         stopped = false;
         blockEntity.setChanged();
     }
@@ -168,7 +161,6 @@ public class Boiler extends CapabilityProvider implements
         tag.putDouble("heat", heat);
         tag.putLong("maxBurn", maxBurn);
         tag.putLong("currentBurn", currentBurn);
-        tag.putDouble("leftSteam", leftSteam);
         return tag;
     }
 
@@ -177,6 +169,5 @@ public class Boiler extends CapabilityProvider implements
         heat = tag.getDouble("heat");
         maxBurn = tag.getLong("maxBurn");
         currentBurn = tag.getLong("currentBurn");
-        leftSteam = tag.getDouble("leftSteam");
     }
 }
