@@ -9,6 +9,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -57,15 +58,14 @@ public class BoilerRecipe implements IRecipe<Boiler> {
             boiler.getInput().drain(input, true).getAmount() >= input.getAmount();
     }
 
-    public double absorbHeat(Boiler boiler, double parallel) {
-        var heat = boiler.getHeat();
+    public double getReaction(double heat, double parallel) {
+        return (heat - minHeat) * reactionRate * parallel;
+    }
 
-        var reaction = (int) Math.floor((heat - minHeat) * reactionRate * parallel);
-        if (reaction <= 0) {
-            return 0;
-        }
+    public double absorbHeat(IFluidCollection inputPort, IFluidCollection outputPort,
+        int reaction, double heat) {
         var inputStack = StackHelper.copyWithAmount(input, input.getAmount() * reaction);
-        var drained = boiler.getInput().drain(inputStack, true);
+        var drained = inputPort.drain(inputStack, true);
         var reaction1 = drained.getAmount() / inputStack.getAmount();
         if (reaction1 <= 0) {
             return 0;
@@ -75,8 +75,8 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         var decay = MathUtil.clamp(1 - (heat - optimalHeat) / (maxHeat - optimalHeat), 0, 1);
         var outputAmount = (int) Math.floor(output.getAmount() * reaction1 * decay);
         var outputStack = StackHelper.copyWithAmount(output, outputAmount);
-        boiler.getInput().drain(inputStack1, false);
-        boiler.getOutput().fill(outputStack, false);
+        inputPort.drain(inputStack1, false);
+        outputPort.fill(outputStack, false);
 
         return absorbRate * reaction1;
     }
