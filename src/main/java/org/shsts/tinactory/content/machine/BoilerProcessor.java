@@ -16,6 +16,7 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
@@ -27,6 +28,7 @@ import java.util.List;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 
@@ -44,6 +46,7 @@ public class BoilerProcessor extends CapabilityProvider implements
     private IItemCollection fuelPort;
     private long maxBurn = 0L;
     private long currentBurn = 0L;
+    private boolean needUpdate = true;
     private boolean stopped = false;
 
     public record Properties(double baseHeat, double baseDecay, double burnSpeed, double burnHeat) {}
@@ -67,31 +70,52 @@ public class BoilerProcessor extends CapabilityProvider implements
         var container = AllCapabilities.CONTAINER.get(blockEntity);
 
         fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
-        fuelPort.asItemFilter().setFilters(List.of(item -> ForgeHooks.getBurnTime(item, null) > 0));
+        fuelPort.asItemFilter().setFilters(List.of(item ->
+            ForgeHooks.getBurnTime(item, null) > 0 && !item.hasContainerItem()));
 
         var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
         var outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluid();
         boiler.setContainer(inputPort, outputPort);
     }
 
-    protected double parallel() {
+    protected double boilParallel() {
         return 1d;
+    }
+
+    protected int burnParallel() {
+        return 1;
+    }
+
+    private void setUpdate() {
+        if (maxBurn == 0) {
+            needUpdate = true;
+        }
     }
 
     @Override
     public void onPreWork() {
-        if (maxBurn > 0 || stopped) {
+        if (maxBurn > 0 || !needUpdate) {
             return;
         }
-        var item = fuelPort.extractItem(1, false);
-        if (item.isEmpty()) {
+
+        currentBurn = 0;
+        if (stopped) {
             return;
         }
-        if (item.hasContainerItem()) {
-            fuelPort.insertItem(item.getContainerItem(), false);
+
+        var maxParallel = burnParallel();
+        for (var stack : fuelPort.getAllItems()) {
+            if (ForgeHooks.getBurnTime(stack, null) > 0) {
+                var stack1 = StackHelper.copyWithCount(stack, maxParallel);
+                var extracted = fuelPort.extractItem(stack1, false);
+                if (!extracted.isEmpty()) {
+                    maxBurn = ForgeHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK * extracted.getCount();
+                    break;
+                }
+            }
         }
-        maxBurn = (long) ForgeHooks.getBurnTime(item, null) * PROGRESS_PER_TICK;
-        currentBurn = 0L;
+
+        needUpdate = false;
         blockEntity.setChanged();
     }
 
@@ -101,15 +125,15 @@ public class BoilerProcessor extends CapabilityProvider implements
         if (maxBurn > 0) {
             currentBurn += (long) (burnSpeed * (double) PROGRESS_PER_TICK);
             if (currentBurn >= maxBurn) {
-                currentBurn = 0;
                 maxBurn = 0;
+                needUpdate = true;
             }
             heatInput = burnHeat;
         }
 
         var world = blockEntity.getLevel();
         assert world != null;
-        boiler.tick(world, heatInput, parallel());
+        boiler.tick(world, heatInput, boilParallel());
 
         stopped = false;
         blockEntity.setChanged();
@@ -117,7 +141,10 @@ public class BoilerProcessor extends CapabilityProvider implements
 
     @Override
     public double getProgress() {
-        return maxBurn <= 0 ? 0d : 1d - ((double) currentBurn / (double) maxBurn);
+        if (maxBurn <= 0) {
+            return currentBurn > 0 ? 1 : 0;
+        }
+        return (double) currentBurn / (double) maxBurn;
     }
 
     private void onConnect(INetwork network) {
@@ -129,6 +156,7 @@ public class BoilerProcessor extends CapabilityProvider implements
         eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CONNECT.get(), this::onConnect);
+        eventManager.subscribe(CONTAINER_CHANGE.get(), this::setUpdate);
     }
 
     @Override

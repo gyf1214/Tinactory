@@ -167,11 +167,16 @@ public class MachineMenu extends ProcessingMenu {
         public Boiler(Properties properties) {
             super(properties);
             addSyncSlot("burn", () -> doublePacket(getProcessor(blockEntity)
-                .map(IProcessor::getProgress)
+                .map(this::getBurn)
                 .orElse(0d)));
             addSyncSlot("heat", () -> doublePacket(getProcessor(blockEntity)
                 .map($ -> getHeat($) / 600d)
                 .orElse(0d)));
+        }
+
+        private double getBurn(IProcessor processor) {
+            var progress = processor.getProgress();
+            return progress <= 0 ? 0 : 1 - progress;
         }
     }
 

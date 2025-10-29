@@ -238,15 +238,26 @@ public class MachineProcessor extends CapabilityProvider implements
             Optional.empty();
     }
 
-    private void updateRecipe() {
+    private void setUpdateRecipe() {
+        if (currentRecipe == null) {
+            needUpdate = true;
+        }
+    }
+
+    private void onTechChange(ITeamProfile team) {
+        if (team == machine().flatMap(IMachine::owner).orElse(null)) {
+            setUpdateRecipe();
+        }
+    }
+
+    @Override
+    public void onPreWork() {
         if (currentRecipe != null || !needUpdate) {
             return;
         }
 
         if (stopped) {
-            if (workProgress > 0) {
-                workProgress = 0;
-            }
+            workProgress = 0;
             return;
         }
 
@@ -272,23 +283,6 @@ public class MachineProcessor extends CapabilityProvider implements
         }
         needUpdate = false;
         blockEntity.setChanged();
-    }
-
-    private void setUpdateRecipe() {
-        if (currentRecipe == null) {
-            needUpdate = true;
-        }
-    }
-
-    private void onTechChange(ITeamProfile team) {
-        if (team == machine().flatMap(IMachine::owner).orElse(null)) {
-            setUpdateRecipe();
-        }
-    }
-
-    @Override
-    public void onPreWork() {
-        updateRecipe();
     }
 
     @Override

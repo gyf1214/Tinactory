@@ -181,7 +181,7 @@ public class MiscMeta extends MetaConsumer {
             GsonHelper.getAsDouble(jo, "burnSpeed"),
             GsonHelper.getAsDouble(jo, "burnHeat"));
 
-        BlockEntityBuilder.builder(id, MachineBlock::simple)
+        BlockEntityBuilder.builder(id, MachineBlock.factory(Voltage.PRIMITIVE))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.BOILER)
             .blockEntity()
