@@ -10,6 +10,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.content.recipe.BoilerRecipe;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.core.gui.Layout;
@@ -26,6 +27,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
     public static final IRecipeType<ToolRecipe.Builder> TOOL_CRAFTING;
+    public static final IRecipeType<BoilerRecipe.Builder> BOILER;
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
 
@@ -35,6 +37,11 @@ public final class AllRecipes {
         TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)
             .recipeClass(ToolRecipe.class)
             .serializer(ToolRecipe.SERIALIZER)
+            .register();
+
+        BOILER = REGISTRATE.recipeType("boiler", BoilerRecipe.Builder::new)
+            .recipeClass(BoilerRecipe.class)
+            .serializer(BoilerRecipe.SERIALIZER)
             .register();
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)

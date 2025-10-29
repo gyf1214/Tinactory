@@ -3,12 +3,23 @@ package org.shsts.tinactory.datagen.content.material
 import org.shsts.tinactory.content.recipe.GeneratorRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactoryBase
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.boiler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.combustionGenerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.gasTurbine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.steamTurbine
 
 object Generators {
     fun init() {
+        boiler {
+            recipe("water") {
+                heat(100.0, 400.0, 500.0)
+                reaction(0.01, 0.1)
+            }
+            recipe("coolant") {
+                heat(150.0, 550.0, 600.0)
+                reaction(0.003, 1.0)
+            }
+        }
         steamTurbine {
             generator("water", 80, 100, input = "gas", output = "liquid",
                 minVoltage = Voltage.ULV)

@@ -6,14 +6,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
@@ -26,7 +23,6 @@ import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
@@ -39,51 +35,47 @@ import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TI
 public class BoilerProcessor extends CapabilityProvider implements
     IProcessor, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final String ID = "machine/boiler";
-    private static final double BASE_HEAT = 20d;
-    private static final double BURN_HEAT = 100d;
-    private static final double BASE_DECAY = 0.0002d;
-    private static final double BASE_BURN = 0.02d;
-    private static final double BASE_ABSORB = 0.001d;
-    private static final double BURN_EFFICIENCY = 10d;
 
     private final BlockEntity blockEntity;
     private final double burnSpeed;
-    private final Fluid water;
-    private final Fluid steam;
+    private final double burnHeat;
+    private final Boiler boiler;
 
     private IItemCollection fuelPort;
-    private IFluidCollection waterPort;
-    private IFluidCollection outputPort;
-    private double heat = BASE_HEAT;
     private long maxBurn = 0L;
     private long currentBurn = 0L;
     private boolean stopped = false;
 
-    private BoilerProcessor(BlockEntity blockEntity, double burnSpeed, Fluid water, Fluid steam) {
+    public record Properties(double baseHeat, double baseDecay, double burnSpeed, double burnHeat) {}
+
+    private BoilerProcessor(BlockEntity blockEntity, Properties properties) {
         this.blockEntity = blockEntity;
-        this.burnSpeed = burnSpeed;
-        this.water = water;
-        this.steam = steam;
+        this.burnSpeed = properties.burnSpeed;
+        this.burnHeat = properties.burnHeat;
+        this.boiler = new Boiler(properties.baseHeat, properties.baseDecay);
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
-        double burnSpeed, Supplier<? extends Fluid> water,
-        Supplier<? extends Fluid> steam) {
-        return $ -> $.capability(ID, be -> new BoilerProcessor(be, burnSpeed, water.get(), steam.get()));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
+        return $ -> $.capability(ID, be -> new BoilerProcessor(be, properties));
     }
 
     public static double getHeat(IProcessor processor) {
-        return ((BoilerProcessor) processor).heat;
+        return ((BoilerProcessor) processor).boiler.getHeat();
     }
 
     private void onLoad() {
         var container = AllCapabilities.CONTAINER.get(blockEntity);
-        fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
-        waterPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
-        outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluid();
 
+        fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
         fuelPort.asItemFilter().setFilters(List.of(item -> ForgeHooks.getBurnTime(item, null) > 0));
-        waterPort.asFluidFilter().setFilters(List.of(fluid -> fluid.getFluid() == water));
+
+        var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
+        var outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluid();
+        boiler.setContainer(inputPort, outputPort);
+    }
+
+    protected double parallel() {
+        return 1d;
     }
 
     @Override
@@ -105,28 +97,20 @@ public class BoilerProcessor extends CapabilityProvider implements
 
     @Override
     public void onWorkTick(double partial) {
-        var decay = Math.max(0, heat - BASE_HEAT) * BASE_DECAY;
-        var heat1 = heat - decay;
+        var heatInput = 0d;
         if (maxBurn > 0) {
             currentBurn += (long) (burnSpeed * (double) PROGRESS_PER_TICK);
             if (currentBurn >= maxBurn) {
                 currentBurn = 0;
                 maxBurn = 0;
             }
-            heat1 += burnSpeed * BASE_BURN;
+            heatInput = burnHeat;
         }
-        if (heat > BURN_HEAT) {
-            var absorb = (heat - BURN_HEAT) * BASE_ABSORB;
-            var amount = (int) Math.floor(absorb * BURN_EFFICIENCY);
-            var drained = waterPort.drain(new FluidStack(water, amount), true);
-            var amount1 = drained.getAmount();
-            if (!drained.isEmpty()) {
-                waterPort.drain(drained, false);
-                outputPort.fill(new FluidStack(steam, amount1), false);
-            }
-            heat1 -= amount1 / BURN_EFFICIENCY;
-        }
-        heat = heat1;
+
+        var world = blockEntity.getLevel();
+        assert world != null;
+        boiler.tick(world, heatInput, parallel());
+
         stopped = false;
         blockEntity.setChanged();
     }
@@ -158,7 +142,7 @@ public class BoilerProcessor extends CapabilityProvider implements
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.putDouble("heat", heat);
+        tag.put("boiler", boiler.serializeNBT());
         tag.putLong("maxBurn", maxBurn);
         tag.putLong("currentBurn", currentBurn);
         return tag;
@@ -166,7 +150,7 @@ public class BoilerProcessor extends CapabilityProvider implements
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        heat = tag.getDouble("heat");
+        boiler.deserializeNBT(tag.getCompound("boiler"));
         maxBurn = tag.getLong("maxBurn");
         currentBurn = tag.getLong("currentBurn");
     }

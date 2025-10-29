@@ -170,7 +170,7 @@ public class MachineMenu extends ProcessingMenu {
                 .map(IProcessor::getProgress)
                 .orElse(0d)));
             addSyncSlot("heat", () -> doublePacket(getProcessor(blockEntity)
-                .map($ -> getHeat($) / 500d)
+                .map($ -> getHeat($) / 600d)
                 .orElse(0d)));
         }
     }

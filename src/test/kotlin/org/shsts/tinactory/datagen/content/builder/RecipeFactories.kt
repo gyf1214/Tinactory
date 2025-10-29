@@ -1,7 +1,6 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import org.shsts.tinactory.Tinactory.REGISTRATE
-import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe
 import org.shsts.tinactory.content.recipe.CleanRecipe
@@ -11,7 +10,6 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ResearchRecipe
-import org.shsts.tinactory.core.recipe.ToolRecipe
 
 typealias SimpleProcessingBuilder = ProcessingRecipeBuilder<ProcessingRecipe.Builder>
 typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
@@ -27,6 +25,10 @@ object RecipeFactories {
 
     fun toolCrafting(block: ToolRecipeFactory.() -> Unit) {
         ToolRecipeFactory().apply(block)
+    }
+
+    fun boiler(block: BoilerRecipeFactory.() -> Unit) {
+        BoilerRecipeFactory().apply(block)
     }
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> processing(name: String,
@@ -346,9 +348,5 @@ object RecipeFactories {
     fun marker(block: MarkerFactory.() -> Unit) {
         val recipeType = REGISTRATE.getRecipeType<MarkerRecipe.Builder>("marker")
         RecipeFactory(recipeType, ::MarkerBuilder).block()
-    }
-
-    fun ToolRecipe.Builder.define(ch: Char, mat: String, sub: String) {
-        define(ch, getMaterial(mat).tag(sub))
     }
 }
