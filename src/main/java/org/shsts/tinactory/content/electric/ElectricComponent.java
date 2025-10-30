@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -106,6 +107,10 @@ public class ElectricComponent extends NetworkComponent {
         }
 
         public void report(String team) {
+            var label = List.of(team);
+            MetricsManager.report("electric_consumed", label, workCons);
+            MetricsManager.report("electric_generated", label, gen);
+            MetricsManager.report("electric_buffered", label, buffer);
         }
     }
 
