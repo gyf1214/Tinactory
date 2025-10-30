@@ -3,7 +3,6 @@ package org.shsts.tinactory.test;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
@@ -44,7 +43,6 @@ public class TinactoryTest {
 
     private void init(FMLCommonSetupEvent event) {
         LOGGER.info("hello TinactoryTest!");
-        MinecraftForge.EVENT_BUS.register(TestCommands.class);
     }
 
     private void onGatherData(GatherDataEvent event) {

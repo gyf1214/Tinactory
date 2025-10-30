@@ -40,15 +40,11 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             jvmArgs '-ea'
 
-            ideaModule project.name + ".test"
+            ideaModule project.name + ".main"
 
             mods {
                 tinactory {
                     source sourceSets.main
-                }
-
-                tinactory_test {
-                    source sourceSets.test
                 }
             }
         }
@@ -60,15 +56,11 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             jvmArgs '-ea'
 
-            ideaModule project.name + ".test"
+            ideaModule project.name + ".main"
 
             mods {
                 tinactory {
                     source sourceSets.main
-                }
-
-                tinactory_test {
-                    source sourceSets.test
                 }
             }
         }

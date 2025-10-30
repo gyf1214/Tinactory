@@ -2,6 +2,7 @@ package org.shsts.tinactory.content;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -15,6 +16,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import org.shsts.tinactory.Tinactory;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -113,6 +115,20 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
+    private static int setTechProgress(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var player = ctx.getSource().getPlayerOrException();
+        var techName = ResourceLocationArgument.getId(ctx, "tech");
+        var progress = LongArgumentType.getLong(ctx, "progress");
+        var manager = TechManager.server();
+        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
+        var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
+
+        team.setTechProgress(tech, progress);
+        var msg = "Set tech %s process of %s to %d".formatted(tech.getLoc(), team.getName(), progress);
+        player.sendMessage(new TextComponent(msg), Util.NIL_UUID);
+        return Command.SINGLE_SUCCESS;
+    }
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var builder = Commands.literal(Tinactory.ID)
             .then(Commands.literal("createTeam")
@@ -129,7 +145,11 @@ public final class AllCommands {
             .then(Commands.literal("admin").requires(p -> p.hasPermission(2))
                 .then(Commands.literal("createSpawn")
                     .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                        .executes(AllCommands::createSpawn))));
+                        .executes(AllCommands::createSpawn)))
+                .then(Commands.literal("setTechProgress")
+                    .then(Commands.argument("tech", ResourceLocationArgument.id())
+                        .then(Commands.argument("progress", LongArgumentType.longArg(0))
+                            .executes(AllCommands::setTechProgress)))));
 
         dispatcher.register(builder);
     }
