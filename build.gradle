@@ -20,6 +20,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'kotlin'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'maven-publish'
 
 group = 'org.shsts.tinactory'
 archivesBaseName = "tinactory"
@@ -183,6 +184,25 @@ artifacts {
 }
 
 build.dependsOn apiJar
+
+publishing {
+    repositories {
+        maven {
+            name = 'shsts'
+            url = 'https://www.shsts.org/m2'
+            credentials {
+                username = shstsUser
+                password = shstsPassword
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            artifact jar
+            artifact apiJar
+        }
+    }
+}
 
 compileTestKotlin {
     kotlinOptions {
