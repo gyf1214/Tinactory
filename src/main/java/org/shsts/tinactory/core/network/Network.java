@@ -13,6 +13,7 @@ import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.slf4j.Logger;
@@ -39,6 +40,11 @@ public class Network extends NetworkBase implements INetwork {
     public Network(Level world, BlockPos center, TeamProfile team) {
         super(world, center, team);
         attachComponents();
+    }
+
+    @Override
+    public ITeamProfile owner() {
+        return team;
     }
 
     @Override

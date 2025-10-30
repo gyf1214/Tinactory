@@ -104,6 +104,9 @@ public class ElectricComponent extends NetworkComponent {
             var buffer = buf.readDouble();
             return new Metrics(workFactor, gen, workCons, buffer);
         }
+
+        public void report(String team) {
+        }
     }
 
     private final Map<BlockPos, Subnet> subnets = new HashMap<>();
@@ -233,6 +236,7 @@ public class ElectricComponent extends NetworkComponent {
 
         var workSpeed = MathUtil.safePow(workFactor, CONFIG.workFactorExponent.get());
         metrics = new Metrics(workSpeed, gen, workCons, buffer);
+        metrics.report(network.owner().getName());
     }
 
     public double getWorkFactor() {

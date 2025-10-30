@@ -18,7 +18,7 @@ public class MetricsManager {
         callbacks.addAll(registry.getValues());
     }
 
-    public void report(String name, List<String> labels, double value) {
+    public static void report(String name, List<String> labels, double value) {
         for (var cb : callbacks) {
             cb.report(name, labels, value);
         }
