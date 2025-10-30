@@ -36,7 +36,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static final String SLOT_SYNC = "slots";
-    public static final int PANEL_HEIGHT = 6 * SLOT_SIZE + SPACING;
+    public static final int PANEL_HEIGHT = 7 * SLOT_SIZE + SPACING;
 
     private final IMachine machine;
     private final IMachineConfig machineConfig;

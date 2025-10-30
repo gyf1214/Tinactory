@@ -51,7 +51,7 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         @Override
         protected int getItemCount() {
             var size = items.size() + fluids.size();
-            return Math.max(1, (size + SLOT_COUNT - 1) / SLOT_COUNT) * SLOT_COUNT;
+            return Math.max(1, (size + SLOT_COUNT) / SLOT_COUNT) * SLOT_COUNT;
         }
 
         @Override
