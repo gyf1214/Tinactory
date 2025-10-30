@@ -11,11 +11,13 @@ import org.shsts.tinactory.content.logistics.SignalComponent;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
+import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.MACHINE_COMPARATOR;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -63,8 +65,12 @@ public class MESignalControllerMenu extends MenuBase {
     }
 
     private List<MESignalControllerSyncPacket.SignalInfo> getVisibleSignals() {
+        var infos = signals.getSubnetSignals(subnet).stream()
+            .sorted(Comparator.comparing(SignalComponent.SignalInfo::machine, MACHINE_COMPARATOR))
+            .toList();
+
         var ret = new ArrayList<MESignalControllerSyncPacket.SignalInfo>();
-        for (var info : signals.getSubnetSignals(subnet)) {
+        for (var info : infos) {
             var machine = info.machine();
             ret.add(new MESignalControllerSyncPacket.SignalInfo(machine.uuid(),
                 machine.title(), machine.icon(), info.key(), info.isWrite()));

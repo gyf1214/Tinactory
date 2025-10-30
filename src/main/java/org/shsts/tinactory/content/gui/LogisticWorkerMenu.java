@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
@@ -12,6 +13,7 @@ import org.shsts.tinactory.core.gui.InventoryMenu;
 import org.shsts.tinactory.core.gui.Menu;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -26,6 +28,11 @@ import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 public class LogisticWorkerMenu extends InventoryMenu {
     public static final int CONFIG_WIDTH = BUTTON_SIZE * 4 + 2;
     public static final String SLOT_SYNC = "info";
+
+    public static final Comparator<IMachine> MACHINE_COMPARATOR =
+        Comparator.<IMachine>comparingLong($ -> $.electric().map(IElectricMachine::getVoltage).orElse(0L))
+            .thenComparing($ -> $.blockEntity().getBlockState().getBlock().getRegistryName())
+            .thenComparing($ -> $.title().getString());
 
     public final IMachine machine;
     private final LogisticComponent logistic;
@@ -68,8 +75,12 @@ public class LogisticWorkerMenu extends InventoryMenu {
     }
 
     private List<LogisticWorkerSyncPacket.PortInfo> getVisiblePorts() {
+        var infos = logistic.getVisiblePorts(subnet).stream()
+            .sorted(Comparator.comparing(LogisticComponent.PortInfo::machine, MACHINE_COMPARATOR))
+            .toList();
+
         var ret = new ArrayList<LogisticWorkerSyncPacket.PortInfo>();
-        for (var info : logistic.getVisiblePorts(subnet)) {
+        for (var info : infos) {
             var machine1 = info.machine();
             var index = info.portIndex();
             var portName = portLabel(info.port().type(), index);
