@@ -9,7 +9,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
@@ -304,7 +304,7 @@ public class TechPanel extends Panel {
     private void startResearch() {
         if (menu.player() instanceof LocalPlayer player && selectedTech != null) {
             var loc = selectedTech.getLoc().toString();
-            var command = "/" + Tinactory.ID + " setTargetTech " + loc;
+            var command = "/" + TinactoryKeys.ID + " setTargetTech " + loc;
             player.chat(command);
         }
     }

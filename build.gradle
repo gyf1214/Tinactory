@@ -166,7 +166,23 @@ processTestResources {
     }
 }
 
+configurations {
+    api
+}
+
+task apiJar(type: Jar) {
+    classifier = 'api'
+    include "org/shsts/tinactory/api/**"
+    from sourceSets.main.output
+}
+
 jar.finalizedBy('reobfJar')
+
+artifacts {
+    api apiJar
+}
+
+build.dependsOn apiJar
 
 compileTestKotlin {
     kotlinOptions {

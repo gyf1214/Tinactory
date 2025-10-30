@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.gui.NetworkControllerMenu;
 import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
@@ -184,7 +184,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     private void onWelcomePressed() {
         if (menu.player() instanceof LocalPlayer player) {
             var name = welcomeEdit.getValue();
-            var command = "/" + Tinactory.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
+            var command = "/" + TinactoryKeys.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
             player.chat(command);
         }
     }

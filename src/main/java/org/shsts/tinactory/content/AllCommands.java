@@ -18,7 +18,7 @@ import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 
@@ -130,7 +130,7 @@ public final class AllCommands {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        var builder = Commands.literal(Tinactory.ID)
+        var builder = Commands.literal(TinactoryKeys.ID)
             .then(Commands.literal("createTeam")
                 .then(Commands.argument("name", StringArgumentType.string())
                     .executes(AllCommands::createTeam)))

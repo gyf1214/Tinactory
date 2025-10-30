@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
-import org.shsts.tinactory.Tinactory;
+import org.shsts.tinactory.api.TinactoryKeys;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -14,7 +14,7 @@ public final class LocHelper {
     }
 
     public static ResourceLocation modLoc(String id) {
-        return new ResourceLocation(Tinactory.ID, id);
+        return new ResourceLocation(TinactoryKeys.ID, id);
     }
 
     public static ResourceLocation gregtech(String id) {

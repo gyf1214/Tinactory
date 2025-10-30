@@ -14,6 +14,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.AllBlockEntities;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.content.AllClientEvents;
@@ -36,11 +37,10 @@ import org.slf4j.Logger;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
-@Mod(Tinactory.ID)
+@Mod(TinactoryKeys.ID)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class Tinactory {
-    public static final String ID = "tinactory";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static ITinyCoreLib CORE;
@@ -65,7 +65,7 @@ public class Tinactory {
         try {
             CORE = ITinyCoreLib.get();
             CHANNEL = CORE.createChannel(modLoc("channel"), "1");
-            REGISTRATE = CORE.registrate(ID).setDefaultChannel(CHANNEL);
+            REGISTRATE = CORE.registrate(TinactoryKeys.ID).setDefaultChannel(CHANNEL);
 
             AllRegistries.init();
             AllMeta.init();
