@@ -110,7 +110,12 @@ public class ElectricComponent extends NetworkComponent {
             var label = List.of(team);
             MetricsManager.report("electric_consumed", label, workCons);
             MetricsManager.report("electric_generated", label, gen);
-            MetricsManager.report("electric_buffered", label, buffer);
+            var sign = MathUtil.compare(buffer);
+            if (sign > 0) {
+                MetricsManager.report("electric_buffer_charged", label, buffer);
+            } else if (sign < 0) {
+                MetricsManager.report("electric_buffer_discharged", label, -buffer);
+            }
         }
     }
 
