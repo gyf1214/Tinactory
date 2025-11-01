@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryBuilder;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;
 import org.shsts.tinactory.api.network.IComponentType;
@@ -50,6 +51,7 @@ public final class AllRegistries {
             .register();
         METRICS_CALLBACKS = REGISTRATE.registry(TinactoryKeys.METRICS_CALLBACKS, IMetricsCallback.class)
             .onBake((registry, stage) -> MetricsManager.onBake(registry))
+            .builder(RegistryBuilder::disableSync)
             .register();
 
         EVENTS = REGISTRATE.getHandler(EVENT_REGISTRY_KEY, IEvent.class);
