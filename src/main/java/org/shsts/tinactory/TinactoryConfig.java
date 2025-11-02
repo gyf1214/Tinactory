@@ -43,8 +43,8 @@ public final class TinactoryConfig {
         primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
             .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
         machineResistanceFactor = builder.comment("Machine resistance factor")
-            .defineList("machine_resistance_factor", List.of(0.05d, 0.1d, 0.1d, 0.2d, 0.2d, 0.4d),
-                i -> ((Number) i).doubleValue() > 0d);
+            .defineList("machine_resistance_factor", List.of(0d),
+                i -> ((Number) i).doubleValue() >= 0d);
         workFactorExponent = builder.comment("Work factor exponent")
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
         coilTemperatureFactor = builder.comment("Temperature energy factor for coil machines")

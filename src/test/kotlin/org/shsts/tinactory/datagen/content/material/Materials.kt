@@ -429,6 +429,10 @@ object Materials {
         }
         material("vanadium_steel", METALLIC) {
             machineProcess(Voltage.MV, 1.5)
+            mix(Voltage.MV) {
+                component("steel", 5)
+                component("vanadium", 1)
+            }
             blast(Voltage.MV, 2500, 1280) {
                 component("nitrogen")
             }

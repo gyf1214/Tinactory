@@ -79,6 +79,12 @@ object InorganicChemistry {
                 output("silver", "ingot", 1)
                 output("sulfuric_acid", "gas", 3)
             }
+            input("ilmenite", amount = 2) {
+                input("carbon")
+                output("iron", "ingot", 2)
+                output("rutile", amount = 2)
+                output("carbon_dioxide")
+            }
         }
     }
 
