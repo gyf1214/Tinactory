@@ -309,7 +309,7 @@ object MiscMachines {
                 input("stone", "primary", 8)
             }
             output(Items.CHEST) {
-                input(ItemTags.PLANKS)
+                input(ItemTags.PLANKS, 8)
             }
             output(Items.HOPPER) {
                 input(Items.CHEST)
