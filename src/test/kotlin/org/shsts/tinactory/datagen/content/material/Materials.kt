@@ -121,13 +121,13 @@ object Materials {
         }
         material("carbon", DULL) {
             machineProcess(Voltage.HV)
-            implosion(4)
+            implosionIngot()
         }
         material("manganese", DULL)
         material("arsenic", DULL)
         material("silicon", METALLIC) {
             machineProcess(Voltage.HV)
-            implosion(4)
+            implosionIngot()
         }
         material("beryllium", METALLIC) {
             machineProcess(Voltage.LV, 0.6)
@@ -325,6 +325,7 @@ object Materials {
 
         material("coke", LIGNITE) {
             toolProcess()
+            implosionPrimary()
         }
         material("charcoal", FINE) {
             toolProcess()
@@ -528,6 +529,7 @@ object Materials {
         }
         material("coal", DULL) {
             toolProcess()
+            implosionPrimary()
             oreProcess {
                 amount = 2
                 siftAndHammer = true
@@ -650,6 +652,7 @@ object Materials {
                 byProducts("certus_quartz", "silicon_dioxide", "certus_quartz")
             }
             machineProcess(Voltage.MV)
+            crystallize("salt_water", Voltage.HV, 200, -1.0, idealCleanness = 0.0)
         }
         material("certus_quartz", CERTUS) {
             oreProcess {
@@ -666,6 +669,7 @@ object Materials {
                 byProducts("lapis", "silicon_dioxide", "lapis")
             }
             machineProcess(Voltage.MV)
+            implosionPrimary()
         }
         material("platinum_metallic", METALLIC)
         material("lava", DULL) {

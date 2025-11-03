@@ -9,5 +9,7 @@
   "aliases": {
     "primary": "gem"
   },
-  "existings": {}
+  "existings": {
+    "block": "tinactory:material/block/coke"
+  }
 }

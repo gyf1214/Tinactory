@@ -28,15 +28,15 @@ public class MaterialMeta extends MetaConsumer {
         super("Material");
     }
 
-    private static int getColor(String hex) {
+    private static int parseColor(String hex) {
         if (!hex.startsWith("0x")) {
             throw new MetaLoadingException("Bad color code " + hex);
         }
         return Integer.parseUnsignedInt(hex.substring(2).toLowerCase(), 16);
     }
 
-    public static int getColor(JsonObject jo, String member) {
-        return getColor(GsonHelper.getAsString(jo, member));
+    public static int parseColor(JsonObject jo, String member) {
+        return parseColor(GsonHelper.getAsString(jo, member));
     }
 
     private void buildItems(MaterialSet.Builder<?> builder, JsonObject jo, int burnTime) {
@@ -72,8 +72,8 @@ public class MaterialMeta extends MetaConsumer {
             builder.existing(sub, fluid, baseAmount);
         } else {
             var tex = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));
-            var texColor = jo.has("textureColor") ? getColor(jo, "textureColor") : builder.getColor();
-            var displayColor = jo.has("displayColor") ? getColor(jo, "displayColor") : builder.getColor();
+            var texColor = jo.has("textureColor") ? parseColor(jo, "textureColor") : builder.getColor();
+            var displayColor = jo.has("displayColor") ? parseColor(jo, "displayColor") : builder.getColor();
             builder.fluid(sub, tex, texColor, displayColor, baseAmount);
         }
     }
@@ -135,7 +135,7 @@ public class MaterialMeta extends MetaConsumer {
             return;
         }
 
-        var color = getColor(jo, "color");
+        var color = parseColor(jo, "color");
         var builder = AllMaterials.newMaterial(loc.getPath()).color(color);
         var burnTime = jo.has("burnTime") ? GsonHelper.getAsInt(jo, "burnTime") : -1;
 

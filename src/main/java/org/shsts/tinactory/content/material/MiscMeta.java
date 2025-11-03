@@ -2,11 +2,15 @@ package org.shsts.tinactory.content.material;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -46,6 +50,7 @@ import static org.shsts.tinactory.content.AllItems.STORAGE_CELLS;
 import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS;
+import static org.shsts.tinactory.content.material.MaterialMeta.parseColor;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -126,10 +131,27 @@ public class MiscMeta extends MetaConsumer {
             .register();
     }
 
+    private void coalBlock(String id, JsonObject jo) {
+        var materialColor = parseMaterialColor(jo, "materialColor");
+        var tint = parseColor(jo, "tint");
+        var burnTime = GsonHelper.getAsInt(jo, "burnTime");
+        REGISTRATE.block(id, Block::new)
+            .material(Material.STONE, materialColor)
+            .properties($ -> $.requiresCorrectToolForDrops().strength(5f, 6f))
+            .tint(tint)
+            .blockItem((block, properties) -> new BlockItem(block, properties) {
+                @Override
+                public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
+                    return burnTime;
+                }
+            }).end()
+            .register();
+    }
+
     private void item(String id, JsonObject jo) {
         var builder = REGISTRATE.item(id);
         if (jo.has("tint")) {
-            builder.tint(MaterialMeta.getColor(jo, "tint"));
+            builder.tint(parseColor(jo, "tint"));
         }
         builder.register();
     }
@@ -219,6 +241,7 @@ public class MiscMeta extends MetaConsumer {
             case "glass" -> glass(id);
             case "lens" -> lens(id, jo);
             case "power" -> power(name, id, jo);
+            case "coal_block" -> coalBlock(id, jo);
             case "item" -> item(id, jo);
             case "me_storage_interface" -> meStorageInterface(id, jo);
             case "me_drive" -> meDrive(id, jo);

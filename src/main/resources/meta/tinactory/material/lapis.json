@@ -13,6 +13,7 @@
   "fluids": {},
   "aliases": {},
   "existings": {
-    "primary": "minecraft:lapis_lazuli"
+    "primary": "minecraft:lapis_lazuli",
+    "block": "minecraft:lapis_block"
   }
 }

@@ -367,8 +367,7 @@ object MiscMachines {
             }
             output(Items.REDSTONE_BLOCK) {
                 circuit(1)
-                input("redstone", "dust", 4)
-                input("iron", "plate", 2)
+                input("redstone", "dust", 9)
             }
             output(Items.TRAPPED_CHEST) {
                 circuit(1)

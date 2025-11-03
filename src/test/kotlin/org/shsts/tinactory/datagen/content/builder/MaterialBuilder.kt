@@ -313,6 +313,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 macerate("pipe", 3)
                 macerate("gem_flawless", 8)
                 macerate("gem_exquisite", 16)
+                macerate("block", 8)
             }
         }
 
@@ -639,22 +640,24 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     fun crystallize(mat2: String, voltage: Voltage, workTicks: Long,
-        baseCleanness: Double, normalCleanness: Double, idealCleanness: Double? = null,
+        baseCleanness: Double, normalCleanness: Double? = null, idealCleanness: Double? = null,
         amount: Number = 1) {
         autoclave {
             defaults {
                 voltage(voltage)
                 workTicks(workTicks)
             }
-            output(material, "gem") {
-                input(material, "seed")
-                input(mat2, amount = amount)
-                extra {
-                    requireCleanness(baseCleanness, normalCleanness)
+            if (normalCleanness != null) {
+                output(material, "gem") {
+                    input(material, "seed")
+                    input(mat2, amount = amount)
+                    extra {
+                        requireCleanness(baseCleanness, normalCleanness)
+                    }
                 }
             }
             if (idealCleanness != null) {
-                output(material, "gem", suffix = "_from_dust") {
+                output(material, "gem", suffix = if (normalCleanness == null) "" else "_from_dust") {
                     input(material, "dust")
                     input(mat2, amount = amount)
                     extra {
@@ -683,12 +686,26 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    fun implosion(amount: Int, voltage: Voltage = Voltage.HV) {
+    private fun ProcessingRecipeFactory.implosion(out: String, inAmount: Int, voltage: Voltage = Voltage.HV,
+        input: String = "dust", outAmount: Int = 1, tntAmount: Int = inAmount / 4) {
+        output(material, out, outAmount) {
+            input(material, input, inAmount)
+            input(Items.TNT, tntAmount, port = 1)
+            voltage(voltage)
+        }
+    }
+
+    fun implosionIngot() {
         implosionCompressor {
-            output(material, "ingot") {
-                input(material, "dust", amount)
-                input(Items.TNT, amount / 4, port = 1)
-                voltage(voltage)
+            implosion("ingot", 4)
+        }
+    }
+
+    fun implosionPrimary() {
+        implosionCompressor {
+            implosion("primary", 16, outAmount = 16, tntAmount = 1)
+            if (material.hasItem("block")) {
+                implosion("block", 18, input = "primary", outAmount = 2, tntAmount = 1)
             }
         }
     }
@@ -820,6 +837,13 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                         voltage(Voltage.LV)
                         workTicks(400)
                     }
+                }
+            }
+
+            if (material.hasItem("gem_flawless")) {
+                implosionCompressor {
+                    implosion("gem", 4, outAmount = 3)
+                    implosion("gem_flawless", 9, input = "gem")
                 }
             }
 

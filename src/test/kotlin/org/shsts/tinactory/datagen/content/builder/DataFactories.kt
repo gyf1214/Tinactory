@@ -29,6 +29,10 @@ object DataFactories {
         blockData { block(entry, block) }
     }
 
+    fun blockData(id: String, block: IBlockDataBuilder<Block, *>.() -> Unit) {
+        blockData { block(id, block) }
+    }
+
     fun dataGen(block: IDataGen.() -> Unit) {
         DATA_GEN.apply(block)
     }

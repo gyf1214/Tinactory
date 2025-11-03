@@ -60,6 +60,16 @@ object OrganicChemistry {
                 workTicks(320)
             }
         }
+
+        pyrolyseOven {
+            output("coke", "block", amount = 2) {
+                output("creosote_oil", amount = 10)
+                input("coal", "block", amount = 2)
+                input("nitrogen", amount = 1)
+                voltage(Voltage.LV)
+                workTicks(320)
+            }
+        }
     }
 
     private fun mv() {

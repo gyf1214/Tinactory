@@ -13,6 +13,7 @@
   "fluids": {},
   "aliases": {},
   "existings": {
-    "primary": "minecraft:coal"
+    "primary": "minecraft:coal",
+    "block": "minecraft:coal_block"
   }
 }

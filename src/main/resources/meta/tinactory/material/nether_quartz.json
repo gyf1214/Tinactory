@@ -11,8 +11,10 @@
     "raw"
   ],
   "fluids": {},
-  "aliases": {},
+  "aliases": {
+    "primary": "gem"
+  },
   "existings": {
-    "primary": "minecraft:quartz"
+    "gem": "minecraft:quartz"
   }
 }

@@ -1,0 +1,6 @@
+{
+  "type": "coal_block",
+  "materialColor": 21,
+  "tint": "0xFF666666",
+  "burnTime": 32000
+}

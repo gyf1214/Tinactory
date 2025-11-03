@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.material
 
+import net.minecraft.tags.BlockTags
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags.FLUID_STORAGE_CELL
@@ -18,7 +19,9 @@ import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Models.basicItem
+import org.shsts.tinactory.datagen.content.Models.cubeTint
 import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
@@ -32,7 +35,14 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 
 object MiscMaterials {
     fun init() {
-        itemData("rubber_tree/sticky_resin") { model(basicItem("metaitems/rubber_drop")) }
+        itemData("rubber_tree/sticky_resin") {
+            model(basicItem("metaitems/rubber_drop"))
+        }
+
+        blockData("material/block/coke") {
+            blockState(cubeTint("material_sets/lignite/block"))
+            tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        }
 
         // disable vanilla recipes
         disableVanilla("iron")
