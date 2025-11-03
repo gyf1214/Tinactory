@@ -111,11 +111,8 @@ public class ElectricComponent extends NetworkComponent {
             MetricsManager.report("electric_consumed", label, workCons);
             MetricsManager.report("electric_generated", label, gen);
             var sign = MathUtil.compare(buffer);
-            if (sign > 0) {
-                MetricsManager.report("electric_buffer_charged", label, buffer);
-            } else if (sign < 0) {
-                MetricsManager.report("electric_buffer_discharged", label, -buffer);
-            }
+            MetricsManager.report("electric_buffer_charged", label, sign > 0 ? buffer : 0);
+            MetricsManager.report("electric_buffer_discharged", label, sign < 0 ? -buffer : 0);
         }
     }
 
