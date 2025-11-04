@@ -76,11 +76,7 @@ public class NetworkController extends CapabilityProvider
         }
     }
 
-    private void onRemoved() {
-        if (network != null) {
-            network.destroy();
-        }
-    }
+    private void onRemoved() {}
 
     private void initByPlayer(Player player) {
         if (network != null) {

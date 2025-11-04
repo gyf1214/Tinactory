@@ -39,15 +39,16 @@ public class LayoutMenu extends InventoryMenu {
      * Called during constructor.
      */
     protected void addLayoutSlots(Layout layout) {
-        var items = MENU_ITEM_HANDLER.get(blockEntity);
-        var xOffset = layout.getXOffset();
-        for (var slot : layout.slots) {
-            var x = xOffset + slot.x() + MARGIN_X + 1;
-            var y = slot.y() + MARGIN_TOP + 1;
-            if (slot.type().portType == PortType.ITEM) {
-                addSlot(new SlotItemHandler(items, slot.index(), x, y));
+        MENU_ITEM_HANDLER.tryGet(blockEntity).ifPresent(items -> {
+            var xOffset = layout.getXOffset();
+            for (var slot : layout.slots) {
+                var x = xOffset + slot.x() + MARGIN_X + 1;
+                var y = slot.y() + MARGIN_TOP + 1;
+                if (slot.type().portType == PortType.ITEM) {
+                    addSlot(new SlotItemHandler(items, slot.index(), x, y));
+                }
             }
-        }
+        });
     }
 
     /**
@@ -65,14 +66,15 @@ public class LayoutMenu extends InventoryMenu {
      * Called during constructor.
      */
     protected void addFluidSlots() {
-        var fluids = MENU_FLUID_HANDLER.get(blockEntity);
-        for (var slot : layout.slots) {
-            if (slot.type().portType == PortType.FLUID) {
-                addSyncSlot(FLUID_SYNC + slot.index(),
-                    () -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
+        MENU_FLUID_HANDLER.tryGet(blockEntity).ifPresent(fluids -> {
+            for (var slot : layout.slots) {
+                if (slot.type().portType == PortType.FLUID) {
+                    addSyncSlot(FLUID_SYNC + slot.index(),
+                        () -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
+                }
             }
-        }
-        onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
+            onEventPacket(FLUID_SLOT_CLICK, p -> clickFluidSlot(fluids, p.getIndex(), p.getButton()));
+        });
     }
 
     public Layout layout() {

@@ -6,6 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -31,6 +32,7 @@ import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.network.Network;
+import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -55,6 +57,8 @@ import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.content.AllEvents.SERVER_TICK;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
@@ -73,12 +77,15 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     protected static final String ID = "network/machine";
 
     protected final BlockEntity blockEntity;
-
-    @Nullable
-    protected Network network;
+    protected final MachineConfig config = new MachineConfig();
 
     private UUID uuid = UUID.randomUUID();
-    protected final MachineConfig config = new MachineConfig();
+    @Nullable
+    protected Network network = null;
+    @Nullable
+    private String teamName = null;
+    @Nullable
+    private TeamProfile team = null;
 
     protected Machine(BlockEntity be) {
         this.blockEntity = be;
@@ -98,15 +105,12 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         if (world().isClientSide) {
             return TechManager.localTeam();
         }
-        if (network == null) {
-            return Optional.empty();
-        }
-        return Optional.of(network.team);
+        return Optional.ofNullable(team);
     }
 
     @Override
     public boolean canPlayerInteract(Player player) {
-        return network != null && network.team.hasPlayer(player);
+        return team != null && team.hasPlayer(player);
     }
 
     @Override
@@ -128,6 +132,26 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         setConfig(SetMachineConfigPacket.builder().set("name", jo).get());
     }
 
+    /**
+     * Only called on server
+     */
+    private void createNetwork(Level world) {
+        if (team != null) {
+            network = new Network(world, blockEntity.getBlockPos(), team);
+        }
+    }
+
+    /**
+     * Only called on server
+     */
+    private void setPlayerTeam(Level world, Player player) {
+        TechManager.server().teamByPlayer(player).ifPresent($ -> {
+            team = $;
+            blockEntity.setChanged();
+            createNetwork(world);
+        });
+    }
+
     private void onPlace(AllEvents.OnPlaceArg arg) {
         // naming is server only as client gets notified when config is changed.
         if (arg.world().isClientSide) {
@@ -136,6 +160,9 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         var item = arg.stack();
         if (item.hasCustomHoverName()) {
             setName(item.getHoverName());
+        }
+        if (arg.placer() instanceof Player player) {
+            setPlayerTeam(arg.world(), player);
         }
     }
 
@@ -146,6 +173,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         if (player.level.isClientSide) {
             return;
         }
+
+        if (team == null) {
+            setPlayerTeam(player.level, player);
+        }
+
         if (!canPlayerInteract(player)) {
             result.set(InteractionResult.FAIL);
             return;
@@ -160,6 +192,18 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
 
         result.set(InteractionResult.PASS);
+    }
+
+    private void onServerLoad(Level world) {
+        team = teamName == null ? null : TechManager.server().teamByName(teamName).orElse(null);
+        teamName = null;
+        createNetwork(world);
+    }
+
+    private void onServerTick(Level world) {
+        if (network != null && network.center.equals(blockEntity.getBlockPos())) {
+            network.tick();
+        }
     }
 
     private void onRemoved(Level world) {
@@ -240,10 +284,19 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
+    public void assignNetwork(INetwork net) {
+        LOGGER.trace("{}: assign to network {}", blockEntity, net);
+        if (network == net) {
+            return;
+        }
+        network = (Network) net;
+        team = network.team;
+        blockEntity.setChanged();
+    }
+
+    @Override
     public void onConnectToNetwork(INetwork network) {
         LOGGER.trace("{}: connect to network {}", blockEntity, network);
-        this.network = (Network) network;
-
         container().ifPresent(container -> {
             var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
             for (var i = 0; i < container.portSize(); i++) {
@@ -263,9 +316,13 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public void onDisconnectFromNetwork() {
-        network = null;
         LOGGER.trace("{}: disconnect from network", blockEntity);
-        updateWorkBlock(world(), false);
+        var world = world();
+        if (network != null && !network.center.equals(blockEntity.getBlockPos())) {
+            network = null;
+            createNetwork(world);
+        }
+        updateWorkBlock(world, false);
     }
 
     private void onPreWork(Level world, INetwork network) {
@@ -296,6 +353,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
         eventManager.subscribe(REMOVED_BY_CHUNK.get(), this::onRemoved);
+        eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
+        eventManager.subscribe(SERVER_TICK.get(), this::onServerTick);
         eventManager.subscribe(BLOCK_PLACE.get(), this::onPlace);
         eventManager.subscribe(BLOCK_USE.get(), this::onUse);
     }
@@ -313,6 +372,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         var tag = new CompoundTag();
         tag.put("config", config.serializeNBT());
         tag.putUUID("uuid", uuid);
+        if (team != null) {
+            tag.putString("owner", team.getName());
+        } else if (teamName != null) {
+            tag.putString("owner", teamName);
+        }
         return tag;
     }
 
@@ -321,6 +385,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         LOGGER.trace("{} deserializer machine NBT, tag={}", blockEntity, tag);
         config.deserializeNBT(tag.getCompound("config"));
         uuid = tag.getUUID("uuid");
+        teamName = tag.contains("owner", Tag.TAG_STRING) ? tag.getString("owner") : null;
     }
 
     @Override

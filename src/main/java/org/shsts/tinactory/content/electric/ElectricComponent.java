@@ -161,7 +161,7 @@ public class ElectricComponent extends NetworkComponent {
         }
         Collections.reverse(solveOrder);
 
-        LOGGER.debug("solve order = {}", solveOrder);
+        LOGGER.trace("solve order = {}", solveOrder);
     }
 
     @Override

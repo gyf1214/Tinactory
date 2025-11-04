@@ -6,7 +6,6 @@ import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
-import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.getComponent
@@ -97,15 +96,6 @@ object MiscMachines {
         ulvComponent("electric_buffer", ulvCable)
 
         toolCrafting {
-            result(NETWORK_CONTROLLER.get()) {
-                pattern("VWV")
-                pattern("VHV")
-                pattern("WVW")
-                define('W', ulvCable)
-                define('H', ulvHull)
-                define('V', ulvCircuit)
-                toolTag(TOOL_WRENCH)
-            }
             result(getMachine("steam_turbine").block(Voltage.ULV)) {
                 pattern("PVP").pattern("RHR").pattern("WVW")
                 define('P', "copper", "pipe")
@@ -122,12 +112,6 @@ object MiscMachines {
             defaults {
                 voltage(Voltage.ULV)
                 workTicks(MACHINE_TICKS)
-            }
-            output(NETWORK_CONTROLLER.get()) {
-                component("machine_hull")
-                circuit(4)
-                component("cable", 2)
-                input("iron", "plate", 4)
             }
             machine("steam_turbine") {
                 component("machine_hull")

@@ -66,7 +66,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         int reaction, double heat) {
         var inputStack = StackHelper.copyWithAmount(input, input.getAmount() * reaction);
         var drained = inputPort.drain(inputStack, true);
-        var reaction1 = drained.getAmount() / inputStack.getAmount();
+        var reaction1 = drained.getAmount() / input.getAmount();
         if (reaction1 <= 0) {
             return 0;
         }

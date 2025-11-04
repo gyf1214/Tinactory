@@ -80,6 +80,7 @@ public class Network extends NetworkBase implements INetwork {
 
     protected void putMachine(BlockPos subnet, IMachine machine) {
         LOGGER.trace("{}: put machine {}", this, machine);
+        machine.assignNetwork(this);
         subnetMachines.put(subnet, machine);
     }
 
@@ -100,6 +101,7 @@ public class Network extends NetworkBase implements INetwork {
     @Override
     protected void connectFinish() {
         super.connectFinish();
+        LOGGER.debug("{}: {} machines connected", this, subnetMachines.values().size());
         for (var component : components.values()) {
             component.onConnect();
         }

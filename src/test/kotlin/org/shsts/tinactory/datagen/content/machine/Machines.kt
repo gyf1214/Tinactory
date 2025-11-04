@@ -3,7 +3,6 @@ package org.shsts.tinactory.datagen.content.machine
 import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.level.block.Block
-import org.shsts.tinactory.content.AllBlockEntities.NETWORK_CONTROLLER
 import org.shsts.tinactory.content.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllItems.componentEntry
@@ -140,13 +139,6 @@ object Machines {
             block(WORKBENCH) {
                 blockState(cubeBlock("casings/crafting_table"))
                 tag(BlockTags.MINEABLE_WITH_AXE)
-            }
-            block(NETWORK_CONTROLLER) {
-                machineModel {
-                    casing("casings/computer/computer_casing")
-                    overlay("overlay/machine/overlay_maintenance_full_auto")
-                    ioTex(ME_BUS)
-                }
             }
             block("machine/boiler/low") {
                 machineModel {

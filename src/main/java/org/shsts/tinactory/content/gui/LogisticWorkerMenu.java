@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.gui;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import org.shsts.tinactory.core.gui.InventoryMenu;
 import org.shsts.tinactory.core.gui.Menu;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -35,6 +37,7 @@ public class LogisticWorkerMenu extends InventoryMenu {
             .thenComparing($ -> $.title().getString());
 
     public final IMachine machine;
+    @Nullable
     private final LogisticComponent logistic;
     private final BlockPos subnet;
     private final Runnable onUpdatePorts;
@@ -48,10 +51,11 @@ public class LogisticWorkerMenu extends InventoryMenu {
         addSyncSlot(SLOT_SYNC, scheduler);
 
         this.machine = MACHINE.get(blockEntity);
-        if (!world.isClientSide) {
-            var network = machine.network().orElseThrow();
-            this.logistic = network.getComponent(LOGISTIC_COMPONENT.get());
-            this.subnet = network.getSubnet(blockEntity.getBlockPos());
+
+        var network = machine.network();
+        if (network.isPresent()) {
+            this.logistic = network.get().getComponent(LOGISTIC_COMPONENT.get());
+            this.subnet = network.get().getSubnet(blockEntity.getBlockPos());
             logistic.onUpdate(onUpdatePorts);
         } else {
             this.logistic = null;
@@ -69,12 +73,16 @@ public class LogisticWorkerMenu extends InventoryMenu {
     @Override
     public void removed(Player player) {
         super.removed(player);
-        if (!world.isClientSide) {
+        if (logistic != null) {
             logistic.unregisterCallback(onUpdatePorts);
         }
     }
 
     private List<LogisticWorkerSyncPacket.PortInfo> getVisiblePorts() {
+        if (logistic == null) {
+            return Collections.emptyList();
+        }
+        
         var infos = logistic.getVisiblePorts(subnet).stream()
             .sorted(Comparator.comparing(LogisticComponent.PortInfo::machine, MACHINE_COMPARATOR))
             .toList();

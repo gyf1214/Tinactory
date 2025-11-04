@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.gui;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -11,6 +12,7 @@ import org.shsts.tinactory.content.logistics.SignalComponent;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class MESignalControllerMenu extends MenuBase {
     public static final String SIGNAL_SYNC = "signals";
 
     public final IMachine machine;
+    @Nullable
     private final SignalComponent signals;
     private final BlockPos subnet;
     private final Runnable onUpdatePorts;
@@ -37,10 +40,11 @@ public class MESignalControllerMenu extends MenuBase {
         this.onUpdatePorts = scheduler::invokeUpdate;
 
         this.machine = MACHINE.get(blockEntity);
-        if (!world.isClientSide) {
-            var network = machine.network().orElseThrow();
-            this.signals = network.getComponent(SIGNAL_COMPONENT.get());
-            this.subnet = network.getSubnet(blockEntity.getBlockPos());
+
+        var network = machine.network();
+        if (network.isPresent()) {
+            this.signals = network.get().getComponent(SIGNAL_COMPONENT.get());
+            this.subnet = network.get().getSubnet(blockEntity.getBlockPos());
             signals.onUpdate(onUpdatePorts);
         } else {
             this.signals = null;
@@ -59,12 +63,16 @@ public class MESignalControllerMenu extends MenuBase {
     @Override
     public void removed(Player player) {
         super.removed(player);
-        if (!world.isClientSide) {
+        if (signals != null) {
             signals.unregisterCallback(onUpdatePorts);
         }
     }
 
     private List<MESignalControllerSyncPacket.SignalInfo> getVisibleSignals() {
+        if (signals == null) {
+            return Collections.emptyList();
+        }
+
         var infos = signals.getSubnetSignals(subnet).stream()
             .sorted(Comparator.comparing(SignalComponent.SignalInfo::machine, MACHINE_COMPARATOR))
             .toList();

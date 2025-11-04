@@ -33,9 +33,7 @@ public class NetworkBase {
     public enum State {
         CONNECTED,
         CONNECTING,
-        CONFLICT,
-        INVALIDATING,
-        DESTROYED
+        INVALIDATING
     }
 
     private State state;
@@ -49,10 +47,8 @@ public class NetworkBase {
 
         private final Queue<BlockPos> queue = new ArrayDeque<>();
         public final Map<BlockPos, BlockInfo> visited = new HashMap<>();
-        public boolean conflict = false;
 
         public void reset() {
-            conflict = false;
             queue.clear();
             visited.clear();
 
@@ -88,9 +84,6 @@ public class NetworkBase {
                 }
 
                 if (visited.containsKey(pos1)) {
-                    if (!visited.get(pos1).subnet.equals(subnet)) {
-                        conflict = true;
-                    }
                     continue;
                 }
 
@@ -115,7 +108,6 @@ public class NetworkBase {
         this.bfsContext = new BFSContext();
 
         reset();
-        manager.registerNetwork(this);
     }
 
     public State getState() {
@@ -134,32 +126,19 @@ public class NetworkBase {
     }
 
     public void invalidate() {
-        if (state == State.DESTROYED || state == State.INVALIDATING) {
+        if (state == State.INVALIDATING) {
             return;
         }
+        var state0 = state;
         state = State.INVALIDATING;
-        onDisconnect();
+        if (state0 == State.CONNECTED) {
+            onDisconnect();
+        }
         if (ref != null) {
             ref.invalidate();
         }
         reset();
         LOGGER.debug("{}: invalidated", this);
-    }
-
-    public void destroy() {
-        if (state == State.DESTROYED || state == State.INVALIDATING) {
-            return;
-        }
-        state = State.INVALIDATING;
-        onDisconnect();
-        if (ref != null) {
-            ref.invalidate();
-        }
-        ref = null;
-        state = State.DESTROYED;
-        bfsContext.reset();
-        manager.unregisterNetwork(this);
-        LOGGER.debug("{}: destroyed", this);
     }
 
     public <K> void addToMap(WeakMap<K, NetworkBase> map, K key) {
@@ -176,39 +155,22 @@ public class NetworkBase {
         bfsContext.reset();
     }
 
-    protected void connectConflict(BlockPos pos) {
-        LOGGER.debug("{}: conflict detected at {}:{}", this, world.dimension().location(), pos);
-        state = State.CONFLICT;
-        bfsContext.reset();
-    }
-
     protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
         LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
             world.dimension(), pos, subnet);
     }
 
     private boolean connectNextBlock() {
-        if (!manager.registerNetwork(this)) {
-            connectConflict(center);
-            return false;
-        }
         var nextPos = bfsContext.next();
-        if (bfsContext.conflict) {
-            connectConflict(center);
-            return false;
-        }
         if (nextPos.isEmpty()) {
             connectFinish();
             return false;
         }
         var pos = nextPos.get();
-        if (pos != center) {
-            if (manager.hasNetworkAtPos(pos)) {
-                connectConflict(pos);
-                return false;
-            }
-            manager.putNetworkAtPos(pos, this);
+        if (manager.hasNetworkAtPos(pos)) {
+            manager.invalidatePos(pos);
         }
+        manager.putNetworkAtPos(pos, this);
         var info = bfsContext.visited.get(pos);
         putBlock(pos, info.state, info.subnet);
         return true;

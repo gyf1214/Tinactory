@@ -20,7 +20,6 @@ public final class NetworkManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Level world;
-    private final Map<BlockPos, NetworkBase> networks = new HashMap<>();
     private final WeakMap<BlockPos, NetworkBase> networkPosMap = new WeakMap<>();
 
     public NetworkManager(Level world) {
@@ -33,29 +32,13 @@ public final class NetworkManager {
     }
 
     public Optional<NetworkBase> getNetworkAtPos(BlockPos pos) {
-        return Optional.ofNullable(networks.get(pos)).or(() -> networkPosMap.get(pos));
+        return networkPosMap.get(pos);
     }
 
     public void putNetworkAtPos(BlockPos pos, NetworkBase network) {
         assert !hasNetworkAtPos(pos);
         LOGGER.trace("track block at {}:{} to network {}", world.dimension().location(), pos, network);
         network.addToMap(networkPosMap, pos);
-    }
-
-    public boolean registerNetwork(NetworkBase network) {
-        var center = network.center;
-        if (networks.containsKey(center)) {
-            return networks.get(center) == network;
-        } else {
-            LOGGER.debug("register network {} at center {}:{}", network, world.dimension().location(), center);
-            invalidatePos(center);
-            networks.put(center, network);
-            return true;
-        }
-    }
-
-    public void unregisterNetwork(NetworkBase network) {
-        networks.remove(network.center);
     }
 
     public void invalidatePos(BlockPos pos) {
@@ -70,7 +53,6 @@ public final class NetworkManager {
 
     public void destroy() {
         networkPosMap.clear();
-        networks.clear();
     }
 
     private static final Map<ResourceKey<Level>, NetworkManager> INSTANCES = new HashMap<>();

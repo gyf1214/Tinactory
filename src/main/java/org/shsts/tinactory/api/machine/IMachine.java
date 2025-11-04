@@ -63,6 +63,11 @@ public interface IMachine {
     Optional<INetwork> network();
 
     /**
+     * Assign a network to the machine.
+     */
+    void assignNetwork(INetwork network);
+
+    /**
      * Called when connect to the network.
      */
     void onConnectToNetwork(INetwork network);
