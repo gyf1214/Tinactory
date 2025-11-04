@@ -11,7 +11,7 @@ A minecraft mod that ports gregtech to 1.18.2 and more.
 
 - Clone the repository.
 - Import the repository into IntelliJ.
-- Download the following file: <https://www.shsts.org/m2/tinactory_extra_resources_v0.zip>, put the file in
+- Download the following file: <https://www.shsts.org/m2/extra/tinactory_extra_resources_v1.zip>, put the file in
   `libs`.
 - Run gradle task `genIntellijRuns`. This will generate 3 tasks: `runClient`, `runServer`, and `runData`.
 - Run the task `runData` to generate data and asset files.
