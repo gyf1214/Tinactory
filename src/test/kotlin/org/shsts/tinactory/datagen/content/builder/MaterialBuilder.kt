@@ -827,7 +827,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                         output(material, "gem", rate = 0.35)
                         output(material, "dust_pure", rate = 0.65)
                         voltage(Voltage.LV)
-                        workTicks(600)
+                        workTicks(400)
                     }
                 } else if (siftAndHammer || siftPrimary) {
                     input(material, "crushed_purified") {
@@ -835,7 +835,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                         output(material, "primary", rate = 0.35)
                         output(material, "dust_pure", rate = 0.65)
                         voltage(Voltage.LV)
-                        workTicks(400)
+                        workTicks(128)
                     }
                 }
             }
