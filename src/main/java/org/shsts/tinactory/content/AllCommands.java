@@ -24,6 +24,7 @@ import org.shsts.tinactory.core.util.I18n;
 
 import java.util.Random;
 
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllWorldGens.PLAYER_START_FEATURE;
 
 @ParametersAreNonnullByDefault
@@ -129,6 +130,29 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
+    private static int createTeamAndSpawn(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        createSpawn(ctx);
+        createTeam(ctx);
+
+        var player = ctx.getSource().getPlayerOrException();
+        var pos = BlockPosArgument.getSpawnablePos(ctx, "pos").above();
+        var world = player.getLevel();
+        player.setRespawnPosition(world.dimension(), pos, 0, true, true);
+        player.moveTo(pos, 0f, 0f);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int addPlayerAndSetSpawn(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        addPlayerToTeam(ctx);
+        var player2 = EntityArgument.getPlayer(ctx, "player");
+        var pos = BlockPosArgument.getSpawnablePos(ctx, "pos").above();
+        var world = player2.getLevel();
+
+        player2.setRespawnPosition(world.dimension(), pos, 0, true, true);
+        player2.moveTo(pos, 0f, 0f);
+        return Command.SINGLE_SUCCESS;
+    }
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var builder = Commands.literal(TinactoryKeys.ID)
             .then(Commands.literal("createTeam")
@@ -150,6 +174,18 @@ public final class AllCommands {
                     .then(Commands.argument("tech", ResourceLocationArgument.id())
                         .then(Commands.argument("progress", LongArgumentType.longArg(0))
                             .executes(AllCommands::setTechProgress)))));
+
+        if (CONFIG.allowTeamSpawnCommands.get()) {
+            builder
+                .then(Commands.literal("createTeamSpawn")
+                    .then(Commands.argument("name", StringArgumentType.string())
+                        .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                            .executes(AllCommands::createTeamAndSpawn))))
+                .then(Commands.literal("addPlayerToTeamAndSpawn")
+                    .then(Commands.argument("player", EntityArgument.player())
+                        .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                            .executes(AllCommands::addPlayerAndSetSpawn))));
+        }
 
         dispatcher.register(builder);
     }

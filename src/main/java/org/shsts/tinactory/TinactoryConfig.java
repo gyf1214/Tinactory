@@ -22,6 +22,7 @@ public final class TinactoryConfig {
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
     public final ConfigValue<Integer> multiblockCheckCycle;
+    public final ConfigValue<Boolean> allowTeamSpawnCommands;
 
     public TinactoryConfig(ForgeConfigSpec.Builder builder) {
         builder.push("logistics");
@@ -61,6 +62,11 @@ public final class TinactoryConfig {
         builder.push("multiblock");
         multiblockCheckCycle = builder.comment("Interval for multiblock to do check")
             .defineInRange("check_cycle", 20, 1, Integer.MAX_VALUE);
+        builder.pop();
+
+        builder.push("team");
+        allowTeamSpawnCommands = builder.comment("Allow commands to manage team spawn points")
+            .define("allow_team_spawn_commands", false);
         builder.pop();
     }
 
