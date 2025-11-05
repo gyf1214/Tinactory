@@ -16,7 +16,12 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.TicketType;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -83,6 +88,11 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
+    private static int syncTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        TechManager.server().syncTeam(ctx.getSource().getPlayerOrException());
+        return Command.SINGLE_SUCCESS;
+    }
+
     private static int setTargetTech(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
         var techName = ResourceLocationArgument.getId(ctx, "tech");
@@ -130,6 +140,17 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
+    private static void teleport(ServerLevel world, ServerPlayer player, BlockPos pos) {
+        ChunkPos chunkpos = new ChunkPos(pos);
+        world.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, chunkpos, 1, player.getId());
+        player.stopRiding();
+        if (player.isSleeping()) {
+            player.stopSleepInBed(true, true);
+        }
+        player.connection.teleport(pos.getX(), pos.getY(), pos.getZ(), 0f, 0f);
+        player.setYHeadRot(0f);
+    }
+
     private static int createTeamAndSpawn(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         createSpawn(ctx);
         createTeam(ctx);
@@ -138,7 +159,7 @@ public final class AllCommands {
         var pos = BlockPosArgument.getSpawnablePos(ctx, "pos").above();
         var world = player.getLevel();
         player.setRespawnPosition(world.dimension(), pos, 0, true, true);
-        player.moveTo(pos, 0f, 0f);
+        teleport(world, player, pos);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -149,7 +170,7 @@ public final class AllCommands {
         var world = player2.getLevel();
 
         player2.setRespawnPosition(world.dimension(), pos, 0, true, true);
-        player2.moveTo(pos, 0f, 0f);
+        teleport(world, player2, pos);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -162,6 +183,7 @@ public final class AllCommands {
                 .then(Commands.argument("player", EntityArgument.player())
                     .executes(AllCommands::addPlayerToTeam)))
             .then(Commands.literal("leaveTeam").executes(AllCommands::leaveTeam))
+            .then(Commands.literal("syncTeam").executes(AllCommands::syncTeam))
             .then(Commands.literal("setTargetTech")
                 .then(Commands.argument("tech", ResourceLocationArgument.id())
                     .executes(AllCommands::setTargetTech))

@@ -58,7 +58,7 @@ public class TechScreen extends MenuScreen<TechMenu> {
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
 
     public static Component tr(String key, Object... args) {
-        return I18n.tr("tinactory.gui.networkController." + key, args);
+        return I18n.tr("tinactory.gui.techMenu." + key, args);
     }
 
     private class RenamePanel extends Panel {

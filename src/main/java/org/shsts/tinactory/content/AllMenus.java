@@ -117,7 +117,7 @@ public final class AllMenus {
             .register();
 
         TECH_MENU = REGISTRATE.menu("network/controller", TechMenu::new)
-            .title("tinactory.gui.networkController.title")
+            .title("tinactory.gui.techMenu.title")
             .screen(() -> () -> TechScreen::new)
             .register();
 

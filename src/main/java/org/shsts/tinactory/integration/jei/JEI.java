@@ -37,9 +37,9 @@ import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ResearchCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
-import org.shsts.tinactory.integration.jei.gui.NetworkControllerHandler;
 import org.shsts.tinactory.integration.jei.gui.ProcessingHandler;
 import org.shsts.tinactory.integration.jei.gui.ResearchHandler;
+import org.shsts.tinactory.integration.jei.gui.TechMenuHandler;
 import org.shsts.tinactory.integration.jei.gui.WorkbenchHandler;
 import org.shsts.tinactory.integration.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.integration.jei.ingredient.RecipeMarker;
@@ -145,7 +145,7 @@ public class JEI implements IModPlugin {
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addGenericGuiContainerHandler(MenuScreen.class, MenuScreenHandler.fluid());
-        registration.addGuiContainerHandler(TechScreen.class, new NetworkControllerHandler());
+        registration.addGuiContainerHandler(TechScreen.class, new TechMenuHandler());
         registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler());
         registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchHandler());
         WorkbenchHandler.addWorkbenchClickArea(registration, toolCategory);

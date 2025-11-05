@@ -10,7 +10,7 @@ import org.shsts.tinactory.integration.jei.ingredient.TechIngredient;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class NetworkControllerHandler extends MenuScreenHandler<TechScreen> {
+public class TechMenuHandler extends MenuScreenHandler<TechScreen> {
     @Override
     protected @Nullable Object getIngredientHovered(Widget hovered,
         double mouseX, double mouseY) {

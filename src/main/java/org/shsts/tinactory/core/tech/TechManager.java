@@ -182,10 +182,14 @@ public class TechManager implements ITechManager {
             scoreboard.removePlayerTeam(playerTeam);
         }
 
+        public void syncTeam(ServerPlayer player) {
+            teamByPlayer(player).ifPresent(profile -> sendFullUpdatePacket(player, profile));
+        }
+
         public void onPlayerJoin(ServerPlayer player) {
             var p = new TechInitPacket(technologies.values());
             CHANNEL.sendToPlayer(player, p);
-            teamByPlayer(player).ifPresent(profile -> sendFullUpdatePacket(player, profile));
+            syncTeam(player);
         }
     }
 

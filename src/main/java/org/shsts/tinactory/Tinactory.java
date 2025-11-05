@@ -98,7 +98,6 @@ public class Tinactory {
         REGISTRATE.registerClient(modEventBus);
         modEventBus.addListener(Tinactory::initClient);
         MinecraftForge.EVENT_BUS.register(AllClientEvents.class);
-        AllClientEvents.initKeys();
     }
 
     private static void init(FMLCommonSetupEvent event) {
@@ -106,6 +105,7 @@ public class Tinactory {
     }
 
     private static void initClient(FMLClientSetupEvent event) {
+        AllClientEvents.initKeys();
         LOGGER.info("hello Tinactory client!");
     }
 }
