@@ -10,7 +10,7 @@ import org.shsts.tinactory.content.gui.MESignalControllerMenu;
 import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
 import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
-import org.shsts.tinactory.content.gui.NetworkControllerMenu;
+import org.shsts.tinactory.content.gui.TechMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.BatteryBoxScreen;
 import org.shsts.tinactory.content.gui.client.ElectricChestScreen;
@@ -21,15 +21,15 @@ import org.shsts.tinactory.content.gui.client.MESignalControllerScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageDetectorScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageInterfaceScreen;
 import org.shsts.tinactory.content.gui.client.MachineScreen;
-import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
+import org.shsts.tinactory.content.gui.client.TechScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
-import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
+import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
@@ -57,7 +57,7 @@ public final class AllMenus {
     public static final IMenuEvent<MEStorageInterfaceEventPacket> ME_STORAGE_INTERFACE_SLOT;
 
     public static final IMenuType WORKBENCH;
-    public static final IMenuType NETWORK_CONTROLLER;
+    public static final IMenuType TECH_MENU;
     public static final IMenuType BATTERY_BOX;
     public static final IMenuType ELECTRIC_CHEST;
     public static final IMenuType ELECTRIC_TANK;
@@ -78,8 +78,6 @@ public final class AllMenus {
             .registerMenuSyncPacket(SyncPackets.DoublePacket.class, SyncPackets.DoublePacket::new)
             .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new)
             .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
-            .registerMenuSyncPacket(NetworkControllerSyncPacket.class,
-                NetworkControllerSyncPacket::new)
             .registerMenuSyncPacket(LogisticWorkerSyncPacket.class,
                 LogisticWorkerSyncPacket::new)
             .registerMenuSyncPacket(MEStorageInterfaceSyncPacket.class,
@@ -95,6 +93,8 @@ public final class AllMenus {
         RENAME = CHANNEL.registerMenuEventPacket(RenameEventPacket.class, RenameEventPacket::new);
         ME_STORAGE_INTERFACE_SLOT = CHANNEL.registerMenuEventPacket(MEStorageInterfaceEventPacket.class,
             MEStorageInterfaceEventPacket::new);
+
+        CHANNEL.registerPacket(OpenTechPacket.class, () -> OpenTechPacket.INSTANCE, TechMenu::onOpenGui);
 
         BATTERY_BOX = REGISTRATE.menu("machine/battery_box", MachineMenu::simpleConfig)
             .title(ProcessingMenu::getTitle)
@@ -116,9 +116,9 @@ public final class AllMenus {
             .screen(() -> () -> ElectricTankScreen::new)
             .register();
 
-        NETWORK_CONTROLLER = REGISTRATE.menu("network/controller", NetworkControllerMenu::new)
+        TECH_MENU = REGISTRATE.menu("network/controller", TechMenu::new)
             .title("tinactory.gui.networkController.title")
-            .screen(() -> () -> NetworkControllerScreen::new)
+            .screen(() -> () -> TechScreen::new)
             .register();
 
         LOGISTIC_WORKER = REGISTRATE.menu("logistics/logistic_worker", LogisticWorkerMenu::new)

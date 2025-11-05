@@ -92,6 +92,6 @@ public class Tab extends Panel {
     @Override
     public void setActive(boolean value) {
         super.setActive(value);
-        select(value ? currentTab : -1);
+        select(value ? (currentTab >= 0 && currentTab < tabPanels.size() ? currentTab : 0) : -1);
     }
 }

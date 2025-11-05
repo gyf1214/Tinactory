@@ -29,7 +29,7 @@ public class DigitalInterfaceMenu extends MachineMenu {
 
     public DigitalInterfaceMenu(Properties properties) {
         super(properties);
-        this.digitalInterface = (DigitalInterface) MACHINE.get(blockEntity);
+        this.digitalInterface = (DigitalInterface) MACHINE.get(blockEntity());
     }
 
     private class ItemSlot extends Slot {

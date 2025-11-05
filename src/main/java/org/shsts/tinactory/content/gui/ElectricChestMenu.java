@@ -106,7 +106,7 @@ public class ElectricChestMenu extends ElectricStorageMenu {
 
     public ElectricChestMenu(Properties properties) {
         super(properties);
-        this.chest = getProvider(blockEntity, ElectricChest.ID, ElectricChest.class);
+        this.chest = getProvider(blockEntity(), ElectricChest.ID, ElectricChest.class);
 
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {

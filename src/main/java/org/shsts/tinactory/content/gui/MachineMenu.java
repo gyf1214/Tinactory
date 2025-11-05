@@ -41,7 +41,7 @@ public class MachineMenu extends ProcessingMenu {
 
     public MachineMenu(Properties properties) {
         super(properties, SLOT_SIZE + SPACING);
-        this.machine = MACHINE.get(blockEntity);
+        this.machine = MACHINE.get(blockEntity());
         onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
         onEventPacket(PORT_CLICK, p -> onPortClick(p.getIndex(), p.getButton()));
     }
@@ -153,23 +153,23 @@ public class MachineMenu extends ProcessingMenu {
 
         @Override
         public boolean stillValid(Player player) {
-            return super.stillValid(player) && MACHINE.tryGet(blockEntity)
+            return super.stillValid(player) && MACHINE.tryGet(blockEntity())
                 .filter($ -> $.canPlayerInteract(player))
                 .isPresent();
         }
 
         private void setMachineConfig(ISetMachineConfigPacket packet) {
-            MACHINE.tryGet(blockEntity).ifPresent($ -> $.setConfig(packet));
+            MACHINE.tryGet(blockEntity()).ifPresent($ -> $.setConfig(packet));
         }
     }
 
     public static class Boiler extends MachineMenu {
         public Boiler(Properties properties) {
             super(properties);
-            addSyncSlot("burn", () -> doublePacket(getProcessor(blockEntity)
+            addSyncSlot("burn", () -> doublePacket(getProcessor(blockEntity())
                 .map(this::getBurn)
                 .orElse(0d)));
-            addSyncSlot("heat", () -> doublePacket(getProcessor(blockEntity)
+            addSyncSlot("heat", () -> doublePacket(getProcessor(blockEntity())
                 .map($ -> getHeat($) / 600d)
                 .orElse(0d)));
         }

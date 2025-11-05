@@ -31,9 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_OFFSET;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.LEFT_WIDTH;
-import static org.shsts.tinactory.content.gui.client.NetworkControllerScreen.tr;
+import static org.shsts.tinactory.content.gui.TechMenu.LEFT_OFFSET;
+import static org.shsts.tinactory.content.gui.TechMenu.LEFT_WIDTH;
+import static org.shsts.tinactory.content.gui.client.TechScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.PANEL_BORDER;
@@ -204,7 +204,7 @@ public class TechPanel extends Panel {
         }
     }
 
-    public TechPanel(NetworkControllerScreen screen) {
+    public TechPanel(TechScreen screen) {
         super(screen);
         this.techManager = TechManager.client();
 

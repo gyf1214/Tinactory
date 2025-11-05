@@ -18,7 +18,7 @@ public class MEStorageDetectorMenu extends InventoryMenu {
     public MEStorageDetectorMenu(Properties properties) {
         super(properties, SLOT_SIZE * 2);
 
-        this.machine = MACHINE.get(blockEntity);
+        this.machine = MACHINE.get(blockEntity());
         onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
     }
 

@@ -45,9 +45,9 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
 
     public MEStorageInterfaceMenu(Properties properties) {
         super(properties, PANEL_HEIGHT);
-        this.machine = MACHINE.get(blockEntity);
+        this.machine = MACHINE.get(blockEntity());
         this.machineConfig = machine.config();
-        this.storageInterface = getProvider(blockEntity, MEStorageInterface.ID, MEStorageInterface.class);
+        this.storageInterface = getProvider(blockEntity(), MEStorageInterface.ID, MEStorageInterface.class);
 
         var scheduler = new ActiveScheduler<>(() -> new MEStorageInterfaceSyncPacket(
             storageInterface.getAllItems(), storageInterface.getAllFluids()));

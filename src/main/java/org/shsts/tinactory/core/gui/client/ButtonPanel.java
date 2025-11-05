@@ -172,7 +172,7 @@ public abstract class ButtonPanel extends Panel {
     protected void setPage(int index) {
         var buttonCount = buttons.size();
         var itemCount = getItemCount();
-        var maxPage = Math.max(1, (itemCount + buttonCount - 1) / buttonCount);
+        var maxPage = buttonCount == 0 ? 1 : Math.max(1, (itemCount + buttonCount - 1) / buttonCount);
         var newPage = MathUtil.clamp(index, 0, maxPage - 1);
         leftPageButton.setActive(newPage != 0);
         rightPageButton.setActive(newPage != maxPage - 1);

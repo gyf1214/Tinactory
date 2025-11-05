@@ -4,13 +4,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.Widget;
 import org.jetbrains.annotations.Nullable;
-import org.shsts.tinactory.content.gui.client.NetworkControllerScreen;
 import org.shsts.tinactory.content.gui.client.TechPanel;
+import org.shsts.tinactory.content.gui.client.TechScreen;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredient;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class NetworkControllerHandler extends MenuScreenHandler<NetworkControllerScreen> {
+public class NetworkControllerHandler extends MenuScreenHandler<TechScreen> {
     @Override
     protected @Nullable Object getIngredientHovered(Widget hovered,
         double mouseX, double mouseY) {

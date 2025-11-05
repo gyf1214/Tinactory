@@ -12,8 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.gui.NetworkControllerMenu;
-import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
+import org.shsts.tinactory.content.gui.TechMenu;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Rect;
@@ -26,18 +25,17 @@ import org.shsts.tinactory.core.gui.client.Tab;
 import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.core.util.MathUtil;
 import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.AllItems.getComponent;
 import static org.shsts.tinactory.content.AllMenus.RENAME;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.HEIGHT;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_MARGIN;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_WIDTH;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.RENAME_BASE_Y;
-import static org.shsts.tinactory.content.gui.NetworkControllerMenu.WIDTH;
+import static org.shsts.tinactory.content.gui.TechMenu.HEIGHT;
+import static org.shsts.tinactory.content.gui.TechMenu.RENAME_BASE_MARGIN;
+import static org.shsts.tinactory.content.gui.TechMenu.RENAME_BASE_WIDTH;
+import static org.shsts.tinactory.content.gui.TechMenu.RENAME_BASE_Y;
+import static org.shsts.tinactory.content.gui.TechMenu.WIDTH;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
@@ -45,20 +43,17 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Texture.CRAFTING_ARROW;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
-import static org.shsts.tinactory.core.util.ClientUtil.INTEGER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
+public class TechScreen extends MenuScreen<TechMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int WELCOME_BUTTON_WIDTH = 72;
 
     private final Panel welcomePanel;
     private final EditBox welcomeEdit;
     private final Tab tabs;
-    private final Label stateLabel;
     private final TechPanel techPanel;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
 
@@ -68,7 +63,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
 
     private class RenamePanel extends Panel {
         public RenamePanel() {
-            super(NetworkControllerScreen.this);
+            super(TechScreen.this);
         }
 
         @Override
@@ -78,7 +73,7 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         }
     }
 
-    public NetworkControllerScreen(NetworkControllerMenu menu, Component title) {
+    public TechScreen(TechMenu menu, Component title) {
         super(menu, title);
 
         this.welcomePanel = new Panel(this);
@@ -90,10 +85,6 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
         welcomePanel.addWidget(new Rect(0, -1, 64, EDIT_HEIGHT), welcomeEdit);
         welcomePanel.addWidget(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
             welcomeButton);
-
-        var statePanel = new Panel(this);
-        this.stateLabel = new Label(menu);
-        statePanel.addWidget(stateLabel);
 
         this.techPanel = new TechPanel(this);
 
@@ -109,20 +100,16 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
             new StaticWidget(menu, CRAFTING_ARROW));
         menu.onRefreshName(renameEdit::setValue);
 
-        this.tabs = new Tab(this, statePanel, getComponent("cable").get(Voltage.LV),
+        this.tabs = new Tab(this,
             techPanel, getComponent("research_equipment").get(Voltage.LV),
             renamePanel, Items.NAME_TAG);
 
         rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
-        rootPanel.addPanel(statePanel);
         rootPanel.addPanel(techPanel);
         rootPanel.addPanel(renamePanel);
         rootPanel.addPanel(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
 
-        menu.onSyncPacket("info", this::refresh);
         TechManager.client().onProgressChange(onTechChange);
-        statePanel.setActive(false);
-        welcomePanel.setActive(false);
 
         this.contentWidth = WIDTH;
         this.contentHeight = HEIGHT;
@@ -135,6 +122,12 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
     }
 
     @Override
+    protected void init() {
+        super.init();
+        refreshTeam();
+    }
+
+    @Override
     public void removed() {
         TechManager.client().removeProgressChangeListener(onTechChange);
         super.removed();
@@ -142,42 +135,14 @@ public class NetworkControllerScreen extends MenuScreen<NetworkControllerMenu> {
 
     private void refreshTeam() {
         var localTeam = TechManager.localTeam();
-        LOGGER.debug("refresh team {}", localTeam);
-        var teamName = localTeam.map(ITeamProfile::getName).orElse("<null>");
-        stateLabel.setLine(0, tr("teamNameLabel", teamName));
-        localTeam.ifPresent(techPanel::refreshTech);
-    }
-
-    private void refresh(NetworkControllerSyncPacket packet) {
-        if (!packet.isPresent()) {
-            welcomePanel.setActive(true);
-            tabs.setActive(false);
-        } else {
-            refreshTeam();
-            stateLabel.setLine(1, tr("stateLabel", packet.getState()));
-            var metric = packet.getElectricMetrics();
-            stateLabel.setLine(2, tr("workFactorLabel",
-                PERCENTAGE_FORMAT.format(metric.workSpeed())));
-            stateLabel.setLine(3, tr("efficiencyLabel",
-                PERCENTAGE_FORMAT.format(metric.efficiency())));
-            var comp = MathUtil.compare(metric.buffer());
-            if (comp == 0) {
-                stateLabel.setLine(4, tr("powerLabel0",
-                    INTEGER_FORMAT.format(metric.workCons()),
-                    INTEGER_FORMAT.format(metric.gen())));
-            } else if (comp > 0) {
-                stateLabel.setLine(4, tr("powerLabel1",
-                    INTEGER_FORMAT.format(metric.workCons()),
-                    INTEGER_FORMAT.format(metric.buffer()),
-                    INTEGER_FORMAT.format(metric.gen())));
-            } else {
-                stateLabel.setLine(4, tr("powerLabel2",
-                    INTEGER_FORMAT.format(metric.workCons()),
-                    INTEGER_FORMAT.format(metric.gen()),
-                    INTEGER_FORMAT.format(-metric.buffer())));
-            }
+        LOGGER.trace("refresh team {}", localTeam);
+        if (localTeam.isPresent()) {
             welcomePanel.setActive(false);
             tabs.setActive(true);
+            techPanel.refreshTech(localTeam.get());
+        } else {
+            welcomePanel.setActive(true);
+            tabs.setActive(false);
         }
     }
 

@@ -20,7 +20,7 @@ public class ElectricStorageMenu extends LayoutMenu {
 
     protected ElectricStorageMenu(Properties properties) {
         super(properties, SLOT_SIZE + SPACING);
-        this.machine = MACHINE.get(blockEntity);
+        this.machine = MACHINE.get(blockEntity());
         this.machineConfig = machine.config();
 
         onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);

@@ -34,7 +34,7 @@ public class ProcessingMenu extends LayoutMenu {
     }
 
     public Optional<Block> machineBlock() {
-        return MACHINE.tryGet(blockEntity)
+        return MACHINE.tryGet(blockEntity())
             .flatMap(IMachine::workBlock)
             .map(BlockState::getBlock);
     }

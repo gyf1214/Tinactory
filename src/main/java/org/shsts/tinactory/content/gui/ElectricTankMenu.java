@@ -21,8 +21,8 @@ public class ElectricTankMenu extends ElectricStorageMenu {
 
     public ElectricTankMenu(Properties properties) {
         super(properties);
-        this.tank = getProvider(blockEntity, ElectricTank.ID, ElectricTank.class);
-        this.fluidHandler = MENU_FLUID_HANDLER.get(blockEntity);
+        this.tank = getProvider(blockEntity(), ElectricTank.ID, ElectricTank.class);
+        this.fluidHandler = MENU_FLUID_HANDLER.get(blockEntity());
 
         for (var slot : layout.slots) {
             addSyncSlot(FLUID_SYNC + slot.index(), () ->

@@ -56,7 +56,7 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements
     }
 
     public MenuScreen(M menu, Component title) {
-        super(menu, title);
+        super(menu, menu.inventory(), title);
         this.titleLabelX = MARGIN_X;
         this.titleLabelY = MARGIN_VERTICAL;
         this.contentWidth = CONTENT_WIDTH;

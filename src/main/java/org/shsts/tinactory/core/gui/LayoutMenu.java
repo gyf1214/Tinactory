@@ -7,6 +7,8 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 
+import java.util.Objects;
+
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
@@ -31,7 +33,7 @@ public class LayoutMenu extends InventoryMenu {
 
     protected LayoutMenu(Properties properties, int extraHeight) {
         this(properties,
-            LAYOUT_PROVIDER.get(properties.blockEntity()).getLayout(),
+            LAYOUT_PROVIDER.get(Objects.requireNonNull(properties.blockEntity())).getLayout(),
             extraHeight);
     }
 
@@ -39,7 +41,7 @@ public class LayoutMenu extends InventoryMenu {
      * Called during constructor.
      */
     protected void addLayoutSlots(Layout layout) {
-        MENU_ITEM_HANDLER.tryGet(blockEntity).ifPresent(items -> {
+        MENU_ITEM_HANDLER.tryGet(blockEntity()).ifPresent(items -> {
             var xOffset = layout.getXOffset();
             for (var slot : layout.slots) {
                 var x = xOffset + slot.x() + MARGIN_X + 1;
@@ -56,7 +58,7 @@ public class LayoutMenu extends InventoryMenu {
      */
     protected void addProgressBar() {
         if (layout.progressBar != null) {
-            addSyncSlot(PROGRESS_SYNC, () -> doublePacket(getProcessor(blockEntity)
+            addSyncSlot(PROGRESS_SYNC, () -> doublePacket(getProcessor(blockEntity())
                 .map(IProcessor::getProgress)
                 .orElse(0d)));
         }
@@ -66,7 +68,7 @@ public class LayoutMenu extends InventoryMenu {
      * Called during constructor.
      */
     protected void addFluidSlots() {
-        MENU_FLUID_HANDLER.tryGet(blockEntity).ifPresent(fluids -> {
+        MENU_FLUID_HANDLER.tryGet(blockEntity()).ifPresent(fluids -> {
             for (var slot : layout.slots) {
                 if (slot.type().portType == PortType.FLUID) {
                     addSyncSlot(FLUID_SYNC + slot.index(),

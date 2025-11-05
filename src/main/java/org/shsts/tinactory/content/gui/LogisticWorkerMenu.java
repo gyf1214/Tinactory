@@ -50,19 +50,19 @@ public class LogisticWorkerMenu extends InventoryMenu {
         this.onUpdatePorts = scheduler::invokeUpdate;
         addSyncSlot(SLOT_SYNC, scheduler);
 
-        this.machine = MACHINE.get(blockEntity);
+        this.machine = MACHINE.get(blockEntity());
 
         var network = machine.network();
         if (network.isPresent()) {
             this.logistic = network.get().getComponent(LOGISTIC_COMPONENT.get());
-            this.subnet = network.get().getSubnet(blockEntity.getBlockPos());
+            this.subnet = network.get().getSubnet(blockEntity().getBlockPos());
             logistic.onUpdate(onUpdatePorts);
         } else {
             this.logistic = null;
             this.subnet = null;
         }
 
-        onEventPacket(SET_MACHINE_CONFIG, p -> MACHINE.get(blockEntity).setConfig(p));
+        onEventPacket(SET_MACHINE_CONFIG, p -> MACHINE.get(blockEntity()).setConfig(p));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class LogisticWorkerMenu extends InventoryMenu {
         if (logistic == null) {
             return Collections.emptyList();
         }
-        
+
         var infos = logistic.getVisiblePorts(subnet).stream()
             .sorted(Comparator.comparing(LogisticComponent.PortInfo::machine, MACHINE_COMPARATOR))
             .toList();

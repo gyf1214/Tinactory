@@ -8,17 +8,18 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.network.NetworkEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.shsts.tinactory.content.gui.sync.NetworkControllerSyncPacket;
+import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
-import org.shsts.tinactory.core.network.NetworkController;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.AllMenus.RENAME;
+import static org.shsts.tinactory.content.AllMenus.TECH_MENU;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
@@ -31,7 +32,7 @@ import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class NetworkControllerMenu extends MenuBase {
+public class TechMenu extends MenuBase {
     public static final int LEFT_WIDTH = PANEL_BORDER * 2 + TECH_SIZE * 5;
     public static final int RIGHT_WIDTH = LEFT_WIDTH + TECH_SIZE * 2;
     public static final int LEFT_OFFSET = LEFT_WIDTH + MARGIN_X * 2;
@@ -122,13 +123,12 @@ public class NetworkControllerMenu extends MenuBase {
         }
     }
 
-    public NetworkControllerMenu(Properties properties) {
+    public TechMenu(Properties properties) {
         super(properties);
 
         renameItem.setFilter(0, stack -> stack.is(Items.NAME_TAG));
         renameItem.onUpdate(this::refreshRenameItem);
 
-        addSyncSlot("info", () -> new NetworkControllerSyncPacket(blockEntity));
         onEventPacket(RENAME, p -> refreshName(p.getName(), false));
         addSlot(new RenameInputSlot(MARGIN_X + RENAME_BASE_MARGIN + 1,
             MARGIN_TOP + RENAME_SLOT_Y + 1));
@@ -147,12 +147,6 @@ public class NetworkControllerMenu extends MenuBase {
                 addSlot(new RenameInventorySlot(9 + i * 9 + j, x + 1, y + 1));
             }
         }
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return super.stillValid(player) &&
-            NetworkController.get(blockEntity).canPlayerInteract(player);
     }
 
     public void setRenameActive(boolean val) {
@@ -198,5 +192,12 @@ public class NetworkControllerMenu extends MenuBase {
 
     public void onRefreshName(Consumer<String> cb) {
         onRefreshName = cb;
+    }
+
+    public static void onOpenGui(OpenTechPacket packet, NetworkEvent.Context ctx) {
+        var player = ctx.getSender();
+        if (player != null) {
+            TECH_MENU.open(player);
+        }
     }
 }

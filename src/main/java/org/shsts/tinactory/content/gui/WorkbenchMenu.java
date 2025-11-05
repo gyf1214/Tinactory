@@ -65,7 +65,7 @@ public class WorkbenchMenu extends LayoutMenu {
         super(properties, AllLayouts.WORKBENCH, 0);
         addLayoutSlots(layout);
 
-        this.workbench = Workbench.get(blockEntity);
+        this.workbench = Workbench.get(blockEntity());
         for (var slot : layout.slots) {
             if (slot.type() == SlotType.NONE) {
                 var x = slot.x() + layout.getXOffset() + MARGIN_X + 1;

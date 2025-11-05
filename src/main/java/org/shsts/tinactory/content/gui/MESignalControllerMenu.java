@@ -39,12 +39,12 @@ public class MESignalControllerMenu extends MenuBase {
             new MESignalControllerSyncPacket(getVisibleSignals()));
         this.onUpdatePorts = scheduler::invokeUpdate;
 
-        this.machine = MACHINE.get(blockEntity);
+        this.machine = MACHINE.get(blockEntity());
 
         var network = machine.network();
         if (network.isPresent()) {
             this.signals = network.get().getComponent(SIGNAL_COMPONENT.get());
-            this.subnet = network.get().getSubnet(blockEntity.getBlockPos());
+            this.subnet = network.get().getSubnet(blockEntity().getBlockPos());
             signals.onUpdate(onUpdatePorts);
         } else {
             this.signals = null;
