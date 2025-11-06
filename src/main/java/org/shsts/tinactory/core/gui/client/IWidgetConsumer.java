@@ -15,31 +15,40 @@ import org.shsts.tinactory.core.gui.RectD;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IWidgetConsumer {
-    void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget);
+    void addGuiComponent(RectD anchor, Rect offset, int zIndex, GuiComponent widget);
+
+    default <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidget(
+        RectD anchor, Rect offset, int zIndex, T widget) {
+        addGuiComponent(anchor, offset, zIndex, widget);
+    }
 
     default <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidget(
         RectD anchor, Rect offset, T widget) {
-        addGuiComponent(anchor, offset, widget);
+        addGuiComponent(anchor, offset, 0, widget);
     }
 
     default <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidget(
         Rect offset, T widget) {
-        addGuiComponent(RectD.ZERO, offset, widget);
+        addGuiComponent(RectD.ZERO, offset, 0, widget);
     }
 
     default <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidget(T widget) {
-        addGuiComponent(RectD.ZERO, Rect.ZERO, widget);
+        addGuiComponent(RectD.ZERO, Rect.ZERO, 0, widget);
+    }
+
+    default void addPanel(RectD anchor, Rect offset, int zIndex, Panel panel) {
+        addGuiComponent(anchor, offset, zIndex, panel);
     }
 
     default void addPanel(RectD anchor, Rect offset, Panel panel) {
-        addGuiComponent(anchor, offset, panel);
+        addGuiComponent(anchor, offset, 0, panel);
     }
 
     default void addPanel(Rect offset, Panel panel) {
-        addGuiComponent(RectD.FULL, offset, panel);
+        addGuiComponent(RectD.FULL, offset, 0, panel);
     }
 
     default void addPanel(Panel panel) {
-        addGuiComponent(RectD.FULL, Rect.ZERO, panel);
+        addGuiComponent(RectD.FULL, Rect.ZERO, 0, panel);
     }
 }

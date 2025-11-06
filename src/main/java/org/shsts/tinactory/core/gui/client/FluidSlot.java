@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
-import static org.shsts.tinactory.core.gui.Texture.FLUID_SLOT_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -78,10 +77,6 @@ public class FluidSlot extends MenuWidget {
         menu.triggerEvent(FLUID_SLOT_CLICK, () -> new SlotEventPacket(tank, button));
     }
 
-    protected void renderBackground(PoseStack poseStack) {
-        RenderUtil.blit(poseStack, FLUID_SLOT_BG, getBlitOffset(), rect.offset(-1, -1).enlarge(2, 2));
-    }
-
     protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {
         RenderUtil.renderFluidWithDecoration(poseStack, getFluidStack(), rect, getBlitOffset());
         if (isHovering(mouseX, mouseY)) {
@@ -91,7 +86,6 @@ public class FluidSlot extends MenuWidget {
 
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        renderBackground(poseStack);
         renderSlot(poseStack, mouseX, mouseY);
     }
 }

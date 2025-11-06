@@ -16,7 +16,7 @@ public class WorkbenchScreen extends LayoutScreen<WorkbenchMenu> {
     public WorkbenchScreen(WorkbenchMenu menu, Component title) {
         super(menu, title);
         for (var image : layout.images) {
-            layoutPanel.addWidget(image.rect(), new StaticWidget(menu, image.texture()));
+            layoutBg.addWidget(image.rect(), new StaticWidget(menu, image.texture()));
         }
     }
 }

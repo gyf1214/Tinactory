@@ -11,8 +11,6 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.ProgressBar;
 
-import java.util.function.Function;
-
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_ANCHOR;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_OFFSET;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -25,15 +23,17 @@ import static org.shsts.tinactory.core.gui.Texture.PROGRESS_BURN;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineScreen extends ProcessingScreen {
+    // in between BG_Z and default
+    protected static final int MACHINE_BOOK_Z = -5;
+
     private final PortPanel portPanel;
     @Nullable
     private final MachineRecipeBook recipeBook;
 
-    protected MachineScreen(ProcessingMenu menu, Component title,
-        @Nullable Function<MachineScreen, MachineRecipeBook> recipeBookFactory) {
+    protected MachineScreen(ProcessingMenu menu, Component title, boolean hasRecipeBook) {
         super(menu, title);
 
-        this.recipeBook = recipeBookFactory == null ? null : recipeBookFactory.apply(this);
+        this.recipeBook = hasRecipeBook ? new MachineRecipeBook(this) : null;
 
         var buttonY = layout.rect.endY() + SPACING;
         this.portPanel = new PortPanel(this, layout);
@@ -47,7 +47,7 @@ public class MachineScreen extends ProcessingScreen {
         });
 
         if (recipeBook != null) {
-            addPanel(recipeBook);
+            addPanel(RectD.FULL, Rect.ZERO, MACHINE_BOOK_Z, recipeBook);
             MachineRecipeBook.addButton(menu, this, recipeBook, RectD.ZERO, 0, buttonY, () -> {
                 if (recipeBook.isBookActive()) {
                     portPanel.setActive(false);
@@ -57,7 +57,7 @@ public class MachineScreen extends ProcessingScreen {
     }
 
     public MachineScreen(ProcessingMenu menu, Component title) {
-        this(menu, title, MachineRecipeBook::new);
+        this(menu, title, true);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class MachineScreen extends ProcessingScreen {
 
     public static class Boiler extends MachineScreen {
         public Boiler(ProcessingMenu menu, Component title) {
-            super(menu, title, null);
+            super(menu, title, false);
             var burnBar = new ProgressBar(menu, PROGRESS_BURN, "burn");
             burnBar.direction = ProgressBar.Direction.VERTICAL;
             layoutPanel.addWidget(new Rect(1, 1 + SLOT_SIZE, 16, 16), burnBar);

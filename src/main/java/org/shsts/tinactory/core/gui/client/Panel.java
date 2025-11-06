@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
@@ -19,7 +20,7 @@ import java.util.List;
 public class Panel extends GuiComponent implements IWidgetConsumer {
     private Rect rect;
 
-    protected record Child(RectD anchor, Rect offset, GuiComponent child) {
+    protected record Child(RectD anchor, Rect offset, int zIndex, GuiComponent child) {
         public void setRect(Rect parent) {
             var sx = parent.inX(anchor.x()) + offset.x();
             var tx = parent.inX(anchor.endX()) + offset.endX();
@@ -77,8 +78,8 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
     }
 
     @Override
-    public void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget) {
-        children.add(new Child(anchor, offset, widget));
+    public void addGuiComponent(RectD anchor, Rect offset, int zIndex, GuiComponent widget) {
+        children.add(new Child(anchor, offset, zIndex, widget));
     }
 
     public void init(Rect rect) {
@@ -87,10 +88,15 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
         addToScreen();
     }
 
+    private void sortChildren() {
+        children.sort(Comparator.comparing(Child::zIndex));
+    }
+
     /**
      * Override this for additional initialization.
      */
     protected void initPanel() {
+        sortChildren();
         for (var child : children) {
             child.initPanel();
         }

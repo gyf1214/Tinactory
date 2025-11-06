@@ -33,6 +33,8 @@ import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements IWidgetConsumer {
+    protected static final int BG_Z = -10;
+
     protected final Panel rootPanel;
     protected final List<Widget> hoverables = new ArrayList<>();
 
@@ -67,7 +69,7 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements
             int x = slot.x - 1 - MARGIN_X;
             int y = slot.y - 1 - MARGIN_TOP;
             var slotBg = new SlotBackground(slot);
-            rootPanel.addWidget(new Rect(x, y, SLOT_SIZE, SLOT_SIZE), slotBg);
+            rootPanel.addWidget(RectD.ZERO, new Rect(x, y, SLOT_SIZE, SLOT_SIZE), BG_Z, slotBg);
         }
     }
 
@@ -76,8 +78,8 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements
     }
 
     @Override
-    public void addGuiComponent(RectD anchor, Rect offset, GuiComponent widget) {
-        rootPanel.addGuiComponent(anchor, offset, widget);
+    public void addGuiComponent(RectD anchor, Rect offset, int zIndex, GuiComponent widget) {
+        rootPanel.addGuiComponent(anchor, offset, zIndex, widget);
     }
 
     @Override
