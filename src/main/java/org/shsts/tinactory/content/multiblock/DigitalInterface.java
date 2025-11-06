@@ -79,6 +79,8 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
         public void setType(SlotType val) {
             type = val;
+            internalItem.resetFilters();
+            internalFluid.resetFilters();
             if (type.direction == PortDirection.INPUT) {
                 internalItem.maxCount = amountByteLimit / CONFIG.bytesPerItem.get();
                 menuItem.allowInput = true;

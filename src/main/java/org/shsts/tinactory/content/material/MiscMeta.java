@@ -197,12 +197,7 @@ public class MiscMeta extends MetaConsumer {
         var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
 
-        var properties = new BoilerProcessor.Properties(
-            GsonHelper.getAsDouble(jo, "baseHeat"),
-            GsonHelper.getAsDouble(jo, "baseDecay"),
-            GsonHelper.getAsDouble(jo, "burnSpeed"),
-            GsonHelper.getAsDouble(jo, "burnHeat"));
-
+        var properties = BoilerProcessor.Properties.fromJson(jo);
         BlockEntityBuilder.builder(id, MachineBlock.factory(Voltage.PRIMITIVE))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.BOILER)

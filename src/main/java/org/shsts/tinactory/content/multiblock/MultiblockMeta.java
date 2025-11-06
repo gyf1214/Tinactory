@@ -11,6 +11,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.content.machine.BoilerProcessor;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.RecipeProcessors;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
@@ -60,8 +61,8 @@ public class MultiblockMeta extends MachineMeta {
         }
 
         private <P> Multiblock.Builder<P> multiblock(IBlockEntityTypeBuilder<P> builder) {
-            var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
-            if (!machineType.equals("power_substation")) {
+            if (!processors.isEmpty()) {
+                var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
                 builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
             }
 
@@ -80,6 +81,10 @@ public class MultiblockMeta extends MachineMeta {
                 }
                 case "large_turbine" -> builder.child(Multiblock.builder(LargeTurbine::new));
                 case "power_substation" -> builder.child(Multiblock.builder(PowerSubstation::new));
+                case "large_boiler" -> {
+                    var properties = BoilerProcessor.Properties.fromJson(jo);
+                    yield builder.child(Multiblock.builder((be, $) -> new LargeBoiler(be, $, properties)));
+                }
                 default -> {
                     if (machineType.equals(recipeTypeStr)) {
                         yield builder.child(Multiblock.builder(Multiblock::new));

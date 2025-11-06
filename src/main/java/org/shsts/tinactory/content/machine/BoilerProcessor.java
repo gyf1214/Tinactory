@@ -1,16 +1,19 @@
 package org.shsts.tinactory.content.machine;
 
+import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
@@ -25,6 +28,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.List;
 
+import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
@@ -45,13 +49,22 @@ public class BoilerProcessor extends CapabilityProvider implements
 
     private IItemCollection fuelPort;
     private long maxBurn = 0L;
+    private int parallelBurn = 1;
     private long currentBurn = 0L;
     private boolean needUpdate = true;
     private boolean stopped = false;
 
-    public record Properties(double baseHeat, double baseDecay, double burnSpeed, double burnHeat) {}
+    public record Properties(double baseHeat, double baseDecay, double burnSpeed, double burnHeat) {
+        public static Properties fromJson(JsonObject jo) {
+            return new Properties(
+                GsonHelper.getAsDouble(jo, "baseHeat"),
+                GsonHelper.getAsDouble(jo, "baseDecay"),
+                GsonHelper.getAsDouble(jo, "burnSpeed"),
+                GsonHelper.getAsDouble(jo, "burnHeat"));
+        }
+    }
 
-    private BoilerProcessor(BlockEntity blockEntity, Properties properties) {
+    protected BoilerProcessor(BlockEntity blockEntity, Properties properties) {
         this.blockEntity = blockEntity;
         this.burnSpeed = properties.burnSpeed;
         this.burnHeat = properties.burnHeat;
@@ -66,9 +79,7 @@ public class BoilerProcessor extends CapabilityProvider implements
         return ((BoilerProcessor) processor).boiler.getHeat();
     }
 
-    private void onLoad() {
-        var container = AllCapabilities.CONTAINER.get(blockEntity);
-
+    public void setContainer(IContainer container) {
         fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
         fuelPort.asItemFilter().setFilters(List.of(item ->
             ForgeHooks.getBurnTime(item, null) > 0 && !item.hasContainerItem()));
@@ -76,6 +87,10 @@ public class BoilerProcessor extends CapabilityProvider implements
         var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
         var outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluid();
         boiler.setContainer(inputPort, outputPort);
+    }
+
+    private void onLoad() {
+        CONTAINER.tryGet(blockEntity).ifPresent(this::setContainer);
     }
 
     protected double boilParallel() {
@@ -109,7 +124,8 @@ public class BoilerProcessor extends CapabilityProvider implements
                 var stack1 = StackHelper.copyWithCount(stack, maxParallel);
                 var extracted = fuelPort.extractItem(stack1, false);
                 if (!extracted.isEmpty()) {
-                    maxBurn = ForgeHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK * extracted.getCount();
+                    maxBurn = ForgeHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK;
+                    parallelBurn = extracted.getCount();
                     break;
                 }
             }
@@ -128,7 +144,7 @@ public class BoilerProcessor extends CapabilityProvider implements
                 maxBurn = 0;
                 needUpdate = true;
             }
-            heatInput = burnHeat;
+            heatInput = burnHeat * parallelBurn;
         }
 
         var world = blockEntity.getLevel();
@@ -173,6 +189,7 @@ public class BoilerProcessor extends CapabilityProvider implements
         tag.put("boiler", boiler.serializeNBT());
         tag.putLong("maxBurn", maxBurn);
         tag.putLong("currentBurn", currentBurn);
+        tag.putInt("parallelBurn", parallelBurn);
         return tag;
     }
 
@@ -181,5 +198,6 @@ public class BoilerProcessor extends CapabilityProvider implements
         boiler.deserializeNBT(tag.getCompound("boiler"));
         maxBurn = tag.getLong("maxBurn");
         currentBurn = tag.getLong("currentBurn");
+        parallelBurn = tag.getInt("parallelBurn");
     }
 }
