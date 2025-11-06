@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.logistics;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -10,6 +11,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.network.ComponentType;
+import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -23,6 +25,8 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LogisticComponent extends NotifierComponent {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     public record PortKey(UUID machineId, int portIndex) {}
 
     public record PortInfo(IMachine machine, int portIndex, IPort port, BlockPos subnet, int priority) {}
@@ -38,7 +42,9 @@ public class LogisticComponent extends NotifierComponent {
 
     private PortKey createPort(IMachine machine, int index, IPort port, BlockPos subnet, int priority) {
         var key = new PortKey(machine.uuid(), index);
-        assert !ports.containsKey(key);
+        if (ports.containsKey(key)) {
+            LOGGER.warn("duplicate port key {}", key);
+        }
         ports.put(key, new PortInfo(machine, index, port, subnet, priority));
         return key;
     }

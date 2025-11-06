@@ -117,17 +117,20 @@ public class Network extends NetworkBase implements INetwork {
     }
 
     @Override
-    protected void onDisconnect() {
-        for (var machine : subnetMachines.values()) {
-            machine.onDisconnectFromNetwork();
-        }
-        for (var component : components.values()) {
-            component.onDisconnect();
+    protected void onDisconnect(boolean connected) {
+        // if the network is not ever connected, skip callbacks of the machines and components.
+        if (connected) {
+            for (var machine : subnetMachines.values()) {
+                machine.onDisconnectFromNetwork();
+            }
+            for (var component : components.values()) {
+                component.onDisconnect();
+            }
         }
         subnetMachines.clear();
         blockSubnets.clear();
         machineSchedulings.clear();
-        super.onDisconnect();
+        super.onDisconnect(connected);
     }
 
     @Override

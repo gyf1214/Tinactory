@@ -15,6 +15,11 @@ import org.shsts.tinactory.integration.jei.category.RecipeCategory
 
 object Markers {
     fun init() {
+        dataGen {
+            tag(AllTags.material("ingot"), AllTags.EXTRUDER_INPUT)
+            tag(AllTags.material("sheet"), AllTags.EXTRUDER_INPUT)
+        }
+
         marker {
             // base markers, i.e. marking all recipes in baseType for multi-use multiblocks
             recipe("smelting") {
@@ -91,7 +96,7 @@ object Markers {
         recipe("extruder/material/$sub") {
             baseType("extruder")
             prefix("material/$sub")
-            input(AllTags.material("ingot"), port = 0)
+            input(AllTags.EXTRUDER_INPUT, port = 0)
             extra {
                 display(AllTags.material(sub))
             }

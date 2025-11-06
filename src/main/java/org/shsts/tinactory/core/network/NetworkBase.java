@@ -114,7 +114,7 @@ public class NetworkBase {
         return state;
     }
 
-    protected void onDisconnect() {
+    protected void onDisconnect(boolean connected) {
         LOGGER.debug("{}: disconnect", this);
     }
 
@@ -131,9 +131,7 @@ public class NetworkBase {
         }
         var state0 = state;
         state = State.INVALIDATING;
-        if (state0 == State.CONNECTED) {
-            onDisconnect();
-        }
+        onDisconnect(state0 == State.CONNECTED);
         if (ref != null) {
             ref.invalidate();
         }

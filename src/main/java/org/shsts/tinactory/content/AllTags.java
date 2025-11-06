@@ -45,6 +45,7 @@ public final class AllTags {
     public static final TagKey<Item> STORAGE_CELL = modItem("storage_cell");
     public static final TagKey<Item> ITEM_STORAGE_CELL = extend(STORAGE_CELL, "item");
     public static final TagKey<Item> FLUID_STORAGE_CELL = extend(STORAGE_CELL, "fluid");
+    public static final TagKey<Item> EXTRUDER_INPUT = modItem("extruder_input");
 
     public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {
         return TagKey.create(tag.registry(), LocHelper.extend(tag.location(), suffix));
