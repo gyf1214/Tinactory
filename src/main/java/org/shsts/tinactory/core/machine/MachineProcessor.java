@@ -19,7 +19,6 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
@@ -196,7 +195,7 @@ public class MachineProcessor extends CapabilityProvider implements
         container().ifPresent(container -> {
             var portSize = container.portSize();
             for (var i = 0; i < portSize; i++) {
-                if (!container.hasPort(i) || container.portDirection(i) != PortDirection.INPUT) {
+                if (!container.hasPort(i)) {
                     continue;
                 }
                 var port = container.getPort(i, ContainerAccess.INTERNAL);

@@ -11,7 +11,8 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
-import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
@@ -115,26 +116,15 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         return false;
     }
 
-    @Override
-    public void setTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
-        var recipeManager = CORE.recipeManager(world);
-        var recipe = recipeManager.byLoc(MARKER, loc)
-            .map($ -> (ProcessingRecipe) $)
-            .or(() -> recipeManager.byLoc(recipeType, loc));
-        if (recipe.isEmpty()) {
-            return;
-        }
-        var recipe1 = recipe.get();
-        // skip filter if targetRecipe is a marker without any input
-        if (recipe1 instanceof MarkerRecipe && recipe1.inputs.isEmpty()) {
-            return;
-        }
+    private void setFilters(ProcessingRecipe recipe, IContainer container) {
+        var skipInputs = recipe instanceof MarkerRecipe && recipe.inputs.isEmpty();
+        var skipOutputs = recipe instanceof MarkerRecipe && recipe.outputs.isEmpty();
 
-        machine.container().ifPresent(container -> {
-            var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
-            var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
+        var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
+        var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
 
-            for (var input : recipe1.inputs) {
+        if (!skipInputs) {
+            for (var input : recipe.inputs) {
                 var idx = input.port();
                 var ingredient = input.ingredient();
                 if (!container.hasPort(idx)) {
@@ -150,21 +140,52 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
                     fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
                 }
             }
+        }
 
-            for (var idx : itemFilters.keys().elementSet()) {
-                var port = container.getPort(idx, ContainerAccess.INTERNAL);
-                if (port.type() == PortType.ITEM) {
-                    port.asItemFilter().setFilters(itemFilters.get(idx));
+        if (!skipOutputs) {
+            for (var output : recipe.outputs) {
+                var idx = output.port();
+                var result = output.result();
+                if (!container.hasPort(idx)) {
+                    continue;
+                }
+                if (result instanceof ProcessingResults.ItemResult item) {
+                    var stack1 = item.stack;
+                    itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
+                } else if (result instanceof ProcessingResults.FluidResult fluid) {
+                    var stack1 = fluid.stack;
+                    fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
                 }
             }
+        }
 
-            for (var idx : fluidFilters.keys().elementSet()) {
-                var port = container.getPort(idx, ContainerAccess.INTERNAL);
-                if (port.type() == PortType.FLUID) {
-                    port.asFluidFilter().setFilters(fluidFilters.get(idx));
-                }
+        for (var i = 0; i < container.portSize(); i++) {
+            if (!container.hasPort(i)) {
+                continue;
             }
-        });
+            var dir = container.portDirection(i);
+            if ((skipInputs && dir == PortDirection.INPUT) ||
+                (skipOutputs && dir == PortDirection.OUTPUT)) {
+                continue;
+            }
+            var port = container.getPort(i, ContainerAccess.INTERNAL);
+            switch (port.type()) {
+                case ITEM -> port.asItemFilter().setFilters(itemFilters.get(i));
+                case FLUID -> port.asFluidFilter().setFilters(fluidFilters.get(i));
+            }
+        }
+    }
+
+    @Override
+    public void setTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
+        var recipeManager = CORE.recipeManager(world);
+        var recipe = recipeManager.byLoc(MARKER, loc)
+            .map($ -> (ProcessingRecipe) $)
+            .or(() -> recipeManager.byLoc(recipeType, loc));
+        if (recipe.isEmpty()) {
+            return;
+        }
+        machine.container().ifPresent(container -> setFilters(recipe.get(), container));
     }
 
     @Override
