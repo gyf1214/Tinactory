@@ -53,7 +53,7 @@ public class DistillationRecipe extends DisplayInputRecipe {
         var container = machine.container().orElseThrow();
         var slots = Math.min(outputs.size(), getSlots(machine));
         for (var i = 0; i < slots; i++) {
-            insertOutput(container, outputs.get(i), parallel, random, false);
+            insertOutput(container, outputs.get(i), parallel, random, false).ifPresent(callback);
         }
     }
 

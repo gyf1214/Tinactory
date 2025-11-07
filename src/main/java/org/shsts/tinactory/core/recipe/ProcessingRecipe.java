@@ -125,12 +125,13 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     public void insertOutputs(IMachine machine, int parallel, Random random,
         Consumer<IProcessingResult> callback) {
-        machine.container().ifPresent(container -> insertOutputs(container, parallel, random));
+        machine.container().ifPresent(container -> insertOutputs(container, parallel, random, callback));
     }
 
-    public void insertOutputs(IContainer container, int parallel, Random random) {
+    public void insertOutputs(IContainer container, int parallel, Random random,
+        Consumer<IProcessingResult> callback) {
         for (var output : outputs) {
-            insertOutput(container, output, parallel, random, false);
+            insertOutput(container, output, parallel, random, false).ifPresent(callback);
         }
     }
 
