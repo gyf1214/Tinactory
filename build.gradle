@@ -120,7 +120,8 @@ dependencies {
 
     compileOnly files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
 
-    runtimeOnly fg.deobf("curse.maven:ctm-267602:3933537")
+    runtimeOnly fg.deobf("curse.maven:ctm-267602:${ctm_id}")
+    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
     compileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
     runtimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
