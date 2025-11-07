@@ -14,6 +14,7 @@ import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -235,10 +236,10 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             var result = output.result();
             if (result instanceof ProcessingResults.ItemResult item) {
                 var stack1 = StackHelper.copyWithCount(item.stack, parallel * item.stack.getCount());
-                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.ItemResult(1, stack1)));
+                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.ItemResult(1d, stack1)));
             } else if (result instanceof ProcessingResults.FluidResult fluid) {
                 var stack1 = StackHelper.copyWithAmount(fluid.stack, parallel * fluid.stack.getAmount());
-                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.FluidResult(1, stack1)));
+                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.FluidResult(1d, stack1)));
             }
         }
     }
@@ -262,10 +263,10 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public void onWorkBegin(R recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> info) {
+    public void onWorkBegin(R recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> callback) {
         parallel = calculateParallel(recipe, machine.world(), machine, maxParallel);
-        recipe.consumeInputs(machine.container().orElseThrow(), parallel, info);
-        addOutputInfo(recipe, parallel, info);
+        recipe.consumeInputs(machine.container().orElseThrow(), parallel, callback);
+        addOutputInfo(recipe, parallel, callback);
         calculateFactors(recipe, machine, parallel);
     }
 
@@ -278,8 +279,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public void onWorkDone(R recipe, IMachine machine, Random random) {
-        recipe.insertOutputs(machine, parallel, random);
+    public void onWorkDone(R recipe, IMachine machine, Random random, Consumer<IProcessingResult> callback) {
+        recipe.insertOutputs(machine, parallel, random, callback);
     }
 
     @Override

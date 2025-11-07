@@ -71,10 +71,14 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         return consumeInput(container, input, parallel, true).isPresent();
     }
 
-    protected boolean insertOutput(IContainer container, Output output, int parallel,
+    protected Optional<IProcessingResult> insertOutput(IContainer container, Output output, int parallel,
         Random random, boolean simulate) {
         var port = container.getPort(output.port, ContainerAccess.INTERNAL);
         return output.result.insertPort(port, parallel, random, simulate);
+    }
+
+    protected boolean canInsertOutput(IContainer container, Output output, int parallel, Random random) {
+        return insertOutput(container, output, parallel, random, true).isPresent();
     }
 
     protected boolean matchInputs(IContainer container, int parallel) {
@@ -82,7 +86,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     }
 
     protected boolean matchOutputs(IContainer container, int parallel, Random random) {
-        return outputs.stream().allMatch(output -> insertOutput(container, output, parallel, random, true));
+        return outputs.stream().allMatch(output -> canInsertOutput(container, output, parallel, random));
     }
 
     protected boolean matchTeam(Optional<ITeamProfile> team) {
@@ -112,14 +116,15 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             .isPresent();
     }
 
-    public void consumeInputs(IContainer container, int parallel, Consumer<ProcessingInfo> cons) {
+    public void consumeInputs(IContainer container, int parallel, Consumer<ProcessingInfo> callback) {
         for (var input : inputs) {
             consumeInput(container, input, parallel, false)
-                .ifPresent($ -> cons.accept(new ProcessingInfo(input.port, $)));
+                .ifPresent($ -> callback.accept(new ProcessingInfo(input.port, $)));
         }
     }
 
-    public void insertOutputs(IMachine machine, int parallel, Random random) {
+    public void insertOutputs(IMachine machine, int parallel, Random random,
+        Consumer<IProcessingResult> callback) {
         machine.container().ifPresent(container -> insertOutputs(container, parallel, random));
     }
 

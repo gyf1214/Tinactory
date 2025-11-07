@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -17,6 +18,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -57,13 +59,14 @@ public class CleanRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public void insertOutputs(IMachine machine, int parallel, Random random) {
+    public void insertOutputs(IMachine machine, int parallel, Random random,
+        Consumer<IProcessingResult> callback) {
         var rate = getCleannessRate(machine);
         if (rate <= 0d) {
             return;
         }
         var parallel1 = rate < 1d ? MathUtil.sampleBinomial(parallel, rate, random) : parallel;
-        super.insertOutputs(machine, parallel1, random);
+        super.insertOutputs(machine, parallel1, random, callback);
     }
 
     public static class Builder extends BuilderBase<CleanRecipe, Builder> {

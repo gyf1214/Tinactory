@@ -20,6 +20,7 @@ import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -63,7 +64,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
     }
 
     public double absorbHeat(IFluidCollection inputPort, IFluidCollection outputPort,
-        int reaction, double heat) {
+        int reaction, double heat, BiConsumer<FluidStack, FluidStack> callback) {
         var inputStack = StackHelper.copyWithAmount(input, input.getAmount() * reaction);
         var drained = inputPort.drain(inputStack, true);
         var reaction1 = drained.getAmount() / input.getAmount();
@@ -77,6 +78,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         var outputStack = StackHelper.copyWithAmount(output, outputAmount);
         inputPort.drain(inputStack1, false);
         outputPort.fill(outputStack, false);
+        callback.accept(inputStack1, outputStack);
 
         return absorbRate * reaction1;
     }

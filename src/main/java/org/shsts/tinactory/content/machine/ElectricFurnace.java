@@ -14,6 +14,7 @@ import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
@@ -225,17 +226,19 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public void onWorkBegin(SmeltingRecipe recipe, IMachine machine,
-        int maxParallel, Consumer<ProcessingInfo> info) {
+        int maxParallel, Consumer<ProcessingInfo> callback) {
         var port = getInputPort(machine.container().orElseThrow());
         var ingredient = recipe.getIngredients().get(0);
 
         parallel = calculateParallel(port, ingredient, maxParallel);
         StackHelper.consumeItemCollection(port, ingredient, parallel, false)
-            .ifPresent($ -> info.accept(new ProcessingInfo(inputPort, new ProcessingIngredients.ItemIngredient($))));
+            .ifPresent($ -> callback.accept(new ProcessingInfo(inputPort,
+                new ProcessingIngredients.ItemIngredient($))));
 
         var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
-        info.accept(new ProcessingInfo(outputPort, new ProcessingResults.ItemResult(1, result1)));
+        callback.accept(new ProcessingInfo(outputPort,
+            new ProcessingResults.ItemResult(1d, result1)));
 
         calculateFactors(machine, parallel);
     }
@@ -249,10 +252,12 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public void onWorkDone(SmeltingRecipe recipe, IMachine machine, Random random) {
+    public void onWorkDone(SmeltingRecipe recipe, IMachine machine, Random random,
+        Consumer<IProcessingResult> callback) {
         var port = getOutputPort(machine.container().orElseThrow());
         var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
+        callback.accept(new ProcessingResults.ItemResult(1d, result1));
         port.insertItem(result1, false);
     }
 

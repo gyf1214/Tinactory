@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
@@ -98,9 +99,10 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     }
 
     @Override
-    public void onWorkDone(OreAnalyzerRecipe recipe, IMachine machine, Random random) {
+    public void onWorkDone(OreAnalyzerRecipe recipe, IMachine machine, Random random,
+        Consumer<IProcessingResult> callback) {
         if (!emptyRecipe) {
-            machine.container().ifPresent(container -> recipe.doInsertOutputs(container, 1, random));
+            super.onWorkDone(recipe, machine, random, callback);
         }
     }
 

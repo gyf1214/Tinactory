@@ -14,6 +14,8 @@ import org.shsts.tinactory.content.machine.BoilerProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
+import java.util.Optional;
+
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 
 @ParametersAreNonnullByDefault
@@ -22,6 +24,11 @@ public class LargeBoiler extends Multiblock {
     private class Processor extends BoilerProcessor {
         public Processor(Properties properties) {
             super(blockEntity, properties);
+        }
+
+        @Override
+        protected Optional<IMachine> machine() {
+            return Optional.ofNullable(multiblockInterface);
         }
 
         @Override

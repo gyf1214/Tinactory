@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
@@ -46,13 +47,16 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
     /**
      * Info is for returning actual ingredients.
      */
-    void onWorkBegin(T recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> info);
+    void onWorkBegin(T recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> callback);
 
     void onWorkContinue(T recipe, IMachine machine);
 
     long onWorkProgress(T recipe, double partial);
 
-    void onWorkDone(T recipe, IMachine machine, Random random);
+    /**
+     * Result is for returning actual result.
+     */
+    void onWorkDone(T recipe, IMachine machine, Random random, Consumer<IProcessingResult> callback);
 
     long getMaxWorkProgress(T recipe);
 

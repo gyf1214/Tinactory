@@ -13,6 +13,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
@@ -22,6 +23,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -66,7 +68,8 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public void insertOutputs(IMachine machine, int parallel, Random random) {
+    public void insertOutputs(IMachine machine, int parallel, Random random,
+        Consumer<IProcessingResult> callback) {
         machine.owner()
             .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress * parallel));
     }

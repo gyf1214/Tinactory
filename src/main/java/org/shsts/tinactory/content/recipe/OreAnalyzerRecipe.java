@@ -5,13 +5,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.content.machine.OreAnalyzer;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
-
-import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -21,25 +17,6 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
     private OreAnalyzerRecipe(Builder builder) {
         super(builder);
         this.rate = builder.rate;
-    }
-
-    /**
-     * This is only called in primitive processor.
-     * <p>
-     * Ignore parallel.
-     */
-    @Override
-    public void insertOutputs(IContainer container, int parallel, Random random) {
-        if (random.nextDouble() <= rate) {
-            super.insertOutputs(container, parallel, random);
-        }
-    }
-
-    /**
-     * This is called in {@link OreAnalyzer}.
-     */
-    public void doInsertOutputs(IContainer container, int parallel, Random random) {
-        super.insertOutputs(container, parallel, random);
     }
 
     public static class Builder extends AssemblyRecipe.BuilderBase<OreAnalyzerRecipe, Builder> {

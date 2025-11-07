@@ -6,8 +6,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
+
+import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.AllRecipes.BOILER;
@@ -45,7 +48,8 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         return input;
     }
 
-    public double absorbHeat(BoilerRecipe recipe, double parallel) {
+    private double absorbHeat(BoilerRecipe recipe, double parallel,
+        BiConsumer<FluidStack, FluidStack> callback) {
         if (lastRecipe != recipe) {
             lastRecipe = recipe;
             hiddenProgress = 0;
@@ -54,15 +58,16 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         var reaction = recipe.getReaction(heat, parallel) + hiddenProgress;
         var reaction1 = (int) Math.floor(reaction);
         hiddenProgress = reaction - reaction1;
-        return reaction1 > 0 ? recipe.absorbHeat(input, output, reaction1, heat) : 0;
+        return reaction1 > 0 ? recipe.absorbHeat(input, output, reaction1, heat, callback) : 0;
     }
 
-    public void tick(Level world, double heatInput, double parallel) {
+    public void tick(Level world, double heatInput, double parallel,
+        BiConsumer<FluidStack, FluidStack> callback) {
         var decay = Math.max(0, heat - baseHeat) * baseDecay;
 
         var recipeManager = CORE.recipeManager(world);
         var recipe = recipeManager.getRecipeFor(BOILER, this, world);
-        var absorb = (double) recipe.map($ -> absorbHeat($, parallel)).orElse(0d);
+        var absorb = (double) recipe.map($ -> absorbHeat($, parallel, callback)).orElse(0d);
 
         heat += heatInput - decay - absorb;
     }

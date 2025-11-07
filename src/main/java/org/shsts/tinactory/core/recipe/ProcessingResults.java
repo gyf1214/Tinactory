@@ -55,23 +55,28 @@ public final class ProcessingResults {
             return portType;
         }
 
-        protected abstract boolean doInsertPort(T port, int parallel, Random random, boolean simulate);
+        protected abstract Optional<IProcessingResult> doInsertPort(T port, int parallel,
+            Random random, boolean simulate);
 
         @Override
-        public boolean insertPort(IPort port, int parallel, Random random, boolean simulate) {
+        public Optional<IProcessingResult> insertPort(IPort port, int parallel,
+            Random random, boolean simulate) {
             if (portClazz.isInstance(port)) {
                 var port1 = portClazz.cast(port);
                 if (rate < 1d) {
                     if (simulate) {
-                        return true;
+                        return Optional.of(this);
                     }
                     var parallel1 = MathUtil.sampleBinomial(parallel, rate, random);
-                    return parallel1 <= 0 || doInsertPort(port1, parallel1, random, false);
+                    if (parallel1 <= 0) {
+                        return Optional.empty();
+                    }
+                    return doInsertPort(port1, parallel1, random, false);
                 } else {
                     return doInsertPort(port1, parallel, random, simulate);
                 }
             }
-            return false;
+            return Optional.empty();
         }
     }
 
@@ -86,9 +91,11 @@ public final class ProcessingResults {
         }
 
         @Override
-        protected boolean doInsertPort(IItemCollection port, int parallel, Random random, boolean simulate) {
+        protected Optional<IProcessingResult> doInsertPort(IItemCollection port, int parallel,
+            Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
-            return port.insertItem(stack1, simulate).isEmpty();
+            return port.insertItem(stack1, simulate).isEmpty() ?
+                Optional.of(new ItemResult(1d, stack1)) : Optional.empty();
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -108,9 +115,11 @@ public final class ProcessingResults {
         }
 
         @Override
-        protected boolean doInsertPort(IFluidCollection port, int parallel, Random random, boolean simulate) {
+        protected Optional<IProcessingResult> doInsertPort(IFluidCollection port, int parallel,
+            Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithAmount(stack, stack.getAmount() * parallel);
-            return port.acceptInput(stack1) && port.fill(stack1, simulate) == stack1.getAmount();
+            return port.acceptInput(stack1) && port.fill(stack1, simulate) == stack1.getAmount() ?
+                Optional.of(new FluidResult(1d, stack1)) : Optional.empty();
         }
 
         private static final Codec<FluidResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(

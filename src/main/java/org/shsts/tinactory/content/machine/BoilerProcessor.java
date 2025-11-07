@@ -15,18 +15,21 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.Machine;
+import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -93,6 +96,10 @@ public class BoilerProcessor extends CapabilityProvider implements
         CONTAINER.tryGet(blockEntity).ifPresent(this::setContainer);
     }
 
+    protected Optional<IMachine> machine() {
+        return MACHINE.tryGet(blockEntity);
+    }
+
     protected double boilParallel() {
         return 1d;
     }
@@ -118,12 +125,18 @@ public class BoilerProcessor extends CapabilityProvider implements
             return;
         }
 
+        var machine = machine();
+        if (machine.isEmpty()) {
+            return;
+        }
+
         var maxParallel = burnParallel();
         for (var stack : fuelPort.getAllItems()) {
             if (ForgeHooks.getBurnTime(stack, null) > 0) {
                 var stack1 = StackHelper.copyWithCount(stack, maxParallel);
                 var extracted = fuelPort.extractItem(stack1, false);
                 if (!extracted.isEmpty()) {
+                    MetricsManager.reportItem("item_consumed", machine.get(), extracted);
                     maxBurn = ForgeHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK;
                     parallelBurn = extracted.getCount();
                     break;
@@ -137,6 +150,12 @@ public class BoilerProcessor extends CapabilityProvider implements
 
     @Override
     public void onWorkTick(double partial) {
+        var machine = machine();
+        if (machine.isEmpty()) {
+            return;
+        }
+        var machine1 = machine.get();
+
         var heatInput = 0d;
         if (maxBurn > 0) {
             currentBurn += (long) (burnSpeed * (double) PROGRESS_PER_TICK);
@@ -149,7 +168,10 @@ public class BoilerProcessor extends CapabilityProvider implements
 
         var world = blockEntity.getLevel();
         assert world != null;
-        boiler.tick(world, heatInput, boilParallel());
+        boiler.tick(world, heatInput, boilParallel(), (input, output) -> {
+            MetricsManager.reportFluid("fluid_consumed", machine1, input);
+            MetricsManager.reportFluid("fluid_produced", machine1, output);
+        });
 
         stopped = false;
         blockEntity.setChanged();
