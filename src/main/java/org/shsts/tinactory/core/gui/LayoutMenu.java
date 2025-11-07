@@ -47,7 +47,7 @@ public class LayoutMenu extends InventoryMenu {
                 var x = xOffset + slot.x() + MARGIN_X + 1;
                 var y = slot.y() + MARGIN_TOP + 1;
                 if (slot.type().portType == PortType.ITEM) {
-                    addSlot(new SlotItemHandler(items, slot.index(), x, y));
+                    addSlot(new SlotItemHandler(items.asItemHandler(), slot.index(), x, y));
                 }
             }
         });

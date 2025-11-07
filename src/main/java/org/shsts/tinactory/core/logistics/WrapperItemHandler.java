@@ -46,6 +46,10 @@ public class WrapperItemHandler extends PortNotifier implements IItemHandlerModi
         filters[idx] = TRUE_FILTER;
     }
 
+    public boolean allowOutput(int idx) {
+        return allowOutputs[idx];
+    }
+
     public void setAllowOutput(int idx, boolean value) {
         allowOutputs[idx] = value;
     }

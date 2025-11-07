@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -19,6 +18,7 @@ import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
@@ -51,7 +51,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     private final Voltage voltage;
     private IMachine machine;
     private final WrapperItemHandler items;
-    private final LazyOptional<IItemHandler> itemHandlerCap;
+    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
 
     public BatteryBox(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
@@ -62,7 +62,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < size; i++) {
             items.setFilter(i, this::allowItem);
         }
-        this.itemHandlerCap = LazyOptional.of(() -> items);
+        this.menuItemHandlerCap = IMenuItemHandler.cap(items);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
@@ -178,7 +178,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
             cap == LAYOUT_PROVIDER.get()) {
             return myself();
         } else if (cap == MENU_ITEM_HANDLER.get()) {
-            return itemHandlerCap.cast();
+            return menuItemHandlerCap.cast();
         }
         return LazyOptional.empty();
     }

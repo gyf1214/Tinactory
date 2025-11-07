@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -17,6 +19,8 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
+import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
+import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
@@ -31,6 +35,7 @@ import java.util.List;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
@@ -49,12 +54,14 @@ public class FlexibleStackContainer extends CapabilityProvider
     private final WrapperItemHandler menuItems;
     private final WrapperItemHandler externalItems;
     private final WrapperFluidTank[] internalFluids;
+    private final WrapperFluidTank[] menuFluids;
     private final WrapperFluidTank[] externalFluids;
     private final CombinedFluidTank combinedFluids;
     private final List<ContainerPort> ports = new ArrayList<>();
-    private final LazyOptional<?> itemHandlerCap;
-    private final LazyOptional<?> menuItemHandlerCap;
-    private final LazyOptional<?> fluidHandlerCap;
+    private final LazyOptional<IItemHandler> itemHandlerCap;
+    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
+    private final LazyOptional<IFluidHandler> fluidHandlerCap;
+    private final LazyOptional<IFluidTanksHandler> menuFluidHandlerCap;
 
     private Layout layout = Layout.EMPTY;
 
@@ -71,20 +78,26 @@ public class FlexibleStackContainer extends CapabilityProvider
         internalItems.onUpdate(this::onUpdate);
 
         this.internalFluids = new WrapperFluidTank[maxFluidSlots];
+        this.menuFluids = new WrapperFluidTank[maxFluidSlots];
         this.externalFluids = new WrapperFluidTank[maxFluidSlots];
         var fluidSize = CONFIG.fluidSlotSize.get();
         for (var i = 0; i < maxFluidSlots; i++) {
             internalFluids[i] = new WrapperFluidTank(fluidSize);
             internalFluids[i].onUpdate(this::onUpdate);
+            menuFluids[i] = new WrapperFluidTank(internalFluids[i]);
+            menuFluids[i].disallowInput();
             externalFluids[i] = new WrapperFluidTank(internalFluids[i]);
             externalFluids[i].disallowInput();
         }
 
-        this.combinedFluids = new CombinedFluidTank(externalFluids);
+        this.combinedFluids = new CombinedFluidTank(internalFluids);
+        var combinedMenuFluids = new CombinedFluidTank(menuFluids);
+        var combinedExternalFluids = new CombinedFluidTank(externalFluids);
 
         this.itemHandlerCap = LazyOptional.of(() -> externalItems);
-        this.menuItemHandlerCap = LazyOptional.of(() -> menuItems);
-        this.fluidHandlerCap = LazyOptional.of(() -> combinedFluids);
+        this.menuItemHandlerCap = IMenuItemHandler.cap(menuItems);
+        this.fluidHandlerCap = LazyOptional.of(() -> combinedExternalFluids);
+        this.menuFluidHandlerCap = LazyOptional.of(() -> combinedMenuFluids);
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
@@ -108,10 +121,9 @@ public class FlexibleStackContainer extends CapabilityProvider
             }
         }
 
-        var allowOutput = type.direction != PortDirection.INPUT;
         var internalPort = new ItemHandlerCollection(internalItems, minSlot, maxSlot);
         var menuPort = new ItemHandlerCollection(menuItems, minSlot, maxSlot);
-        var externalPort = new ItemHandlerCollection(externalItems, minSlot, maxSlot, allowOutput);
+        var externalPort = new ItemHandlerCollection(externalItems, minSlot, maxSlot);
         return new ContainerPort(type, internalPort, menuPort, externalPort);
     }
 
@@ -121,22 +133,25 @@ public class FlexibleStackContainer extends CapabilityProvider
         }
 
         var externalTanks = new WrapperFluidTank[slots.size()];
+        var menuTanks = new WrapperFluidTank[slots.size()];
         var internalTanks = new WrapperFluidTank[slots.size()];
         var k = 0;
         for (var slot : slots) {
             var i = slot.index();
             if (type == SlotType.FLUID_INPUT) {
+                menuFluids[i].resetFilter();
                 externalFluids[i].resetFilter();
+                externalFluids[i].allowOutput = false;
             }
             externalTanks[k] = externalFluids[i];
+            menuTanks[k] = menuFluids[i];
             internalTanks[k] = internalFluids[i];
             k++;
         }
 
-        var allowOutput = type.direction != PortDirection.INPUT;
         var internalPort = new CombinedFluidTank(internalTanks);
-        var menuPort = new CombinedFluidTank(externalTanks);
-        var externalPort = new CombinedFluidTank(allowOutput, externalTanks);
+        var menuPort = new CombinedFluidTank(menuTanks);
+        var externalPort = new CombinedFluidTank(externalTanks);
         return new ContainerPort(type, internalPort, menuPort, externalPort);
     }
 
@@ -172,8 +187,12 @@ public class FlexibleStackContainer extends CapabilityProvider
             externalItems.disallowInput(i);
             externalItems.setAllowOutput(i, true);
         }
+        for (var menuFluid : menuFluids) {
+            menuFluid.disallowInput();
+        }
         for (var externalFluid : externalFluids) {
             externalFluid.disallowInput();
+            externalFluid.allowOutput = true;
         }
         ports.clear();
     }
@@ -213,12 +232,14 @@ public class FlexibleStackContainer extends CapabilityProvider
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == LAYOUT_PROVIDER.get() || cap == CONTAINER.get()) {
             return myself();
-        } else if (cap == MENU_FLUID_HANDLER.get()) {
-            return fluidHandlerCap.cast();
         } else if (cap == ITEM_HANDLER.get()) {
             return itemHandlerCap.cast();
         } else if (cap == MENU_ITEM_HANDLER.get()) {
             return menuItemHandlerCap.cast();
+        } else if (cap == FLUID_HANDLER.get()) {
+            return fluidHandlerCap.cast();
+        } else if (cap == MENU_FLUID_HANDLER.get()) {
+            return menuFluidHandlerCap.cast();
         }
         return LazyOptional.empty();
     }

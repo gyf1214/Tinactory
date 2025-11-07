@@ -2,18 +2,14 @@ package org.shsts.tinactory.core.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
+/**
+ * This interface is intended to allow manipulating individual slots for a fluidHandler.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IFluidStackHandler extends IFluidCollection {
-    int getTanks();
-
+public interface IFluidTanksHandler extends IFluidHandler {
     IFluidTank getTank(int index);
-
-    default FluidStack getFluidInTank(int index) {
-        return getTank(index).getFluid();
-    }
 }

@@ -34,24 +34,18 @@ public class ItemHandlerCollection implements IItemCollection, IItemFilter, IPor
     private final int minSlot;
     private final int maxSlot;
     private final RangedWrapper rangedWrapper;
-    private final boolean acceptOutput;
 
-    public ItemHandlerCollection(IItemHandlerModifiable itemHandler, int minSlot, int maxSlot, boolean acceptOutput) {
+    public ItemHandlerCollection(IItemHandlerModifiable itemHandler, int minSlot, int maxSlot) {
         this.itemHandler = itemHandler;
         this.minSlot = minSlot;
         this.maxSlot = maxSlot;
         this.rangedWrapper = new RangedWrapper(itemHandler, minSlot, maxSlot);
-        this.acceptOutput = acceptOutput;
 
         if (itemHandler instanceof IPortNotifier notifier1) {
             this.notifier = notifier1;
         } else {
             this.notifier = null;
         }
-    }
-
-    public ItemHandlerCollection(IItemHandlerModifiable itemHandler, int minSlot, int maxSlot) {
-        this(itemHandler, minSlot, maxSlot, true);
     }
 
     public ItemHandlerCollection(IItemHandlerModifiable itemHandler) {
@@ -70,7 +64,16 @@ public class ItemHandlerCollection implements IItemCollection, IItemFilter, IPor
 
     @Override
     public boolean acceptOutput() {
-        return acceptOutput;
+        // if the inner handler is not a wrapper, we don't know whether it accepts output
+        if (!(itemHandler instanceof WrapperItemHandler wrapper)) {
+            return true;
+        }
+        for (var i = minSlot; i < maxSlot; i++) {
+            if (wrapper.allowOutput(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -10,7 +10,7 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
-import org.shsts.tinactory.core.logistics.IFluidStackHandler;
+import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.slf4j.Logger;
@@ -205,7 +205,7 @@ public class InventoryMenu extends MenuBase {
         return success;
     }
 
-    protected void clickFluidSlot(IFluidStackHandler container, int tankIndex, int button) {
+    protected void clickFluidSlot(IFluidTanksHandler container, int tankIndex, int button) {
         var tank = container.getTank(tankIndex);
         clickFluidSlot((carried, mayDrain, mayFill) ->
             doClickFluidSlot(carried, tank, mayDrain, mayFill), button);

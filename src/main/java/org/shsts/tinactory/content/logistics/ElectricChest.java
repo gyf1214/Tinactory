@@ -40,7 +40,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     private final WrapperItemHandler internalItems;
     private final IItemCollection externalPort;
     private final ItemStack[] filters;
-    private final LazyOptional<?> itemHandlerCap;
+    private final LazyOptional<IItemHandler> itemHandlerCap;
 
     private class VoidableItemHandler extends WrapperItemHandler {
         public VoidableItemHandler(IItemHandlerModifiable compose) {

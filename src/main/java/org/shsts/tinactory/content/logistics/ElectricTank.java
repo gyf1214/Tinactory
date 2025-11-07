@@ -15,7 +15,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
-import org.shsts.tinactory.core.logistics.IFluidStackHandler;
+import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -24,6 +24,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Arrays;
 
+import static org.shsts.tinactory.content.AllCapabilities.FLUID_HANDLER;
 import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
 
 @ParametersAreNonnullByDefault
@@ -36,7 +37,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     private final WrapperFluidTank[] tanks;
     private final CombinedFluidTank port;
     private final FluidStack[] filters;
-    private final LazyOptional<IFluidStackHandler> fluidHandlerCap;
+    private final LazyOptional<IFluidTanksHandler> fluidHandlerCap;
 
     private class VoidableFluidTank extends WrapperFluidTank {
         public VoidableFluidTank(int capacity) {
@@ -123,7 +124,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == MENU_FLUID_HANDLER.get()) {
+        if (cap == FLUID_HANDLER.get() || cap == MENU_FLUID_HANDLER.get()) {
             return fluidHandlerCap.cast();
         }
         return super.getCapability(cap, side);

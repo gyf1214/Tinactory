@@ -10,6 +10,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IFluidFilter;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
@@ -22,66 +23,19 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter,
+public class CombinedFluidTank implements IFluidTanksHandler, IFluidCollection, IFluidFilter,
     IPortNotifier, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final WrapperFluidTank[] tanks;
-    private final boolean acceptOutput;
-
-    public CombinedFluidTank(boolean acceptOutput, WrapperFluidTank... tanks) {
-        this.tanks = tanks;
-        this.acceptOutput = acceptOutput;
-    }
 
     public CombinedFluidTank(WrapperFluidTank... tanks) {
-        this(true, tanks);
+        this.tanks = tanks;
     }
 
     @Override
     public int getTanks() {
         return tanks.length;
-    }
-
-    @Override
-    public IFluidTank getTank(int index) {
-        if (index < 0 || index >= tanks.length) {
-            return WrapperFluidTank.EMPTY;
-        }
-        return tanks[index];
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        var size = tanks.length;
-        var tankTags = new ListTag();
-        for (var i = 0; i < size; i++) {
-            var tank = tanks[i];
-            if (!tank.getFluid().isEmpty()) {
-                var fluidTag = tank.serializeNBT();
-                fluidTag.putInt("Tank", i);
-                tankTags.add(fluidTag);
-            }
-        }
-        var tag = new CompoundTag();
-        tag.putInt("Size", size);
-        tag.put("Tanks", tankTags);
-        return tag;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag tag) {
-        for (var tank : tanks) {
-            tank.setFluid(FluidStack.EMPTY);
-        }
-        var listTag = tag.getList("Tanks", Tag.TAG_COMPOUND);
-        for (var i = 0; i < listTag.size(); i++) {
-            var tankTag = listTag.getCompound(i);
-            var index = tankTag.getInt("Tank");
-            if (index >= 0 && index < tanks.length) {
-                tanks[index].deserializeNBT(tankTag);
-            }
-        }
     }
 
     @Override
@@ -91,7 +45,7 @@ public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter,
 
     @Override
     public boolean acceptOutput() {
-        return acceptOutput;
+        return Arrays.stream(tanks).anyMatch($ -> $.allowOutput);
     }
 
     @Override
@@ -166,6 +120,21 @@ public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter,
     }
 
     @Override
+    public int fill(FluidStack fluid, FluidAction action) {
+        return fill(fluid, action.simulate());
+    }
+
+    @Override
+    public FluidStack drain(FluidStack fluid, FluidAction action) {
+        return drain(fluid, action.simulate());
+    }
+
+    @Override
+    public FluidStack drain(int limit, FluidAction action) {
+        return drain(limit, action.simulate());
+    }
+
+    @Override
     public int getFluidAmount(FluidStack fluid) {
         if (fluid.isEmpty() || !acceptOutput()) {
             return 0;
@@ -189,6 +158,26 @@ public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter,
             .map(WrapperFluidTank::getFluid)
             .filter(f -> !f.isEmpty())
             .toList();
+    }
+
+    @Override
+    public IFluidTank getTank(int index) {
+        return tanks[index];
+    }
+
+    @Override
+    public FluidStack getFluidInTank(int tank) {
+        return tanks[tank].getFluid();
+    }
+
+    @Override
+    public int getTankCapacity(int tank) {
+        return tanks[tank].getCapacity();
+    }
+
+    @Override
+    public boolean isFluidValid(int tank, FluidStack fluid) {
+        return tanks[tank].isFluidValid(fluid);
     }
 
     @Override
@@ -220,6 +209,39 @@ public class CombinedFluidTank implements IFluidStackHandler, IFluidFilter,
     public void unregisterListener(Runnable listener) {
         for (var tank : tanks) {
             tank.unregisterListener(listener);
+        }
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        var size = tanks.length;
+        var tankTags = new ListTag();
+        for (var i = 0; i < size; i++) {
+            var tank = tanks[i];
+            if (!tank.getFluid().isEmpty()) {
+                var fluidTag = tank.serializeNBT();
+                fluidTag.putInt("Tank", i);
+                tankTags.add(fluidTag);
+            }
+        }
+        var tag = new CompoundTag();
+        tag.putInt("Size", size);
+        tag.put("Tanks", tankTags);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        for (var tank : tanks) {
+            tank.setFluid(FluidStack.EMPTY);
+        }
+        var listTag = tag.getList("Tanks", Tag.TAG_COMPOUND);
+        for (var i = 0; i < listTag.size(); i++) {
+            var tankTag = listTag.getCompound(i);
+            var index = tankTag.getInt("Tank");
+            if (index >= 0 && index < tanks.length) {
+                tanks[index].deserializeNBT(tankTag);
+            }
         }
     }
 }

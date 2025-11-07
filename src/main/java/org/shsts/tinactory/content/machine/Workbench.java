@@ -21,6 +21,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.recipe.ToolRecipe;
@@ -129,7 +130,7 @@ public class Workbench extends CapabilityProvider implements
     @Nullable
     private Object currentRecipe = null;
 
-    private final LazyOptional<?> itemHandlerCap;
+    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
 
     private Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
@@ -145,7 +146,7 @@ public class Workbench extends CapabilityProvider implements
             new CombinedInvWrapper(toolStorage, craftingView));
         this.itemView.onUpdate(this::onUpdate);
 
-        this.itemHandlerCap = LazyOptional.of(() -> itemView);
+        this.menuItemHandlerCap = IMenuItemHandler.cap(itemView);
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
@@ -259,7 +260,7 @@ public class Workbench extends CapabilityProvider implements
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == MENU_ITEM_HANDLER.get()) {
-            return itemHandlerCap.cast();
+            return menuItemHandlerCap.cast();
         }
         return LazyOptional.empty();
     }

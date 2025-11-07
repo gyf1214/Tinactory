@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
@@ -23,6 +22,7 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidCollection;
 import org.shsts.tinactory.core.logistics.CombinedItemCollection;
+import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
@@ -69,7 +69,7 @@ public class MEDrive extends CapabilityProvider
     private final WrapperItemHandler storages;
     private final CombinedItemCollection combinedItems;
     private final CombinedFluidCollection combinedFluids;
-    private final LazyOptional<IItemHandler> itemHandlerCap;
+    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
     private final LazyOptional<IElectricMachine> electricCap;
 
     private IMachine machine;
@@ -84,7 +84,7 @@ public class MEDrive extends CapabilityProvider
         for (var i = 0; i < size; i++) {
             storages.setFilter(i, this::allowItem);
         }
-        this.itemHandlerCap = LazyOptional.of(() -> storages);
+        this.menuItemHandlerCap = IMenuItemHandler.cap(storages);
         storages.onUpdate(this::onStorageChange);
 
         this.combinedItems = new CombinedItemCollection();
@@ -187,7 +187,7 @@ public class MEDrive extends CapabilityProvider
         if (cap == LAYOUT_PROVIDER.get()) {
             return myself();
         } else if (cap == MENU_ITEM_HANDLER.get()) {
-            return itemHandlerCap.cast();
+            return menuItemHandlerCap.cast();
         } else if (cap == ELECTRIC_MACHINE.get()) {
             return electricCap.cast();
         }
