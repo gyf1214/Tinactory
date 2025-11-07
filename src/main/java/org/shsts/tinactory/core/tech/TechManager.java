@@ -150,6 +150,11 @@ public class TechManager implements ITechManager {
             return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
         }
 
+        @Override
+        public int nextId() {
+            return TinactorySavedData.get().nextId();
+        }
+
         private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
             var p = team.fullUpdatePacket();
             CHANNEL.sendToPlayer(player, p);

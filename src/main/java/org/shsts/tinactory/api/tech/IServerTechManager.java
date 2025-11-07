@@ -10,6 +10,8 @@ public interface IServerTechManager extends ITechManager {
 
     Optional<? extends IServerTeamProfile> teamByName(String name);
 
+    int nextId();
+
     void addPlayerToTeam(ServerPlayer player, ITeamProfile team);
 
     void newTeam(ServerPlayer player, String name);

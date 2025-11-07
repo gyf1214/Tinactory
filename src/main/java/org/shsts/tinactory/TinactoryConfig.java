@@ -23,6 +23,7 @@ public final class TinactoryConfig {
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
     public final ConfigValue<Integer> multiblockCheckCycle;
     public final ConfigValue<Boolean> allowTeamSpawnCommands;
+    public final ConfigValue<Integer> teamSpread;
 
     public TinactoryConfig(ForgeConfigSpec.Builder builder) {
         builder.push("logistics");
@@ -67,6 +68,7 @@ public final class TinactoryConfig {
         builder.push("team");
         allowTeamSpawnCommands = builder.comment("Allow commands to manage team spawn points")
             .define("allow_team_spawn_commands", false);
+        teamSpread = builder.comment("Spread of teams").define("team_spread", 1024);
         builder.pop();
     }
 

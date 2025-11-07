@@ -29,6 +29,8 @@ public class PlayerStartFeature extends Feature<NoneFeatureConfiguration> {
         }
         var chestPos = pos.offset(0, 1, 1);
         world.setBlock(chestPos, Blocks.CHEST.defaultBlockState(), 3);
+        world.setBlock(chestPos.east(), Blocks.TORCH.defaultBlockState(), 3);
+        world.setBlock(chestPos.west(), Blocks.TORCH.defaultBlockState(), 3);
         world.getBlockEntity(chestPos, BlockEntityType.CHEST).ifPresent(chest -> {
             chest.setItem(0, new ItemStack(Blocks.GRASS_BLOCK, 64));
             chest.setItem(1, new ItemStack(Blocks.DIRT, 64));
@@ -37,6 +39,7 @@ public class PlayerStartFeature extends Feature<NoneFeatureConfiguration> {
             chest.setItem(4, new ItemStack(Items.BONE_MEAL, 16));
             chest.setItem(5, new ItemStack(Items.WATER_BUCKET));
             chest.setItem(6, new ItemStack(Items.WATER_BUCKET));
+            chest.setItem(7, new ItemStack(Items.TORCH, 64));
         });
         return true;
     }

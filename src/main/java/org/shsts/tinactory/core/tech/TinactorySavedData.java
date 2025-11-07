@@ -20,10 +20,14 @@ import java.util.Map;
 public class TinactorySavedData extends SavedData {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String NAME = "tinactory_saved_data";
-
+    private int nextId = 0;
     private final Map<String, TeamProfile> teams = new HashMap<>();
 
     private TinactorySavedData() {}
+
+    public int nextId() {
+        return nextId;
+    }
 
     @Override
     public CompoundTag save(CompoundTag tag) {
@@ -32,6 +36,7 @@ public class TinactorySavedData extends SavedData {
             .map(TeamProfile::serializeNBT)
             .forEach(teamsTag::add);
         tag.put("teams", teamsTag);
+        tag.putInt("nextId", nextId);
         return tag;
     }
 
@@ -40,11 +45,13 @@ public class TinactorySavedData extends SavedData {
         tag.getList("teams", Tag.TAG_COMPOUND).stream()
             .flatMap(tag1 -> TeamProfile.fromTag(tag1).stream())
             .forEach(team -> teams.put(team.getName(), team));
+        nextId = tag.getInt("nextId");
     }
 
     public TeamProfile getTeamProfile(PlayerTeam playerTeam) {
         if (!teams.containsKey(playerTeam.getName())) {
             teams.put(playerTeam.getName(), TeamProfile.create(playerTeam));
+            nextId++;
             setDirty();
         }
         return teams.get(playerTeam.getName());
