@@ -118,6 +118,31 @@ public class MachineRecipeBook extends Panel {
                 return recipe.buttonToolTip();
             }
         }
+
+        private int findCurrentIndex() {
+            var currentLoc = getCurrentRecipeLoc();
+            if (currentLoc == null) {
+                return 0;
+            }
+            for (var i = 0; i < recipes.size(); i++) {
+                if (currentLoc.equals(recipes.get(i).loc())) {
+                    return i + 1;
+                }
+            }
+            return -1;
+        }
+
+        @Override
+        protected void doRefresh() {
+            var buttonCount = buttons.size();
+            if (buttonCount > 0) {
+                var currentIndex = findCurrentIndex();
+                if (currentIndex >= 0) {
+                    page = currentIndex / buttonCount;
+                }
+            }
+            super.doRefresh();
+        }
     }
 
     private final BlockEntity blockEntity;

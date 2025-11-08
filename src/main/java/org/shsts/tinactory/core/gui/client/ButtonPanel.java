@@ -30,9 +30,9 @@ public abstract class ButtonPanel extends Panel {
     private final int buttonWidth;
     private final int buttonHeight;
     private final int verticalSpacing;
-    private int page = 0;
+    protected int page = 0;
 
-    private final List<ItemButton> buttons = new ArrayList<>();
+    protected final List<ItemButton> buttons = new ArrayList<>();
     private final PageButton leftPageButton;
     private final PageButton rightPageButton;
 
@@ -172,7 +172,7 @@ public abstract class ButtonPanel extends Panel {
     protected void setPage(int index) {
         var buttonCount = buttons.size();
         var itemCount = getItemCount();
-        var maxPage = buttonCount == 0 ? 1 : Math.max(1, (itemCount + buttonCount - 1) / buttonCount);
+        var maxPage = buttonCount > 0 ? Math.max(1, (itemCount + buttonCount - 1) / buttonCount) : 1;
         var newPage = MathUtil.clamp(index, 0, maxPage - 1);
         leftPageButton.setActive(newPage != 0);
         rightPageButton.setActive(newPage != maxPage - 1);
