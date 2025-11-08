@@ -11,10 +11,7 @@ import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
-import org.shsts.tinactory.core.util.ClientUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,18 +38,11 @@ public record ProcessingRecipeBookItem(ProcessingRecipe recipe) implements IReci
 
     @Override
     public Optional<List<Component>> buttonToolTip() {
-        return recipe.getDescription().map(List::of)
-            .or(() -> ProcessingResults.mapItemOrFluid(recipe.getDisplay(),
-                ClientUtil::itemTooltip, fluid -> ClientUtil.fluidTooltip(fluid, false)));
+        return recipe.getDescription();
     }
 
     @Override
-    public void renderButton(PoseStack poseStack, Rect rect, int z) {
-        var x = rect.x() + 2;
-        var y = rect.y() + 2;
-        var output = recipe.getDisplay();
-        RenderUtil.renderIngredient(output,
-            stack -> RenderUtil.renderItem(stack, x, y),
-            stack -> RenderUtil.renderFluid(poseStack, stack, x, y, z));
+    public void render(PoseStack poseStack, Rect rect, int z) {
+        recipe.getDisplay().getValue().render(poseStack, rect, z);
     }
 }

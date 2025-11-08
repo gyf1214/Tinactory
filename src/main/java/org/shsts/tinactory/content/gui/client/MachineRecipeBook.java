@@ -87,10 +87,12 @@ public class MachineRecipeBook extends Panel {
             } else {
                 RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect);
             }
+
+            var rect1 = rect.offset(2, 2).enlarge(-5, -5);
             if (recipe == null) {
-                RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect.offset(2, 2).enlarge(-5, -5));
+                RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect1);
             } else {
-                recipe.renderButton(poseStack, rect, z);
+                recipe.render(poseStack, rect1, z);
             }
         }
 

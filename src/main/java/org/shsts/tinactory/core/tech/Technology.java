@@ -11,6 +11,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.client.IRenderable;
+import org.shsts.tinactory.core.gui.client.Renderables;
+import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -31,9 +33,9 @@ public class Technology implements ITechnology {
     private final Map<String, Integer> modifiers;
     private final long maxProgress;
     @Nullable
-    private final Item displayItem;
+    private final ItemStack displayItem;
     @Nullable
-    private final ResourceLocation displayTexture;
+    private final Texture displayTexture;
     private final int rank;
 
     public Technology(List<ResourceLocation> dependIds, long maxProgress, Map<String, Integer> modifiers,
@@ -41,8 +43,8 @@ public class Technology implements ITechnology {
         this.dependIds = dependIds;
         this.modifiers = modifiers;
         this.maxProgress = maxProgress;
-        this.displayItem = displayItem.orElse(null);
-        this.displayTexture = displayTexture.orElse(null);
+        this.displayItem = displayItem.map(ItemStack::new).orElse(null);
+        this.displayTexture = displayTexture.map($ -> new Texture($, 16, 16)).orElse(null);
         this.rank = rank;
     }
 
@@ -79,13 +81,16 @@ public class Technology implements ITechnology {
     }
 
     @Override
-    public ItemStack getDisplayItem() {
-        return displayItem != null ? new ItemStack(displayItem) : ItemStack.EMPTY;
-    }
-
-    @Override
-    public ResourceLocation getDisplayTexture() {
-        return displayTexture != null ? displayTexture : modLoc("void");
+    public DistLazy<IRenderable> getDisplay() {
+        return () -> () -> {
+            if (displayItem != null) {
+                return Renderables.item(displayItem);
+            } else if (displayTexture != null) {
+                return Renderables.texture(displayTexture);
+            } else {
+                return Renderables.VOID;
+            }
+        };
     }
 
     /**
@@ -124,9 +129,9 @@ public class Technology implements ITechnology {
         Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
         Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("modifiers").forGetter(tech -> tech.modifiers),
         ForgeRegistries.ITEMS.getCodec().optionalFieldOf("display_item")
-            .forGetter(tech -> Optional.ofNullable(tech.displayItem)),
+            .forGetter(tech -> Optional.ofNullable(tech.displayItem).map(ItemStack::getItem)),
         ResourceLocation.CODEC.optionalFieldOf("display_texture")
-            .forGetter(tech -> Optional.ofNullable(tech.displayTexture)),
+            .forGetter(tech -> Optional.ofNullable(tech.displayTexture).map(Texture::loc)),
         Codec.INT.fieldOf("rank").forGetter(tech -> tech.rank)
     ).apply(instance, Technology::new));
 }

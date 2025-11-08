@@ -6,6 +6,7 @@ import org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES
 import org.shsts.tinactory.content.AllRecipes.getTypeInfo
 import org.shsts.tinactory.content.AllTags
 import org.shsts.tinactory.core.material.OreVariant
+import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.MarkerBuilder
@@ -46,26 +47,26 @@ object Markers {
             oreProcess("thermal_centrifuge", "crushed")
             oreProcess("thermal_centrifuge", "crushed_purified")
 
-            extrude("stick")
+            extrude("stick", "rod")
             extrude("plate")
             extrude("ring")
             extrude("wire")
             extrude("bolt")
             extrude("gear")
             extrude("rotor")
-            extrude("pipe")
+            extrude("pipe", "pipe.normal")
 
             solidifier("ingot")
-            solidifier("dust")
-            solidifier("sheet")
+            solidifier("dust", "ball")
+            solidifier("sheet", "plate")
             solidifier("nugget")
-            solidifier("ring")
+            solidifier("ring", fromMod = true)
             solidifier("plate")
-            solidifier("stick")
-            solidifier("bolt")
+            solidifier("stick", fromMod = true)
+            solidifier("bolt", fromMod = true)
             solidifier("gear")
             solidifier("rotor")
-            solidifier("pipe")
+            solidifier("pipe", "block")
 
             for (variant in OreVariant.entries) {
                 val name = variant.serializedName
@@ -92,23 +93,27 @@ object Markers {
         }
     }
 
-    private fun MarkerFactory.extrude(sub: String) {
+    private fun MarkerFactory.extrude(sub: String, shape: String = sub) {
         recipe("extruder/material/$sub") {
             baseType("extruder")
             prefix("material/$sub")
             input(AllTags.EXTRUDER_INPUT, port = 0)
             extra {
-                display(AllTags.material(sub))
+                display(gregtech("items/metaitems/shape.extruder.$shape"))
             }
         }
     }
 
-    private fun MarkerFactory.solidifier(sub: String) {
+    private fun MarkerFactory.solidifier(sub: String, shape: String = sub, fromMod: Boolean = false) {
         recipe("fluid_solidifier/material/$sub") {
             baseType("fluid_solidifier")
             prefix("material/$sub")
             extra {
-                display(AllTags.material(sub))
+                if (fromMod) {
+                    display(modLoc("items/metaitems/shape.mold.$shape"))
+                } else {
+                    display(gregtech("items/metaitems/shape.mold.$shape"))
+                }
             }
         }
     }

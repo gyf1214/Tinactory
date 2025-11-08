@@ -68,8 +68,8 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
     }
 
     @Override
-    public void renderButton(PoseStack poseStack, Rect rect, int z) {
+    public void render(PoseStack poseStack, Rect rect, int z) {
         RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
-            .ifPresent(item -> RenderUtil.renderItem(item, rect.x() + 2, rect.y() + 2));
+            .ifPresent(item -> RenderUtil.renderItem(item, rect.x(), rect.y()));
     }
 }

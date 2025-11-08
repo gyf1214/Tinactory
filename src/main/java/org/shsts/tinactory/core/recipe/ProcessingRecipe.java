@@ -20,8 +20,12 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
+import org.shsts.tinactory.core.gui.client.IRenderable;
+import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
+import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -144,24 +148,35 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
     }
 
-    public Optional<String> getDescriptionId() {
+    protected Optional<String> getDescriptionId() {
         return Optional.empty();
     }
 
-    public Optional<Component> getDescription() {
-        return getDescriptionId().map(I18n::tr);
+    public Optional<List<Component>> getDescription() {
+        return getDescriptionId().map($ -> List.of((Component) I18n.tr($)))
+            .or(() -> ProcessingResults.mapItemOrFluid(getDisplayObject(),
+                ClientUtil::itemTooltip, fluid -> ClientUtil.fluidTooltip(fluid, false)));
     }
 
-    public IProcessingObject getDisplay() {
+    public IProcessingObject getDisplayObject() {
         if (!outputs.isEmpty()) {
-            return outputs.stream().min(Comparator.comparingInt(Output::port))
-                .get().result;
+            return outputs.stream().min(Comparator.comparingInt(Output::port)).get().result;
         } else if (!inputs.isEmpty()) {
-            return inputs.stream().min(Comparator.comparingInt(Input::port))
-                .get().ingredient;
+            return inputs.stream().min(Comparator.comparingInt(Input::port)).get().ingredient;
         } else {
             return ProcessingResults.EMPTY;
         }
+    }
+
+    public DistLazy<IRenderable> getDisplay() {
+        return () -> () -> (poseStack, rect, z) -> {
+            var object = getDisplayObject();
+            var x = rect.x();
+            var y = rect.y();
+            RenderUtil.renderIngredient(object,
+                stack -> RenderUtil.renderItem(stack, x, y),
+                stack -> RenderUtil.renderFluid(poseStack, stack, x, y, z));
+        };
     }
 
     @Override

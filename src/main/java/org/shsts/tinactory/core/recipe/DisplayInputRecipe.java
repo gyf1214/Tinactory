@@ -14,7 +14,7 @@ public class DisplayInputRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public IProcessingObject getDisplay() {
+    public IProcessingObject getDisplayObject() {
         return inputs.get(0).ingredient();
     }
 

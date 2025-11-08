@@ -16,9 +16,13 @@ import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
+import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.client.IRenderable;
+import org.shsts.tinactory.core.gui.client.Renderables;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -32,14 +36,17 @@ public class MarkerRecipe extends ProcessingRecipe {
     private final String prefix;
     private final boolean requireMultiblock;
     @Nullable
-    private final IProcessingIngredient display;
+    private final IProcessingIngredient displayIngredient;
+    @Nullable
+    private final Texture displayTex;
 
     private MarkerRecipe(Builder builder) {
         super(builder);
         this.baseType = builder.getBaseType();
         this.prefix = builder.prefix;
         this.requireMultiblock = builder.requireMultiblock;
-        this.display = builder.display;
+        this.displayIngredient = builder.displayIngredient;
+        this.displayTex = builder.displayTex != null ? new Texture(builder.displayTex, 16, 16) : null;
     }
 
     @Override
@@ -48,9 +55,17 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public IProcessingObject getDisplay() {
-        if (display != null) {
-            return display;
+    public IProcessingObject getDisplayObject() {
+        if (displayIngredient != null) {
+            return displayIngredient;
+        }
+        return super.getDisplayObject();
+    }
+
+    @Override
+    public DistLazy<IRenderable> getDisplay() {
+        if (displayTex != null) {
+            return () -> () -> Renderables.texture(displayTex);
         }
         return super.getDisplay();
     }
@@ -89,7 +104,9 @@ public class MarkerRecipe extends ProcessingRecipe {
         private String prefix = "";
         private boolean requireMultiblock = false;
         @Nullable
-        private IProcessingIngredient display = null;
+        private IProcessingIngredient displayIngredient = null;
+        @Nullable
+        private ResourceLocation displayTex = null;
 
         public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
             super(parent, loc);
@@ -111,7 +128,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
 
         public Builder display(IProcessingIngredient value) {
-            this.display = value;
+            this.displayIngredient = value;
             return this;
         }
 
@@ -121,6 +138,11 @@ public class MarkerRecipe extends ProcessingRecipe {
 
         public Builder display(TagKey<Item> tag) {
             return display(new ProcessingIngredients.TagIngredient(tag, 1));
+        }
+
+        public Builder display(ResourceLocation tex) {
+            displayTex = tex;
+            return this;
         }
 
         public RecipeType<?> getBaseType() {
@@ -147,8 +169,13 @@ public class MarkerRecipe extends ProcessingRecipe {
                 .prefix(GsonHelper.getAsString(jo, "prefix", ""))
                 .requireMultiblock(GsonHelper.getAsBoolean(jo, "require_multiblock", false));
             if (jo.has("display")) {
-                var jo1 = GsonHelper.getAsJsonObject(jo, "display");
-                builder.display(ProcessingIngredients.fromJson(jo1));
+                if (jo.get("display").isJsonObject()) {
+                    var jo1 = GsonHelper.getAsJsonObject(jo, "display");
+                    builder.display(ProcessingIngredients.fromJson(jo1));
+                } else {
+                    var tex = new ResourceLocation(GsonHelper.getAsString(jo, "display"));
+                    builder.display(tex);
+                }
             }
             return builder;
         }
@@ -159,8 +186,10 @@ public class MarkerRecipe extends ProcessingRecipe {
             jo.addProperty("base_type", recipe.baseType.toString());
             jo.addProperty("prefix", recipe.prefix);
             jo.addProperty("require_multiblock", recipe.requireMultiblock);
-            if (recipe.display != null) {
-                jo.add("display", ProcessingIngredients.toJson(recipe.display));
+            if (recipe.displayTex != null) {
+                jo.addProperty("display", recipe.displayTex.loc().toString());
+            } else if (recipe.displayIngredient != null) {
+                jo.add("display", ProcessingIngredients.toJson(recipe.displayIngredient));
             }
         }
     }
