@@ -46,9 +46,9 @@
     ],
     [
       "CCC",
-      "CAC",
-      "CAC",
-      "CAC",
+      "CPC",
+      "CPC",
+      "CPC",
       "R$R"
     ],
     [
@@ -65,6 +65,6 @@
       "block": "tinactory:multiblock/solid/stable_titanium"
     },
     "R": "tinactory:multiblock/misc/turbine_blade",
-    "A": "air"
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing"
   }
 }

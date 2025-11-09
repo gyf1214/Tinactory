@@ -29,26 +29,31 @@
   "appearance": "tinactory:multiblock/solid/stable_titanium",
   "layers": [
     [
-      "CCC",
-      "CCC",
-      "CCC",
-      "BBB"
-    ],
-    [
-      "CCC",
-      "LLL",
-      "LLL",
+      "BBB",
+      "BBB",
+      "BBB",
       "B$B"
     ],
     [
+      "CGC",
+      "GLG",
+      "GAG",
+      "CGC"
+    ],
+    [
       "CCC",
-      "CCC",
-      "CCC",
-      "BBB"
+      "CRC",
+      "CRC",
+      "CCC"
     ]
   ],
   "defines": {
     "C": "tinactory:multiblock/solid/stable_titanium",
+    "G": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
     "L": {
       "type": "tag_with_same_block",
       "key": "lens",
@@ -57,6 +62,8 @@
     "B": {
       "type": "block_or_interface",
       "block": "tinactory:multiblock/solid/stable_titanium"
-    }
+    },
+    "R": "tinactory:multiblock/misc/grate_machine_casing",
+    "A": "air"
   }
 }

@@ -14,7 +14,9 @@ import org.shsts.tinactory.content.AllTags.CLEANROOM_DOOR
 import org.shsts.tinactory.content.AllTags.CLEANROOM_WALL
 import org.shsts.tinactory.content.AllTags.COIL
 import org.shsts.tinactory.content.AllTags.ELECTRIC_FURNACE
+import org.shsts.tinactory.content.AllTags.GLASS_CASING
 import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WRENCH
+import org.shsts.tinactory.content.AllTags.POWER_BLOCK
 import org.shsts.tinactory.content.AllTags.machine
 import org.shsts.tinactory.content.multiblock.TurbineBlock.CENTER_BLADE
 import org.shsts.tinactory.content.network.MachineBlock
@@ -27,6 +29,7 @@ import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.Models
+import org.shsts.tinactory.datagen.content.Models.cubeCasing
 import org.shsts.tinactory.datagen.content.Models.cubeColumn
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.solidBlock
@@ -41,7 +44,9 @@ import org.shsts.tinactory.datagen.content.builder.BlockDataFactory
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
@@ -107,6 +112,11 @@ object Multiblocks {
                 tag(Tags.Blocks.GLASS)
             }
 
+            misc("hardened_glass") {
+                blockState(solidBlock("casings/transparent/tempered_glass"))
+                tag(GLASS_CASING)
+            }
+
             misc("plascrete") {
                 blockState(solidBlock("casings/cleanroom/plascrete"))
                 tag(CLEANROOM_WALL)
@@ -130,12 +140,14 @@ object Multiblocks {
             }
 
             misc("lithography_lens/basic") {
-                blockState(solidBlock("casings/transparent/cleanroom_glass"))
+                blockState(cubeCasing("casings/solid/machine_casing_solid_steel",
+                    "overlay/machine/overlay_laser_target"))
                 tag(AllTags.LITHOGRAPHY_LENS)
             }
 
             misc("lithography_lens/good") {
-                blockState(solidBlock("casings/transparent/laminated_glass"))
+                blockState(cubeCasing("casings/solid/machine_casing_stable_titanium",
+                    "overlay/machine/overlay_laser_source"))
                 tag(AllTags.LITHOGRAPHY_LENS)
             }
 
@@ -157,13 +169,15 @@ object Multiblocks {
                 val texName = if (v == Voltage.HV) "empty_tier_i" else "lapotronic_${v.id}"
                 misc("power_block/${v.id}") {
                     blockState(cubeColumn("casings/battery/$texName"))
-                    tag(AllTags.POWER)
+                    tag(POWER_BLOCK)
                 }
             }
         }
 
         dataGen {
             tag(BlockTags.DOORS, CLEANROOM_DOOR)
+            tag(GLASS_CASING, CLEANROOM_WALL)
+            tag(GLASS_CASING, Tags.Blocks.GLASS)
         }
     }
 
@@ -281,13 +295,23 @@ object Multiblocks {
             misc("lithography_lens/basic") {
                 input("titanium", "stick", 4)
                 component("robot_arm", 2)
-                input("ruby", "lens", 4)
-                input("diamond", "lens", 4)
-                input("sapphire", "lens", 4)
-                input("emerald", "lens", 4)
+                input("ruby", "lens", 16)
+                input("diamond", "lens", 16)
+                input("sapphire", "lens", 16)
+                input("emerald", "lens", 16)
+                input("steel", "plate", 6)
                 input("soldering_alloy", amount = 3)
                 workTicks(320)
                 tech(Technologies.LITHOGRAPHY)
+            }
+        }
+
+        arcFurnace {
+            misc("hardened_glass") {
+                misc("clear_glass")
+                input("oxygen", amount = 0.6)
+                voltage(Voltage.HV)
+                workTicks(768)
             }
         }
 
@@ -321,8 +345,9 @@ object Multiblocks {
             misc("lithography_lens/good") {
                 misc("lithography_lens/basic")
                 component("robot_arm", 2)
-                input("topaz", "lens", 4)
-                input("blue_topaz", "lens", 4)
+                input("topaz", "lens", 16)
+                input("blue_topaz", "lens", 16)
+                input("titanium", "plate", 6)
                 input("soldering_alloy", amount = 3)
                 tech(Technologies.LITHOGRAPHY)
             }
@@ -355,8 +380,9 @@ object Multiblocks {
         input(SOLID_CASINGS.getValue(name).get())
     }
 
-    private fun AssemblyRecipeFactory.misc(name: String, amount: Int = 1,
-        block: AssemblyRecipeBuilder.() -> Unit) {
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>,
+        RB : ProcessingRecipeBuilder<B>> RecipeFactory<B, RB>.misc(
+        name: String, amount: Int = 1, block: RB.() -> Unit) {
         output(getBlock("multiblock/misc/$name"), amount, block = block)
     }
 

@@ -20,6 +20,13 @@
       "BBBBB",
       "BB$BB"
     ],
+    [
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB"
+    ],
     {
       "rows": [
         "CCCCC",
@@ -28,7 +35,7 @@
         "CPPPC",
         "CCCCC"
       ],
-      "height": "2-14"
+      "height": "1-14"
     },
     [
       "CCCCC",
@@ -43,7 +50,11 @@
       "type": "block_or_interface",
       "block": "tinactory:multiblock/solid/insulated_battery"
     },
-    "C": "tinactory:multiblock/solid/insulated_battery",
+    "C": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/insulated_battery"
+    },
     "P": {
       "type": "tag_with_same_block",
       "key": "power",

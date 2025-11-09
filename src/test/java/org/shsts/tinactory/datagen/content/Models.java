@@ -183,6 +183,24 @@ public final class Models {
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<Block,
+        U, BlockStateProvider>> cubeCasing(String casing, String overlay) {
+        return ctx -> {
+            var provider = ctx.provider();
+            var models = provider.models();
+            var existingHelper = models.existingFileHelper;
+            var baseModel = modLoc(CASING_MODEL);
+            var casingTex = gregtech("blocks/" + casing);
+            var overlayTex = gregtech("blocks/" + overlay);
+            var model = applyCasing(models.withExistingParent(ctx.id(), baseModel), casingTex, existingHelper)
+                .texture("front_overlay", overlayTex)
+                .texture("back_overlay", overlayTex)
+                .texture("left_overlay", overlayTex)
+                .texture("right_overlay", overlayTex);
+            provider.simpleBlock(ctx.object(), model);
+        };
+    }
+
+    public static <U extends Block> Consumer<IEntryDataContext<Block,
         U, BlockStateProvider>> cubeTint(String tex) {
         return ctx -> {
             var model = ctx.provider().models()

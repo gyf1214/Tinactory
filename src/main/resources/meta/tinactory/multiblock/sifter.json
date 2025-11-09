@@ -56,24 +56,24 @@
   "appearance": "tinactory:multiblock/solid/solid_steel",
   "layers": [
     [
-      "     ",
+      " B B ",
+      "BBBBB",
       " BBB ",
-      " BBB ",
-      " BBB ",
-      "     "
+      "BBBBB",
+      " B B "
     ],
     [
-      "     ",
-      " CCC ",
+      " C C ",
+      "CACAC",
       " CAC ",
-      " CCC ",
-      "     "
+      "CACAC",
+      " C C "
     ],
     [
       " CCC ",
-      "CAAAC",
-      "CAAAC",
-      "CAAAC",
+      "CGGGC",
+      "CGGGC",
+      "CGGGC",
       " CCC "
     ],
     [
@@ -85,9 +85,9 @@
     ],
     [
       " CCC ",
-      "CGGGC",
-      "CGGGC",
-      "CGGGC",
+      "CAAAC",
+      "CAAAC",
+      "CAAAC",
       " CCC "
     ]
   ],

@@ -30,30 +30,43 @@
   "appearance": "tinactory:multiblock/solid/frost_proof",
   "layers": [
     [
-      "CCC",
-      "CCC",
-      "CCC",
-      "BBB"
+      "BCCCC",
+      "BCCCC",
+      "BCCCC"
     ],
     [
-      "CCC",
-      "CLC",
-      "CLC",
-      "B$B"
+      "BCWWC",
+      "BAGGC",
+      "B$WWC"
     ],
     [
-      "CCC",
-      "CCC",
-      "CCC",
-      "BBB"
+      "BCWWC",
+      "BAAAC",
+      "BCWWC"
+    ],
+    [
+      " CWWC",
+      " CGGC",
+      " CWWC"
+    ],
+    [
+      " CCCC",
+      " CCCC",
+      " CCCC"
     ]
   ],
   "defines": {
     "C": "tinactory:multiblock/solid/frost_proof",
-    "L": "tinactory:multiblock/misc/metal_processing_chamber",
+    "G": "tinactory:multiblock/misc/metal_processing_chamber",
+    "W": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/frost_proof"
+    },
     "B": {
       "type": "block_or_interface",
       "block": "tinactory:multiblock/solid/frost_proof"
-    }
+    },
+    "A": "air"
   }
 }

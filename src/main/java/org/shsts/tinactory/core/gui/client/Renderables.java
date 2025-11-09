@@ -15,7 +15,11 @@ public final class Renderables {
     public static IRenderable VOID = (poseStack, rect, z) -> {};
 
     public static IRenderable item(ItemStack stack) {
-        return (poseStack, rect, z) -> RenderUtil.renderItem(stack, rect.x(), rect.y());
+        return (poseStack, rect, z) -> {
+            var poseStack1 = RenderUtil.applyToModelViewStack(poseStack);
+            RenderUtil.renderItem(stack, rect.x(), rect.y());
+            RenderUtil.popModelViewStack(poseStack1);
+        };
     }
 
     public static IRenderable fluid(FluidStack stack) {

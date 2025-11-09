@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.GlassBlock;
+import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LensBlock extends GlassBlock {
+public class LensBlock extends Block {
     private final List<Supplier<? extends Item>> lensSupp;
     @Nullable
     private List<Item> lens = null;

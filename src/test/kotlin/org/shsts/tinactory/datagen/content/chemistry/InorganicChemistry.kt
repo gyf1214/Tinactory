@@ -35,8 +35,8 @@ object InorganicChemistry {
             }
             input("chalcopyrite", amount = 2) {
                 input("oxygen", amount = 6)
-                output("iron", "ingot", 3)
                 output("copper", "ingot", 3)
+                output("iron", "ingot", 3)
                 output("sulfuric_acid", "gas", 6)
             }
             input("pyrite", amount = 2) {
@@ -81,8 +81,8 @@ object InorganicChemistry {
             }
             input("ilmenite", amount = 2) {
                 input("carbon")
-                output("iron", "ingot", 2)
                 output("rutile", amount = 2)
+                output("iron", "ingot", 2)
                 output("carbon_dioxide")
             }
         }

@@ -108,6 +108,7 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private void lens(String id, JsonObject jo) {
+        var materialColor = parseMaterialColor(jo, "materialColor");
         var ja = GsonHelper.getAsJsonArray(jo, "materials");
         var lens = new ArrayList<Supplier<? extends Item>>();
         for (var je : ja) {
@@ -117,7 +118,9 @@ public class MiscMeta extends MetaConsumer {
         }
 
         REGISTRATE.block(id, LensBlock.factory(lens))
-            .transform(MiscMeta::glass)
+            .material(Material.HEAVY_METAL, materialColor)
+            .properties(CASING_PROPERTY)
+            .translucent()
             .register();
     }
 
