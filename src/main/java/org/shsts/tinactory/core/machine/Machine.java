@@ -137,7 +137,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
      */
     private void createNetwork(Level world) {
         if (team != null) {
-            network = new Network(world, blockEntity.getBlockPos(), team);
+            network = new Network(world, uuid, blockEntity.getBlockPos(), team);
         }
     }
 
@@ -409,5 +409,10 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         Consumer<Boolean> setter) {
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
         signal.registerWrite(machine, STOP_SIGNAL, val -> setter.accept(val > 0));
+    }
+
+    @Override
+    public String toString() {
+        return "Machine[uuid=" + uuid + "]";
     }
 }

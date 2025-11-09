@@ -166,6 +166,7 @@ public class NetworkBase {
         }
         var pos = nextPos.get();
         if (manager.hasNetworkAtPos(pos)) {
+            LOGGER.debug("{}: invalidate conflict network at {}", this, pos);
             manager.invalidatePos(pos);
         }
         manager.putNetworkAtPos(pos, this);

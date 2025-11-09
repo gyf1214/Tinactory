@@ -83,7 +83,9 @@ public class MultiblockMeta extends MachineMeta {
                 case "power_substation" -> builder.child(Multiblock.builder(PowerSubstation::new));
                 case "large_boiler" -> {
                     var properties = FireBoiler.Properties.fromJson(jo);
-                    yield builder.child(Multiblock.builder((be, $) -> new LargeBoiler(be, $, properties)));
+                    var baseBoilerParallel = GsonHelper.getAsDouble(jo, "baseBoilerParallel");
+                    yield builder.child(Multiblock.builder((be, $) ->
+                        new LargeBoiler(be, $, properties, baseBoilerParallel)));
                 }
                 default -> {
                     if (machineType.equals(recipeTypeStr)) {

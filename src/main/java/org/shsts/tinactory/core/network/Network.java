@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 
@@ -29,6 +30,7 @@ import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 public class Network extends NetworkBase implements INetwork {
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    private final UUID uuid;
     private final Map<IComponentType<?>, INetworkComponent> components = new HashMap<>();
     private final Multimap<BlockPos, IMachine> subnetMachines = ArrayListMultimap.create();
     private final Map<BlockPos, BlockPos> blockSubnets = new HashMap<>();
@@ -37,8 +39,9 @@ public class Network extends NetworkBase implements INetwork {
     private final Multimap<IScheduling, INetworkComponent.Ticker> machineSchedulings =
         ArrayListMultimap.create();
 
-    public Network(Level world, BlockPos center, TeamProfile team) {
+    public Network(Level world, UUID uuid, BlockPos center, TeamProfile team) {
         super(world, center, team);
+        this.uuid = uuid;
         attachComponents();
     }
 
@@ -144,5 +147,10 @@ public class Network extends NetworkBase implements INetwork {
                 ticker.tick(world, this);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Network[uuid=" + uuid + "]";
     }
 }

@@ -5,6 +5,7 @@
   "baseDecay": 0.0002,
   "burnSpeed": 45,
   "burnHeat": 1,
+  "baseBoilerParallel": 3,
   "layout": {
     "slots": [
       {

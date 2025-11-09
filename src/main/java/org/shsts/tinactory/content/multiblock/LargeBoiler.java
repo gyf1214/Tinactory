@@ -14,9 +14,12 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.machine.FireBoiler;
+import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.ArrayList;
@@ -24,19 +27,21 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.AllEvents.CONNECT;
+import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.content.multiblock.FixedBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LargeBoiler extends Multiblock implements INBTSerializable<CompoundTag> {
     private final FireBoiler boiler;
-    private final LazyOptional<IProcessor> processorCap;
     private final List<BlockPos> fireboxes = new ArrayList<>();
+    private final LazyOptional<IProcessor> processorCap;
 
     private int boilParallel = 1;
 
     public LargeBoiler(BlockEntity blockEntity, Builder<?> builder,
-        FireBoiler.Properties properties) {
+        FireBoiler.Properties properties, double baseBoilerParallel) {
         super(blockEntity, builder);
         this.boiler = new FireBoiler(properties) {
             @Override
@@ -46,7 +51,7 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
 
             @Override
             protected double boilParallel() {
-                return boilParallel;
+                return boilParallel * baseBoilerParallel;
             }
 
             @Override
@@ -66,7 +71,7 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     protected void doCheckMultiblock(CheckContext ctx) {
         super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
-            boilParallel = (int) ctx.getProperty("height") - 1;
+            boilParallel = (int) ctx.getProperty("height") - 2;
             fireboxes.clear();
             for (var pos : ctx.blocks) {
                 var block = ctx.getBlock(pos);
@@ -110,6 +115,19 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     @Override
     public IMenuType menu(IMachine machine) {
         return AllMenus.BOILER;
+    }
+
+    private void onConnect(INetwork network) {
+        if (multiblockInterface != null) {
+            Machine.registerStopSignal(network, multiblockInterface, boiler::setStopped);
+        }
+    }
+
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        super.subscribeEvents(eventManager);
+        eventManager.subscribe(CONNECT.get(), this::onConnect);
+        eventManager.subscribe(CONTAINER_CHANGE.get(), boiler::onUpdateContainer);
     }
 
     @Override
